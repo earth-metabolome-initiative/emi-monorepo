@@ -26,6 +26,7 @@ pub enum SampleAttribute {
     Id,
     Model,
     SampleSource,
+    SampleSourceModel,
 }
 impl core::str::FromStr for SampleAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
@@ -33,8 +34,10 @@ impl core::str::FromStr for SampleAttribute {
         match s {
             "Model" => Ok(Self::Model),
             "SampleSource" => Ok(Self::SampleSource),
+            "SampleSourceModel" => Ok(Self::SampleSourceModel),
             "model" => Ok(Self::Model),
             "sample_source" => Ok(Self::SampleSource),
+            "sample_source_model" => Ok(Self::SampleSourceModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
@@ -46,6 +49,7 @@ impl core::fmt::Display for SampleAttribute {
             Self::Id => write!(f, "samples.id"),
             Self::Model => write!(f, "samples.model"),
             Self::SampleSource => write!(f, "samples.sample_source"),
+            Self::SampleSourceModel => write!(f, "samples.sample_source_model"),
         }
     }
 }
@@ -59,6 +63,7 @@ pub struct InsertableSample {
     pub(crate) id: ::rosetta_uuid::Uuid,
     pub(crate) model: i32,
     pub(crate) sample_source: ::rosetta_uuid::Uuid,
+    pub(crate) sample_source_model: i32,
 }
 impl InsertableSample {
     pub fn id<C: diesel::connection::LoadConnection>(
@@ -106,6 +111,30 @@ impl InsertableSample {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::sample_models::SampleModel::read(self.model, conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn samples_model_sample_source_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::sample_models::SampleModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::sample_models::SampleModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::sample_models::sample_models::dsl::id
+                    .eq(&self.model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::sample_models::sample_models::dsl::sample_source_model
+                            .eq(&self.sample_source_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::sample_models::SampleModel,
+            >(conn)
+    }
     pub fn sample_source<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -123,6 +152,42 @@ impl InsertableSample {
             conn,
         )
     }
+    pub fn sample_source_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel::read(
+            self.sample_source_model,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn samples_sample_source_sample_source_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id
+                    .eq(&self.sample_source)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                            .eq(&self.sample_source_model),
+                    ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -134,6 +199,7 @@ pub struct InsertableSampleBuilder<
 > {
     pub(crate) model: Option<i32>,
     pub(crate) sample_source: Option<::rosetta_uuid::Uuid>,
+    pub(crate) sample_source_model: Option<i32>,
     pub(crate) id: PhysicalAsset,
 }
 impl From<InsertableSampleBuilder>
@@ -149,7 +215,12 @@ where
     PhysicalAsset: common_traits::builder::IsCompleteBuilder,
 {
     fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.model.is_some() && self.sample_source.is_some()
+        self.id.is_complete()
+            && self.model.is_some()
+            && self.sample_source.is_some()
+            && (self.sample_source_model.is_some()
+                || self.model.is_some()
+                || self.sample_source.is_some())
     }
 }
 /// Trait defining setters for attributes of an instance of `Sample` or
@@ -201,6 +272,28 @@ pub trait SampleSettable: Sized {
         self,
         sample_source: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
+    /// Sets the value of the `public.samples.sample_source_model` column.
+    ///
+    /// # Arguments
+    /// * `sample_source_model`: The value to set for the
+    ///   `public.samples.sample_source_model` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn sample_source_model(
+        self,
+        sample_source_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
@@ -221,23 +314,26 @@ impl<
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v3 ["`assets`"]
-    ///    v2@{shape: rounded, label: "model"}
-    ///class v2 undirectly-involved-column
+    ///subgraph v4 ["`assets`"]
+    ///    v3@{shape: rounded, label: "model"}
+    ///class v3 undirectly-involved-column
     ///end
-    ///subgraph v4 ["`physical_assets`"]
+    ///subgraph v5 ["`physical_assets`"]
     ///    v0@{shape: rounded, label: "model"}
     ///class v0 directly-involved-column
     ///end
-    ///subgraph v5 ["`samples`"]
+    ///subgraph v6 ["`samples`"]
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "sample_source_model"}
+    ///class v2 directly-involved-column
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v1 --->|"`ancestral same as`"| v2
+    ///v0 --->|"`ancestral same as`"| v3
+    ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v4 --->|"`extends`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
     ///v5 --->|"`extends`"| v4
+    ///v6 --->|"`extends`"| v5
     ///```
     fn model(
         mut self,
@@ -256,11 +352,36 @@ impl<
         Ok(self)
     }
     ///Sets the value of the `public.samples.sample_source` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///v0@{shape: rounded, label: "sample_source"}
+    ///class v0 column-of-interest
+    ///v1@{shape: rounded, label: "sample_source_model"}
+    ///class v1 directly-involved-column
+    ///v0 -.->|"`foreign defines`"| v1
+    ///```
     fn sample_source(
         mut self,
         sample_source: ::rosetta_uuid::Uuid,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
         self.sample_source = Some(sample_source);
+        Ok(self)
+    }
+    ///Sets the value of the `public.samples.sample_source_model` column.
+    fn sample_source_model(
+        mut self,
+        sample_source_model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.sample_source_model = Some(sample_source_model);
         Ok(self)
     }
 }

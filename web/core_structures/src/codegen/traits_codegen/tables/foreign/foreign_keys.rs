@@ -75,6 +75,7 @@ mod instrument_states;
 mod materials;
 mod next_procedure_templates;
 mod observation_subjects;
+mod organism_models;
 mod organism_taxa;
 mod organisms;
 mod packaging_models;

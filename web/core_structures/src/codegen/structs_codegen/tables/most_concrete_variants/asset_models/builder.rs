@@ -154,6 +154,10 @@ pub enum AssetModelBuilderDAG {
     FreezerModel(
         crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder,
     ),
+    ///Builder for the `organism_models` table.
+    OrganismModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableOrganismModelBuilder,
+    ),
     ///Builder for the `packaging_models` table.
     PackagingModel(
         crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder,
@@ -553,6 +557,15 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableFreeze
         value: crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder,
     ) -> Self {
         AssetModelBuilderDAG::FreezerModel(value)
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableOrganismModelBuilder>
+    for AssetModelBuilderDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertableOrganismModelBuilder,
+    ) -> Self {
+        AssetModelBuilderDAG::OrganismModel(value)
     }
 }
 impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder>

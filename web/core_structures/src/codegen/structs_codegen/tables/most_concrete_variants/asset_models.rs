@@ -45,23 +45,24 @@ pub use builder::AssetModelBuilderDAG;
 /// v35@{shape: rect, label: "digital_asset_models"}
 /// v36@{shape: rect, label: "freeze_dryer_models"}
 /// v37@{shape: rect, label: "freezer_models"}
-/// v38@{shape: rect, label: "packaging_models"}
-/// v39@{shape: rect, label: "phone_models"}
-/// v40@{shape: rect, label: "physical_asset_models"}
-/// v41@{shape: rect, label: "pipette_models"}
-/// v42@{shape: rect, label: "pipette_tip_models"}
-/// v43@{shape: rect, label: "positioning_device_models"}
-/// v44@{shape: rect, label: "reagent_models"}
-/// v45@{shape: rect, label: "sample_models"}
-/// v46@{shape: rect, label: "sample_source_models"}
-/// v47@{shape: rect, label: "volume_measuring_device_models"}
-/// v48@{shape: rect, label: "volumetric_container_models"}
-/// v49@{shape: rect, label: "weighing_device_models"}
-/// v1 --->|"`extends`"| v40
-/// v2 --->|"`extends`"| v40
-/// v3 --->|"`extends`"| v40
-/// v4 --->|"`extends`"| v40
-/// v5 --->|"`extends`"| v40
+/// v38@{shape: rect, label: "organism_models"}
+/// v39@{shape: rect, label: "packaging_models"}
+/// v40@{shape: rect, label: "phone_models"}
+/// v41@{shape: rect, label: "physical_asset_models"}
+/// v42@{shape: rect, label: "pipette_models"}
+/// v43@{shape: rect, label: "pipette_tip_models"}
+/// v44@{shape: rect, label: "positioning_device_models"}
+/// v45@{shape: rect, label: "reagent_models"}
+/// v46@{shape: rect, label: "sample_models"}
+/// v47@{shape: rect, label: "sample_source_models"}
+/// v48@{shape: rect, label: "volume_measuring_device_models"}
+/// v49@{shape: rect, label: "volumetric_container_models"}
+/// v50@{shape: rect, label: "weighing_device_models"}
+/// v1 --->|"`extends`"| v41
+/// v2 --->|"`extends`"| v41
+/// v3 --->|"`extends`"| v41
+/// v4 --->|"`extends`"| v41
+/// v5 --->|"`extends`"| v41
 /// v6 --->|"`extends`"| v28
 /// v6 --->|"`extends`"| v1
 /// v7 --->|"`extends`"| v1
@@ -91,48 +92,49 @@ pub use builder::AssetModelBuilderDAG;
 /// v19 --->|"`extends`"| v37
 /// v19 --->|"`extends`"| v29
 /// v20 --->|"`extends`"| v28
-/// v20 --->|"`extends`"| v38
-/// v21 --->|"`extends`"| v38
+/// v20 --->|"`extends`"| v39
+/// v21 --->|"`extends`"| v39
 /// v21 --->|"`extends`"| v29
 /// v22 --->|"`extends`"| v28
-/// v22 --->|"`extends`"| v41
-/// v23 --->|"`extends`"| v41
+/// v22 --->|"`extends`"| v42
+/// v23 --->|"`extends`"| v42
 /// v23 --->|"`extends`"| v29
 /// v24 --->|"`extends`"| v28
-/// v24 --->|"`extends`"| v42
-/// v25 --->|"`extends`"| v42
+/// v24 --->|"`extends`"| v43
+/// v25 --->|"`extends`"| v43
 /// v25 --->|"`extends`"| v29
 /// v26 --->|"`extends`"| v28
-/// v26 --->|"`extends`"| v43
-/// v27 --->|"`extends`"| v43
+/// v26 --->|"`extends`"| v44
+/// v27 --->|"`extends`"| v44
 /// v27 --->|"`extends`"| v29
-/// v28 --->|"`extends`"| v40
+/// v28 --->|"`extends`"| v41
 /// v29 --->|"`extends`"| v0
 /// v30 --->|"`extends`"| v28
-/// v30 --->|"`extends`"| v47
-/// v31 --->|"`extends`"| v47
+/// v30 --->|"`extends`"| v48
+/// v31 --->|"`extends`"| v48
 /// v31 --->|"`extends`"| v29
 /// v32 --->|"`extends`"| v28
-/// v32 --->|"`extends`"| v49
-/// v33 --->|"`extends`"| v49
+/// v32 --->|"`extends`"| v50
+/// v33 --->|"`extends`"| v50
 /// v33 --->|"`extends`"| v29
-/// v34 --->|"`extends`"| v40
+/// v34 --->|"`extends`"| v41
 /// v35 --->|"`extends`"| v0
-/// v36 --->|"`extends`"| v40
-/// v37 --->|"`extends`"| v40
-/// v38 --->|"`extends`"| v40
-/// v39 --->|"`extends`"| v3
-/// v39 --->|"`extends`"| v43
-/// v40 --->|"`extends`"| v0
-/// v41 --->|"`extends`"| v40
-/// v42 --->|"`extends`"| v40
-/// v43 --->|"`extends`"| v40
-/// v44 --->|"`extends`"| v0
-/// v45 --->|"`extends`"| v40
-/// v46 --->|"`extends`"| v40
-/// v47 --->|"`extends`"| v40
-/// v48 --->|"`extends`"| v34
-/// v49 --->|"`extends`"| v40
+/// v36 --->|"`extends`"| v41
+/// v37 --->|"`extends`"| v41
+/// v38 --->|"`extends`"| v47
+/// v39 --->|"`extends`"| v41
+/// v40 --->|"`extends`"| v3
+/// v40 --->|"`extends`"| v44
+/// v41 --->|"`extends`"| v0
+/// v42 --->|"`extends`"| v41
+/// v43 --->|"`extends`"| v41
+/// v44 --->|"`extends`"| v41
+/// v45 --->|"`extends`"| v0
+/// v46 --->|"`extends`"| v41
+/// v47 --->|"`extends`"| v41
+/// v48 --->|"`extends`"| v41
+/// v49 --->|"`extends`"| v34
+/// v50 --->|"`extends`"| v41
 /// ```
 pub enum AssetModelDAG {
     ///Variant representing the `asset_models` table.
@@ -277,6 +279,10 @@ pub enum AssetModelDAG {
     ),
     ///Variant representing the `freezer_models` table.
     FreezerModel(crate::codegen::structs_codegen::tables::freezer_models::FreezerModel),
+    ///Variant representing the `organism_models` table.
+    OrganismModel(
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel,
+    ),
     ///Variant representing the `packaging_models` table.
     PackagingModel(
         crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
@@ -643,6 +649,15 @@ impl From<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel>
         AssetModelDAG::FreezerModel(value)
     }
 }
+impl From<crate::codegen::structs_codegen::tables::organism_models::OrganismModel>
+    for AssetModelDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::organism_models::OrganismModel,
+    ) -> Self {
+        AssetModelDAG::OrganismModel(value)
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel>
     for AssetModelDAG
 {
@@ -848,6 +863,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::freezer_models::FreezerModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::organism_models::OrganismModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::packaging_models::PackagingModel: web_common_traits::database::Read<
@@ -1114,6 +1132,12 @@ where
                 }
                 "freezer_models" => {
                     <crate::codegen::structs_codegen::tables::freezer_models::FreezerModel as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "organism_models" => {
+                    <crate::codegen::structs_codegen::tables::organism_models::OrganismModel as web_common_traits::database::Read<
                         C,
                     >>::read(*self.id(), conn)?
                         .into()

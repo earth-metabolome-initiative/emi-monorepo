@@ -158,6 +158,8 @@ pub mod next_procedure_templates;
 pub use next_procedure_templates::NextProcedureTemplate;
 pub mod observation_subjects;
 pub use observation_subjects::ObservationSubject;
+pub mod organism_models;
+pub use organism_models::OrganismModel;
 pub mod organism_taxa;
 pub use organism_taxa::OrganismTaxon;
 pub mod organisms;

@@ -1,6 +1,9 @@
 //! Submodule to initialize the `instruments` in the database.
 
-use core_structures::{PhysicalAssetModel, User, tables::insertables::AssetModelSettable};
+use core_structures::{
+    OrganismModel, SampleModel, User,
+    tables::insertables::{AssetModelSettable, SampleModelSettable},
+};
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
@@ -14,14 +17,14 @@ use web_common_traits::database::{Insertable, InsertableVariant};
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn organism(user: &User, conn: &mut PgConnection) -> anyhow::Result<PhysicalAssetModel> {
+pub(crate) fn organism(user: &User, conn: &mut PgConnection) -> anyhow::Result<OrganismModel> {
     const ORGANISM: &str = "Organism";
 
-    if let Some(existing_organism) = PhysicalAssetModel::from_name(ORGANISM, conn).optional()? {
+    if let Some(existing_organism) = OrganismModel::from_name(ORGANISM, conn).optional()? {
         return Ok(existing_organism);
     }
 
-    Ok(PhysicalAssetModel::new()
+    Ok(OrganismModel::new()
         .name(ORGANISM)?
         .description("Organisms used in laboratory procedures")?
         .created_by(user.id)?
@@ -38,16 +41,17 @@ pub(crate) fn organism(user: &User, conn: &mut PgConnection) -> anyhow::Result<P
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn sample(user: &User, conn: &mut PgConnection) -> anyhow::Result<PhysicalAssetModel> {
-    const SAMPLE: &str = "sample";
+pub(crate) fn sample(user: &User, conn: &mut PgConnection) -> anyhow::Result<SampleModel> {
+    const SAMPLE: &str = "Organism Sample";
 
-    if let Some(existing_sample) = PhysicalAssetModel::from_name(SAMPLE, conn).optional()? {
+    if let Some(existing_sample) = SampleModel::from_name(SAMPLE, conn).optional()? {
         return Ok(existing_sample);
     }
 
-    Ok(PhysicalAssetModel::new()
+    Ok(SampleModel::new()
         .name(SAMPLE)?
         .description("Samples used in laboratory procedures")?
+        .sample_source_model(organism(user, conn)?.id)?
         .created_by(user.id)?
         .insert(user.id, conn)?)
 }

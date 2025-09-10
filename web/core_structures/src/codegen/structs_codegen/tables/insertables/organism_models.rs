@@ -1,49 +1,45 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum SampleModelExtensionAttribute {
-    PhysicalAssetModel(
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+pub enum OrganismModelExtensionAttribute {
+    SampleSourceModel(
+        crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
     ),
 }
-impl core::fmt::Display for SampleModelExtensionAttribute {
+impl core::fmt::Display for OrganismModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::PhysicalAssetModel(e) => write!(f, "{e}"),
+            Self::SampleSourceModel(e) => write!(f, "{e}"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
-    for SampleModelExtensionAttribute
+impl From<crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute>
+    for OrganismModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
     ) -> Self {
-        Self::PhysicalAssetModel(attribute)
+        Self::SampleSourceModel(attribute)
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum SampleModelAttribute {
-    Extension(SampleModelExtensionAttribute),
+pub enum OrganismModelAttribute {
+    Extension(OrganismModelExtensionAttribute),
     Id,
-    SampleSourceModel,
 }
-impl core::str::FromStr for SampleModelAttribute {
+impl core::str::FromStr for OrganismModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "SampleSourceModel" => Ok(Self::SampleSourceModel),
-            "sample_source_model" => Ok(Self::SampleSourceModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
 }
-impl core::fmt::Display for SampleModelAttribute {
+impl core::fmt::Display for OrganismModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "sample_models.id"),
-            Self::SampleSourceModel => write!(f, "sample_models.sample_source_model"),
+            Self::Id => write!(f, "organism_models.id"),
         }
     }
 }
@@ -51,32 +47,15 @@ impl core::fmt::Display for SampleModelAttribute {
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
     diesel(
-        table_name = crate::codegen::diesel_codegen::tables::sample_models::sample_models
+        table_name = crate::codegen::diesel_codegen::tables::organism_models::organism_models
     )
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InsertableSampleModel {
+pub struct InsertableOrganismModel {
     pub(crate) id: i32,
-    pub(crate) sample_source_model: i32,
 }
-impl InsertableSampleModel {
+impl InsertableOrganismModel {
     pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.id, conn,
-        )
-    }
-    pub fn sample_source_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -89,91 +68,63 @@ impl InsertableSampleModel {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel::read(
-            self.sample_source_model,
-            conn,
+            self.id, conn,
         )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InsertableSampleModelBuilder<
-    PhysicalAssetModel
-        = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
+pub struct InsertableOrganismModelBuilder<
+    SampleSourceModel
+        = crate::codegen::structs_codegen::tables::insertables::InsertableSampleSourceModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
+                crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
+            >,
         >,
 > {
-    pub(crate) sample_source_model: Option<i32>,
-    pub(crate) id: PhysicalAssetModel,
+    pub(crate) id: SampleSourceModel,
 }
-impl From<InsertableSampleModelBuilder>
-    for web_common_traits::database::IdOrBuilder<i32, InsertableSampleModelBuilder>
+impl From<InsertableOrganismModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableOrganismModelBuilder>
 {
-    fn from(builder: InsertableSampleModelBuilder) -> Self {
+    fn from(builder: InsertableOrganismModelBuilder) -> Self {
         Self::Builder(builder)
     }
 }
-impl<PhysicalAssetModel> common_traits::builder::IsCompleteBuilder
-    for crate::codegen::structs_codegen::tables::insertables::InsertableSampleModelBuilder<
-        PhysicalAssetModel,
+impl<SampleSourceModel> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableOrganismModelBuilder<
+        SampleSourceModel,
     >
 where
-    PhysicalAssetModel: common_traits::builder::IsCompleteBuilder,
+    SampleSourceModel: common_traits::builder::IsCompleteBuilder,
 {
     fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.sample_source_model.is_some()
+        self.id.is_complete()
     }
 }
-/// Trait defining setters for attributes of an instance of `SampleModel` or
+/// Trait defining setters for attributes of an instance of `OrganismModel` or
 /// descendant tables.
-pub trait SampleModelSettable: Sized {
+pub trait OrganismModelSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
-    /// Sets the value of the `public.sample_models.sample_source_model` column.
-    ///
-    /// # Arguments
-    /// * `sample_source_model`: The value to set for the
-    ///   `public.sample_models.sample_source_model` column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type `i32`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn sample_source_model(
-        self,
-        sample_source_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl<PhysicalAssetModel> SampleModelSettable for InsertableSampleModelBuilder<PhysicalAssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute;
-    /// Sets the value of the `public.sample_models.sample_source_model` column.
-    fn sample_source_model(
-        mut self,
-        sample_source_model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.sample_source_model = Some(sample_source_model);
-        Ok(self)
-    }
+impl<SampleSourceModel> OrganismModelSettable
+    for InsertableOrganismModelBuilder<SampleSourceModel>
+{
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute;
 }
 impl<
-    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    SampleSourceModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
-for InsertableSampleModelBuilder<PhysicalAssetModel>
+for InsertableOrganismModelBuilder<SampleSourceModel>
 where
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute,
+        Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute;
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
     fn name<N>(
@@ -184,7 +135,7 @@ where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
+        self.id = <SampleSourceModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.id,
                 name,
             )
@@ -206,7 +157,7 @@ where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
+        self.id = <SampleSourceModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.id,
                 description,
             )
@@ -257,7 +208,7 @@ where
         mut self,
         created_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
+        self.id = <SampleSourceModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.id,
                 created_by,
             )
@@ -281,7 +232,7 @@ where
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
+        self.id = <SampleSourceModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.id,
                 created_at,
             )
@@ -299,7 +250,7 @@ where
         mut self,
         updated_by: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
+        self.id = <SampleSourceModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.id,
                 updated_by,
             )
@@ -323,7 +274,7 @@ where
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
+        self.id = <SampleSourceModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.id,
                 updated_at,
             )
@@ -337,19 +288,19 @@ where
     }
 }
 impl<
-    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    SampleSourceModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
-for InsertableSampleModelBuilder<PhysicalAssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute;
+for InsertableOrganismModelBuilder<SampleSourceModel> {
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     fn parent_model(
         mut self,
         parent_model: Option<i32>,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
+        self.id = <SampleSourceModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.id,
                 parent_model,
             )
@@ -362,19 +313,25 @@ for InsertableSampleModelBuilder<PhysicalAssetModel> {
         Ok(self)
     }
 }
-impl<PhysicalAssetModel> web_common_traits::database::MostConcreteTable
-    for InsertableSampleModelBuilder<PhysicalAssetModel>
+impl<SampleSourceModel>
+    crate::codegen::structs_codegen::tables::insertables::SampleSourceModelSettable
+    for InsertableOrganismModelBuilder<SampleSourceModel>
+{
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute;
+}
+impl<SampleSourceModel> web_common_traits::database::MostConcreteTable
+    for InsertableOrganismModelBuilder<SampleSourceModel>
 where
-    PhysicalAssetModel: web_common_traits::database::MostConcreteTable,
+    SampleSourceModel: web_common_traits::database::MostConcreteTable,
 {
     fn set_most_concrete_table(&mut self, table_name: &str) {
         self.id.set_most_concrete_table(table_name);
     }
 }
-impl<PhysicalAssetModel> web_common_traits::prelude::SetPrimaryKey
-    for InsertableSampleModelBuilder<PhysicalAssetModel>
+impl<SampleSourceModel> web_common_traits::prelude::SetPrimaryKey
+    for InsertableOrganismModelBuilder<SampleSourceModel>
 where
-    PhysicalAssetModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
+    SampleSourceModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
 {
     type PrimaryKey = i32;
     fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
@@ -382,18 +339,18 @@ where
         self
     }
 }
-impl<PhysicalAssetModel, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableSampleModelBuilder<PhysicalAssetModel>
+impl<SampleSourceModel, C> web_common_traits::database::TryInsertGeneric<C>
+    for InsertableOrganismModelBuilder<SampleSourceModel>
 where
     Self: web_common_traits::database::InsertableVariant<
             C,
             UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::sample_models::SampleModel,
-            Error = web_common_traits::database::InsertError<SampleModelAttribute>,
+            Row = crate::codegen::structs_codegen::tables::organism_models::OrganismModel,
+            Error = web_common_traits::database::InsertError<OrganismModelAttribute>,
         >,
-    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    SampleSourceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = SampleModelAttribute;
+    type Attributes = OrganismModelAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
@@ -401,7 +358,7 @@ where
     ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::sample_models::SampleModel =
+        let insertable: crate::codegen::structs_codegen::tables::organism_models::OrganismModel =
             self.insert(user_id, conn)?;
         Ok(insertable.id())
     }

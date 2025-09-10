@@ -81,6 +81,7 @@ pub enum TableName {
     Material,
     NextProcedureTemplate,
     ObservationSubject,
+    OrganismModel,
     OrganismTaxon,
     Organism,
     Organization,
@@ -304,6 +305,7 @@ impl core::fmt::Display for TableName {
                 write!(f, stringify!(NextProcedureTemplate))
             }
             TableName::ObservationSubject => write!(f, stringify!(ObservationSubject)),
+            TableName::OrganismModel => write!(f, stringify!(OrganismModel)),
             TableName::OrganismTaxon => write!(f, stringify!(OrganismTaxon)),
             TableName::Organism => write!(f, stringify!(Organism)),
             TableName::Organization => write!(f, stringify!(Organization)),

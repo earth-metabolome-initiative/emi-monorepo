@@ -81,6 +81,7 @@ mod login_providers;
 mod materials;
 mod next_procedure_templates;
 mod observation_subjects;
+mod organism_models;
 mod organism_taxa;
 mod organisms;
 mod organizations;
@@ -469,6 +470,9 @@ pub enum Rows {
         Vec<
             crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
         >,
+    ),
+    OrganismModel(
+        Vec<crate::codegen::structs_codegen::tables::organism_models::OrganismModel>,
     ),
     OrganismTaxon(
         Vec<crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon>,
@@ -1243,6 +1247,13 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::OrganismModel(organism_models) => {
+                organism_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::OrganismTaxon(organism_taxa) => {
                 organism_taxa
                     .iter()
@@ -1844,6 +1855,7 @@ impl web_common_traits::prelude::Rows for Rows {
                 next_procedure_templates.primary_keys()
             }
             Rows::ObservationSubject(observation_subjects) => observation_subjects.primary_keys(),
+            Rows::OrganismModel(organism_models) => organism_models.primary_keys(),
             Rows::OrganismTaxon(organism_taxa) => organism_taxa.primary_keys(),
             Rows::Organism(organisms) => organisms.primary_keys(),
             Rows::Organization(organizations) => organizations.primary_keys(),

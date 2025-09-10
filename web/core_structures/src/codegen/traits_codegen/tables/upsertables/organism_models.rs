@@ -1,45 +1,37 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::codegen::structs_codegen::tables::organisms::Organism
+    for crate::codegen::structs_codegen::tables::organism_models::OrganismModel
 {
     fn upsert(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl, upsert::excluded,
-        };
+        use diesel::RunQueryDsl;
 
-        use crate::codegen::diesel_codegen::tables::organisms::organisms::*;
+        use crate::codegen::diesel_codegen::tables::organism_models::organism_models::*;
         diesel::insert_into(table)
             .values(self)
             .on_conflict(id)
-            .do_update()
-            .set(self)
-            .filter(model.ne(excluded(model)))
+            .do_nothing()
             .get_results(conn)
             .map(|mut result| result.pop())
     }
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::codegen::structs_codegen::tables::organisms::Organism
+    for crate::codegen::structs_codegen::tables::organism_models::OrganismModel
 {
     fn upsert(
         &self,
         conn: &mut diesel::SqliteConnection,
     ) -> Result<Option<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, RunQueryDsl, query_dsl::methods::FilterDsl, upsert::excluded,
-        };
+        use diesel::RunQueryDsl;
 
-        use crate::codegen::diesel_codegen::tables::organisms::organisms::*;
+        use crate::codegen::diesel_codegen::tables::organism_models::organism_models::*;
         diesel::insert_into(table)
             .values(self)
             .on_conflict(id)
-            .do_update()
-            .set(self)
-            .filter(model.ne(excluded(model)))
+            .do_nothing()
             .get_results(conn)
             .map(|mut result| result.pop())
     }

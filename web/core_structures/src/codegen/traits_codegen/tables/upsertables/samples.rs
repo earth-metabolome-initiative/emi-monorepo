@@ -17,7 +17,12 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(model.ne(excluded(model)).or(sample_source.ne(excluded(sample_source))))
+            .filter(
+                model
+                    .ne(excluded(model))
+                    .or(sample_source.ne(excluded(sample_source)))
+                    .or(sample_source_model.ne(excluded(sample_source_model))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }
@@ -41,7 +46,12 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .on_conflict(id)
             .do_update()
             .set(self)
-            .filter(model.ne(excluded(model)).or(sample_source.ne(excluded(sample_source))))
+            .filter(
+                model
+                    .ne(excluded(model))
+                    .or(sample_source.ne(excluded(sample_source)))
+                    .or(sample_source_model.ne(excluded(sample_source_model))),
+            )
             .get_results(conn)
             .map(|mut result| result.pop())
     }

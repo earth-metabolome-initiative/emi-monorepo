@@ -11,14 +11,14 @@
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::sample_models::SampleModel,
-        foreign_key = model
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
+        foreign_key = sample_source
     )
 )]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
-        foreign_key = sample_source
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
+        foreign_key = sample_source_model
     )
 )]
 #[diesel(primary_key(id))]
@@ -27,6 +27,7 @@ pub struct Sample {
     pub id: ::rosetta_uuid::Uuid,
     pub model: i32,
     pub sample_source: ::rosetta_uuid::Uuid,
+    pub sample_source_model: i32,
 }
 impl web_common_traits::prelude::TableName for Sample {
     const TABLE_NAME: &'static str = "samples";
@@ -117,6 +118,30 @@ impl Sample {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::sample_models::SampleModel::read(self.model, conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn samples_model_sample_source_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::sample_models::SampleModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::sample_models::SampleModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::sample_models::sample_models::dsl::id
+                    .eq(&self.model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::sample_models::sample_models::dsl::sample_source_model
+                            .eq(&self.sample_source_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::sample_models::SampleModel,
+            >(conn)
+    }
     pub fn sample_source<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -133,6 +158,42 @@ impl Sample {
             self.sample_source,
             conn,
         )
+    }
+    pub fn sample_source_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel::read(
+            self.sample_source_model,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn samples_sample_source_sample_source_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id
+                    .eq(&self.sample_source)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                            .eq(&self.sample_source_model),
+                    ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,
@@ -186,24 +247,81 @@ impl Sample {
             .order_by(samples::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_model(
+    pub fn from_model<C>(
         model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::samples::samples::model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::samples::samples::model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::samples::samples::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::samples::samples::model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::samples::samples::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::samples::samples;
+        Self::table()
+            .filter(samples::model.eq(model))
+            .order_by(samples::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_model_and_sample_source_model(
+        model: i32,
+        sample_source_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
 
-        use crate::codegen::diesel_codegen::tables::{
-            physical_assets::physical_assets, samples::samples,
-        };
+        use crate::codegen::diesel_codegen::tables::samples::samples;
         Self::table()
-            .inner_join(physical_assets::table.on(samples::id.eq(physical_assets::id)))
-            .filter(physical_assets::model.eq(model))
+            .filter(
+                samples::model.eq(model).and(samples::sample_source_model.eq(sample_source_model)),
+            )
             .order_by(samples::id.asc())
-            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_sample_source_and_sample_source_model(
+        sample_source: ::rosetta_uuid::Uuid,
+        sample_source_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::samples::samples;
+        Self::table()
+            .filter(
+                samples::sample_source
+                    .eq(sample_source)
+                    .and(samples::sample_source_model.eq(sample_source_model)),
+            )
+            .order_by(samples::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]

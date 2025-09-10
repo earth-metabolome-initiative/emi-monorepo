@@ -381,6 +381,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::ObservationSubject)
                     .collect::<Vec<_>>()
             }
+            super::Rows::OrganismModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::OrganismModel)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::OrganismTaxon(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::OrganismTaxon)

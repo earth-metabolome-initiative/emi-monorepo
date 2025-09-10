@@ -1,45 +1,31 @@
 #[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(
-    diesel::Selectable,
-    diesel::Insertable,
-    diesel::AsChangeset,
-    diesel::Queryable,
-    diesel::Identifiable,
-    diesel::Associations,
-)]
+#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(
-    belongs_to(
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
-        foreign_key = sample_source_model
-    )
-)]
 #[diesel(primary_key(id))]
 #[diesel(
-    table_name = crate::codegen::diesel_codegen::tables::sample_models::sample_models
+    table_name = crate::codegen::diesel_codegen::tables::organism_models::organism_models
 )]
-pub struct SampleModel {
+pub struct OrganismModel {
     pub id: i32,
-    pub sample_source_model: i32,
 }
-impl web_common_traits::prelude::TableName for SampleModel {
-    const TABLE_NAME: &'static str = "sample_models";
+impl web_common_traits::prelude::TableName for OrganismModel {
+    const TABLE_NAME: &'static str = "organism_models";
 }
-impl<'a> From<&'a SampleModel>
+impl<'a> From<&'a OrganismModel>
     for web_common_traits::database::IdOrBuilder<
         i32,
-        crate::codegen::structs_codegen::tables::insertables::InsertableSampleModelBuilder,
+        crate::codegen::structs_codegen::tables::insertables::InsertableOrganismModelBuilder,
     >
 {
-    fn from(value: &'a SampleModel) -> Self {
+    fn from(value: &'a OrganismModel) -> Self {
         web_common_traits::database::IdOrBuilder::Id(value.id)
     }
 }
 impl
     web_common_traits::prelude::ExtensionTable<
         crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-    > for SampleModel
+    > for OrganismModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
@@ -47,43 +33,35 @@ where
 impl
     web_common_traits::prelude::ExtensionTable<
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-    > for SampleModel
+    > for OrganismModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::sample_models::SampleModel,
-    > for SampleModel
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
+    > for OrganismModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
-impl diesel::Identifiable for SampleModel {
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel,
+    > for OrganismModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
+impl diesel::Identifiable for OrganismModel {
     type Id = i32;
     fn id(self) -> Self::Id {
         self.id
     }
 }
-impl SampleModel {
+impl OrganismModel {
     pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.id, conn,
-        )
-    }
-    pub fn sample_source_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -96,64 +74,43 @@ impl SampleModel {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel::read(
-            self.sample_source_model,
-            conn,
+            self.id, conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_id_and_sample_source_model(
-        id: i32,
-        sample_source_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::sample_models::sample_models;
-        Self::table()
-            .filter(
-                sample_models::id
-                    .eq(id)
-                    .and(sample_models::sample_source_model.eq(sample_source_model)),
-            )
-            .order_by(sample_models::id.asc())
-            .first::<Self>(conn)
     }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::sample_models::sample_models::id as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::organism_models::organism_models::id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::sample_models::sample_models::id as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::organism_models::organism_models::id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::sample_models::sample_models::id,
+                crate::codegen::diesel_codegen::tables::organism_models::organism_models::id,
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::sample_models::sample_models::id as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::organism_models::organism_models::id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::sample_models::sample_models::id,
+                crate::codegen::diesel_codegen::tables::organism_models::organism_models::id,
             >,
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
-        use crate::codegen::diesel_codegen::tables::sample_models::sample_models;
+        use crate::codegen::diesel_codegen::tables::organism_models::organism_models;
         Self::table()
-            .filter(sample_models::id.eq(id))
-            .order_by(sample_models::id.asc())
+            .filter(organism_models::id.eq(id))
+            .order_by(organism_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -167,14 +124,14 @@ impl SampleModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            physical_asset_models::physical_asset_models, sample_models::sample_models,
+            organism_models::organism_models, physical_asset_models::physical_asset_models,
         };
         Self::table()
             .inner_join(
-                physical_asset_models::table.on(sample_models::id.eq(physical_asset_models::id)),
+                physical_asset_models::table.on(organism_models::id.eq(physical_asset_models::id)),
             )
             .filter(physical_asset_models::parent_model.eq(parent_model))
-            .order_by(sample_models::id.asc())
+            .order_by(organism_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -189,12 +146,12 @@ impl SampleModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, sample_models::sample_models,
+            asset_models::asset_models, organism_models::organism_models,
         };
         Self::table()
-            .inner_join(asset_models::table.on(sample_models::id.eq(asset_models::id)))
+            .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
             .filter(asset_models::name.eq(name))
-            .order_by(sample_models::id.asc())
+            .order_by(organism_models::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
     }
@@ -210,12 +167,12 @@ impl SampleModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, sample_models::sample_models,
+            asset_models::asset_models, organism_models::organism_models,
         };
         Self::table()
-            .inner_join(asset_models::table.on(sample_models::id.eq(asset_models::id)))
+            .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
             .filter(asset_models::parent_model.eq(parent_model).and(asset_models::id.eq(id)))
-            .order_by(sample_models::id.asc())
+            .order_by(organism_models::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
     }
@@ -230,12 +187,12 @@ impl SampleModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, sample_models::sample_models,
+            asset_models::asset_models, organism_models::organism_models,
         };
         Self::table()
-            .inner_join(asset_models::table.on(sample_models::id.eq(asset_models::id)))
+            .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
             .filter(asset_models::most_concrete_table.eq(most_concrete_table))
-            .order_by(sample_models::id.asc())
+            .order_by(organism_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -250,12 +207,12 @@ impl SampleModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, sample_models::sample_models,
+            asset_models::asset_models, organism_models::organism_models,
         };
         Self::table()
-            .inner_join(asset_models::table.on(sample_models::id.eq(asset_models::id)))
+            .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
             .filter(asset_models::description.eq(description))
-            .order_by(sample_models::id.asc())
+            .order_by(organism_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -270,12 +227,12 @@ impl SampleModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, sample_models::sample_models,
+            asset_models::asset_models, organism_models::organism_models,
         };
         Self::table()
-            .inner_join(asset_models::table.on(sample_models::id.eq(asset_models::id)))
+            .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
             .filter(asset_models::created_by.eq(created_by))
-            .order_by(sample_models::id.asc())
+            .order_by(organism_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -290,12 +247,12 @@ impl SampleModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, sample_models::sample_models,
+            asset_models::asset_models, organism_models::organism_models,
         };
         Self::table()
-            .inner_join(asset_models::table.on(sample_models::id.eq(asset_models::id)))
+            .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
             .filter(asset_models::created_at.eq(created_at))
-            .order_by(sample_models::id.asc())
+            .order_by(organism_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -310,12 +267,12 @@ impl SampleModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, sample_models::sample_models,
+            asset_models::asset_models, organism_models::organism_models,
         };
         Self::table()
-            .inner_join(asset_models::table.on(sample_models::id.eq(asset_models::id)))
+            .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
             .filter(asset_models::updated_by.eq(updated_by))
-            .order_by(sample_models::id.asc())
+            .order_by(organism_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
@@ -330,18 +287,18 @@ impl SampleModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, sample_models::sample_models,
+            asset_models::asset_models, organism_models::organism_models,
         };
         Self::table()
-            .inner_join(asset_models::table.on(sample_models::id.eq(asset_models::id)))
+            .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
             .filter(asset_models::updated_at.eq(updated_at))
-            .order_by(sample_models::id.asc())
+            .order_by(organism_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
 }
-impl AsRef<SampleModel> for SampleModel {
-    fn as_ref(&self) -> &SampleModel {
+impl AsRef<OrganismModel> for OrganismModel {
+    fn as_ref(&self) -> &OrganismModel {
         self
     }
 }

@@ -81,6 +81,7 @@ pub enum TablePrimaryKey {
     Material(i16),
     NextProcedureTemplate((i32, i32, i32)),
     ObservationSubject(i16),
+    OrganismModel(i32),
     OrganismTaxon((::rosetta_uuid::Uuid, i32)),
     Organism(::rosetta_uuid::Uuid),
     Organization(i16),
@@ -370,6 +371,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::ObservationSubject(_) => {
                 crate::codegen::tables::table_names::TableName::ObservationSubject
+            }
+            TablePrimaryKey::OrganismModel(_) => {
+                crate::codegen::tables::table_names::TableName::OrganismModel
             }
             TablePrimaryKey::OrganismTaxon(_) => {
                 crate::codegen::tables::table_names::TableName::OrganismTaxon

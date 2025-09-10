@@ -78,6 +78,7 @@ pub mod login_providers;
 pub mod materials;
 pub mod next_procedure_templates;
 pub mod observation_subjects;
+pub mod organism_models;
 pub mod organism_taxa;
 pub mod organisms;
 pub mod organizations;

@@ -3,6 +3,8 @@
 pub struct SampleModelForeignKeys {
     pub id:
         Option<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel>,
+    pub sample_source_model:
+        Option<crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::sample_models::SampleModel
@@ -18,9 +20,14 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.id,
             ),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleSourceModel(
+                self.sample_source_model,
+            ),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.id.is_some()
+        foreign_keys.id.is_some() && foreign_keys.sample_source_model.is_some()
     }
     fn update(
         &self,
@@ -47,6 +54,26 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.id == physical_asset_models.id {
                     foreign_keys.id = None;
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::SampleSourceModel(sample_source_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.sample_source_model == sample_source_models.id {
+                    foreign_keys.sample_source_model = Some(sample_source_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::SampleSourceModel(sample_source_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.sample_source_model == sample_source_models.id {
+                    foreign_keys.sample_source_model = None;
                     updated = true;
                 }
             }

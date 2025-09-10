@@ -425,6 +425,11 @@ pub use observation_subjects::{
     InsertableObservationSubject, InsertableObservationSubjectBuilder, ObservationSubjectAttribute,
     ObservationSubjectSettable,
 };
+mod organism_models;
+pub use organism_models::{
+    InsertableOrganismModel, InsertableOrganismModelBuilder, OrganismModelAttribute,
+    OrganismModelExtensionAttribute, OrganismModelSettable,
+};
 mod organism_taxa;
 pub use organism_taxa::{
     InsertableOrganismTaxon, InsertableOrganismTaxonBuilder, OrganismTaxonAttribute,

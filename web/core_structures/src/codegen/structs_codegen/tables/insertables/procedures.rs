@@ -700,19 +700,6 @@ impl ProcedureSettable for InsertableProcedureBuilder {
         mut self,
         procedure_template: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(predecessor_procedure_template) = self.predecessor_procedure_template {
-            pgrx_validation::must_be_distinct_i32(
-                    procedure_template,
-                    predecessor_procedure_template,
-                )
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::PredecessorProcedureTemplate,
-                        )
-                })?;
-        }
         if let Some(parent_procedure_template) = self.parent_procedure_template {
             pgrx_validation::must_be_distinct_i32(
                     procedure_template,
@@ -723,6 +710,19 @@ impl ProcedureSettable for InsertableProcedureBuilder {
                         .rename_fields(
                             crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ProcedureTemplate,
                             crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ParentProcedureTemplate,
+                        )
+                })?;
+        }
+        if let Some(predecessor_procedure_template) = self.predecessor_procedure_template {
+            pgrx_validation::must_be_distinct_i32(
+                    procedure_template,
+                    predecessor_procedure_template,
+                )
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::PredecessorProcedureTemplate,
                         )
                 })?;
         }
@@ -951,7 +951,7 @@ impl ProcedureSettable for InsertableProcedureBuilder {
                 validation_errors::SingleFieldError::from(err)
                     .rename_field(ProcedureAttribute::NumberOfCompletedSubprocedures)
             })?;
-        pgrx_validation::must_be_strictly_positive_i16(number_of_completed_subprocedures)
+        pgrx_validation::must_be_positive_i16(number_of_completed_subprocedures)
             .map_err(|e| {
                 e
                     .rename_field(

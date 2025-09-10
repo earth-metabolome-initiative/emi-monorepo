@@ -214,6 +214,9 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::ObservationSubject(_) => {
                 crate::codegen::tables::table_names::TableName::ObservationSubject
             }
+            super::Row::OrganismModel(_) => {
+                crate::codegen::tables::table_names::TableName::OrganismModel
+            }
             super::Row::OrganismTaxon(_) => {
                 crate::codegen::tables::table_names::TableName::OrganismTaxon
             }

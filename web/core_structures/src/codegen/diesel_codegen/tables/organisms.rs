@@ -1,3 +1,4 @@
 diesel::table! {
-    organisms(id) { id -> ::rosetta_uuid::diesel_impls::Uuid }
+    organisms(id) { id -> ::rosetta_uuid::diesel_impls::Uuid, model ->
+    diesel::sql_types::Integer }
 }

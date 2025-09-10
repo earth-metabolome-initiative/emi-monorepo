@@ -201,6 +201,30 @@ impl InsertableHarvestingProcedureTemplate {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn harvesting_procedure_template_sample_model_sample_source_m_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::sample_models::SampleModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::sample_models::SampleModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::sample_models::sample_models::dsl::id
+                    .eq(&self.sample_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::sample_models::sample_models::dsl::sample_source_model
+                            .eq(&self.sample_source_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::sample_models::SampleModel,
+            >(conn)
+    }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -289,7 +313,8 @@ where
     fn is_complete(&self) -> bool {
         self.procedure_template.is_complete()
             && (self.sample_source_model.is_some()
-                || self.procedure_template_sample_source_model.is_complete())
+                || self.procedure_template_sample_source_model.is_complete()
+                || self.sample_model.is_some())
             && self.procedure_template_sample_source_model.is_complete()
             && (self.sample_model.is_some()
                 || self.procedure_template_sample_model.is_complete())
@@ -572,23 +597,27 @@ impl<ProcedureTemplate> HarvestingProcedureTemplateSettable
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`harvesting_procedure_templates`"]
+    /// subgraph v5 ["`harvesting_procedure_templates`"]
     ///    v0@{shape: rounded, label: "procedure_template_sample_model"}
     /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "sample_model"}
     /// class v1 column-of-interest
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
+    ///    v2@{shape: rounded, label: "sample_source_model"}
     /// class v2 directly-involved-column
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
+    /// subgraph v6 ["`procedure_template_asset_models`"]
+    ///    v3@{shape: rounded, label: "asset_model"}
+    /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "id"}
+    /// class v4 undirectly-involved-column
+    /// end
+    /// v0 --->|"`associated same as`"| v4
+    /// v0 --->|"`associated same as`"| v4
     /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
-    /// v4 ---o|"`associated with`"| v5
+    /// v1 --->|"`associated same as`"| v3
+    /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v3
+    /// v5 ---o|"`associated with`"| v6
     /// ```
     fn sample_model(
         mut self,

@@ -78,6 +78,7 @@ mod login_providers;
 mod materials;
 mod next_procedure_templates;
 mod observation_subjects;
+mod organism_models;
 mod organism_taxa;
 mod organisms;
 mod organizations;

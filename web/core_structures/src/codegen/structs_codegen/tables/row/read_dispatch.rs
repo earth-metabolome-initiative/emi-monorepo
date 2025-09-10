@@ -240,6 +240,9 @@ where
     crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::organism_models::OrganismModel: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon: web_common_traits::database::Read<
         C,
     >,
@@ -1147,6 +1150,15 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::OrganismModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::organism_models::OrganismModel::read(
                             primary_key,
                             conn,
                         )?

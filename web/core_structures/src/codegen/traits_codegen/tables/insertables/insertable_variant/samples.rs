@@ -21,6 +21,15 @@ where
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
+    Self: crate::codegen::structs_codegen::tables::insertables::SampleSettable<
+        Attributes = crate::codegen::structs_codegen::tables::insertables::SampleAttribute,
+    >,
+    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::sample_models::SampleModel: web_common_traits::database::Read<
+        C,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::samples::Sample;
@@ -47,10 +56,31 @@ where
         )
     }
     fn try_insert(
-        self,
+        mut self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::Read;
+        if let Some(model) = self.model {
+            let sample_models = crate::codegen::structs_codegen::tables::sample_models::SampleModel::read(
+                model,
+                conn,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SampleSettable>::sample_source_model(
+                self,
+                sample_models.sample_source_model,
+            )?;
+        }
+        if let Some(sample_source) = self.sample_source {
+            let assets = crate::codegen::structs_codegen::tables::assets::Asset::read(
+                sample_source,
+                conn,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::SampleSettable>::sample_source_model(
+                self,
+                assets.model,
+            )?;
+        }
         let model = self
             .model
             .ok_or(
@@ -63,6 +93,13 @@ where
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     crate::codegen::structs_codegen::tables::insertables::SampleAttribute::SampleSource,
+                ),
+            )?;
+        let sample_source_model = self
+            .sample_source_model
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::SampleAttribute::SampleSourceModel,
                 ),
             )?;
         let id = self
@@ -79,6 +116,7 @@ where
             id,
             model,
             sample_source,
+            sample_source_model,
         })
     }
 }

@@ -43,6 +43,9 @@ where
         C,
         UserId = i32,
     >,
+    crate::codegen::structs_codegen::tables::sample_models::SampleModel: web_common_traits::database::Read<
+        C,
+    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
     type Row = crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate;
@@ -102,6 +105,16 @@ where
             self = <Self as crate::codegen::structs_codegen::tables::insertables::HarvestingProcedureTemplateSettable>::sample_source_model(
                 self,
                 procedure_template_asset_models.asset_model,
+            )?;
+        }
+        if let Some(sample_model) = self.sample_model {
+            let sample_models = crate::codegen::structs_codegen::tables::sample_models::SampleModel::read(
+                sample_model,
+                conn,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::HarvestingProcedureTemplateSettable>::sample_source_model(
+                self,
+                sample_models.sample_source_model,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(

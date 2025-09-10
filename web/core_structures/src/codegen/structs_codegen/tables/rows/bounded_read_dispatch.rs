@@ -240,6 +240,9 @@ where
     crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::organism_models::OrganismModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -1067,6 +1070,14 @@ where
             }
             crate::codegen::tables::table_names::TableName::ObservationSubject => {
                 crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::OrganismModel => {
+                crate::codegen::structs_codegen::tables::organism_models::OrganismModel::bounded_read(
                         offset,
                         limit,
                         conn,

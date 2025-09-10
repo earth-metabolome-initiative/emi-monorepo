@@ -225,6 +225,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::ObservationSubject(observation_subjects) => {
                 crate::codegen::tables::rows::Rows::from(observation_subjects)
             }
+            super::Row::OrganismModel(organism_models) => {
+                crate::codegen::tables::rows::Rows::from(organism_models)
+            }
             super::Row::OrganismTaxon(organism_taxa) => {
                 crate::codegen::tables::rows::Rows::from(organism_taxa)
             }

@@ -16,6 +16,8 @@ CREATE TABLE IF NOT EXISTS harvesting_procedure_templates (
 		procedure_template_sample_model,
 		sample_model
 	) REFERENCES procedure_template_asset_models(id, asset_model),
+	-- We enforce that the `sample_model` is associated with the `sample_source_model`.
+	FOREIGN KEY (sample_model, sample_source_model) REFERENCES sample_models(id, sample_source_model),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_sample_source_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
@@ -29,6 +31,7 @@ CREATE TABLE IF NOT EXISTS harvesting_procedure_templates (
 		procedure_template_sample_model
 	)
 );
+
 CREATE TABLE IF NOT EXISTS harvesting_procedures (
 	-- Identifier of the harvesting procedure, which is also a foreign key to the general procedure.
 	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
@@ -64,15 +67,9 @@ CREATE TABLE IF NOT EXISTS harvesting_procedures (
 		procedure_template_sample_model
 	),
 	-- We enforce that the `procedure_sample_source` is associated with the `sample_source`.
-	FOREIGN KEY (
-		procedure_sample_source,
-		sample_source
-	) REFERENCES procedure_assets(id, asset),
+	FOREIGN KEY (procedure_sample_source, sample_source) REFERENCES procedure_assets(id, asset),
 	-- We enforce that the `procedure_sample` is associated with the `sample`.
-	FOREIGN KEY (
-		procedure_sample,
-		sample
-	) REFERENCES procedure_assets(id, asset),
+	FOREIGN KEY (procedure_sample, sample) REFERENCES procedure_assets(id, asset),
 	-- We enforce that the `procedure_sample_source` is associated with `procedure_template_sample_source_model`.
 	FOREIGN KEY (
 		procedure_sample_source,

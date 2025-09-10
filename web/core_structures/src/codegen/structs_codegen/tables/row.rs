@@ -79,6 +79,7 @@ mod login_providers;
 mod materials;
 mod next_procedure_templates;
 mod observation_subjects;
+mod organism_models;
 mod organism_taxa;
 mod organisms;
 mod organizations;
@@ -348,6 +349,9 @@ pub enum Row {
     ),
     ObservationSubject(
         crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
+    ),
+    OrganismModel(
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel,
     ),
     OrganismTaxon(crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon),
     Organism(crate::codegen::structs_codegen::tables::organisms::Organism),
@@ -684,6 +688,7 @@ impl Row {
             Row::ObservationSubject(observation_subjects) => {
                 observation_subjects.upsert(conn)?.map(Row::from)
             }
+            Row::OrganismModel(organism_models) => organism_models.upsert(conn)?.map(Row::from),
             Row::OrganismTaxon(organism_taxa) => organism_taxa.upsert(conn)?.map(Row::from),
             Row::Organism(organisms) => organisms.upsert(conn)?.map(Row::from),
             Row::Organization(organizations) => organizations.upsert(conn)?.map(Row::from),
@@ -970,6 +975,7 @@ impl web_common_traits::prelude::Row for Row {
                 next_procedure_templates.primary_key()
             }
             Row::ObservationSubject(observation_subjects) => observation_subjects.primary_key(),
+            Row::OrganismModel(organism_models) => organism_models.primary_key(),
             Row::OrganismTaxon(organism_taxa) => organism_taxa.primary_key(),
             Row::Organism(organisms) => organisms.primary_key(),
             Row::Organization(organizations) => organizations.primary_key(),

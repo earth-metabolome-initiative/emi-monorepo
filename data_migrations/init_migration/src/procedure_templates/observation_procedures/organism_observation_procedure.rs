@@ -1,7 +1,11 @@
-use core_structures::{tables::insertables::{
+use core_structures::{
+    GeolocationProcedureTemplate, PhotographProcedureTemplate, ProcedureTemplate,
+    ProcedureTemplateAssetModel, User,
+    tables::insertables::{
         GeolocationProcedureTemplateSettable, PhotographProcedureTemplateSettable,
         ProcedureTemplateAssetModelSettable, ProcedureTemplateSettable,
-    }, traits::AppendProcedureTemplate, GeolocationProcedureTemplate, PhotographProcedureTemplate, ProcedureTemplate, User, ProcedureTemplateAssetModel
+    },
+    traits::AppendProcedureTemplate,
 };
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
@@ -29,7 +33,8 @@ pub(crate) fn organism_observation_procedure(
     let photograph_procedure_name = "Organism in Ecosystem Picture";
 
     if let Some(existing) = ProcedureTemplate::from_name(name, conn).optional()? {
-        let photograph_procedure = PhotographProcedureTemplate::from_name(photograph_procedure_name, conn)?;
+        let photograph_procedure =
+            PhotographProcedureTemplate::from_name(photograph_procedure_name, conn)?;
         let organism = photograph_procedure.procedure_template_photographed_asset_model(conn)?;
         return Ok((existing, organism));
     }
@@ -62,7 +67,8 @@ pub(crate) fn organism_observation_procedure(
         )?
         .created_by(user.id)?
         .insert(user.id, conn)?;
-    let organism = organism_in_ecosystem_picture.procedure_template_photographed_asset_model(conn)?;
+    let organism =
+        organism_in_ecosystem_picture.procedure_template_photographed_asset_model(conn)?;
     let phone = organism_in_ecosystem_picture.procedure_template_photographed_with_model;
 
     // Take a picture of the full organism

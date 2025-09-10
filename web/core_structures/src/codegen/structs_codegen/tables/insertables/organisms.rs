@@ -24,11 +24,14 @@ impl From<crate::codegen::structs_codegen::tables::insertables::SampleSourceAttr
 pub enum OrganismAttribute {
     Extension(OrganismExtensionAttribute),
     Id,
+    Model,
 }
 impl core::str::FromStr for OrganismAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Model" => Ok(Self::Model),
+            "model" => Ok(Self::Model),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
@@ -38,6 +41,7 @@ impl core::fmt::Display for OrganismAttribute {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
             Self::Id => write!(f, "organisms.id"),
+            Self::Model => write!(f, "organisms.model"),
         }
     }
 }
@@ -49,6 +53,7 @@ impl core::fmt::Display for OrganismAttribute {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableOrganism {
     pub(crate) id: ::rosetta_uuid::Uuid,
+    pub(crate) model: i32,
 }
 impl InsertableOrganism {
     pub fn id<C: diesel::connection::LoadConnection>(
@@ -65,6 +70,39 @@ impl InsertableOrganism {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::sample_sources::SampleSource::read(self.id, conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn organisms_id_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
+    pub fn model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel::read(
+            self.model, conn,
+        )
+    }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -76,6 +114,7 @@ pub struct InsertableOrganismBuilder<
             >,
         >,
 > {
+    pub(crate) model: Option<i32>,
     pub(crate) id: SampleSource,
 }
 impl From<InsertableOrganismBuilder>
@@ -93,7 +132,7 @@ where
     SampleSource: common_traits::builder::IsCompleteBuilder,
 {
     fn is_complete(&self) -> bool {
-        self.id.is_complete()
+        self.id.is_complete() && self.model.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Organism` or
@@ -101,9 +140,101 @@ where
 pub trait OrganismSettable: Sized {
     /// Attributes required to build the insertable.
     type Attributes;
+    /// Sets the value of the `public.organisms.model` column.
+    ///
+    /// # Arguments
+    /// * `model`: The value to set for the `public.organisms.model` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn model(
+        self,
+        model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
-impl<SampleSource> OrganismSettable for InsertableOrganismBuilder<SampleSource> {
+impl<
+    SampleSource: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::SampleSourceAttribute,
+        >
+        + crate::codegen::structs_codegen::tables::insertables::SampleSourceSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::SampleSourceAttribute,
+        >,
+> OrganismSettable for InsertableOrganismBuilder<SampleSource> {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismAttribute;
+    ///Sets the value of the `public.organisms.model` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`assets`"]
+    ///    v3@{shape: rounded, label: "model"}
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`organisms`"]
+    ///    v0@{shape: rounded, label: "model"}
+    ///class v0 column-of-interest
+    ///end
+    ///subgraph v6 ["`physical_assets`"]
+    ///    v1@{shape: rounded, label: "model"}
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v7 ["`sample_sources`"]
+    ///    v2@{shape: rounded, label: "model"}
+    ///class v2 directly-involved-column
+    ///end
+    ///v0 --->|"`ancestral same as`"| v3
+    ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v0 -.->|"`inferred ancestral same as`"| v2
+    ///v1 --->|"`ancestral same as`"| v3
+    ///v2 --->|"`ancestral same as`"| v3
+    ///v2 -.->|"`inferred ancestral same as`"| v1
+    ///v5 --->|"`extends`"| v7
+    ///v6 --->|"`extends`"| v4
+    ///v7 --->|"`extends`"| v6
+    ///```
+    fn model(
+        mut self,
+        model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.id = <SampleSource as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
+                self.id,
+                model,
+            )
+            .map_err(|err| {
+                err.into_field_name(|attribute| Self::Attributes::Extension(
+                    attribute.into(),
+                ))
+            })?;
+        self.id = <SampleSource as crate::codegen::structs_codegen::tables::insertables::SampleSourceSettable>::model(
+                self.id,
+                model,
+            )
+            .map_err(|err| {
+                err.into_field_name(|attribute| Self::Attributes::Extension(
+                    attribute.into(),
+                ))
+            })?;
+        self.model = Some(model);
+        Ok(self)
+    }
 }
 impl<
     SampleSource: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
@@ -300,7 +431,7 @@ where
 impl<SampleSource> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable
     for InsertableOrganismBuilder<SampleSource>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::SampleSourceSettable<
+    Self: crate::codegen::structs_codegen::tables::insertables::OrganismSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismAttribute,
         >,
 {
@@ -319,57 +450,84 @@ where
     /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v3 ["`assets`"]
+    /// subgraph v4 ["`assets`"]
     ///    v2@{shape: rounded, label: "model"}
     /// class v2 undirectly-involved-column
     /// end
-    /// subgraph v4 ["`physical_assets`"]
+    /// subgraph v5 ["`organisms`"]
     ///    v0@{shape: rounded, label: "model"}
-    /// class v0 column-of-interest
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v6 ["`physical_assets`"]
+    ///    v1@{shape: rounded, label: "model"}
+    /// class v1 column-of-interest
+    /// end
+    /// subgraph v7 ["`sample_sources`"]
+    ///    v3@{shape: rounded, label: "model"}
+    /// class v3 undirectly-involved-column
+    /// end
+    /// v0 --->|"`ancestral same as`"| v2
+    /// v0 -.->|"`inferred ancestral same as`"| v1
+    /// v0 -.->|"`inferred ancestral same as`"| v3
+    /// v1 --->|"`ancestral same as`"| v2
+    /// v3 --->|"`ancestral same as`"| v2
+    /// v3 -.->|"`inferred ancestral same as`"| v1
+    /// v5 --->|"`extends`"| v7
+    /// v6 --->|"`extends`"| v4
+    /// v7 --->|"`extends`"| v6
+    /// ```
+    fn model(
+        self,
+        model: i32,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        <Self as OrganismSettable>::model(self, model)
+    }
+}
+impl<SampleSource> crate::codegen::structs_codegen::tables::insertables::SampleSourceSettable
+    for InsertableOrganismBuilder<SampleSource>
+where
+    Self: crate::codegen::structs_codegen::tables::insertables::OrganismSettable<
+            Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismAttribute,
+        >,
+{
+    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismAttribute;
+    #[inline]
+    /// Sets the value of the `public.sample_sources.model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart BT
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v3 ["`organisms`"]
+    ///    v0@{shape: rounded, label: "model"}
+    /// class v0 directly-involved-column
+    /// end
+    /// subgraph v4 ["`physical_assets`"]
+    ///    v2@{shape: rounded, label: "model"}
+    /// class v2 undirectly-involved-column
     /// end
     /// subgraph v5 ["`sample_sources`"]
     ///    v1@{shape: rounded, label: "model"}
-    /// class v1 directly-involved-column
+    /// class v1 column-of-interest
     /// end
-    /// v0 --->|"`ancestral same as`"| v2
-    /// v1 --->|"`ancestral same as`"| v2
-    /// v1 -.->|"`inferred ancestral same as`"| v0
-    /// v4 --->|"`extends`"| v3
+    /// v0 -.->|"`inferred ancestral same as`"| v2
+    /// v0 -.->|"`inferred ancestral same as`"| v1
+    /// v1 -.->|"`inferred ancestral same as`"| v2
+    /// v3 --->|"`extends`"| v5
     /// v5 --->|"`extends`"| v4
     /// ```
     fn model(
         self,
         model: i32,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        <Self as crate::codegen::structs_codegen::tables::insertables::SampleSourceSettable>::model(
-            self, model,
-        )
-    }
-}
-impl<
-    SampleSource: crate::codegen::structs_codegen::tables::insertables::SampleSourceSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::SampleSourceAttribute,
-        >,
-> crate::codegen::structs_codegen::tables::insertables::SampleSourceSettable
-for InsertableOrganismBuilder<SampleSource> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismAttribute;
-    #[inline]
-    ///Sets the value of the `public.sample_sources.model` column.
-    fn model(
-        mut self,
-        model: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = <SampleSource as crate::codegen::structs_codegen::tables::insertables::SampleSourceSettable>::model(
-                self.id,
-                model,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
+        <Self as OrganismSettable>::model(self, model)
     }
 }
 impl<SampleSource> web_common_traits::database::MostConcreteTable

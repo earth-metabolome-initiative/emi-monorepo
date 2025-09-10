@@ -1,11 +1,25 @@
 #[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+    diesel::Associations,
+)]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel,
+        foreign_key = model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::organisms::organisms)]
 pub struct Organism {
     pub id: ::rosetta_uuid::Uuid,
+    pub model: i32,
 }
 impl web_common_traits::prelude::TableName for Organism {
     const TABLE_NAME: &'static str = "organisms";
@@ -73,6 +87,39 @@ impl Organism {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::sample_sources::SampleSource::read(self.id, conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn organisms_id_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
+    pub fn model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel::read(
+            self.model, conn,
+        )
+    }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,
         conn: &mut C,
@@ -108,6 +155,22 @@ impl Organism {
 
         use crate::codegen::diesel_codegen::tables::organisms::organisms;
         Self::table().filter(organisms::id.eq(id)).order_by(organisms::id.asc()).load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_id_and_model(
+        id: ::rosetta_uuid::Uuid,
+        model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::organisms::organisms;
+        Self::table()
+            .filter(organisms::id.eq(id).and(organisms::model.eq(model)))
+            .order_by(organisms::id.asc())
+            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_model(

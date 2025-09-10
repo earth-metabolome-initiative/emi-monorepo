@@ -12,9 +12,12 @@ use core_structures::{
 use diesel::OptionalExtension;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::procedure_template_asset_models::{
-    coffee_wrapper::coffee_wrapper_builder, conical_tubes::cct_builder,
-    conical_tubes_box::cct_box_builder, organism::sample_builder,
+use crate::{
+    procedure_template_asset_models::{
+        coffee_wrapper::coffee_wrapper_builder, conical_tubes::cct_builder,
+        conical_tubes_box::cct_box_builder, organism::sample_builder,
+    },
+    procedure_templates::organism_observation_procedure,
 };
 
 /// Initializes the part of organism collection procedure template in the
@@ -31,7 +34,6 @@ use crate::procedure_template_asset_models::{
 /// * If the procedure template building fails.
 pub(crate) fn init_part_of_organism_collection(
     user: &User,
-    organism: &ProcedureTemplateAssetModel,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<(ProcedureTemplate, ProcedureTemplateAssetModel)> {
     let name = "Part of Organism Collection";
@@ -42,6 +44,8 @@ pub(crate) fn init_part_of_organism_collection(
         let cct = storage_procedure.procedure_template_stored_into_model(conn)?;
         return Ok((existing, cct));
     }
+
+    let (_, organism) = organism_observation_procedure(user, conn)?;
 
     let collection = ProcedureTemplate::new()
         .name(name)?
@@ -68,21 +72,13 @@ pub(crate) fn init_part_of_organism_collection(
         .created_by(user.id)?
         .insert(user.id, conn)?;
 
-    // Cut the part of the organism to be collected with a sterile scalpel
-    let cut_part = ProcedureTemplate::new()
-        .name("Cut part of organism")?
-        .description(
-            "Use a sterile scalpel to cut the desired part of the organism, such as leaves, stems, or roots.",
-        )?
-        .created_by(user.id)?
-        .insert(user.id, conn)?;
 
     // Harvest the sample from the sample source
     let sample_harvesting = HarvestingProcedureTemplate::new()
         .name("Harvest sample")?
         .description("Harvest the cut part of the organism as a sample.")?
         .created_by(user.id)?
-        .procedure_template_sample_source_model(organism)?
+        .procedure_template_sample_source_model(&organism)?
         .procedure_template_sample_model(sample_builder(user, conn)?)?
         .insert(user.id, conn)?;
     let sample: i32 = sample_harvesting.procedure_template_sample_model;
@@ -128,7 +124,7 @@ pub(crate) fn init_part_of_organism_collection(
         &[
             &gloves_reminder,
             &sterilization_reminder,
-            &cut_part,
+            &sample_harvesting.procedure_template(conn)?,
             &coffee_filter_wrapping.procedure_template(conn)?,
             &place_in_tube.procedure_template(conn)?,
             &place_in_storage_box.procedure_template(conn)?,

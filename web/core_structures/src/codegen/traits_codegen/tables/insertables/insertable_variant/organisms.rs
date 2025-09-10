@@ -51,6 +51,13 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        let model = self
+            .model
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::OrganismAttribute::Model,
+                ),
+            )?;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
@@ -61,6 +68,9 @@ where
                     ),
                 ))
             })?;
-        Ok(Self::InsertableVariant { id })
+        Ok(Self::InsertableVariant {
+            id,
+            model,
+        })
     }
 }

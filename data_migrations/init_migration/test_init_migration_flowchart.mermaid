@@ -1,6 +1,5 @@
 ---
 config:
-  layout: elk
   theme: default
   look: classic
   flowchart:
@@ -8,47 +7,48 @@ config:
 title: DBGI Plan
 ---
 flowchart TB
-classDef procedure_template fill: #f0746c,stroke: #df2216
 classDef foreign_procedure_template stroke-dasharray: 5, 5
-classDef ptam_node_26 fill: #efa8a8,stroke: #ab1f1f,stroke-dasharray: 5, 5
+classDef procedure_template fill: #f0746c,stroke: #df2216
 classDef ptam_edge_26 stroke: #ab1f1f
-classDef ptam_node_48 fill: #efbaa8,stroke: #ab431f
 classDef ptam_edge_48 stroke: #ab431f
-classDef ptam_node_49 fill: #efcca8,stroke: #ab661f
 classDef ptam_edge_49 stroke: #ab661f
+classDef ptam_edge_53 stroke: #66ab1f
+classDef ptam_edge_54 stroke: #43ab1f
+classDef ptam_edge_55 stroke: #1fab1f
+classDef ptam_edge_61 stroke: #1f64ab
+classDef ptam_edge_62 stroke: #1f43ab
+classDef ptam_edge_63 stroke: #1f1fab
+classDef ptam_edge_66 stroke: #871fab
+classDef ptam_edge_68 stroke: #ab1f87
+classDef ptam_node_26 fill: #efa8a8,stroke: #ab1f1f,stroke-dasharray: 5, 5
+classDef ptam_node_48 fill: #efbaa8,stroke: #ab431f
+classDef ptam_node_49 fill: #efcca8,stroke: #ab661f
 classDef ptam_node_50 fill: #efdda8,stroke: #ab871f
 classDef ptam_node_51 fill: #efefa8,stroke: #abab1f
 classDef ptam_node_52 fill: #ddefa8,stroke: #87ab1f
 classDef ptam_node_53 fill: #ccefa8,stroke: #66ab1f
-classDef ptam_edge_53 stroke: #66ab1f
 classDef ptam_node_54 fill: #baefa8,stroke: #43ab1f
 classDef ptam_node_55 fill: #a8efa8,stroke: #1fab1f
-classDef ptam_edge_55 stroke: #1fab1f
 classDef ptam_node_56 fill: #a8efba,stroke: #1fab43
 classDef ptam_node_57 fill: #a8efcc,stroke: #1fab66
 classDef ptam_node_58 fill: #a8efdd,stroke: #1fab87
 classDef ptam_node_59 fill: #a8efef,stroke: #1fabab
 classDef ptam_node_60 fill: #a8ddef,stroke: #1f87ab
 classDef ptam_node_61 fill: #a8cbef,stroke: #1f64ab
-classDef ptam_edge_61 stroke: #1f64ab
 classDef ptam_node_62 fill: #a8baef,stroke: #1f43ab
-classDef ptam_edge_62 stroke: #1f43ab
 classDef ptam_node_63 fill: #a8a8ef,stroke: #1f1fab
-classDef ptam_edge_63 stroke: #1f1fab
 classDef ptam_node_64 fill: #baa8ef,stroke: #431fab
 classDef ptam_node_65 fill: #cba8ef,stroke: #641fab
 classDef ptam_node_66 fill: #dda8ef,stroke: #871fab
-classDef ptam_edge_66 stroke: #871fab
 classDef ptam_node_67 fill: #efa8ef,stroke: #ab1fab
 classDef ptam_node_68 fill: #efa8dd,stroke: #ab1f87
-classDef ptam_edge_68 stroke: #ab1f87
 classDef ptam_node_69 fill: #efa8cc,stroke: #ab1f66
 classDef ptam_node_70 fill: #efa8ba,stroke: #ab1f43
 subgraph v1 ["`Sample extraction solvent`"]
     v0@{shape: lean-r, label: "Sample extraction solvent"}
 class v0 ptam_node_26
 end
-subgraph v80 ["`DBGI Plan`"]
+subgraph v82 ["`DBGI Plan`"]
     direction LR
     subgraph v18 ["`Organism observation procedure`"]
     direction TB
@@ -85,130 +85,134 @@ class v15 ptam_node_48
 class v16 ptam_node_49
 end
 end
-    subgraph v31 ["`Part of Organism Collection`"]
+    subgraph v33 ["`Part of Organism Collection`"]
     direction TB
     v19@{shape: rounded, label: "Wear gloves"}
 class v19 procedure_template
     v20@{shape: rounded, label: "Sterilize scalpel and gloves"}
 class v20 procedure_template
-    v21@{shape: rounded, label: "Cut part of organism"}
-class v21 procedure_template
-    subgraph v24 ["`Wrap in coffee filter paper`"]
-    v22@{shape: lean-r, label: "Coffee Filter Wrapper"}
+    subgraph v23 ["`Harvest sample`"]
+    v21@{shape: lean-r, label: "Organism"}
+class v21 ptam_node_49
+    v22@{shape: lean-r, label: "Organism Sample"}
 class v22 ptam_node_53
-    v23@{shape: lean-r, label: "sample"}
-class v23 ptam_node_54
 end
-    subgraph v27 ["`Place in conical centrifugal tube`"]
-    v25@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
-class v25 ptam_node_55
-    v26@{shape: lean-r, label: "Coffee Filter Wrapper"}
-class v26 ptam_node_53
+    subgraph v26 ["`Wrap in coffee filter paper`"]
+    v24@{shape: lean-r, label: "Coffee Filter Wrapper"}
+class v24 ptam_node_54
+    v25@{shape: lean-r, label: "Organism Sample"}
+class v25 ptam_node_53
 end
-    subgraph v30 ["`Place in storage box`"]
-    v28@{shape: lean-r, label: "Polystyrene Box"}
-class v28 ptam_node_56
-    v29@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
-class v29 ptam_node_55
+    subgraph v29 ["`Place in conical centrifugal tube`"]
+    v27@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
+class v27 ptam_node_55
+    v28@{shape: lean-r, label: "Coffee Filter Wrapper"}
+class v28 ptam_node_54
+end
+    subgraph v32 ["`Place in storage box`"]
+    v30@{shape: lean-r, label: "Polystyrene Box"}
+class v30 ptam_node_56
+    v31@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
+class v31 ptam_node_55
 end
 end
-    subgraph v75 ["`Sample Processing`"]
+    subgraph v77 ["`Sample Processing`"]
     direction TB
-    subgraph v34 ["`Freezing`"]
-    v32@{shape: lean-r, label: "Freezer -80°C"}
-class v32 ptam_node_57
-    v33@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
-class v33 ptam_node_55
+    subgraph v36 ["`Freezing`"]
+    v34@{shape: lean-r, label: "Freezer -80°C"}
+class v34 ptam_node_57
+    v35@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
+class v35 ptam_node_55
 end
-    subgraph v37 ["`Freeze Drying`"]
-    v35@{shape: lean-r, label: "Freeze dryer"}
-class v35 ptam_node_58
-    v36@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
-class v36 ptam_node_55
+    subgraph v39 ["`Freeze Drying`"]
+    v37@{shape: lean-r, label: "Freeze dryer"}
+class v37 ptam_node_58
+    v38@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
+class v38 ptam_node_55
 end
-    subgraph v40 ["`Falcon Storage`"]
-    v38@{shape: lean-r, label: "Conical Centrifugal Tube 50ml Rack"}
-class v38 ptam_node_59
-    v39@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
-class v39 ptam_node_55
+    subgraph v42 ["`Falcon Storage`"]
+    v40@{shape: lean-r, label: "Conical Centrifugal Tube 50ml Rack"}
+class v40 ptam_node_59
+    v41@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
+class v41 ptam_node_55
 end
-    subgraph v44 ["`Fractioning`"]
-    v41@{shape: lean-r, label: "Weighing Scale"}
-class v41 ptam_node_60
-    v42@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
-class v42 ptam_node_55
-    v43@{shape: lean-r, label: "Safelock Tube 2ml"}
-class v43 ptam_node_61
+    subgraph v46 ["`Fractioning`"]
+    v43@{shape: lean-r, label: "Weighing Scale"}
+class v43 ptam_node_60
+    v44@{shape: lean-r, label: "Conical Centrifugal Tube 50ml"}
+class v44 ptam_node_55
+    v45@{shape: lean-r, label: "Safelock Tube 2ml"}
+class v45 ptam_node_61
 end
-    subgraph v48 ["`Ball Mill 1`"]
-    v45@{shape: lean-r, label: "Metal Bead 3mm"}
-class v45 ptam_node_62
-    v46@{shape: lean-r, label: "Ball Mill Machine"}
-class v46 ptam_node_63
-    v47@{shape: lean-r, label: "Safelock Tube 2ml"}
-class v47 ptam_node_61
+    subgraph v50 ["`Ball Mill 1`"]
+    v47@{shape: lean-r, label: "Metal Bead 3mm"}
+class v47 ptam_node_62
+    v48@{shape: lean-r, label: "Ball Mill Machine"}
+class v48 ptam_node_63
+    v49@{shape: lean-r, label: "Safelock Tube 2ml"}
+class v49 ptam_node_61
 end
-    subgraph v52 ["`Pouring Solvent`"]
-    v49@{shape: lean-r, label: "Volume Measuring Device"}
-class v49 ptam_node_64
-    v50@{shape: lean-r, label: "Sample extraction solvent"}
-class v50 ptam_node_26
-    v51@{shape: lean-r, label: "Safelock Tube 2ml"}
-class v51 ptam_node_61
+    subgraph v54 ["`Pouring Solvent`"]
+    v51@{shape: lean-r, label: "Volume Measuring Device"}
+class v51 ptam_node_64
+    v52@{shape: lean-r, label: "Sample extraction solvent"}
+class v52 ptam_node_26
+    v53@{shape: lean-r, label: "Safelock Tube 2ml"}
+class v53 ptam_node_61
 end
-    subgraph v56 ["`Ball Mill 2`"]
-    v53@{shape: lean-r, label: "Metal Bead 3mm"}
-class v53 ptam_node_62
-    v54@{shape: lean-r, label: "Ball Mill Machine"}
-class v54 ptam_node_63
-    v55@{shape: lean-r, label: "Safelock Tube 2ml"}
-class v55 ptam_node_61
+    subgraph v58 ["`Ball Mill 2`"]
+    v55@{shape: lean-r, label: "Metal Bead 3mm"}
+class v55 ptam_node_62
+    v56@{shape: lean-r, label: "Ball Mill Machine"}
+class v56 ptam_node_63
+    v57@{shape: lean-r, label: "Safelock Tube 2ml"}
+class v57 ptam_node_61
 end
-    subgraph v59 ["`Centrifuge`"]
-    v57@{shape: lean-r, label: "Safelock Centrifuge"}
-class v57 ptam_node_65
-    v58@{shape: lean-r, label: "Safelock Tube 2ml"}
-class v58 ptam_node_61
-end
-    subgraph v64 ["`Supernatant`"]
+    subgraph v61 ["`Centrifuge`"]
+    v59@{shape: lean-r, label: "Safelock Centrifuge"}
+class v59 ptam_node_65
     v60@{shape: lean-r, label: "Safelock Tube 2ml"}
 class v60 ptam_node_61
-    v61@{shape: lean-r, label: "Long Term Storage Vial"}
-class v61 ptam_node_66
-    v62@{shape: lean-r, label: "Pipette 1000µl"}
-class v62 ptam_node_67
-    v63@{shape: lean-r, label: "Pipette Tip 1ml"}
-class v63 ptam_node_68
 end
-    subgraph v67 ["`Capping`"]
-    v65@{shape: lean-r, label: "Long Term Storage Vial"}
-class v65 ptam_node_66
-    v66@{shape: lean-r, label: "Sealed Cap for Vial 1.5ml"}
-class v66 ptam_node_69
+    subgraph v66 ["`Supernatant`"]
+    v62@{shape: lean-r, label: "Safelock Tube 2ml"}
+class v62 ptam_node_61
+    v63@{shape: lean-r, label: "Long Term Storage Vial"}
+class v63 ptam_node_66
+    v64@{shape: lean-r, label: "Pipette 1000µl"}
+class v64 ptam_node_67
+    v65@{shape: lean-r, label: "Pipette Tip 1ml"}
+class v65 ptam_node_68
 end
-    subgraph v70 ["`Long Term Storage Vial Storage`"]
-    v68@{shape: lean-r, label: "Long Term Storage Vial Box"}
-class v68 ptam_node_70
-    v69@{shape: lean-r, label: "Long Term Storage Vial"}
-class v69 ptam_node_66
+    subgraph v69 ["`Capping`"]
+    v67@{shape: lean-r, label: "Long Term Storage Vial"}
+class v67 ptam_node_66
+    v68@{shape: lean-r, label: "Sealed Cap for Vial 1.5ml"}
+class v68 ptam_node_69
 end
-    subgraph v72 ["`Dispose of Eppendorf Tube`"]
-    v71@{shape: lean-r, label: "Safelock Tube 2ml"}
-class v71 ptam_node_61
+    subgraph v72 ["`Long Term Storage Vial Storage`"]
+    v70@{shape: lean-r, label: "Long Term Storage Vial Box"}
+class v70 ptam_node_70
+    v71@{shape: lean-r, label: "Long Term Storage Vial"}
+class v71 ptam_node_66
 end
-    subgraph v74 ["`Dispose of Pipette Tips`"]
-    v73@{shape: lean-r, label: "Pipette Tip 1ml"}
-class v73 ptam_node_68
+    subgraph v74 ["`Dispose of Eppendorf Tube`"]
+    v73@{shape: lean-r, label: "Safelock Tube 2ml"}
+class v73 ptam_node_61
+end
+    subgraph v76 ["`Dispose of Pipette Tips`"]
+    v75@{shape: lean-r, label: "Pipette Tip 1ml"}
+class v75 ptam_node_68
 end
 end
-    v76@{shape: rounded, label: "Positive Ionization LC-MS"}
-class v76 procedure_template
-    v77@{shape: rounded, label: "Negative Ionization LC-MS"}
-class v77 procedure_template
-    subgraph v79 ["`Data Enrichment Procedure`"]
-    direction TB
-    v78@{shape: rounded, label: "Weather Retrieval Procedure"}
+    v78@{shape: rounded, label: "Positive Ionization LC-MS"}
 class v78 procedure_template
+    v79@{shape: rounded, label: "Negative Ionization LC-MS"}
+class v79 procedure_template
+    subgraph v81 ["`Data Enrichment Procedure`"]
+    direction TB
+    v80@{shape: rounded, label: "Weather Retrieval Procedure"}
+class v80 procedure_template
 end
 end
 v3 e0@-.-|"`same as`"| v7
@@ -227,61 +231,65 @@ v2 ---> v6
 v6 ---> v10
 v10 ---> v14
 v14 ---> v17
-v22 e10@-.-|"`same as`"| v26
-class e10 ptam_edge_53
-v25 e11@-.-|"`same as`"| v29
-class e11 ptam_edge_55
+v4 e10@-.-|"`same as`"| v21
+class e10 ptam_edge_49
+v22 e11@-.-|"`same as`"| v25
+class e11 ptam_edge_53
+v24 e12@-.-|"`same as`"| v28
+class e12 ptam_edge_54
+v27 e13@-.-|"`same as`"| v31
+class e13 ptam_edge_55
 v19 ---> v20
-v20 ---> v21
-v21 ---> v24
-v24 ---> v27
-v27 ---> v30
-v25 e17@-.-|"`same as`"| v33
-class e17 ptam_edge_55
-v25 e18@-.-|"`same as`"| v36
-class e18 ptam_edge_55
-v25 e19@-.-|"`same as`"| v39
+v20 ---> v23
+v23 ---> v26
+v26 ---> v29
+v29 ---> v32
+v27 e19@-.-|"`same as`"| v35
 class e19 ptam_edge_55
-v25 e20@-.-|"`same as`"| v42
+v27 e20@-.-|"`same as`"| v38
 class e20 ptam_edge_55
-v43 e21@-.-|"`same as`"| v47
-class e21 ptam_edge_61
-v0 e22@-.-|"`same as`"| v50
-class e22 ptam_edge_26
-v43 e23@-.-|"`same as`"| v51
+v27 e21@-.-|"`same as`"| v41
+class e21 ptam_edge_55
+v27 e22@-.-|"`same as`"| v44
+class e22 ptam_edge_55
+v45 e23@-.-|"`same as`"| v49
 class e23 ptam_edge_61
-v45 e24@-.-|"`same as`"| v53
-class e24 ptam_edge_62
-v46 e25@-.-|"`same as`"| v54
-class e25 ptam_edge_63
-v43 e26@-.-|"`same as`"| v55
-class e26 ptam_edge_61
-v43 e27@-.-|"`same as`"| v58
-class e27 ptam_edge_61
-v43 e28@-.-|"`same as`"| v60
+v0 e24@-.-|"`same as`"| v52
+class e24 ptam_edge_26
+v45 e25@-.-|"`same as`"| v53
+class e25 ptam_edge_61
+v47 e26@-.-|"`same as`"| v55
+class e26 ptam_edge_62
+v48 e27@-.-|"`same as`"| v56
+class e27 ptam_edge_63
+v45 e28@-.-|"`same as`"| v57
 class e28 ptam_edge_61
-v61 e29@-.-|"`same as`"| v65
-class e29 ptam_edge_66
-v61 e30@-.-|"`same as`"| v69
-class e30 ptam_edge_66
-v43 e31@-.-|"`same as`"| v71
-class e31 ptam_edge_61
-v63 e32@-.-|"`same as`"| v73
-class e32 ptam_edge_68
-v34 ---> v37
-v37 ---> v40
-v40 ---> v44
-v44 ---> v48
-v48 ---> v52
-v52 ---> v56
-v56 ---> v59
-v59 ---> v64
-v64 ---> v72
-v67 ---> v70
-v72 ---> v74
-v74 ---> v67
-v18 ---> v31
-v31 ---> v75
-v75 ---> v76
-v76 ---> v77
-v77 ---> v79
+v45 e29@-.-|"`same as`"| v60
+class e29 ptam_edge_61
+v45 e30@-.-|"`same as`"| v62
+class e30 ptam_edge_61
+v63 e31@-.-|"`same as`"| v67
+class e31 ptam_edge_66
+v63 e32@-.-|"`same as`"| v71
+class e32 ptam_edge_66
+v45 e33@-.-|"`same as`"| v73
+class e33 ptam_edge_61
+v65 e34@-.-|"`same as`"| v75
+class e34 ptam_edge_68
+v36 ---> v39
+v39 ---> v42
+v42 ---> v46
+v46 ---> v50
+v50 ---> v54
+v54 ---> v58
+v58 ---> v61
+v61 ---> v66
+v66 ---> v74
+v69 ---> v72
+v74 ---> v76
+v76 ---> v69
+v18 ---> v33
+v33 ---> v77
+v77 ---> v78
+v78 ---> v79
+v79 ---> v81

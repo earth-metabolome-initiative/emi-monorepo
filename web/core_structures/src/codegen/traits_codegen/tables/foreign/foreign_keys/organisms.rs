@@ -2,6 +2,7 @@
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct OrganismForeignKeys {
     pub id: Option<crate::codegen::structs_codegen::tables::sample_sources::SampleSource>,
+    pub model: Option<crate::codegen::structs_codegen::tables::organism_models::OrganismModel>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::organisms::Organism
@@ -15,9 +16,12 @@ impl web_common_traits::prelude::HasForeignKeys
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleSource(self.id),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::OrganismModel(self.model),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.id.is_some()
+        foreign_keys.id.is_some() && foreign_keys.model.is_some()
     }
     fn update(
         &self,
@@ -27,6 +31,26 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::OrganismModel(organism_models),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.model == organism_models.id {
+                    foreign_keys.model = Some(organism_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::OrganismModel(organism_models),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.model == organism_models.id {
+                    foreign_keys.model = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::SampleSource(sample_sources),
                 web_common_traits::crud::CRUD::Read

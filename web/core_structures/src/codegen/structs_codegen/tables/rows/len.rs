@@ -81,6 +81,7 @@ impl super::Rows {
             super::Rows::Material(rows) => rows.len(),
             super::Rows::NextProcedureTemplate(rows) => rows.len(),
             super::Rows::ObservationSubject(rows) => rows.len(),
+            super::Rows::OrganismModel(rows) => rows.len(),
             super::Rows::OrganismTaxon(rows) => rows.len(),
             super::Rows::Organism(rows) => rows.len(),
             super::Rows::Organization(rows) => rows.len(),
