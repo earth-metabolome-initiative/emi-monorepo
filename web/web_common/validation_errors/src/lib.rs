@@ -54,8 +54,10 @@ pub enum SingleFieldError<FieldName = ()> {
     InvalidMail(FieldName),
     /// The provided text is not a valid font awesome class.
     InvalidFontAwesomeClass(FieldName, String),
-    /// The float is not strictly positive (0.0, ...]
+    /// The numeric value is not strictly positive (0.0, ...]
     UnexpectedNegativeOrZeroValue(FieldName),
+    /// The numeric value is not positive [0.0, ...]
+    UnexpectedNegativeValue(FieldName),
     /// The float is not strictly greater than the expected amount.
     MustBeSmallerThan(FieldName, f64),
     /// The float is not strictly smaller than the expected amount.
@@ -86,6 +88,9 @@ impl SingleFieldError {
             }
             SingleFieldError::UnexpectedNegativeOrZeroValue(()) => {
                 SingleFieldError::UnexpectedNegativeOrZeroValue(field_name)
+            }
+            SingleFieldError::UnexpectedNegativeValue(()) => {
+                SingleFieldError::UnexpectedNegativeValue(field_name)
             }
             SingleFieldError::MustBeSmallerThan((), expected_value) => {
                 SingleFieldError::MustBeSmallerThan(field_name, expected_value)
@@ -132,6 +137,7 @@ impl SingleFieldError {
             | SingleFieldError::InvalidCasCode((), _)
             | SingleFieldError::InvalidMolecularFormula((), _)
             | SingleFieldError::InvalidMediaType((), _)
+            | SingleFieldError::UnexpectedNegativeValue(())
             | SingleFieldError::UnexpectedNegativeOrZeroValue(()) => {
                 unimplemented!("Cannot convert the variant error into a double field error.")
             }
@@ -166,6 +172,9 @@ impl<FieldName> SingleFieldError<FieldName> {
             }
             SingleFieldError::UnexpectedNegativeOrZeroValue(field_name) => {
                 SingleFieldError::UnexpectedNegativeOrZeroValue(convert(field_name))
+            }
+            SingleFieldError::UnexpectedNegativeValue(field_name) => {
+                SingleFieldError::UnexpectedNegativeValue(convert(field_name))
             }
             SingleFieldError::MustBeSmallerThan(field_name, expected_value) => {
                 SingleFieldError::MustBeSmallerThan(convert(field_name), expected_value)
@@ -245,6 +254,9 @@ impl<A: core::fmt::Display> core::fmt::Display for SingleFieldError<A> {
             SingleFieldError::UnexpectedNegativeOrZeroValue(field_name) => {
                 write!(f, "The {field_name} field must be a positive number greater than zero.")
             }
+            SingleFieldError::UnexpectedNegativeValue(field_name) => {
+                write!(f, "The {field_name} field must be a non-negative number (zero or greater).")
+            }
             SingleFieldError::MustBeSmallerThan(field_name, expected_value) => {
                 write!(f, "The {field_name} field must be smaller than {expected_value}.")
             }
@@ -322,6 +334,7 @@ impl<FieldName> DoubleFieldError<FieldName> {
     }
 }
 
+#[cfg(feature = "diesel")]
 impl TryFrom<diesel::result::Error> for Error {
     type Error = diesel::result::Error;
 

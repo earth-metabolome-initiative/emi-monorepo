@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS procedures (
 	-- is generally automatically updated via triggers on the procedures
 	-- table, but it can also be manually updated if needed.
 	number_of_completed_subprocedures SMALLINT NOT NULL DEFAULT 0 CHECK (
-		must_be_strictly_positive_i16(number_of_completed_subprocedures)
+		must_be_positive_i16(number_of_completed_subprocedures)
 	),
 	-- We check that the created_at is before or equal to updated_at.
 	CHECK (must_be_smaller_than_utc(created_at, updated_at)),
