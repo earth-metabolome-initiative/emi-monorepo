@@ -17,6 +17,12 @@ const DATABASE_PORT: u16 = 12032;
 #[tokio::test]
 async fn test_init_db() {
     let mut test_time_tracker = TimeTracker::new("Test Init DB");
+
+    // We delete the `cache` directory if it exists
+    if Path::new("cache").exists() {
+        std::fs::remove_dir_all("cache").expect("Failed to remove cache directory");
+    }
+
     let task = Task::new("Booting up Docker");
     // Get the output directory
     let (docker, mut conn) = reference_docker_with_connection(DATABASE_NAME, DATABASE_PORT)
