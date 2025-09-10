@@ -195,6 +195,12 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::GeolocationProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::GeolocationProcedure
             }
+            super::Row::HarvestingProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::HarvestingProcedureTemplate
+            }
+            super::Row::HarvestingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::HarvestingProcedure
+            }
             super::Row::InstrumentState(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentState
             }

@@ -268,9 +268,9 @@ for InsertableCommercialWeighingDeviceLotBuilder<
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v7
     ///v6 --->|"`extends`"| v5
-    ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
         mut self,
@@ -604,8 +604,8 @@ where
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v0
     ///v5 --->|"`extends`"| v7
-    ///v6 --->|"`extends`"| v5
     ///v7 --->|"`extends`"| v4
+    ///v6 --->|"`extends`"| v5
     ///```
     fn parent_model(
         self,

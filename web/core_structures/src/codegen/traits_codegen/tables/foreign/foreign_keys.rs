@@ -69,6 +69,8 @@ mod freezing_procedure_templates;
 mod freezing_procedures;
 mod geolocation_procedure_templates;
 mod geolocation_procedures;
+mod harvesting_procedure_templates;
+mod harvesting_procedures;
 mod instrument_states;
 mod materials;
 mod next_procedure_templates;

@@ -7,6 +7,7 @@ mod fractioning_procedure_templates;
 mod freeze_drying_procedure_templates;
 mod freezing_procedure_templates;
 mod geolocation_procedure_templates;
+mod harvesting_procedure_templates;
 mod packaging_procedure_templates;
 mod photograph_procedure_templates;
 mod pouring_procedure_templates;
@@ -59,6 +60,9 @@ where
                     value.procedure_template_asset_models(conn)?
                 }
                 Self::GeolocationProcedureTemplate(value) => {
+                    value.procedure_template_asset_models(conn)?
+                }
+                Self::HarvestingProcedureTemplate(value) => {
                     value.procedure_template_asset_models(conn)?
                 }
                 Self::PackagingProcedureTemplate(value) => {

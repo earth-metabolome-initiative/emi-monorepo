@@ -27,25 +27,25 @@ pub use builder::AssetBuilderDAG;
 /// v17@{shape: rect, label: "volume_measuring_devices"}
 /// v18@{shape: rect, label: "volumetric_containers"}
 /// v19@{shape: rect, label: "weighing_devices"}
-/// v6 --->|"`extends`"| v10
-/// v8 --->|"`extends`"| v13
-/// v10 --->|"`extends`"| v0
-/// v2 --->|"`extends`"| v10
-/// v12 --->|"`extends`"| v10
-/// v17 --->|"`extends`"| v10
-/// v19 --->|"`extends`"| v10
-/// v18 --->|"`extends`"| v4
-/// v13 --->|"`extends`"| v10
-/// v5 --->|"`extends`"| v0
-/// v11 --->|"`extends`"| v10
-/// v3 --->|"`extends`"| v10
-/// v4 --->|"`extends`"| v10
-/// v14 --->|"`extends`"| v10
-/// v16 --->|"`extends`"| v5
-/// v1 --->|"`extends`"| v10
-/// v15 --->|"`extends`"| v5
-/// v9 --->|"`extends`"| v5
 /// v7 --->|"`extends`"| v10
+/// v9 --->|"`extends`"| v5
+/// v15 --->|"`extends`"| v5
+/// v16 --->|"`extends`"| v5
+/// v18 --->|"`extends`"| v4
+/// v17 --->|"`extends`"| v10
+/// v4 --->|"`extends`"| v10
+/// v2 --->|"`extends`"| v10
+/// v13 --->|"`extends`"| v10
+/// v3 --->|"`extends`"| v10
+/// v5 --->|"`extends`"| v0
+/// v1 --->|"`extends`"| v10
+/// v10 --->|"`extends`"| v0
+/// v6 --->|"`extends`"| v10
+/// v11 --->|"`extends`"| v10
+/// v19 --->|"`extends`"| v10
+/// v14 --->|"`extends`"| v10
+/// v12 --->|"`extends`"| v10
+/// v8 --->|"`extends`"| v13
 /// ```
 pub enum AssetDAG {
     /// Variant representing the `assets` table.

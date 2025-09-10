@@ -219,6 +219,12 @@ where
     crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::instrument_states::InstrumentState: web_common_traits::database::Read<
         C,
     >,
@@ -1078,6 +1084,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::HarvestingProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::HarvestingProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure::read(
                             primary_key,
                             conn,
                         )?

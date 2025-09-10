@@ -831,17 +831,17 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`storage_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template"}
-    /// class v1 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_stored_into_model"}
     /// class v3 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template"}
+    /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_stored_asset_model"}
     /// class v2 directly-involved-column
     /// end
+    /// v3 --->|"`associated same as`"| v4
     /// v1 --->|"`ancestral same as`"| v0
     /// v1 -.->|"`foreign defines`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v3 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
     /// v7 --->|"`extends`"| v6
     /// v7 ---o|"`associated with`"| v5
@@ -882,17 +882,17 @@ impl<
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_stored_asset"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stored_asset"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_stored_asset"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_asset(
@@ -993,17 +993,17 @@ impl<
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_stored_asset_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stored_asset"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_stored_asset_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_stored_asset_model(
@@ -1042,25 +1042,26 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`procedure_assets`"]
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
     ///    v1@{shape: rounded, label: "asset_model"}
     /// class v1 directly-involved-column
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
     /// end
     /// subgraph v9 ["`storage_procedures`"]
+    ///    v4@{shape: rounded, label: "procedure_template_stored_asset_model"}
+    /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "stored_asset"}
     /// class v5 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_stored_asset"}
     /// class v3 column-of-interest
-    ///    v4@{shape: rounded, label: "procedure_template_stored_asset_model"}
-    /// class v4 directly-involved-column
     ///    v6@{shape: rounded, label: "stored_asset_model"}
     /// class v6 directly-involved-column
     /// end
+    /// v4 --->|"`associated same as`"| v2
     /// v5 --->|"`associated same as`"| v0
     /// v3 --->|"`associated same as`"| v7
     /// v3 --->|"`associated same as`"| v7
@@ -1070,7 +1071,6 @@ impl<
     /// v3 -.->|"`foreign defines`"| v5
     /// v3 -.->|"`foreign defines`"| v6
     /// v0 -.->|"`foreign defines`"| v1
-    /// v4 --->|"`associated same as`"| v2
     /// v6 --->|"`associated same as`"| v1
     /// v9 ---o|"`associated with`"| v8
     /// ```
@@ -1207,17 +1207,17 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_stored_into"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stored_into"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_stored_into"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_into(
@@ -1262,17 +1262,17 @@ impl<
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_stored_into"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stored_into_model"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_stored_into"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_into_model(
@@ -1317,17 +1317,17 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_stored_into"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_stored_into_model"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_stored_into"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_stored_into_model(
@@ -1366,28 +1366,26 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
-    ///    v1@{shape: rounded, label: "asset_model"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "asset_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v9 ["`storage_procedures`"]
     ///    v4@{shape: rounded, label: "procedure_template_stored_into_model"}
     /// class v4 directly-involved-column
-    ///    v5@{shape: rounded, label: "stored_into"}
-    /// class v5 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_stored_into"}
     /// class v3 column-of-interest
+    ///    v5@{shape: rounded, label: "stored_into"}
+    /// class v5 directly-involved-column
     ///    v6@{shape: rounded, label: "stored_into_model"}
     /// class v6 directly-involved-column
     /// end
-    /// v0 -.->|"`foreign defines`"| v1
     /// v4 --->|"`associated same as`"| v2
-    /// v5 --->|"`associated same as`"| v0
     /// v3 --->|"`associated same as`"| v7
     /// v3 --->|"`associated same as`"| v7
     /// v3 --->|"`associated same as`"| v7
@@ -1395,6 +1393,8 @@ impl<
     /// v3 -.->|"`foreign defines`"| v4
     /// v3 -.->|"`foreign defines`"| v5
     /// v3 -.->|"`foreign defines`"| v6
+    /// v0 -.->|"`foreign defines`"| v1
+    /// v5 --->|"`associated same as`"| v0
     /// v6 --->|"`associated same as`"| v1
     /// v9 ---o|"`associated with`"| v8
     /// ```

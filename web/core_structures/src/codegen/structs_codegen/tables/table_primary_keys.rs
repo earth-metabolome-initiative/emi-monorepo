@@ -74,6 +74,8 @@ pub enum TablePrimaryKey {
     FreezingProcedure(::rosetta_uuid::Uuid),
     GeolocationProcedureTemplate(i32),
     GeolocationProcedure(::rosetta_uuid::Uuid),
+    HarvestingProcedureTemplate(i32),
+    HarvestingProcedure(::rosetta_uuid::Uuid),
     InstrumentState(i16),
     LoginProvider(i16),
     Material(i16),
@@ -347,6 +349,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::GeolocationProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::GeolocationProcedure
+            }
+            TablePrimaryKey::HarvestingProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::HarvestingProcedureTemplate
+            }
+            TablePrimaryKey::HarvestingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::HarvestingProcedure
             }
             TablePrimaryKey::InstrumentState(_) => {
                 crate::codegen::tables::table_names::TableName::InstrumentState

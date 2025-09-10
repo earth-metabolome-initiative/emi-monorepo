@@ -71,6 +71,8 @@ pub mod freezing_procedure_templates;
 pub mod freezing_procedures;
 pub mod geolocation_procedure_templates;
 pub mod geolocation_procedures;
+pub mod harvesting_procedure_templates;
+pub mod harvesting_procedures;
 pub mod instrument_states;
 pub mod login_providers;
 pub mod materials;

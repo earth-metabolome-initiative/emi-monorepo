@@ -72,6 +72,8 @@ mod freezing_procedure_templates;
 mod freezing_procedures;
 mod geolocation_procedure_templates;
 mod geolocation_procedures;
+mod harvesting_procedure_templates;
+mod harvesting_procedures;
 mod instrument_states;
 mod into_iter;
 mod len;
@@ -439,6 +441,16 @@ pub enum Rows {
     GeolocationProcedure(
         Vec<
             crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
+        >,
+    ),
+    HarvestingProcedureTemplate(
+        Vec<
+            crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+        >,
+    ),
+    HarvestingProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure,
         >,
     ),
     InstrumentState(
@@ -1182,6 +1194,20 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::HarvestingProcedureTemplate(harvesting_procedure_templates) => {
+                harvesting_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::HarvestingProcedure(harvesting_procedures) => {
+                harvesting_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::InstrumentState(instrument_states) => {
                 instrument_states
                     .iter()
@@ -1804,6 +1830,12 @@ impl web_common_traits::prelude::Rows for Rows {
             }
             Rows::GeolocationProcedure(geolocation_procedures) => {
                 geolocation_procedures.primary_keys()
+            }
+            Rows::HarvestingProcedureTemplate(harvesting_procedure_templates) => {
+                harvesting_procedure_templates.primary_keys()
+            }
+            Rows::HarvestingProcedure(harvesting_procedures) => {
+                harvesting_procedures.primary_keys()
             }
             Rows::InstrumentState(instrument_states) => instrument_states.primary_keys(),
             Rows::LoginProvider(login_providers) => login_providers.primary_keys(),

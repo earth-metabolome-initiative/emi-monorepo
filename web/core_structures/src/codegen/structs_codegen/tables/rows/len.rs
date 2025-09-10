@@ -74,6 +74,8 @@ impl super::Rows {
             super::Rows::FreezingProcedure(rows) => rows.len(),
             super::Rows::GeolocationProcedureTemplate(rows) => rows.len(),
             super::Rows::GeolocationProcedure(rows) => rows.len(),
+            super::Rows::HarvestingProcedureTemplate(rows) => rows.len(),
+            super::Rows::HarvestingProcedure(rows) => rows.len(),
             super::Rows::InstrumentState(rows) => rows.len(),
             super::Rows::LoginProvider(rows) => rows.len(),
             super::Rows::Material(rows) => rows.len(),

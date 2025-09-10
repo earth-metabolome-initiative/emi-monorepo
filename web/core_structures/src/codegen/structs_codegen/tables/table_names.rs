@@ -74,6 +74,8 @@ pub enum TableName {
     FreezingProcedure,
     GeolocationProcedureTemplate,
     GeolocationProcedure,
+    HarvestingProcedureTemplate,
+    HarvestingProcedure,
     InstrumentState,
     LoginProvider,
     Material,
@@ -291,6 +293,10 @@ impl core::fmt::Display for TableName {
             TableName::GeolocationProcedure => {
                 write!(f, stringify!(GeolocationProcedure))
             }
+            TableName::HarvestingProcedureTemplate => {
+                write!(f, stringify!(HarvestingProcedureTemplate))
+            }
+            TableName::HarvestingProcedure => write!(f, stringify!(HarvestingProcedure)),
             TableName::InstrumentState => write!(f, stringify!(InstrumentState)),
             TableName::LoginProvider => write!(f, stringify!(LoginProvider)),
             TableName::Material => write!(f, stringify!(Material)),

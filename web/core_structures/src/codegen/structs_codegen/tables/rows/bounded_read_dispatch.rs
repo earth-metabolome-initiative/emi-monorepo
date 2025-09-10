@@ -219,6 +219,12 @@ where
     crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::instrument_states::InstrumentState: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -1005,6 +1011,22 @@ where
             }
             crate::codegen::tables::table_names::TableName::GeolocationProcedure => {
                 crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::HarvestingProcedureTemplate => {
+                crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::HarvestingProcedure => {
+                crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure::bounded_read(
                         offset,
                         limit,
                         conn,

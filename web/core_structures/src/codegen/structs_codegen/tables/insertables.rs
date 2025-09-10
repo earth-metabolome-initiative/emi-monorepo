@@ -389,6 +389,18 @@ pub use geolocation_procedures::{
     GeolocationProcedureSettable, InsertableGeolocationProcedure,
     InsertableGeolocationProcedureBuilder,
 };
+mod harvesting_procedure_templates;
+pub use harvesting_procedure_templates::{
+    HarvestingProcedureTemplateAttribute, HarvestingProcedureTemplateExtensionAttribute,
+    HarvestingProcedureTemplateSettable, InsertableHarvestingProcedureTemplate,
+    InsertableHarvestingProcedureTemplateBuilder,
+};
+mod harvesting_procedures;
+pub use harvesting_procedures::{
+    HarvestingProcedureAttribute, HarvestingProcedureExtensionAttribute,
+    HarvestingProcedureSettable, InsertableHarvestingProcedure,
+    InsertableHarvestingProcedureBuilder,
+};
 mod instrument_states;
 pub use instrument_states::{
     InsertableInstrumentState, InsertableInstrumentStateBuilder, InstrumentStateAttribute,

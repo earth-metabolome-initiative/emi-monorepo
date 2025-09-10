@@ -38,6 +38,10 @@ pub enum ProcedureBuilderDAG {
     GeolocationProcedure(
         crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureBuilder,
     ),
+    ///Builder for the `harvesting_procedures` table.
+    HarvestingProcedure(
+        crate::codegen::structs_codegen::tables::insertables::InsertableHarvestingProcedureBuilder,
+    ),
     ///Builder for the `packaging_procedures` table.
     PackagingProcedure(
         crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureBuilder,
@@ -152,6 +156,16 @@ impl
         value: crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureBuilder,
     ) -> Self {
         ProcedureBuilderDAG::GeolocationProcedure(value)
+    }
+}
+impl
+    From<crate::codegen::structs_codegen::tables::insertables::InsertableHarvestingProcedureBuilder>
+    for ProcedureBuilderDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertableHarvestingProcedureBuilder,
+    ) -> Self {
+        ProcedureBuilderDAG::HarvestingProcedure(value)
     }
 }
 impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureBuilder>

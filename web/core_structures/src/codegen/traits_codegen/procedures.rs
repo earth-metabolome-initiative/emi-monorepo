@@ -7,6 +7,7 @@ mod fractioning_procedures;
 mod freeze_drying_procedures;
 mod freezing_procedures;
 mod geolocation_procedures;
+mod harvesting_procedures;
 mod packaging_procedures;
 mod photograph_procedures;
 mod pouring_procedures;

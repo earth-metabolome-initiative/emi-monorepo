@@ -17,28 +17,30 @@ pub use builder::ProcedureTemplateBuilderDAG;
 /// v6@{shape: rect, label: "freeze_drying_procedure_templates"}
 /// v7@{shape: rect, label: "freezing_procedure_templates"}
 /// v8@{shape: rect, label: "geolocation_procedure_templates"}
-/// v9@{shape: rect, label: "packaging_procedure_templates"}
-/// v10@{shape: rect, label: "photograph_procedure_templates"}
-/// v11@{shape: rect, label: "pouring_procedure_templates"}
-/// v12@{shape: rect, label: "procedure_templates"}
-/// v13@{shape: rect, label: "storage_procedure_templates"}
-/// v14@{shape: rect, label: "supernatant_procedure_templates"}
-/// v15@{shape: rect, label: "weighing_procedure_templates"}
-/// v13 --->|"`extends`"| v12
-/// v14 --->|"`extends`"| v12
-/// v8 --->|"`extends`"| v12
-/// v11 --->|"`extends`"| v12
-/// v0 --->|"`extends`"| v12
-/// v10 --->|"`extends`"| v12
-/// v4 --->|"`extends`"| v12
-/// v2 --->|"`extends`"| v12
-/// v6 --->|"`extends`"| v12
-/// v3 --->|"`extends`"| v12
-/// v15 --->|"`extends`"| v12
-/// v9 --->|"`extends`"| v12
-/// v5 --->|"`extends`"| v12
-/// v7 --->|"`extends`"| v12
-/// v1 --->|"`extends`"| v12
+/// v9@{shape: rect, label: "harvesting_procedure_templates"}
+/// v10@{shape: rect, label: "packaging_procedure_templates"}
+/// v11@{shape: rect, label: "photograph_procedure_templates"}
+/// v12@{shape: rect, label: "pouring_procedure_templates"}
+/// v13@{shape: rect, label: "procedure_templates"}
+/// v14@{shape: rect, label: "storage_procedure_templates"}
+/// v15@{shape: rect, label: "supernatant_procedure_templates"}
+/// v16@{shape: rect, label: "weighing_procedure_templates"}
+/// v9 --->|"`extends`"| v13
+/// v2 --->|"`extends`"| v13
+/// v1 --->|"`extends`"| v13
+/// v15 --->|"`extends`"| v13
+/// v10 --->|"`extends`"| v13
+/// v4 --->|"`extends`"| v13
+/// v6 --->|"`extends`"| v13
+/// v11 --->|"`extends`"| v13
+/// v0 --->|"`extends`"| v13
+/// v5 --->|"`extends`"| v13
+/// v12 --->|"`extends`"| v13
+/// v16 --->|"`extends`"| v13
+/// v3 --->|"`extends`"| v13
+/// v14 --->|"`extends`"| v13
+/// v7 --->|"`extends`"| v13
+/// v8 --->|"`extends`"| v13
 /// ```
 pub enum ProcedureTemplateDAG {
     ///Variant representing the `aliquoting_procedure_templates` table.
@@ -76,6 +78,10 @@ pub enum ProcedureTemplateDAG {
     ///Variant representing the `geolocation_procedure_templates` table.
     GeolocationProcedureTemplate(
         crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+    ),
+    ///Variant representing the `harvesting_procedure_templates` table.
+    HarvestingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
     ),
     ///Variant representing the `packaging_procedure_templates` table.
     PackagingProcedureTemplate(
@@ -188,6 +194,15 @@ impl From<
     }
 }
 impl From<
+    crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+> for ProcedureTemplateDAG {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+    ) -> Self {
+        ProcedureTemplateDAG::HarvestingProcedureTemplate(value)
+    }
+}
+impl From<
     crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
 > for ProcedureTemplateDAG {
     fn from(
@@ -280,6 +295,9 @@ where
     crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
@@ -357,6 +375,12 @@ where
                 }
                 "geolocation_procedure_templates" => {
                     <crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "harvesting_procedure_templates" => {
+                    <crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate as web_common_traits::database::Read<
                         C,
                     >>::read(*self.id(), conn)?
                         .into()

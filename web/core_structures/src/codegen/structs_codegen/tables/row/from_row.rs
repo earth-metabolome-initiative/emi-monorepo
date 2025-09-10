@@ -206,6 +206,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::GeolocationProcedure(geolocation_procedures) => {
                 crate::codegen::tables::rows::Rows::from(geolocation_procedures)
             }
+            super::Row::HarvestingProcedureTemplate(harvesting_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(harvesting_procedure_templates)
+            }
+            super::Row::HarvestingProcedure(harvesting_procedures) => {
+                crate::codegen::tables::rows::Rows::from(harvesting_procedures)
+            }
             super::Row::InstrumentState(instrument_states) => {
                 crate::codegen::tables::rows::Rows::from(instrument_states)
             }

@@ -26,6 +26,7 @@ mod freezer_models;
 mod freezers;
 mod freezing_procedure_templates;
 mod geolocation_procedure_templates;
+mod harvesting_procedure_templates;
 mod next_procedure_templates;
 mod packaging_procedure_templates;
 mod parent_procedure_templates;

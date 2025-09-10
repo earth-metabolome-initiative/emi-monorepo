@@ -16,28 +16,30 @@ pub use builder::ProcedureBuilderDAG;
 /// v6@{shape: rect, label: "freeze_drying_procedures"}
 /// v7@{shape: rect, label: "freezing_procedures"}
 /// v8@{shape: rect, label: "geolocation_procedures"}
-/// v9@{shape: rect, label: "packaging_procedures"}
-/// v10@{shape: rect, label: "photograph_procedures"}
-/// v11@{shape: rect, label: "pouring_procedures"}
-/// v12@{shape: rect, label: "procedures"}
-/// v13@{shape: rect, label: "storage_procedures"}
-/// v14@{shape: rect, label: "supernatant_procedures"}
-/// v15@{shape: rect, label: "weighing_procedures"}
-/// v14 --->|"`extends`"| v12
-/// v5 --->|"`extends`"| v12
-/// v4 --->|"`extends`"| v12
-/// v7 --->|"`extends`"| v12
-/// v8 --->|"`extends`"| v12
-/// v1 --->|"`extends`"| v12
-/// v6 --->|"`extends`"| v12
-/// v15 --->|"`extends`"| v12
-/// v3 --->|"`extends`"| v12
-/// v13 --->|"`extends`"| v12
-/// v2 --->|"`extends`"| v12
-/// v10 --->|"`extends`"| v12
-/// v9 --->|"`extends`"| v12
-/// v0 --->|"`extends`"| v12
-/// v11 --->|"`extends`"| v12
+/// v9@{shape: rect, label: "harvesting_procedures"}
+/// v10@{shape: rect, label: "packaging_procedures"}
+/// v11@{shape: rect, label: "photograph_procedures"}
+/// v12@{shape: rect, label: "pouring_procedures"}
+/// v13@{shape: rect, label: "procedures"}
+/// v14@{shape: rect, label: "storage_procedures"}
+/// v15@{shape: rect, label: "supernatant_procedures"}
+/// v16@{shape: rect, label: "weighing_procedures"}
+/// v7 --->|"`extends`"| v13
+/// v15 --->|"`extends`"| v13
+/// v11 --->|"`extends`"| v13
+/// v8 --->|"`extends`"| v13
+/// v1 --->|"`extends`"| v13
+/// v3 --->|"`extends`"| v13
+/// v12 --->|"`extends`"| v13
+/// v5 --->|"`extends`"| v13
+/// v2 --->|"`extends`"| v13
+/// v14 --->|"`extends`"| v13
+/// v0 --->|"`extends`"| v13
+/// v16 --->|"`extends`"| v13
+/// v6 --->|"`extends`"| v13
+/// v10 --->|"`extends`"| v13
+/// v9 --->|"`extends`"| v13
+/// v4 --->|"`extends`"| v13
 /// ```
 pub enum ProcedureDAG {
     /// Variant representing the `aliquoting_procedures` table.
@@ -73,6 +75,10 @@ pub enum ProcedureDAG {
     /// Variant representing the `geolocation_procedures` table.
     GeolocationProcedure(
         crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
+    ),
+    /// Variant representing the `harvesting_procedures` table.
+    HarvestingProcedure(
+        crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure,
     ),
     /// Variant representing the `packaging_procedures` table.
     PackagingProcedure(
@@ -178,6 +184,15 @@ impl From<crate::codegen::structs_codegen::tables::geolocation_procedures::Geolo
         ProcedureDAG::GeolocationProcedure(value)
     }
 }
+impl From<crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure>
+    for ProcedureDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure,
+    ) -> Self {
+        ProcedureDAG::HarvestingProcedure(value)
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure>
     for ProcedureDAG
 {
@@ -258,6 +273,8 @@ where
         web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure:
         web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure:
+        web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure:
         web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure:
@@ -326,6 +343,12 @@ where
                 }
                 "geolocation_procedures" => {
                     <crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "harvesting_procedures" => {
+                    <crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure as web_common_traits::database::Read<
                         C,
                     >>::read(*self.id(), conn)?
                         .into()

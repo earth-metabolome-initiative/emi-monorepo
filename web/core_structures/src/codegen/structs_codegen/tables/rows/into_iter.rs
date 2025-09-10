@@ -348,6 +348,16 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::GeolocationProcedure)
                     .collect::<Vec<_>>()
             }
+            super::Rows::HarvestingProcedureTemplate(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::HarvestingProcedureTemplate)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::HarvestingProcedure(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::HarvestingProcedure)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::InstrumentState(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::InstrumentState)

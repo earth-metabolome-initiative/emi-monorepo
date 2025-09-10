@@ -72,6 +72,8 @@ mod freezing_procedures;
 mod from_row;
 mod geolocation_procedure_templates;
 mod geolocation_procedures;
+mod harvesting_procedure_templates;
+mod harvesting_procedures;
 mod instrument_states;
 mod login_providers;
 mod materials;
@@ -327,6 +329,12 @@ pub enum Row {
     ),
     GeolocationProcedure(
         crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
+    ),
+    HarvestingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+    ),
+    HarvestingProcedure(
+        crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure,
     ),
     InstrumentState(
         crate::codegen::structs_codegen::tables::instrument_states::InstrumentState,
@@ -659,6 +667,12 @@ impl Row {
             Row::GeolocationProcedure(geolocation_procedures) => {
                 geolocation_procedures.upsert(conn)?.map(Row::from)
             }
+            Row::HarvestingProcedureTemplate(harvesting_procedure_templates) => {
+                harvesting_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::HarvestingProcedure(harvesting_procedures) => {
+                harvesting_procedures.upsert(conn)?.map(Row::from)
+            }
             Row::InstrumentState(instrument_states) => {
                 instrument_states.upsert(conn)?.map(Row::from)
             }
@@ -945,6 +959,10 @@ impl web_common_traits::prelude::Row for Row {
             Row::GeolocationProcedure(geolocation_procedures) => {
                 geolocation_procedures.primary_key()
             }
+            Row::HarvestingProcedureTemplate(harvesting_procedure_templates) => {
+                harvesting_procedure_templates.primary_key()
+            }
+            Row::HarvestingProcedure(harvesting_procedures) => harvesting_procedures.primary_key(),
             Row::InstrumentState(instrument_states) => instrument_states.primary_key(),
             Row::LoginProvider(login_providers) => login_providers.primary_key(),
             Row::Material(materials) => materials.primary_key(),

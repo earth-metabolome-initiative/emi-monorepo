@@ -1,8 +1,8 @@
 //! Submodule defining the Ethanol 70 percent procedure creation.
 
 use core_structures::{
-    PackagingProcedureTemplate, ProcedureTemplate, ProcedureTemplateAssetModel,
-    StorageProcedureTemplate, User,
+    HarvestingProcedureTemplate, PackagingProcedureTemplate, ProcedureTemplate,
+    ProcedureTemplateAssetModel, StorageProcedureTemplate, User,
     tables::insertables::{
         PackagingProcedureTemplateSettable, ProcedureTemplateSettable,
         StorageProcedureTemplateSettable,
@@ -74,6 +74,14 @@ pub(crate) fn init_part_of_organism_collection(
             "Use a sterile scalpel to cut the desired part of the organism, such as leaves, stems, or roots.",
         )?
         .created_by(user.id)?
+        .insert(user.id, conn)?;
+
+    // Harvest the sample from the sample source
+    let sample_harvesting = HarvestingProcedureTemplate::new()
+        .name("Harvest sample")?
+        .description("Harvest the cut part of the organism as a sample.")?
+        .created_by(user.id)?
+        .procedure_template_harvested_from_model(sample_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
     // Wrapping procedure with coffee filter paper
