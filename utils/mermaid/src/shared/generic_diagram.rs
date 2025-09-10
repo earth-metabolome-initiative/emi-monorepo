@@ -89,7 +89,10 @@ impl<Node, Edge, Config: Default> Default for GenericDiagramBuilder<Node, Edge, 
 impl<N: Node + Display, E: Edge<Node = N> + Display, C: Configuration>
     From<GenericDiagramBuilder<N, E, C>> for GenericDiagram<N, E, C>
 {
-    fn from(builder: GenericDiagramBuilder<N, E, C>) -> Self {
+    fn from(mut builder: GenericDiagramBuilder<N, E, C>) -> Self {
+        builder.generic_diagram.nodes.sort_unstable();
+        builder.generic_diagram.edges.sort_unstable();
+        builder.generic_diagram.style_classes.sort_unstable();
         builder.generic_diagram
     }
 }

@@ -8,7 +8,7 @@ use crate::{
 };
 
 /// Trait representing an edge in a Mermaid diagram.
-pub trait Edge {
+pub trait Edge: Ord {
     /// Type of the builder used to construct this edge.
     type Builder: EdgeBuilder<Edge = Self>;
     /// Type of the node this edge connects to.
