@@ -892,12 +892,12 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v5 ["`centrifuge_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
-    /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template"}
     /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
+    /// class v2 directly-involved-column
     /// end
     /// subgraph v6 ["`procedure_assets`"]
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
@@ -946,16 +946,16 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`centrifuge_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_centrifuged_container"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "centrifuged_container"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_centrifuged_container"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1001,16 +1001,16 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`centrifuge_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_centrifuged_container"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "centrifuged_container_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_centrifuged_container"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1057,16 +1057,16 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`centrifuge_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "procedure_centrifuged_container"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
@@ -1113,22 +1113,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`centrifuge_procedures`"]
-    ///    v1@{shape: rounded, label: "centrifuged_container_model"}
-    /// class v1 directly-involved-column
-    ///    v3@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
-    /// class v3 directly-involved-column
     ///    v0@{shape: rounded, label: "centrifuged_container"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "centrifuged_container_model"}
+    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_centrifuged_container"}
     /// class v2 column-of-interest
+    ///    v3@{shape: rounded, label: "procedure_template_centrifuged_container_model"}
+    /// class v3 directly-involved-column
     /// end
     /// subgraph v9 ["`procedure_assets`"]
-    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v6 directly-involved-column
     ///    v4@{shape: rounded, label: "asset"}
     /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "asset_model"}
     /// class v5 directly-involved-column
+    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v6 directly-involved-column
     ///    v7@{shape: rounded, label: "id"}
     /// class v7 undirectly-involved-column
     /// end
@@ -1285,10 +1285,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`centrifuge_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_centrifuged_with"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "centrifuged_with_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_centrifuged_with"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset_model"}
@@ -1404,16 +1404,16 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`centrifuge_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "procedure_centrifuged_with"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
@@ -1462,22 +1462,22 @@ impl<
     /// subgraph v8 ["`centrifuge_procedures`"]
     ///    v0@{shape: rounded, label: "centrifuged_with"}
     /// class v0 directly-involved-column
-    ///    v3@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
-    /// class v3 directly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_centrifuged_with"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "centrifuged_with_model"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_centrifuged_with"}
+    /// class v2 column-of-interest
+    ///    v3@{shape: rounded, label: "procedure_template_centrifuged_with_model"}
+    /// class v3 directly-involved-column
     /// end
     /// subgraph v9 ["`procedure_assets`"]
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
     ///    v4@{shape: rounded, label: "asset"}
     /// class v4 directly-involved-column
-    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v6 directly-involved-column
     ///    v5@{shape: rounded, label: "asset_model"}
     /// class v5 directly-involved-column
+    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v6 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v4
     /// v0 -.->|"`foreign defines`"| v1

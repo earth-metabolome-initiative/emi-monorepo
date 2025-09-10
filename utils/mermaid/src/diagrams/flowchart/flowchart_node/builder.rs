@@ -138,10 +138,12 @@ impl Builder for FlowchartNodeBuilder {
     type Object = FlowchartNode;
     type Error = NodeError<Self::Attribute>;
 
-    fn build(self) -> Result<Self::Object, Self::Error> {
+    fn build(mut self) -> Result<Self::Object, Self::Error> {
         if self.direction.is_some() && self.subnodes.is_empty() {
             return Err(BuilderError::IncompleteBuild(FlowchartNodeAttribute::Subnodes).into());
         }
+
+        self.subnodes.sort_unstable();
 
         Ok(FlowchartNode {
             node: self.builder.build()?,

@@ -447,10 +447,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`disposal_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "procedure_template_asset_model"}
@@ -552,10 +552,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`disposal_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "procedure_disposed_asset"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
@@ -607,10 +607,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`disposal_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_disposed_asset"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "disposed_asset"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_disposed_asset"}
+    /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_disposed_asset_model"}
     /// class v2 directly-involved-column
     /// end
