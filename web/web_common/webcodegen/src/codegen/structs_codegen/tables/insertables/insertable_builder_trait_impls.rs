@@ -287,7 +287,7 @@ impl Table {
                 let generic_ident = extension_table.struct_ident()?;
                 let generic_attributes = extension_table.insertable_enum_ty()?;
 
-                let trait_idents = extension_table_traits
+                let mut trait_idents = extension_table_traits
                     .get(extension_table)
                     .unwrap()
                     .iter()
@@ -298,6 +298,8 @@ impl Table {
                         })
                     })
                     .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+
+                trait_idents.sort_unstable_by_key(|ident| ident.to_string());
 
                 Ok(if trait_idents.is_empty() {
                     quote! { #generic_ident }

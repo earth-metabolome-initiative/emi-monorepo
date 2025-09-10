@@ -170,9 +170,9 @@ pub trait VolumetricContainerSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    Container: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+    Container: crate::codegen::structs_codegen::tables::insertables::ContainerSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
-        > + crate::codegen::structs_codegen::tables::insertables::ContainerSettable<
+        > + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
         >,
 > VolumetricContainerSettable for InsertableVolumetricContainerBuilder<Container>
