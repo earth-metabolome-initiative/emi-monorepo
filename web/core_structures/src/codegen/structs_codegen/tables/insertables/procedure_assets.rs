@@ -74,29 +74,6 @@ pub struct InsertableProcedureAsset {
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProcedureAsset {
-    #[cfg(feature = "postgres")]
-    pub fn procedure_assets_asset_asset_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
-    {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
-        };
-        let Some(asset) = self.asset else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::assets::Asset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(asset).and(
-                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
-                        .eq(&self.asset_model),
-                ),
-            )
-            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
-            .optional()
-    }
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -288,6 +265,29 @@ impl InsertableProcedureAsset {
             (self.asset_model, self.ancestor_model),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn procedure_assets_asset_asset_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
+    {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(asset) = self.asset else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(asset).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.asset_model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+            .optional()
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]

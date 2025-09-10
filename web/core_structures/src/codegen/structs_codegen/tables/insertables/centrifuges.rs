@@ -196,8 +196,8 @@ impl<
     ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v4 --->|"`extends`"| v5
     ///v5 --->|"`extends`"| v3
+    ///v4 --->|"`extends`"| v5
     ///```
     fn model(
         mut self,
@@ -435,18 +435,18 @@ where
     /// class v2 undirectly-involved-column
     /// end
     /// subgraph v4 ["`centrifuges`"]
-    ///    v1@{shape: rounded, label: "model"}
-    /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`physical_assets`"]
-    ///    v0@{shape: rounded, label: "model"}
-    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "model"}
+    /// class v1 column-of-interest
     /// end
-    /// v1 --->|"`ancestral same as`"| v2
-    /// v1 -.->|"`inferred ancestral same as`"| v0
     /// v0 --->|"`ancestral same as`"| v2
-    /// v4 --->|"`extends`"| v5
+    /// v0 -.->|"`inferred ancestral same as`"| v1
+    /// v1 --->|"`ancestral same as`"| v2
     /// v5 --->|"`extends`"| v3
+    /// v4 --->|"`extends`"| v5
     /// ```
     fn model(
         self,

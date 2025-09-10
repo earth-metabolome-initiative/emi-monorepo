@@ -107,6 +107,13 @@ where
                     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Deprecated,
                 ),
             )?;
+        let number_of_subprocedure_templates = self
+            .number_of_subprocedure_templates
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::NumberOfSubprocedureTemplates,
+                ),
+            )?;
         Ok(Self::InsertableVariant {
             most_concrete_table,
             name,
@@ -117,6 +124,7 @@ where
             updated_by,
             updated_at,
             deprecated,
+            number_of_subprocedure_templates,
         })
     }
 }

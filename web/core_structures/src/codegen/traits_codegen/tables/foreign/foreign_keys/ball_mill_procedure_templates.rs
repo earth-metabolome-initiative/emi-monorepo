@@ -1,12 +1,6 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BallMillProcedureTemplateForeignKeys {
-    pub ball_mill_procedure_templates_milled_with_model_bead_model_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-    >,
-    pub ball_mill_procedure_templates_bead_model_milled_container_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-    >,
     pub procedure_template: Option<
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
     >,
@@ -31,6 +25,12 @@ pub struct BallMillProcedureTemplateForeignKeys {
     pub ball_mill_procedure_templates_milled_with_model_milled_con_fkey: Option<
         crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
     >,
+    pub ball_mill_procedure_templates_milled_with_model_bead_model_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    >,
+    pub ball_mill_procedure_templates_bead_model_milled_container_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    >,
 }
 impl web_common_traits::prelude::HasForeignKeys
 for crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate {
@@ -40,24 +40,6 @@ for crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::Ball
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
-                        self.milled_with_model,
-                        self.bead_model,
-                    )),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
-                        self.bead_model,
-                        self.milled_container_model,
-                    )),
-                ),
-            );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -123,15 +105,27 @@ for crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::Ball
                     )),
                 ),
             );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
+                        self.milled_with_model,
+                        self.bead_model,
+                    )),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
+                        self.bead_model,
+                        self.milled_container_model,
+                    )),
+                ),
+            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys
-            .ball_mill_procedure_templates_milled_with_model_bead_model_fkey
-            .is_some()
-            && foreign_keys
-                .ball_mill_procedure_templates_bead_model_milled_container_fkey
-                .is_some() && foreign_keys.procedure_template.is_some()
-            && foreign_keys.bead_model.is_some()
+        foreign_keys.procedure_template.is_some() && foreign_keys.bead_model.is_some()
             && foreign_keys.procedure_template_bead_model.is_some()
             && foreign_keys.milled_with_model.is_some()
             && foreign_keys.procedure_template_milled_with_model.is_some()
@@ -139,6 +133,12 @@ for crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::Ball
             && foreign_keys.procedure_template_milled_container_model.is_some()
             && foreign_keys
                 .ball_mill_procedure_templates_milled_with_model_milled_con_fkey
+                .is_some()
+            && foreign_keys
+                .ball_mill_procedure_templates_milled_with_model_bead_model_fkey
+                .is_some()
+            && foreign_keys
+                .ball_mill_procedure_templates_bead_model_milled_container_fkey
                 .is_some()
     }
     fn update(
@@ -158,6 +158,16 @@ for crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::Ball
                 | web_common_traits::crud::CRUD::Update,
             ) => {
                 if self.milled_with_model == asset_compatibility_rules.left_asset_model
+                    && self.milled_container_model
+                        == asset_compatibility_rules.right_asset_model
+                {
+                    foreign_keys
+                        .ball_mill_procedure_templates_milled_with_model_milled_con_fkey = Some(
+                        asset_compatibility_rules,
+                    );
+                    updated = true;
+                }
+                if self.milled_with_model == asset_compatibility_rules.left_asset_model
                     && self.bead_model == asset_compatibility_rules.right_asset_model
                 {
                     foreign_keys
@@ -176,16 +186,6 @@ for crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::Ball
                     );
                     updated = true;
                 }
-                if self.milled_with_model == asset_compatibility_rules.left_asset_model
-                    && self.milled_container_model
-                        == asset_compatibility_rules.right_asset_model
-                {
-                    foreign_keys
-                        .ball_mill_procedure_templates_milled_with_model_milled_con_fkey = Some(
-                        asset_compatibility_rules,
-                    );
-                    updated = true;
-                }
             }
             (
                 crate::codegen::tables::row::Row::AssetCompatibilityRule(
@@ -193,6 +193,14 @@ for crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::Ball
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
+                if self.milled_with_model == asset_compatibility_rules.left_asset_model
+                    && self.milled_container_model
+                        == asset_compatibility_rules.right_asset_model
+                {
+                    foreign_keys
+                        .ball_mill_procedure_templates_milled_with_model_milled_con_fkey = None;
+                    updated = true;
+                }
                 if self.milled_with_model == asset_compatibility_rules.left_asset_model
                     && self.bead_model == asset_compatibility_rules.right_asset_model
                 {
@@ -206,14 +214,6 @@ for crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::Ball
                 {
                     foreign_keys
                         .ball_mill_procedure_templates_bead_model_milled_container_fkey = None;
-                    updated = true;
-                }
-                if self.milled_with_model == asset_compatibility_rules.left_asset_model
-                    && self.milled_container_model
-                        == asset_compatibility_rules.right_asset_model
-                {
-                    foreign_keys
-                        .ball_mill_procedure_templates_milled_with_model_milled_con_fkey = None;
                     updated = true;
                 }
             }

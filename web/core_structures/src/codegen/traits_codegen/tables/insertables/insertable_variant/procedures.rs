@@ -61,6 +61,16 @@ where
                 Some(procedures.procedure_template),
             )?;
         }
+        if let Some(predecessor_procedure) = self.predecessor_procedure {
+            let procedures = crate::codegen::structs_codegen::tables::procedures::Procedure::read(
+                predecessor_procedure,
+                conn,
+            )?;
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
+                self,
+                Some(procedures.procedure_template),
+            )?;
+        }
         let procedure = self
             .procedure
             .ok_or(
@@ -110,16 +120,26 @@ where
                     crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::UpdatedAt,
                 ),
             )?;
+        let number_of_completed_subprocedures = self
+            .number_of_completed_subprocedures
+            .ok_or(
+                common_traits::prelude::BuilderError::IncompleteBuild(
+                    crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::NumberOfCompletedSubprocedures,
+                ),
+            )?;
         Ok(Self::InsertableVariant {
             procedure,
             procedure_template,
             parent_procedure: self.parent_procedure,
             parent_procedure_template: self.parent_procedure_template,
+            predecessor_procedure: self.predecessor_procedure,
+            predecessor_procedure_template: self.predecessor_procedure_template,
             most_concrete_table,
             created_by,
             created_at,
             updated_by,
             updated_at,
+            number_of_completed_subprocedures,
         })
     }
 }

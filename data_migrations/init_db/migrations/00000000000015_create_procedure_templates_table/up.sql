@@ -21,6 +21,12 @@ CREATE TABLE IF NOT EXISTS procedure_templates (
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP CHECK (must_be_smaller_than_utc(created_at, updated_at)),
 	-- Whether this procedure template is deprecated and should not be used for new procedures
 	deprecated BOOLEAN NOT NULL DEFAULT FALSE,
+	-- The number of subprocedures this procedure template has. This field
+	-- is generally automatically updated via triggers on the parent_procedure_templates
+	-- table, but it can also be manually updated if needed.
+	number_of_subprocedure_templates SMALLINT NOT NULL DEFAULT 0 CHECK (
+		must_be_strictly_positive_i16(number_of_subprocedure_templates)
+	),
 	-- We enforce that the name and description are distinct to avoid lazy duplicates
 	CHECK (must_be_distinct(name, description))
 );
@@ -35,6 +41,22 @@ CREATE TABLE IF NOT EXISTS parent_procedure_templates (
 	-- The timestamp when this relationship was created
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Upon inserting a new parent-child relationship, we increment the number_of_subprocedure_templates
+-- of the parent procedure template and update the `updated_at` and `updated_by` fields.
+CREATE OR REPLACE FUNCTION increment_number_of_subprocedure_templates() RETURNS TRIGGER AS $$ BEGIN
+UPDATE procedure_templates
+SET number_of_subprocedure_templates = number_of_subprocedure_templates + 1,
+	updated_at = CURRENT_TIMESTAMP,
+	updated_by = NEW.created_by
+WHERE procedure_template = NEW.parent;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE OR REPLACE TRIGGER trg_increment_number_of_subprocedure_templates
+AFTER
+INSERT ON parent_procedure_templates FOR EACH ROW EXECUTE FUNCTION increment_number_of_subprocedure_templates();
+
 CREATE TABLE IF NOT EXISTS next_procedure_templates (
 	PRIMARY KEY (parent, predecessor, successor),
 	-- The parent procedure template
@@ -53,31 +75,18 @@ CREATE TABLE IF NOT EXISTS next_procedure_templates (
 	FOREIGN KEY (parent, successor) REFERENCES parent_procedure_templates(parent, child)
 );
 -- Trigger function
-CREATE OR REPLACE FUNCTION ensure_parent_procedure_templates()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-    -- Insert predecessor parent relationship if missing
-    INSERT INTO parent_procedure_templates (parent, child, created_by)
-    VALUES (NEW.parent, NEW.predecessor, NEW.created_by)
-    ON CONFLICT (parent, child) DO NOTHING;
-
-    -- Insert successor parent relationship if missing
-    INSERT INTO parent_procedure_templates (parent, child, created_by)
-    VALUES (NEW.parent, NEW.successor, NEW.created_by)
-    ON CONFLICT (parent, child) DO NOTHING;
-
-    RETURN NEW;
+CREATE OR REPLACE FUNCTION ensure_parent_procedure_templates() RETURNS TRIGGER LANGUAGE plpgsql AS $$ BEGIN -- Insert predecessor parent relationship if missing
+INSERT INTO parent_procedure_templates (parent, child, created_by)
+VALUES (NEW.parent, NEW.predecessor, NEW.created_by) ON CONFLICT (parent, child) DO NOTHING;
+-- Insert successor parent relationship if missing
+INSERT INTO parent_procedure_templates (parent, child, created_by)
+VALUES (NEW.parent, NEW.successor, NEW.created_by) ON CONFLICT (parent, child) DO NOTHING;
+RETURN NEW;
 END;
 $$;
-
 -- Trigger
-CREATE TRIGGER before_insert_next_procedure_templates
-BEFORE INSERT ON next_procedure_templates
-FOR EACH ROW
-EXECUTE FUNCTION ensure_parent_procedure_templates();
-
+CREATE TRIGGER before_insert_next_procedure_templates BEFORE
+INSERT ON next_procedure_templates FOR EACH ROW EXECUTE FUNCTION ensure_parent_procedure_templates();
 CREATE TABLE IF NOT EXISTS procedure_template_asset_models (
 	-- Identifier of the procedure template asset model
 	id SERIAL PRIMARY KEY,
@@ -107,7 +116,6 @@ CREATE TABLE IF NOT EXISTS procedure_template_asset_models (
 	-- keys from the concrete procedures to check that the asset model is correctly aligned.
 	UNIQUE (id, asset_model)
 );
-
 CREATE OR REPLACE FUNCTION inherit_procedure_template_asset_models() RETURNS TRIGGER AS $$ BEGIN
 INSERT INTO procedure_template_asset_models (
 		name,

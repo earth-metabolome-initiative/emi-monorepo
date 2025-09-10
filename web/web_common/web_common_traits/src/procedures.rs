@@ -119,8 +119,11 @@ pub trait ProcedureTemplateGraph<C> {
         procedure_template_asset_model: &Self::ProcedureTemplateAssetModel,
     ) -> Option<&Self::ProcedureAsset>;
 
-    /// Returns the current parent procedure.
-    fn parent_procedure(&self) -> &Self::Procedure;
+    /// Returns the current parent procedure, if any.
+    fn parent_procedure(&self) -> Option<&Self::Procedure>;
+
+    /// Returns the last processed procedure, if any.
+    fn last_procedure(&self) -> Option<&Self::Procedure>;
 
     /// Returns a reference to the next procedure template to be processed, if
     /// any.

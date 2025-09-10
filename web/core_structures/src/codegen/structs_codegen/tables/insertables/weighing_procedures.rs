@@ -726,17 +726,17 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`weighing_procedures`"]
-    ///    v3@{shape: rounded, label: "procedure_template_weighed_with_model"}
-    /// class v3 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template"}
     /// class v1 column-of-interest
+    ///    v3@{shape: rounded, label: "procedure_template_weighed_with_model"}
+    /// class v3 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_weighed_container_model"}
     /// class v2 directly-involved-column
     /// end
-    /// v3 --->|"`associated same as`"| v4
     /// v1 --->|"`ancestral same as`"| v0
     /// v1 -.->|"`foreign defines`"| v2
     /// v1 -.->|"`foreign defines`"| v3
+    /// v3 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v4
     /// v7 --->|"`extends`"| v6
     /// v7 ---o|"`associated with`"| v5
@@ -778,16 +778,16 @@ impl<
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_weighed_container"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "weighed_container"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_weighed_container"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn weighed_container(
@@ -833,16 +833,16 @@ impl<
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_weighed_container"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_weighed_container_model"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_weighed_container"}
+    /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_weighed_container_model(
@@ -884,26 +884,26 @@ impl<
     /// subgraph v6 ["`procedure_assets`"]
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`weighing_procedures`"]
+    ///    v2@{shape: rounded, label: "procedure_template_weighed_container_model"}
+    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_weighed_container"}
     /// class v3 column-of-interest
     ///    v4@{shape: rounded, label: "weighed_container"}
     /// class v4 directly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_template_weighed_container_model"}
-    /// class v2 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v1
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 -.->|"`foreign defines`"| v2
     /// v3 -.->|"`foreign defines`"| v4
     /// v4 --->|"`associated same as`"| v0
-    /// v2 --->|"`associated same as`"| v1
     /// v7 ---o|"`associated with`"| v6
     /// ```
     fn procedure_weighed_container<PWC>(
@@ -1093,16 +1093,16 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_weighed_with_model"}
-    /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_weighed_with"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_weighed_with_model"}
+    /// class v1 column-of-interest
     /// end
-    /// v1 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_weighed_with_model(
@@ -1141,28 +1141,28 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v1 directly-involved-column
     /// end
     /// subgraph v7 ["`weighing_procedures`"]
+    ///    v4@{shape: rounded, label: "weighed_with"}
+    /// class v4 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_weighed_with"}
     /// class v3 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_weighed_with_model"}
     /// class v2 directly-involved-column
-    ///    v4@{shape: rounded, label: "weighed_with"}
-    /// class v4 directly-involved-column
     /// end
+    /// v4 --->|"`associated same as`"| v0
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v3 -.->|"`foreign defines`"| v2
     /// v3 -.->|"`foreign defines`"| v4
     /// v2 --->|"`associated same as`"| v1
-    /// v4 --->|"`associated same as`"| v0
     /// v7 ---o|"`associated with`"| v6
     /// ```
     fn procedure_weighed_with<PWW>(
@@ -1346,6 +1346,42 @@ where
         Ok(self)
     }
     #[inline]
+    ///Sets the value of the `public.procedures.predecessor_procedure` column.
+    fn predecessor_procedure(
+        mut self,
+        predecessor_procedure: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
+                self.procedure,
+                predecessor_procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.predecessor_procedure_template` column.
+    fn predecessor_procedure_template(
+        mut self,
+        predecessor_procedure_template: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
+                self.procedure,
+                predecessor_procedure_template,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
     fn created_by(
         mut self,
@@ -1420,6 +1456,28 @@ where
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
                 self.procedure,
                 updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.number_of_completed_subprocedures` column.
+    fn number_of_completed_subprocedures<NOCS>(
+        mut self,
+        number_of_completed_subprocedures: NOCS,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        NOCS: TryInto<i16>,
+        validation_errors::SingleFieldError: From<<NOCS as TryInto<i16>>::Error>,
+    {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::number_of_completed_subprocedures(
+                self.procedure,
+                number_of_completed_subprocedures,
             )
             .map_err(|e| {
                 e

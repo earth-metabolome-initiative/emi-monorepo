@@ -213,10 +213,10 @@ pub trait CommercialPipetteLotSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     PipetteModel,
@@ -254,12 +254,12 @@ for InsertableCommercialPipetteLotBuilder<CommercialProductLot, PipetteModel> {
     ///end
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
-    ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v6
+    ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v7
     ///```
     fn product_model(
@@ -513,19 +513,19 @@ where
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     ///subgraph v3 ["`commercial_pipette_lots`"]
-    ///    v1@{shape: rounded, label: "product_model"}
-    ///class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "product_model"}
+    ///class v0 directly-involved-column
     ///end
     ///subgraph v4 ["`commercial_product_lots`"]
-    ///    v0@{shape: rounded, label: "product_model"}
-    ///class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "product_model"}
+    ///class v1 column-of-interest
     ///end
     ///subgraph v5 ["`physical_asset_models`"]
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 undirectly-involved-column
     ///end
+    ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v3 --->|"`extends`"| v4
     ///v4 --->|"`extends`"| v5
@@ -567,25 +567,25 @@ where
     ///class v2 undirectly-involved-column
     ///end
     ///subgraph v5 ["`commercial_pipette_lots`"]
-    ///    v1@{shape: rounded, label: "product_model"}
-    ///class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "product_model"}
+    ///class v0 directly-involved-column
     ///end
     ///subgraph v6 ["`commercial_product_lots`"]
     ///    v3@{shape: rounded, label: "product_model"}
     ///class v3 undirectly-involved-column
     ///end
     ///subgraph v7 ["`physical_asset_models`"]
-    ///    v0@{shape: rounded, label: "parent_model"}
-    ///class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "parent_model"}
+    ///class v1 column-of-interest
     ///end
     ///v0 --->|"`ancestral same as`"| v2
+    ///v0 -.->|"`inferred ancestral same as`"| v3
+    ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
+    ///v3 -.->|"`inferred ancestral same as`"| v1
     ///v1 --->|"`ancestral same as`"| v2
-    ///v1 -.->|"`inferred ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v7 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v6
+    ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v7
     ///```
     fn parent_model(

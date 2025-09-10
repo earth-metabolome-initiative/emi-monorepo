@@ -85,6 +85,23 @@ impl diesel::Identifiable for FreezingProcedure {
     }
 }
 impl FreezingProcedure {
+    pub fn frozen_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
+            self.frozen_container,
+            conn,
+        )
+    }
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -111,23 +128,6 @@ impl FreezingProcedure {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate::read(
             self.procedure_template,
-            conn,
-        )
-    }
-    pub fn frozen_container<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
-            self.frozen_container,
             conn,
         )
     }
@@ -1011,6 +1011,50 @@ impl FreezingProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_predecessor_procedure(
+        predecessor_procedure: ::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            freezing_procedures::freezing_procedures, procedures::procedures,
+        };
+        Self::table()
+            .inner_join(
+                procedures::table.on(freezing_procedures::procedure.eq(procedures::procedure)),
+            )
+            .filter(procedures::predecessor_procedure.eq(predecessor_procedure))
+            .order_by(freezing_procedures::procedure.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_predecessor_procedure_template(
+        predecessor_procedure_template: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            freezing_procedures::freezing_procedures, procedures::procedures,
+        };
+        Self::table()
+            .inner_join(
+                procedures::table.on(freezing_procedures::procedure.eq(procedures::procedure)),
+            )
+            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .order_by(freezing_procedures::procedure.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_most_concrete_table(
         most_concrete_table: &str,
         conn: &mut diesel::PgConnection,
@@ -1116,6 +1160,30 @@ impl FreezingProcedure {
                 procedures::table.on(freezing_procedures::procedure.eq(procedures::procedure)),
             )
             .filter(procedures::updated_at.eq(updated_at))
+            .order_by(freezing_procedures::procedure.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_number_of_completed_subprocedures(
+        number_of_completed_subprocedures: i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            freezing_procedures::freezing_procedures, procedures::procedures,
+        };
+        Self::table()
+            .inner_join(
+                procedures::table.on(freezing_procedures::procedure.eq(procedures::procedure)),
+            )
+            .filter(
+                procedures::number_of_completed_subprocedures.eq(number_of_completed_subprocedures),
+            )
             .order_by(freezing_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

@@ -78,44 +78,6 @@ impl diesel::Identifiable for BallMillProcedureTemplate {
     }
 }
 impl BallMillProcedureTemplate {
-    pub fn ball_mill_procedure_templates_milled_with_model_bead_model_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
-            (self.milled_with_model, self.bead_model),
-            conn,
-        )
-    }
-    pub fn ball_mill_procedure_templates_bead_model_milled_container_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
-            (self.bead_model, self.milled_container_model),
-            conn,
-        )
-    }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -329,6 +291,44 @@ impl BallMillProcedureTemplate {
             conn,
         )
     }
+    pub fn ball_mill_procedure_templates_milled_with_model_bead_model_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
+            (self.milled_with_model, self.bead_model),
+            conn,
+        )
+    }
+    pub fn ball_mill_procedure_templates_bead_model_milled_container_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
+            (self.bead_model, self.milled_container_model),
+            conn,
+        )
+    }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_and_procedure_template_bead_model(
         procedure_template: i32,
@@ -391,44 +391,6 @@ impl BallMillProcedureTemplate {
             )
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
             .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_milled_with_model_and_bead_model(
-        milled_with_model: i32,
-        bead_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates;
-        Self::table()
-            .filter(
-                ball_mill_procedure_templates::milled_with_model
-                    .eq(milled_with_model)
-                    .and(ball_mill_procedure_templates::bead_model.eq(bead_model)),
-            )
-            .order_by(ball_mill_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_bead_model_and_milled_container_model(
-        bead_model: i32,
-        milled_container_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates;
-        Self::table()
-            .filter(ball_mill_procedure_templates::bead_model.eq(bead_model).and(
-                ball_mill_procedure_templates::milled_container_model.eq(milled_container_model),
-            ))
-            .order_by(ball_mill_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
     }
     pub fn from_procedure_template<C>(
         procedure_template: i32,
@@ -671,6 +633,44 @@ impl BallMillProcedureTemplate {
         use crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates;
         Self::table()
             .filter(ball_mill_procedure_templates::milled_with_model.eq(milled_with_model).and(
+                ball_mill_procedure_templates::milled_container_model.eq(milled_container_model),
+            ))
+            .order_by(ball_mill_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_milled_with_model_and_bead_model(
+        milled_with_model: i32,
+        bead_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates;
+        Self::table()
+            .filter(
+                ball_mill_procedure_templates::milled_with_model
+                    .eq(milled_with_model)
+                    .and(ball_mill_procedure_templates::bead_model.eq(bead_model)),
+            )
+            .order_by(ball_mill_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_bead_model_and_milled_container_model(
+        bead_model: i32,
+        milled_container_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates;
+        Self::table()
+            .filter(ball_mill_procedure_templates::bead_model.eq(bead_model).and(
                 ball_mill_procedure_templates::milled_container_model.eq(milled_container_model),
             ))
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
@@ -927,6 +927,33 @@ impl BallMillProcedureTemplate {
                     .eq(procedure_templates::procedure_template)),
             )
             .filter(procedure_templates::deprecated.eq(deprecated))
+            .order_by(ball_mill_procedure_templates::procedure_template.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_number_of_subprocedure_templates(
+        number_of_subprocedure_templates: i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            ball_mill_procedure_templates::ball_mill_procedure_templates,
+            procedure_templates::procedure_templates,
+        };
+        Self::table()
+            .inner_join(
+                procedure_templates::table.on(ball_mill_procedure_templates::procedure_template
+                    .eq(procedure_templates::procedure_template)),
+            )
+            .filter(
+                procedure_templates::number_of_subprocedure_templates
+                    .eq(number_of_subprocedure_templates),
+            )
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

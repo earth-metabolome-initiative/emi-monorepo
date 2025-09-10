@@ -545,16 +545,16 @@ where
     ///class v2 undirectly-involved-column
     ///end
     ///subgraph v4 ["`commercial_weighing_device_models`"]
-    ///    v1@{shape: rounded, label: "weighing_device_model"}
-    ///class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "weighing_device_model"}
+    ///class v0 directly-involved-column
     ///end
     ///subgraph v5 ["`physical_asset_models`"]
-    ///    v0@{shape: rounded, label: "parent_model"}
-    ///class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "parent_model"}
+    ///class v1 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
-    ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(

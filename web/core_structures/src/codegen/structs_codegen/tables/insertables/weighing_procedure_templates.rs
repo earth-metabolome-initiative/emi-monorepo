@@ -443,15 +443,15 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "weighed_container_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_weighed_container_model"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "weighed_container_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn weighed_container_model(
@@ -494,21 +494,21 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_weighed_container_model"}
-    /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "weighed_container_model"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_weighed_container_model"}
+    /// class v1 column-of-interest
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_weighed_container_model<PTWCM>(
@@ -581,10 +581,10 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedure_templates`"]
     ///    v2@{shape: rounded, label: "weighed_with_model"}
@@ -642,15 +642,15 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
     /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`weighing_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_weighed_with_model"}
-    /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "weighed_with_model"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_weighed_with_model"}
+    /// class v1 column-of-interest
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_weighed_with_model<PTWWM>(
@@ -878,6 +878,28 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
                 self.procedure_template,
                 deprecated,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedure_templates.number_of_subprocedure_templates` column.
+    fn number_of_subprocedure_templates<NOST>(
+        mut self,
+        number_of_subprocedure_templates: NOST,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        NOST: TryInto<i16>,
+        validation_errors::SingleFieldError: From<<NOST as TryInto<i16>>::Error>,
+    {
+        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::number_of_subprocedure_templates(
+                self.procedure_template,
+                number_of_subprocedure_templates,
             )
             .map_err(|e| {
                 e

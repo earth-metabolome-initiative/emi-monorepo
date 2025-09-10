@@ -1257,16 +1257,16 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v7 ["`aliquoting_procedures`"]
+    ///    v4@{shape: rounded, label: "procedure_template_pipette_tip_model"}
+    /// class v4 directly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template"}
     /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
     /// class v1 directly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_template_aliquoted_with_model"}
     /// class v3 directly-involved-column
-    ///    v4@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v4 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
+    /// class v2 directly-involved-column
     /// end
     /// subgraph v8 ["`procedure_assets`"]
     ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
@@ -1276,15 +1276,15 @@ impl<
     ///    v5@{shape: rounded, label: "procedure_template"}
     /// class v5 directly-involved-column
     /// end
+    /// v4 --->|"`associated same as`"| v6
     /// v0 --->|"`ancestral same as`"| v5
     /// v0 -.->|"`foreign defines`"| v4
     /// v0 -.->|"`foreign defines`"| v1
     /// v0 -.->|"`foreign defines`"| v2
     /// v0 -.->|"`foreign defines`"| v3
     /// v1 --->|"`associated same as`"| v6
-    /// v2 --->|"`associated same as`"| v6
     /// v3 --->|"`associated same as`"| v6
-    /// v4 --->|"`associated same as`"| v6
+    /// v2 --->|"`associated same as`"| v6
     /// v7 --->|"`extends`"| v9
     /// v7 ---o|"`associated with`"| v8
     /// ```
@@ -1319,10 +1319,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedures`"]
-    ///    v0@{shape: rounded, label: "aliquoted_with"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_aliquoted_with"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "aliquoted_with"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -1330,12 +1330,12 @@ impl<
     ///    v2@{shape: rounded, label: "asset"}
     /// class v2 directly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn aliquoted_with(
@@ -1380,10 +1380,10 @@ impl<
     /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1436,10 +1436,10 @@ impl<
     /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
@@ -1488,26 +1488,24 @@ impl<
     /// subgraph v8 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "aliquoted_with"}
     /// class v0 directly-involved-column
-    ///    v1@{shape: rounded, label: "aliquoted_with_model"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_aliquoted_with"}
     /// class v2 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_aliquoted_with_model"}
     /// class v3 directly-involved-column
+    ///    v1@{shape: rounded, label: "aliquoted_with_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v9 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "asset"}
-    /// class v4 directly-involved-column
-    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v6 directly-involved-column
-    ///    v5@{shape: rounded, label: "asset_model"}
-    /// class v5 directly-involved-column
     ///    v7@{shape: rounded, label: "id"}
     /// class v7 undirectly-involved-column
+    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v6 directly-involved-column
+    ///    v4@{shape: rounded, label: "asset"}
+    /// class v4 directly-involved-column
+    ///    v5@{shape: rounded, label: "asset_model"}
+    /// class v5 directly-involved-column
     /// end
-    /// v4 -.->|"`foreign defines`"| v5
     /// v0 --->|"`associated same as`"| v4
-    /// v1 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
@@ -1516,6 +1514,8 @@ impl<
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v3
     /// v3 --->|"`associated same as`"| v6
+    /// v1 --->|"`associated same as`"| v5
+    /// v4 -.->|"`foreign defines`"| v5
     /// v8 ---o|"`associated with`"| v9
     /// ```
     fn procedure_aliquoted_with<PAW>(
@@ -1650,22 +1650,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedures`"]
-    ///    v0@{shape: rounded, label: "pipette_tip_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_pipette_tip"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "pipette_tip_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
+    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn pipette_tip_model(
@@ -1759,28 +1759,28 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`aliquoting_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v2 directly-involved-column
-    ///    v1@{shape: rounded, label: "procedure_pipette_tip"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "pipette_tip_model"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_pipette_tip"}
+    /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
+    /// class v2 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
-    ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
-    ///    v3@{shape: rounded, label: "asset_model"}
-    /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
+    ///    v3@{shape: rounded, label: "asset_model"}
+    /// class v3 directly-involved-column
+    ///    v5@{shape: rounded, label: "id"}
+    /// class v5 undirectly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v4
+    /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
-    /// v0 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn procedure_pipette_tip<PPT>(
@@ -1881,10 +1881,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_aliquoted_from"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "aliquoted_from"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_aliquoted_from"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset"}
@@ -1892,11 +1892,11 @@ impl<
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn aliquoted_from(
@@ -1942,10 +1942,10 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
@@ -1991,27 +1991,27 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`aliquoting_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_aliquoted_from"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
+    /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "aliquoted_from"}
     /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "asset"}
-    /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
+    ///    v3@{shape: rounded, label: "asset"}
+    /// class v3 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v4
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v4
     /// v0 --->|"`associated same as`"| v3
     /// v6 ---o|"`associated with`"| v7
     /// ```
@@ -2116,10 +2116,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_aliquoted_into"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "aliquoted_into"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_aliquoted_into"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -2127,11 +2127,11 @@ impl<
     ///    v2@{shape: rounded, label: "asset"}
     /// class v2 directly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn aliquoted_into(
@@ -2171,22 +2171,22 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "procedure_aliquoted_into"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_aliquoted_into_model(
@@ -2234,12 +2234,12 @@ impl<
     /// class v2 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "asset"}
-    /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
+    ///    v3@{shape: rounded, label: "asset"}
+    /// class v3 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
@@ -2381,14 +2381,14 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///subgraph v2 ["`aliquoting_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template"}
-    ///class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template"}
+    ///class v0 directly-involved-column
     ///end
     ///subgraph v3 ["`procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_template"}
-    ///class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template"}
+    ///class v1 column-of-interest
     ///end
-    ///v1 --->|"`ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v1
     ///v2 --->|"`extends`"| v3
     ///```
     fn procedure_template(
@@ -2427,6 +2427,42 @@ where
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
                 self.procedure,
                 parent_procedure_template,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.predecessor_procedure` column.
+    fn predecessor_procedure(
+        mut self,
+        predecessor_procedure: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
+                self.procedure,
+                predecessor_procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.predecessor_procedure_template` column.
+    fn predecessor_procedure_template(
+        mut self,
+        predecessor_procedure_template: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
+                self.procedure,
+                predecessor_procedure_template,
             )
             .map_err(|e| {
                 e
@@ -2511,6 +2547,28 @@ where
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
                 self.procedure,
                 updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.number_of_completed_subprocedures` column.
+    fn number_of_completed_subprocedures<NOCS>(
+        mut self,
+        number_of_completed_subprocedures: NOCS,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        NOCS: TryInto<i16>,
+        validation_errors::SingleFieldError: From<<NOCS as TryInto<i16>>::Error>,
+    {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::number_of_completed_subprocedures(
+                self.procedure,
+                number_of_completed_subprocedures,
             )
             .map_err(|e| {
                 e

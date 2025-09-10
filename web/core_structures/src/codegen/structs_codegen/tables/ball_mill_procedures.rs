@@ -11,18 +11,6 @@
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::bead_models::BeadModel,
-        foreign_key = bead_model
-    )
-)]
-#[diesel(
-    belongs_to(
-        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
-        foreign_key = milled_with_model
-    )
-)]
-#[diesel(
-    belongs_to(
         crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine,
         foreign_key = milled_with
     )
@@ -31,6 +19,18 @@
     belongs_to(
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
         foreign_key = milled_container
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel,
+        foreign_key = bead_model
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+        foreign_key = milled_with_model
     )
 )]
 #[diesel(
@@ -94,6 +94,62 @@ impl diesel::Identifiable for BallMillProcedure {
     }
 }
 impl BallMillProcedure {
+    pub fn procedure_milled_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_milled_with,
+            conn,
+        )
+    }
+    pub fn milled_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine:
+            web_common_traits::database::Read<C>,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(milled_with) = self.milled_with else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine::read(
+            milled_with,
+            conn,
+        )
+        .optional()
+    }
+    pub fn milled_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
+            self.milled_container,
+            conn,
+        )
+    }
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -204,62 +260,6 @@ impl BallMillProcedure {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
             self.procedure_template_milled_with_model,
-            conn,
-        )
-    }
-    pub fn procedure_milled_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_milled_with,
-            conn,
-        )
-    }
-    pub fn milled_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine>,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine:
-            web_common_traits::database::Read<C>,
-    {
-        use diesel::OptionalExtension;
-        use web_common_traits::database::Read;
-        let Some(milled_with) = self.milled_with else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine::read(
-            milled_with,
-            conn,
-        )
-        .optional()
-    }
-    pub fn milled_container<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
-            self.milled_container,
             conn,
         )
     }
@@ -666,6 +666,45 @@ impl BallMillProcedure {
             conn,
         )
     }
+    pub fn from_procedure_milled_with<C>(
+        procedure_milled_with: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::ball_mill_procedures::ball_mill_procedures::procedure_milled_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::ball_mill_procedures::ball_mill_procedures::procedure_milled_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::ball_mill_procedures::ball_mill_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::ball_mill_procedures::ball_mill_procedures::procedure_milled_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::ball_mill_procedures::ball_mill_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::ball_mill_procedures::ball_mill_procedures;
+        Self::table()
+            .filter(ball_mill_procedures::procedure_milled_with.eq(procedure_milled_with))
+            .order_by(ball_mill_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
     pub fn from_procedure<C>(
         procedure: ::rosetta_uuid::Uuid,
         conn: &mut C,
@@ -864,45 +903,6 @@ impl BallMillProcedure {
                 ball_mill_procedures::procedure_template_milled_with_model
                     .eq(procedure_template_milled_with_model),
             )
-            .order_by(ball_mill_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    pub fn from_procedure_milled_with<C>(
-        procedure_milled_with: ::rosetta_uuid::Uuid,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::ball_mill_procedures::ball_mill_procedures::procedure_milled_with as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::ball_mill_procedures::ball_mill_procedures::procedure_milled_with as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::ball_mill_procedures::ball_mill_procedures::procedure,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::ball_mill_procedures::ball_mill_procedures::procedure_milled_with as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::ball_mill_procedures::ball_mill_procedures::procedure,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::ball_mill_procedures::ball_mill_procedures;
-        Self::table()
-            .filter(ball_mill_procedures::procedure_milled_with.eq(procedure_milled_with))
             .order_by(ball_mill_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -1367,6 +1367,50 @@ impl BallMillProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_predecessor_procedure(
+        predecessor_procedure: ::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            ball_mill_procedures::ball_mill_procedures, procedures::procedures,
+        };
+        Self::table()
+            .inner_join(
+                procedures::table.on(ball_mill_procedures::procedure.eq(procedures::procedure)),
+            )
+            .filter(procedures::predecessor_procedure.eq(predecessor_procedure))
+            .order_by(ball_mill_procedures::procedure.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_predecessor_procedure_template(
+        predecessor_procedure_template: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            ball_mill_procedures::ball_mill_procedures, procedures::procedures,
+        };
+        Self::table()
+            .inner_join(
+                procedures::table.on(ball_mill_procedures::procedure.eq(procedures::procedure)),
+            )
+            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .order_by(ball_mill_procedures::procedure.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_most_concrete_table(
         most_concrete_table: &str,
         conn: &mut diesel::PgConnection,
@@ -1472,6 +1516,30 @@ impl BallMillProcedure {
                 procedures::table.on(ball_mill_procedures::procedure.eq(procedures::procedure)),
             )
             .filter(procedures::updated_at.eq(updated_at))
+            .order_by(ball_mill_procedures::procedure.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_number_of_completed_subprocedures(
+        number_of_completed_subprocedures: i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            ball_mill_procedures::ball_mill_procedures, procedures::procedures,
+        };
+        Self::table()
+            .inner_join(
+                procedures::table.on(ball_mill_procedures::procedure.eq(procedures::procedure)),
+            )
+            .filter(
+                procedures::number_of_completed_subprocedures.eq(number_of_completed_subprocedures),
+            )
             .order_by(ball_mill_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

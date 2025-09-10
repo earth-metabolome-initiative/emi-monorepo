@@ -22,11 +22,15 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                     .ne(excluded(procedure_template))
                     .or(parent_procedure.ne(excluded(parent_procedure)))
                     .or(parent_procedure_template.ne(excluded(parent_procedure_template)))
+                    .or(predecessor_procedure.ne(excluded(predecessor_procedure)))
+                    .or(predecessor_procedure_template.ne(excluded(predecessor_procedure_template)))
                     .or(most_concrete_table.ne(excluded(most_concrete_table)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                    .or(updated_at.ne(excluded(updated_at)))
+                    .or(number_of_completed_subprocedures
+                        .ne(excluded(number_of_completed_subprocedures))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -56,11 +60,15 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                     .ne(excluded(procedure_template))
                     .or(parent_procedure.ne(excluded(parent_procedure)))
                     .or(parent_procedure_template.ne(excluded(parent_procedure_template)))
+                    .or(predecessor_procedure.ne(excluded(predecessor_procedure)))
+                    .or(predecessor_procedure_template.ne(excluded(predecessor_procedure_template)))
                     .or(most_concrete_table.ne(excluded(most_concrete_table)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at))),
+                    .or(updated_at.ne(excluded(updated_at)))
+                    .or(number_of_completed_subprocedures
+                        .ne(excluded(number_of_completed_subprocedures))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

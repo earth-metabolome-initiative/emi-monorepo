@@ -843,6 +843,50 @@ impl WeighingProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_predecessor_procedure(
+        predecessor_procedure: ::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedures::procedures, weighing_procedures::weighing_procedures,
+        };
+        Self::table()
+            .inner_join(
+                procedures::table.on(weighing_procedures::procedure.eq(procedures::procedure)),
+            )
+            .filter(procedures::predecessor_procedure.eq(predecessor_procedure))
+            .order_by(weighing_procedures::procedure.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_predecessor_procedure_template(
+        predecessor_procedure_template: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedures::procedures, weighing_procedures::weighing_procedures,
+        };
+        Self::table()
+            .inner_join(
+                procedures::table.on(weighing_procedures::procedure.eq(procedures::procedure)),
+            )
+            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .order_by(weighing_procedures::procedure.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_most_concrete_table(
         most_concrete_table: &str,
         conn: &mut diesel::PgConnection,
@@ -948,6 +992,30 @@ impl WeighingProcedure {
                 procedures::table.on(weighing_procedures::procedure.eq(procedures::procedure)),
             )
             .filter(procedures::updated_at.eq(updated_at))
+            .order_by(weighing_procedures::procedure.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_number_of_completed_subprocedures(
+        number_of_completed_subprocedures: i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            procedures::procedures, weighing_procedures::weighing_procedures,
+        };
+        Self::table()
+            .inner_join(
+                procedures::table.on(weighing_procedures::procedure.eq(procedures::procedure)),
+            )
+            .filter(
+                procedures::number_of_completed_subprocedures.eq(number_of_completed_subprocedures),
+            )
             .order_by(weighing_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

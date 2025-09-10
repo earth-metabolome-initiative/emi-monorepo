@@ -220,10 +220,10 @@ pub trait CommercialWeighingDeviceLotSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     WeighingDeviceModel,
@@ -262,15 +262,15 @@ for InsertableCommercialWeighingDeviceLotBuilder<
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v7 --->|"`extends`"| v4
-    ///v5 --->|"`extends`"| v7
     ///v6 --->|"`extends`"| v5
+    ///v5 --->|"`extends`"| v7
     ///```
     fn product_model(
         mut self,
@@ -543,8 +543,8 @@ where
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v4 --->|"`extends`"| v3
     ///v3 --->|"`extends`"| v5
+    ///v4 --->|"`extends`"| v3
     ///```
     fn product_model(
         self,
@@ -590,19 +590,19 @@ where
     ///class v3 undirectly-involved-column
     ///end
     ///subgraph v6 ["`commercial_weighing_device_lots`"]
-    ///    v1@{shape: rounded, label: "product_model"}
-    ///class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "product_model"}
+    ///class v0 directly-involved-column
     ///end
     ///subgraph v7 ["`physical_asset_models`"]
-    ///    v0@{shape: rounded, label: "parent_model"}
-    ///class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "parent_model"}
+    ///class v1 column-of-interest
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v1 -.->|"`inferred ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
     ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
+    ///v3 -.->|"`inferred ancestral same as`"| v1
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v0 -.->|"`inferred ancestral same as`"| v3
+    ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v5

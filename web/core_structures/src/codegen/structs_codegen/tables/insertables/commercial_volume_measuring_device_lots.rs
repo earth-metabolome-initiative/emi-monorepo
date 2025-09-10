@@ -274,13 +274,13 @@ for InsertableCommercialVolumeMeasuringDeviceLotBuilder<
     ///end
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
     ///v7 --->|"`extends`"| v4
-    ///v5 --->|"`extends`"| v7
     ///v6 --->|"`extends`"| v5
+    ///v5 --->|"`extends`"| v7
     ///```
     fn product_model(
         mut self,
@@ -550,9 +550,9 @@ where
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 undirectly-involved-column
     ///end
+    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v3 --->|"`extends`"| v5
     ///v4 --->|"`extends`"| v3
     ///```
@@ -603,22 +603,22 @@ where
     ///class v3 undirectly-involved-column
     ///end
     ///subgraph v6 ["`commercial_volume_measuring_device_lots`"]
-    ///    v1@{shape: rounded, label: "product_model"}
-    ///class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "product_model"}
+    ///class v0 directly-involved-column
     ///end
     ///subgraph v7 ["`physical_asset_models`"]
-    ///    v0@{shape: rounded, label: "parent_model"}
-    ///class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "parent_model"}
+    ///class v1 column-of-interest
     ///end
-    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
-    ///v1 -.->|"`inferred ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v0 -.->|"`inferred ancestral same as`"| v3
+    ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v0
-    ///v7 --->|"`extends`"| v4
-    ///v6 --->|"`extends`"| v5
+    ///v3 -.->|"`inferred ancestral same as`"| v1
     ///v5 --->|"`extends`"| v7
+    ///v6 --->|"`extends`"| v5
+    ///v7 --->|"`extends`"| v4
     ///```
     fn parent_model(
         self,

@@ -1,14 +1,14 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FreezingProcedureForeignKeys {
+    pub frozen_container: Option<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+    >,
     pub procedure: Option<
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
     pub procedure_template: Option<
         crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-    >,
-    pub frozen_container: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
     >,
     pub frozen_container_model: Option<
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
@@ -43,16 +43,16 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
+                self.frozen_container,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::FreezingProcedureTemplate(
                 self.procedure_template,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
-                self.frozen_container,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -104,9 +104,9 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure.is_some()
+        foreign_keys.frozen_container.is_some()
+            && foreign_keys.procedure.is_some()
             && foreign_keys.procedure_template.is_some()
-            && foreign_keys.frozen_container.is_some()
             && foreign_keys.frozen_container_model.is_some()
             && foreign_keys.procedure_template_frozen_container_model.is_some()
             && foreign_keys.procedure_frozen_container.is_some()

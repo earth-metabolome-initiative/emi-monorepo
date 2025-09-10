@@ -32,17 +32,20 @@ use crate::{Column, Table};
 /// # Errors
 ///
 /// * If the database connection fails.
-pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Eq + Hash>(
+pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Ord + Eq + Hash>(
     display_columns: bool,
-    columns: &[C],
+    unsorted_columns: &[C],
     column_of_interest: &Column,
     conn: &mut PgConnection,
 ) -> Result<Flowchart, crate::errors::WebCodeGenError> {
     assert_eq!(
-        columns.iter().collect::<HashSet<_>>().len(),
-        columns.len(),
+        unsorted_columns.iter().collect::<HashSet<_>>().len(),
+        unsorted_columns.len(),
         "Provided columns must be unique"
     );
+
+    let mut columns = unsorted_columns.into_iter().collect::<Vec<_>>();
+    columns.sort_unstable();
 
     let mut inferred_columns = columns
         .iter()
@@ -106,7 +109,7 @@ pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Eq + Hash>(
 
     if display_columns {
         // First, we populate the column nodes.
-        for column in columns {
+        for column in &columns {
             let mut node_builder = FlowchartNodeBuilder::default()
                 .label(&column.as_ref().column_name)
                 .expect("Valid label")

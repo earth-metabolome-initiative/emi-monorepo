@@ -631,6 +631,33 @@ impl GeolocationProcedureTemplate {
             .select(Self::as_select())
             .load::<Self>(conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn from_number_of_subprocedure_templates(
+        number_of_subprocedure_templates: i16,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            geolocation_procedure_templates::geolocation_procedure_templates,
+            procedure_templates::procedure_templates,
+        };
+        Self::table()
+            .inner_join(
+                procedure_templates::table.on(geolocation_procedure_templates::procedure_template
+                    .eq(procedure_templates::procedure_template)),
+            )
+            .filter(
+                procedure_templates::number_of_subprocedure_templates
+                    .eq(number_of_subprocedure_templates),
+            )
+            .order_by(geolocation_procedure_templates::procedure_template.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
 }
 impl AsRef<GeolocationProcedureTemplate> for GeolocationProcedureTemplate {
     fn as_ref(&self) -> &GeolocationProcedureTemplate {

@@ -207,7 +207,7 @@ impl Table {
             let column_camel_case_name = insertable_column.camel_case_name()?;
 
             column_camel_case_idents.push(
-                if let Some((partial_builder_kind, _, partial_builder_constraint)) =
+                if let Some((_partial_builder_kind, _, partial_builder_constraint)) =
                     insertable_column.requires_partial_builder(conn)?
                 {
                     let foreign_table = partial_builder_constraint
@@ -293,7 +293,7 @@ impl Table {
         for insertable_column in insertable_columns.iter() {
             let enum_variant = insertable_column.camel_case_ident()?;
 
-            if let Some((partial_builder_kind, _, foreign_key)) =
+            if let Some((_partial_builder_kind, _, foreign_key)) =
                 insertable_column.requires_partial_builder(conn)?
             {
                 let foreign_table_enum = foreign_key.foreign_table(conn)?.insertable_enum_ty()?;
@@ -504,7 +504,7 @@ impl Codegen<'_> {
         if let Some(passing_through) = passing_through {
             if table.has_column(passing_through) {
                 let passing_through_ident = passing_through.camel_case_ident()?;
-                let (partial_builder_kind, _, foreign_key) = passing_through
+                let (_partial_builder_kind, _, foreign_key) = passing_through
                     .requires_partial_builder(conn)?
                     .expect("Passing through column must require a partial builder");
                 let foreign_table = foreign_key.foreign_table(conn)?;

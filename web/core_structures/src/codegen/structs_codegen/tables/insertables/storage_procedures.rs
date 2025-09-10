@@ -114,6 +114,30 @@ pub struct InsertableStorageProcedure {
     pub(crate) procedure_stored_into: ::rosetta_uuid::Uuid,
 }
 impl InsertableStorageProcedure {
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedures_procedure_stored_asset_stored_asset_mod_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_stored_asset)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.stored_asset_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -412,30 +436,6 @@ impl InsertableStorageProcedure {
             (self.stored_into_model, self.stored_asset_model),
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn storage_procedures_procedure_stored_asset_stored_asset_mod_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_stored_asset)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.stored_asset_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn storage_procedures_procedure_stored_into_stored_into_model_fkey(
@@ -876,23 +876,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v2@{shape: rounded, label: "stored_asset"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stored_asset"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "stored_asset"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_asset(
@@ -931,10 +931,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_stored_asset"}
@@ -987,23 +987,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_stored_asset"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_stored_asset_model"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_stored_asset"}
+    /// class v1 directly-involved-column
     /// end
+    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn procedure_template_stored_asset_model(
@@ -1042,27 +1042,25 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`procedure_assets`"]
-    ///    v1@{shape: rounded, label: "asset_model"}
-    /// class v1 directly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "asset_model"}
+    /// class v1 directly-involved-column
     ///    v7@{shape: rounded, label: "id"}
     /// class v7 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// subgraph v9 ["`storage_procedures`"]
-    ///    v4@{shape: rounded, label: "procedure_template_stored_asset_model"}
-    /// class v4 directly-involved-column
-    ///    v5@{shape: rounded, label: "stored_asset"}
-    /// class v5 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_stored_asset"}
     /// class v3 column-of-interest
+    ///    v5@{shape: rounded, label: "stored_asset"}
+    /// class v5 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_stored_asset_model"}
+    /// class v4 directly-involved-column
     ///    v6@{shape: rounded, label: "stored_asset_model"}
     /// class v6 directly-involved-column
     /// end
-    /// v4 --->|"`associated same as`"| v2
-    /// v5 --->|"`associated same as`"| v0
     /// v3 --->|"`associated same as`"| v7
     /// v3 --->|"`associated same as`"| v7
     /// v3 --->|"`associated same as`"| v7
@@ -1071,6 +1069,8 @@ impl<
     /// v3 -.->|"`foreign defines`"| v5
     /// v3 -.->|"`foreign defines`"| v6
     /// v0 -.->|"`foreign defines`"| v1
+    /// v5 --->|"`associated same as`"| v0
+    /// v4 --->|"`associated same as`"| v2
     /// v6 --->|"`associated same as`"| v1
     /// v9 ---o|"`associated with`"| v8
     /// ```
@@ -1087,6 +1087,36 @@ impl<
         >,
     {
         let mut procedure_stored_asset = procedure_stored_asset.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_asset {
+            procedure_stored_asset = if let (Some(stored_asset_model), Some(asset_model)) =
+                (self.stored_asset_model, builder.asset_model)
+            {
+                if stored_asset_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::StoredAssetModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.stored_asset_model = Some(asset_model);
+                builder.into()
+            } else if let Some(stored_asset_model) = self.stored_asset_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
+                        builder,
+                        stored_asset_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureStoredAsset(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_asset {
             procedure_stored_asset = if let (
                 Some(procedure_template_stored_asset_model),
@@ -1113,36 +1143,6 @@ impl<
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
                         procedure_template_stored_asset_model,
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureStoredAsset(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_asset {
-            procedure_stored_asset = if let (Some(stored_asset_model), Some(asset_model)) =
-                (self.stored_asset_model, builder.asset_model)
-            {
-                if stored_asset_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::StoredAssetModel,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.stored_asset_model = Some(asset_model);
-                builder.into()
-            } else if let Some(stored_asset_model) = self.stored_asset_model {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
-                        builder,
-                        stored_asset_model,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1201,23 +1201,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v2@{shape: rounded, label: "stored_into"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stored_into"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "stored_into"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_into(
@@ -1256,23 +1256,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_assets`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`storage_procedures`"]
-    ///    v2@{shape: rounded, label: "stored_into_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_stored_into"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "stored_into_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn stored_into_model(
@@ -1368,12 +1368,12 @@ impl<
     /// subgraph v8 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "asset_model"}
+    /// class v1 directly-involved-column
     ///    v7@{shape: rounded, label: "id"}
     /// class v7 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset"}
     /// class v0 directly-involved-column
-    ///    v1@{shape: rounded, label: "asset_model"}
-    /// class v1 directly-involved-column
     /// end
     /// subgraph v9 ["`storage_procedures`"]
     ///    v4@{shape: rounded, label: "procedure_template_stored_into_model"}
@@ -1609,6 +1609,42 @@ where
         Ok(self)
     }
     #[inline]
+    ///Sets the value of the `public.procedures.predecessor_procedure` column.
+    fn predecessor_procedure(
+        mut self,
+        predecessor_procedure: Option<::rosetta_uuid::Uuid>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
+                self.procedure,
+                predecessor_procedure,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.predecessor_procedure_template` column.
+    fn predecessor_procedure_template(
+        mut self,
+        predecessor_procedure_template: Option<i32>,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
+                self.procedure,
+                predecessor_procedure_template,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
     fn created_by(
         mut self,
@@ -1683,6 +1719,28 @@ where
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
                 self.procedure,
                 updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| Self::Attributes::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.procedures.number_of_completed_subprocedures` column.
+    fn number_of_completed_subprocedures<NOCS>(
+        mut self,
+        number_of_completed_subprocedures: NOCS,
+    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    where
+        NOCS: TryInto<i16>,
+        validation_errors::SingleFieldError: From<<NOCS as TryInto<i16>>::Error>,
+    {
+        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::number_of_completed_subprocedures(
+                self.procedure,
+                number_of_completed_subprocedures,
             )
             .map_err(|e| {
                 e

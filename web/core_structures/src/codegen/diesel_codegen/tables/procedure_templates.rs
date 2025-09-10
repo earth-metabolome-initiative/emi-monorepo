@@ -5,6 +5,6 @@ diesel::table! {
     diesel::sql_types::Text, created_by -> diesel::sql_types::Integer, created_at ->
     rosetta_timestamp::diesel_impls::TimestampUTC, updated_by ->
     diesel::sql_types::Integer, updated_at ->
-    rosetta_timestamp::diesel_impls::TimestampUTC, deprecated -> diesel::sql_types::Bool
-    }
+    rosetta_timestamp::diesel_impls::TimestampUTC, deprecated -> diesel::sql_types::Bool,
+    number_of_subprocedure_templates -> diesel::sql_types::SmallInt }
 }

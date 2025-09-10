@@ -11,6 +11,17 @@ CREATE TABLE IF NOT EXISTS procedures (
 	parent_procedure_template INTEGER REFERENCES procedure_templates(procedure_template) CHECK (
 		must_be_distinct_i32(procedure_template, parent_procedure_template)
 	),
+	-- The predecessor procedure (if any) of this procedure.
+	predecessor_procedure UUID REFERENCES procedures(procedure) ON DELETE CASCADE CHECK (
+		must_be_distinct_uuid(procedure, predecessor_procedure)
+	),
+	-- The predecessor procedure template (if any) of this procedure.
+	predecessor_procedure_template INTEGER REFERENCES procedure_templates(procedure_template) CHECK (
+		must_be_distinct_i32(
+			procedure_template,
+			predecessor_procedure_template
+		)
+	),
 	-- The name of the most concrete table this procedure is associated with.
 	most_concrete_table TEXT NOT NULL,
 	-- User who created this procedure.
@@ -21,6 +32,12 @@ CREATE TABLE IF NOT EXISTS procedures (
 	updated_by INTEGER NOT NULL REFERENCES users(id),
 	-- Timestamp when this procedure was last updated.
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	-- The number of completed subprocedures this procedure has. This field
+	-- is generally automatically updated via triggers on the procedures
+	-- table, but it can also be manually updated if needed.
+	number_of_completed_subprocedures SMALLINT NOT NULL DEFAULT 0 CHECK (
+		must_be_strictly_positive_i16(number_of_completed_subprocedures)
+	),
 	-- We check that the created_at is before or equal to updated_at.
 	CHECK (must_be_smaller_than_utc(created_at, updated_at)),
 	-- We create an index on (procedure_template, parent_procedure_template) to allow for foreign
@@ -29,9 +46,22 @@ CREATE TABLE IF NOT EXISTS procedures (
 	-- We enforce that if a parent procedure and parent procedure template are specified,
 	-- then the parent procedure must indeed be of the specified parent procedure template.
 	FOREIGN KEY (parent_procedure, parent_procedure_template) REFERENCES procedures(procedure, procedure_template),
+	-- We enforce that if a predecessor procedure and predecessor procedure template are specified,
+	-- then the predecessor procedure must indeed be of the specified predecessor procedure template.
+	FOREIGN KEY (
+		predecessor_procedure,
+		predecessor_procedure_template
+	) REFERENCES procedures(procedure, procedure_template),
 	-- We enforce that if a parent procedure template is specified, then the parent procedure template
 	-- must indeed be a valid parent procedure template for the specified procedure template.
 	FOREIGN KEY (parent_procedure_template, procedure_template) REFERENCES parent_procedure_templates(parent, child),
+	-- We enforce that if both a predecessor procedure template and a parent procedure template are specified,
+	-- then there must exist a row in `next_procedure_templates`
+	FOREIGN KEY (
+		parent_procedure_template,
+		predecessor_procedure_template,
+		procedure_template
+	) REFERENCES next_procedure_templates(parent, predecessor, successor),
 	-- We check that either both parent_procedure and parent_procedure_template are NULL,
 	-- or neither is NULL.
 	CHECK (
@@ -43,8 +73,77 @@ CREATE TABLE IF NOT EXISTS procedures (
 			parent_procedure IS NOT NULL
 			AND parent_procedure_template IS NOT NULL
 		)
+	),
+	-- We check that either both predecessor_procedure and predecessor_procedure_template are NULL,
+	-- or neither is NULL.
+	CHECK (
+		(
+			predecessor_procedure IS NULL
+			AND predecessor_procedure_template IS NULL
+		)
+		OR (
+			predecessor_procedure IS NOT NULL
+			AND predecessor_procedure_template IS NOT NULL
+		)
+	),
+	-- We check that if the previous procedure is specified, then the parent procedure must also be specified.
+	CHECK (
+		(predecessor_procedure IS NULL)
+		OR (parent_procedure IS NOT NULL)
 	)
 );
+-- Upon inserting a new procedure, if it has a parent procedure,
+-- we increment the number_of_completed_subprocedures of the parent procedure
+-- and update the `updated_at` and `updated_by` fields.
+CREATE OR REPLACE FUNCTION increment_number_of_completed_subprocedures() RETURNS TRIGGER AS $$ BEGIN IF NEW.parent_procedure IS NOT NULL THEN
+UPDATE procedures
+SET number_of_completed_subprocedures = number_of_completed_subprocedures + 1,
+	updated_at = CURRENT_TIMESTAMP,
+	updated_by = NEW.created_by
+WHERE procedure = NEW.parent_procedure;
+END IF;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE OR REPLACE TRIGGER trg_increment_number_of_completed_subprocedures
+AFTER
+INSERT ON procedures FOR EACH ROW EXECUTE FUNCTION increment_number_of_completed_subprocedures();
+-- Before allowing the insertion of a new procedure, we ensure that the
+-- parent procedure, if specified, is incomplete, that is the number of
+-- completed subprocedures is less than the number of subprocedure templates defined
+-- in the parent procedure template of the parent procedure.
+CREATE OR REPLACE FUNCTION check_parent_procedure_incomplete() RETURNS TRIGGER AS $$ BEGIN IF NEW.parent_procedure IS NOT NULL THEN PERFORM 1
+FROM procedures p
+	JOIN procedure_templates pt ON p.procedure_template = pt.procedure_template
+WHERE p.procedure = NEW.parent_procedure
+	AND p.number_of_completed_subprocedures < pt.number_of_subprocedure_templates;
+IF NOT FOUND THEN RAISE EXCEPTION 'Parent procedure % is already complete',
+NEW.parent_procedure;
+END IF;
+END IF;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trg_check_parent_procedure_incomplete BEFORE
+INSERT ON procedures FOR EACH ROW EXECUTE FUNCTION check_parent_procedure_incomplete();
+-- Before allowing the insertion of a new procedure, we ensure that if a predecessor procedure
+-- is specified, then the predecessor procedure must be complete, that is the number of
+-- completed subprocedures is equal to the number of subprocedure templates defined
+-- in the parent procedure template of the predecessor procedure.
+CREATE OR REPLACE FUNCTION check_predecessor_procedure_complete() RETURNS TRIGGER AS $$ BEGIN IF NEW.predecessor_procedure IS NOT NULL THEN PERFORM 1
+FROM procedures p
+	JOIN procedure_templates pt ON p.procedure_template = pt.procedure_template
+WHERE p.procedure = NEW.predecessor_procedure
+	AND p.number_of_completed_subprocedures = pt.number_of_subprocedure_templates;
+IF NOT FOUND THEN RAISE EXCEPTION 'Predecessor procedure % is not complete',
+NEW.predecessor_procedure;
+END IF;
+END IF;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER trg_check_predecessor_procedure_complete BEFORE
+INSERT ON procedures FOR EACH ROW EXECUTE FUNCTION check_predecessor_procedure_complete();
 CREATE TABLE IF NOT EXISTS procedure_assets (
 	-- The ID of this procedure asset.
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -90,26 +189,39 @@ CREATE TABLE IF NOT EXISTS procedure_assets (
 	-- corresponds to a specific asset (if any).
 	UNIQUE (id, asset)
 );
-
--- When we insert a procedure assets, we ensure that the associated
--- procedure parent, if any, has the analogue procedure asset or we
--- insert it recursively.
--- CREATE OR REPLACE FUNCTION insert_attribute_propagate()
--- RETURNS TRIGGER AS $$
--- BEGIN
---     -- Insert attribute into parent if one exists
---     INSERT INTO attributes (node_id, key, value)
---     SELECT n.parent_id, NEW.key, NEW.value
---     FROM nodes n
---     WHERE n.id = NEW.node_id
---       AND n.parent_id IS NOT NULL
---     ON CONFLICT (node_id, key) DO NOTHING;
-
---     RETURN NEW;
--- END;
--- $$ LANGUAGE plpgsql;
-
--- CREATE TRIGGER insert_attribute_propagate
--- AFTER INSERT ON attributes
--- FOR EACH ROW
--- EXECUTE FUNCTION insert_attribute_propagate();
+-- When we insert a procedure assets, the parent procedure if any
+-- must also receive its own version of the procedure asset. The
+-- parent procedure's procedure asset will reference many of the
+-- same fields, but the `procedure_template_asset_model` will be
+-- the one defined in the parent procedure template which is characterized
+-- by being `based_on` the current procedure template asset model.
+CREATE OR REPLACE FUNCTION inherit_procedure_assets() RETURNS TRIGGER AS $$ BEGIN
+INSERT INTO procedure_assets (
+		procedure,
+		procedure_template,
+		asset_model,
+		asset,
+		procedure_template_asset_model,
+		ancestor_model,
+		created_by,
+		created_at
+	)
+SELECT p.parent_procedure,
+	p.parent_procedure_template,
+	pam.asset_model,
+	NEW.asset,
+	ptam.id,
+	pam.ancestor_model,
+	NEW.created_by,
+	NEW.created_at
+FROM procedures p
+	JOIN procedure_template_asset_models pam ON pam.procedure_template = NEW.procedure_template_asset_model
+	JOIN procedure_template_asset_models ptam ON ptam.based_on = pam.id
+WHERE p.procedure = NEW.procedure
+	AND p.parent_procedure IS NOT NULL;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE OR REPLACE TRIGGER trg_inherit_procedure_assets
+AFTER
+INSERT ON procedure_assets FOR EACH ROW EXECUTE FUNCTION inherit_procedure_assets();
