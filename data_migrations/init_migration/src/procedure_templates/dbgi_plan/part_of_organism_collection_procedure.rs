@@ -16,8 +16,7 @@ use crate::{
     procedure_template_asset_models::{
         coffee_wrapper::coffee_wrapper_builder, conical_tubes::cct_builder,
         conical_tubes_box::cct_box_builder, organism::sample_builder,
-    },
-    procedure_templates::organism_observation_procedure,
+    }, procedure_templates::dbgi_plan::organism_observation_procedure::organism_observation_procedure,
 };
 
 /// Initializes the part of organism collection procedure template in the
@@ -32,7 +31,7 @@ use crate::{
 ///
 /// * If the connection fails to insert the procedure template.
 /// * If the procedure template building fails.
-pub(crate) fn init_part_of_organism_collection(
+pub(crate) fn part_of_organism_collection(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<(ProcedureTemplate, ProcedureTemplateAssetModel)> {

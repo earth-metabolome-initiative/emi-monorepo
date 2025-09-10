@@ -1,5 +1,6 @@
 mod codegen;
 mod migrations;
+mod directus_templates;
 use diesel::{Connection, PgConnection};
 use web_common_traits::database::BoundedRead;
 
