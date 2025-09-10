@@ -75,6 +75,30 @@ pub struct InsertableCommercialVolumeMeasuringDeviceModel {
     pub(crate) volume_measuring_device_model: i32,
 }
 impl InsertableCommercialVolumeMeasuringDeviceModel {
+    #[cfg(feature = "postgres")]
+    pub fn commercial_volume_measuring_d_id_volume_measuring_device_m_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.volume_measuring_device_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
     pub fn volume_measuring_device_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -130,30 +154,6 @@ impl InsertableCommercialVolumeMeasuringDeviceModel {
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
             self.id, conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn commercial_volume_measuring_d_id_volume_measuring_device_m_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
-                    .eq(&self.id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
-                            .eq(&self.volume_measuring_device_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -563,9 +563,9 @@ where
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 column-of-interest
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(

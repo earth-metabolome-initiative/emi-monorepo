@@ -11,12 +11,6 @@
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::project_states::ProjectState,
-        foreign_key = state_id
-    )
-)]
-#[diesel(
-    belongs_to(
         crate::codegen::structs_codegen::tables::colors::Color,
         foreign_key = color_id
     )
@@ -25,6 +19,12 @@
     belongs_to(
         crate::codegen::structs_codegen::tables::projects::Project,
         foreign_key = parent_project_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::project_states::ProjectState,
+        foreign_key = state_id
     )
 )]
 #[diesel(primary_key(id))]
@@ -98,43 +98,6 @@ impl diesel::Identifiable for Project {
     }
 }
 impl Project {
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
-    }
-    pub fn updated_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
-    }
-    pub fn state<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::project_states::ProjectState,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::project_states::ProjectState:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::project_states::ProjectState::read(
-            self.state_id,
-            conn,
-        )
-    }
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -145,6 +108,16 @@ impl Project {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::colors::Color::read(self.color_id, conn)
+    }
+    pub fn created_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn parent_project<C: diesel::connection::LoadConnection>(
         &self,
@@ -164,6 +137,33 @@ impl Project {
         };
         crate::codegen::structs_codegen::tables::projects::Project::read(parent_project_id, conn)
             .optional()
+    }
+    pub fn state<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::project_states::ProjectState,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::project_states::ProjectState:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::project_states::ProjectState::read(
+            self.state_id,
+            conn,
+        )
+    }
+    pub fn updated_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(

@@ -11,14 +11,14 @@
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-        foreign_key = container_model
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        foreign_key = contained_asset_model
     )
 )]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-        foreign_key = contained_asset_model
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        foreign_key = container_model
     )
 )]
 #[diesel(
@@ -66,23 +66,6 @@ impl diesel::Identifiable for ContainerCompatibilityRule {
     }
 }
 impl ContainerCompatibilityRule {
-    pub fn container_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel::read(
-            self.container_model,
-            conn,
-        )
-    }
     pub fn contained_asset_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -97,6 +80,23 @@ impl ContainerCompatibilityRule {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
             self.contained_asset_model,
+            conn,
+        )
+    }
+    pub fn container_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel::read(
+            self.container_model,
             conn,
         )
     }

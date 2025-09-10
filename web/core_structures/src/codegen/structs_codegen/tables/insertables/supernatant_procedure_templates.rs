@@ -180,194 +180,22 @@ pub struct InsertableSupernatantProcedureTemplate {
     pub(crate) procedure_template_pipette_tip_model: i32,
 }
 impl InsertableSupernatantProcedureTemplate {
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+    pub fn supernatant_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
-            self.procedure_template,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
+            (self.transferred_with_model, self.pipette_tip_model),
             conn,
         )
-    }
-    pub fn stratified_source_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
-            self.stratified_source_model,
-            conn,
-        )
-    }
-    pub fn procedure_template_stratified_source_model<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_stratified_source_model,
-            conn,
-        )
-    }
-    pub fn supernatant_destination_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
-            self.supernatant_destination_model,
-            conn,
-        )
-    }
-    pub fn procedure_template_supernatant_destination_model<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_supernatant_destination_model,
-            conn,
-        )
-    }
-    pub fn transferred_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::read(
-            self.transferred_with_model,
-            conn,
-        )
-    }
-    pub fn procedure_template_transferred_with_model<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_transferred_with_model,
-            conn,
-        )
-    }
-    pub fn pipette_tip_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::read(
-            self.pipette_tip_model,
-            conn,
-        )
-    }
-    pub fn procedure_template_pipette_tip_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_pipette_tip_model,
-            conn,
-        )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedure_templa_procedure_template_transferr_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_transferred_with_model)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
-                            .eq(&self.transferred_with_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn supernatant_procedure_templa_procedure_template_pipette_t_fkey1(
@@ -392,23 +220,6 @@ impl InsertableSupernatantProcedureTemplate {
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
             >(conn)
-    }
-    pub fn supernatant_pm_compatibility_rules<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
-            (self.transferred_with_model, self.pipette_tip_model),
-            conn,
-        )
     }
     #[cfg(feature = "postgres")]
     pub fn supernatant_procedure_templa_procedure_template_stratifie_fkey1(
@@ -457,6 +268,195 @@ impl InsertableSupernatantProcedureTemplate {
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
             >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn supernatant_procedure_templa_procedure_template_transferr_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_transferred_with_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.transferred_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
+    }
+    pub fn procedure_template_pipette_tip_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_pipette_tip_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_stratified_source_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_stratified_source_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_supernatant_destination_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_supernatant_destination_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_transferred_with_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_transferred_with_model,
+            conn,
+        )
+    }
+    pub fn supernatant_destination_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.supernatant_destination_model,
+            conn,
+        )
+    }
+    pub fn pipette_tip_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::read(
+            self.pipette_tip_model,
+            conn,
+        )
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    pub fn stratified_source_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.stratified_source_model,
+            conn,
+        )
+    }
+    pub fn transferred_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::read(
+            self.transferred_with_model,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
@@ -819,16 +819,16 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_stratified_source_model"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stratified_source_model"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_stratified_source_model"}
+    /// class v1 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
@@ -964,10 +964,10 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedure_templates`"]
     ///    v2@{shape: rounded, label: "supernatant_destination_model"}
@@ -975,10 +975,10 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateSettable
     ///    v1@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
     /// class v1 directly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn supernatant_destination_model(
@@ -1021,16 +1021,16 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v0@{shape: rounded, label: "asset_model"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
-    /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "supernatant_destination_model"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
+    /// class v1 column-of-interest
     /// end
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
@@ -1114,15 +1114,15 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateSettable
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "transferred_with_model"}
-    /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_transferred_with_model"}
     /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "transferred_with_model"}
+    /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`associated same as`"| v0
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn transferred_with_model(
@@ -1257,15 +1257,15 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateSettable
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedure_templates`"]
-    ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "pipette_tip_model"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
+    /// class v2 directly-involved-column
     /// end
+    /// v1 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v3
     /// v2 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v0
     /// v5 ---o|"`associated with`"| v4
     /// ```
     fn pipette_tip_model(
@@ -1306,16 +1306,16 @@ impl<ProcedureTemplate> SupernatantProcedureTemplateSettable
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`procedure_template_asset_models`"]
-    ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v0@{shape: rounded, label: "asset_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`supernatant_procedure_templates`"]
-    ///    v1@{shape: rounded, label: "pipette_tip_model"}
-    /// class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "pipette_tip_model"}
+    /// class v1 directly-involved-column
     /// end
     /// v1 --->|"`associated same as`"| v0
     /// v2 --->|"`associated same as`"| v3

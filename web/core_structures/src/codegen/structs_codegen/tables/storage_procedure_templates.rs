@@ -11,14 +11,14 @@
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-        foreign_key = stored_into_model
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        foreign_key = stored_asset_model
     )
 )]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-        foreign_key = stored_asset_model
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        foreign_key = stored_into_model
     )
 )]
 #[diesel(primary_key(procedure_template))]
@@ -84,57 +84,29 @@ impl StorageProcedureTemplate {
             conn,
         )
     }
-    pub fn stored_into_model<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn storage_procedure_templates_procedure_template_stored_ass_fkey1(
         &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel::read(
-            self.stored_into_model,
-            conn,
-        )
-    }
-    pub fn procedure_template_stored_into_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_stored_into_model,
-            conn,
-        )
-    }
-    pub fn stored_asset_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.stored_asset_model,
-            conn,
-        )
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_stored_asset_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
+                            .eq(&self.stored_asset_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
     }
     pub fn procedure_template_stored_asset_model<C: diesel::connection::LoadConnection>(
         &self,
@@ -178,29 +150,57 @@ impl StorageProcedureTemplate {
                 crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
             >(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn storage_procedure_templates_procedure_template_stored_ass_fkey1(
+    pub fn procedure_template_stored_into_model<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_stored_asset_model)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
-                            .eq(&self.stored_asset_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-            >(conn)
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_stored_into_model,
+            conn,
+        )
+    }
+    pub fn stored_asset_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
+            self.stored_asset_model,
+            conn,
+        )
+    }
+    pub fn stored_into_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel::read(
+            self.stored_into_model,
+            conn,
+        )
     }
     pub fn storage_procedure_templates_stored_into_model_stored_asset_fkey<
         C: diesel::connection::LoadConnection,
@@ -303,44 +303,22 @@ impl StorageProcedureTemplate {
             .order_by(storage_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }
-    pub fn from_procedure_template_stored_into_model<C>(
-        procedure_template_stored_into_model: i32,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::procedure_template_stored_into_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::procedure_template_stored_into_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::procedure_template,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::procedure_template_stored_into_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::procedure_template,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_stored_asset_model_and_stored_asset_model(
+        procedure_template_stored_asset_model: i32,
+        stored_asset_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
 
         use crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates;
         Self::table()
             .filter(
-                storage_procedure_templates::procedure_template_stored_into_model
-                    .eq(procedure_template_stored_into_model),
+                storage_procedure_templates::procedure_template_stored_asset_model
+                    .eq(procedure_template_stored_asset_model)
+                    .and(storage_procedure_templates::stored_asset_model.eq(stored_asset_model)),
             )
             .order_by(storage_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
@@ -407,22 +385,44 @@ impl StorageProcedureTemplate {
             .order_by(storage_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_stored_asset_model_and_stored_asset_model(
-        procedure_template_stored_asset_model: i32,
-        stored_asset_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
+    pub fn from_procedure_template_stored_into_model<C>(
+        procedure_template_stored_into_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::procedure_template_stored_into_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::procedure_template_stored_into_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::procedure_template,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::procedure_template_stored_into_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::procedure_template,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates;
         Self::table()
             .filter(
-                storage_procedure_templates::procedure_template_stored_asset_model
-                    .eq(procedure_template_stored_asset_model)
-                    .and(storage_procedure_templates::stored_asset_model.eq(stored_asset_model)),
+                storage_procedure_templates::procedure_template_stored_into_model
+                    .eq(procedure_template_stored_into_model),
             )
             .order_by(storage_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)

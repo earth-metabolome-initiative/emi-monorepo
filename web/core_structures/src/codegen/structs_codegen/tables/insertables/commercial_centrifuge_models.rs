@@ -90,6 +90,30 @@ impl InsertableCommercialCentrifugeModel {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_centrifuge_models_id_centrifuge_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.centrifuge_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
     pub fn commercial_centrifuge_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -121,30 +145,6 @@ impl InsertableCommercialCentrifugeModel {
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
             self.id, conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn commercial_centrifuge_models_id_centrifuge_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
-                    .eq(&self.id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
-                            .eq(&self.centrifuge_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]

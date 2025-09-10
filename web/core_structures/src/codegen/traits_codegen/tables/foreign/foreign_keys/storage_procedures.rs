@@ -4,8 +4,20 @@ pub struct StorageProcedureForeignKeys {
     pub procedure: Option<
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
+    pub procedure_stored_asset: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub procedure_stored_into: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
     pub procedure_template: Option<
         crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
+    >,
+    pub procedure_template_stored_asset_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_template_stored_into_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
     pub stored_asset: Option<
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
@@ -13,23 +25,11 @@ pub struct StorageProcedureForeignKeys {
     pub stored_asset_model: Option<
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
     >,
-    pub procedure_template_stored_asset_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_stored_asset: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
     pub stored_into: Option<
         crate::codegen::structs_codegen::tables::containers::Container,
     >,
     pub stored_into_model: Option<
         crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-    >,
-    pub procedure_template_stored_into_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_stored_into: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     >,
     pub storage_procedures_stored_into_model_stored_asset_model_fkey: Option<
         crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
@@ -48,18 +48,18 @@ impl web_common_traits::prelude::HasForeignKeys
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_stored_asset,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_stored_into,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::StorageProcedureTemplate(
                 self.procedure_template,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(
-                self.stored_asset,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
-                self.stored_asset_model,
             ),
         ));
         connector
@@ -70,9 +70,22 @@ impl web_common_traits::prelude::HasForeignKeys
                     ),
                 ),
             );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_stored_into_model,
+                    ),
+                ),
+            );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_stored_asset,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(
+                self.stored_asset,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
+                self.stored_asset_model,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -85,19 +98,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.stored_into_model,
             ),
         ));
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_stored_into_model,
-                    ),
-                ),
-            );
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_stored_into,
-            ),
-        ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerCompatibilityRule(
                 (self.stored_into_model, self.stored_asset_model),
@@ -106,15 +106,15 @@ impl web_common_traits::prelude::HasForeignKeys
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure.is_some()
+            && foreign_keys.procedure_stored_asset.is_some()
+            && foreign_keys.procedure_stored_into.is_some()
             && foreign_keys.procedure_template.is_some()
+            && foreign_keys.procedure_template_stored_asset_model.is_some()
+            && foreign_keys.procedure_template_stored_into_model.is_some()
             && foreign_keys.stored_asset.is_some()
             && foreign_keys.stored_asset_model.is_some()
-            && foreign_keys.procedure_template_stored_asset_model.is_some()
-            && foreign_keys.procedure_stored_asset.is_some()
             && foreign_keys.stored_into.is_some()
             && foreign_keys.stored_into_model.is_some()
-            && foreign_keys.procedure_template_stored_into_model.is_some()
-            && foreign_keys.procedure_stored_into.is_some()
             && foreign_keys.storage_procedures_stored_into_model_stored_asset_model_fkey.is_some()
     }
     fn update(

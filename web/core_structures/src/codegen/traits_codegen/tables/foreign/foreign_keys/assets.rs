@@ -1,8 +1,8 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AssetForeignKeys {
-    pub model: Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub model: Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>,
     pub updated_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -15,18 +15,18 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(self.model),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(self.model),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.updated_by),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.model.is_some()
-            && foreign_keys.created_by.is_some()
+        foreign_keys.created_by.is_some()
+            && foreign_keys.model.is_some()
             && foreign_keys.updated_by.is_some()
     }
     fn update(

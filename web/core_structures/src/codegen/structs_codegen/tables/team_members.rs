@@ -10,14 +10,14 @@
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::teams::Team,
-        foreign_key = team_id
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = member_id
     )
 )]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::users::User,
-        foreign_key = member_id
+        crate::codegen::structs_codegen::tables::teams::Team,
+        foreign_key = team_id
     )
 )]
 #[diesel(primary_key(team_id, member_id))]
@@ -56,16 +56,6 @@ impl diesel::Identifiable for TeamMember {
     }
 }
 impl TeamMember {
-    pub fn team<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::teams::Team, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::teams::Team::read(self.team_id, conn)
-    }
     pub fn member<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -75,6 +65,16 @@ impl TeamMember {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::users::User::read(self.member_id, conn)
+    }
+    pub fn team<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::teams::Team, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::teams::Team::read(self.team_id, conn)
     }
 }
 impl AsRef<TeamMember> for TeamMember {

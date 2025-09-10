@@ -103,24 +103,6 @@ impl InsertableCommercialPackagingLot {
             self.id, conn,
         )
     }
-    pub fn product_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel::read(
-            self.product_model,
-            conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn commercial_packaging_lots_id_product_model_fkey(
         &self,
@@ -144,6 +126,24 @@ impl InsertableCommercialPackagingLot {
             .first::<
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
+    }
+    pub fn product_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel::read(
+            self.product_model,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -255,14 +255,14 @@ for InsertableCommercialPackagingLotBuilder<CommercialProductLot, PackagingModel
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v1 --->|"`ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v6 --->|"`extends`"| v7
+    ///v1 --->|"`ancestral same as`"| v3
+    ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v5 --->|"`extends`"| v6
+    ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
@@ -591,12 +591,12 @@ where
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v1
-    ///v7 --->|"`extends`"| v4
+    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v6
     ///v6 --->|"`extends`"| v7
+    ///v7 --->|"`extends`"| v4
     ///```
     fn parent_model(
         self,

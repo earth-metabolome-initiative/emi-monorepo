@@ -25,22 +25,22 @@ pub use builder::ProcedureTemplateBuilderDAG;
 /// v14@{shape: rect, label: "storage_procedure_templates"}
 /// v15@{shape: rect, label: "supernatant_procedure_templates"}
 /// v16@{shape: rect, label: "weighing_procedure_templates"}
+/// v0 --->|"`extends`"| v13
+/// v1 --->|"`extends`"| v13
+/// v2 --->|"`extends`"| v13
+/// v3 --->|"`extends`"| v13
 /// v4 --->|"`extends`"| v13
 /// v5 --->|"`extends`"| v13
-/// v1 --->|"`extends`"| v13
+/// v6 --->|"`extends`"| v13
 /// v7 --->|"`extends`"| v13
+/// v8 --->|"`extends`"| v13
+/// v9 --->|"`extends`"| v13
 /// v10 --->|"`extends`"| v13
 /// v11 --->|"`extends`"| v13
-/// v15 --->|"`extends`"| v13
-/// v2 --->|"`extends`"| v13
-/// v8 --->|"`extends`"| v13
 /// v12 --->|"`extends`"| v13
-/// v0 --->|"`extends`"| v13
-/// v3 --->|"`extends`"| v13
-/// v9 --->|"`extends`"| v13
-/// v16 --->|"`extends`"| v13
-/// v6 --->|"`extends`"| v13
 /// v14 --->|"`extends`"| v13
+/// v15 --->|"`extends`"| v13
+/// v16 --->|"`extends`"| v13
 /// ```
 pub enum ProcedureTemplateDAG {
     ///Variant representing the `aliquoting_procedure_templates` table.

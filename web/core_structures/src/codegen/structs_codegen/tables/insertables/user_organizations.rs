@@ -37,16 +37,6 @@ pub struct InsertableUserOrganization {
     pub(crate) organization_id: i16,
 }
 impl InsertableUserOrganization {
-    pub fn user<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.user_id, conn)
-    }
     pub fn organization<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -63,6 +53,16 @@ impl InsertableUserOrganization {
             self.organization_id,
             conn,
         )
+    }
+    pub fn user<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.user_id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]

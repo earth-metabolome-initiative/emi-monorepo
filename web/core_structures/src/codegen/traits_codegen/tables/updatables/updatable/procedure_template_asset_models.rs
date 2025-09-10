@@ -25,10 +25,10 @@ where
         if user_id == self.created_by {
             return Ok(true);
         }
-        if !self.procedure_template(conn)?.can_update(user_id, conn)? {
+        if !self.asset_model(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
-        if !self.asset_model(conn)?.can_update(user_id, conn)? {
+        if !self.procedure_template(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         Ok(true)

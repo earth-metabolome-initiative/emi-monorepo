@@ -12,10 +12,10 @@ where
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<bool, diesel::result::Error> {
-        if !self.descendant_model(conn)?.can_update(user_id, conn)? {
+        if !self.ancestor_model(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
-        if !self.ancestor_model(conn)?.can_update(user_id, conn)? {
+        if !self.descendant_model(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         Ok(true)

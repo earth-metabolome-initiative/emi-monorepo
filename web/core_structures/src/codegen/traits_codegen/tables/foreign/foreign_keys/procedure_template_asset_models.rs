@@ -1,16 +1,16 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcedureTemplateAssetModelForeignKeys {
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    pub asset_model: Option<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
     >,
     pub based_on: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
-    pub asset_model: Option<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-    >,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    >,
 }
 impl web_common_traits::prelude::HasForeignKeys
 for crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel {
@@ -23,8 +23,8 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                        self.procedure_template,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
+                        self.asset_model,
                     ),
                 ),
             );
@@ -41,24 +41,25 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
-                        self.asset_model,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(
+                        self.created_by,
                     ),
                 ),
             );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(
-                        self.created_by,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                        self.procedure_template,
                     ),
                 ),
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_template.is_some()
+        foreign_keys.asset_model.is_some()
             && (foreign_keys.based_on.is_some() || self.based_on.is_some())
-            && foreign_keys.asset_model.is_some() && foreign_keys.created_by.is_some()
+            && foreign_keys.created_by.is_some()
+            && foreign_keys.procedure_template.is_some()
     }
     fn update(
         &self,

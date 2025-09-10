@@ -1,20 +1,20 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DisposalProcedureForeignKeys {
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
-    >,
     pub disposed_asset: Option<
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    >,
+    pub procedure_disposed_asset: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
     pub procedure_template_disposed_asset_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
-    pub procedure_disposed_asset: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -26,14 +26,6 @@ impl web_common_traits::prelude::HasForeignKeys
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::DisposalProcedureTemplate(
-                self.procedure_template,
-            ),
-        ));
         if let Some(disposed_asset) = self.disposed_asset {
             connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(
@@ -41,6 +33,14 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
             ));
         }
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_disposed_asset,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
+        ));
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -50,17 +50,17 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
             );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_disposed_asset,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::DisposalProcedureTemplate(
+                self.procedure_template,
             ),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure.is_some()
-            && foreign_keys.procedure_template.is_some()
-            && (foreign_keys.disposed_asset.is_some() || self.disposed_asset.is_some())
-            && foreign_keys.procedure_template_disposed_asset_model.is_some()
+        (foreign_keys.disposed_asset.is_some() || self.disposed_asset.is_some())
             && foreign_keys.procedure_disposed_asset.is_some()
+            && foreign_keys.procedure.is_some()
+            && foreign_keys.procedure_template_disposed_asset_model.is_some()
+            && foreign_keys.procedure_template.is_some()
     }
     fn update(
         &self,

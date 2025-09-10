@@ -37,23 +37,6 @@ pub struct InsertableAssetModelAncestor {
     pub(crate) ancestor_model: i32,
 }
 impl InsertableAssetModelAncestor {
-    pub fn descendant_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
-            self.descendant_model,
-            conn,
-        )
-    }
     pub fn ancestor_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -68,6 +51,23 @@ impl InsertableAssetModelAncestor {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
             self.ancestor_model,
+            conn,
+        )
+    }
+    pub fn descendant_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
+            self.descendant_model,
             conn,
         )
     }

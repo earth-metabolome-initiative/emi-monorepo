@@ -117,122 +117,6 @@ impl InsertableHarvestingProcedure {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
     }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::read(
-            self.procedure_template,
-            conn,
-        )
-    }
-    pub fn sample_source<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource::read(
-            self.sample_source,
-            conn,
-        )
-    }
-    pub fn procedure_template_sample_source_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_sample_source_model,
-            conn,
-        )
-    }
-    pub fn procedure_sample_source<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_sample_source,
-            conn,
-        )
-    }
-    pub fn sample<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::samples::Sample, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::samples::Sample:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::samples::Sample::read(self.sample, conn)
-    }
-    pub fn procedure_template_sample_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_sample_model,
-            conn,
-        )
-    }
-    pub fn procedure_sample<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_sample,
-            conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn harvesting_procedures_procedure_procedure_template_fkey(
         &self,
@@ -255,56 +139,25 @@ impl InsertableHarvestingProcedure {
                 crate::codegen::structs_codegen::tables::procedures::Procedure,
             >(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn harvesting_procedures_procedure_template_procedure_templat_fkey(
+    pub fn procedure_sample<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
         diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template_sample_source_model
-                            .eq(&self.procedure_template_sample_source_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
-            >(conn)
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_sample,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
-    pub fn harvesting_procedures_procedure_template_procedure_templa_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template_sample_model
-                            .eq(&self.procedure_template_sample_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn harvesting_procedures_procedure_sample_source_sample_sourc_fkey(
+    pub fn harvesting_procedures_procedure_sample_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -317,10 +170,10 @@ impl InsertableHarvestingProcedure {
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_sample_source)
+                    .eq(&self.procedure_sample)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.sample_source),
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_sample_model),
                     ),
             )
             .first::<
@@ -351,6 +204,23 @@ impl InsertableHarvestingProcedure {
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
     }
+    pub fn procedure_sample_source<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_sample_source,
+            conn,
+        )
+    }
     #[cfg(feature = "postgres")]
     pub fn harvesting_procedures_procedure_sample_source_procedure_te_fkey(
         &self,
@@ -376,7 +246,7 @@ impl InsertableHarvestingProcedure {
             >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn harvesting_procedures_procedure_sample_procedure_template_fkey(
+    pub fn harvesting_procedures_procedure_sample_source_sample_sourc_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -389,15 +259,145 @@ impl InsertableHarvestingProcedure {
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_sample)
+                    .eq(&self.procedure_sample_source)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_sample_model),
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.sample_source),
                     ),
             )
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn harvesting_procedures_procedure_template_procedure_templa_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template_sample_model
+                            .eq(&self.procedure_template_sample_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn harvesting_procedures_procedure_template_procedure_templat_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template_sample_source_model
+                            .eq(&self.procedure_template_sample_source_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+            >(conn)
+    }
+    pub fn procedure_template_sample_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_sample_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_sample_source_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_sample_source_model,
+            conn,
+        )
+    }
+    pub fn sample<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::samples::Sample, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::samples::Sample:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::samples::Sample::read(self.sample, conn)
+    }
+    pub fn sample_source<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource::read(
+            self.sample_source,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -663,10 +663,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v5 ["`harvesting_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_template"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_sample_model"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_template"}
+    /// class v0 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_sample_source_model"}
     /// class v2 directly-involved-column
     /// end
@@ -723,16 +723,16 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn sample_source(
@@ -772,10 +772,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`harvesting_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_sample_source"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_sample_source_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_sample_source"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -826,28 +826,28 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`harvesting_procedures`"]
+    ///    v1@{shape: rounded, label: "procedure_template_sample_source_model"}
+    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "procedure_sample_source"}
     /// class v0 column-of-interest
     ///    v2@{shape: rounded, label: "sample_source"}
     /// class v2 directly-involved-column
-    ///    v1@{shape: rounded, label: "procedure_template_sample_source_model"}
-    /// class v1 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
+    ///    v5@{shape: rounded, label: "id"}
+    /// class v5 undirectly-involved-column
     ///    v3@{shape: rounded, label: "asset"}
     /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
-    ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v5
     /// v0 --->|"`associated same as`"| v5
     /// v0 --->|"`associated same as`"| v5
     /// v0 -.->|"`foreign defines`"| v1
     /// v0 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v4
+    /// v2 --->|"`associated same as`"| v3
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn procedure_sample_source<PSS>(
@@ -863,37 +863,6 @@ impl<
         >,
     {
         let mut procedure_sample_source = procedure_sample_source.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_sample_source
-        {
-            procedure_sample_source = if let (Some(sample_source), Some(asset)) =
-                (self.sample_source, builder.asset)
-            {
-                if sample_source != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::SampleSource,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.sample_source = Some(asset);
-                builder.into()
-            } else if let Some(sample_source) = self.sample_source {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(sample_source),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureSampleSource(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_sample_source
         {
             procedure_sample_source = if let (
@@ -933,6 +902,37 @@ impl<
                 builder.into()
             };
         }
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_sample_source
+        {
+            procedure_sample_source = if let (Some(sample_source), Some(asset)) =
+                (self.sample_source, builder.asset)
+            {
+                if sample_source != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::SampleSource,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.sample_source = Some(asset);
+                builder.into()
+            } else if let Some(sample_source) = self.sample_source {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(sample_source),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureSampleSource(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         self.procedure_sample_source = procedure_sample_source;
         Ok(self)
     }
@@ -956,16 +956,16 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn sample(
@@ -1010,10 +1010,10 @@ impl<
     /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
@@ -1058,12 +1058,12 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`harvesting_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_sample_model"}
-    /// class v1 directly-involved-column
-    ///    v0@{shape: rounded, label: "procedure_sample"}
-    /// class v0 column-of-interest
     ///    v2@{shape: rounded, label: "sample"}
     /// class v2 directly-involved-column
+    ///    v0@{shape: rounded, label: "procedure_sample"}
+    /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_sample_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "asset"}
@@ -1073,12 +1073,12 @@ impl<
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v4
     /// v0 --->|"`associated same as`"| v5
     /// v0 --->|"`associated same as`"| v5
     /// v0 --->|"`associated same as`"| v5
     /// v0 -.->|"`foreign defines`"| v1
     /// v0 -.->|"`foreign defines`"| v2
+    /// v1 --->|"`associated same as`"| v4
     /// v2 --->|"`associated same as`"| v3
     /// v6 ---o|"`associated with`"| v7
     /// ```
@@ -1095,34 +1095,6 @@ impl<
         >,
     {
         let mut procedure_sample = procedure_sample.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_sample {
-            procedure_sample = if let (Some(sample), Some(asset)) = (self.sample, builder.asset) {
-                if sample != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::Sample,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.sample = Some(asset);
-                builder.into()
-            } else if let Some(sample) = self.sample {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(sample),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureSample(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_sample {
             procedure_sample = if let (
                 Some(procedure_template_sample_model),
@@ -1149,6 +1121,34 @@ impl<
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
                         procedure_template_sample_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureSample(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_sample {
+            procedure_sample = if let (Some(sample), Some(asset)) = (self.sample, builder.asset) {
+                if sample != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::Sample,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.sample = Some(asset);
+                builder.into()
+            } else if let Some(sample) = self.sample {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(sample),
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {

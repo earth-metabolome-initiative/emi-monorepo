@@ -71,6 +71,23 @@ impl InsertableVolumetricContainer {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::containers::Container::read(self.id, conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn volumetric_containers_id_volumetric_container_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.volumetric_container_model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
     pub fn volumetric_container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -88,23 +105,6 @@ impl InsertableVolumetricContainer {
             self.volumetric_container_model,
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn volumetric_containers_id_volumetric_container_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::assets::Asset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
-                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
-                        .eq(&self.volumetric_container_model),
-                ),
-            )
-            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -170,9 +170,9 @@ pub trait VolumetricContainerSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    Container: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+    Container: crate::codegen::structs_codegen::tables::insertables::ContainerSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
-        > + crate::codegen::structs_codegen::tables::insertables::ContainerSettable<
+        > + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
         >,
 > VolumetricContainerSettable for InsertableVolumetricContainerBuilder<Container>
@@ -209,14 +209,14 @@ impl<
     ///    v2@{shape: rounded, label: "volumetric_container_model"}
     /// class v2 column-of-interest
     /// end
-    /// v2 --->|"`ancestral same as`"| v3
-    /// v2 -.->|"`inferred ancestral same as`"| v0
-    /// v2 -.->|"`inferred ancestral same as`"| v1
     /// v0 --->|"`ancestral same as`"| v3
     /// v0 -.->|"`inferred ancestral same as`"| v1
     /// v1 --->|"`ancestral same as`"| v3
-    /// v6 --->|"`extends`"| v4
+    /// v2 --->|"`ancestral same as`"| v3
+    /// v2 -.->|"`inferred ancestral same as`"| v0
+    /// v2 -.->|"`inferred ancestral same as`"| v1
     /// v5 --->|"`extends`"| v6
+    /// v6 --->|"`extends`"| v4
     /// v7 --->|"`extends`"| v5
     /// ```
     fn volumetric_container_model(
@@ -474,8 +474,8 @@ where
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v5 --->|"`extends`"| v3
     ///v3 --->|"`extends`"| v4
+    ///v5 --->|"`extends`"| v3
     ///```
     fn container_model(
         self,
@@ -533,9 +533,9 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
+    ///v5 --->|"`extends`"| v6
     ///v6 --->|"`extends`"| v4
     ///v7 --->|"`extends`"| v5
-    ///v5 --->|"`extends`"| v6
     ///```
     fn model(
         self,

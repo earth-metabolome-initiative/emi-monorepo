@@ -73,23 +73,6 @@ pub struct InsertableCommercialPipetteTipModel {
     pub(crate) pipette_tip_model: i32,
 }
 impl InsertableCommercialPipetteTipModel {
-    pub fn pipette_tip_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::read(
-            self.pipette_tip_model,
-            conn,
-        )
-    }
     pub fn commercial_pipette_tip_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -145,6 +128,23 @@ impl InsertableCommercialPipetteTipModel {
             .first::<
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
+    }
+    pub fn pipette_tip_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::read(
+            self.pipette_tip_model,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -249,9 +249,9 @@ for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipMode
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 directly-involved-column
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn pipette_tip_model(
@@ -534,9 +534,9 @@ where
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 column-of-interest
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(

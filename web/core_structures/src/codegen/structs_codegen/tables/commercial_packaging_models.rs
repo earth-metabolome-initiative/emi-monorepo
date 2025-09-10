@@ -73,23 +73,6 @@ impl diesel::Identifiable for CommercialPackagingModel {
     }
 }
 impl CommercialPackagingModel {
-    pub fn packaging_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::read(
-            self.packaging_model,
-            conn,
-        )
-    }
     pub fn commercial_packaging_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -146,44 +129,22 @@ impl CommercialPackagingModel {
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
     }
-    pub fn from_packaging_model<C>(
-        packaging_model: i32,
+    pub fn packaging_model<C: diesel::connection::LoadConnection>(
+        &self,
         conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+        diesel::result::Error,
+    >
     where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models::packaging_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models::packaging_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models::id,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models::packaging_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models::id,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models;
-        Self::table()
-            .filter(commercial_packaging_models::packaging_model.eq(packaging_model))
-            .order_by(commercial_packaging_models::id.asc())
-            .load::<Self>(conn)
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::read(
+            self.packaging_model,
+            conn,
+        )
     }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where
@@ -238,6 +199,45 @@ impl CommercialPackagingModel {
                     .eq(id)
                     .and(commercial_packaging_models::packaging_model.eq(packaging_model)),
             )
+            .order_by(commercial_packaging_models::id.asc())
+            .load::<Self>(conn)
+    }
+    pub fn from_packaging_model<C>(
+        packaging_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models::packaging_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models::packaging_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models::packaging_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::commercial_packaging_models::commercial_packaging_models;
+        Self::table()
+            .filter(commercial_packaging_models::packaging_model.eq(packaging_model))
             .order_by(commercial_packaging_models::id.asc())
             .load::<Self>(conn)
     }

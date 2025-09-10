@@ -4,17 +4,17 @@ pub struct WeighingProcedureTemplateForeignKeys {
     pub procedure_template: Option<
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
     >,
-    pub weighed_container_model: Option<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-    >,
     pub procedure_template_weighed_container_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
-    pub weighed_with_model: Option<
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-    >,
     pub procedure_template_weighed_with_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub weighed_container_model: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    >,
+    pub weighed_with_model: Option<
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -36,24 +36,8 @@ for crate::codegen::structs_codegen::tables::weighing_procedure_templates::Weigh
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
-                        self.weighed_container_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
                         self.procedure_template_weighed_container_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDeviceModel(
-                        self.weighed_with_model,
                     ),
                 ),
             );
@@ -65,13 +49,29 @@ for crate::codegen::structs_codegen::tables::weighing_procedure_templates::Weigh
                     ),
                 ),
             );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                        self.weighed_container_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDeviceModel(
+                        self.weighed_with_model,
+                    ),
+                ),
+            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure_template.is_some()
-            && foreign_keys.weighed_container_model.is_some()
             && foreign_keys.procedure_template_weighed_container_model.is_some()
-            && foreign_keys.weighed_with_model.is_some()
             && foreign_keys.procedure_template_weighed_with_model.is_some()
+            && foreign_keys.weighed_container_model.is_some()
+            && foreign_keys.weighed_with_model.is_some()
     }
     fn update(
         &self,

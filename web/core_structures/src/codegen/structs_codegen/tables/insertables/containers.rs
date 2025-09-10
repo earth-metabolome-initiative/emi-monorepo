@@ -56,20 +56,6 @@ pub struct InsertableContainer {
     pub(crate) container_model: i32,
 }
 impl InsertableContainer {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
-    }
     pub fn container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -103,6 +89,20 @@ impl InsertableContainer {
                 ),
             )
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
+    pub fn id<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -442,9 +442,9 @@ where
     ///    v1@{shape: rounded, label: "model"}
     /// class v1 column-of-interest
     /// end
-    /// v1 --->|"`ancestral same as`"| v2
     /// v0 --->|"`ancestral same as`"| v2
     /// v0 -.->|"`inferred ancestral same as`"| v1
+    /// v1 --->|"`ancestral same as`"| v2
     /// v4 --->|"`extends`"| v5
     /// v5 --->|"`extends`"| v3
     /// ```

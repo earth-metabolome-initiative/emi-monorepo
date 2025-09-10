@@ -72,22 +72,6 @@ impl InsertableSampleSource {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
     }
-    pub fn model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel::read(
-            self.model, conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn sample_sources_id_model_fkey(
         &self,
@@ -104,6 +88,22 @@ impl InsertableSampleSource {
                 ),
             )
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
+    pub fn model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel::read(
+            self.model, conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -197,11 +197,11 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 column-of-interest
     ///end
+    ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v5 --->|"`extends`"| v4
     ///v4 --->|"`extends`"| v3
+    ///v5 --->|"`extends`"| v4
     ///```
     fn model(
         mut self,
@@ -451,8 +451,8 @@ where
     ///v0 --->|"`ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v0
-    ///v5 --->|"`extends`"| v4
     ///v4 --->|"`extends`"| v3
+    ///v5 --->|"`extends`"| v4
     ///```
     fn model(
         self,

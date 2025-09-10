@@ -70,22 +70,6 @@ impl DigitalAsset {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::assets::Asset::read(self.id, conn)
     }
-    pub fn model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel::read(
-            self.model, conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn digital_assets_id_model_fkey(
         &self,
@@ -102,6 +86,22 @@ impl DigitalAsset {
                 ),
             )
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
+    pub fn model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel::read(
+            self.model, conn,
+        )
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,

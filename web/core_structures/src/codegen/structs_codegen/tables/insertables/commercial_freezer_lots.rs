@@ -101,23 +101,6 @@ impl InsertableCommercialFreezerLot {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::freezer_models::FreezerModel::read(self.id, conn)
     }
-    pub fn product_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel::read(
-            self.product_model,
-            conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn commercial_freezer_lots_id_product_model_fkey(
         &self,
@@ -141,6 +124,23 @@ impl InsertableCommercialFreezerLot {
             .first::<
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
+    }
+    pub fn product_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel::read(
+            self.product_model,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -252,15 +252,15 @@ for InsertableCommercialFreezerLotBuilder<CommercialProductLot, FreezerModel> {
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v1 --->|"`ancestral same as`"| v3
-    ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
+    ///v1 --->|"`ancestral same as`"| v3
+    ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v5 --->|"`extends`"| v6
-    ///v7 --->|"`extends`"| v4
     ///v6 --->|"`extends`"| v7
+    ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
         mut self,
@@ -527,8 +527,8 @@ where
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v4 --->|"`extends`"| v5
     ///v3 --->|"`extends`"| v4
+    ///v4 --->|"`extends`"| v5
     ///```
     fn product_model(
         self,
@@ -588,12 +588,12 @@ where
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
     ///v3 --->|"`ancestral same as`"| v2
     ///v3 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v6
     ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
-    ///v5 --->|"`extends`"| v6
     ///```
     fn parent_model(
         self,

@@ -77,28 +77,6 @@ impl InsertableDigitalAssetModel {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(self.id, conn)
     }
-    pub fn parent_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel>,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel:
-            web_common_traits::database::Read<C>,
-    {
-        use diesel::OptionalExtension;
-        use web_common_traits::database::Read;
-        let Some(parent_model) = self.parent_model else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel::read(
-            parent_model,
-            conn,
-        )
-        .optional()
-    }
     #[cfg(feature = "postgres")]
     pub fn digital_asset_models_id_parent_model_fkey(
         &self,
@@ -127,6 +105,28 @@ impl InsertableDigitalAssetModel {
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
             .optional()
+    }
+    pub fn parent_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel>,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel:
+            web_common_traits::database::Read<C>,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(parent_model) = self.parent_model else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel::read(
+            parent_model,
+            conn,
+        )
+        .optional()
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]

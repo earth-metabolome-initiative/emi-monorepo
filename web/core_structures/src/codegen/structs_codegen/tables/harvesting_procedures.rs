@@ -11,14 +11,14 @@
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
-        foreign_key = sample_source
+        crate::codegen::structs_codegen::tables::samples::Sample,
+        foreign_key = sample
     )
 )]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::samples::Sample,
-        foreign_key = sample
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
+        foreign_key = sample_source
     )
 )]
 #[diesel(primary_key(procedure))]
@@ -82,122 +82,6 @@ impl HarvestingProcedure {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
     }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::read(
-            self.procedure_template,
-            conn,
-        )
-    }
-    pub fn sample_source<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource::read(
-            self.sample_source,
-            conn,
-        )
-    }
-    pub fn procedure_template_sample_source_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_sample_source_model,
-            conn,
-        )
-    }
-    pub fn procedure_sample_source<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_sample_source,
-            conn,
-        )
-    }
-    pub fn sample<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::samples::Sample, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::samples::Sample:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::samples::Sample::read(self.sample, conn)
-    }
-    pub fn procedure_template_sample_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_sample_model,
-            conn,
-        )
-    }
-    pub fn procedure_sample<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_sample,
-            conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn harvesting_procedures_procedure_procedure_template_fkey(
         &self,
@@ -220,56 +104,25 @@ impl HarvestingProcedure {
                 crate::codegen::structs_codegen::tables::procedures::Procedure,
             >(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn harvesting_procedures_procedure_template_procedure_templat_fkey(
+    pub fn procedure_sample<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
         diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template_sample_source_model
-                            .eq(&self.procedure_template_sample_source_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
-            >(conn)
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_sample,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
-    pub fn harvesting_procedures_procedure_template_procedure_templa_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template_sample_model
-                            .eq(&self.procedure_template_sample_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn harvesting_procedures_procedure_sample_source_sample_sourc_fkey(
+    pub fn harvesting_procedures_procedure_sample_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -282,10 +135,10 @@ impl HarvestingProcedure {
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_sample_source)
+                    .eq(&self.procedure_sample)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.sample_source),
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_sample_model),
                     ),
             )
             .first::<
@@ -316,6 +169,23 @@ impl HarvestingProcedure {
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
     }
+    pub fn procedure_sample_source<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_sample_source,
+            conn,
+        )
+    }
     #[cfg(feature = "postgres")]
     pub fn harvesting_procedures_procedure_sample_source_procedure_te_fkey(
         &self,
@@ -341,7 +211,7 @@ impl HarvestingProcedure {
             >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn harvesting_procedures_procedure_sample_procedure_template_fkey(
+    pub fn harvesting_procedures_procedure_sample_source_sample_sourc_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -354,15 +224,145 @@ impl HarvestingProcedure {
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_sample)
+                    .eq(&self.procedure_sample_source)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_sample_model),
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.sample_source),
                     ),
             )
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn harvesting_procedures_procedure_template_procedure_templa_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template_sample_model
+                            .eq(&self.procedure_template_sample_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn harvesting_procedures_procedure_template_procedure_templat_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template_sample_source_model
+                            .eq(&self.procedure_template_sample_source_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+            >(conn)
+    }
+    pub fn procedure_template_sample_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_sample_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_sample_source_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_sample_source_model,
+            conn,
+        )
+    }
+    pub fn sample<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::samples::Sample, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::samples::Sample:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::samples::Sample::read(self.sample, conn)
+    }
+    pub fn sample_source<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource::read(
+            self.sample_source,
+            conn,
+        )
     }
     pub fn from_procedure<C>(
         procedure: ::rosetta_uuid::Uuid,
@@ -400,6 +400,186 @@ impl HarvestingProcedure {
         use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
         Self::table()
             .filter(harvesting_procedures::procedure.eq(procedure))
+            .order_by(harvesting_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_and_procedure_template(
+        procedure: ::rosetta_uuid::Uuid,
+        procedure_template: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
+        Self::table()
+            .filter(
+                harvesting_procedures::procedure
+                    .eq(procedure)
+                    .and(harvesting_procedures::procedure_template.eq(procedure_template)),
+            )
+            .order_by(harvesting_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    pub fn from_procedure_sample<C>(
+        procedure_sample: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_sample as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_sample as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_sample as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
+        Self::table()
+            .filter(harvesting_procedures::procedure_sample.eq(procedure_sample))
+            .order_by(harvesting_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_sample_and_procedure_template_sample_model(
+        procedure_sample: ::rosetta_uuid::Uuid,
+        procedure_template_sample_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
+        Self::table()
+            .filter(
+                harvesting_procedures::procedure_sample.eq(procedure_sample).and(
+                    harvesting_procedures::procedure_template_sample_model
+                        .eq(procedure_template_sample_model),
+                ),
+            )
+            .order_by(harvesting_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_sample_and_sample(
+        procedure_sample: ::rosetta_uuid::Uuid,
+        sample: ::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
+        Self::table()
+            .filter(
+                harvesting_procedures::procedure_sample
+                    .eq(procedure_sample)
+                    .and(harvesting_procedures::sample.eq(sample)),
+            )
+            .order_by(harvesting_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    pub fn from_procedure_sample_source<C>(
+        procedure_sample_source: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_sample_source as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_sample_source as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_sample_source as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
+        Self::table()
+            .filter(harvesting_procedures::procedure_sample_source.eq(procedure_sample_source))
+            .order_by(harvesting_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_sample_source_and_procedure_template_sample_source_model(
+        procedure_sample_source: ::rosetta_uuid::Uuid,
+        procedure_template_sample_source_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
+        Self::table()
+            .filter(
+                harvesting_procedures::procedure_sample_source.eq(procedure_sample_source).and(
+                    harvesting_procedures::procedure_template_sample_source_model
+                        .eq(procedure_template_sample_source_model),
+                ),
+            )
+            .order_by(harvesting_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_sample_source_and_sample_source(
+        procedure_sample_source: ::rosetta_uuid::Uuid,
+        sample_source: ::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
+        Self::table()
+            .filter(
+                harvesting_procedures::procedure_sample_source
+                    .eq(procedure_sample_source)
+                    .and(harvesting_procedures::sample_source.eq(sample_source)),
+            )
             .order_by(harvesting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -442,84 +622,45 @@ impl HarvestingProcedure {
             .order_by(harvesting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    pub fn from_procedure_template_sample_source_model<C>(
-        procedure_template_sample_source_model: i32,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_template_sample_source_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_template_sample_source_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_template_sample_source_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_and_procedure_template_sample_model(
+        procedure_template: i32,
+        procedure_template_sample_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
 
         use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
         Self::table()
             .filter(
-                harvesting_procedures::procedure_template_sample_source_model
-                    .eq(procedure_template_sample_source_model),
+                harvesting_procedures::procedure_template.eq(procedure_template).and(
+                    harvesting_procedures::procedure_template_sample_model
+                        .eq(procedure_template_sample_model),
+                ),
             )
             .order_by(harvesting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    pub fn from_procedure_sample_source<C>(
-        procedure_sample_source: ::rosetta_uuid::Uuid,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_sample_source as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_sample_source as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_sample_source as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_and_procedure_template_sample_source_model(
+        procedure_template: i32,
+        procedure_template_sample_source_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
 
         use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
         Self::table()
-            .filter(harvesting_procedures::procedure_sample_source.eq(procedure_sample_source))
+            .filter(
+                harvesting_procedures::procedure_template.eq(procedure_template).and(
+                    harvesting_procedures::procedure_template_sample_source_model
+                        .eq(procedure_template_sample_source_model),
+                ),
+            )
             .order_by(harvesting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -565,20 +706,20 @@ impl HarvestingProcedure {
             .order_by(harvesting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    pub fn from_procedure_sample<C>(
-        procedure_sample: ::rosetta_uuid::Uuid,
+    pub fn from_procedure_template_sample_source_model<C>(
+        procedure_template_sample_source_model: i32,
         conn: &mut C,
     ) -> Result<Vec<Self>, diesel::result::Error>
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_sample as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
+            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_template_sample_source_model as diesel::expression_methods::EqAll<
+                i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_sample as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
+            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_template_sample_source_model as diesel::expression_methods::EqAll<
+                i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
@@ -586,8 +727,8 @@ impl HarvestingProcedure {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_sample as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
+            <crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures::procedure_template_sample_source_model as diesel::expression_methods::EqAll<
+                i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
@@ -600,150 +741,9 @@ impl HarvestingProcedure {
 
         use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
         Self::table()
-            .filter(harvesting_procedures::procedure_sample.eq(procedure_sample))
-            .order_by(harvesting_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_and_procedure_template(
-        procedure: ::rosetta_uuid::Uuid,
-        procedure_template: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
-        Self::table()
             .filter(
-                harvesting_procedures::procedure
-                    .eq(procedure)
-                    .and(harvesting_procedures::procedure_template.eq(procedure_template)),
-            )
-            .order_by(harvesting_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_and_procedure_template_sample_source_model(
-        procedure_template: i32,
-        procedure_template_sample_source_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
-        Self::table()
-            .filter(
-                harvesting_procedures::procedure_template.eq(procedure_template).and(
-                    harvesting_procedures::procedure_template_sample_source_model
-                        .eq(procedure_template_sample_source_model),
-                ),
-            )
-            .order_by(harvesting_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_and_procedure_template_sample_model(
-        procedure_template: i32,
-        procedure_template_sample_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
-        Self::table()
-            .filter(
-                harvesting_procedures::procedure_template.eq(procedure_template).and(
-                    harvesting_procedures::procedure_template_sample_model
-                        .eq(procedure_template_sample_model),
-                ),
-            )
-            .order_by(harvesting_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_sample_source_and_sample_source(
-        procedure_sample_source: ::rosetta_uuid::Uuid,
-        sample_source: ::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
-        Self::table()
-            .filter(
-                harvesting_procedures::procedure_sample_source
-                    .eq(procedure_sample_source)
-                    .and(harvesting_procedures::sample_source.eq(sample_source)),
-            )
-            .order_by(harvesting_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_sample_and_sample(
-        procedure_sample: ::rosetta_uuid::Uuid,
-        sample: ::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
-        Self::table()
-            .filter(
-                harvesting_procedures::procedure_sample
-                    .eq(procedure_sample)
-                    .and(harvesting_procedures::sample.eq(sample)),
-            )
-            .order_by(harvesting_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_sample_source_and_procedure_template_sample_source_model(
-        procedure_sample_source: ::rosetta_uuid::Uuid,
-        procedure_template_sample_source_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
-        Self::table()
-            .filter(
-                harvesting_procedures::procedure_sample_source.eq(procedure_sample_source).and(
-                    harvesting_procedures::procedure_template_sample_source_model
-                        .eq(procedure_template_sample_source_model),
-                ),
-            )
-            .order_by(harvesting_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_sample_and_procedure_template_sample_model(
-        procedure_sample: ::rosetta_uuid::Uuid,
-        procedure_template_sample_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
-        Self::table()
-            .filter(
-                harvesting_procedures::procedure_sample.eq(procedure_sample).and(
-                    harvesting_procedures::procedure_template_sample_model
-                        .eq(procedure_template_sample_model),
-                ),
+                harvesting_procedures::procedure_template_sample_source_model
+                    .eq(procedure_template_sample_source_model),
             )
             .order_by(harvesting_procedures::procedure.asc())
             .load::<Self>(conn)

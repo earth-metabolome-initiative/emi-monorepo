@@ -82,6 +82,30 @@ impl InsertableCommercialCapModel {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::cap_models::CapModel::read(self.cap_model, conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_cap_models_id_cap_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.cap_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
     pub fn commercial_cap_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -108,30 +132,6 @@ impl InsertableCommercialCapModel {
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
             self.id, conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn commercial_cap_models_id_cap_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
-                    .eq(&self.id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
-                            .eq(&self.cap_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]

@@ -119,35 +119,6 @@ pub struct InsertableGeolocationProcedure {
     pub(crate) location: postgis_diesel::types::Point,
 }
 impl InsertableGeolocationProcedure {
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::read(
-            self.procedure_template,
-            conn,
-        )
-    }
     pub fn geolocated_asset<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -162,43 +133,6 @@ impl InsertableGeolocationProcedure {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(
             self.geolocated_asset,
-            conn,
-        )
-    }
-    pub fn procedure_template_geolocated_asset_model<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_geolocated_asset_model,
-            conn,
-        )
-    }
-    pub fn procedure_geolocated_asset<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_geolocated_asset,
             conn,
         )
     }
@@ -224,7 +158,18 @@ impl InsertableGeolocationProcedure {
         )
         .optional()
     }
-    pub fn procedure_geolocated_with<C: diesel::connection::LoadConnection>(
+    pub fn procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
+    }
+    pub fn procedure_geolocated_asset<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -237,98 +182,32 @@ impl InsertableGeolocationProcedure {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_geolocated_with,
-            conn,
-        )
-    }
-    pub fn procedure_template_geolocated_with_model<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_geolocated_with_model,
+            self.procedure_geolocated_asset,
             conn,
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn geolocation_procedures_procedure_procedure_template_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
-                    .eq(&self.procedure)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
-                            .eq(&self.procedure_template),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedures::Procedure,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn geolocation_procedures_procedure_template_procedure_templa_fkey(
+    pub fn geolocation_procedures_procedure_geolocated_asset_geolocat_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
         diesel::result::Error,
-    >{
+    > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::table()
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_geolocated_asset)
                     .and(
-                        crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template_geolocated_with_model
-                            .eq(&self.procedure_template_geolocated_with_model),
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.geolocated_asset),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn geolocation_procedures_procedure_template_procedure_templ_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template_geolocated_asset_model
-                            .eq(&self.procedure_template_geolocated_asset_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -355,53 +234,22 @@ impl InsertableGeolocationProcedure {
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn geolocation_procedures_procedure_geolocated_with_procedure_fkey(
+    pub fn procedure_geolocated_with<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
         diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_geolocated_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_geolocated_with_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn geolocation_procedures_procedure_geolocated_asset_geolocat_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_geolocated_asset)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.geolocated_asset),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_geolocated_with,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn geolocation_procedures_procedure_geolocated_with_geolocate_fkey(
@@ -431,6 +279,158 @@ impl InsertableGeolocationProcedure {
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
             .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub fn geolocation_procedures_procedure_geolocated_with_procedure_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_geolocated_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_geolocated_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn geolocation_procedures_procedure_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
+                    .eq(&self.procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
+                            .eq(&self.procedure_template),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    pub fn procedure_template_geolocated_asset_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_geolocated_asset_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_geolocated_with_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_geolocated_with_model,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn geolocation_procedures_procedure_template_procedure_templ_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template_geolocated_asset_model
+                            .eq(&self.procedure_template_geolocated_asset_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn geolocation_procedures_procedure_template_procedure_templa_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template_geolocated_with_model
+                            .eq(&self.procedure_template_geolocated_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+            >(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
@@ -729,10 +729,10 @@ impl<
     /// subgraph v5 ["`geolocation_procedures`"]
     ///    v2@{shape: rounded, label: "procedure_template_geolocated_with_model"}
     /// class v2 directly-involved-column
-    ///    v1@{shape: rounded, label: "procedure_template_geolocated_asset_model"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_template_geolocated_asset_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v6 ["`procedure_assets`"]
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
@@ -742,11 +742,11 @@ impl<
     ///    v3@{shape: rounded, label: "procedure_template"}
     /// class v3 directly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v4
-    /// v1 --->|"`associated same as`"| v4
     /// v0 --->|"`ancestral same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
     /// v0 -.->|"`foreign defines`"| v2
+    /// v1 --->|"`associated same as`"| v4
+    /// v2 --->|"`associated same as`"| v4
     /// v5 --->|"`extends`"| v7
     /// v5 ---o|"`associated with`"| v6
     /// ```
@@ -781,10 +781,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`geolocation_procedures`"]
-    ///    v0@{shape: rounded, label: "geolocated_asset"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_geolocated_asset"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "geolocated_asset"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset"}
@@ -836,10 +836,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`geolocation_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_geolocated_asset_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "procedure_geolocated_asset"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_geolocated_asset_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
@@ -847,11 +847,11 @@ impl<
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_geolocated_asset_model(
@@ -891,28 +891,28 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`geolocation_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_geolocated_asset_model"}
-    /// class v2 directly-involved-column
-    ///    v1@{shape: rounded, label: "procedure_geolocated_asset"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "geolocated_asset"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_geolocated_asset"}
+    /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_template_geolocated_asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v4 directly-involved-column
     ///    v3@{shape: rounded, label: "asset"}
     /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v4
+    /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
-    /// v0 --->|"`associated same as`"| v3
+    /// v2 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn procedure_geolocated_asset<PGA>(
@@ -928,6 +928,38 @@ impl<
         >,
     {
         let mut procedure_geolocated_asset = procedure_geolocated_asset.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_geolocated_asset
+        {
+            procedure_geolocated_asset = if let (Some(geolocated_asset), Some(asset)) =
+                (self.geolocated_asset, builder.asset)
+            {
+                if geolocated_asset != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::GeolocatedAsset,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.geolocated_asset = Some(asset);
+                builder.into()
+            } else if let Some(geolocated_asset) = self.geolocated_asset {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(geolocated_asset),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureGeolocatedAsset(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_geolocated_asset
         {
@@ -969,38 +1001,6 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_geolocated_asset
-        {
-            procedure_geolocated_asset = if let (Some(geolocated_asset), Some(asset)) =
-                (self.geolocated_asset, builder.asset)
-            {
-                if geolocated_asset != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::GeolocatedAsset,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.geolocated_asset = Some(asset);
-                builder.into()
-            } else if let Some(geolocated_asset) = self.geolocated_asset {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(geolocated_asset),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureGeolocatedAsset(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         self.procedure_geolocated_asset = procedure_geolocated_asset;
         Ok(self)
     }
@@ -1030,11 +1030,11 @@ impl<
     ///    v2@{shape: rounded, label: "asset"}
     /// class v2 directly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn geolocated_with(
@@ -1075,26 +1075,26 @@ impl<
     /// subgraph v6 ["`geolocation_procedures`"]
     ///    v0@{shape: rounded, label: "geolocated_with"}
     /// class v0 directly-involved-column
-    ///    v2@{shape: rounded, label: "procedure_template_geolocated_with_model"}
-    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_geolocated_with"}
     /// class v1 column-of-interest
+    ///    v2@{shape: rounded, label: "procedure_template_geolocated_with_model"}
+    /// class v2 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
+    ///    v5@{shape: rounded, label: "id"}
+    /// class v5 undirectly-involved-column
     ///    v3@{shape: rounded, label: "asset"}
     /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
-    ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
-    /// v2 --->|"`associated same as`"| v4
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn procedure_geolocated_with<PGW>(
@@ -1110,6 +1110,38 @@ impl<
         >,
     {
         let mut procedure_geolocated_with = procedure_geolocated_with.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_geolocated_with
+        {
+            procedure_geolocated_with = if let (Some(geolocated_with), Some(asset)) =
+                (self.geolocated_with, builder.asset)
+            {
+                if geolocated_with != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::GeolocatedWith,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.geolocated_with = Some(asset);
+                builder.into()
+            } else if let Some(geolocated_with) = self.geolocated_with {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(geolocated_with),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureGeolocatedWith(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_geolocated_with
         {
@@ -1151,38 +1183,6 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_geolocated_with
-        {
-            procedure_geolocated_with = if let (Some(geolocated_with), Some(asset)) =
-                (self.geolocated_with, builder.asset)
-            {
-                if geolocated_with != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::GeolocatedWith,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.geolocated_with = Some(asset);
-                builder.into()
-            } else if let Some(geolocated_with) = self.geolocated_with {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(geolocated_with),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureGeolocatedWith(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         self.procedure_geolocated_with = procedure_geolocated_with;
         Ok(self)
     }
@@ -1208,16 +1208,16 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_geolocated_with_model(

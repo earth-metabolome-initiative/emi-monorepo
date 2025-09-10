@@ -1,10 +1,10 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ContainerCompatibilityRuleForeignKeys {
-    pub container_model:
-        Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
     pub contained_asset_model:
         Option<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel>,
+    pub container_model:
+        Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
     pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -18,16 +18,16 @@ for crate::codegen::structs_codegen::tables::container_compatibility_rules::Cont
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(
-                        self.container_model,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
+                        self.contained_asset_model,
                     ),
                 ),
             );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
-                        self.contained_asset_model,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(
+                        self.container_model,
                     ),
                 ),
             );
@@ -41,8 +41,8 @@ for crate::codegen::structs_codegen::tables::container_compatibility_rules::Cont
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.container_model.is_some()
-            && foreign_keys.contained_asset_model.is_some()
+        foreign_keys.contained_asset_model.is_some()
+            && foreign_keys.container_model.is_some()
             && foreign_keys.created_by.is_some()
     }
     fn update(

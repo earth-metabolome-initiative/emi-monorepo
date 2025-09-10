@@ -1,53 +1,53 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct BallMillProcedureForeignKeys {
-    pub procedure_milled_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    pub bead_model: Option<
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel,
     >,
-    pub milled_with: Option<
-        crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine,
+    pub ball_mill_procedures_bead_model_milled_container_model_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
     >,
     pub milled_container: Option<
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
     >,
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
-    >,
-    pub bead_model: Option<
-        crate::codegen::structs_codegen::tables::bead_models::BeadModel,
-    >,
-    pub procedure_template_bead_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_bead: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub milled_with_model: Option<
-        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
-    >,
-    pub procedure_template_milled_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
     pub milled_container_model: Option<
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
-    pub procedure_template_milled_container_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub procedure_milled_container: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub ball_mill_procedures_milled_with_model_milled_container_mo_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    pub milled_with: Option<
+        crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine,
     >,
     pub ball_mill_procedures_milled_with_model_bead_model_fkey: Option<
         crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
     >,
-    pub ball_mill_procedures_bead_model_milled_container_model_fkey: Option<
+    pub milled_with_model: Option<
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+    >,
+    pub ball_mill_procedures_milled_with_model_milled_container_mo_fkey: Option<
         crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    >,
+    pub procedure_bead: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
+    pub procedure_milled_container: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub procedure_milled_with: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub procedure_template_bead_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
+    >,
+    pub procedure_template_milled_container_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_template_milled_with_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -60,8 +60,22 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_milled_with,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadModel(self.bead_model),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
+                self.bead_model,
+                self.milled_container_model,
+            )),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
+                self.milled_container,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                self.milled_container_model,
             ),
         ));
         if let Some(milled_with) = self.milled_with {
@@ -72,20 +86,39 @@ impl web_common_traits::prelude::HasForeignKeys
             ));
         }
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
-                self.milled_container,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
+                self.milled_with_model,
+                self.bead_model,
+            )),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillMachineModel(
+                self.milled_with_model,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
+                self.milled_with_model,
+                self.milled_container_model,
+            )),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_bead,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillProcedureTemplate(
-                self.procedure_template,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_milled_container,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadModel(self.bead_model),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_milled_with,
+            ),
         ));
         connector
             .send(
@@ -96,26 +129,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
             );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_bead,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillMachineModel(
-                self.milled_with_model,
-            ),
-        ));
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_milled_with_model,
-                    ),
-                ),
-            );
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
-                self.milled_container_model,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillProcedureTemplate(
+                self.procedure_template,
             ),
         ));
         connector
@@ -126,49 +141,34 @@ impl web_common_traits::prelude::HasForeignKeys
                     ),
                 ),
             );
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_milled_container,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
-                self.milled_with_model,
-                self.milled_container_model,
-            )),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
-                self.milled_with_model,
-                self.bead_model,
-            )),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
-                self.bead_model,
-                self.milled_container_model,
-            )),
-        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_milled_with_model,
+                    ),
+                ),
+            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_milled_with.is_some()
-            && (foreign_keys.milled_with.is_some() || self.milled_with.is_some())
+        foreign_keys.bead_model.is_some()
+            && foreign_keys.ball_mill_procedures_bead_model_milled_container_model_fkey.is_some()
             && foreign_keys.milled_container.is_some()
-            && foreign_keys.procedure.is_some()
-            && foreign_keys.procedure_template.is_some()
-            && foreign_keys.bead_model.is_some()
-            && foreign_keys.procedure_template_bead_model.is_some()
-            && foreign_keys.procedure_bead.is_some()
-            && foreign_keys.milled_with_model.is_some()
-            && foreign_keys.procedure_template_milled_with_model.is_some()
             && foreign_keys.milled_container_model.is_some()
-            && foreign_keys.procedure_template_milled_container_model.is_some()
-            && foreign_keys.procedure_milled_container.is_some()
+            && (foreign_keys.milled_with.is_some() || self.milled_with.is_some())
+            && foreign_keys.ball_mill_procedures_milled_with_model_bead_model_fkey.is_some()
+            && foreign_keys.milled_with_model.is_some()
             && foreign_keys
                 .ball_mill_procedures_milled_with_model_milled_container_mo_fkey
                 .is_some()
-            && foreign_keys.ball_mill_procedures_milled_with_model_bead_model_fkey.is_some()
-            && foreign_keys.ball_mill_procedures_bead_model_milled_container_model_fkey.is_some()
+            && foreign_keys.procedure_bead.is_some()
+            && foreign_keys.procedure.is_some()
+            && foreign_keys.procedure_milled_container.is_some()
+            && foreign_keys.procedure_milled_with.is_some()
+            && foreign_keys.procedure_template_bead_model.is_some()
+            && foreign_keys.procedure_template.is_some()
+            && foreign_keys.procedure_template_milled_container_model.is_some()
+            && foreign_keys.procedure_template_milled_with_model.is_some()
     }
     fn update(
         &self,
@@ -184,10 +184,10 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.milled_with_model == asset_compatibility_rules.left_asset_model
+                if self.bead_model == asset_compatibility_rules.left_asset_model
                     && self.milled_container_model == asset_compatibility_rules.right_asset_model
                 {
-                    foreign_keys.ball_mill_procedures_milled_with_model_milled_container_mo_fkey =
+                    foreign_keys.ball_mill_procedures_bead_model_milled_container_model_fkey =
                         Some(asset_compatibility_rules);
                     updated = true;
                 }
@@ -198,10 +198,10 @@ impl web_common_traits::prelude::HasForeignKeys
                         Some(asset_compatibility_rules);
                     updated = true;
                 }
-                if self.bead_model == asset_compatibility_rules.left_asset_model
+                if self.milled_with_model == asset_compatibility_rules.left_asset_model
                     && self.milled_container_model == asset_compatibility_rules.right_asset_model
                 {
-                    foreign_keys.ball_mill_procedures_bead_model_milled_container_model_fkey =
+                    foreign_keys.ball_mill_procedures_milled_with_model_milled_container_mo_fkey =
                         Some(asset_compatibility_rules);
                     updated = true;
                 }
@@ -210,11 +210,10 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::AssetCompatibilityRule(asset_compatibility_rules),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.milled_with_model == asset_compatibility_rules.left_asset_model
+                if self.bead_model == asset_compatibility_rules.left_asset_model
                     && self.milled_container_model == asset_compatibility_rules.right_asset_model
                 {
-                    foreign_keys.ball_mill_procedures_milled_with_model_milled_container_mo_fkey =
-                        None;
+                    foreign_keys.ball_mill_procedures_bead_model_milled_container_model_fkey = None;
                     updated = true;
                 }
                 if self.milled_with_model == asset_compatibility_rules.left_asset_model
@@ -223,10 +222,11 @@ impl web_common_traits::prelude::HasForeignKeys
                     foreign_keys.ball_mill_procedures_milled_with_model_bead_model_fkey = None;
                     updated = true;
                 }
-                if self.bead_model == asset_compatibility_rules.left_asset_model
+                if self.milled_with_model == asset_compatibility_rules.left_asset_model
                     && self.milled_container_model == asset_compatibility_rules.right_asset_model
                 {
-                    foreign_keys.ball_mill_procedures_bead_model_milled_container_model_fkey = None;
+                    foreign_keys.ball_mill_procedures_milled_with_model_milled_container_mo_fkey =
+                        None;
                     updated = true;
                 }
             }
@@ -322,10 +322,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_milled_with == procedure_assets.id {
-                    foreign_keys.procedure_milled_with = Some(procedure_assets);
-                    updated = true;
-                }
                 if self.procedure_bead == procedure_assets.id {
                     foreign_keys.procedure_bead = Some(procedure_assets);
                     updated = true;
@@ -334,21 +330,25 @@ impl web_common_traits::prelude::HasForeignKeys
                     foreign_keys.procedure_milled_container = Some(procedure_assets);
                     updated = true;
                 }
+                if self.procedure_milled_with == procedure_assets.id {
+                    foreign_keys.procedure_milled_with = Some(procedure_assets);
+                    updated = true;
+                }
             }
             (
                 crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_milled_with == procedure_assets.id {
-                    foreign_keys.procedure_milled_with = None;
-                    updated = true;
-                }
                 if self.procedure_bead == procedure_assets.id {
                     foreign_keys.procedure_bead = None;
                     updated = true;
                 }
                 if self.procedure_milled_container == procedure_assets.id {
                     foreign_keys.procedure_milled_container = None;
+                    updated = true;
+                }
+                if self.procedure_milled_with == procedure_assets.id {
+                    foreign_keys.procedure_milled_with = None;
                     updated = true;
                 }
             }
@@ -365,15 +365,15 @@ impl web_common_traits::prelude::HasForeignKeys
                         Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
-                if self.procedure_template_milled_with_model == procedure_template_asset_models.id {
-                    foreign_keys.procedure_template_milled_with_model =
-                        Some(procedure_template_asset_models.clone());
-                    updated = true;
-                }
                 if self.procedure_template_milled_container_model
                     == procedure_template_asset_models.id
                 {
                     foreign_keys.procedure_template_milled_container_model =
+                        Some(procedure_template_asset_models.clone());
+                    updated = true;
+                }
+                if self.procedure_template_milled_with_model == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_milled_with_model =
                         Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
@@ -388,14 +388,14 @@ impl web_common_traits::prelude::HasForeignKeys
                     foreign_keys.procedure_template_bead_model = None;
                     updated = true;
                 }
-                if self.procedure_template_milled_with_model == procedure_template_asset_models.id {
-                    foreign_keys.procedure_template_milled_with_model = None;
-                    updated = true;
-                }
                 if self.procedure_template_milled_container_model
                     == procedure_template_asset_models.id
                 {
                     foreign_keys.procedure_template_milled_container_model = None;
+                    updated = true;
+                }
+                if self.procedure_template_milled_with_model == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_milled_with_model = None;
                     updated = true;
                 }
             }

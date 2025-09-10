@@ -63,7 +63,10 @@ where
         self.set_most_concrete_table("photograph_procedure_templates");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureTemplate = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct
+            .procedure_template_photograph_model(conn)?
+            .can_update(user_id, conn)?
+        {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -78,10 +81,7 @@ where
                     .into(),
             );
         }
-        if !insertable_struct
-            .procedure_template_photograph_model(conn)?
-            .can_update(user_id, conn)?
-        {
+        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),

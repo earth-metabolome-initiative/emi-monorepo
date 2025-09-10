@@ -61,48 +61,6 @@ pub struct InsertableProcedureTemplateAssetModel {
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProcedureTemplateAssetModel {
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
-            self.procedure_template,
-            conn,
-        )
-    }
-    pub fn based_on<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        >,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use diesel::OptionalExtension;
-        use web_common_traits::database::Read;
-        let Some(based_on) = self.based_on else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-                based_on,
-                conn,
-            )
-            .optional()
-    }
     pub fn asset_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -119,16 +77,6 @@ impl InsertableProcedureTemplateAssetModel {
             self.asset_model,
             conn,
         )
-    }
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn procedure_template_asset_models_based_on_asset_model_fkey(
@@ -160,6 +108,58 @@ impl InsertableProcedureTemplateAssetModel {
                 crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
             >(conn)
             .optional()
+    }
+    pub fn based_on<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        Option<
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(based_on) = self.based_on else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+                based_on,
+                conn,
+            )
+            .optional()
+    }
+    pub fn created_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]

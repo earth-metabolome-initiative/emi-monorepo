@@ -100,43 +100,6 @@ pub struct InsertableProject {
     pub(crate) end_date: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProject {
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
-    }
-    pub fn updated_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
-    }
-    pub fn state<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::project_states::ProjectState,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::project_states::ProjectState:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::project_states::ProjectState::read(
-            self.state_id,
-            conn,
-        )
-    }
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -147,6 +110,16 @@ impl InsertableProject {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::colors::Color::read(self.color_id, conn)
+    }
+    pub fn created_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn parent_project<C: diesel::connection::LoadConnection>(
         &self,
@@ -166,6 +139,33 @@ impl InsertableProject {
         };
         crate::codegen::structs_codegen::tables::projects::Project::read(parent_project_id, conn)
             .optional()
+    }
+    pub fn state<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::project_states::ProjectState,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::project_states::ProjectState:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::project_states::ProjectState::read(
+            self.state_id,
+            conn,
+        )
+    }
+    pub fn updated_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd)]

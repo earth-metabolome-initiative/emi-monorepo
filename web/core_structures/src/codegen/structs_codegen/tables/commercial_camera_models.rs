@@ -92,6 +92,30 @@ impl CommercialCameraModel {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_camera_models_id_camera_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.camera_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
     pub fn commercial_camera_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -121,30 +145,6 @@ impl CommercialCameraModel {
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
             self.id, conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn commercial_camera_models_id_camera_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
-                    .eq(&self.id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
-                            .eq(&self.camera_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
     }
     pub fn from_camera_model<C>(
         camera_model: i32,
@@ -185,6 +185,26 @@ impl CommercialCameraModel {
             .order_by(commercial_camera_models::id.asc())
             .load::<Self>(conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn from_id_and_camera_model(
+        id: i32,
+        camera_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::commercial_camera_models::commercial_camera_models;
+        Self::table()
+            .filter(
+                commercial_camera_models::id
+                    .eq(id)
+                    .and(commercial_camera_models::camera_model.eq(camera_model)),
+            )
+            .order_by(commercial_camera_models::id.asc())
+            .load::<Self>(conn)
+    }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where
         C: diesel::connection::LoadConnection,
@@ -218,26 +238,6 @@ impl CommercialCameraModel {
         use crate::codegen::diesel_codegen::tables::commercial_camera_models::commercial_camera_models;
         Self::table()
             .filter(commercial_camera_models::id.eq(id))
-            .order_by(commercial_camera_models::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_id_and_camera_model(
-        id: i32,
-        camera_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::commercial_camera_models::commercial_camera_models;
-        Self::table()
-            .filter(
-                commercial_camera_models::id
-                    .eq(id)
-                    .and(commercial_camera_models::camera_model.eq(camera_model)),
-            )
             .order_by(commercial_camera_models::id.asc())
             .load::<Self>(conn)
     }

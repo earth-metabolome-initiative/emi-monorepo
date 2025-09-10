@@ -108,24 +108,6 @@ impl InsertableCommercialBallMillMachineLot {
             conn,
         )
     }
-    pub fn product_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel::read(
-            self.product_model,
-            conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn commercial_ball_mill_machine_lots_id_product_model_fkey(
         &self,
@@ -149,6 +131,24 @@ impl InsertableCommercialBallMillMachineLot {
             .first::<
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
+    }
+    pub fn product_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel::read(
+            self.product_model,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -265,14 +265,14 @@ for InsertableCommercialBallMillMachineLotBuilder<
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 directly-involved-column
     ///end
-    ///v2 --->|"`ancestral same as`"| v3
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v6 --->|"`extends`"| v7
+    ///v2 --->|"`ancestral same as`"| v3
     ///v5 --->|"`extends`"| v6
+    ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
@@ -550,9 +550,9 @@ where
     ///    v2@{shape: rounded, label: "parent_model"}
     ///class v2 undirectly-involved-column
     ///end
-    ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
+    ///v1 -.->|"`inferred ancestral same as`"| v2
     ///v3 --->|"`extends`"| v4
     ///v4 --->|"`extends`"| v5
     ///```
@@ -610,14 +610,14 @@ where
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 column-of-interest
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v1
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v6 --->|"`extends`"| v7
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v6
+    ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
     ///```
     fn parent_model(

@@ -112,24 +112,6 @@ impl CommercialPipetteTipLot {
             self.id, conn,
         )
     }
-    pub fn product_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel::read(
-            self.product_model,
-            conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn commercial_pipette_tip_lots_id_product_model_fkey(
         &self,
@@ -153,6 +135,24 @@ impl CommercialPipetteTipLot {
             .first::<
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
+    }
+    pub fn product_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel::read(
+            self.product_model,
+            conn,
+        )
     }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where

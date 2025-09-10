@@ -111,24 +111,6 @@ impl InsertableCommercialVolumeMeasuringDeviceLot {
             conn,
         )
     }
-    pub fn product_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel::read(
-            self.product_model,
-            conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn commercial_volume_measuring_device_lots_id_product_model_fkey(
         &self,
@@ -152,6 +134,24 @@ impl InsertableCommercialVolumeMeasuringDeviceLot {
             .first::<
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
+    }
+    pub fn product_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel::read(
+            self.product_model,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -230,10 +230,10 @@ pub trait CommercialVolumeMeasuringDeviceLotSettable: Sized {
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>;
 }
 impl<
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >
-        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        + crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
             Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
         >,
     VolumeMeasuringDeviceModel,
@@ -274,13 +274,13 @@ for InsertableCommercialVolumeMeasuringDeviceLotBuilder<
     ///end
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v0
     ///v1 -.->|"`inferred ancestral same as`"| v2
-    ///v7 --->|"`extends`"| v4
-    ///v6 --->|"`extends`"| v5
+    ///v2 --->|"`ancestral same as`"| v3
     ///v5 --->|"`extends`"| v7
+    ///v6 --->|"`extends`"| v5
+    ///v7 --->|"`extends`"| v4
     ///```
     fn product_model(
         mut self,
@@ -610,12 +610,12 @@ where
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 column-of-interest
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v1
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v7
     ///v6 --->|"`extends`"| v5
     ///v7 --->|"`extends`"| v4

@@ -63,6 +63,17 @@ pub struct InsertableCommercialProduct {
     pub(crate) brand_id: i32,
 }
 impl InsertableCommercialProduct {
+    pub fn brand<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::brands::Brand, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::brands::Brand:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::brands::Brand::read(self.brand_id, conn)
+    }
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -76,17 +87,6 @@ impl InsertableCommercialProduct {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(self.id, conn)
-    }
-    pub fn brand<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::brands::Brand, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::brands::Brand:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::brands::Brand::read(self.brand_id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]

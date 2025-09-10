@@ -165,32 +165,37 @@ pub struct InsertableAliquotingProcedure {
     pub(crate) procedure_aliquoted_into: ::rosetta_uuid::Uuid,
 }
 impl InsertableAliquotingProcedure {
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+    pub fn aliquoted_from<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate::read(
-            self.procedure_template,
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
+            self.aliquoted_from,
+            conn,
+        )
+    }
+    pub fn aliquoted_into<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
+            self.aliquoted_into,
             conn,
         )
     }
@@ -230,40 +235,22 @@ impl InsertableAliquotingProcedure {
             conn,
         )
     }
-    pub fn procedure_template_aliquoted_with_model<
+    pub fn aliquoting_procedures_aliquoted_with_model_pipette_tip_mod_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_aliquoted_with_model,
-            conn,
-        )
-    }
-    pub fn procedure_aliquoted_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_aliquoted_with,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
+            (self.aliquoted_with_model, self.pipette_tip_model),
             conn,
         )
     }
@@ -284,77 +271,29 @@ impl InsertableAliquotingProcedure {
             conn,
         )
     }
-    pub fn procedure_template_pipette_tip_model<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn aliquoting_procedures_procedure_aliquoted_from_aliquoted_f_fkey(
         &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_pipette_tip_model,
-            conn,
-        )
-    }
-    pub fn procedure_pipette_tip<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
         diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_pipette_tip,
-            conn,
-        )
-    }
-    pub fn aliquoted_from<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
-            self.aliquoted_from,
-            conn,
-        )
-    }
-    pub fn procedure_template_aliquoted_from_model<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_aliquoted_from_model,
-            conn,
-        )
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_aliquoted_from)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.aliquoted_from),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     pub fn procedure_aliquoted_from<C: diesel::connection::LoadConnection>(
         &self,
@@ -373,42 +312,53 @@ impl InsertableAliquotingProcedure {
             conn,
         )
     }
-    pub fn aliquoted_into<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn aliquoting_procedures_procedure_aliquoted_from_procedure_t_fkey(
         &self,
-        conn: &mut C,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
         diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
-            self.aliquoted_into,
-            conn,
-        )
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_aliquoted_from)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_aliquoted_from_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
-    pub fn procedure_template_aliquoted_into_model<
-        C: diesel::connection::LoadConnection,
-    >(
+    #[cfg(feature = "postgres")]
+    pub fn aliquoting_procedures_procedure_aliquoted_into_aliquoted_i_fkey(
         &self,
-        conn: &mut C,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
         diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_aliquoted_into_model,
-            conn,
-        )
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_aliquoted_into)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.aliquoted_into),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     pub fn procedure_aliquoted_into<C: diesel::connection::LoadConnection>(
         &self,
@@ -426,6 +376,200 @@ impl InsertableAliquotingProcedure {
             self.procedure_aliquoted_into,
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn aliquoting_procedures_procedure_aliquoted_into_procedure_t_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_aliquoted_into)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_aliquoted_into_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn aliquoting_procedures_procedure_aliquoted_with_aliquoted_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(aliquoted_with) = self.aliquoted_with else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_aliquoted_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(aliquoted_with),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+            .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub fn aliquoting_procedures_procedure_aliquoted_with_aliquoted_w_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_aliquoted_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.aliquoted_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    pub fn procedure_aliquoted_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_aliquoted_with,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn aliquoting_procedures_procedure_aliquoted_with_procedure_t_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_aliquoted_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_aliquoted_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    pub fn procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
+    }
+    pub fn procedure_pipette_tip<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_pipette_tip,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn aliquoting_procedures_procedure_pipette_tip_pipette_tip_mo_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_pipette_tip)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.pipette_tip_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn aliquoting_procedures_procedure_pipette_tip_procedure_temp_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_pipette_tip)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_pipette_tip_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn aliquoting_procedures_procedure_procedure_template_fkey(
@@ -449,29 +593,101 @@ impl InsertableAliquotingProcedure {
                 crate::codegen::structs_codegen::tables::procedures::Procedure,
             >(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn aliquoting_procedures_procedure_template_procedure_templat_fkey(
+    pub fn procedure_template_aliquoted_from_model<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_aliquoted_from_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_aliquoted_into_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_aliquoted_into_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_aliquoted_with_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_aliquoted_with_model,
+            conn,
+        )
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
         diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates::dsl::procedure_template_aliquoted_with_model
-                            .eq(&self.procedure_template_aliquoted_with_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
-            >(conn)
+    >
+    where
+        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    pub fn procedure_template_pipette_tip_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_pipette_tip_model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn aliquoting_procedures_procedure_template_procedure_templa_fkey1(
@@ -546,244 +762,28 @@ impl InsertableAliquotingProcedure {
             >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn aliquoting_procedures_procedure_aliquoted_with_procedure_t_fkey(
+    pub fn aliquoting_procedures_procedure_template_procedure_templat_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
         diesel::result::Error,
-    > {
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_aliquoted_with)
+                crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                        crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates::dsl::procedure_template_aliquoted_with_model
                             .eq(&self.procedure_template_aliquoted_with_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
             >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn aliquoting_procedures_procedure_pipette_tip_procedure_temp_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_pipette_tip)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_pipette_tip_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn aliquoting_procedures_procedure_aliquoted_from_procedure_t_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_aliquoted_from)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_aliquoted_from_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn aliquoting_procedures_procedure_aliquoted_into_procedure_t_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_aliquoted_into)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_aliquoted_into_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn aliquoting_procedures_procedure_aliquoted_with_aliquoted_w_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_aliquoted_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.aliquoted_with_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn aliquoting_procedures_procedure_aliquoted_with_aliquoted_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
-        };
-        let Some(aliquoted_with) = self.aliquoted_with else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_aliquoted_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(aliquoted_with),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
-    pub fn aliquoting_procedures_procedure_aliquoted_from_aliquoted_f_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_aliquoted_from)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.aliquoted_from),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn aliquoting_procedures_procedure_aliquoted_into_aliquoted_i_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_aliquoted_into)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.aliquoted_into),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn aliquoting_procedures_procedure_pipette_tip_pipette_tip_mo_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_pipette_tip)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.pipette_tip_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    pub fn aliquoting_procedures_aliquoted_with_model_pipette_tip_mod_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
-            (self.aliquoted_with_model, self.pipette_tip_model),
-            conn,
-        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -1257,16 +1257,16 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v7 ["`aliquoting_procedures`"]
-    ///    v4@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v4 directly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template"}
     /// class v0 column-of-interest
-    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
-    /// class v1 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_template_aliquoted_with_model"}
     /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_pipette_tip_model"}
+    /// class v4 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v8 ["`procedure_assets`"]
     ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
@@ -1276,15 +1276,15 @@ impl<
     ///    v5@{shape: rounded, label: "procedure_template"}
     /// class v5 directly-involved-column
     /// end
-    /// v4 --->|"`associated same as`"| v6
     /// v0 --->|"`ancestral same as`"| v5
-    /// v0 -.->|"`foreign defines`"| v4
     /// v0 -.->|"`foreign defines`"| v1
     /// v0 -.->|"`foreign defines`"| v2
     /// v0 -.->|"`foreign defines`"| v3
+    /// v0 -.->|"`foreign defines`"| v4
     /// v1 --->|"`associated same as`"| v6
-    /// v3 --->|"`associated same as`"| v6
     /// v2 --->|"`associated same as`"| v6
+    /// v3 --->|"`associated same as`"| v6
+    /// v4 --->|"`associated same as`"| v6
     /// v7 --->|"`extends`"| v9
     /// v7 ---o|"`associated with`"| v8
     /// ```
@@ -1319,10 +1319,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_aliquoted_with"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "aliquoted_with"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_aliquoted_with"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -1330,12 +1330,12 @@ impl<
     ///    v2@{shape: rounded, label: "asset"}
     /// class v2 directly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn aliquoted_with(
@@ -1380,10 +1380,10 @@ impl<
     /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1486,26 +1486,27 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`aliquoting_procedures`"]
-    ///    v0@{shape: rounded, label: "aliquoted_with"}
-    /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_aliquoted_with"}
     /// class v2 column-of-interest
-    ///    v3@{shape: rounded, label: "procedure_template_aliquoted_with_model"}
-    /// class v3 directly-involved-column
+    ///    v0@{shape: rounded, label: "aliquoted_with"}
+    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "aliquoted_with_model"}
     /// class v1 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_template_aliquoted_with_model"}
+    /// class v3 directly-involved-column
     /// end
     /// subgraph v9 ["`procedure_assets`"]
     ///    v7@{shape: rounded, label: "id"}
     /// class v7 undirectly-involved-column
-    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v6 directly-involved-column
     ///    v4@{shape: rounded, label: "asset"}
     /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "asset_model"}
     /// class v5 directly-involved-column
+    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v6 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
@@ -1514,7 +1515,6 @@ impl<
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v3
     /// v3 --->|"`associated same as`"| v6
-    /// v1 --->|"`associated same as`"| v5
     /// v4 -.->|"`foreign defines`"| v5
     /// v8 ---o|"`associated with`"| v9
     /// ```
@@ -1533,32 +1533,24 @@ impl<
         let mut procedure_aliquoted_with = procedure_aliquoted_with.into();
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_with
         {
-            procedure_aliquoted_with = if let (
-                Some(procedure_template_aliquoted_with_model),
-                Some(procedure_template_asset_model),
-            ) = (
-                self.procedure_template_aliquoted_with_model,
-                builder.procedure_template_asset_model,
-            ) {
-                if procedure_template_aliquoted_with_model != procedure_template_asset_model {
+            procedure_aliquoted_with = if let (Some(aliquoted_with), Some(asset)) =
+                (self.aliquoted_with, builder.asset)
+            {
+                if aliquoted_with != asset {
                     return Err(web_common_traits::database::InsertError::BuilderError(
                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateAliquotedWithModel,
+                            Self::Attributes::AliquotedWith,
                         ),
                     ));
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
-            {
-                self.procedure_template_aliquoted_with_model = Some(procedure_template_asset_model);
+            } else if let Some(asset) = builder.asset {
+                self.aliquoted_with = Some(asset);
                 builder.into()
-            } else if let Some(procedure_template_aliquoted_with_model) =
-                self.procedure_template_aliquoted_with_model
-            {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
+            } else if let Some(aliquoted_with) = self.aliquoted_with {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        procedure_template_aliquoted_with_model,
+                        Some(aliquoted_with),
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1603,24 +1595,32 @@ impl<
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_with
         {
-            procedure_aliquoted_with = if let (Some(aliquoted_with), Some(asset)) =
-                (self.aliquoted_with, builder.asset)
-            {
-                if aliquoted_with != asset {
+            procedure_aliquoted_with = if let (
+                Some(procedure_template_aliquoted_with_model),
+                Some(procedure_template_asset_model),
+            ) = (
+                self.procedure_template_aliquoted_with_model,
+                builder.procedure_template_asset_model,
+            ) {
+                if procedure_template_aliquoted_with_model != procedure_template_asset_model {
                     return Err(web_common_traits::database::InsertError::BuilderError(
                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::AliquotedWith,
+                            Self::Attributes::ProcedureTemplateAliquotedWithModel,
                         ),
                     ));
                 }
                 builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.aliquoted_with = Some(asset);
+            } else if let Some(procedure_template_asset_model) =
+                builder.procedure_template_asset_model
+            {
+                self.procedure_template_aliquoted_with_model = Some(procedure_template_asset_model);
                 builder.into()
-            } else if let Some(aliquoted_with) = self.aliquoted_with {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+            } else if let Some(procedure_template_aliquoted_with_model) =
+                self.procedure_template_aliquoted_with_model
+            {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
-                        Some(aliquoted_with),
+                        procedure_template_aliquoted_with_model,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1656,16 +1656,16 @@ impl<
     /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn pipette_tip_model(
@@ -1711,16 +1711,16 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_pipette_tip_model(
@@ -1759,18 +1759,18 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`aliquoting_procedures`"]
-    ///    v0@{shape: rounded, label: "pipette_tip_model"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_pipette_tip"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "pipette_tip_model"}
+    /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
     /// class v2 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v4 directly-involved-column
     ///    v3@{shape: rounded, label: "asset_model"}
     /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
     /// end
@@ -1797,6 +1797,36 @@ impl<
     {
         let mut procedure_pipette_tip = procedure_pipette_tip.into();
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_pipette_tip {
+            procedure_pipette_tip = if let (Some(pipette_tip_model), Some(asset_model)) =
+                (self.pipette_tip_model, builder.asset_model)
+            {
+                if pipette_tip_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::PipetteTipModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.pipette_tip_model = Some(asset_model);
+                builder.into()
+            } else if let Some(pipette_tip_model) = self.pipette_tip_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
+                        builder,
+                        pipette_tip_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedurePipetteTip(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_pipette_tip {
             procedure_pipette_tip = if let (
                 Some(procedure_template_pipette_tip_model),
                 Some(procedure_template_asset_model),
@@ -1822,36 +1852,6 @@ impl<
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
                         procedure_template_pipette_tip_model,
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedurePipetteTip(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_pipette_tip {
-            procedure_pipette_tip = if let (Some(pipette_tip_model), Some(asset_model)) =
-                (self.pipette_tip_model, builder.asset_model)
-            {
-                if pipette_tip_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::PipetteTipModel,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.pipette_tip_model = Some(asset_model);
-                builder.into()
-            } else if let Some(pipette_tip_model) = self.pipette_tip_model {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
-                        builder,
-                        pipette_tip_model,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1947,11 +1947,11 @@ impl<
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_aliquoted_from_model(
@@ -1991,28 +1991,28 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`aliquoting_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_aliquoted_from"}
-    /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_aliquoted_from"}
+    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "aliquoted_from"}
     /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v4 directly-involved-column
-    ///    v3@{shape: rounded, label: "asset"}
-    /// class v3 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
+    ///    v3@{shape: rounded, label: "asset"}
+    /// class v3 directly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v4 directly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
     /// v2 --->|"`associated same as`"| v4
-    /// v0 --->|"`associated same as`"| v3
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn procedure_aliquoted_from<PAF>(
@@ -2028,6 +2028,37 @@ impl<
         >,
     {
         let mut procedure_aliquoted_from = procedure_aliquoted_from.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_from
+        {
+            procedure_aliquoted_from = if let (Some(aliquoted_from), Some(asset)) =
+                (self.aliquoted_from, builder.asset)
+            {
+                if aliquoted_from != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::AliquotedFrom,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.aliquoted_from = Some(asset);
+                builder.into()
+            } else if let Some(aliquoted_from) = self.aliquoted_from {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(aliquoted_from),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureAliquotedFrom(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_from
         {
             procedure_aliquoted_from = if let (
@@ -2067,37 +2098,6 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_from
-        {
-            procedure_aliquoted_from = if let (Some(aliquoted_from), Some(asset)) =
-                (self.aliquoted_from, builder.asset)
-            {
-                if aliquoted_from != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::AliquotedFrom,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.aliquoted_from = Some(asset);
-                builder.into()
-            } else if let Some(aliquoted_from) = self.aliquoted_from {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(aliquoted_from),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureAliquotedFrom(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         self.procedure_aliquoted_from = procedure_aliquoted_from;
         Ok(self)
     }
@@ -2116,10 +2116,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedures`"]
-    ///    v0@{shape: rounded, label: "aliquoted_into"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_aliquoted_into"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "aliquoted_into"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -2171,16 +2171,16 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`aliquoting_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_aliquoted_into"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_aliquoted_into"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
@@ -2226,20 +2226,20 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`aliquoting_procedures`"]
-    ///    v0@{shape: rounded, label: "aliquoted_into"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_aliquoted_into"}
     /// class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
     /// class v2 directly-involved-column
+    ///    v0@{shape: rounded, label: "aliquoted_into"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
+    ///    v3@{shape: rounded, label: "asset"}
+    /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
-    ///    v3@{shape: rounded, label: "asset"}
-    /// class v3 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
@@ -2263,6 +2263,37 @@ impl<
         >,
     {
         let mut procedure_aliquoted_into = procedure_aliquoted_into.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_into
+        {
+            procedure_aliquoted_into = if let (Some(aliquoted_into), Some(asset)) =
+                (self.aliquoted_into, builder.asset)
+            {
+                if aliquoted_into != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::AliquotedInto,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.aliquoted_into = Some(asset);
+                builder.into()
+            } else if let Some(aliquoted_into) = self.aliquoted_into {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(aliquoted_into),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureAliquotedInto(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_into
         {
             procedure_aliquoted_into = if let (
@@ -2291,37 +2322,6 @@ impl<
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
                         procedure_template_aliquoted_into_model,
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureAliquotedInto(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_into
-        {
-            procedure_aliquoted_into = if let (Some(aliquoted_into), Some(asset)) =
-                (self.aliquoted_into, builder.asset)
-            {
-                if aliquoted_into != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::AliquotedInto,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.aliquoted_into = Some(asset);
-                builder.into()
-            } else if let Some(aliquoted_into) = self.aliquoted_into {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(aliquoted_into),
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {

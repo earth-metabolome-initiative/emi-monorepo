@@ -74,31 +74,75 @@ pub struct InsertableProcedureAsset {
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProcedureAsset {
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+    pub fn ancestor_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
-            self.procedure_template,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
+            self.ancestor_model,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn procedure_assets_asset_asset_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
+    {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(asset) = self.asset else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(asset).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.asset_model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+            .optional()
+    }
+    pub fn asset<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::assets::Asset:
+            web_common_traits::database::Read<C>,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(asset) = self.asset else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::read(asset, conn).optional()
+    }
+    pub fn procedure_assets_asset_model_ancestor_model_fkey<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor::read(
+            (self.asset_model, self.ancestor_model),
             conn,
         )
     }
@@ -119,56 +163,6 @@ impl InsertableProcedureAsset {
             conn,
         )
     }
-    pub fn asset<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::assets::Asset:
-            web_common_traits::database::Read<C>,
-    {
-        use diesel::OptionalExtension;
-        use web_common_traits::database::Read;
-        let Some(asset) = self.asset else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::assets::Asset::read(asset, conn).optional()
-    }
-    pub fn procedure_template_asset_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_asset_model,
-            conn,
-        )
-    }
-    pub fn ancestor_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
-            self.ancestor_model,
-            conn,
-        )
-    }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -178,6 +172,17 @@ impl InsertableProcedureAsset {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
+    }
+    pub fn procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn procedure_assets_procedure_procedure_template_fkey(
@@ -199,30 +204,6 @@ impl InsertableProcedureAsset {
             )
             .first::<
                 crate::codegen::structs_codegen::tables::procedures::Procedure,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn procedure_assets_procedure_template_asset_model_procedure_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_asset_model)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::procedure_template
-                            .eq(&self.procedure_template),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -249,45 +230,64 @@ impl InsertableProcedureAsset {
                 crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
             >(conn)
     }
-    pub fn procedure_assets_asset_model_ancestor_model_fkey<C: diesel::connection::LoadConnection>(
+    pub fn procedure_template_asset_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor:
-            web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor::read(
-            (self.asset_model, self.ancestor_model),
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_asset_model,
             conn,
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn procedure_assets_asset_asset_model_fkey(
+    pub fn procedure_assets_procedure_template_asset_model_procedure_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
-    {
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >{
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        let Some(asset) = self.asset else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::assets::Asset::table()
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(asset).and(
-                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
-                        .eq(&self.asset_model),
-                ),
+                crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
+                    .eq(&self.procedure_template_asset_model)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::procedure_template
+                            .eq(&self.procedure_template),
+                    ),
             )
-            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
-            .optional()
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            >(conn)
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]

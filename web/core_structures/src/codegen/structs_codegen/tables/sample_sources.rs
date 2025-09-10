@@ -81,22 +81,6 @@ impl SampleSource {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
     }
-    pub fn model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel::read(
-            self.model, conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn sample_sources_id_model_fkey(
         &self,
@@ -113,6 +97,22 @@ impl SampleSource {
                 ),
             )
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
+    pub fn model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel::read(
+            self.model, conn,
+        )
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,

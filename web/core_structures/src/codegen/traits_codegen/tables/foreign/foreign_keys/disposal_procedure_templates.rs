@@ -1,14 +1,14 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct DisposalProcedureTemplateForeignKeys {
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
     pub disposed_asset_model: Option<
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
     >,
     pub procedure_template_disposed_asset_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -19,14 +19,6 @@ for crate::codegen::structs_codegen::tables::disposal_procedure_templates::Dispo
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                        self.procedure_template,
-                    ),
-                ),
-            );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -43,11 +35,19 @@ for crate::codegen::structs_codegen::tables::disposal_procedure_templates::Dispo
                     ),
                 ),
             );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                        self.procedure_template,
+                    ),
+                ),
+            );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_template.is_some()
-            && foreign_keys.disposed_asset_model.is_some()
+        foreign_keys.disposed_asset_model.is_some()
             && foreign_keys.procedure_template_disposed_asset_model.is_some()
+            && foreign_keys.procedure_template.is_some()
     }
     fn update(
         &self,

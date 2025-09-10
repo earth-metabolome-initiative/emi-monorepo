@@ -4,24 +4,24 @@ pub struct HarvestingProcedureForeignKeys {
     pub procedure: Option<
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
-    >,
-    pub sample_source: Option<
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
-    >,
-    pub procedure_template_sample_source_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    pub procedure_sample: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     >,
     pub procedure_sample_source: Option<
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     >,
-    pub sample: Option<crate::codegen::structs_codegen::tables::samples::Sample>,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+    >,
     pub procedure_template_sample_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
-    pub procedure_sample: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    pub procedure_template_sample_source_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub sample: Option<crate::codegen::structs_codegen::tables::samples::Sample>,
+    pub sample_source: Option<
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -36,6 +36,16 @@ impl web_common_traits::prelude::HasForeignKeys
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_sample,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_sample_source,
+            ),
+        ));
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -44,11 +54,14 @@ impl web_common_traits::prelude::HasForeignKeys
                     ),
                 ),
             );
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleSource(
-                self.sample_source,
-            ),
-        ));
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_sample_model,
+                    ),
+                ),
+            );
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -58,36 +71,23 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
             );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_sample_source,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Sample(self.sample),
         ));
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_sample_model,
-                    ),
-                ),
-            );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_sample,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleSource(
+                self.sample_source,
             ),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure.is_some()
-            && foreign_keys.procedure_template.is_some()
-            && foreign_keys.sample_source.is_some()
-            && foreign_keys.procedure_template_sample_source_model.is_some()
-            && foreign_keys.procedure_sample_source.is_some()
-            && foreign_keys.sample.is_some()
-            && foreign_keys.procedure_template_sample_model.is_some()
             && foreign_keys.procedure_sample.is_some()
+            && foreign_keys.procedure_sample_source.is_some()
+            && foreign_keys.procedure_template.is_some()
+            && foreign_keys.procedure_template_sample_model.is_some()
+            && foreign_keys.procedure_template_sample_source_model.is_some()
+            && foreign_keys.sample.is_some()
+            && foreign_keys.sample_source.is_some()
     }
     fn update(
         &self,
@@ -127,12 +127,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_sample_source == procedure_assets.id {
-                    foreign_keys.procedure_sample_source = Some(procedure_assets);
-                    updated = true;
-                }
                 if self.procedure_sample == procedure_assets.id {
                     foreign_keys.procedure_sample = Some(procedure_assets);
+                    updated = true;
+                }
+                if self.procedure_sample_source == procedure_assets.id {
+                    foreign_keys.procedure_sample_source = Some(procedure_assets);
                     updated = true;
                 }
             }
@@ -140,12 +140,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_sample_source == procedure_assets.id {
-                    foreign_keys.procedure_sample_source = None;
-                    updated = true;
-                }
                 if self.procedure_sample == procedure_assets.id {
                     foreign_keys.procedure_sample = None;
+                    updated = true;
+                }
+                if self.procedure_sample_source == procedure_assets.id {
+                    foreign_keys.procedure_sample_source = None;
                     updated = true;
                 }
             }
@@ -157,14 +157,14 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_template_sample_source_model == procedure_template_asset_models.id
-                {
-                    foreign_keys.procedure_template_sample_source_model =
+                if self.procedure_template_sample_model == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_sample_model =
                         Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
-                if self.procedure_template_sample_model == procedure_template_asset_models.id {
-                    foreign_keys.procedure_template_sample_model =
+                if self.procedure_template_sample_source_model == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_sample_source_model =
                         Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
@@ -175,13 +175,13 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
+                if self.procedure_template_sample_model == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_sample_model = None;
+                    updated = true;
+                }
                 if self.procedure_template_sample_source_model == procedure_template_asset_models.id
                 {
                     foreign_keys.procedure_template_sample_source_model = None;
-                    updated = true;
-                }
-                if self.procedure_template_sample_model == procedure_template_asset_models.id {
-                    foreign_keys.procedure_template_sample_model = None;
                     updated = true;
                 }
             }

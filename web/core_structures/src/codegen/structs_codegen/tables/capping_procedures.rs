@@ -78,35 +78,6 @@ impl diesel::Identifiable for CappingProcedure {
     }
 }
 impl CappingProcedure {
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::read(
-            self.procedure_template,
-            conn,
-        )
-    }
     pub fn capped_container<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -121,6 +92,25 @@ impl CappingProcedure {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
             self.capped_container,
+            conn,
+        )
+    }
+    pub fn capping_procedures_capped_container_model_capped_with_mode_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
+            (self.capped_container_model, self.capped_with_model),
             conn,
         )
     }
@@ -142,43 +132,6 @@ impl CappingProcedure {
             conn,
         )
     }
-    pub fn procedure_template_capped_container_model<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_capped_container_model,
-            conn,
-        )
-    }
-    pub fn procedure_capped_container<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_capped_container,
-            conn,
-        )
-    }
     pub fn capped_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -193,113 +146,8 @@ impl CappingProcedure {
             conn,
         )
     }
-    pub fn procedure_template_capped_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_capped_with_model,
-            conn,
-        )
-    }
-    pub fn procedure_capped_with<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_capped_with,
-            conn,
-        )
-    }
     #[cfg(feature = "postgres")]
-    pub fn capping_procedures_procedure_procedure_template_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
-                    .eq(&self.procedure)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
-                            .eq(&self.procedure_template),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedures::Procedure,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn capping_procedures_procedure_template_procedure_template_c_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template_capped_container_model
-                            .eq(&self.procedure_template_capped_container_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn capping_procedures_procedure_template_procedure_template_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
-        diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template_capped_with_model
-                            .eq(&self.procedure_template_capped_with_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn capping_procedures_procedure_capped_container_procedure_te_fkey(
+    pub fn capping_procedures_procedure_capped_container_capped_cont_fkey1(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -314,32 +162,8 @@ impl CappingProcedure {
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
                     .eq(&self.procedure_capped_container)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_capped_container_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn capping_procedures_procedure_capped_with_procedure_templat_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_capped_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_capped_with_model),
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.capped_container),
                     ),
             )
             .first::<
@@ -370,6 +194,47 @@ impl CappingProcedure {
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
     }
+    pub fn procedure_capped_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_capped_container,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn capping_procedures_procedure_capped_container_procedure_te_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_capped_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_capped_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
     #[cfg(feature = "postgres")]
     pub fn capping_procedures_procedure_capped_with_capped_with_model_fkey(
         &self,
@@ -394,8 +259,25 @@ impl CappingProcedure {
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
     }
+    pub fn procedure_capped_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_capped_with,
+            conn,
+        )
+    }
     #[cfg(feature = "postgres")]
-    pub fn capping_procedures_procedure_capped_container_capped_cont_fkey1(
+    pub fn capping_procedures_procedure_capped_with_procedure_templat_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -408,34 +290,352 @@ impl CappingProcedure {
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_capped_container)
+                    .eq(&self.procedure_capped_with)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.capped_container),
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_capped_with_model),
                     ),
             )
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
     }
-    pub fn capping_procedures_capped_container_model_capped_with_mode_fkey<
+    pub fn procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn capping_procedures_procedure_procedure_template_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
+                    .eq(&self.procedure)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
+                            .eq(&self.procedure_template),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedures::Procedure,
+            >(conn)
+    }
+    pub fn procedure_template_capped_container_model<
         C: diesel::connection::LoadConnection,
     >(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
-            web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
-            (self.capped_container_model, self.capped_with_model),
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_capped_container_model,
             conn,
         )
+    }
+    pub fn procedure_template_capped_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_capped_with_model,
+            conn,
+        )
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn capping_procedures_procedure_template_procedure_template_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template_capped_with_model
+                            .eq(&self.procedure_template_capped_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn capping_procedures_procedure_template_procedure_template_c_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+        diesel::result::Error,
+    >{
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template_capped_container_model
+                            .eq(&self.procedure_template_capped_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_capped_container_model_and_capped_with_model(
+        capped_container_model: i32,
+        capped_with_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
+        Self::table()
+            .filter(
+                capping_procedures::capped_container_model
+                    .eq(capped_container_model)
+                    .and(capping_procedures::capped_with_model.eq(capped_with_model)),
+            )
+            .order_by(capping_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_capped_container_and_capped_container(
+        procedure_capped_container: ::rosetta_uuid::Uuid,
+        capped_container: ::rosetta_uuid::Uuid,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
+        Self::table()
+            .filter(
+                capping_procedures::procedure_capped_container
+                    .eq(procedure_capped_container)
+                    .and(capping_procedures::capped_container.eq(capped_container)),
+            )
+            .order_by(capping_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_capped_container_and_capped_container_model(
+        procedure_capped_container: ::rosetta_uuid::Uuid,
+        capped_container_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
+        Self::table()
+            .filter(
+                capping_procedures::procedure_capped_container
+                    .eq(procedure_capped_container)
+                    .and(capping_procedures::capped_container_model.eq(capped_container_model)),
+            )
+            .order_by(capping_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    pub fn from_procedure_capped_container<C>(
+        procedure_capped_container: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_capped_container as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_capped_container as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_capped_container as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
+        Self::table()
+            .filter(capping_procedures::procedure_capped_container.eq(procedure_capped_container))
+            .order_by(capping_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_capped_container_and_procedure_template_capped_container_model(
+        procedure_capped_container: ::rosetta_uuid::Uuid,
+        procedure_template_capped_container_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
+        Self::table()
+            .filter(
+                capping_procedures::procedure_capped_container.eq(procedure_capped_container).and(
+                    capping_procedures::procedure_template_capped_container_model
+                        .eq(procedure_template_capped_container_model),
+                ),
+            )
+            .order_by(capping_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_capped_with_and_capped_with_model(
+        procedure_capped_with: ::rosetta_uuid::Uuid,
+        capped_with_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
+        Self::table()
+            .filter(
+                capping_procedures::procedure_capped_with
+                    .eq(procedure_capped_with)
+                    .and(capping_procedures::capped_with_model.eq(capped_with_model)),
+            )
+            .order_by(capping_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    pub fn from_procedure_capped_with<C>(
+        procedure_capped_with: ::rosetta_uuid::Uuid,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_capped_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_capped_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_capped_with as diesel::expression_methods::EqAll<
+                ::rosetta_uuid::Uuid,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
+        Self::table()
+            .filter(capping_procedures::procedure_capped_with.eq(procedure_capped_with))
+            .order_by(capping_procedures::procedure.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_capped_with_and_procedure_template_capped_with_model(
+        procedure_capped_with: ::rosetta_uuid::Uuid,
+        procedure_template_capped_with_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
+        Self::table()
+            .filter(
+                capping_procedures::procedure_capped_with.eq(procedure_capped_with).and(
+                    capping_procedures::procedure_template_capped_with_model
+                        .eq(procedure_template_capped_with_model),
+                ),
+            )
+            .order_by(capping_procedures::procedure.asc())
+            .load::<Self>(conn)
     }
     pub fn from_procedure<C>(
         procedure: ::rosetta_uuid::Uuid,
@@ -476,42 +676,23 @@ impl CappingProcedure {
             .order_by(capping_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    pub fn from_procedure_template<C>(
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_and_procedure_template(
+        procedure: ::rosetta_uuid::Uuid,
         procedure_template: i32,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_template as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_template as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_template as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
 
         use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
         Self::table()
-            .filter(capping_procedures::procedure_template.eq(procedure_template))
+            .filter(
+                capping_procedures::procedure
+                    .eq(procedure)
+                    .and(capping_procedures::procedure_template.eq(procedure_template)),
+            )
             .order_by(capping_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -557,45 +738,6 @@ impl CappingProcedure {
             .order_by(capping_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    pub fn from_procedure_capped_container<C>(
-        procedure_capped_container: ::rosetta_uuid::Uuid,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_capped_container as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_capped_container as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_capped_container as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
-        Self::table()
-            .filter(capping_procedures::procedure_capped_container.eq(procedure_capped_container))
-            .order_by(capping_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
     pub fn from_procedure_template_capped_with_model<C>(
         procedure_template_capped_with_model: i32,
         conn: &mut C,
@@ -638,20 +780,20 @@ impl CappingProcedure {
             .order_by(capping_procedures::procedure.asc())
             .load::<Self>(conn)
     }
-    pub fn from_procedure_capped_with<C>(
-        procedure_capped_with: ::rosetta_uuid::Uuid,
+    pub fn from_procedure_template<C>(
+        procedure_template: i32,
         conn: &mut C,
     ) -> Result<Vec<Self>, diesel::result::Error>
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_capped_with as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
+            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_template as diesel::expression_methods::EqAll<
+                i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_capped_with as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
+            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_template as diesel::expression_methods::EqAll<
+                i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
@@ -659,8 +801,8 @@ impl CappingProcedure {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_capped_with as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
+            <crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures::procedure_template as diesel::expression_methods::EqAll<
+                i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
@@ -673,48 +815,7 @@ impl CappingProcedure {
 
         use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
         Self::table()
-            .filter(capping_procedures::procedure_capped_with.eq(procedure_capped_with))
-            .order_by(capping_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_and_procedure_template(
-        procedure: ::rosetta_uuid::Uuid,
-        procedure_template: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
-        Self::table()
-            .filter(
-                capping_procedures::procedure
-                    .eq(procedure)
-                    .and(capping_procedures::procedure_template.eq(procedure_template)),
-            )
-            .order_by(capping_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_and_procedure_template_capped_container_model(
-        procedure_template: i32,
-        procedure_template_capped_container_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
-        Self::table()
-            .filter(
-                capping_procedures::procedure_template.eq(procedure_template).and(
-                    capping_procedures::procedure_template_capped_container_model
-                        .eq(procedure_template_capped_container_model),
-                ),
-            )
+            .filter(capping_procedures::procedure_template.eq(procedure_template))
             .order_by(capping_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -740,8 +841,8 @@ impl CappingProcedure {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_procedure_capped_container_and_procedure_template_capped_container_model(
-        procedure_capped_container: ::rosetta_uuid::Uuid,
+    pub fn from_procedure_template_and_procedure_template_capped_container_model(
+        procedure_template: i32,
         procedure_template_capped_container_model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
@@ -752,111 +853,10 @@ impl CappingProcedure {
         use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
         Self::table()
             .filter(
-                capping_procedures::procedure_capped_container.eq(procedure_capped_container).and(
+                capping_procedures::procedure_template.eq(procedure_template).and(
                     capping_procedures::procedure_template_capped_container_model
                         .eq(procedure_template_capped_container_model),
                 ),
-            )
-            .order_by(capping_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_capped_with_and_procedure_template_capped_with_model(
-        procedure_capped_with: ::rosetta_uuid::Uuid,
-        procedure_template_capped_with_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
-        Self::table()
-            .filter(
-                capping_procedures::procedure_capped_with.eq(procedure_capped_with).and(
-                    capping_procedures::procedure_template_capped_with_model
-                        .eq(procedure_template_capped_with_model),
-                ),
-            )
-            .order_by(capping_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_capped_container_and_capped_container_model(
-        procedure_capped_container: ::rosetta_uuid::Uuid,
-        capped_container_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
-        Self::table()
-            .filter(
-                capping_procedures::procedure_capped_container
-                    .eq(procedure_capped_container)
-                    .and(capping_procedures::capped_container_model.eq(capped_container_model)),
-            )
-            .order_by(capping_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_capped_with_and_capped_with_model(
-        procedure_capped_with: ::rosetta_uuid::Uuid,
-        capped_with_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
-        Self::table()
-            .filter(
-                capping_procedures::procedure_capped_with
-                    .eq(procedure_capped_with)
-                    .and(capping_procedures::capped_with_model.eq(capped_with_model)),
-            )
-            .order_by(capping_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_capped_container_and_capped_container(
-        procedure_capped_container: ::rosetta_uuid::Uuid,
-        capped_container: ::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
-        Self::table()
-            .filter(
-                capping_procedures::procedure_capped_container
-                    .eq(procedure_capped_container)
-                    .and(capping_procedures::capped_container.eq(capped_container)),
-            )
-            .order_by(capping_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_capped_container_model_and_capped_with_model(
-        capped_container_model: i32,
-        capped_with_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
-        Self::table()
-            .filter(
-                capping_procedures::capped_container_model
-                    .eq(capped_container_model)
-                    .and(capping_procedures::capped_with_model.eq(capped_with_model)),
             )
             .order_by(capping_procedures::procedure.asc())
             .load::<Self>(conn)

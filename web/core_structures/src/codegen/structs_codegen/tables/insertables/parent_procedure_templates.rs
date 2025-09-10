@@ -47,23 +47,6 @@ pub struct InsertableParentProcedureTemplate {
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableParentProcedureTemplate {
-    pub fn parent<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
-            self.parent,
-            conn,
-        )
-    }
     pub fn child<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -89,6 +72,23 @@ impl InsertableParentProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
+    }
+    pub fn parent<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.parent,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]

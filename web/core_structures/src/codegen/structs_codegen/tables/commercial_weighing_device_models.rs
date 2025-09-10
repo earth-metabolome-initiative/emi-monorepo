@@ -73,23 +73,6 @@ impl diesel::Identifiable for CommercialWeighingDeviceModel {
     }
 }
 impl CommercialWeighingDeviceModel {
-    pub fn weighing_device_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::read(
-            self.weighing_device_model,
-            conn,
-        )
-    }
     pub fn commercial_weighing_device_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -146,46 +129,22 @@ impl CommercialWeighingDeviceModel {
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
     }
-    pub fn from_weighing_device_model<C>(
-        weighing_device_model: i32,
+    pub fn weighing_device_model<C: diesel::connection::LoadConnection>(
+        &self,
         conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
+        diesel::result::Error,
+    >
     where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models::weighing_device_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models::weighing_device_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models::id,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models::weighing_device_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models::id,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models;
-        Self::table()
-            .filter(
-                commercial_weighing_device_models::weighing_device_model.eq(weighing_device_model),
-            )
-            .order_by(commercial_weighing_device_models::id.asc())
-            .load::<Self>(conn)
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::read(
+            self.weighing_device_model,
+            conn,
+        )
     }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where
@@ -238,6 +197,47 @@ impl CommercialWeighingDeviceModel {
             .filter(commercial_weighing_device_models::id.eq(id).and(
                 commercial_weighing_device_models::weighing_device_model.eq(weighing_device_model),
             ))
+            .order_by(commercial_weighing_device_models::id.asc())
+            .load::<Self>(conn)
+    }
+    pub fn from_weighing_device_model<C>(
+        weighing_device_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models::weighing_device_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models::weighing_device_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models::weighing_device_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::commercial_weighing_device_models::commercial_weighing_device_models;
+        Self::table()
+            .filter(
+                commercial_weighing_device_models::weighing_device_model.eq(weighing_device_model),
+            )
             .order_by(commercial_weighing_device_models::id.asc())
             .load::<Self>(conn)
     }

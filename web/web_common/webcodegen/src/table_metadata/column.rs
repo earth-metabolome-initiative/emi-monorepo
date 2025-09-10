@@ -1705,6 +1705,9 @@ impl Column {
                 foreign_definer_constraint.columns(conn)?.iter().filter(|c| c != &self).cloned(),
             );
         }
+
+        foreign_defined_columns.sort_unstable();
+
         Ok(foreign_defined_columns)
     }
 

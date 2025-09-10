@@ -142,14 +142,16 @@ pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Ord + Eq + Hash
         }
 
         // Next, we define the relationships between the columns.
-        for (column, column_node) in &column_nodes {
+        let mut column_nodes_vec = column_nodes.iter().collect::<Vec<_>>();
+        column_nodes_vec.sort_unstable();
+        for (column, column_node) in &column_nodes_vec {
             let ancestral_same_as_columns = column.ancestral_same_as_columns(conn)?;
             for ancestral_same_as_column in &ancestral_same_as_columns {
                 if let Some(ancestral_column_node) = column_nodes.get(&ancestral_same_as_column) {
                     flowchart
                         .edge(
                             FlowchartEdgeBuilder::default()
-                                .source(column_node.clone())
+                                .source((*column_node).clone())
                                 .unwrap()
                                 .destination(ancestral_column_node.clone())
                                 .unwrap()
@@ -174,7 +176,7 @@ pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Ord + Eq + Hash
                     flowchart
                         .edge(
                             FlowchartEdgeBuilder::default()
-                                .source(column_node.clone())
+                                .source((*column_node).clone())
                                 .unwrap()
                                 .destination(inferred_ancestral_same_as_column_node.clone())
                                 .unwrap()
@@ -198,7 +200,7 @@ pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Ord + Eq + Hash
                     flowchart
                         .edge(
                             FlowchartEdgeBuilder::default()
-                                .source(column_node.clone())
+                                .source((*column_node).clone())
                                 .unwrap()
                                 .destination(associated_column_node.clone())
                                 .unwrap()
@@ -219,7 +221,7 @@ pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Ord + Eq + Hash
                     flowchart
                         .edge(
                             FlowchartEdgeBuilder::default()
-                                .source(column_node.clone())
+                                .source((*column_node).clone())
                                 .unwrap()
                                 .destination(foreign_associated_column_node.clone())
                                 .unwrap()
@@ -265,7 +267,9 @@ pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Ord + Eq + Hash
 
         // Next, we include the connections relative to the tables which extend other
         // tables.
-        for (table, table_node) in &table_nodes {
+        let mut table_nodes_vec = table_nodes.iter().collect::<Vec<_>>();
+        table_nodes_vec.sort_unstable();
+        for (table, table_node) in &table_nodes_vec {
             let extension_tables = table.extension_tables(conn)?;
 
             for extended_table in extension_tables.iter() {
@@ -273,7 +277,7 @@ pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Ord + Eq + Hash
                     flowchart
                         .edge(
                             FlowchartEdgeBuilder::default()
-                                .source(table_node.clone())
+                                .source((*table_node).clone())
                                 .unwrap()
                                 .destination(extended_table_node.clone())
                                 .unwrap()
@@ -290,7 +294,7 @@ pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Ord + Eq + Hash
                     flowchart
                         .edge(
                             FlowchartEdgeBuilder::default()
-                                .source(table_node.clone())
+                                .source((*table_node).clone())
                                 .unwrap()
                                 .destination(associated_table_node.clone())
                                 .unwrap()

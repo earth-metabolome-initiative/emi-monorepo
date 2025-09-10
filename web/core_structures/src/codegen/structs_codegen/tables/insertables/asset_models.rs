@@ -69,6 +69,16 @@ pub struct InsertableAssetModel {
     pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableAssetModel {
+    pub fn created_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
+    }
     pub fn parent_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -87,16 +97,6 @@ impl InsertableAssetModel {
         };
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(parent_model, conn)
             .optional()
-    }
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,

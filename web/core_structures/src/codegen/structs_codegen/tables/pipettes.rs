@@ -79,22 +79,6 @@ impl Pipette {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
     }
-    pub fn model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot::read(
-            self.model, conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn pipettes_id_model_fkey(
         &self,
@@ -111,6 +95,22 @@ impl Pipette {
                 ),
             )
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
+    pub fn model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot::read(
+            self.model, conn,
+        )
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,

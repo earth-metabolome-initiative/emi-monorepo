@@ -73,6 +73,30 @@ impl diesel::Identifiable for CommercialBallMillMachineModel {
     }
 }
 impl CommercialBallMillMachineModel {
+    #[cfg(feature = "postgres")]
+    pub fn commercial_ball_mill_machine_mo_id_ball_mill_machine_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.ball_mill_machine_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
     pub fn ball_mill_machine_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -124,28 +148,25 @@ impl CommercialBallMillMachineModel {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn commercial_ball_mill_machine_mo_id_ball_mill_machine_model_fkey(
-        &self,
+    pub fn from_id_and_ball_mill_machine_model(
+        id: i32,
+        ball_mill_machine_model: i32,
         conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
+    ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+
+        use crate::codegen::diesel_codegen::tables::commercial_ball_mill_machine_models::commercial_ball_mill_machine_models;
+        Self::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
-                    .eq(&self.id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
-                            .eq(&self.ball_mill_machine_model),
-                    ),
+                commercial_ball_mill_machine_models::id.eq(id).and(
+                    commercial_ball_mill_machine_models::ball_mill_machine_model
+                        .eq(ball_mill_machine_model),
+                ),
             )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
+            .order_by(commercial_ball_mill_machine_models::id.asc())
+            .load::<Self>(conn)
     }
     pub fn from_ball_mill_machine_model<C>(
         ball_mill_machine_model: i32,
@@ -222,27 +243,6 @@ impl CommercialBallMillMachineModel {
         use crate::codegen::diesel_codegen::tables::commercial_ball_mill_machine_models::commercial_ball_mill_machine_models;
         Self::table()
             .filter(commercial_ball_mill_machine_models::id.eq(id))
-            .order_by(commercial_ball_mill_machine_models::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_id_and_ball_mill_machine_model(
-        id: i32,
-        ball_mill_machine_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::commercial_ball_mill_machine_models::commercial_ball_mill_machine_models;
-        Self::table()
-            .filter(
-                commercial_ball_mill_machine_models::id.eq(id).and(
-                    commercial_ball_mill_machine_models::ball_mill_machine_model
-                        .eq(ball_mill_machine_model),
-                ),
-            )
             .order_by(commercial_ball_mill_machine_models::id.asc())
             .load::<Self>(conn)
     }

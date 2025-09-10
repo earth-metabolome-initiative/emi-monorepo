@@ -65,20 +65,6 @@ impl diesel::Identifiable for Container {
     }
 }
 impl Container {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
-    }
     pub fn container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -112,6 +98,36 @@ impl Container {
                 ),
             )
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
+    pub fn id<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_id_and_container_model(
+        id: ::rosetta_uuid::Uuid,
+        container_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::containers::containers;
+        Self::table()
+            .filter(containers::id.eq(id).and(containers::container_model.eq(container_model)))
+            .order_by(containers::id.asc())
+            .load::<Self>(conn)
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,
@@ -149,22 +165,6 @@ impl Container {
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::id.eq(id))
-            .order_by(containers::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_id_and_container_model(
-        id: ::rosetta_uuid::Uuid,
-        container_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::containers::containers;
-        Self::table()
-            .filter(containers::id.eq(id).and(containers::container_model.eq(container_model)))
             .order_by(containers::id.asc())
             .load::<Self>(conn)
     }

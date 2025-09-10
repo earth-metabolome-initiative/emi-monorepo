@@ -141,32 +141,20 @@ pub struct InsertablePhotographProcedure {
     pub(crate) procedure_photograph: ::rosetta_uuid::Uuid,
 }
 impl InsertablePhotographProcedure {
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+    pub fn photograph<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate,
+        crate::codegen::structs_codegen::tables::photographs::Photograph,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::photographs::Photograph:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::read(
-            self.procedure_template,
+        crate::codegen::structs_codegen::tables::photographs::Photograph::read(
+            self.photograph,
             conn,
         )
     }
@@ -184,43 +172,6 @@ impl InsertablePhotographProcedure {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(
             self.photographed_asset,
-            conn,
-        )
-    }
-    pub fn procedure_template_photographed_asset_model<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_photographed_asset_model,
-            conn,
-        )
-    }
-    pub fn procedure_photographed_asset<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_photographed_asset,
             conn,
         )
     }
@@ -243,25 +194,146 @@ impl InsertablePhotographProcedure {
         crate::codegen::structs_codegen::tables::cameras::Camera::read(photographed_with, conn)
             .optional()
     }
-    pub fn procedure_template_photographed_with_model<
-        C: diesel::connection::LoadConnection,
-    >(
+    pub fn procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
+    }
+    pub fn procedure_photograph<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_photographed_with_model,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_photograph,
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn photograph_procedures_procedure_photograph_photograph_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_photograph)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.photograph),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn photograph_procedures_procedure_photograph_procedure_templ_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_photograph)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_photograph_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    pub fn procedure_photographed_asset<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_photographed_asset,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn photograph_procedures_procedure_photographed_asset_photogr_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_photographed_asset)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.photographed_asset),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn photograph_procedures_procedure_photographed_asset_procedu_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_photographed_asset)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_photographed_asset_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     pub fn procedure_photographed_with<C: diesel::connection::LoadConnection>(
         &self,
@@ -280,57 +352,58 @@ impl InsertablePhotographProcedure {
             conn,
         )
     }
-    pub fn photograph<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn photograph_procedures_procedure_photographed_with_photogra_fkey(
         &self,
-        conn: &mut C,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::photographs::Photograph,
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
         diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::photographs::Photograph:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::photographs::Photograph::read(
-            self.photograph,
-            conn,
-        )
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(photographed_with) = self.photographed_with else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_photographed_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(photographed_with),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+            .optional()
     }
-    pub fn procedure_template_photograph_model<C: diesel::connection::LoadConnection>(
+    #[cfg(feature = "postgres")]
+    pub fn photograph_procedures_procedure_photographed_with_procedur_fkey(
         &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_photograph_model,
-            conn,
-        )
-    }
-    pub fn procedure_photograph<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
+        conn: &mut diesel::PgConnection,
     ) -> Result<
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
         diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_photograph,
-            conn,
-        )
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_photographed_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_photographed_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn photograph_procedures_procedure_procedure_template_fkey(
@@ -354,29 +427,81 @@ impl InsertablePhotographProcedure {
                 crate::codegen::structs_codegen::tables::procedures::Procedure,
             >(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn photograph_procedures_procedure_template_procedure_templat_fkey(
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate,
         diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template_photographed_with_model
-                            .eq(&self.procedure_template_photographed_with_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate,
-            >(conn)
+    >
+    where
+        crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    pub fn procedure_template_photograph_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_photograph_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_photographed_asset_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_photographed_asset_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_photographed_with_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_photographed_with_model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn photograph_procedures_procedure_template_procedure_templa_fkey1(
@@ -427,152 +552,27 @@ impl InsertablePhotographProcedure {
             >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn photograph_procedures_procedure_photographed_with_procedur_fkey(
+    pub fn photograph_procedures_procedure_template_procedure_templat_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate,
         diesel::result::Error,
-    > {
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_photographed_with)
+                crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                        crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template_photographed_with_model
                             .eq(&self.procedure_template_photographed_with_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn photograph_procedures_procedure_photographed_asset_procedu_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_photographed_asset)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_photographed_asset_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn photograph_procedures_procedure_photograph_procedure_templ_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_photograph)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_photograph_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn photograph_procedures_procedure_photographed_asset_photogr_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_photographed_asset)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.photographed_asset),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn photograph_procedures_procedure_photographed_with_photogra_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
-        };
-        let Some(photographed_with) = self.photographed_with else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_photographed_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(photographed_with),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
-    pub fn photograph_procedures_procedure_photograph_photograph_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_photograph)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.photograph),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate,
             >(conn)
     }
 }
@@ -949,13 +949,13 @@ impl<
     ///    v4@{shape: rounded, label: "procedure_template"}
     /// class v4 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v5
-    /// v3 --->|"`associated same as`"| v5
-    /// v2 --->|"`associated same as`"| v5
     /// v0 --->|"`ancestral same as`"| v4
-    /// v0 -.->|"`foreign defines`"| v2
     /// v0 -.->|"`foreign defines`"| v1
+    /// v0 -.->|"`foreign defines`"| v2
     /// v0 -.->|"`foreign defines`"| v3
+    /// v1 --->|"`associated same as`"| v5
+    /// v2 --->|"`associated same as`"| v5
+    /// v3 --->|"`associated same as`"| v5
     /// v6 --->|"`extends`"| v8
     /// v6 ---o|"`associated with`"| v7
     /// ```
@@ -1100,27 +1100,27 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`photograph_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_photographed_asset"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "photographed_asset"}
     /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_photographed_asset_model"}
     /// class v2 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_photographed_asset"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v7 ["`procedure_assets`"]
+    ///    v5@{shape: rounded, label: "id"}
+    /// class v5 undirectly-involved-column
     ///    v3@{shape: rounded, label: "asset"}
     /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
-    ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
-    /// v0 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
@@ -1137,6 +1137,38 @@ impl<
         >,
     {
         let mut procedure_photographed_asset = procedure_photographed_asset.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_photographed_asset
+        {
+            procedure_photographed_asset = if let (Some(photographed_asset), Some(asset)) =
+                (self.photographed_asset, builder.asset)
+            {
+                if photographed_asset != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::PhotographedAsset,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.photographed_asset = Some(asset);
+                builder.into()
+            } else if let Some(photographed_asset) = self.photographed_asset {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(photographed_asset),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedurePhotographedAsset(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_photographed_asset
         {
@@ -1178,38 +1210,6 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_photographed_asset
-        {
-            procedure_photographed_asset = if let (Some(photographed_asset), Some(asset)) =
-                (self.photographed_asset, builder.asset)
-            {
-                if photographed_asset != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::PhotographedAsset,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.photographed_asset = Some(asset);
-                builder.into()
-            } else if let Some(photographed_asset) = self.photographed_asset {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(photographed_asset),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedurePhotographedAsset(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         self.procedure_photographed_asset = procedure_photographed_asset;
         Ok(self)
     }
@@ -1228,10 +1228,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`photograph_procedures`"]
-    ///    v0@{shape: rounded, label: "photographed_with"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_photographed_with"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "photographed_with"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -1294,11 +1294,11 @@ impl<
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_photographed_with_model(
@@ -1338,28 +1338,28 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`photograph_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_photographed_with_model"}
-    /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "photographed_with"}
     /// class v0 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_photographed_with_model"}
+    /// class v2 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_photographed_with"}
     /// class v1 column-of-interest
     /// end
     /// subgraph v7 ["`procedure_assets`"]
+    ///    v3@{shape: rounded, label: "asset"}
+    /// class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
-    ///    v3@{shape: rounded, label: "asset"}
-    /// class v3 directly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v4
     /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn procedure_photographed_with<PPW>(
@@ -1375,6 +1375,38 @@ impl<
         >,
     {
         let mut procedure_photographed_with = procedure_photographed_with.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
+            procedure_photographed_with
+        {
+            procedure_photographed_with = if let (Some(photographed_with), Some(asset)) =
+                (self.photographed_with, builder.asset)
+            {
+                if photographed_with != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::PhotographedWith,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.photographed_with = Some(asset);
+                builder.into()
+            } else if let Some(photographed_with) = self.photographed_with {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(photographed_with),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedurePhotographedWith(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_photographed_with
         {
@@ -1416,38 +1448,6 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_photographed_with
-        {
-            procedure_photographed_with = if let (Some(photographed_with), Some(asset)) =
-                (self.photographed_with, builder.asset)
-            {
-                if photographed_with != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::PhotographedWith,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.photographed_with = Some(asset);
-                builder.into()
-            } else if let Some(photographed_with) = self.photographed_with {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(photographed_with),
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedurePhotographedWith(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         self.procedure_photographed_with = procedure_photographed_with;
         Ok(self)
     }
@@ -1465,16 +1465,16 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`photograph_procedures`"]
-    ///    v0@{shape: rounded, label: "photograph"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_photograph"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "photograph"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1526,16 +1526,16 @@ impl<
     /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_photograph_model(
@@ -1574,28 +1574,28 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`photograph_procedures`"]
-    ///    v0@{shape: rounded, label: "photograph"}
-    /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_photograph_model"}
     /// class v2 directly-involved-column
+    ///    v0@{shape: rounded, label: "photograph"}
+    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_photograph"}
     /// class v1 column-of-interest
     /// end
     /// subgraph v7 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v4 directly-involved-column
     ///    v3@{shape: rounded, label: "asset"}
     /// class v3 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
     /// class v5 undirectly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v4 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
-    /// v2 --->|"`associated same as`"| v4
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
+    /// v2 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
     fn procedure_photograph<PP>(
@@ -1611,6 +1611,36 @@ impl<
         >,
     {
         let mut procedure_photograph = procedure_photograph.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_photograph {
+            procedure_photograph = if let (Some(photograph), Some(asset)) =
+                (self.photograph, builder.asset)
+            {
+                if photograph != asset {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::Photograph,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset) = builder.asset {
+                self.photograph = Some(asset);
+                builder.into()
+            } else if let Some(photograph) = self.photograph {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+                        builder,
+                        Some(photograph),
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedurePhotograph(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_photograph {
             procedure_photograph = if let (
                 Some(procedure_template_photograph_model),
@@ -1637,36 +1667,6 @@ impl<
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
                         procedure_template_photograph_model,
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedurePhotograph(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_photograph {
-            procedure_photograph = if let (Some(photograph), Some(asset)) =
-                (self.photograph, builder.asset)
-            {
-                if photograph != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::Photograph,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.photograph = Some(asset);
-                builder.into()
-            } else if let Some(photograph) = self.photograph {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
-                        builder,
-                        Some(photograph),
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {

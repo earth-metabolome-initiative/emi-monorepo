@@ -1,35 +1,35 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct AliquotingProcedureTemplateForeignKeys {
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
-    pub aliquoted_from_model: Option<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-    >,
-    pub procedure_template_aliquoted_from_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub aliquoted_into_model: Option<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-    >,
     pub procedure_template_aliquoted_into_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
-    pub aliquoted_with_model: Option<
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
     >,
     pub procedure_template_aliquoted_with_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
-    pub pipette_tip_model: Option<
-        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+    pub aliquoting_procedure_template_aliquoted_with_model_pipette_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    >,
+    pub procedure_template_aliquoted_from_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
     pub procedure_template_pipette_tip_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
-    pub aliquoting_procedure_template_aliquoted_with_model_pipette_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    pub aliquoted_from_model: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    >,
+    pub aliquoted_into_model: Option<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+    >,
+    pub aliquoted_with_model: Option<
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+    >,
+    pub pipette_tip_model: Option<
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+    >,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -43,48 +43,8 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::Ali
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                        self.procedure_template,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
-                        self.aliquoted_from_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_aliquoted_from_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
-                        self.aliquoted_into_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
                         self.procedure_template_aliquoted_into_model,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteModel(
-                        self.aliquoted_with_model,
                     ),
                 ),
             );
@@ -99,8 +59,17 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::Ali
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteTipModel(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
+                        self.aliquoted_with_model,
                         self.pipette_tip_model,
+                    )),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_aliquoted_from_model,
                     ),
                 ),
             );
@@ -115,26 +84,57 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::Ali
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                        self.aliquoted_from_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                        self.aliquoted_into_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteModel(
                         self.aliquoted_with_model,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PipetteTipModel(
                         self.pipette_tip_model,
-                    )),
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                        self.procedure_template,
+                    ),
                 ),
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_template.is_some()
-            && foreign_keys.aliquoted_from_model.is_some()
-            && foreign_keys.procedure_template_aliquoted_from_model.is_some()
-            && foreign_keys.aliquoted_into_model.is_some()
-            && foreign_keys.procedure_template_aliquoted_into_model.is_some()
-            && foreign_keys.aliquoted_with_model.is_some()
+        foreign_keys.procedure_template_aliquoted_into_model.is_some()
             && foreign_keys.procedure_template_aliquoted_with_model.is_some()
-            && foreign_keys.pipette_tip_model.is_some()
-            && foreign_keys.procedure_template_pipette_tip_model.is_some()
             && foreign_keys
                 .aliquoting_procedure_template_aliquoted_with_model_pipette_fkey
                 .is_some()
+            && foreign_keys.procedure_template_aliquoted_from_model.is_some()
+            && foreign_keys.procedure_template_pipette_tip_model.is_some()
+            && foreign_keys.aliquoted_from_model.is_some()
+            && foreign_keys.aliquoted_into_model.is_some()
+            && foreign_keys.aliquoted_with_model.is_some()
+            && foreign_keys.pipette_tip_model.is_some()
+            && foreign_keys.procedure_template.is_some()
     }
     fn update(
         &self,
@@ -228,14 +228,6 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::Ali
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_template_aliquoted_from_model
-                    == procedure_template_asset_models.id
-                {
-                    foreign_keys.procedure_template_aliquoted_from_model = Some(
-                        procedure_template_asset_models.clone(),
-                    );
-                    updated = true;
-                }
                 if self.procedure_template_aliquoted_into_model
                     == procedure_template_asset_models.id
                 {
@@ -248,6 +240,14 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::Ali
                     == procedure_template_asset_models.id
                 {
                     foreign_keys.procedure_template_aliquoted_with_model = Some(
+                        procedure_template_asset_models.clone(),
+                    );
+                    updated = true;
+                }
+                if self.procedure_template_aliquoted_from_model
+                    == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_aliquoted_from_model = Some(
                         procedure_template_asset_models.clone(),
                     );
                     updated = true;
@@ -267,12 +267,6 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::Ali
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_template_aliquoted_from_model
-                    == procedure_template_asset_models.id
-                {
-                    foreign_keys.procedure_template_aliquoted_from_model = None;
-                    updated = true;
-                }
                 if self.procedure_template_aliquoted_into_model
                     == procedure_template_asset_models.id
                 {
@@ -283,6 +277,12 @@ for crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::Ali
                     == procedure_template_asset_models.id
                 {
                     foreign_keys.procedure_template_aliquoted_with_model = None;
+                    updated = true;
+                }
+                if self.procedure_template_aliquoted_from_model
+                    == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_aliquoted_from_model = None;
                     updated = true;
                 }
                 if self.procedure_template_pipette_tip_model

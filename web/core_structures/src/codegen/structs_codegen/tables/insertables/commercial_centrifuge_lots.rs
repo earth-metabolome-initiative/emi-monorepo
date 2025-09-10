@@ -103,24 +103,6 @@ impl InsertableCommercialCentrifugeLot {
             self.id, conn,
         )
     }
-    pub fn product_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel::read(
-            self.product_model,
-            conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn commercial_centrifuge_lots_id_product_model_fkey(
         &self,
@@ -144,6 +126,24 @@ impl InsertableCommercialCentrifugeLot {
             .first::<
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
+    }
+    pub fn product_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel::read(
+            self.product_model,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -257,9 +257,9 @@ for InsertableCommercialCentrifugeLotBuilder<CentrifugeModel, CommercialProductL
     ///v0 --->|"`ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
     ///v0 -.->|"`inferred ancestral same as`"| v2
-    ///v2 --->|"`ancestral same as`"| v3
     ///v1 --->|"`ancestral same as`"| v3
     ///v1 -.->|"`inferred ancestral same as`"| v2
+    ///v2 --->|"`ancestral same as`"| v3
     ///v5 --->|"`extends`"| v6
     ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
@@ -587,12 +587,12 @@ where
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 column-of-interest
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v3 --->|"`ancestral same as`"| v2
-    ///v3 -.->|"`inferred ancestral same as`"| v1
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v3
     ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v3 --->|"`ancestral same as`"| v2
+    ///v3 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v6
     ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4

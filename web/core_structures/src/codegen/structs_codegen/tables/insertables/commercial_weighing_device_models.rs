@@ -75,23 +75,6 @@ pub struct InsertableCommercialWeighingDeviceModel {
     pub(crate) weighing_device_model: i32,
 }
 impl InsertableCommercialWeighingDeviceModel {
-    pub fn weighing_device_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::read(
-            self.weighing_device_model,
-            conn,
-        )
-    }
     pub fn commercial_weighing_device_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -147,6 +130,23 @@ impl InsertableCommercialWeighingDeviceModel {
             .first::<
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
+    }
+    pub fn weighing_device_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::read(
+            self.weighing_device_model,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -258,9 +258,9 @@ for InsertableCommercialWeighingDeviceModelBuilder<
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 directly-involved-column
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn weighing_device_model(
@@ -552,9 +552,9 @@ where
     ///    v1@{shape: rounded, label: "parent_model"}
     ///class v1 column-of-interest
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
     fn parent_model(

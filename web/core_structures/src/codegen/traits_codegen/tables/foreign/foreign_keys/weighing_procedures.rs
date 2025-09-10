@@ -7,23 +7,23 @@ pub struct WeighingProcedureForeignKeys {
     pub procedure_template: Option<
         crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
     >,
-    pub weighed_container: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-    >,
     pub procedure_template_weighed_container_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    >,
+    pub procedure_template_weighed_with_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
     pub procedure_weighed_container: Option<
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     >,
-    pub weighed_with: Option<
-        crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice,
-    >,
-    pub procedure_template_weighed_with_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-    >,
     pub procedure_weighed_with: Option<
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub weighed_container: Option<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+    >,
+    pub weighed_with: Option<
+        crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -43,11 +43,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.procedure_template,
             ),
         ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
-                self.weighed_container,
-            ),
-        ));
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -56,18 +51,6 @@ impl web_common_traits::prelude::HasForeignKeys
                     ),
                 ),
             );
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_weighed_container,
-            ),
-        ));
-        if let Some(weighed_with) = self.weighed_with {
-            connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDevice(
-                    weighed_with,
-                ),
-            ));
-        }
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -78,19 +61,36 @@ impl web_common_traits::prelude::HasForeignKeys
             );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_weighed_container,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
                 self.procedure_weighed_with,
             ),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
+                self.weighed_container,
+            ),
+        ));
+        if let Some(weighed_with) = self.weighed_with {
+            connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::WeighingDevice(
+                    weighed_with,
+                ),
+            ));
+        }
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.procedure.is_some()
             && foreign_keys.procedure_template.is_some()
-            && foreign_keys.weighed_container.is_some()
             && foreign_keys.procedure_template_weighed_container_model.is_some()
-            && foreign_keys.procedure_weighed_container.is_some()
-            && (foreign_keys.weighed_with.is_some() || self.weighed_with.is_some())
             && foreign_keys.procedure_template_weighed_with_model.is_some()
+            && foreign_keys.procedure_weighed_container.is_some()
             && foreign_keys.procedure_weighed_with.is_some()
+            && foreign_keys.weighed_container.is_some()
+            && (foreign_keys.weighed_with.is_some() || self.weighed_with.is_some())
     }
     fn update(
         &self,

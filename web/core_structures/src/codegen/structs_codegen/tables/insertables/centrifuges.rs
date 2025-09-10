@@ -70,6 +70,23 @@ impl InsertableCentrifuge {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn centrifuges_id_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
     pub fn model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -87,23 +104,6 @@ impl InsertableCentrifuge {
             self.model,
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn centrifuges_id_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::assets::Asset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
-                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
-                        .eq(&self.model),
-                ),
-            )
-            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -193,11 +193,11 @@ impl<
     ///    v1@{shape: rounded, label: "model"}
     ///class v1 directly-involved-column
     ///end
-    ///v1 --->|"`ancestral same as`"| v2
     ///v0 --->|"`ancestral same as`"| v2
     ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v5 --->|"`extends`"| v3
+    ///v1 --->|"`ancestral same as`"| v2
     ///v4 --->|"`extends`"| v5
+    ///v5 --->|"`extends`"| v3
     ///```
     fn model(
         mut self,
@@ -445,8 +445,8 @@ where
     /// v0 --->|"`ancestral same as`"| v2
     /// v0 -.->|"`inferred ancestral same as`"| v1
     /// v1 --->|"`ancestral same as`"| v2
-    /// v5 --->|"`extends`"| v3
     /// v4 --->|"`extends`"| v5
+    /// v5 --->|"`extends`"| v3
     /// ```
     fn model(
         self,

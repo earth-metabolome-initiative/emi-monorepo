@@ -75,23 +75,6 @@ impl diesel::Identifiable for CommercialPipetteModel {
     }
 }
 impl CommercialPipetteModel {
-    pub fn pipette_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::read(
-            self.pipette_model,
-            conn,
-        )
-    }
     pub fn commercial_pipette_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -146,44 +129,22 @@ impl CommercialPipetteModel {
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
     }
-    pub fn from_pipette_model<C>(
-        pipette_model: i32,
+    pub fn pipette_model<C: diesel::connection::LoadConnection>(
+        &self,
         conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel,
+        diesel::result::Error,
+    >
     where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::pipette_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::pipette_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::id,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::pipette_model as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::id,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models;
-        Self::table()
-            .filter(commercial_pipette_models::pipette_model.eq(pipette_model))
-            .order_by(commercial_pipette_models::id.asc())
-            .load::<Self>(conn)
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::pipette_models::PipetteModel::read(
+            self.pipette_model,
+            conn,
+        )
     }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where
@@ -238,6 +199,45 @@ impl CommercialPipetteModel {
                     .eq(id)
                     .and(commercial_pipette_models::pipette_model.eq(pipette_model)),
             )
+            .order_by(commercial_pipette_models::id.asc())
+            .load::<Self>(conn)
+    }
+    pub fn from_pipette_model<C>(
+        pipette_model: i32,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::pipette_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::pipette_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::pipette_model as diesel::expression_methods::EqAll<
+                i32,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
+        use crate::codegen::diesel_codegen::tables::commercial_pipette_models::commercial_pipette_models;
+        Self::table()
+            .filter(commercial_pipette_models::pipette_model.eq(pipette_model))
             .order_by(commercial_pipette_models::id.asc())
             .load::<Self>(conn)
     }

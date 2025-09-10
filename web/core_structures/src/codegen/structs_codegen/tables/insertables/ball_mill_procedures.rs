@@ -143,20 +143,71 @@ pub struct InsertableBallMillProcedure {
     pub(crate) procedure_milled_container: ::rosetta_uuid::Uuid,
 }
 impl InsertableBallMillProcedure {
-    pub fn procedure_milled_with<C: diesel::connection::LoadConnection>(
+    pub fn bead_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_milled_with,
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel::read(self.bead_model, conn)
+    }
+    pub fn ball_mill_procedures_bead_model_milled_container_model_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
+            (self.bead_model, self.milled_container_model),
+            conn,
+        )
+    }
+    pub fn milled_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
+            self.milled_container,
+            conn,
+        )
+    }
+    pub fn milled_container_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
+            self.milled_container_model,
             conn,
         )
     }
@@ -182,98 +233,22 @@ impl InsertableBallMillProcedure {
         )
         .optional()
     }
-    pub fn milled_container<C: diesel::connection::LoadConnection>(
+    pub fn ball_mill_procedures_milled_with_model_bead_model_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
-            self.milled_container,
-            conn,
-        )
-    }
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate::read(
-            self.procedure_template,
-            conn,
-        )
-    }
-    pub fn bead_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::bead_models::BeadModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::bead_models::BeadModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::bead_models::BeadModel::read(self.bead_model, conn)
-    }
-    pub fn procedure_template_bead_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_bead_model,
-            conn,
-        )
-    }
-    pub fn procedure_bead<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_bead,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
+            (self.milled_with_model, self.bead_model),
             conn,
         )
     }
@@ -294,61 +269,100 @@ impl InsertableBallMillProcedure {
             conn,
         )
     }
-    pub fn procedure_template_milled_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_milled_with_model,
-            conn,
-        )
-    }
-    pub fn milled_container_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
-            self.milled_container_model,
-            conn,
-        )
-    }
-    pub fn procedure_template_milled_container_model<
+    pub fn ball_mill_procedures_milled_with_model_milled_container_mo_fkey<
         C: diesel::connection::LoadConnection,
     >(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_milled_container_model,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
+            (self.milled_with_model, self.milled_container_model),
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn ball_mill_procedures_procedure_bead_bead_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_bead)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.bead_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    pub fn procedure_bead<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_bead,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn ball_mill_procedures_procedure_bead_procedure_template_bea_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_bead)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_bead_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    pub fn procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
     }
     pub fn procedure_milled_container<C: diesel::connection::LoadConnection>(
         &self,
@@ -366,6 +380,172 @@ impl InsertableBallMillProcedure {
             self.procedure_milled_container,
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn ball_mill_procedures_procedure_milled_container_milled_co_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_milled_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.milled_container),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn ball_mill_procedures_procedure_milled_container_milled_con_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_milled_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.milled_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn ball_mill_procedures_procedure_milled_container_procedure_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_milled_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_milled_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    pub fn procedure_milled_with<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_milled_with,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn ball_mill_procedures_procedure_milled_with_milled_with_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(milled_with) = self.milled_with else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_milled_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(milled_with),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+            .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub fn ball_mill_procedures_procedure_milled_with_milled_with_mod_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_milled_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.milled_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn ball_mill_procedures_procedure_milled_with_procedure_templ_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_milled_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_milled_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn ball_mill_procedures_procedure_procedure_template_fkey(
@@ -389,29 +569,79 @@ impl InsertableBallMillProcedure {
                 crate::codegen::structs_codegen::tables::procedures::Procedure,
             >(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn ball_mill_procedures_procedure_template_procedure_template_fkey(
+    pub fn procedure_template_bead_model<C: diesel::connection::LoadConnection>(
         &self,
-        conn: &mut diesel::PgConnection,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_bead_model,
+            conn,
+        )
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
     ) -> Result<
         crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
         diesel::result::Error,
-    >{
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::dsl::procedure_template_bead_model
-                            .eq(&self.procedure_template_bead_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
-            >(conn)
+    >
+    where
+        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    pub fn procedure_template_milled_container_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_milled_container_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_milled_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_milled_with_model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn ball_mill_procedures_procedure_template_procedure_templat_fkey1(
@@ -462,258 +692,28 @@ impl InsertableBallMillProcedure {
             >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn ball_mill_procedures_procedure_bead_procedure_template_bea_fkey(
+    pub fn ball_mill_procedures_procedure_template_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
         diesel::result::Error,
-    > {
+    >{
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_bead)
+                crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::dsl::procedure_template
+                    .eq(&self.procedure_template)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                        crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::dsl::procedure_template_bead_model
                             .eq(&self.procedure_template_bead_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
             >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn ball_mill_procedures_procedure_milled_with_procedure_templ_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_milled_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_milled_with_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn ball_mill_procedures_procedure_milled_container_procedure_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_milled_container)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_milled_container_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn ball_mill_procedures_procedure_milled_container_milled_con_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_milled_container)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.milled_container_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn ball_mill_procedures_procedure_milled_with_milled_with_mod_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_milled_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.milled_with_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn ball_mill_procedures_procedure_milled_with_milled_with_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
-        };
-        let Some(milled_with) = self.milled_with else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_milled_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(milled_with),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-            .optional()
-    }
-    #[cfg(feature = "postgres")]
-    pub fn ball_mill_procedures_procedure_bead_bead_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_bead)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.bead_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn ball_mill_procedures_procedure_milled_container_milled_co_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_milled_container)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.milled_container),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    pub fn ball_mill_procedures_milled_with_model_milled_container_mo_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
-            (self.milled_with_model, self.milled_container_model),
-            conn,
-        )
-    }
-    pub fn ball_mill_procedures_milled_with_model_bead_model_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
-            (self.milled_with_model, self.bead_model),
-            conn,
-        )
-    }
-    pub fn ball_mill_procedures_bead_model_milled_container_model_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
-            (self.bead_model, self.milled_container_model),
-            conn,
-        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -1118,14 +1118,14 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v6 ["`ball_mill_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_template_milled_container_model"}
-    /// class v2 directly-involved-column
     ///    v0@{shape: rounded, label: "procedure_template"}
     /// class v0 column-of-interest
-    ///    v1@{shape: rounded, label: "procedure_template_bead_model"}
-    /// class v1 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_milled_container_model"}
+    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_template_milled_with_model"}
     /// class v3 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_bead_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
     ///    v5@{shape: rounded, label: "procedure_template_asset_model"}
@@ -1135,12 +1135,12 @@ impl<
     ///    v4@{shape: rounded, label: "procedure_template"}
     /// class v4 directly-involved-column
     /// end
-    /// v2 --->|"`associated same as`"| v5
     /// v0 --->|"`ancestral same as`"| v4
-    /// v0 -.->|"`foreign defines`"| v3
-    /// v0 -.->|"`foreign defines`"| v2
     /// v0 -.->|"`foreign defines`"| v1
+    /// v0 -.->|"`foreign defines`"| v2
+    /// v0 -.->|"`foreign defines`"| v3
     /// v1 --->|"`associated same as`"| v5
+    /// v2 --->|"`associated same as`"| v5
     /// v3 --->|"`associated same as`"| v5
     /// v6 --->|"`extends`"| v8
     /// v6 ---o|"`associated with`"| v7
@@ -1175,16 +1175,16 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedures`"]
-    ///    v0@{shape: rounded, label: "bead_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_bead"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "bead_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1229,16 +1229,16 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_bead"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_bead_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_bead"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
@@ -1285,25 +1285,25 @@ impl<
     /// subgraph v6 ["`ball_mill_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_bead"}
     /// class v1 column-of-interest
-    ///    v0@{shape: rounded, label: "bead_model"}
-    /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_bead_model"}
     /// class v2 directly-involved-column
+    ///    v0@{shape: rounded, label: "bead_model"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v7 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v4 directly-involved-column
-    ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
     ///    v3@{shape: rounded, label: "asset_model"}
     /// class v3 directly-involved-column
+    ///    v5@{shape: rounded, label: "id"}
+    /// class v5 undirectly-involved-column
+    ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v4 directly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 --->|"`associated same as`"| v5
     /// v1 -.->|"`foreign defines`"| v0
     /// v1 -.->|"`foreign defines`"| v2
-    /// v0 --->|"`associated same as`"| v3
     /// v2 --->|"`associated same as`"| v4
     /// v6 ---o|"`associated with`"| v7
     /// ```
@@ -1320,6 +1320,36 @@ impl<
         >,
     {
         let mut procedure_bead = procedure_bead.into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_bead {
+            procedure_bead = if let (Some(bead_model), Some(asset_model)) =
+                (self.bead_model, builder.asset_model)
+            {
+                if bead_model != asset_model {
+                    return Err(web_common_traits::database::InsertError::BuilderError(
+                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                            Self::Attributes::BeadModel,
+                        ),
+                    ));
+                }
+                builder.into()
+            } else if let Some(asset_model) = builder.asset_model {
+                self.bead_model = Some(asset_model);
+                builder.into()
+            } else if let Some(bead_model) = self.bead_model {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
+                        builder,
+                        bead_model,
+                    )
+                    .map_err(|e| {
+                        e.into_field_name(|attribute| {
+                            Self::Attributes::ProcedureBead(attribute)
+                        })
+                    })?
+                    .into()
+            } else {
+                builder.into()
+            };
+        }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_bead {
             procedure_bead = if let (
                 Some(procedure_template_bead_model),
@@ -1355,36 +1385,6 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_bead {
-            procedure_bead = if let (Some(bead_model), Some(asset_model)) =
-                (self.bead_model, builder.asset_model)
-            {
-                if bead_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::BeadModel,
-                        ),
-                    ));
-                }
-                builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.bead_model = Some(asset_model);
-                builder.into()
-            } else if let Some(bead_model) = self.bead_model {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
-                        builder,
-                        bead_model,
-                    )
-                    .map_err(|e| {
-                        e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureBead(attribute)
-                        })
-                    })?
-                    .into()
-            } else {
-                builder.into()
-            };
-        }
         self.procedure_bead = procedure_bead;
         Ok(self)
     }
@@ -1403,10 +1403,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_milled_with"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "milled_with_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_milled_with"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -1414,12 +1414,12 @@ impl<
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn milled_with_model(
@@ -1459,10 +1459,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_milled_with"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_milled_with_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_milled_with"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
@@ -1514,28 +1514,27 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`ball_mill_procedures`"]
-    ///    v1@{shape: rounded, label: "milled_with_model"}
-    /// class v1 directly-involved-column
-    ///    v3@{shape: rounded, label: "procedure_template_milled_with_model"}
-    /// class v3 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_milled_with"}
     /// class v2 column-of-interest
     ///    v0@{shape: rounded, label: "milled_with"}
     /// class v0 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_template_milled_with_model"}
+    /// class v3 directly-involved-column
+    ///    v1@{shape: rounded, label: "milled_with_model"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v9 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "asset"}
-    /// class v4 directly-involved-column
-    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v6 directly-involved-column
     ///    v7@{shape: rounded, label: "id"}
     /// class v7 undirectly-involved-column
+    ///    v4@{shape: rounded, label: "asset"}
+    /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "asset_model"}
     /// class v5 directly-involved-column
+    ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v6 directly-involved-column
     /// end
-    /// v4 -.->|"`foreign defines`"| v5
+    /// v0 --->|"`associated same as`"| v4
     /// v1 --->|"`associated same as`"| v5
-    /// v3 --->|"`associated same as`"| v6
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
@@ -1543,7 +1542,8 @@ impl<
     /// v2 -.->|"`foreign defines`"| v0
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v3
-    /// v0 --->|"`associated same as`"| v4
+    /// v3 --->|"`associated same as`"| v6
+    /// v4 -.->|"`foreign defines`"| v5
     /// v8 ---o|"`associated with`"| v9
     /// ```
     fn procedure_milled_with<PMW>(
@@ -1560,31 +1560,24 @@ impl<
     {
         let mut procedure_milled_with = procedure_milled_with.into();
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_milled_with {
-            procedure_milled_with = if let (
-                Some(procedure_template_milled_with_model),
-                Some(procedure_template_asset_model),
-            ) =
-                (self.procedure_template_milled_with_model, builder.procedure_template_asset_model)
+            procedure_milled_with = if let (Some(milled_with), Some(asset)) =
+                (self.milled_with, builder.asset)
             {
-                if procedure_template_milled_with_model != procedure_template_asset_model {
+                if milled_with != asset {
                     return Err(web_common_traits::database::InsertError::BuilderError(
                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateMilledWithModel,
+                            Self::Attributes::MilledWith,
                         ),
                     ));
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
-            {
-                self.procedure_template_milled_with_model = Some(procedure_template_asset_model);
+            } else if let Some(asset) = builder.asset {
+                self.milled_with = Some(asset);
                 builder.into()
-            } else if let Some(procedure_template_milled_with_model) =
-                self.procedure_template_milled_with_model
-            {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
+            } else if let Some(milled_with) = self.milled_with {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        procedure_template_milled_with_model,
+                        Some(milled_with),
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1627,24 +1620,31 @@ impl<
             };
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_milled_with {
-            procedure_milled_with = if let (Some(milled_with), Some(asset)) =
-                (self.milled_with, builder.asset)
+            procedure_milled_with = if let (
+                Some(procedure_template_milled_with_model),
+                Some(procedure_template_asset_model),
+            ) =
+                (self.procedure_template_milled_with_model, builder.procedure_template_asset_model)
             {
-                if milled_with != asset {
+                if procedure_template_milled_with_model != procedure_template_asset_model {
                     return Err(web_common_traits::database::InsertError::BuilderError(
                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::MilledWith,
+                            Self::Attributes::ProcedureTemplateMilledWithModel,
                         ),
                     ));
                 }
                 builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.milled_with = Some(asset);
+            } else if let Some(procedure_template_asset_model) =
+                builder.procedure_template_asset_model
+            {
+                self.procedure_template_milled_with_model = Some(procedure_template_asset_model);
                 builder.into()
-            } else if let Some(milled_with) = self.milled_with {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+            } else if let Some(procedure_template_milled_with_model) =
+                self.procedure_template_milled_with_model
+            {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
-                        Some(milled_with),
+                        procedure_template_milled_with_model,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1673,23 +1673,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_milled_with"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "milled_with"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_milled_with"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset"}
+    /// class v2 directly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn milled_with(
@@ -1728,10 +1728,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedures`"]
-    ///    v0@{shape: rounded, label: "milled_container"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_milled_container"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "milled_container"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset"}
@@ -1783,10 +1783,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`ball_mill_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_milled_container"}
-    /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "milled_container_model"}
     /// class v0 column-of-interest
+    ///    v1@{shape: rounded, label: "procedure_milled_container"}
+    /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "id"}
@@ -1794,12 +1794,12 @@ impl<
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn milled_container_model(
@@ -1895,26 +1895,27 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`ball_mill_procedures`"]
+    ///    v0@{shape: rounded, label: "milled_container"}
+    /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_milled_container"}
     /// class v2 column-of-interest
     ///    v1@{shape: rounded, label: "milled_container_model"}
     /// class v1 directly-involved-column
-    ///    v0@{shape: rounded, label: "milled_container"}
-    /// class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_template_milled_container_model"}
     /// class v3 directly-involved-column
     /// end
     /// subgraph v9 ["`procedure_assets`"]
-    ///    v5@{shape: rounded, label: "asset_model"}
-    /// class v5 directly-involved-column
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
     ///    v4@{shape: rounded, label: "asset"}
     /// class v4 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
     ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v6 directly-involved-column
+    ///    v5@{shape: rounded, label: "asset_model"}
+    /// class v5 directly-involved-column
     /// end
-    /// v4 -.->|"`foreign defines`"| v5
+    /// v0 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
@@ -1922,9 +1923,8 @@ impl<
     /// v2 -.->|"`foreign defines`"| v0
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v3
-    /// v1 --->|"`associated same as`"| v5
-    /// v0 --->|"`associated same as`"| v4
     /// v3 --->|"`associated same as`"| v6
+    /// v4 -.->|"`foreign defines`"| v5
     /// v8 ---o|"`associated with`"| v9
     /// ```
     fn procedure_milled_container<PMC>(
@@ -1943,33 +1943,24 @@ impl<
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_milled_container
         {
-            procedure_milled_container = if let (
-                Some(procedure_template_milled_container_model),
-                Some(procedure_template_asset_model),
-            ) = (
-                self.procedure_template_milled_container_model,
-                builder.procedure_template_asset_model,
-            ) {
-                if procedure_template_milled_container_model != procedure_template_asset_model {
+            procedure_milled_container = if let (Some(milled_container), Some(asset)) =
+                (self.milled_container, builder.asset)
+            {
+                if milled_container != asset {
                     return Err(web_common_traits::database::InsertError::BuilderError(
                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateMilledContainerModel,
+                            Self::Attributes::MilledContainer,
                         ),
                     ));
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
-            {
-                self.procedure_template_milled_container_model =
-                    Some(procedure_template_asset_model);
+            } else if let Some(asset) = builder.asset {
+                self.milled_container = Some(asset);
                 builder.into()
-            } else if let Some(procedure_template_milled_container_model) =
-                self.procedure_template_milled_container_model
-            {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
+            } else if let Some(milled_container) = self.milled_container {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        procedure_template_milled_container_model,
+                        Some(milled_container),
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -2016,24 +2007,33 @@ impl<
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_milled_container
         {
-            procedure_milled_container = if let (Some(milled_container), Some(asset)) =
-                (self.milled_container, builder.asset)
-            {
-                if milled_container != asset {
+            procedure_milled_container = if let (
+                Some(procedure_template_milled_container_model),
+                Some(procedure_template_asset_model),
+            ) = (
+                self.procedure_template_milled_container_model,
+                builder.procedure_template_asset_model,
+            ) {
+                if procedure_template_milled_container_model != procedure_template_asset_model {
                     return Err(web_common_traits::database::InsertError::BuilderError(
                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::MilledContainer,
+                            Self::Attributes::ProcedureTemplateMilledContainerModel,
                         ),
                     ));
                 }
                 builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.milled_container = Some(asset);
+            } else if let Some(procedure_template_asset_model) =
+                builder.procedure_template_asset_model
+            {
+                self.procedure_template_milled_container_model =
+                    Some(procedure_template_asset_model);
                 builder.into()
-            } else if let Some(milled_container) = self.milled_container {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+            } else if let Some(procedure_template_milled_container_model) =
+                self.procedure_template_milled_container_model
+            {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
-                        Some(milled_container),
+                        procedure_template_milled_container_model,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {

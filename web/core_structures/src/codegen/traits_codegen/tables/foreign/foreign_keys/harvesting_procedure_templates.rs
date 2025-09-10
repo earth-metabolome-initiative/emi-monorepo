@@ -1,20 +1,20 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct HarvestingProcedureTemplateForeignKeys {
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-    >,
-    pub sample_source_model: Option<
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
+    pub procedure_template_sample_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
     pub procedure_template_sample_source_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    >,
     pub sample_model: Option<
         crate::codegen::structs_codegen::tables::sample_models::SampleModel,
     >,
-    pub procedure_template_sample_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    pub sample_source_model: Option<
+        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -28,16 +28,8 @@ for crate::codegen::structs_codegen::tables::harvesting_procedure_templates::Har
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                        self.procedure_template,
-                    ),
-                ),
-            );
-        connector
-            .send(
-                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleSourceModel(
-                        self.sample_source_model,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
+                        self.procedure_template_sample_model,
                     ),
                 ),
             );
@@ -52,6 +44,14 @@ for crate::codegen::structs_codegen::tables::harvesting_procedure_templates::Har
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                        self.procedure_template,
+                    ),
+                ),
+            );
+        connector
+            .send(
+                web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleModel(
                         self.sample_model,
                     ),
@@ -60,18 +60,18 @@ for crate::codegen::structs_codegen::tables::harvesting_procedure_templates::Har
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_sample_model,
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleSourceModel(
+                        self.sample_source_model,
                     ),
                 ),
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure_template.is_some()
-            && foreign_keys.sample_source_model.is_some()
+        foreign_keys.procedure_template_sample_model.is_some()
             && foreign_keys.procedure_template_sample_source_model.is_some()
+            && foreign_keys.procedure_template.is_some()
             && foreign_keys.sample_model.is_some()
-            && foreign_keys.procedure_template_sample_model.is_some()
+            && foreign_keys.sample_source_model.is_some()
     }
     fn update(
         &self,
@@ -89,18 +89,18 @@ for crate::codegen::structs_codegen::tables::harvesting_procedure_templates::Har
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_template_sample_source_model
-                    == procedure_template_asset_models.id
-                {
-                    foreign_keys.procedure_template_sample_source_model = Some(
-                        procedure_template_asset_models.clone(),
-                    );
-                    updated = true;
-                }
                 if self.procedure_template_sample_model
                     == procedure_template_asset_models.id
                 {
                     foreign_keys.procedure_template_sample_model = Some(
+                        procedure_template_asset_models.clone(),
+                    );
+                    updated = true;
+                }
+                if self.procedure_template_sample_source_model
+                    == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_sample_source_model = Some(
                         procedure_template_asset_models.clone(),
                     );
                     updated = true;
@@ -112,16 +112,16 @@ for crate::codegen::structs_codegen::tables::harvesting_procedure_templates::Har
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_template_sample_source_model
-                    == procedure_template_asset_models.id
-                {
-                    foreign_keys.procedure_template_sample_source_model = None;
-                    updated = true;
-                }
                 if self.procedure_template_sample_model
                     == procedure_template_asset_models.id
                 {
                     foreign_keys.procedure_template_sample_model = None;
+                    updated = true;
+                }
+                if self.procedure_template_sample_source_model
+                    == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_sample_source_model = None;
                     updated = true;
                 }
             }

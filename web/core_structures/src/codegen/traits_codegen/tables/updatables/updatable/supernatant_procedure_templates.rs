@@ -29,7 +29,10 @@ where
         user_id: Self::UserId,
         conn: &mut C,
     ) -> Result<bool, diesel::result::Error> {
-        if !self.procedure_template(conn)?.can_update(user_id, conn)? {
+        if !self.supernatant_pm_compatibility_rules(conn)?.can_update(user_id, conn)? {
+            return Ok(false);
+        }
+        if !self.procedure_template_pipette_tip_model(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         if !self
@@ -44,10 +47,7 @@ where
         {
             return Ok(false);
         }
-        if !self.procedure_template_pipette_tip_model(conn)?.can_update(user_id, conn)? {
-            return Ok(false);
-        }
-        if !self.supernatant_pm_compatibility_rules(conn)?.can_update(user_id, conn)? {
+        if !self.procedure_template(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         Ok(true)

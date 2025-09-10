@@ -86,6 +86,23 @@ impl VolumetricContainer {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::containers::Container::read(self.id, conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn volumetric_containers_id_volumetric_container_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::assets::Asset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
+                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
+                        .eq(&self.volumetric_container_model),
+                ),
+            )
+            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
     pub fn volumetric_container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -103,23 +120,6 @@ impl VolumetricContainer {
             self.volumetric_container_model,
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn volumetric_containers_id_volumetric_container_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::assets::Asset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
-                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
-                        .eq(&self.volumetric_container_model),
-                ),
-            )
-            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,

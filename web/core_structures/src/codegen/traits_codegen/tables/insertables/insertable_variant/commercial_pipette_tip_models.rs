@@ -51,16 +51,16 @@ where
         self.set_most_concrete_table("commercial_pipette_tip_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteTipModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.pipette_tip_model(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct
+            .commercial_pipette_tip_models_id_fkey(conn)?
+            .can_update(user_id, conn)?
+        {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
             );
         }
-        if !insertable_struct
-            .commercial_pipette_tip_models_id_fkey(conn)?
-            .can_update(user_id, conn)?
-        {
+        if !insertable_struct.pipette_tip_model(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),

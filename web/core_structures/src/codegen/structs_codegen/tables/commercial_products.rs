@@ -60,6 +60,17 @@ impl diesel::Identifiable for CommercialProduct {
     }
 }
 impl CommercialProduct {
+    pub fn brand<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::brands::Brand, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::brands::Brand:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::brands::Brand::read(self.brand_id, conn)
+    }
     pub fn id<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -73,17 +84,6 @@ impl CommercialProduct {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(self.id, conn)
-    }
-    pub fn brand<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::brands::Brand, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::brands::Brand:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::brands::Brand::read(self.brand_id, conn)
     }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where

@@ -65,93 +65,6 @@ impl diesel::Identifiable for PackagingProcedureTemplate {
     }
 }
 impl PackagingProcedureTemplate {
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
-            self.procedure_template,
-            conn,
-        )
-    }
-    pub fn packaged_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::read(
-            self.packaged_with_model,
-            conn,
-        )
-    }
-    pub fn procedure_template_packaged_with_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_packaged_with_model,
-            conn,
-        )
-    }
-    pub fn sample_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.sample_model,
-            conn,
-        )
-    }
-    pub fn procedure_template_sample_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_sample_model,
-            conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn packaging_procedure_template_procedure_template_packaged_fkey1(
         &self,
@@ -200,6 +113,23 @@ impl PackagingProcedureTemplate {
                 crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
             >(conn)
     }
+    pub fn packaged_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::read(
+            self.packaged_with_model,
+            conn,
+        )
+    }
     pub fn packaging_procedure_templates_packaged_with_model_sample_m_fkey<
         C: diesel::connection::LoadConnection,
     >(
@@ -216,6 +146,76 @@ impl PackagingProcedureTemplate {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
             (self.packaged_with_model, self.sample_model),
+            conn,
+        )
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    pub fn procedure_template_packaged_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_packaged_with_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_sample_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_sample_model,
+            conn,
+        )
+    }
+    pub fn sample_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
+            self.sample_model,
             conn,
         )
     }
@@ -260,6 +260,68 @@ impl PackagingProcedureTemplate {
             )
             .order_by(packaging_procedure_templates::procedure_template.asc())
             .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_packaged_with_model_and_packaged_with_model(
+        procedure_template_packaged_with_model: i32,
+        packaged_with_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates;
+        Self::table()
+            .filter(
+                packaging_procedure_templates::procedure_template_packaged_with_model
+                    .eq(procedure_template_packaged_with_model)
+                    .and(
+                        packaging_procedure_templates::packaged_with_model.eq(packaged_with_model),
+                    ),
+            )
+            .order_by(packaging_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_procedure_template_sample_model_and_sample_model(
+        procedure_template_sample_model: i32,
+        sample_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates;
+        Self::table()
+            .filter(
+                packaging_procedure_templates::procedure_template_sample_model
+                    .eq(procedure_template_sample_model)
+                    .and(packaging_procedure_templates::sample_model.eq(sample_model)),
+            )
+            .order_by(packaging_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_packaged_with_model_and_sample_model(
+        packaged_with_model: i32,
+        sample_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates;
+        Self::table()
+            .filter(
+                packaging_procedure_templates::packaged_with_model
+                    .eq(packaged_with_model)
+                    .and(packaging_procedure_templates::sample_model.eq(sample_model)),
+            )
+            .order_by(packaging_procedure_templates::procedure_template.asc())
+            .load::<Self>(conn)
     }
     pub fn from_procedure_template<C>(
         procedure_template: i32,
@@ -380,68 +442,6 @@ impl PackagingProcedureTemplate {
             .filter(
                 packaging_procedure_templates::procedure_template_sample_model
                     .eq(procedure_template_sample_model),
-            )
-            .order_by(packaging_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_packaged_with_model_and_packaged_with_model(
-        procedure_template_packaged_with_model: i32,
-        packaged_with_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates;
-        Self::table()
-            .filter(
-                packaging_procedure_templates::procedure_template_packaged_with_model
-                    .eq(procedure_template_packaged_with_model)
-                    .and(
-                        packaging_procedure_templates::packaged_with_model.eq(packaged_with_model),
-                    ),
-            )
-            .order_by(packaging_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_sample_model_and_sample_model(
-        procedure_template_sample_model: i32,
-        sample_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates;
-        Self::table()
-            .filter(
-                packaging_procedure_templates::procedure_template_sample_model
-                    .eq(procedure_template_sample_model)
-                    .and(packaging_procedure_templates::sample_model.eq(sample_model)),
-            )
-            .order_by(packaging_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_packaged_with_model_and_sample_model(
-        packaged_with_model: i32,
-        sample_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates;
-        Self::table()
-            .filter(
-                packaging_procedure_templates::packaged_with_model
-                    .eq(packaged_with_model)
-                    .and(packaging_procedure_templates::sample_model.eq(sample_model)),
             )
             .order_by(packaging_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)

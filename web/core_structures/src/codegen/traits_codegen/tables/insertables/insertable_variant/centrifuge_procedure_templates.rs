@@ -63,16 +63,16 @@ where
         self.set_most_concrete_table("centrifuge_procedure_templates");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplate = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct
+            .procedure_template_centrifuged_with_model(conn)?
+            .can_update(user_id, conn)?
+        {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
             );
         }
-        if !insertable_struct
-            .procedure_template_centrifuged_with_model(conn)?
-            .can_update(user_id, conn)?
-        {
+        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),

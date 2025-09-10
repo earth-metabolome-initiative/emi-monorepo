@@ -90,6 +90,30 @@ impl CommercialCentrifugeModel {
             conn,
         )
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_centrifuge_models_id_centrifuge_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.centrifuge_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
     pub fn commercial_centrifuge_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -121,30 +145,6 @@ impl CommercialCentrifugeModel {
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
             self.id, conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn commercial_centrifuge_models_id_centrifuge_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
-                    .eq(&self.id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
-                            .eq(&self.centrifuge_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
     }
     pub fn from_centrifuge_model<C>(
         centrifuge_model: i32,
@@ -185,6 +185,26 @@ impl CommercialCentrifugeModel {
             .order_by(commercial_centrifuge_models::id.asc())
             .load::<Self>(conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn from_id_and_centrifuge_model(
+        id: i32,
+        centrifuge_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::commercial_centrifuge_models::commercial_centrifuge_models;
+        Self::table()
+            .filter(
+                commercial_centrifuge_models::id
+                    .eq(id)
+                    .and(commercial_centrifuge_models::centrifuge_model.eq(centrifuge_model)),
+            )
+            .order_by(commercial_centrifuge_models::id.asc())
+            .load::<Self>(conn)
+    }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where
         C: diesel::connection::LoadConnection,
@@ -218,26 +238,6 @@ impl CommercialCentrifugeModel {
         use crate::codegen::diesel_codegen::tables::commercial_centrifuge_models::commercial_centrifuge_models;
         Self::table()
             .filter(commercial_centrifuge_models::id.eq(id))
-            .order_by(commercial_centrifuge_models::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_id_and_centrifuge_model(
-        id: i32,
-        centrifuge_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::commercial_centrifuge_models::commercial_centrifuge_models;
-        Self::table()
-            .filter(
-                commercial_centrifuge_models::id
-                    .eq(id)
-                    .and(commercial_centrifuge_models::centrifuge_model.eq(centrifuge_model)),
-            )
             .order_by(commercial_centrifuge_models::id.asc())
             .load::<Self>(conn)
     }

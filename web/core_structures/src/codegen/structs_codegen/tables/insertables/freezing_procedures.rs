@@ -139,35 +139,6 @@ impl InsertableFreezingProcedure {
             conn,
         )
     }
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate::read(
-            self.procedure_template,
-            conn,
-        )
-    }
     pub fn frozen_container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -183,43 +154,6 @@ impl InsertableFreezingProcedure {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
             self.frozen_container_model,
-            conn,
-        )
-    }
-    pub fn procedure_template_frozen_container_model<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_frozen_container_model,
-            conn,
-        )
-    }
-    pub fn procedure_frozen_container<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
-            self.procedure_frozen_container,
             conn,
         )
     }
@@ -259,23 +193,124 @@ impl InsertableFreezingProcedure {
             conn,
         )
     }
-    pub fn procedure_template_frozen_with_model<C: diesel::connection::LoadConnection>(
+    pub fn freezing_procedures_frozen_with_model_frozen_container_mod_fkey<
+        C: diesel::connection::LoadConnection,
+    >(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_frozen_with_model,
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
+            (self.frozen_with_model, self.frozen_container_model),
             conn,
         )
+    }
+    pub fn procedure<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::procedures::Procedure:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
+    }
+    pub fn procedure_frozen_container<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            self.procedure_frozen_container,
+            conn,
+        )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freezing_procedures_procedure_frozen_container_frozen_con_fkey1(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_frozen_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(&self.frozen_container),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freezing_procedures_procedure_frozen_container_frozen_cont_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_frozen_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.frozen_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freezing_procedures_procedure_frozen_container_procedure_t_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_frozen_container)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_frozen_container_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     pub fn procedure_frozen_with<C: diesel::connection::LoadConnection>(
         &self,
@@ -293,6 +328,83 @@ impl InsertableFreezingProcedure {
             self.procedure_frozen_with,
             conn,
         )
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freezing_procedures_procedure_frozen_with_frozen_with_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(frozen_with) = self.frozen_with else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_frozen_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                            .eq(frozen_with),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+            .optional()
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freezing_procedures_procedure_frozen_with_frozen_with_mode_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_frozen_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                            .eq(&self.frozen_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn freezing_procedures_procedure_frozen_with_procedure_templa_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                    .eq(&self.procedure_frozen_with)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                            .eq(&self.procedure_template_frozen_with_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            >(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn freezing_procedures_procedure_procedure_template_fkey(
@@ -315,6 +427,62 @@ impl InsertableFreezingProcedure {
             .first::<
                 crate::codegen::structs_codegen::tables::procedures::Procedure,
             >(conn)
+    }
+    pub fn procedure_template<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate::read(
+            self.procedure_template,
+            conn,
+        )
+    }
+    pub fn procedure_template_frozen_container_model<
+        C: diesel::connection::LoadConnection,
+    >(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_frozen_container_model,
+            conn,
+        )
+    }
+    pub fn procedure_template_frozen_with_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+            C,
+        >,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
+            self.procedure_template_frozen_with_model,
+            conn,
+        )
     }
     #[cfg(feature = "postgres")]
     pub fn freezing_procedures_procedure_template_procedure_template_fkey(
@@ -363,174 +531,6 @@ impl InsertableFreezingProcedure {
             .first::<
                 crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
             >(conn)
-    }
-    pub fn freezing_procedures_frozen_with_model_frozen_container_mod_fkey<
-        C: diesel::connection::LoadConnection,
-    >(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
-            (self.frozen_with_model, self.frozen_container_model),
-            conn,
-        )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freezing_procedures_procedure_frozen_container_procedure_t_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_frozen_container)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_frozen_container_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freezing_procedures_procedure_frozen_with_procedure_templa_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_frozen_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_frozen_with_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freezing_procedures_procedure_frozen_container_frozen_cont_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_frozen_container)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.frozen_container_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freezing_procedures_procedure_frozen_with_frozen_with_mode_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_frozen_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.frozen_with_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freezing_procedures_procedure_frozen_container_frozen_con_fkey1(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_frozen_container)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.frozen_container),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freezing_procedures_procedure_frozen_with_frozen_with_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
-        };
-        let Some(frozen_with) = self.frozen_with else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
-                    .eq(&self.procedure_frozen_with)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(frozen_with),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-            .optional()
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -864,10 +864,10 @@ impl<
     /// class v3 directly-involved-column
     /// end
     /// v0 --->|"`ancestral same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v2
     /// v0 -.->|"`foreign defines`"| v1
-    /// v2 --->|"`associated same as`"| v4
+    /// v0 -.->|"`foreign defines`"| v2
     /// v1 --->|"`associated same as`"| v4
+    /// v2 --->|"`associated same as`"| v4
     /// v5 --->|"`extends`"| v7
     /// v5 ---o|"`associated with`"| v6
     /// ```
@@ -902,16 +902,16 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`freezing_procedures`"]
-    ///    v0@{shape: rounded, label: "frozen_container"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_frozen_container"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "frozen_container"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -957,16 +957,16 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`freezing_procedures`"]
-    ///    v0@{shape: rounded, label: "frozen_container_model"}
-    /// class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_frozen_container"}
     /// class v1 directly-involved-column
+    ///    v0@{shape: rounded, label: "frozen_container_model"}
+    /// class v0 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "asset_model"}
+    /// class v2 directly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1013,23 +1013,23 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`freezing_procedures`"]
-    ///    v1@{shape: rounded, label: "procedure_template_frozen_container_model"}
-    /// class v1 column-of-interest
     ///    v0@{shape: rounded, label: "procedure_frozen_container"}
     /// class v0 directly-involved-column
+    ///    v1@{shape: rounded, label: "procedure_template_frozen_container_model"}
+    /// class v1 column-of-interest
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
+    /// class v2 directly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v2
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 --->|"`associated same as`"| v3
     /// v0 -.->|"`foreign defines`"| v1
+    /// v1 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn procedure_template_frozen_container_model(
@@ -1069,25 +1069,27 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`freezing_procedures`"]
-    ///    v2@{shape: rounded, label: "procedure_frozen_container"}
-    /// class v2 column-of-interest
-    ///    v3@{shape: rounded, label: "procedure_template_frozen_container_model"}
-    /// class v3 directly-involved-column
     ///    v1@{shape: rounded, label: "frozen_container_model"}
     /// class v1 directly-involved-column
     ///    v0@{shape: rounded, label: "frozen_container"}
     /// class v0 directly-involved-column
+    ///    v2@{shape: rounded, label: "procedure_frozen_container"}
+    /// class v2 column-of-interest
+    ///    v3@{shape: rounded, label: "procedure_template_frozen_container_model"}
+    /// class v3 directly-involved-column
     /// end
     /// subgraph v9 ["`procedure_assets`"]
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
+    ///    v5@{shape: rounded, label: "asset_model"}
+    /// class v5 directly-involved-column
     ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v6 directly-involved-column
     ///    v4@{shape: rounded, label: "asset"}
     /// class v4 directly-involved-column
-    ///    v5@{shape: rounded, label: "asset_model"}
-    /// class v5 directly-involved-column
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
@@ -1096,8 +1098,6 @@ impl<
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v3
     /// v3 --->|"`associated same as`"| v6
-    /// v1 --->|"`associated same as`"| v5
-    /// v0 --->|"`associated same as`"| v4
     /// v4 -.->|"`foreign defines`"| v5
     /// v8 ---o|"`associated with`"| v9
     /// ```
@@ -1117,33 +1117,24 @@ impl<
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_frozen_container
         {
-            procedure_frozen_container = if let (
-                Some(procedure_template_frozen_container_model),
-                Some(procedure_template_asset_model),
-            ) = (
-                self.procedure_template_frozen_container_model,
-                builder.procedure_template_asset_model,
-            ) {
-                if procedure_template_frozen_container_model != procedure_template_asset_model {
+            procedure_frozen_container = if let (Some(frozen_container), Some(asset)) =
+                (self.frozen_container, builder.asset)
+            {
+                if frozen_container != asset {
                     return Err(web_common_traits::database::InsertError::BuilderError(
                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateFrozenContainerModel,
+                            Self::Attributes::FrozenContainer,
                         ),
                     ));
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
-            {
-                self.procedure_template_frozen_container_model =
-                    Some(procedure_template_asset_model);
+            } else if let Some(asset) = builder.asset {
+                self.frozen_container = Some(asset);
                 builder.into()
-            } else if let Some(procedure_template_frozen_container_model) =
-                self.procedure_template_frozen_container_model
-            {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
+            } else if let Some(frozen_container) = self.frozen_container {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        procedure_template_frozen_container_model,
+                        Some(frozen_container),
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1190,24 +1181,33 @@ impl<
         if let web_common_traits::database::IdOrBuilder::Builder(builder) =
             procedure_frozen_container
         {
-            procedure_frozen_container = if let (Some(frozen_container), Some(asset)) =
-                (self.frozen_container, builder.asset)
-            {
-                if frozen_container != asset {
+            procedure_frozen_container = if let (
+                Some(procedure_template_frozen_container_model),
+                Some(procedure_template_asset_model),
+            ) = (
+                self.procedure_template_frozen_container_model,
+                builder.procedure_template_asset_model,
+            ) {
+                if procedure_template_frozen_container_model != procedure_template_asset_model {
                     return Err(web_common_traits::database::InsertError::BuilderError(
                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::FrozenContainer,
+                            Self::Attributes::ProcedureTemplateFrozenContainerModel,
                         ),
                     ));
                 }
                 builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.frozen_container = Some(asset);
+            } else if let Some(procedure_template_asset_model) =
+                builder.procedure_template_asset_model
+            {
+                self.procedure_template_frozen_container_model =
+                    Some(procedure_template_asset_model);
                 builder.into()
-            } else if let Some(frozen_container) = self.frozen_container {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+            } else if let Some(procedure_template_frozen_container_model) =
+                self.procedure_template_frozen_container_model
+            {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
-                        Some(frozen_container),
+                        procedure_template_frozen_container_model,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1247,12 +1247,12 @@ impl<
     ///    v3@{shape: rounded, label: "id"}
     /// class v3 undirectly-involved-column
     /// end
+    /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 --->|"`associated same as`"| v3
     /// v1 -.->|"`foreign defines`"| v0
-    /// v0 --->|"`associated same as`"| v2
     /// v4 ---o|"`associated with`"| v5
     /// ```
     fn frozen_with(
@@ -1297,10 +1297,10 @@ impl<
     /// class v1 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
-    ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
     ///    v2@{shape: rounded, label: "asset_model"}
     /// class v2 directly-involved-column
+    ///    v3@{shape: rounded, label: "id"}
+    /// class v3 undirectly-involved-column
     /// end
     /// v0 --->|"`associated same as`"| v2
     /// v1 --->|"`associated same as`"| v3
@@ -1347,10 +1347,10 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v4 ["`freezing_procedures`"]
-    ///    v0@{shape: rounded, label: "procedure_frozen_with"}
-    /// class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_frozen_with_model"}
     /// class v1 column-of-interest
+    ///    v0@{shape: rounded, label: "procedure_frozen_with"}
+    /// class v0 directly-involved-column
     /// end
     /// subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
@@ -1402,29 +1402,27 @@ impl<
     /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
     /// subgraph v8 ["`freezing_procedures`"]
-    ///    v1@{shape: rounded, label: "frozen_with_model"}
-    /// class v1 directly-involved-column
-    ///    v3@{shape: rounded, label: "procedure_template_frozen_with_model"}
-    /// class v3 directly-involved-column
     ///    v0@{shape: rounded, label: "frozen_with"}
     /// class v0 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_frozen_with"}
     /// class v2 column-of-interest
+    ///    v1@{shape: rounded, label: "frozen_with_model"}
+    /// class v1 directly-involved-column
+    ///    v3@{shape: rounded, label: "procedure_template_frozen_with_model"}
+    /// class v3 directly-involved-column
     /// end
     /// subgraph v9 ["`procedure_assets`"]
-    ///    v4@{shape: rounded, label: "asset"}
-    /// class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "asset_model"}
     /// class v5 directly-involved-column
-    ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
     ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
     /// class v6 directly-involved-column
+    ///    v4@{shape: rounded, label: "asset"}
+    /// class v4 directly-involved-column
+    ///    v7@{shape: rounded, label: "id"}
+    /// class v7 undirectly-involved-column
     /// end
-    /// v1 --->|"`associated same as`"| v5
-    /// v3 --->|"`associated same as`"| v6
-    /// v4 -.->|"`foreign defines`"| v5
     /// v0 --->|"`associated same as`"| v4
+    /// v1 --->|"`associated same as`"| v5
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
     /// v2 --->|"`associated same as`"| v7
@@ -1432,6 +1430,8 @@ impl<
     /// v2 -.->|"`foreign defines`"| v0
     /// v2 -.->|"`foreign defines`"| v1
     /// v2 -.->|"`foreign defines`"| v3
+    /// v3 --->|"`associated same as`"| v6
+    /// v4 -.->|"`foreign defines`"| v5
     /// v8 ---o|"`associated with`"| v9
     /// ```
     fn procedure_frozen_with<PFW>(
@@ -1448,31 +1448,24 @@ impl<
     {
         let mut procedure_frozen_with = procedure_frozen_with.into();
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_frozen_with {
-            procedure_frozen_with = if let (
-                Some(procedure_template_frozen_with_model),
-                Some(procedure_template_asset_model),
-            ) =
-                (self.procedure_template_frozen_with_model, builder.procedure_template_asset_model)
+            procedure_frozen_with = if let (Some(frozen_with), Some(asset)) =
+                (self.frozen_with, builder.asset)
             {
-                if procedure_template_frozen_with_model != procedure_template_asset_model {
+                if frozen_with != asset {
                     return Err(web_common_traits::database::InsertError::BuilderError(
                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateFrozenWithModel,
+                            Self::Attributes::FrozenWith,
                         ),
                     ));
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
-            {
-                self.procedure_template_frozen_with_model = Some(procedure_template_asset_model);
+            } else if let Some(asset) = builder.asset {
+                self.frozen_with = Some(asset);
                 builder.into()
-            } else if let Some(procedure_template_frozen_with_model) =
-                self.procedure_template_frozen_with_model
-            {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
+            } else if let Some(frozen_with) = self.frozen_with {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                         builder,
-                        procedure_template_frozen_with_model,
+                        Some(frozen_with),
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
@@ -1515,24 +1508,31 @@ impl<
             };
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_frozen_with {
-            procedure_frozen_with = if let (Some(frozen_with), Some(asset)) =
-                (self.frozen_with, builder.asset)
+            procedure_frozen_with = if let (
+                Some(procedure_template_frozen_with_model),
+                Some(procedure_template_asset_model),
+            ) =
+                (self.procedure_template_frozen_with_model, builder.procedure_template_asset_model)
             {
-                if frozen_with != asset {
+                if procedure_template_frozen_with_model != procedure_template_asset_model {
                     return Err(web_common_traits::database::InsertError::BuilderError(
                         web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::FrozenWith,
+                            Self::Attributes::ProcedureTemplateFrozenWithModel,
                         ),
                     ));
                 }
                 builder.into()
-            } else if let Some(asset) = builder.asset {
-                self.frozen_with = Some(asset);
+            } else if let Some(procedure_template_asset_model) =
+                builder.procedure_template_asset_model
+            {
+                self.procedure_template_frozen_with_model = Some(procedure_template_asset_model);
                 builder.into()
-            } else if let Some(frozen_with) = self.frozen_with {
-                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
+            } else if let Some(procedure_template_frozen_with_model) =
+                self.procedure_template_frozen_with_model
+            {
+                <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
-                        Some(frozen_with),
+                        procedure_template_frozen_with_model,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {

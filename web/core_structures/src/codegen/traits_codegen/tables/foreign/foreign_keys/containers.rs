@@ -1,9 +1,9 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ContainerForeignKeys {
-    pub id: Option<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>,
     pub container_model:
         Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
+    pub id: Option<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>,
 }
 impl web_common_traits::prelude::HasForeignKeys
     for crate::codegen::structs_codegen::tables::containers::Container
@@ -15,16 +15,16 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(self.id),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerModel(
                 self.container_model,
             ),
         ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(self.id),
+        ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.id.is_some() && foreign_keys.container_model.is_some()
+        foreign_keys.container_model.is_some() && foreign_keys.id.is_some()
     }
     fn update(
         &self,

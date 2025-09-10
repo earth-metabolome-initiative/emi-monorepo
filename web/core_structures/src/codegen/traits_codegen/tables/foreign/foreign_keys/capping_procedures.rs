@@ -1,35 +1,35 @@
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CappingProcedureForeignKeys {
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
-    >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
-    >,
     pub capped_container: Option<
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+    >,
+    pub capping_procedures_capped_container_model_capped_with_mode_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
     >,
     pub capped_container_model: Option<
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     >,
-    pub procedure_template_capped_container_model: Option<
-        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+    pub capped_with_model: Option<
+        crate::codegen::structs_codegen::tables::cap_models::CapModel,
     >,
     pub procedure_capped_container: Option<
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     >,
-    pub capped_with_model: Option<
-        crate::codegen::structs_codegen::tables::cap_models::CapModel,
+    pub procedure_capped_with: Option<
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    pub procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
+    pub procedure_template_capped_container_model: Option<
+        crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
     pub procedure_template_capped_with_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
-    pub procedure_capped_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-    >,
-    pub capping_procedures_capped_container_model_capped_with_mode_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -42,22 +42,38 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CappingProcedureTemplate(
-                self.procedure_template,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
                 self.capped_container,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
+                self.capped_container_model,
+                self.capped_with_model,
+            )),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
                 self.capped_container_model,
             ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CapModel(
+                self.capped_with_model,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_capped_container,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
+                self.procedure_capped_with,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
         ));
         connector
             .send(
@@ -67,16 +83,6 @@ impl web_common_traits::prelude::HasForeignKeys
                     ),
                 ),
             );
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_capped_container,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CapModel(
-                self.capped_with_model,
-            ),
-        ));
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -86,30 +92,24 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
             );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
-                self.procedure_capped_with,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::CappingProcedureTemplate(
+                self.procedure_template,
             ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
-                self.capped_container_model,
-                self.capped_with_model,
-            )),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure.is_some()
-            && foreign_keys.procedure_template.is_some()
-            && foreign_keys.capped_container.is_some()
-            && foreign_keys.capped_container_model.is_some()
-            && foreign_keys.procedure_template_capped_container_model.is_some()
-            && foreign_keys.procedure_capped_container.is_some()
-            && foreign_keys.capped_with_model.is_some()
-            && foreign_keys.procedure_template_capped_with_model.is_some()
-            && foreign_keys.procedure_capped_with.is_some()
+        foreign_keys.capped_container.is_some()
             && foreign_keys
                 .capping_procedures_capped_container_model_capped_with_mode_fkey
                 .is_some()
+            && foreign_keys.capped_container_model.is_some()
+            && foreign_keys.capped_with_model.is_some()
+            && foreign_keys.procedure_capped_container.is_some()
+            && foreign_keys.procedure_capped_with.is_some()
+            && foreign_keys.procedure.is_some()
+            && foreign_keys.procedure_template_capped_container_model.is_some()
+            && foreign_keys.procedure_template_capped_with_model.is_some()
+            && foreign_keys.procedure_template.is_some()
     }
     fn update(
         &self,

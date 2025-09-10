@@ -17,14 +17,14 @@
 )]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::team_states::TeamState,
-        foreign_key = state_id
+        crate::codegen::structs_codegen::tables::teams::Team,
+        foreign_key = parent_team_id
     )
 )]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::teams::Team,
-        foreign_key = parent_team_id
+        crate::codegen::structs_codegen::tables::team_states::TeamState,
+        foreign_key = state_id
     )
 )]
 #[diesel(primary_key(id))]
@@ -93,26 +93,6 @@ impl diesel::Identifiable for Team {
     }
 }
 impl Team {
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
-    }
-    pub fn updated_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
-    }
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -123,6 +103,30 @@ impl Team {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::colors::Color::read(self.color_id, conn)
+    }
+    pub fn created_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
+    }
+    pub fn parent_team<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<Option<crate::codegen::structs_codegen::tables::teams::Team>, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
+    {
+        use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
+        let Some(parent_team_id) = self.parent_team_id else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::teams::Team::read(parent_team_id, conn).optional()
     }
     pub fn state<C: diesel::connection::LoadConnection>(
         &self,
@@ -138,19 +142,15 @@ impl Team {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::team_states::TeamState::read(self.state_id, conn)
     }
-    pub fn parent_team<C: diesel::connection::LoadConnection>(
+    pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<Option<crate::codegen::structs_codegen::tables::teams::Team>, diesel::result::Error>
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
-        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        let Some(parent_team_id) = self.parent_team_id else {
-            return Ok(None);
-        };
-        crate::codegen::structs_codegen::tables::teams::Team::read(parent_team_id, conn).optional()
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(

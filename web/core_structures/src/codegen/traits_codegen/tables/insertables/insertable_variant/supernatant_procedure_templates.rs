@@ -70,7 +70,19 @@ where
         self.set_most_concrete_table("supernatant_procedure_templates");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplate = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
+        if !insertable_struct
+            .supernatant_pm_compatibility_rules(conn)?
+            .can_update(user_id, conn)?
+        {
+            return Err(
+                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
+                    .into(),
+            );
+        }
+        if !insertable_struct
+            .procedure_template_pipette_tip_model(conn)?
+            .can_update(user_id, conn)?
+        {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),
@@ -94,19 +106,7 @@ where
                     .into(),
             );
         }
-        if !insertable_struct
-            .procedure_template_pipette_tip_model(conn)?
-            .can_update(user_id, conn)?
-        {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
-        if !insertable_struct
-            .supernatant_pm_compatibility_rules(conn)?
-            .can_update(user_id, conn)?
-        {
+        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                     .into(),

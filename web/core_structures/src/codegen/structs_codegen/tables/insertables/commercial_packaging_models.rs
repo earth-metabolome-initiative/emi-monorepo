@@ -73,23 +73,6 @@ pub struct InsertableCommercialPackagingModel {
     pub(crate) packaging_model: i32,
 }
 impl InsertableCommercialPackagingModel {
-    pub fn packaging_model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::read(
-            self.packaging_model,
-            conn,
-        )
-    }
     pub fn commercial_packaging_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -145,6 +128,23 @@ impl InsertableCommercialPackagingModel {
             .first::<
                 crate::codegen::structs_codegen::tables::asset_models::AssetModel,
             >(conn)
+    }
+    pub fn packaging_model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::read(
+            self.packaging_model,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]

@@ -37,16 +37,6 @@ pub struct InsertableTeamProject {
     pub(crate) project_id: i32,
 }
 impl InsertableTeamProject {
-    pub fn team<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::teams::Team, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::teams::Team::read(self.team_id, conn)
-    }
     pub fn project<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -57,6 +47,16 @@ impl InsertableTeamProject {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::projects::Project::read(self.project_id, conn)
+    }
+    pub fn team<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::teams::Team, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::teams::Team::read(self.team_id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]

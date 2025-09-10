@@ -55,6 +55,16 @@ impl diesel::Identifiable for AssetCompatibilityRule {
     }
 }
 impl AssetCompatibilityRule {
+    pub fn created_by<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
+    }
     pub fn left_asset_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -88,16 +98,6 @@ impl AssetCompatibilityRule {
             self.right_asset_model,
             conn,
         )
-    }
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn from_left_asset_model<C>(
         left_asset_model: i32,

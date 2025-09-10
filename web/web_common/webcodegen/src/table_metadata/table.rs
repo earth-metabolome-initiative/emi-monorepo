@@ -294,6 +294,12 @@ fn foreign_keys(
             .filter(key_column_usage::table_schema.eq(&table.table_schema))
             .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
             .filter(key_column_usage::ordinal_position.eq(1))
+            .order_by((
+                key_column_usage::constraint_catalog,
+                key_column_usage::constraint_schema,
+                key_column_usage::constraint_name,
+                key_column_usage::ordinal_position,
+            ))
             .select(KeyColumnUsage::as_select())
             .load::<KeyColumnUsage>(conn)?,
     ))

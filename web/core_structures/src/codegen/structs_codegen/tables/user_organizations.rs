@@ -10,14 +10,14 @@
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::users::User,
-        foreign_key = user_id
+        crate::codegen::structs_codegen::tables::organizations::Organization,
+        foreign_key = organization_id
     )
 )]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::organizations::Organization,
-        foreign_key = organization_id
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = user_id
     )
 )]
 #[diesel(primary_key(user_id, organization_id))]
@@ -56,16 +56,6 @@ impl diesel::Identifiable for UserOrganization {
     }
 }
 impl UserOrganization {
-    pub fn user<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.user_id, conn)
-    }
     pub fn organization<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -82,6 +72,16 @@ impl UserOrganization {
             self.organization_id,
             conn,
         )
+    }
+    pub fn user<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.user_id, conn)
     }
 }
 impl AsRef<UserOrganization> for UserOrganization {

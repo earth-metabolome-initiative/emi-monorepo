@@ -1,25 +1,25 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ProcedureAssetForeignKeys {
-    pub procedure: Option<
-        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    pub ancestor_model: Option<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
     >,
-    pub procedure_template: Option<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
+    pub asset: Option<crate::codegen::structs_codegen::tables::assets::Asset>,
+    pub procedure_assets_asset_model_ancestor_model_fkey: Option<
+        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
     >,
     pub asset_model: Option<
         crate::codegen::structs_codegen::tables::asset_models::AssetModel,
     >,
-    pub asset: Option<crate::codegen::structs_codegen::tables::assets::Asset>,
+    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
+    pub procedure: Option<
+        crate::codegen::structs_codegen::tables::procedures::Procedure,
+    >,
     pub procedure_template_asset_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
-    pub ancestor_model: Option<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-    >,
-    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
-    pub procedure_assets_asset_model_ancestor_model_fkey: Option<
-        crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
+    pub procedure_template: Option<
+        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
@@ -32,16 +32,8 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
-                self.procedure_template,
-            ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
-                self.asset_model,
+                self.ancestor_model,
             ),
         ));
         if let Some(asset) = self.asset {
@@ -49,6 +41,23 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Asset(asset),
             ));
         }
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModelAncestor((
+                self.asset_model,
+                self.ancestor_model,
+            )),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
+                self.asset_model,
+            ),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
+        ));
+        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
+        ));
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -58,29 +67,20 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
             );
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
-                self.ancestor_model,
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
+                self.procedure_template,
             ),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModelAncestor((
-                self.asset_model,
-                self.ancestor_model,
-            )),
         ));
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.procedure.is_some()
-            && foreign_keys.procedure_template.is_some()
-            && foreign_keys.asset_model.is_some()
+        foreign_keys.ancestor_model.is_some()
             && (foreign_keys.asset.is_some() || self.asset.is_some())
-            && foreign_keys.procedure_template_asset_model.is_some()
-            && foreign_keys.ancestor_model.is_some()
-            && foreign_keys.created_by.is_some()
             && foreign_keys.procedure_assets_asset_model_ancestor_model_fkey.is_some()
+            && foreign_keys.asset_model.is_some()
+            && foreign_keys.created_by.is_some()
+            && foreign_keys.procedure.is_some()
+            && foreign_keys.procedure_template_asset_model.is_some()
+            && foreign_keys.procedure_template.is_some()
     }
     fn update(
         &self,
@@ -121,12 +121,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.asset_model == asset_models.id {
-                    foreign_keys.asset_model = Some(asset_models.clone());
-                    updated = true;
-                }
                 if self.ancestor_model == asset_models.id {
                     foreign_keys.ancestor_model = Some(asset_models.clone());
+                    updated = true;
+                }
+                if self.asset_model == asset_models.id {
+                    foreign_keys.asset_model = Some(asset_models.clone());
                     updated = true;
                 }
             }
@@ -134,12 +134,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::AssetModel(asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.asset_model == asset_models.id {
-                    foreign_keys.asset_model = None;
-                    updated = true;
-                }
                 if self.ancestor_model == asset_models.id {
                     foreign_keys.ancestor_model = None;
+                    updated = true;
+                }
+                if self.asset_model == asset_models.id {
+                    foreign_keys.asset_model = None;
                     updated = true;
                 }
             }

@@ -90,6 +90,30 @@ impl CommercialBeadModel {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::bead_models::BeadModel::read(self.bead_model, conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn commercial_bead_models_id_bead_model_fkey(
+        &self,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+        diesel::result::Error,
+    > {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
+            .filter(
+                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
+                    .eq(&self.id)
+                    .and(
+                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
+                            .eq(&self.bead_model),
+                    ),
+            )
+            .first::<
+                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
+            >(conn)
+    }
     pub fn commercial_bead_models_id_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -119,30 +143,6 @@ impl CommercialBeadModel {
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
             self.id, conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn commercial_bead_models_id_bead_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
-                    .eq(&self.id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
-                            .eq(&self.bead_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
     }
     pub fn from_bead_model<C>(
         bead_model: i32,
@@ -183,6 +183,26 @@ impl CommercialBeadModel {
             .order_by(commercial_bead_models::id.asc())
             .load::<Self>(conn)
     }
+    #[cfg(feature = "postgres")]
+    pub fn from_id_and_bead_model(
+        id: i32,
+        bead_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::commercial_bead_models::commercial_bead_models;
+        Self::table()
+            .filter(
+                commercial_bead_models::id
+                    .eq(id)
+                    .and(commercial_bead_models::bead_model.eq(bead_model)),
+            )
+            .order_by(commercial_bead_models::id.asc())
+            .load::<Self>(conn)
+    }
     pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
     where
         C: diesel::connection::LoadConnection,
@@ -216,26 +236,6 @@ impl CommercialBeadModel {
         use crate::codegen::diesel_codegen::tables::commercial_bead_models::commercial_bead_models;
         Self::table()
             .filter(commercial_bead_models::id.eq(id))
-            .order_by(commercial_bead_models::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_id_and_bead_model(
-        id: i32,
-        bead_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::commercial_bead_models::commercial_bead_models;
-        Self::table()
-            .filter(
-                commercial_bead_models::id
-                    .eq(id)
-                    .and(commercial_bead_models::bead_model.eq(bead_model)),
-            )
             .order_by(commercial_bead_models::id.asc())
             .load::<Self>(conn)
     }

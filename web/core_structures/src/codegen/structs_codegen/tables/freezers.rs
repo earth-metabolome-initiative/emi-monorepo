@@ -79,22 +79,6 @@ impl Freezer {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
     }
-    pub fn model<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot::read(
-            self.model, conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn freezers_id_model_fkey(
         &self,
@@ -111,6 +95,22 @@ impl Freezer {
                 ),
             )
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+    }
+    pub fn model<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<
+        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
+        diesel::result::Error,
+    >
+    where
+        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot:
+            web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot::read(
+            self.model, conn,
+        )
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,

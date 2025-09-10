@@ -15,10 +15,10 @@ where
         if user_id == self.created_by {
             return Ok(true);
         }
-        if !self.parent(conn)?.can_update(user_id, conn)? {
+        if !self.child(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
-        if !self.child(conn)?.can_update(user_id, conn)? {
+        if !self.parent(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }
         Ok(true)
