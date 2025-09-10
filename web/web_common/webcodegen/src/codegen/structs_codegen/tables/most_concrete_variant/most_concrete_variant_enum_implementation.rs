@@ -90,8 +90,7 @@ impl Codegen<'_> {
             "".to_owned(),
             "# Mermaid illustration of the DAG:".to_owned(),
             "```mermaid".to_owned(),
-            mermaid,
-            "```".to_owned(),
+            format!("{mermaid}```"),
         ];
 
         Ok(quote! {
