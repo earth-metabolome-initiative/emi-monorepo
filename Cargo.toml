@@ -57,7 +57,7 @@ members = [
   "utils/numeric_common_traits",
   "data_structures/multi_ranged",
   "web/web_common/procedure_codegen",
-  "web/core_structures/procedure_builder",
+  "web/core_structures/guided_procedure_builder",
 ]
 
 [workspace.dependencies]
@@ -191,7 +191,7 @@ procedure_codegen = { path = "web/web_common/procedure_codegen" }
 mermaid = { path = "utils/mermaid" }
 colorsys = "0.7.0"
 prettyplease = "0.2"
-procedure_builder = { path = "web/core_structures/procedure_builder" }
+guided_procedure_builder = { path = "web/core_structures/guided_procedure_builder" }
 
 [workspace.lints.rust]
 missing_docs = "forbid"

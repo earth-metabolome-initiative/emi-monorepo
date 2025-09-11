@@ -1,0 +1,18 @@
+[package]
+name = "guided_procedure_builder"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+core_structures.workspace = true
+algebra.workspace = true
+graph.workspace = true
+diesel.workspace = true
+web_common_traits.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = ["backend"]
+backend = ["core_structures/backend"]
