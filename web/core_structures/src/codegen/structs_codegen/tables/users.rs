@@ -51,6 +51,22 @@ impl web_common_traits::database::PrimaryKeyLike for User {
 }
 impl User {
     #[cfg(feature = "postgres")]
+    pub fn from_first_name_and_last_name(
+        first_name: &str,
+        last_name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::users::users;
+        Self::table()
+            .filter(users::first_name.eq(first_name).and(users::last_name.eq(last_name)))
+            .order_by(users::id.asc())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_first_name(
         first_name: &str,
         conn: &mut diesel::PgConnection,

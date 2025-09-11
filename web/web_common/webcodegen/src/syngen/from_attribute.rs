@@ -51,7 +51,7 @@ impl Table {
                 )
             };
 
-            for index in extension_table.unique_indices(conn)? {
+            for index in extension_table.indices(conn)? {
                 if index.is_primary_key() {
                     continue;
                 }
@@ -65,7 +65,7 @@ impl Table {
                 ancestral_from_attributes.push((
                     vec![root_table.clone(), extension_table.clone()],
                     columns,
-                    true,
+                    index.is_unique(),
                     Some(join_clause.clone()),
                 ));
             }
@@ -174,7 +174,7 @@ impl Table {
             }
         };
 
-        for index in self.unique_indices(conn)? {
+        for index in self.indices(conn)? {
             if index.is_primary_key() {
                 continue;
             }
@@ -185,7 +185,7 @@ impl Table {
                 continue;
             }
 
-            from_methods.push((vec![arc_table.clone()], columns, true, None));
+            from_methods.push((vec![arc_table.clone()], columns, index.is_unique(), None));
         }
 
         for foreign_key_constraint in self.foreign_keys(conn)?.as_ref() {

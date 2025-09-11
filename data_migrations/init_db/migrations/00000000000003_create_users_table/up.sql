@@ -15,6 +15,9 @@ CREATE TABLE IF NOT EXISTS users (
     CHECK (must_be_smaller_than_utc(created_at, updated_at))
 );
 
+CREATE INDEX IF NOT EXISTS idx_users_first_name_last_name 
+    ON users(first_name, last_name);
+
 -- Since users may have multiple organizations, we need a join table to represent this relationship
 CREATE TABLE IF NOT EXISTS user_organizations (
     user_id INTEGER NOT NULL,

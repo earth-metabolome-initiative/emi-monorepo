@@ -339,6 +339,34 @@ fn unique_indices(table: &Table, conn: &mut PgConnection) -> Result<Vec<PgIndex>
     disk = true,
     sync_to_disk_on_cache_change = true,
     create = r##" {
+        DiskCache::new("table.indices")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
+    key = "String",
+    convert = r#"{ table.to_string() }"#
+)]
+fn indices(table: &Table, conn: &mut PgConnection) -> Result<Vec<PgIndex>, WebCodeGenError> {
+    use crate::schema::{pg_class, pg_index};
+
+    let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
+
+    Ok(pg_index::table
+        .inner_join(pg_class1.on(pg_class1.field(pg_class::oid).eq(pg_index::indexrelid)))
+        .inner_join(pg_class2.on(pg_class2.field(pg_class::oid).eq(pg_index::indrelid)))
+        .filter(pg_class2.field(pg_class::relname).eq(&table.table_name).and(
+            pg_class2.field(pg_class::relnamespace).eq(pg_class1.field(pg_class::relnamespace)),
+        ))
+        .select(PgIndex::as_select())
+        .load::<PgIndex>(conn)?)
+}
+
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
         DiskCache::new("table.same_as_indices")
             .set_disk_directory("cache")
             .build()
@@ -961,6 +989,23 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<bool, WebCodeGenError> {
         Ok(self.updated_by_column(include_ancestors, conn)?.is_some())
+    }
+
+    /// Returns the indices for the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Returns
+    ///
+    /// A vector of indices.
+    ///
+    /// # Errors
+    ///
+    /// * If the indices cannot be loaded from the database.
+    pub fn indices(&self, conn: &mut PgConnection) -> Result<Vec<PgIndex>, WebCodeGenError> {
+        indices(self, conn)
     }
 
     /// Returns the UNIQUE constraint indices for the table.
