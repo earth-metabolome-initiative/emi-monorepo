@@ -41,7 +41,7 @@ pub(crate) fn get_address(
         Ok(PortalAddress::new()
             .city(city.id)?
             .street_name(directus_address.street.clone())?
-            .street_number(directus_address.street_number.clone())?
+            .house_number(directus_address.street_number.clone())?
             .postal_code(directus_address.postal_code.clone())?
             .geolocation(match directus_address.geolocation.clone() {
                 postgis_diesel::types::GeometryContainer::Point(geolocation) => geolocation,

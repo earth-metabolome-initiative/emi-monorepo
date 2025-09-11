@@ -10,6 +10,7 @@ diesel.workspace = true
 common_traits = { workspace = true, features = ["serde"] }
 validation_errors.workspace = true
 generic_backend_request_errors.workspace = true
+iso_codes.workspace = true
 
 [features]
 sqlite = ["diesel/sqlite"]

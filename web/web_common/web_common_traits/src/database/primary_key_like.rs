@@ -62,7 +62,7 @@ macro_rules! impl_primary_key_like_for_pk_copy {
 	};
 }
 
-impl_primary_key_like_for_pk_copy!(i16, i32, i64, rosetta_uuid::Uuid);
+impl_primary_key_like_for_pk_copy!(i16, i32, i64, rosetta_uuid::Uuid, iso_codes::CountryCode);
 
 macro_rules! impl_primary_key_like_for_pk_clone {
 	($($t:ty),*) => {
