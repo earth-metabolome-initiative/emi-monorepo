@@ -17,7 +17,7 @@ pub(crate) struct Hierarchy {
     /// being built, and including all its sub-procedure templates.
     hierarchy: GenericGraph<
         Rc<SortedVec<Rc<ProcedureTemplate>>>,
-        GenericBiMatrix2D<SquareCSR2D<CSR2D<u16, u16, u16>>, SquareCSR2D<CSR2D<u16, u16, u16>>>,
+        GenericBiMatrix2D<SquareCSR2D<CSR2D<u16, usize, usize>>, SquareCSR2D<CSR2D<u16, usize, usize>>>,
     >,
 }
 

@@ -32,3 +32,5 @@ mod symmetric_csr;
 mod upper_triangular_csr;
 #[cfg(any(feature = "std", feature = "alloc"))]
 mod valued_csr2d;
+#[cfg(any(feature = "std", feature = "alloc"))]
+mod generic_bimatrix;

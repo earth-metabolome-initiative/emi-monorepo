@@ -13,13 +13,13 @@ use web_common_traits::prelude::Builder;
 #[derive(Debug, Clone)]
 pub(crate) struct TaskGraph {
     /// The task graph of the procedure template being built.
-    task_graph: GenericGraph<Rc<SortedVec<Rc<ProcedureTemplate>>>, SquareCSR2D<CSR2D<u8, u8, u8>>>,
+    task_graph: GenericGraph<Rc<SortedVec<Rc<ProcedureTemplate>>>, SquareCSR2D<CSR2D<u8, usize, usize>>>,
 }
 
 impl TaskGraph {
     pub(super) fn new(
         nodes: Rc<SortedVec<Rc<ProcedureTemplate>>>,
-        edges: SquareCSR2D<CSR2D<u8, u8, u8>>,
+        edges: SquareCSR2D<CSR2D<u8, usize, usize>>,
     ) -> Self {
         Self {
             task_graph: GenericMonoplexMonopartiteGraphBuilder::default()

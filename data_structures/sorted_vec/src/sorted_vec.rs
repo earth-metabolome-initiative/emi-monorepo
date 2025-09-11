@@ -124,6 +124,14 @@ impl<V> SortedVec<V> {
     {
         self.vec.binary_search(value)
     }
+
+    /// Binary searches this slice with a comparator function.
+    pub fn binary_search_by<F>(&self, f: F) -> Result<usize, usize>
+    where
+        F: FnMut(&V) -> core::cmp::Ordering,
+    {
+        self.vec.binary_search_by(f)
+    }
 }
 
 impl<V: PartialOrd> SortedVec<V> {
