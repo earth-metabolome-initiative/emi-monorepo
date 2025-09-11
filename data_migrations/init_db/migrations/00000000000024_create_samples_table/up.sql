@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS sample_models (
 CREATE TABLE IF NOT EXISTS samples (
   id UUID PRIMARY KEY REFERENCES physical_assets(id),
   model INTEGER NOT NULL REFERENCES sample_models(id),
-  sample_source UUID NOT NULL REFERENCES sample_sources(id),
+  sample_source UUID REFERENCES sample_sources(id),
   sample_source_model INTEGER NOT NULL REFERENCES sample_source_models(id),
   FOREIGN KEY (id, model) REFERENCES assets(id, model),
   FOREIGN KEY (model, sample_source_model) REFERENCES sample_models(id, sample_source_model),
