@@ -27,7 +27,7 @@ pub(crate) fn get_address(
         }
     };
 
-    if let Some(address) = PortalAddress::from_city_id_and_street_name_and_street_number(
+    if let Some(address) = PortalAddress::from_city_id_and_street_name_and_house_number(
         city.id,
         &directus_address.street,
         &directus_address.street_number,
