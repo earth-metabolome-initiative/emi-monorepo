@@ -20,14 +20,10 @@ The `up.sql` should contain the SQL commands to create the new procedure templat
     - Run `cargo run --release`
 
 
-
-
 ## Notes
 
 Here is a list of reserved and non-reserved words in the database that should not be used as identifiers for tables or columns.
 
 https://www.postgresql.org/docs/current/sql-keywords-appendix.html
-
-`non-reserved` words can be used, but it is not recommended.
 
 In our case it is OK to use the `non-reserved` words, but it is not recommended.
