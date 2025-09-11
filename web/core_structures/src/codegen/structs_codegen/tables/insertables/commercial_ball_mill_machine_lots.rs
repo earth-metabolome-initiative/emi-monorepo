@@ -51,6 +51,60 @@ impl core::str::FromStr for CommercialBallMillMachineLotAttribute {
         }
     }
 }
+impl
+    web_common_traits::database::DefaultExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+    > for CommercialBallMillMachineLotAttribute
+{
+    /// Returns the default value for the target attribute.
+    fn target_default() -> Self {
+        Self::Extension(
+            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute::Id
+                .into(),
+        )
+    }
+}
+impl<PhysicalAssetModel>
+    web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotBuilder<
+            PhysicalAssetModel,
+        >,
+    > for CommercialBallMillMachineLotAttribute
+{
+    type EffectiveExtensionAttribute =
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute;
+    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
+        Self::Extension(extension_attribute.into())
+    }
+}
+impl
+    web_common_traits::database::DefaultExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute,
+    > for CommercialBallMillMachineLotAttribute
+{
+    /// Returns the default value for the target attribute.
+    fn target_default() -> Self {
+        Self::Extension(
+            crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute::Id
+                .into(),
+        )
+    }
+}
+impl<PhysicalAssetModel>
+    web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
+            PhysicalAssetModel,
+        >,
+    > for CommercialBallMillMachineLotAttribute
+{
+    type EffectiveExtensionAttribute =
+        crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute;
+    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
+        Self::Extension(extension_attribute.into())
+    }
+}
 impl core::fmt::Display for CommercialBallMillMachineLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -713,14 +767,14 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = CommercialBallMillMachineLotAttribute;
+    type Attribute = CommercialBallMillMachineLotAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attributes>,
+        web_common_traits::database::InsertError<Self::Attribute>,
     > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;

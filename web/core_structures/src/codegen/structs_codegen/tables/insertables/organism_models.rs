@@ -35,6 +35,33 @@ impl core::str::FromStr for OrganismModelAttribute {
         }
     }
 }
+impl
+    web_common_traits::database::DefaultExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
+    > for OrganismModelAttribute
+{
+    /// Returns the default value for the target attribute.
+    fn target_default() -> Self {
+        Self::Extension(
+            crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute::Id
+                .into(),
+        )
+    }
+}
+impl<PhysicalAssetModel>
+    web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::InsertableSampleSourceModelBuilder<
+            PhysicalAssetModel,
+        >,
+    > for OrganismModelAttribute
+{
+    type EffectiveExtensionAttribute =
+        crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute;
+    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
+        Self::Extension(extension_attribute.into())
+    }
+}
 impl core::fmt::Display for OrganismModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -362,12 +389,12 @@ where
         >,
     SampleSourceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = OrganismModelAttribute;
+    type Attribute = OrganismModelAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::organism_models::OrganismModel =

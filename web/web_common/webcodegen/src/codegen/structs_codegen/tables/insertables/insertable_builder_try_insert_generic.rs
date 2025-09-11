@@ -95,13 +95,13 @@ impl Codegen<'_> {
                 where
                     #(#where_constraints),*
             {
-                type Attributes = #attributes_enum;
+                type Attribute = #attributes_enum;
 
                 fn mint_primary_key(
                     self,
                     user_id: #user_id_type,
                     conn: &mut C,
-                ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>>
+                ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>>
                 {
                     use diesel::Identifiable;
                     use web_common_traits::database::InsertableVariant;

@@ -36,6 +36,13 @@ where
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::AssetAttribute,
+        Asset,
+        EffectiveExtensionAttribute = <Asset as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAsset;
@@ -89,11 +96,12 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::PhysicalAssetExtensionAttribute::Asset(
-                        crate::codegen::structs_codegen::tables::insertables::AssetAttribute::Id,
-                    ),
-                ))
+                err.into_field_name(|attribute| {
+                    <crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute as web_common_traits::database::FromExtensionAttribute<
+                        crate::codegen::structs_codegen::tables::insertables::AssetAttribute,
+                        Asset,
+                    >>::from_extension_attribute(attribute)
+                })
             })?;
         Ok(Self::InsertableVariant {
             id,

@@ -383,6 +383,13 @@ impl AssetModelSettable for InsertableAssetModelBuilder {
             validation_errors::SingleFieldError::from(err)
                 .rename_field(AssetModelAttribute::Description)
         })?;
+        pgrx_validation::must_be_paragraph(description.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Description,
+                    )
+            })?;
         if let Some(name) = self.name.as_ref() {
             pgrx_validation::must_be_distinct(name, description.as_ref())
                 .map_err(|e| {
@@ -393,13 +400,6 @@ impl AssetModelSettable for InsertableAssetModelBuilder {
                         )
                 })?;
         }
-        pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Description,
-                    )
-            })?;
         self.description = Some(description);
         Ok(self)
     }
@@ -538,12 +538,12 @@ where
             Error = web_common_traits::database::InsertError<AssetModelAttribute>,
         >,
 {
-    type Attributes = AssetModelAttribute;
+    type Attribute = AssetModelAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::asset_models::AssetModel =

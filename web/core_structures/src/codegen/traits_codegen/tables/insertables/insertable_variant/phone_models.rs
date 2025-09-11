@@ -39,6 +39,20 @@ where
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
+        CameraModel,
+        EffectiveExtensionAttribute = <CameraModel as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute,
+        PositioningDeviceModel,
+        EffectiveExtensionAttribute = <PositioningDeviceModel as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::phone_models::PhoneModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModel;
@@ -87,22 +101,24 @@ where
                 .phone_models_camera
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::PhoneModelExtensionAttribute::CameraModel(
-                            crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
+                            CameraModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .phone_models_positioning
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::PhoneModelExtensionAttribute::PositioningDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute,
+                            PositioningDeviceModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         } else {
@@ -110,22 +126,24 @@ where
                 .phone_models_positioning
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::PhoneModelExtensionAttribute::PositioningDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute,
+                            PositioningDeviceModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .phone_models_camera
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::PhoneModelExtensionAttribute::CameraModel(
-                            crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::PhoneModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
+                            CameraModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         };

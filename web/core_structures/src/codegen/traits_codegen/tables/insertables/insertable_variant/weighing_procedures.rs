@@ -26,7 +26,7 @@ where
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
@@ -50,6 +50,13 @@ where
         C,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::WeighingProcedureAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+        Procedure,
+        EffectiveExtensionAttribute = <Procedure as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedure;
@@ -185,11 +192,12 @@ where
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::WeighingProcedureAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::WeighingProcedureExtensionAttribute::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::Procedure,
-                    ),
-                ))
+                err.into_field_name(|attribute| {
+                    <crate::codegen::structs_codegen::tables::insertables::WeighingProcedureAttribute as web_common_traits::database::FromExtensionAttribute<
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+                        Procedure,
+                    >>::from_extension_attribute(attribute)
+                })
             })?;
         let procedure_weighed_container = match self.procedure_weighed_container {
             web_common_traits::database::IdOrBuilder::Id(id) => id,

@@ -1,11 +1,11 @@
 impl<
     C: diesel::connection::LoadConnection,
-    VolumeMeasuringDeviceModel,
     CommercialProduct,
+    VolumeMeasuringDeviceModel,
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModelBuilder<
-    VolumeMeasuringDeviceModel,
     CommercialProduct,
+    VolumeMeasuringDeviceModel,
 >
 where
     diesel::query_builder::InsertStatement<
@@ -35,6 +35,20 @@ where
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceModelAttribute,
+        VolumeMeasuringDeviceModel,
+        EffectiveExtensionAttribute = <VolumeMeasuringDeviceModel as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+        CommercialProduct,
+        EffectiveExtensionAttribute = <CommercialProduct as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialVolumeMeasuringDeviceModel;
@@ -96,22 +110,24 @@ where
                 .commercial_volume_measuring_device_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+                            CommercialProduct,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .commercial_volume_measuring_device_models_id_fkey
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelExtensionAttribute::VolumeMeasuringDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceModelAttribute,
+                            VolumeMeasuringDeviceModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         } else {
@@ -119,22 +135,24 @@ where
                 .commercial_volume_measuring_device_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelExtensionAttribute::VolumeMeasuringDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceModelAttribute,
+                            VolumeMeasuringDeviceModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .commercial_volume_measuring_device_models_id_fkey1
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+                            CommercialProduct,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         };

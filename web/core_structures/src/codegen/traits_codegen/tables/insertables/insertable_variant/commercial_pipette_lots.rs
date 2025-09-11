@@ -32,6 +32,20 @@ where
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+        CommercialProductLot,
+        EffectiveExtensionAttribute = <CommercialProductLot as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute,
+        PipetteModel,
+        EffectiveExtensionAttribute = <PipetteModel as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteLot;
@@ -83,22 +97,24 @@ where
                 .commercial_pipette_lots_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotExtensionAttribute::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+                            CommercialProductLot,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .commercial_pipette_lots_id_fkey1
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotExtensionAttribute::PipetteModel(
-                            crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute,
+                            PipetteModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         } else {
@@ -106,22 +122,24 @@ where
                 .commercial_pipette_lots_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotExtensionAttribute::PipetteModel(
-                            crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute,
+                            PipetteModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .commercial_pipette_lots_id_fkey
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotExtensionAttribute::CommercialProductLot(
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialPipetteLotAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+                            CommercialProductLot,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         };

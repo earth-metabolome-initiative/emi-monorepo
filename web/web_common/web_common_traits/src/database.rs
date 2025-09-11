@@ -28,6 +28,6 @@ pub use primary_key_like::{MaybePrimaryKeyLike, PrimaryKeyLike};
 pub use read::{BoundedRead, BoundedReadDispatch, Read, ReadDispatch};
 pub use table_name::TableName;
 pub use tabular::{Row, Rows, StaticTabular, Tabular};
-pub use try_insert::TryInsertGeneric;
+pub use try_insert::{DefaultExtensionAttribute, FromExtensionAttribute, TryInsertGeneric};
 pub use updatable::Updatable;
 pub use upsertable::{UpsertVec, Upsertable};

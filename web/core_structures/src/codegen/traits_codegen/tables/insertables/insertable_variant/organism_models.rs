@@ -22,6 +22,13 @@ where
         PrimaryKey = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
+        SampleSourceModel,
+        EffectiveExtensionAttribute = <SampleSourceModel as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::organism_models::OrganismModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableOrganismModel;
@@ -55,11 +62,12 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::OrganismModelExtensionAttribute::SampleSourceModel(
-                        crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute::Id,
-                    ),
-                ))
+                err.into_field_name(|attribute| {
+                    <crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                        crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
+                        SampleSourceModel,
+                    >>::from_extension_attribute(attribute)
+                })
             })?;
         Ok(Self::InsertableVariant { id })
     }

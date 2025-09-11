@@ -210,12 +210,12 @@ where
             Error = web_common_traits::database::InsertError<ColorAttribute>,
         >,
 {
-    type Attributes = ColorAttribute;
+    type Attribute = ColorAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::colors::Color =

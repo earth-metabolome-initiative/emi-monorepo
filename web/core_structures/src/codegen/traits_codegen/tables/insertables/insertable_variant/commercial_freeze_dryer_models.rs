@@ -1,11 +1,11 @@
 impl<
     C: diesel::connection::LoadConnection,
-    FreezeDryerModel,
     CommercialProduct,
+    FreezeDryerModel,
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModelBuilder<
-    FreezeDryerModel,
     CommercialProduct,
+    FreezeDryerModel,
 >
 where
     diesel::query_builder::InsertStatement<
@@ -32,6 +32,20 @@ where
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::FreezeDryerModelAttribute,
+        FreezeDryerModel,
+        EffectiveExtensionAttribute = <FreezeDryerModel as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+        CommercialProduct,
+        EffectiveExtensionAttribute = <CommercialProduct as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_freeze_dryer_models::CommercialFreezeDryerModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezeDryerModel;
@@ -89,22 +103,24 @@ where
                 .commercial_freeze_dryer_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+                            CommercialProduct,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .commercial_freeze_dryer_models_id_fkey
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelExtensionAttribute::FreezeDryerModel(
-                            crate::codegen::structs_codegen::tables::insertables::FreezeDryerModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::FreezeDryerModelAttribute,
+                            FreezeDryerModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         } else {
@@ -112,22 +128,24 @@ where
                 .commercial_freeze_dryer_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelExtensionAttribute::FreezeDryerModel(
-                            crate::codegen::structs_codegen::tables::insertables::FreezeDryerModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::FreezeDryerModelAttribute,
+                            FreezeDryerModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .commercial_freeze_dryer_models_id_fkey1
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+                            CommercialProduct,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         };

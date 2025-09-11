@@ -22,6 +22,13 @@ where
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::PhotographAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
+        DigitalAsset,
+        EffectiveExtensionAttribute = <DigitalAsset as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::photographs::Photograph;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePhotograph;
@@ -55,11 +62,12 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::PhotographAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::PhotographExtensionAttribute::DigitalAsset(
-                        crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute::Id,
-                    ),
-                ))
+                err.into_field_name(|attribute| {
+                    <crate::codegen::structs_codegen::tables::insertables::PhotographAttribute as web_common_traits::database::FromExtensionAttribute<
+                        crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
+                        DigitalAsset,
+                    >>::from_extension_attribute(attribute)
+                })
             })?;
         Ok(Self::InsertableVariant { id })
     }

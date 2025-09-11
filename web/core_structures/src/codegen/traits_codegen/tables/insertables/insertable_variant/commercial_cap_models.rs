@@ -25,6 +25,20 @@ where
         PrimaryKey = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::CapModelAttribute,
+        CapModel,
+        EffectiveExtensionAttribute = <CapModel as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+        CommercialProduct,
+        EffectiveExtensionAttribute = <CommercialProduct as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapModel;
@@ -66,22 +80,24 @@ where
                 .commercial_cap_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialCapModelExtensionAttribute::CapModel(
-                            crate::codegen::structs_codegen::tables::insertables::CapModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CapModelAttribute,
+                            CapModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .commercial_cap_models_id_fkey1
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialCapModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+                            CommercialProduct,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         } else {
@@ -89,22 +105,24 @@ where
                 .commercial_cap_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialCapModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+                            CommercialProduct,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .commercial_cap_models_id_fkey
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialCapModelExtensionAttribute::CapModel(
-                            crate::codegen::structs_codegen::tables::insertables::CapModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialCapModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CapModelAttribute,
+                            CapModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         };

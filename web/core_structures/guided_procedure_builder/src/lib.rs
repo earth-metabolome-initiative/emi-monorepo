@@ -2,3 +2,4 @@
 
 mod guided_procedure_builder;
 mod procedure_template_graph;
+mod structs;

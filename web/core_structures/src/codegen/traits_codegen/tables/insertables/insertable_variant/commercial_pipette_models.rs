@@ -1,11 +1,11 @@
 impl<
     C: diesel::connection::LoadConnection,
-    PipetteModel,
     CommercialProduct,
+    PipetteModel,
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteModelBuilder<
-    PipetteModel,
     CommercialProduct,
+    PipetteModel,
 >
 where
     diesel::query_builder::InsertStatement<
@@ -32,6 +32,20 @@ where
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute,
+        PipetteModel,
+        EffectiveExtensionAttribute = <PipetteModel as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+        CommercialProduct,
+        EffectiveExtensionAttribute = <CommercialProduct as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_pipette_models::CommercialPipetteModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPipetteModel;
@@ -89,22 +103,24 @@ where
                 .commercial_pipette_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+                            CommercialProduct,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .commercial_pipette_models_id_fkey
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelExtensionAttribute::PipetteModel(
-                            crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute,
+                            PipetteModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         } else {
@@ -112,22 +128,24 @@ where
                 .commercial_pipette_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelExtensionAttribute::PipetteModel(
-                            crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute,
+                            PipetteModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .commercial_pipette_models_id_fkey1
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialPipetteModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+                            CommercialProduct,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         };

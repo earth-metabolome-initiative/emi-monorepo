@@ -32,7 +32,7 @@ where
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
@@ -46,6 +46,13 @@ where
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+        Procedure,
+        EffectiveExtensionAttribute = <Procedure as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedure;
@@ -200,11 +207,12 @@ where
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureExtensionAttribute::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::Procedure,
-                    ),
-                ))
+                err.into_field_name(|attribute| {
+                    <crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureAttribute as web_common_traits::database::FromExtensionAttribute<
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+                        Procedure,
+                    >>::from_extension_attribute(attribute)
+                })
             })?;
         let procedure_freeze_dried_container = match self
             .procedure_freeze_dried_container

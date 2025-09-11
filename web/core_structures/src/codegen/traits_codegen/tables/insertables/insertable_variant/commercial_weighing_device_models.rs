@@ -1,11 +1,11 @@
 impl<
     C: diesel::connection::LoadConnection,
-    WeighingDeviceModel,
     CommercialProduct,
+    WeighingDeviceModel,
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelBuilder<
-    WeighingDeviceModel,
     CommercialProduct,
+    WeighingDeviceModel,
 >
 where
     diesel::query_builder::InsertStatement<
@@ -35,6 +35,20 @@ where
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute,
+        WeighingDeviceModel,
+        EffectiveExtensionAttribute = <WeighingDeviceModel as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+        CommercialProduct,
+        EffectiveExtensionAttribute = <CommercialProduct as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModel;
@@ -92,22 +106,24 @@ where
                 .commercial_weighing_device_models_id_fkey1
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+                            CommercialProduct,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .commercial_weighing_device_models_id_fkey
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelExtensionAttribute::WeighingDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute,
+                            WeighingDeviceModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         } else {
@@ -115,22 +131,24 @@ where
                 .commercial_weighing_device_models_id_fkey
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelExtensionAttribute::WeighingDeviceModel(
-                            crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute,
+                            WeighingDeviceModel,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             let _ = self
                 .commercial_weighing_device_models_id_fkey1
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
-                    err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelAttribute::Extension(
-                        crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelExtensionAttribute::CommercialProduct(
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id,
-                        ),
-                    ))
+                    err.into_field_name(|attribute| {
+                        <crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+                            CommercialProduct,
+                        >>::from_extension_attribute(attribute)
+                    })
                 })?;
             id
         };

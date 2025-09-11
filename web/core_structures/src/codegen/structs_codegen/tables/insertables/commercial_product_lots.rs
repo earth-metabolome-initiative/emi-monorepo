@@ -41,6 +41,33 @@ impl core::str::FromStr for CommercialProductLotAttribute {
         }
     }
 }
+impl
+    web_common_traits::database::DefaultExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    > for CommercialProductLotAttribute
+{
+    /// Returns the default value for the target attribute.
+    fn target_default() -> Self {
+        Self::Extension(
+            crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute::Id
+                .into(),
+        )
+    }
+}
+impl<AssetModel>
+    web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
+            AssetModel,
+        >,
+    > for CommercialProductLotAttribute
+{
+    type EffectiveExtensionAttribute =
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute;
+    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
+        Self::Extension(extension_attribute.into())
+    }
+}
 impl core::fmt::Display for CommercialProductLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -568,14 +595,14 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attributes = CommercialProductLotAttribute;
+    type Attribute = CommercialProductLotAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attributes>,
+        web_common_traits::database::InsertError<Self::Attribute>,
     > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;

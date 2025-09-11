@@ -26,6 +26,13 @@ where
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+        AssetModel,
+        EffectiveExtensionAttribute = <AssetModel as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetModel;
@@ -73,11 +80,12 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelExtensionAttribute::AssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Id,
-                    ),
-                ))
+                err.into_field_name(|attribute| {
+                    <crate::codegen::structs_codegen::tables::insertables::DigitalAssetModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+                        AssetModel,
+                    >>::from_extension_attribute(attribute)
+                })
             })?;
         Ok(Self::InsertableVariant {
             id,

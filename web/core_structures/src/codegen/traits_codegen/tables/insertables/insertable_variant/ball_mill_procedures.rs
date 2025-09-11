@@ -29,7 +29,7 @@ where
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
@@ -43,6 +43,13 @@ where
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+        Procedure,
+        EffectiveExtensionAttribute = <Procedure as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedure;
@@ -218,11 +225,12 @@ where
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::BallMillProcedureExtensionAttribute::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::Procedure,
-                    ),
-                ))
+                err.into_field_name(|attribute| {
+                    <crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute as web_common_traits::database::FromExtensionAttribute<
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+                        Procedure,
+                    >>::from_extension_attribute(attribute)
+                })
             })?;
         let procedure_bead = match self.procedure_bead {
             web_common_traits::database::IdOrBuilder::Id(id) => id,

@@ -72,6 +72,31 @@ impl core::str::FromStr for StorageProcedureAttribute {
         }
     }
 }
+impl
+    web_common_traits::database::DefaultExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+    > for StorageProcedureAttribute
+{
+    /// Returns the default value for the target attribute.
+    fn target_default() -> Self {
+        Self::Extension(
+            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::Procedure
+                .into(),
+        )
+    }
+}
+impl
+    web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
+    > for StorageProcedureAttribute
+{
+    type EffectiveExtensionAttribute =
+        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute;
+    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
+        Self::Extension(extension_attribute.into())
+    }
+}
 impl core::fmt::Display for StorageProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -1867,12 +1892,12 @@ where
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder:
         web_common_traits::database::TryInsertGeneric<C>,
 {
-    type Attributes = StorageProcedureAttribute;
+    type Attribute = StorageProcedureAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure = self

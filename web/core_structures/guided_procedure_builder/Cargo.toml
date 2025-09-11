@@ -9,6 +9,7 @@ algebra.workspace = true
 graph.workspace = true
 diesel.workspace = true
 web_common_traits.workspace = true
+sorted_vec.workspace = true
 
 [lints]
 workspace = true

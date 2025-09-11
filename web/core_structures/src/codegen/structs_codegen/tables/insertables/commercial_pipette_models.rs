@@ -49,6 +49,59 @@ impl core::str::FromStr for CommercialPipetteModelAttribute {
         }
     }
 }
+impl
+    web_common_traits::database::DefaultExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute,
+    > for CommercialPipetteModelAttribute
+{
+    /// Returns the default value for the target attribute.
+    fn target_default() -> Self {
+        Self::Extension(
+            crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute::Id.into(),
+        )
+    }
+}
+impl<PhysicalAssetModel>
+    web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePipetteModelBuilder<
+            PhysicalAssetModel,
+        >,
+    > for CommercialPipetteModelAttribute
+{
+    type EffectiveExtensionAttribute =
+        crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute;
+    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
+        Self::Extension(extension_attribute.into())
+    }
+}
+impl
+    web_common_traits::database::DefaultExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    > for CommercialPipetteModelAttribute
+{
+    /// Returns the default value for the target attribute.
+    fn target_default() -> Self {
+        Self::Extension(
+            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id
+                .into(),
+        )
+    }
+}
+impl<AssetModel>
+    web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
+            AssetModel,
+        >,
+    > for CommercialPipetteModelAttribute
+{
+    type EffectiveExtensionAttribute =
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute;
+    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
+        Self::Extension(extension_attribute.into())
+    }
+}
 impl core::fmt::Display for CommercialPipetteModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -623,14 +676,14 @@ where
     >,
     PipetteModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = CommercialPipetteModelAttribute;
+    type Attribute = CommercialPipetteModelAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attributes>,
+        web_common_traits::database::InsertError<Self::Attribute>,
     > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;

@@ -330,14 +330,14 @@ where
         Error = web_common_traits::database::InsertError<AssetCompatibilityRuleAttribute>,
     >,
 {
-    type Attributes = AssetCompatibilityRuleAttribute;
+    type Attribute = AssetCompatibilityRuleAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attributes>,
+        web_common_traits::database::InsertError<Self::Attribute>,
     > {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;

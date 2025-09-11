@@ -1,8 +1,5 @@
 //! Submodule defining the init migrations for the procedure templates.
 
-use core_structures::User;
-use diesel::PgConnection;
-
 mod dbgi_plan;
 mod vinesh_plan;
 pub use dbgi_plan::init_dbgi_plan;

@@ -284,12 +284,12 @@ where
             Error = web_common_traits::database::InsertError<UserEmailAttribute>,
         >,
 {
-    type Attributes = UserEmailAttribute;
+    type Attribute = UserEmailAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
         use diesel::Identifiable;
         use web_common_traits::database::InsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::user_emails::UserEmail =

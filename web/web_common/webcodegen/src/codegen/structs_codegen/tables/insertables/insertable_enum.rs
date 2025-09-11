@@ -370,6 +370,50 @@ impl Table {
             .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
         let from_str_impl = self.insertable_enum_from_str_impl(conn)?;
+        let from_extension_implementations = self.extension_tables(conn)?
+            .iter()
+            .map(|extension_table| {
+                let insertable_enum = self.attributes_enum_ident()?;
+                let extension_table_enum_ty = extension_table.insertable_enum_ty()?;
+                let builder_type = extension_table.insertable_builder_ty()?;
+                let builder_generics = extension_table.extension_tables(conn)?.iter().map(|ancestor| {
+                    ancestor.struct_ident()
+                }).collect::<Result<Vec<_>, WebCodeGenError>>()?;
+                let maybe_builder_generics = if builder_generics.is_empty() {
+                    quote::quote! {}
+                } else {
+                    quote::quote! { <#(#builder_generics),*> }
+                };
+                let primary_key_columns = extension_table.primary_key_columns(conn)?;
+                assert_eq!(
+                    primary_key_columns.len(),
+                    1,
+                    "The extension table `{}` must have a single-column primary key",
+                    extension_table.table_name
+                );
+                let primary_key_column = &primary_key_columns[0];
+                let primary_key_column_ident = primary_key_column.camel_case_ident()?;
+
+                Ok(quote::quote! {
+                    impl web_common_traits::database::DefaultExtensionAttribute<#extension_table_enum_ty> for #insertable_enum {
+                        /// Returns the default value for the target attribute.
+                        fn target_default() -> Self {
+                            Self::Extension(#extension_table_enum_ty::#primary_key_column_ident.into())
+                        }
+                    }
+
+                    impl<#(#builder_generics),*>
+                        web_common_traits::database::FromExtensionAttribute<#extension_table_enum_ty, #builder_type #maybe_builder_generics> for #insertable_enum
+                    {
+                        type EffectiveExtensionAttribute = #extension_table_enum_ty;
+
+                        fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
+                            Self::Extension(extension_attribute.into())
+                        }
+                    }
+                })
+            })
+            .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
         Ok(quote::quote! {
             #insertable_extension_enum_definition
@@ -383,6 +427,8 @@ impl Table {
             #(#from_implementations)*
 
             #from_str_impl
+
+            #(#from_extension_implementations)*
 
             impl core::fmt::Display for #insertable_enum {
                 fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {

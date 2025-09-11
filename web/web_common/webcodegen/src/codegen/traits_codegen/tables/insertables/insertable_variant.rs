@@ -66,6 +66,7 @@ impl Codegen<'_> {
         }];
         let mut try_insert_generic_constraint: HashSet<Arc<Table>> = HashSet::new();
         let mut attribute_availability_checks = Vec::new();
+        let attributes_enum = table.insertable_enum_ty()?;
 
         let generics_recursive_operation = if !right_generics.is_empty() {
             let extension_foreign_keys =
@@ -95,24 +96,24 @@ impl Codegen<'_> {
                         extension_foreign_key.constraint_ident(conn)?;
                     let foreign_table = extension_foreign_key.foreign_table(conn)?;
                     let foreign_table_generic = foreign_table.struct_ident()?;
-
-                    let foreign_columns = extension_foreign_key.foreign_columns(conn)?;
-                    assert_eq!(
-                        foreign_columns.len(),
-                        1,
-                        "The foreign key should have exactly one column"
-                    );
-                    let foreign_column = &foreign_columns[0];
-
-                    let enum_path = self.column_enum_path(table, foreign_column, None, conn)?;
+                    let expected_attribute = foreign_table.insertable_enum_ty()?;
 
                     additional_where_requirements.push(quote! {
                         #foreign_table_generic: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = #primary_key_type>
                     });
                     quote! {
-                        self.#extension_foreign_key_ident.mint_primary_key(user_id, conn).map_err(|err| {
-                            err.into_field_name(|_| #enum_path)
-                        })?
+                        self.#extension_foreign_key_ident
+                            .mint_primary_key(user_id, conn)
+                            .map_err(|err| {
+                                err.into_field_name(|attribute| {
+                                    <
+                                        #attributes_enum as web_common_traits::database::FromExtensionAttribute<
+                                            #expected_attribute,
+                                            #foreign_table_generic,
+                                        >
+                                    >::from_extension_attribute(attribute)
+                                })
+                            })?
                     }
                 }
                 _ => {
@@ -136,37 +137,32 @@ impl Codegen<'_> {
                         .map(|extension_foreign_key| {
                             let is_last = extension_foreign_key == extension_foreign_keys.last().unwrap();
                             let is_first = extension_foreign_key == extension_foreign_keys.first().unwrap();
-                            let foreign_columns = extension_foreign_key.foreign_columns(conn)?;
-                            assert_eq!(
-                                foreign_columns.len(),
-                                1,
-                                "The foreign key should have exactly one column"
-                            );
-                            let foreign_column = &foreign_columns[0];
-
-                            let enum_path = self.column_enum_path(table, foreign_column, None, conn)?;
                             let extension_foreign_key_ident = extension_foreign_key.constraint_ident(conn)?;
+                            let foreign_table = extension_foreign_key.foreign_table(conn)?;
+                            let foreign_table_generic = foreign_table.struct_ident()?;
+                            let expected_attribute = foreign_table.insertable_enum_ty()?;
 
                             let other_foreign_keys_handling = extension_foreign_keys.iter().filter(|other_extension_foreign_key| {
                                 other_extension_foreign_key != &extension_foreign_key
                             })
                             .map(|other_extension_foreign_key| {
-                                let other_foreign_columns = other_extension_foreign_key.foreign_columns(conn)?;
-                                assert_eq!(
-                                    other_foreign_columns.len(),
-                                    1,
-                                    "The foreign key should have exactly one column"
-                                );
-                                let other_foreign_column = &other_foreign_columns[0];
-                                let other_enum_path = self.column_enum_path(table, other_foreign_column, None, conn)?;
-
+                                let other_foreign_table = other_extension_foreign_key.foreign_table(conn)?;
+                                let other_foreign_table_generic = other_foreign_table.struct_ident()?;
+                                let other_expected_attribute = other_foreign_table.insertable_enum_ty()?;
                                 let other_extension_foreign_key_ident = other_extension_foreign_key.constraint_ident(conn)?;
                                 Ok(quote! {
                                     let _ = self.#other_extension_foreign_key_ident
                                         .set_primary_key(#primary_key_ident)
                                         .mint_primary_key(user_id, conn)
                                         .map_err(|err| {
-                                            err.into_field_name(|_| #other_enum_path)
+                                            err.into_field_name(|attribute| {
+                                                <
+                                                    #attributes_enum as web_common_traits::database::FromExtensionAttribute<
+                                                        #other_expected_attribute,
+                                                        #other_foreign_table_generic,
+                                                    >
+                                                >::from_extension_attribute(attribute)
+                                            })
                                         })?;
                                 })
                             }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
@@ -194,7 +190,14 @@ impl Codegen<'_> {
                                     // the primary key.
                                     let #primary_key_ident = self.#extension_foreign_key_ident.mint_primary_key(user_id, conn)
                                         .map_err(|err| {
-                                            err.into_field_name(|_| #enum_path)
+                                            err.into_field_name(|attribute| {
+                                                <
+                                                    #attributes_enum as web_common_traits::database::FromExtensionAttribute<
+                                                        #expected_attribute,
+                                                        #foreign_table_generic,
+                                                    >
+                                                >::from_extension_attribute(attribute)
+                                            })
                                         })?;
                                     #(#other_foreign_keys_handling)*
 
@@ -360,7 +363,7 @@ impl Codegen<'_> {
                 additional_where_requirements.push(quote! {
                     #foreign_builder: web_common_traits::database::TryInsertGeneric<
                         C,
-                        Attributes = #foreign_attributes,
+                        Attribute = #foreign_attributes,
                         PrimaryKey = #partial_builder_table_primary_key_type
                     >
                 });
@@ -490,6 +493,7 @@ impl Codegen<'_> {
             return Err(crate::errors::CodeGenerationError::UserTableNotProvided.into());
         };
         let user_id_type = user_table.primary_key_type(conn)?;
+        let extension_network = self.table_extension_network().unwrap();
 
         for table in tables {
             // We create a file for each table
@@ -558,7 +562,8 @@ impl Codegen<'_> {
             additional_where_clause.dedup_by_key(|x| x.to_string());
 
             let extension_tables = table.extension_tables(conn)?;
-            let generics = extension_tables
+            let generics = extension_network
+                .extension_tables(table)
                 .iter()
                 .map(|extension_table| extension_table.struct_ident())
                 .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
@@ -582,6 +587,21 @@ impl Codegen<'_> {
                 } else {
                     None
                 };
+
+            // We add to the additional where clause the requirements
+            // for FromExtensionAttribute
+
+            additional_where_clause.extend(extension_tables.iter().map(|extension_table| {
+                let struct_ident = extension_table.struct_ident()?;
+                let expected_attribute = extension_table.insertable_enum_ty()?;
+                Ok(quote! {
+                    #attributes_enum: web_common_traits::database::FromExtensionAttribute<
+                        #expected_attribute,
+                        #struct_ident,
+                        EffectiveExtensionAttribute=<#struct_ident as web_common_traits::database::TryInsertGeneric<C>>::Attribute
+                    >
+                })
+            }).collect::<Result<Vec<_>, WebCodeGenError>>()?);
 
             std::fs::write(&table_file, self.beautify_code(&quote::quote!{
 				impl<C: diesel::connection::LoadConnection, #(#generics),*> web_common_traits::database::InsertableVariant<C> for #insertable_builder #maybe_right_generics

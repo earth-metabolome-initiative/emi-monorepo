@@ -19,6 +19,13 @@ where
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     C: diesel::connection::LoadConnection,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+        AssetModel,
+        EffectiveExtensionAttribute = <AssetModel as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProduct;
@@ -59,11 +66,12 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::CommercialProductExtensionAttribute::AssetModel(
-                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Id,
-                    ),
-                ))
+                err.into_field_name(|attribute| {
+                    <crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute as web_common_traits::database::FromExtensionAttribute<
+                        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+                        AssetModel,
+                    >>::from_extension_attribute(attribute)
+                })
             })?;
         Ok(Self::InsertableVariant {
             id,

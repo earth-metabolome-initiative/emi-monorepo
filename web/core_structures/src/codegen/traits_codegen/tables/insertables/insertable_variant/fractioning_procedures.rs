@@ -29,7 +29,7 @@ where
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
         C,
-        Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
@@ -43,6 +43,13 @@ where
         UserId = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+        Procedure,
+        EffectiveExtensionAttribute = <Procedure as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedure;
@@ -208,11 +215,12 @@ where
             .procedure
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::FractioningProcedureExtensionAttribute::Procedure(
-                        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::Procedure,
-                    ),
-                ))
+                err.into_field_name(|attribute| {
+                    <crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute as web_common_traits::database::FromExtensionAttribute<
+                        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+                        Procedure,
+                    >>::from_extension_attribute(attribute)
+                })
             })?;
         let procedure_fragment_container = match self.procedure_fragment_container {
             web_common_traits::database::IdOrBuilder::Id(id) => id,

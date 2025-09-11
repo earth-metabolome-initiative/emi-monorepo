@@ -19,6 +19,13 @@ where
     C: diesel::connection::LoadConnection,
     ContainerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
+        ContainerModel,
+        EffectiveExtensionAttribute = <ContainerModel as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModel;
@@ -59,11 +66,12 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelExtensionAttribute::ContainerModel(
-                        crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute::Id,
-                    ),
-                ))
+                err.into_field_name(|attribute| {
+                    <crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute as web_common_traits::database::FromExtensionAttribute<
+                        crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
+                        ContainerModel,
+                    >>::from_extension_attribute(attribute)
+                })
             })?;
         Ok(Self::InsertableVariant {
             id,

@@ -22,6 +22,13 @@ where
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::OrganismAttribute: web_common_traits::database::FromExtensionAttribute<
+        crate::codegen::structs_codegen::tables::insertables::SampleSourceAttribute,
+        SampleSource,
+        EffectiveExtensionAttribute = <SampleSource as web_common_traits::database::TryInsertGeneric<
+            C,
+        >>::Attribute,
+    >,
 {
     type Row = crate::codegen::structs_codegen::tables::organisms::Organism;
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableOrganism;
@@ -62,11 +69,12 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::OrganismAttribute::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::OrganismExtensionAttribute::SampleSource(
-                        crate::codegen::structs_codegen::tables::insertables::SampleSourceAttribute::Id,
-                    ),
-                ))
+                err.into_field_name(|attribute| {
+                    <crate::codegen::structs_codegen::tables::insertables::OrganismAttribute as web_common_traits::database::FromExtensionAttribute<
+                        crate::codegen::structs_codegen::tables::insertables::SampleSourceAttribute,
+                        SampleSource,
+                    >>::from_extension_attribute(attribute)
+                })
             })?;
         Ok(Self::InsertableVariant {
             id,
