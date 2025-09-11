@@ -5,7 +5,7 @@ use core_structures::{User, tables::insertables::InsertableProcedureTemplateAsse
 use diesel::PgConnection;
 
 use crate::{
-    asset_models::organisms::{organism, sample},
+    asset_models::organisms::{organism_model, organism_sample_model},
     procedure_template_asset_models::default_pmt::default_pmt,
 };
 
@@ -23,7 +23,7 @@ pub(crate) fn organism_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, organism(user, conn)?, conn)
+    default_pmt(user, organism_model(user, conn)?, conn)
 }
 
 /// Returns a partial builder for a sample trackable.
@@ -40,5 +40,5 @@ pub(crate) fn sample_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, sample(user, conn)?, conn)
+    default_pmt(user, organism_sample_model(user, conn)?, conn)
 }

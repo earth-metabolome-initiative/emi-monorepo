@@ -23,11 +23,13 @@ impl web_common_traits::prelude::HasForeignKeys
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleModel(self.model),
         ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleSource(
-                self.sample_source,
-            ),
-        ));
+        if let Some(sample_source) = self.sample_source {
+            connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleSource(
+                    sample_source,
+                ),
+            ));
+        }
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::SampleSourceModel(
                 self.sample_source_model,
@@ -37,7 +39,7 @@ impl web_common_traits::prelude::HasForeignKeys
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.id.is_some()
             && foreign_keys.model.is_some()
-            && foreign_keys.sample_source.is_some()
+            && (foreign_keys.sample_source.is_some() || self.sample_source.is_some())
             && foreign_keys.sample_source_model.is_some()
     }
     fn update(
@@ -114,7 +116,10 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.sample_source == sample_sources.id {
+                if self
+                    .sample_source
+                    .is_some_and(|sample_source| sample_source == sample_sources.id)
+                {
                     foreign_keys.sample_source = Some(sample_sources);
                     updated = true;
                 }
@@ -123,7 +128,10 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::SampleSource(sample_sources),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.sample_source == sample_sources.id {
+                if self
+                    .sample_source
+                    .is_some_and(|sample_source| sample_source == sample_sources.id)
+                {
                     foreign_keys.sample_source = None;
                     updated = true;
                 }

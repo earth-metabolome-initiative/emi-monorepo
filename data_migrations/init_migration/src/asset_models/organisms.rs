@@ -17,7 +17,7 @@ use web_common_traits::database::{Insertable, InsertableVariant};
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn organism(user: &User, conn: &mut PgConnection) -> anyhow::Result<OrganismModel> {
+pub fn organism_model(user: &User, conn: &mut PgConnection) -> anyhow::Result<OrganismModel> {
     const ORGANISM: &str = "Organism";
 
     if let Some(existing_organism) = OrganismModel::from_name(ORGANISM, conn).optional()? {
@@ -41,7 +41,7 @@ pub(crate) fn organism(user: &User, conn: &mut PgConnection) -> anyhow::Result<O
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn sample(user: &User, conn: &mut PgConnection) -> anyhow::Result<SampleModel> {
+pub fn organism_sample_model(user: &User, conn: &mut PgConnection) -> anyhow::Result<SampleModel> {
     const SAMPLE: &str = "Organism Sample";
 
     if let Some(existing_sample) = SampleModel::from_name(SAMPLE, conn).optional()? {
@@ -51,7 +51,7 @@ pub(crate) fn sample(user: &User, conn: &mut PgConnection) -> anyhow::Result<Sam
     Ok(SampleModel::new()
         .name(SAMPLE)?
         .description("Samples used in laboratory procedures")?
-        .sample_source_model(organism(user, conn)?)?
+        .sample_source_model(organism_model(user, conn)?)?
         .created_by(user)?
         .insert(user.id, conn)?)
 }

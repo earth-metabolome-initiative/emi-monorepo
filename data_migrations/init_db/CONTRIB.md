@@ -17,6 +17,7 @@ The `up.sql` should contain the SQL commands to create the new procedure templat
 4. At this stage we should be able to move to the codegen part, which will generate the structs associated to the tables and extends the procedure graph and enumeration automatically.
 
     - For this we switch to `web/core_structures/core_structures_builder`.
+    - Remove the cache via `rm -rf cache/`
     - Run `cargo run --release`
 
 

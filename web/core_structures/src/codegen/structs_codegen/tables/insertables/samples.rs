@@ -86,7 +86,7 @@ impl core::fmt::Display for SampleAttribute {
 pub struct InsertableSample {
     pub(crate) id: ::rosetta_uuid::Uuid,
     pub(crate) model: i32,
-    pub(crate) sample_source: ::rosetta_uuid::Uuid,
+    pub(crate) sample_source: Option<::rosetta_uuid::Uuid>,
     pub(crate) sample_source_model: i32,
 }
 impl InsertableSample {
@@ -163,18 +163,23 @@ impl InsertableSample {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
+        Option<crate::codegen::structs_codegen::tables::sample_sources::SampleSource>,
         diesel::result::Error,
     >
     where
         crate::codegen::structs_codegen::tables::sample_sources::SampleSource:
             web_common_traits::database::Read<C>,
     {
+        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
+        let Some(sample_source) = self.sample_source else {
+            return Ok(None);
+        };
         crate::codegen::structs_codegen::tables::sample_sources::SampleSource::read(
-            self.sample_source,
+            sample_source,
             conn,
         )
+        .optional()
     }
     pub fn sample_source_model<C: diesel::connection::LoadConnection>(
         &self,
@@ -197,20 +202,26 @@ impl InsertableSample {
     pub fn samples_sample_source_sample_source_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
+    ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
+    {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(sample_source) = self.sample_source else {
+            return Ok(None);
         };
         crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id
-                    .eq(&self.sample_source)
+                    .eq(sample_source)
                     .and(
                         crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
                             .eq(&self.sample_source_model),
                     ),
             )
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
+            .optional()
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -241,7 +252,6 @@ where
     fn is_complete(&self) -> bool {
         self.id.is_complete()
             && self.model.is_some()
-            && self.sample_source.is_some()
             && (self.sample_source_model.is_some()
                 || self.model.is_some()
                 || self.sample_source.is_some())
@@ -299,7 +309,7 @@ pub trait SampleSettable: Sized {
         sample_source: SS,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        SS: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
+        SS: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.samples.sample_source_model` column.
     ///
     /// # Arguments
@@ -410,14 +420,14 @@ impl<
         sample_source: SS,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        SS: web_common_traits::database::PrimaryKeyLike<
+        SS: web_common_traits::database::MaybePrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
         >,
     {
-        let sample_source = <SS as web_common_traits::database::PrimaryKeyLike>::primary_key(
+        let sample_source = <SS as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
             &sample_source,
         );
-        self.sample_source = Some(sample_source);
+        self.sample_source = sample_source;
         Ok(self)
     }
     ///Sets the value of the `public.samples.sample_source_model` column.

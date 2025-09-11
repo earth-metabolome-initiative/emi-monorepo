@@ -721,19 +721,6 @@ impl ProcedureSettable for InsertableProcedureBuilder {
     {
         let procedure_template =
             <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
-        if let Some(predecessor_procedure_template) = self.predecessor_procedure_template {
-            pgrx_validation::must_be_distinct_i32(
-                    procedure_template,
-                    predecessor_procedure_template,
-                )
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ProcedureTemplate,
-                            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::PredecessorProcedureTemplate,
-                        )
-                })?;
-        }
         if let Some(parent_procedure_template) = self.parent_procedure_template {
             pgrx_validation::must_be_distinct_i32(
                     procedure_template,
@@ -744,6 +731,19 @@ impl ProcedureSettable for InsertableProcedureBuilder {
                         .rename_fields(
                             crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ProcedureTemplate,
                             crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ParentProcedureTemplate,
+                        )
+                })?;
+        }
+        if let Some(predecessor_procedure_template) = self.predecessor_procedure_template {
+            pgrx_validation::must_be_distinct_i32(
+                    procedure_template,
+                    predecessor_procedure_template,
+                )
+                .map_err(|e| {
+                    e
+                        .rename_fields(
+                            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::ProcedureTemplate,
+                            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::PredecessorProcedureTemplate,
                         )
                 })?;
         }

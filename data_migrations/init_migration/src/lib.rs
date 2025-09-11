@@ -1,7 +1,7 @@
 #![doc = include_str!("../README.md")]
 use diesel::{Connection, PgConnection};
 
-mod asset_models;
+pub mod asset_models;
 mod brands;
 mod login_providers;
 mod procedure_template_asset_models;

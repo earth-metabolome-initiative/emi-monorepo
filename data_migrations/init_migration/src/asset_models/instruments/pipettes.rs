@@ -1,3 +1,4 @@
+//! Submodule defining the functions to initialize `pipette` asset models.
 use core_structures::{
     CommercialProduct, PipetteModel, User,
     tables::insertables::{AssetModelSettable, CommercialProductSettable},

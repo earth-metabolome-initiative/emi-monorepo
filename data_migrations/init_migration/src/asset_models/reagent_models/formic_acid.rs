@@ -1,3 +1,4 @@
+//! Submodule defining the functions to initialize `formic_acid` asset models.
 use core_structures::{
     ReagentModel, User,
     tables::insertables::{AssetModelSettable, ReagentModelSettable},

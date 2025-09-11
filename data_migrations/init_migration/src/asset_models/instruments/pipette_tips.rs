@@ -1,3 +1,4 @@
+//! Submodule defining the functions to initialize `pipette_tips` asset models.
 use core_structures::{
     CommercialProduct, PipetteTipModel, User,
     tables::insertables::{AssetModelSettable, CommercialProductSettable},

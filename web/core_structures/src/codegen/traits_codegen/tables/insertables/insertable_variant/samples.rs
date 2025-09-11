@@ -95,13 +95,6 @@ where
                     crate::codegen::structs_codegen::tables::insertables::SampleAttribute::Model,
                 ),
             )?;
-        let sample_source = self
-            .sample_source
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::SampleAttribute::SampleSource,
-                ),
-            )?;
         let sample_source_model = self
             .sample_source_model
             .ok_or(
@@ -123,7 +116,7 @@ where
         Ok(Self::InsertableVariant {
             id,
             model,
-            sample_source,
+            sample_source: self.sample_source,
             sample_source_model,
         })
     }

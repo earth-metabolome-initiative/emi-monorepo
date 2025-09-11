@@ -1,8 +1,18 @@
 mod codegen;
 mod directus_templates;
+mod impls;
 mod migrations;
+mod sample_source_kind;
+use core_structures::{
+    Sample,
+    tables::insertables::{AssetSettable, SampleSettable},
+};
 use diesel::{Connection, PgConnection};
-use web_common_traits::database::BoundedRead;
+use init_migration::init_root_user;
+use web_common_traits::{
+    database::{BoundedRead, InsertableVariant},
+    prelude::Insertable,
+};
 
 use crate::codegen::FieldDatum;
 
@@ -35,7 +45,20 @@ pub fn directus_migration(
     portal_conn: &mut PgConnection,
 ) -> Result<(), anyhow::Error> {
     for field_data_row in FieldDatum::bounded_read(0, 5, directus_conn)? {
+        // let user = field_data_row.author(portal_conn)?;
+        let user = init_root_user(portal_conn)?;
         println!("Field data row: {:?}", field_data_row);
+        let mut sample_builder = Sample::new()
+            .name(field_data_row.sample_id.clone())?
+            .sample_source(field_data_row.sample_source(&user, portal_conn)?)?;
+
+        sample_builder = SampleSettable::model(
+            sample_builder,
+            field_data_row.sample_model(&user, portal_conn)?,
+        )?;
+
+        let sample: Sample = sample_builder.insert(user.id, portal_conn).unwrap();
+        println!("Inserted sample: {:?}", sample);
     }
     // insert_missing_users(directus_conn, portal_conn)?;
     // insert_missing_brands(directus_conn, portal_conn)?;
