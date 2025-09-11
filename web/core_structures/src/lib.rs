@@ -5,5 +5,4 @@ pub mod document;
 pub mod impls;
 pub mod traits;
 
-#[cfg(feature = "postgres")]
 pub use document::create_photograph;

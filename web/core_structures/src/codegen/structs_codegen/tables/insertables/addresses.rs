@@ -4,7 +4,7 @@ pub enum AddressAttribute {
     Id,
     CityId,
     StreetName,
-    StreetNumber,
+    HouseNumber,
     PostalCode,
     Geolocation,
 }
@@ -14,12 +14,12 @@ impl core::str::FromStr for AddressAttribute {
         match s {
             "CityId" => Ok(Self::CityId),
             "StreetName" => Ok(Self::StreetName),
-            "StreetNumber" => Ok(Self::StreetNumber),
+            "HouseNumber" => Ok(Self::HouseNumber),
             "PostalCode" => Ok(Self::PostalCode),
             "Geolocation" => Ok(Self::Geolocation),
             "city_id" => Ok(Self::CityId),
             "street_name" => Ok(Self::StreetName),
-            "street_number" => Ok(Self::StreetNumber),
+            "house_number" => Ok(Self::HouseNumber),
             "postal_code" => Ok(Self::PostalCode),
             "geolocation" => Ok(Self::Geolocation),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
@@ -32,7 +32,7 @@ impl core::fmt::Display for AddressAttribute {
             Self::Id => write!(f, "addresses.id"),
             Self::CityId => write!(f, "addresses.city_id"),
             Self::StreetName => write!(f, "addresses.street_name"),
-            Self::StreetNumber => write!(f, "addresses.street_number"),
+            Self::HouseNumber => write!(f, "addresses.house_number"),
             Self::PostalCode => write!(f, "addresses.postal_code"),
             Self::Geolocation => write!(f, "addresses.geolocation"),
         }
@@ -47,7 +47,7 @@ impl core::fmt::Display for AddressAttribute {
 pub struct InsertableAddress {
     pub(crate) city_id: i32,
     pub(crate) street_name: String,
-    pub(crate) street_number: String,
+    pub(crate) house_number: String,
     pub(crate) postal_code: String,
     pub(crate) geolocation: postgis_diesel::types::Point,
 }
@@ -68,7 +68,7 @@ impl InsertableAddress {
 pub struct InsertableAddressBuilder {
     pub(crate) city_id: Option<i32>,
     pub(crate) street_name: Option<String>,
-    pub(crate) street_number: Option<String>,
+    pub(crate) house_number: Option<String>,
     pub(crate) postal_code: Option<String>,
     pub(crate) geolocation: Option<postgis_diesel::types::Point>,
 }
@@ -85,7 +85,7 @@ impl common_traits::builder::IsCompleteBuilder
     fn is_complete(&self) -> bool {
         self.city_id.is_some()
             && self.street_name.is_some()
-            && self.street_number.is_some()
+            && self.house_number.is_some()
             && self.postal_code.is_some()
             && self.geolocation.is_some()
     }
@@ -144,11 +144,11 @@ pub trait AddressSettable: Sized {
     where
         SN: TryInto<String>,
         validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>;
-    /// Sets the value of the `public.addresses.street_number` column.
+    /// Sets the value of the `public.addresses.house_number` column.
     ///
     /// # Arguments
-    /// * `street_number`: The value to set for the
-    ///   `public.addresses.street_number` column.
+    /// * `house_number`: The value to set for the
+    ///   `public.addresses.house_number` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -163,13 +163,13 @@ pub trait AddressSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn street_number<SN>(
+    fn house_number<HN>(
         self,
-        street_number: SN,
+        house_number: HN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        SN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>;
+        HN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<HN as TryInto<String>>::Error>;
     /// Sets the value of the `public.addresses.postal_code` column.
     ///
     /// # Arguments
@@ -254,20 +254,20 @@ impl AddressSettable for InsertableAddressBuilder {
         self.street_name = Some(street_name);
         Ok(self)
     }
-    /// Sets the value of the `public.addresses.street_number` column.
-    fn street_number<SN>(
+    /// Sets the value of the `public.addresses.house_number` column.
+    fn house_number<HN>(
         mut self,
-        street_number: SN,
+        house_number: HN,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        SN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>,
+        HN: TryInto<String>,
+        validation_errors::SingleFieldError: From<<HN as TryInto<String>>::Error>,
     {
-        let street_number = street_number.try_into().map_err(|err| {
+        let house_number = house_number.try_into().map_err(|err| {
             validation_errors::SingleFieldError::from(err)
-                .rename_field(AddressAttribute::StreetNumber)
+                .rename_field(AddressAttribute::HouseNumber)
         })?;
-        self.street_number = Some(street_number);
+        self.house_number = Some(house_number);
         Ok(self)
     }
     /// Sets the value of the `public.addresses.postal_code` column.

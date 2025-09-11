@@ -55,11 +55,11 @@ where
                     crate::codegen::structs_codegen::tables::insertables::AddressAttribute::StreetName,
                 ),
             )?;
-        let street_number = self
-            .street_number
+        let house_number = self
+            .house_number
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::AddressAttribute::StreetNumber,
+                    crate::codegen::structs_codegen::tables::insertables::AddressAttribute::HouseNumber,
                 ),
             )?;
         let postal_code = self
@@ -79,7 +79,7 @@ where
         Ok(Self::InsertableVariant {
             city_id,
             street_name,
-            street_number,
+            house_number,
             postal_code,
             geolocation,
         })
