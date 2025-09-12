@@ -622,7 +622,7 @@ impl InsertableCentrifugeProcedure {
 ///    .procedure_centrifuged_with(procedure_centrifuged_with)?
 ///    .procedure_template(procedure_template)?
 ///    .created_by(created_by)?
-///    .most_concrete_table(most_concrete_table)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
 ///    // Optionally set fields with default values
 ///    .created_at(created_at)?

@@ -223,8 +223,8 @@ impl InsertableCommercialCentrifugeLot {
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
 ///    .description(description)?
-///    .most_concrete_table(most_concrete_table)?
 ///    .name(name)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
 ///    .product_model(product_model)?
 ///    .lot(lot)?

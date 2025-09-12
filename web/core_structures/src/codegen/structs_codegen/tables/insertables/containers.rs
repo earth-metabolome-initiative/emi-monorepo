@@ -150,7 +150,7 @@ impl InsertableContainer {
 /// let container = Container::new()
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
-///    .most_concrete_table(most_concrete_table)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
 ///    .container_model(container_model)?
 ///    // Optionally set fields with default values

@@ -121,6 +121,12 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<Vec<Column>, WebCodeGenError> {
         let mut insertable_columns = self.insertable_columns(conn, false)?;
+
+        // We filter the `most_concrete_table` column, if present.
+        if let Some(most_concrete_table_column) = self.most_concrete_table_column(false, conn)? {
+            insertable_columns.retain(|c| c != &most_concrete_table_column);
+        }
+
         let mut ancestral_insertable_columns = Vec::new();
         for extension in self.extension_tables(conn)?.iter() {
             let extension_insertable_columns = extension.ancestral_insertable_columns(conn)?;

@@ -18,6 +18,7 @@ impl Codegen<'_> {
         let ancestral_insertable_columns = table.ancestral_insertable_columns(conn)?;
         let struct_name = table.struct_name()?;
         let snake_case_table_name = table.singular_snake_case_name()?;
+        let has_created_by = table.has_created_by_column(true, conn)?;
 
         // We determine the set of traits which are required
         // to call the setters for the columns.
@@ -83,6 +84,13 @@ impl Codegen<'_> {
         for column in &mandatory_columns {
             let setter_name = column.getter_name()?;
             let column_name = column.snake_case_name()?;
+
+            if column.is_updated_by(conn)? && has_created_by {
+                documentation.push(format!(
+                    "    // Note: `{setter_name}` is automatically set by the `created by` column."
+                ));
+            }
+
             documentation.push(format!("    .{setter_name}({column_name})?"));
         }
         if !defaulted_columns.is_empty() {

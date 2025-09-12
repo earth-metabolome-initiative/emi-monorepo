@@ -860,7 +860,7 @@ impl InsertableSupernatantProcedure {
 /// let supernatant_procedure = SupernatantProcedure::new()
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
-///    .most_concrete_table(most_concrete_table)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
 ///    .procedure_pipette_tip(procedure_pipette_tip)?
 ///    .procedure_stratified_source(procedure_stratified_source)?

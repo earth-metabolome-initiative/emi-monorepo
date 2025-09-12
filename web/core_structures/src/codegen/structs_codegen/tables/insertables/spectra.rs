@@ -133,7 +133,7 @@ impl InsertableSpectrum {
 /// let spectrum = Spectrum::new()
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
-///    .most_concrete_table(most_concrete_table)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
 ///    .model(model)?
 ///    .spectra_collection(spectra_collection_id)?

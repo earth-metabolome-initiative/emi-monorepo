@@ -473,7 +473,7 @@ impl InsertableWeighingProcedure {
 /// let weighing_procedure = WeighingProcedure::new()
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
-///    .most_concrete_table(most_concrete_table)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
 ///    .kilograms(kilograms)?
 ///    .procedure_template(procedure_template)?

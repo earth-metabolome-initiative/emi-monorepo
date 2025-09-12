@@ -1,14 +1,10 @@
 //! Submodule providing helpers methods to work with the FieldDatum author.
 
-use core_structures::{User};
+use core_structures::{User, tables::insertables::UserSettable};
 use diesel::PgConnection;
+use web_common_traits::database::{Insertable, InsertableVariant};
 
 use crate::codegen::FieldDatum;
-
-use web_common_traits::database::Insertable;
-use core_structures::tables::insertables::UserSettable;
-
-use web_common_traits::database::InsertableVariant;
 
 impl FieldDatum {
     /// Returns the author of the field datum if it exists.
@@ -27,13 +23,20 @@ fn dispatch_user_from_name(name: &str, portal: &mut PgConnection) -> anyhow::Res
     }
 }
 
-
-fn get_or_insert_user(first_name: &str, last_name: &str, portal: &mut PgConnection) -> anyhow::Result<User> {
-
+fn get_or_insert_user(
+    first_name: &str,
+    last_name: &str,
+    portal: &mut PgConnection,
+) -> anyhow::Result<User> {
     let users = User::from_first_name_and_last_name(first_name, last_name, portal)?;
 
     if !users.is_empty() {
-        assert_eq!(users.len(), 1, "Expected exactly one user with name {first_name} {last_name}, found {}", users.len());
+        assert_eq!(
+            users.len(),
+            1,
+            "Expected exactly one user with name {first_name} {last_name}, found {}",
+            users.len()
+        );
         return Ok(users.into_iter().next().unwrap());
     }
 

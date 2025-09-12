@@ -343,8 +343,8 @@ impl InsertableFreezingProcedureTemplate {
 ///    .procedure_template_frozen_with_model(procedure_template_frozen_with_model)?
 ///    .created_by(created_by)?
 ///    .description(description)?
-///    .most_concrete_table(most_concrete_table)?
 ///    .name(name)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
 ///    // Optionally set fields with default values
 ///    .kelvin(kelvin)?

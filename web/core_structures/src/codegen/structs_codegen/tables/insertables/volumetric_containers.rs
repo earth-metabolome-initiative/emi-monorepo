@@ -154,7 +154,7 @@ impl InsertableVolumetricContainer {
 /// let volumetric_container = VolumetricContainer::new()
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
-///    .most_concrete_table(most_concrete_table)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
 ///    .volumetric_container_model(volumetric_container_model)?
 ///    // Optionally set fields with default values

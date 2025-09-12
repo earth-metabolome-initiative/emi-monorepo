@@ -224,8 +224,8 @@ impl InsertableCommercialCentrifugeModel {
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
 ///    .description(description)?
-///    .most_concrete_table(most_concrete_table)?
 ///    .name(name)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
 ///    .centrifuge_model(centrifuge_model)?
 ///    .brand(brand_id)?
