@@ -14,6 +14,8 @@ use graph::{
 use sorted_vec::prelude::SortedVec;
 use web_common_traits::prelude::Builder;
 #[derive(Debug, Clone)]
+/// Represents the task graph of a procedure template, including its nodes,
+/// edges, and a Kahn topological ordering of the nodes.
 pub(crate) struct TaskGraph {
     /// The task graph of the procedure template being built.
     task_graph: GenericGraph<

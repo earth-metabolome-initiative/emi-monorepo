@@ -15,7 +15,7 @@ use graph::{
         MonoplexGraphBuilder,
     },
 };
-use guided_procedure_builder::{OwnershipLike, ProcedureTemplateGraph};
+use guided_procedure_builder::{HierarchyLike, OwnershipLike, ProcedureTemplateGraph};
 use mermaid::{
     FlowchartError,
     prelude::{
@@ -401,7 +401,7 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
             FlowchartConfigurationBuilder::default()
                 .renderer(Renderer::EclipseLayoutKernel)
                 .direction(parent_direction)
-                .title(&metadata.root_procedure_template_name())?,
+                .title(&graph.root_procedure_template_name())?,
         )?;
 
         let colors = Color::maximally_distinct(
@@ -418,13 +418,14 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
 
         let mut foreign_procedure_template_node_builders = Vec::new();
         for foreign_procedure_template in graph.foreign_procedure_templates() {
-            foreign_procedure_template_node_builders.push(
+            foreign_procedure_template_node_builders.push((
+                foreign_procedure_template,
                 FlowchartNodeBuilder::default()
                     .label(&foreign_procedure_template.name)?
                     .shape(FlowchartNodeShape::RoundEdges)
                     .style_class(foreign_procedure_template_class.clone())
                     .map_err(FlowchartError::from)?,
-            );
+            ));
         }
 
         let mut ptam_classes = HashMap::new();
@@ -457,11 +458,15 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
                 procedure_template_asset_model_nodes
                     .insert(foreign_ptam.clone(), foreign_ptam_node.clone());
 
-                foreign_procedure_template_node_builders.find_mut(|b| {
-                    foreign_procedure_template
-                });
-                foreign_procedure_template_node_builder =
-                    foreign_procedure_template_node_builder.subnode(foreign_ptam_node)?;
+                let fptn_builder = foreign_procedure_template_node_builders
+                    .iter_mut()
+                    .find_map(|(foreign_ptam, _)| {
+                        foreign_ptam.procedure_template
+                            == foreign_procedure_template.procedure_template
+                    })
+                    .expect("Foreign procedure template node builder should exist")
+                    .1;
+                fptn_builder = fptn_builder.subnode(foreign_ptam_node)?;
             }
 
             let node_style_class = builder.style_class(node_style_class_builder)?;

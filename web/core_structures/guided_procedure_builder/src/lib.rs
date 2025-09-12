@@ -6,4 +6,4 @@ mod structs;
 
 pub use guided_procedure_builder::GuidedProcedureBuilder;
 pub use procedure_template_graph::ProcedureTemplateGraph;
-pub use structs::OwnershipLike;
+pub use structs::{HierarchyLike, OwnershipLike};

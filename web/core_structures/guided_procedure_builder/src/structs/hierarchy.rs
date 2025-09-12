@@ -31,7 +31,9 @@ mod load_task_graph;
 use load_subprocedure_templates::load_subprocedure_templates;
 
 #[derive(Debug, Clone)]
-pub(crate) struct Hierarchy {
+/// Represents the hierarchy of procedure templates rooted at a given procedure
+/// template, including all its sub-procedure templates.
+pub struct Hierarchy {
     /// The hierarchy of procedure templates, rooted at the procedure template
     /// being built, and including all its sub-procedure templates.
     hierarchy: GenericGraph<
@@ -105,9 +107,17 @@ impl AsRef<Hierarchy> for Hierarchy {
     }
 }
 
+/// A trait for types that can provide access to a `Hierarchy`.
 pub trait HierarchyLike: AsRef<Hierarchy> {
     /// Returns a reference to the root procedure template of the hierarchy.
     fn root_procedure_template(&self) -> &ProcedureTemplate {
         self.as_ref().hierarchy.nodes_vocabulary().first().expect("Hierarchy is empty").as_ref()
     }
+
+    /// Returns a reference to the root procedure template name.
+    fn root_procedure_template_name(&self) -> &str {
+        &self.root_procedure_template().name
+    }
 }
+
+impl<T: AsRef<Hierarchy>> HierarchyLike for T {}

@@ -1608,31 +1608,27 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
         let primary_key_columns = self.primary_key_columns(conn)?;
+        // If the primary key is a composite key, we need to construct a tuple of the
+        // types.
+        let primary_key_names = primary_key_columns
+            .iter()
+            .map(|column| {
+                let column_ident = column.snake_case_ident()?;
+                let maybe_clone =
+                    if column.supports_copy(conn)? { None } else { Some(quote! { .clone() }) };
+                Ok(if include_self {
+                    quote! { self.#column_ident #maybe_clone }
+                } else {
+                    quote! { #column_ident #maybe_clone }
+                })
+            })
+            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
-        // We construct the rust type or tuple of rust types that represent the primary
-        // key.
-        Ok(if primary_key_columns.len() == 1 {
-            // If the primary key is a single column, we can just use the type of that
-            // column.
-            let primary_key = primary_key_columns[0].snake_case_ident()?;
-            if include_self {
-                quote! { self.#primary_key }
-            } else {
-                quote! { #primary_key }
-            }
-        } else {
-            // If the primary key is a composite key, we need to construct a tuple of the
-            // types.
-            let primary_key_names = primary_key_columns
-                .iter()
-                .map(Column::snake_case_ident)
-                .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
-            if include_self {
-                quote! { (#(self.#primary_key_names),*) }
-            } else {
-                quote! { (#(#primary_key_names),*) }
-            }
-        })
+        let formatted = quote! {
+            #(#primary_key_names),*
+        };
+
+        if primary_key_columns.len() == 1 { Ok(formatted) } else { Ok(quote! { ( #formatted ) }) }
     }
 
     /// Returns the columns NOT composing the primary keys.
