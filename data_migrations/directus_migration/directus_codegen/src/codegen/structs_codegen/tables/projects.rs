@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -38,27 +38,28 @@ pub struct Project {
 impl web_common_traits::prelude::TableName for Project {
     const TABLE_NAME: &'static str = "Projects";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::projects::Project,
-> for Project
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::projects::Project,
+    > for Project
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl<C> web_common_traits::prelude::Ancestor<C> for Project
 where
     Self: web_common_traits::prelude::TableName + Sized,
     C: diesel::connection::LoadConnection,
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization
-        + diesel::sql_types::HasSqlType<diesel::sql_types::Integer> + 'static,
+        + diesel::sql_types::HasSqlType<diesel::sql_types::Integer>
+        + 'static,
     web_common_traits::prelude::AncestorExists: diesel::deserialize::FromSqlRow<
-        diesel::sql_types::Untyped,
-        <C as diesel::Connection>::Backend,
-    >,
+            diesel::sql_types::Untyped,
+            <C as diesel::Connection>::Backend,
+        >,
     for<'a> &'a Self: diesel::Identifiable,
-    for<'a> <&'a Self as diesel::Identifiable>::Id: diesel::serialize::ToSql<
-        diesel::sql_types::Integer,
-        C::Backend,
-    >,
+    for<'a> <&'a Self as diesel::Identifiable>::Id:
+        diesel::serialize::ToSql<diesel::sql_types::Integer, C::Backend>,
 {
     const PARENT_ID: &'static str = "parent_project";
     const ID: &'static str = "id";
@@ -85,14 +86,10 @@ impl Project {
     pub fn batch<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::batches::Batch,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::batches::Batch, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::batches::Batch: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::batches::Batch:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::batches::Batch::read(self.batch, conn)
@@ -105,19 +102,15 @@ impl Project {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::projects::Project: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::projects::Project:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(parent_project) = self.parent_project else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::projects::Project::read(
-                parent_project,
-                conn,
-            )
+        crate::codegen::structs_codegen::tables::projects::Project::read(parent_project, conn)
             .optional()
     }
     pub fn user_created<C: diesel::connection::LoadConnection>(
@@ -128,20 +121,19 @@ impl Project {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_created) = self.user_created else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_created,
-                conn,
-            )
-            .optional()
+            user_created,
+            conn,
+        )
+        .optional()
     }
     pub fn user_updated<C: diesel::connection::LoadConnection>(
         &self,
@@ -151,29 +143,27 @@ impl Project {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_updated) = self.user_updated else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_updated,
-                conn,
-            )
-            .optional()
+            user_updated,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_project_id(
         project_id: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::projects::projects;
         Self::table()
             .filter(projects::project_id.eq(project_id))
@@ -185,9 +175,8 @@ impl Project {
         batch: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::projects::projects;
         Self::table()
             .filter(projects::batch.eq(batch))
@@ -199,9 +188,8 @@ impl Project {
         user_created: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::projects::projects;
         Self::table()
             .filter(projects::user_created.eq(user_created))
@@ -213,9 +201,8 @@ impl Project {
         user_updated: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::projects::projects;
         Self::table()
             .filter(projects::user_updated.eq(user_updated))
@@ -227,9 +214,8 @@ impl Project {
         status: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::projects::projects;
         Self::table()
             .filter(projects::status.eq(status))
@@ -241,9 +227,8 @@ impl Project {
         date_created: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::projects::projects;
         Self::table()
             .filter(projects::date_created.eq(date_created))
@@ -255,9 +240,8 @@ impl Project {
         date_updated: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::projects::projects;
         Self::table()
             .filter(projects::date_updated.eq(date_updated))
@@ -269,9 +253,8 @@ impl Project {
         uuid_project: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::projects::projects;
         Self::table()
             .filter(projects::uuid_project.eq(uuid_project))
@@ -283,9 +266,8 @@ impl Project {
         project_description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::projects::projects;
         Self::table()
             .filter(projects::project_description.eq(project_description))

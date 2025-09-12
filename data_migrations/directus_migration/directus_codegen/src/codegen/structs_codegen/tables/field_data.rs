@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable
+    diesel::Identifiable,
 )]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::field_data::field_data)]
@@ -57,12 +57,14 @@ pub struct FieldDatum {
 impl web_common_traits::prelude::TableName for FieldDatum {
     const TABLE_NAME: &'static str = "Field_Data";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::field_data::FieldDatum,
-> for FieldDatum
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::field_data::FieldDatum,
+    > for FieldDatum
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl diesel::Identifiable for FieldDatum {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -84,20 +86,19 @@ impl FieldDatum {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_created) = self.user_created else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_created,
-                conn,
-            )
-            .optional()
+            user_created,
+            conn,
+        )
+        .optional()
     }
     pub fn user_updated<C: diesel::connection::LoadConnection>(
         &self,
@@ -107,29 +108,27 @@ impl FieldDatum {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_updated) = self.user_updated else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_updated,
-                conn,
-            )
-            .optional()
+            user_updated,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_sample_id(
         sample_id: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::sample_id.eq(sample_id))
@@ -141,9 +140,8 @@ impl FieldDatum {
         user_created: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::user_created.eq(user_created))
@@ -155,9 +153,8 @@ impl FieldDatum {
         user_updated: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::user_updated.eq(user_updated))
@@ -169,9 +166,8 @@ impl FieldDatum {
         date_created: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::date_created.eq(date_created))
@@ -183,9 +179,8 @@ impl FieldDatum {
         date_updated: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::date_updated.eq(date_updated))
@@ -197,9 +192,8 @@ impl FieldDatum {
         collector_fullname: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::collector_fullname.eq(collector_fullname))
@@ -211,9 +205,8 @@ impl FieldDatum {
         observation_subject: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::observation_subject.eq(observation_subject))
@@ -225,9 +218,8 @@ impl FieldDatum {
         inat_upload: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::inat_upload.eq(inat_upload))
@@ -239,9 +231,8 @@ impl FieldDatum {
         is_wild: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::is_wild.eq(is_wild))
@@ -253,9 +244,8 @@ impl FieldDatum {
         taxon_name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::taxon_name.eq(taxon_name))
@@ -267,9 +257,8 @@ impl FieldDatum {
         no_name_on_list: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::no_name_on_list.eq(no_name_on_list))
@@ -281,9 +270,8 @@ impl FieldDatum {
         picture_panel: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::picture_panel.eq(picture_panel))
@@ -295,9 +283,8 @@ impl FieldDatum {
         picture_general: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::picture_general.eq(picture_general))
@@ -309,9 +296,8 @@ impl FieldDatum {
         picture_detail: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::picture_detail.eq(picture_detail))
@@ -323,9 +309,8 @@ impl FieldDatum {
         picture_cut: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::picture_cut.eq(picture_cut))
@@ -337,9 +322,8 @@ impl FieldDatum {
         picture_panel_label: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::picture_panel_label.eq(picture_panel_label))
@@ -351,9 +335,8 @@ impl FieldDatum {
         collector_orcid: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::collector_orcid.eq(collector_orcid))
@@ -365,9 +348,8 @@ impl FieldDatum {
         collector_inat: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::collector_inat.eq(collector_inat))
@@ -379,9 +361,8 @@ impl FieldDatum {
         qfield_project: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::qfield_project.eq(qfield_project))
@@ -393,9 +374,8 @@ impl FieldDatum {
         picture_free: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::picture_free.eq(picture_free))
@@ -407,9 +387,8 @@ impl FieldDatum {
         comment_eco: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::comment_eco.eq(comment_eco))
@@ -421,9 +400,8 @@ impl FieldDatum {
         weather: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::weather.eq(weather))
@@ -435,9 +413,8 @@ impl FieldDatum {
         sample_name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::sample_name.eq(sample_name))
@@ -449,9 +426,8 @@ impl FieldDatum {
         name_proposition: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::name_proposition.eq(name_proposition))
@@ -463,9 +439,8 @@ impl FieldDatum {
         ipen: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::ipen.eq(ipen))
@@ -477,9 +452,8 @@ impl FieldDatum {
         match_name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::match_name.eq(match_name))
@@ -491,9 +465,8 @@ impl FieldDatum {
         ott_id: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::ott_id.eq(ott_id))
@@ -505,9 +478,8 @@ impl FieldDatum {
         rank: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::rank.eq(rank))
@@ -519,9 +491,8 @@ impl FieldDatum {
         wikidata_id: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::wikidata_id.eq(wikidata_id))
@@ -533,9 +504,8 @@ impl FieldDatum {
         unknown: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::unknown.eq(unknown))
@@ -547,9 +517,8 @@ impl FieldDatum {
         comment_env: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::comment_env.eq(comment_env))
@@ -561,9 +530,8 @@ impl FieldDatum {
         date: i64,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::date.eq(date))
@@ -575,9 +543,8 @@ impl FieldDatum {
         soil_type: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::soil_type.eq(soil_type))
@@ -589,9 +556,8 @@ impl FieldDatum {
         catalogue_number: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::catalogue_number.eq(catalogue_number))
@@ -603,9 +569,8 @@ impl FieldDatum {
         extracted_id: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::field_data::field_data;
         Self::table()
             .filter(field_data::extracted_id.eq(extracted_id))

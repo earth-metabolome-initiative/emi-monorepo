@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -49,12 +49,14 @@ pub struct DirectusFile {
 impl web_common_traits::prelude::TableName for DirectusFile {
     const TABLE_NAME: &'static str = "directus_files";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
-> for DirectusFile
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile,
+    > for DirectusFile
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusFile {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
@@ -72,26 +74,22 @@ impl DirectusFile {
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
-        >,
+        Option<crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(folder) = self.folder else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder::read(
-                folder,
-                conn,
-            )
-            .optional()
+            folder, conn,
+        )
+        .optional()
     }
     pub fn modified_by<C: diesel::connection::LoadConnection>(
         &self,
@@ -101,20 +99,19 @@ impl DirectusFile {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(modified_by) = self.modified_by else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                modified_by,
-                conn,
-            )
-            .optional()
+            modified_by,
+            conn,
+        )
+        .optional()
     }
     pub fn uploaded_by<C: diesel::connection::LoadConnection>(
         &self,
@@ -124,29 +121,27 @@ impl DirectusFile {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(uploaded_by) = self.uploaded_by else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                uploaded_by,
-                conn,
-            )
-            .optional()
+            uploaded_by,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_modified_by(
         modified_by: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::modified_by.eq(modified_by))
@@ -158,9 +153,8 @@ impl DirectusFile {
         uploaded_by: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::uploaded_by.eq(uploaded_by))
@@ -172,9 +166,8 @@ impl DirectusFile {
         storage: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::storage.eq(storage))
@@ -186,9 +179,8 @@ impl DirectusFile {
         filename_disk: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::filename_disk.eq(filename_disk))
@@ -200,9 +192,8 @@ impl DirectusFile {
         filename_download: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::filename_download.eq(filename_download))
@@ -214,9 +205,8 @@ impl DirectusFile {
         title: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::title.eq(title))
@@ -228,9 +218,8 @@ impl DirectusFile {
         r#type: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::r#type.eq(r#type))
@@ -268,9 +257,8 @@ impl DirectusFile {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::created_on.eq(created_on))
@@ -308,9 +296,8 @@ impl DirectusFile {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::modified_on.eq(modified_on))
@@ -322,9 +309,8 @@ impl DirectusFile {
         charset: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::charset.eq(charset))
@@ -336,9 +322,8 @@ impl DirectusFile {
         filesize: i64,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::filesize.eq(filesize))
@@ -350,9 +335,8 @@ impl DirectusFile {
         width: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::width.eq(width))
@@ -364,9 +348,8 @@ impl DirectusFile {
         height: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::height.eq(height))
@@ -378,9 +361,8 @@ impl DirectusFile {
         duration: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::duration.eq(duration))
@@ -392,9 +374,8 @@ impl DirectusFile {
         embed: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::embed.eq(embed))
@@ -406,9 +387,8 @@ impl DirectusFile {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::description.eq(description))
@@ -420,9 +400,8 @@ impl DirectusFile {
         location: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::location.eq(location))
@@ -434,9 +413,8 @@ impl DirectusFile {
         tags: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::tags.eq(tags))
@@ -448,9 +426,8 @@ impl DirectusFile {
         focal_point_x: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::focal_point_x.eq(focal_point_x))
@@ -462,9 +439,8 @@ impl DirectusFile {
         focal_point_y: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::focal_point_y.eq(focal_point_y))
@@ -476,9 +452,8 @@ impl DirectusFile {
         tus_id: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::tus_id.eq(tus_id))
@@ -490,9 +465,8 @@ impl DirectusFile {
         uploaded_on: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_files::directus_files;
         Self::table()
             .filter(directus_files::uploaded_on.eq(uploaded_on))

@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable
+    diesel::Identifiable,
 )]
 #[diesel(primary_key(version))]
 #[diesel(
@@ -19,12 +19,14 @@ pub struct DirectusMigration {
 impl web_common_traits::prelude::TableName for DirectusMigration {
     const TABLE_NAME: &'static str = "directus_migrations";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_migrations::DirectusMigration,
-> for DirectusMigration
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_migrations::DirectusMigration,
+    > for DirectusMigration
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a String>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusMigration {
     type Id = String;
     fn id(self) -> Self::Id {
@@ -43,9 +45,8 @@ impl DirectusMigration {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_migrations::directus_migrations;
         Self::table()
             .filter(directus_migrations::name.eq(name))
@@ -57,9 +58,8 @@ impl DirectusMigration {
         timestamp: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_migrations::directus_migrations;
         Self::table()
             .filter(directus_migrations::timestamp.eq(timestamp))

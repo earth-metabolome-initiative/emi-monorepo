@@ -5,9 +5,8 @@ use core_structures::{
     tables::insertables::{UserEmailSettable, UserSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
-
 use directus_codegen::{DirectusUser, FieldDatum as DirectusFieldDatum};
+use web_common_traits::database::{Insertable, InsertableVariant};
 
 /// This module provides a method to retrieve or insert a user in the database.
 pub fn get_user(

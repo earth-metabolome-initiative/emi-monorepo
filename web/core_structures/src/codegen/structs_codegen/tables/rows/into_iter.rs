@@ -552,6 +552,14 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::Sample(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Sample).collect::<Vec<_>>()
             }
+            super::Rows::SoilModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::SoilModel)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::Soil(rows) => {
+                rows.into_iter().map(crate::codegen::tables::row::Row::Soil).collect::<Vec<_>>()
+            }
             super::Rows::SpatialRefSy(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::SpatialRefSy)

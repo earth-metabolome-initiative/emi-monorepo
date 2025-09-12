@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -63,12 +63,14 @@ pub struct DirectusSetting {
 impl web_common_traits::prelude::TableName for DirectusSetting {
     const TABLE_NAME: &'static str = "directus_settings";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_settings::DirectusSetting,
-> for DirectusSetting
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_settings::DirectusSetting,
+    > for DirectusSetting
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusSetting {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -90,20 +92,19 @@ impl DirectusSetting {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_files::DirectusFile: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(project_logo) = self.project_logo else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_files::DirectusFile::read(
-                project_logo,
-                conn,
-            )
-            .optional()
+            project_logo,
+            conn,
+        )
+        .optional()
     }
     pub fn public_background<C: diesel::connection::LoadConnection>(
         &self,
@@ -113,20 +114,19 @@ impl DirectusSetting {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_files::DirectusFile: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(public_background) = self.public_background else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_files::DirectusFile::read(
-                public_background,
-                conn,
-            )
-            .optional()
+            public_background,
+            conn,
+        )
+        .optional()
     }
     pub fn public_favicon<C: diesel::connection::LoadConnection>(
         &self,
@@ -136,20 +136,19 @@ impl DirectusSetting {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_files::DirectusFile: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(public_favicon) = self.public_favicon else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_files::DirectusFile::read(
-                public_favicon,
-                conn,
-            )
-            .optional()
+            public_favicon,
+            conn,
+        )
+        .optional()
     }
     pub fn public_foreground<C: diesel::connection::LoadConnection>(
         &self,
@@ -159,20 +158,19 @@ impl DirectusSetting {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_files::DirectusFile: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_files::DirectusFile:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(public_foreground) = self.public_foreground else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_files::DirectusFile::read(
-                public_foreground,
-                conn,
-            )
-            .optional()
+            public_foreground,
+            conn,
+        )
+        .optional()
     }
     pub fn public_registration_role<C: diesel::connection::LoadConnection>(
         &self,
@@ -182,54 +180,49 @@ impl DirectusSetting {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(public_registration_role) = self.public_registration_role else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_roles::DirectusRole::read(
-                public_registration_role,
-                conn,
-            )
-            .optional()
+            public_registration_role,
+            conn,
+        )
+        .optional()
     }
     pub fn storage_default_folder<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder,
-        >,
+        Option<crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(storage_default_folder) = self.storage_default_folder else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_folders::DirectusFolder::read(
-                storage_default_folder,
-                conn,
-            )
-            .optional()
+            storage_default_folder,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_project_logo(
         project_logo: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::project_logo.eq(project_logo))
@@ -241,9 +234,8 @@ impl DirectusSetting {
         public_background: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::public_background.eq(public_background))
@@ -255,9 +247,8 @@ impl DirectusSetting {
         public_favicon: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::public_favicon.eq(public_favicon))
@@ -269,9 +260,8 @@ impl DirectusSetting {
         public_foreground: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::public_foreground.eq(public_foreground))
@@ -283,9 +273,8 @@ impl DirectusSetting {
         project_name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::project_name.eq(project_name))
@@ -297,9 +286,8 @@ impl DirectusSetting {
         project_url: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::project_url.eq(project_url))
@@ -311,9 +299,8 @@ impl DirectusSetting {
         project_color: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::project_color.eq(project_color))
@@ -325,9 +312,8 @@ impl DirectusSetting {
         public_note: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::public_note.eq(public_note))
@@ -339,9 +325,8 @@ impl DirectusSetting {
         auth_login_attempts: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::auth_login_attempts.eq(auth_login_attempts))
@@ -353,9 +338,8 @@ impl DirectusSetting {
         auth_password_policy: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::auth_password_policy.eq(auth_password_policy))
@@ -367,14 +351,11 @@ impl DirectusSetting {
         storage_asset_transform: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
-            .filter(
-                directus_settings::storage_asset_transform.eq(storage_asset_transform),
-            )
+            .filter(directus_settings::storage_asset_transform.eq(storage_asset_transform))
             .order_by(directus_settings::id.asc())
             .load::<Self>(conn)
     }
@@ -383,9 +364,8 @@ impl DirectusSetting {
         custom_css: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::custom_css.eq(custom_css))
@@ -397,9 +377,8 @@ impl DirectusSetting {
         mapbox_key: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::mapbox_key.eq(mapbox_key))
@@ -411,9 +390,8 @@ impl DirectusSetting {
         project_descriptor: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::project_descriptor.eq(project_descriptor))
@@ -425,9 +403,8 @@ impl DirectusSetting {
         default_language: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::default_language.eq(default_language))
@@ -439,9 +416,8 @@ impl DirectusSetting {
         default_appearance: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::default_appearance.eq(default_appearance))
@@ -453,9 +429,8 @@ impl DirectusSetting {
         default_theme_light: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::default_theme_light.eq(default_theme_light))
@@ -467,9 +442,8 @@ impl DirectusSetting {
         default_theme_dark: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::default_theme_dark.eq(default_theme_dark))
@@ -481,9 +455,8 @@ impl DirectusSetting {
         report_error_url: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::report_error_url.eq(report_error_url))
@@ -495,9 +468,8 @@ impl DirectusSetting {
         report_bug_url: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::report_bug_url.eq(report_bug_url))
@@ -509,9 +481,8 @@ impl DirectusSetting {
         report_feature_url: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::report_feature_url.eq(report_feature_url))
@@ -549,9 +520,8 @@ impl DirectusSetting {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(directus_settings::public_registration.eq(public_registration))
@@ -589,9 +559,8 @@ impl DirectusSetting {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_settings::directus_settings;
         Self::table()
             .filter(

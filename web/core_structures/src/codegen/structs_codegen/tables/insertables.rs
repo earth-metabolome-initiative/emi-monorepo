@@ -603,6 +603,15 @@ pub use samples::{
     InsertableSample, InsertableSampleBuilder, SampleAttribute, SampleExtensionAttribute,
     SampleSettable,
 };
+mod soil_models;
+pub use soil_models::{
+    InsertableSoilModel, InsertableSoilModelBuilder, SoilModelAttribute,
+    SoilModelExtensionAttribute, SoilModelSettable,
+};
+mod soils;
+pub use soils::{
+    InsertableSoil, InsertableSoilBuilder, SoilAttribute, SoilExtensionAttribute, SoilSettable,
+};
 mod spatial_ref_sys;
 pub use spatial_ref_sys::{
     InsertableSpatialRefSy, InsertableSpatialRefSyBuilder, SpatialRefSyAttribute,

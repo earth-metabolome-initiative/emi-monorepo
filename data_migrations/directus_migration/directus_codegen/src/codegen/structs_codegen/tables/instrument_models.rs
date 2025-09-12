@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -39,12 +39,14 @@ pub struct InstrumentModel {
 impl web_common_traits::prelude::TableName for InstrumentModel {
     const TABLE_NAME: &'static str = "Instrument_Models";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
-> for InstrumentModel
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::instrument_models::InstrumentModel,
+    > for InstrumentModel
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl diesel::Identifiable for InstrumentModel {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -61,14 +63,10 @@ impl InstrumentModel {
     pub fn brand<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::brands::Brand,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::brands::Brand, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::brands::Brand: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::brands::Brand:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::brands::Brand::read(self.brand, conn)
@@ -81,9 +79,8 @@ impl InstrumentModel {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::instrument_types::InstrumentType: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::instrument_types::InstrumentType:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::instrument_types::InstrumentType::read(
@@ -99,20 +96,19 @@ impl InstrumentModel {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_created) = self.user_created else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_created,
-                conn,
-            )
-            .optional()
+            user_created,
+            conn,
+        )
+        .optional()
     }
     pub fn user_updated<C: diesel::connection::LoadConnection>(
         &self,
@@ -122,29 +118,27 @@ impl InstrumentModel {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_updated) = self.user_updated else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_updated,
-                conn,
-            )
-            .optional()
+            user_updated,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_user_created(
         user_created: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::instrument_models::instrument_models;
         Self::table()
             .filter(instrument_models::user_created.eq(user_created))
@@ -156,9 +150,8 @@ impl InstrumentModel {
         user_updated: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::instrument_models::instrument_models;
         Self::table()
             .filter(instrument_models::user_updated.eq(user_updated))
@@ -170,9 +163,8 @@ impl InstrumentModel {
         status: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::instrument_models::instrument_models;
         Self::table()
             .filter(instrument_models::status.eq(status))
@@ -184,9 +176,8 @@ impl InstrumentModel {
         date_created: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::instrument_models::instrument_models;
         Self::table()
             .filter(instrument_models::date_created.eq(date_created))
@@ -198,9 +189,8 @@ impl InstrumentModel {
         date_updated: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::instrument_models::instrument_models;
         Self::table()
             .filter(instrument_models::date_updated.eq(date_updated))
@@ -212,9 +202,8 @@ impl InstrumentModel {
         instrument_model: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::instrument_models::instrument_models;
         Self::table()
             .filter(instrument_models::instrument_model.eq(instrument_model))
@@ -226,9 +215,8 @@ impl InstrumentModel {
         barcode: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::instrument_models::instrument_models;
         Self::table()
             .filter(instrument_models::barcode.eq(barcode))

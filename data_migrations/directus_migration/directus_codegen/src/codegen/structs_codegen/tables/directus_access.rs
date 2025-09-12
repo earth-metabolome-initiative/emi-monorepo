@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -40,12 +40,14 @@ pub struct DirectusAccess {
 impl web_common_traits::prelude::TableName for DirectusAccess {
     const TABLE_NAME: &'static str = "directus_access";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_access::DirectusAccess,
-> for DirectusAccess
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_access::DirectusAccess,
+    > for DirectusAccess
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusAccess {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
@@ -67,9 +69,8 @@ impl DirectusAccess {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy::read(
@@ -85,19 +86,15 @@ impl DirectusAccess {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(role) = self.role else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole::read(
-                role,
-                conn,
-            )
+        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole::read(role, conn)
             .optional()
     }
     pub fn user<C: diesel::connection::LoadConnection>(
@@ -108,19 +105,15 @@ impl DirectusAccess {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user) = self.user else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user,
-                conn,
-            )
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(user, conn)
             .optional()
     }
     #[cfg(feature = "postgres")]
@@ -128,9 +121,8 @@ impl DirectusAccess {
         sort: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_access::directus_access;
         Self::table()
             .filter(directus_access::sort.eq(sort))

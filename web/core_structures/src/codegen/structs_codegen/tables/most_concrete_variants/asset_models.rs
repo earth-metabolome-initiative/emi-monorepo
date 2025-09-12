@@ -55,9 +55,10 @@ pub use builder::AssetModelBuilderDAG;
 /// v45@{shape: rect, label: "reagent_models"}
 /// v46@{shape: rect, label: "sample_models"}
 /// v47@{shape: rect, label: "sample_source_models"}
-/// v48@{shape: rect, label: "volume_measuring_device_models"}
-/// v49@{shape: rect, label: "volumetric_container_models"}
-/// v50@{shape: rect, label: "weighing_device_models"}
+/// v48@{shape: rect, label: "soil_models"}
+/// v49@{shape: rect, label: "volume_measuring_device_models"}
+/// v50@{shape: rect, label: "volumetric_container_models"}
+/// v51@{shape: rect, label: "weighing_device_models"}
 /// v1 --->|"`extends`"| v41
 /// v2 --->|"`extends`"| v41
 /// v3 --->|"`extends`"| v41
@@ -110,12 +111,12 @@ pub use builder::AssetModelBuilderDAG;
 /// v28 --->|"`extends`"| v41
 /// v29 --->|"`extends`"| v0
 /// v30 --->|"`extends`"| v28
-/// v30 --->|"`extends`"| v48
-/// v31 --->|"`extends`"| v48
+/// v30 --->|"`extends`"| v49
+/// v31 --->|"`extends`"| v49
 /// v31 --->|"`extends`"| v29
 /// v32 --->|"`extends`"| v28
-/// v32 --->|"`extends`"| v50
-/// v33 --->|"`extends`"| v50
+/// v32 --->|"`extends`"| v51
+/// v33 --->|"`extends`"| v51
 /// v33 --->|"`extends`"| v29
 /// v34 --->|"`extends`"| v41
 /// v35 --->|"`extends`"| v0
@@ -132,9 +133,10 @@ pub use builder::AssetModelBuilderDAG;
 /// v45 --->|"`extends`"| v0
 /// v46 --->|"`extends`"| v41
 /// v47 --->|"`extends`"| v41
-/// v48 --->|"`extends`"| v41
-/// v49 --->|"`extends`"| v34
-/// v50 --->|"`extends`"| v41
+/// v48 --->|"`extends`"| v47
+/// v49 --->|"`extends`"| v41
+/// v50 --->|"`extends`"| v34
+/// v51 --->|"`extends`"| v41
 /// ```
 pub enum AssetModelDAG {
     ///Variant representing the `asset_models` table.
@@ -311,6 +313,8 @@ pub enum AssetModelDAG {
     SampleSourceModel(
         crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
     ),
+    ///Variant representing the `soil_models` table.
+    SoilModel(crate::codegen::structs_codegen::tables::soil_models::SoilModel),
     ///Variant representing the `volume_measuring_device_models` table.
     VolumeMeasuringDeviceModel(
         crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
@@ -724,6 +728,11 @@ impl From<crate::codegen::structs_codegen::tables::sample_source_models::SampleS
         AssetModelDAG::SampleSourceModel(value)
     }
 }
+impl From<crate::codegen::structs_codegen::tables::soil_models::SoilModel> for AssetModelDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::soil_models::SoilModel) -> Self {
+        AssetModelDAG::SoilModel(value)
+    }
+}
 impl From<
     crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
 > for AssetModelDAG {
@@ -893,6 +902,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::soil_models::SoilModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel: web_common_traits::database::Read<
@@ -1192,6 +1204,12 @@ where
                 }
                 "sample_source_models" => {
                     <crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "soil_models" => {
+                    <crate::codegen::structs_codegen::tables::soil_models::SoilModel as web_common_traits::database::Read<
                         C,
                     >>::read(*self.id(), conn)?
                         .into()

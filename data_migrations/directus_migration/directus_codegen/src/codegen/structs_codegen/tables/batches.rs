@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -34,12 +34,14 @@ pub struct Batch {
 impl web_common_traits::prelude::TableName for Batch {
     const TABLE_NAME: &'static str = "Batches";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::batches::Batch,
-> for Batch
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::batches::Batch,
+    > for Batch
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl diesel::Identifiable for Batch {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -61,19 +63,15 @@ impl Batch {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::batch_types::BatchType: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::batch_types::BatchType:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(batch_type) = self.batch_type else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::batch_types::BatchType::read(
-                batch_type,
-                conn,
-            )
+        crate::codegen::structs_codegen::tables::batch_types::BatchType::read(batch_type, conn)
             .optional()
     }
     pub fn user_created<C: diesel::connection::LoadConnection>(
@@ -84,20 +82,19 @@ impl Batch {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_created) = self.user_created else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_created,
-                conn,
-            )
-            .optional()
+            user_created,
+            conn,
+        )
+        .optional()
     }
     pub fn user_updated<C: diesel::connection::LoadConnection>(
         &self,
@@ -107,29 +104,27 @@ impl Batch {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_updated) = self.user_updated else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_updated,
-                conn,
-            )
-            .optional()
+            user_updated,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_batch_id(
         batch_id: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::batches::batches;
         Self::table()
             .filter(batches::batch_id.eq(batch_id))
@@ -141,9 +136,8 @@ impl Batch {
         old_id: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::batches::batches;
         Self::table()
             .filter(batches::old_id.eq(old_id))
@@ -155,9 +149,8 @@ impl Batch {
         user_created: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::batches::batches;
         Self::table()
             .filter(batches::user_created.eq(user_created))
@@ -169,9 +162,8 @@ impl Batch {
         user_updated: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::batches::batches;
         Self::table()
             .filter(batches::user_updated.eq(user_updated))
@@ -183,9 +175,8 @@ impl Batch {
         status: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::batches::batches;
         Self::table()
             .filter(batches::status.eq(status))
@@ -197,9 +188,8 @@ impl Batch {
         date_created: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::batches::batches;
         Self::table()
             .filter(batches::date_created.eq(date_created))
@@ -211,9 +201,8 @@ impl Batch {
         date_updated: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::batches::batches;
         Self::table()
             .filter(batches::date_updated.eq(date_updated))
@@ -225,9 +214,8 @@ impl Batch {
         uuid_batch: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::batches::batches;
         Self::table()
             .filter(batches::uuid_batch.eq(uuid_batch))
@@ -239,9 +227,8 @@ impl Batch {
         comments: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::batches::batches;
         Self::table()
             .filter(batches::comments.eq(comments))
@@ -253,9 +240,8 @@ impl Batch {
         short_description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::batches::batches;
         Self::table()
             .filter(batches::short_description.eq(short_description))
@@ -267,9 +253,8 @@ impl Batch {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::batches::batches;
         Self::table()
             .filter(batches::description.eq(description))

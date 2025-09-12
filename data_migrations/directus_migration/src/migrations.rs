@@ -14,9 +14,8 @@ use diesel::PgConnection;
 use init_migration::init_dbgi_plan;
 pub(crate) use utils::{get_room, get_user};
 mod insert_collection_procedures;
-pub use insert_collection_procedures::insert_directus_collection_procedures;
-
 use directus_codegen::Container as DirectusContainer;
+pub use insert_collection_procedures::insert_directus_collection_procedures;
 
 fn process_sample(
     user: &User,

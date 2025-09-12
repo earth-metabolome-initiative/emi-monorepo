@@ -1,1 +1,1 @@
-mod foreign ;
+mod foreign;

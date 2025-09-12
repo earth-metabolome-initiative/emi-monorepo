@@ -2,10 +2,10 @@
 
 use core_structures::{Room as PortalRoom, tables::insertables::RoomSettable};
 use diesel::{OptionalExtension, PgConnection};
+use directus_codegen::Room as DirectusRoom;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 use super::{get_address, get_user};
-use directus_codegen::Room as DirectusRoom;
 
 pub(crate) fn get_room(
     directus_room: &DirectusRoom,

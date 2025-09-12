@@ -118,6 +118,8 @@ pub enum TablePrimaryKey {
     SampleSource(::rosetta_uuid::Uuid),
     SampleState(i16),
     Sample(::rosetta_uuid::Uuid),
+    SoilModel(i32),
+    Soil(::rosetta_uuid::Uuid),
     SpatialRefSy(i32),
     Spectrum(::rosetta_uuid::Uuid),
     SpectraCollection(::rosetta_uuid::Uuid),
@@ -471,6 +473,10 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
                 crate::codegen::tables::table_names::TableName::SampleState
             }
             TablePrimaryKey::Sample(_) => crate::codegen::tables::table_names::TableName::Sample,
+            TablePrimaryKey::SoilModel(_) => {
+                crate::codegen::tables::table_names::TableName::SoilModel
+            }
+            TablePrimaryKey::Soil(_) => crate::codegen::tables::table_names::TableName::Soil,
             TablePrimaryKey::SpatialRefSy(_) => {
                 crate::codegen::tables::table_names::TableName::SpatialRefSy
             }

@@ -305,6 +305,8 @@ impl web_common_traits::prelude::Tabular for super::Row {
                 crate::codegen::tables::table_names::TableName::SampleState
             }
             super::Row::Sample(_) => crate::codegen::tables::table_names::TableName::Sample,
+            super::Row::SoilModel(_) => crate::codegen::tables::table_names::TableName::SoilModel,
+            super::Row::Soil(_) => crate::codegen::tables::table_names::TableName::Soil,
             super::Row::SpatialRefSy(_) => {
                 crate::codegen::tables::table_names::TableName::SpatialRefSy
             }

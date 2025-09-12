@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -40,12 +40,14 @@ pub struct DriedSamplesDatum {
 impl web_common_traits::prelude::TableName for DriedSamplesDatum {
     const TABLE_NAME: &'static str = "Dried_Samples_Data";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::dried_samples_data::DriedSamplesDatum,
-> for DriedSamplesDatum
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::dried_samples_data::DriedSamplesDatum,
+    > for DriedSamplesDatum
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl diesel::Identifiable for DriedSamplesDatum {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -67,17 +69,15 @@ impl DriedSamplesDatum {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::batches::Batch: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::batches::Batch:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(batch) = self.batch else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::batches::Batch::read(batch, conn)
-            .optional()
+        crate::codegen::structs_codegen::tables::batches::Batch::read(batch, conn).optional()
     }
     pub fn field_data<C: diesel::connection::LoadConnection>(
         &self,
@@ -87,19 +87,15 @@ impl DriedSamplesDatum {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::field_data::FieldDatum: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::field_data::FieldDatum:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(field_data) = self.field_data else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::field_data::FieldDatum::read(
-                field_data,
-                conn,
-            )
+        crate::codegen::structs_codegen::tables::field_data::FieldDatum::read(field_data, conn)
             .optional()
     }
     pub fn parent_container<C: diesel::connection::LoadConnection>(
@@ -110,32 +106,24 @@ impl DriedSamplesDatum {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::containers::Container: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::containers::Container:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(parent_container) = self.parent_container else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::containers::Container::read(
-                parent_container,
-                conn,
-            )
+        crate::codegen::structs_codegen::tables::containers::Container::read(parent_container, conn)
             .optional()
     }
     pub fn sample_container<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::containers::Container,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::containers::Container, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::containers::Container: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::containers::Container:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::containers::Container::read(
@@ -151,20 +139,19 @@ impl DriedSamplesDatum {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_created) = self.user_created else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_created,
-                conn,
-            )
-            .optional()
+            user_created,
+            conn,
+        )
+        .optional()
     }
     pub fn user_updated<C: diesel::connection::LoadConnection>(
         &self,
@@ -174,29 +161,27 @@ impl DriedSamplesDatum {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_updated) = self.user_updated else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_updated,
-                conn,
-            )
-            .optional()
+            user_updated,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_sample_container(
         sample_container: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data;
         Self::table()
             .filter(dried_samples_data::sample_container.eq(sample_container))
@@ -208,9 +193,8 @@ impl DriedSamplesDatum {
         parent_container: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data;
         Self::table()
             .filter(dried_samples_data::parent_container.eq(parent_container))
@@ -222,9 +206,8 @@ impl DriedSamplesDatum {
         user_created: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data;
         Self::table()
             .filter(dried_samples_data::user_created.eq(user_created))
@@ -236,9 +219,8 @@ impl DriedSamplesDatum {
         user_updated: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data;
         Self::table()
             .filter(dried_samples_data::user_updated.eq(user_updated))
@@ -250,9 +232,8 @@ impl DriedSamplesDatum {
         status: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data;
         Self::table()
             .filter(dried_samples_data::status.eq(status))
@@ -264,9 +245,8 @@ impl DriedSamplesDatum {
         date_created: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data;
         Self::table()
             .filter(dried_samples_data::date_created.eq(date_created))
@@ -278,9 +258,8 @@ impl DriedSamplesDatum {
         date_updated: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data;
         Self::table()
             .filter(dried_samples_data::date_updated.eq(date_updated))
@@ -292,9 +271,8 @@ impl DriedSamplesDatum {
         uuid_dried_sample: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data;
         Self::table()
             .filter(dried_samples_data::uuid_dried_sample.eq(uuid_dried_sample))

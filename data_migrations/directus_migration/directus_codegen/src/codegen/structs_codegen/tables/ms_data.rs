@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -62,12 +62,14 @@ pub struct MsDatum {
 impl web_common_traits::prelude::TableName for MsDatum {
     const TABLE_NAME: &'static str = "MS_Data";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::ms_data::MsDatum,
-> for MsDatum
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::ms_data::MsDatum,
+    > for MsDatum
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl diesel::Identifiable for MsDatum {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -89,17 +91,15 @@ impl MsDatum {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::batches::Batch: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::batches::Batch:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(batch) = self.batch else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::batches::Batch::read(batch, conn)
-            .optional()
+        crate::codegen::structs_codegen::tables::batches::Batch::read(batch, conn).optional()
     }
     pub fn injection_method<C: diesel::connection::LoadConnection>(
         &self,
@@ -109,9 +109,8 @@ impl MsDatum {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::injection_methods::InjectionMethod: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::injection_methods::InjectionMethod:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::injection_methods::InjectionMethod::read(
@@ -122,14 +121,10 @@ impl MsDatum {
     pub fn injection_volume_unit<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::si_units::SiUnit,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::si_units::SiUnit, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::si_units::SiUnit: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::si_units::SiUnit:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::si_units::SiUnit::read(
@@ -145,9 +140,8 @@ impl MsDatum {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::instruments::Instrument: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::instruments::Instrument:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::instruments::Instrument::read(
@@ -158,14 +152,10 @@ impl MsDatum {
     pub fn parent_sample_container<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::containers::Container,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::containers::Container, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::containers::Container: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::containers::Container:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::containers::Container::read(
@@ -181,20 +171,19 @@ impl MsDatum {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_created) = self.user_created else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_created,
-                conn,
-            )
-            .optional()
+            user_created,
+            conn,
+        )
+        .optional()
     }
     pub fn user_updated<C: diesel::connection::LoadConnection>(
         &self,
@@ -204,29 +193,27 @@ impl MsDatum {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_updated) = self.user_updated else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_updated,
-                conn,
-            )
-            .optional()
+            user_updated,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_filename(
         filename: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
         Self::table()
             .filter(ms_data::filename.eq(filename))
@@ -238,9 +225,8 @@ impl MsDatum {
         user_created: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
         Self::table()
             .filter(ms_data::user_created.eq(user_created))
@@ -252,9 +238,8 @@ impl MsDatum {
         user_updated: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
         Self::table()
             .filter(ms_data::user_updated.eq(user_updated))
@@ -266,9 +251,8 @@ impl MsDatum {
         status: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
         Self::table()
             .filter(ms_data::status.eq(status))
@@ -280,9 +264,8 @@ impl MsDatum {
         date_created: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
         Self::table()
             .filter(ms_data::date_created.eq(date_created))
@@ -294,9 +277,8 @@ impl MsDatum {
         date_updated: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
         Self::table()
             .filter(ms_data::date_updated.eq(date_updated))
@@ -308,9 +290,8 @@ impl MsDatum {
         uuid_ms_file: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
         Self::table()
             .filter(ms_data::uuid_ms_file.eq(uuid_ms_file))
@@ -322,9 +303,8 @@ impl MsDatum {
         status_comment: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
         Self::table()
             .filter(ms_data::status_comment.eq(status_comment))
@@ -362,9 +342,8 @@ impl MsDatum {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
         Self::table()
             .filter(ms_data::injection_volume.eq(injection_volume))
@@ -376,9 +355,8 @@ impl MsDatum {
         converted: bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
         Self::table()
             .filter(ms_data::converted.eq(converted))
@@ -390,9 +368,8 @@ impl MsDatum {
         processed: bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
         Self::table()
             .filter(ms_data::processed.eq(processed))

@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -28,27 +28,28 @@ pub struct DirectusRole {
 impl web_common_traits::prelude::TableName for DirectusRole {
     const TABLE_NAME: &'static str = "directus_roles";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
-> for DirectusRole
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole,
+    > for DirectusRole
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
-{}
+{
+}
 impl<C> web_common_traits::prelude::Ancestor<C> for DirectusRole
 where
     Self: web_common_traits::prelude::TableName + Sized,
     C: diesel::connection::LoadConnection,
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization
-        + diesel::sql_types::HasSqlType<::rosetta_uuid::diesel_impls::Uuid> + 'static,
+        + diesel::sql_types::HasSqlType<::rosetta_uuid::diesel_impls::Uuid>
+        + 'static,
     web_common_traits::prelude::AncestorExists: diesel::deserialize::FromSqlRow<
-        diesel::sql_types::Untyped,
-        <C as diesel::Connection>::Backend,
-    >,
+            diesel::sql_types::Untyped,
+            <C as diesel::Connection>::Backend,
+        >,
     for<'a> &'a Self: diesel::Identifiable,
-    for<'a> <&'a Self as diesel::Identifiable>::Id: diesel::serialize::ToSql<
-        ::rosetta_uuid::diesel_impls::Uuid,
-        C::Backend,
-    >,
+    for<'a> <&'a Self as diesel::Identifiable>::Id:
+        diesel::serialize::ToSql<::rosetta_uuid::diesel_impls::Uuid, C::Backend>,
 {
     const PARENT_ID: &'static str = "parent";
     const ID: &'static str = "id";
@@ -80,19 +81,15 @@ impl DirectusRole {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(parent) = self.parent else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole::read(
-                parent,
-                conn,
-            )
+        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole::read(parent, conn)
             .optional()
     }
     #[cfg(feature = "postgres")]
@@ -100,9 +97,8 @@ impl DirectusRole {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_roles::directus_roles;
         Self::table()
             .filter(directus_roles::name.eq(name))
@@ -114,9 +110,8 @@ impl DirectusRole {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_roles::directus_roles;
         Self::table()
             .filter(directus_roles::icon.eq(icon))
@@ -128,9 +123,8 @@ impl DirectusRole {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_roles::directus_roles;
         Self::table()
             .filter(directus_roles::description.eq(description))

@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -52,27 +52,28 @@ pub struct Container {
 impl web_common_traits::prelude::TableName for Container {
     const TABLE_NAME: &'static str = "Containers";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::containers::Container,
-> for Container
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::containers::Container,
+    > for Container
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl<C> web_common_traits::prelude::Ancestor<C> for Container
 where
     Self: web_common_traits::prelude::TableName + Sized,
     C: diesel::connection::LoadConnection,
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization
-        + diesel::sql_types::HasSqlType<diesel::sql_types::Integer> + 'static,
+        + diesel::sql_types::HasSqlType<diesel::sql_types::Integer>
+        + 'static,
     web_common_traits::prelude::AncestorExists: diesel::deserialize::FromSqlRow<
-        diesel::sql_types::Untyped,
-        <C as diesel::Connection>::Backend,
-    >,
+            diesel::sql_types::Untyped,
+            <C as diesel::Connection>::Backend,
+        >,
     for<'a> &'a Self: diesel::Identifiable,
-    for<'a> <&'a Self as diesel::Identifiable>::Id: diesel::serialize::ToSql<
-        diesel::sql_types::Integer,
-        C::Backend,
-    >,
+    for<'a> <&'a Self as diesel::Identifiable>::Id:
+        diesel::serialize::ToSql<diesel::sql_types::Integer, C::Backend>,
 {
     const PARENT_ID: &'static str = "parent_container";
     const ID: &'static str = "id";
@@ -100,26 +101,23 @@ impl Container {
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-        >,
+        Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(container_model) = self.container_model else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::container_models::ContainerModel::read(
-                container_model,
-                conn,
-            )
-            .optional()
+            container_model,
+            conn,
+        )
+        .optional()
     }
     pub fn location<C: diesel::connection::LoadConnection>(
         &self,
@@ -129,19 +127,15 @@ impl Container {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::universities::University: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::universities::University:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(location) = self.location else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::universities::University::read(
-                location,
-                conn,
-            )
+        crate::codegen::structs_codegen::tables::universities::University::read(location, conn)
             .optional()
     }
     pub fn parent_container<C: diesel::connection::LoadConnection>(
@@ -152,19 +146,15 @@ impl Container {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::containers::Container: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::containers::Container:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(parent_container) = self.parent_container else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::containers::Container::read(
-                parent_container,
-                conn,
-            )
+        crate::codegen::structs_codegen::tables::containers::Container::read(parent_container, conn)
             .optional()
     }
     pub fn user_created<C: diesel::connection::LoadConnection>(
@@ -175,20 +165,19 @@ impl Container {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_created) = self.user_created else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_created,
-                conn,
-            )
-            .optional()
+            user_created,
+            conn,
+        )
+        .optional()
     }
     pub fn user_updated<C: diesel::connection::LoadConnection>(
         &self,
@@ -198,29 +187,27 @@ impl Container {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_updated) = self.user_updated else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_updated,
-                conn,
-            )
-            .optional()
+            user_updated,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_container_id(
         container_id: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::container_id.eq(container_id))
@@ -232,9 +219,8 @@ impl Container {
         old_id: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::old_id.eq(old_id))
@@ -246,9 +232,8 @@ impl Container {
         user_created: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::user_created.eq(user_created))
@@ -260,9 +245,8 @@ impl Container {
         user_updated: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::user_updated.eq(user_updated))
@@ -274,9 +258,8 @@ impl Container {
         status: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::status.eq(status))
@@ -288,9 +271,8 @@ impl Container {
         date_created: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::date_created.eq(date_created))
@@ -302,9 +284,8 @@ impl Container {
         date_updated: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::date_updated.eq(date_updated))
@@ -342,9 +323,8 @@ impl Container {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::used.eq(used))
@@ -382,9 +362,8 @@ impl Container {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::reserved.eq(reserved))
@@ -396,9 +375,8 @@ impl Container {
         uuid_container: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::uuid_container.eq(uuid_container))
@@ -410,9 +388,8 @@ impl Container {
         is_finite: bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::is_finite.eq(is_finite))
@@ -424,9 +401,8 @@ impl Container {
         __columns: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::__columns.eq(__columns))
@@ -438,9 +414,8 @@ impl Container {
         rows: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::rows.eq(rows))
@@ -452,9 +427,8 @@ impl Container {
         rows_numeric: bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::rows_numeric.eq(rows_numeric))
@@ -466,9 +440,8 @@ impl Container {
         columns_numeric: bool,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::containers::containers;
         Self::table()
             .filter(containers::columns_numeric.eq(columns_numeric))

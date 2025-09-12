@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable
+    diesel::Identifiable,
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -25,12 +25,14 @@ pub struct DirectusActivity {
 impl web_common_traits::prelude::TableName for DirectusActivity {
     const TABLE_NAME: &'static str = "directus_activity";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
-> for DirectusActivity
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity,
+    > for DirectusActivity
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusActivity {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -49,9 +51,8 @@ impl DirectusActivity {
         action: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_activity::directus_activity;
         Self::table()
             .filter(directus_activity::action.eq(action))
@@ -63,9 +64,8 @@ impl DirectusActivity {
         user: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_activity::directus_activity;
         Self::table()
             .filter(directus_activity::user.eq(user))
@@ -103,9 +103,8 @@ impl DirectusActivity {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_activity::directus_activity;
         Self::table()
             .filter(directus_activity::timestamp.eq(timestamp))
@@ -117,9 +116,8 @@ impl DirectusActivity {
         ip: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_activity::directus_activity;
         Self::table()
             .filter(directus_activity::ip.eq(ip))
@@ -131,9 +129,8 @@ impl DirectusActivity {
         user_agent: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_activity::directus_activity;
         Self::table()
             .filter(directus_activity::user_agent.eq(user_agent))
@@ -145,9 +142,8 @@ impl DirectusActivity {
         collection: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_activity::directus_activity;
         Self::table()
             .filter(directus_activity::collection.eq(collection))
@@ -159,9 +155,8 @@ impl DirectusActivity {
         item: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_activity::directus_activity;
         Self::table()
             .filter(directus_activity::item.eq(item))
@@ -173,9 +168,8 @@ impl DirectusActivity {
         origin: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_activity::directus_activity;
         Self::table()
             .filter(directus_activity::origin.eq(origin))

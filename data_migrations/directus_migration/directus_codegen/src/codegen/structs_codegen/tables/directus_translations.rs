@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable
+    diesel::Identifiable,
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -20,12 +20,14 @@ pub struct DirectusTranslation {
 impl web_common_traits::prelude::TableName for DirectusTranslation {
     const TABLE_NAME: &'static str = "directus_translations";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_translations::DirectusTranslation,
-> for DirectusTranslation
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_translations::DirectusTranslation,
+    > for DirectusTranslation
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusTranslation {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
@@ -44,9 +46,8 @@ impl DirectusTranslation {
         language: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_translations::directus_translations;
         Self::table()
             .filter(directus_translations::language.eq(language))
@@ -58,9 +59,8 @@ impl DirectusTranslation {
         key: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_translations::directus_translations;
         Self::table()
             .filter(directus_translations::key.eq(key))
@@ -72,9 +72,8 @@ impl DirectusTranslation {
         value: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_translations::directus_translations;
         Self::table()
             .filter(directus_translations::value.eq(value))

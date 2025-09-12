@@ -322,6 +322,10 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
                 crate::codegen::tables::rows::Rows::from(sample_states)
             }
             super::Row::Sample(samples) => crate::codegen::tables::rows::Rows::from(samples),
+            super::Row::SoilModel(soil_models) => {
+                crate::codegen::tables::rows::Rows::from(soil_models)
+            }
+            super::Row::Soil(soils) => crate::codegen::tables::rows::Rows::from(soils),
             super::Row::SpatialRefSy(spatial_ref_sys) => {
                 crate::codegen::tables::rows::Rows::from(spatial_ref_sys)
             }

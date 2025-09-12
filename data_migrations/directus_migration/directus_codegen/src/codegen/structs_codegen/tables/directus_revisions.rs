@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -43,27 +43,28 @@ pub struct DirectusRevision {
 impl web_common_traits::prelude::TableName for DirectusRevision {
     const TABLE_NAME: &'static str = "directus_revisions";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
-> for DirectusRevision
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
+    > for DirectusRevision
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl<C> web_common_traits::prelude::Ancestor<C> for DirectusRevision
 where
     Self: web_common_traits::prelude::TableName + Sized,
     C: diesel::connection::LoadConnection,
     <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization
-        + diesel::sql_types::HasSqlType<diesel::sql_types::Integer> + 'static,
+        + diesel::sql_types::HasSqlType<diesel::sql_types::Integer>
+        + 'static,
     web_common_traits::prelude::AncestorExists: diesel::deserialize::FromSqlRow<
-        diesel::sql_types::Untyped,
-        <C as diesel::Connection>::Backend,
-    >,
+            diesel::sql_types::Untyped,
+            <C as diesel::Connection>::Backend,
+        >,
     for<'a> &'a Self: diesel::Identifiable,
-    for<'a> <&'a Self as diesel::Identifiable>::Id: diesel::serialize::ToSql<
-        diesel::sql_types::Integer,
-        C::Backend,
-    >,
+    for<'a> <&'a Self as diesel::Identifiable>::Id:
+        diesel::serialize::ToSql<diesel::sql_types::Integer, C::Backend>,
 {
     const PARENT_ID: &'static str = "parent";
     const ID: &'static str = "id";
@@ -95,9 +96,8 @@ impl DirectusRevision {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::directus_activity::DirectusActivity::read(
@@ -109,60 +109,51 @@ impl DirectusRevision {
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision,
-        >,
+        Option<crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(parent) = self.parent else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_revisions::DirectusRevision::read(
-                parent,
-                conn,
-            )
-            .optional()
+            parent, conn,
+        )
+        .optional()
     }
     pub fn version<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion,
-        >,
+        Option<crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(version) = self.version else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_versions::DirectusVersion::read(
-                version,
-                conn,
-            )
-            .optional()
+            version, conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_collection(
         collection: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions;
         Self::table()
             .filter(directus_revisions::collection.eq(collection))
@@ -174,9 +165,8 @@ impl DirectusRevision {
         item: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_revisions::directus_revisions;
         Self::table()
             .filter(directus_revisions::item.eq(item))

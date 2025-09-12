@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable
+    diesel::Identifiable,
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -24,12 +24,14 @@ pub struct DirectusPolicy {
 impl web_common_traits::prelude::TableName for DirectusPolicy {
     const TABLE_NAME: &'static str = "directus_policies";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
-> for DirectusPolicy
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy,
+    > for DirectusPolicy
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusPolicy {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
@@ -48,9 +50,8 @@ impl DirectusPolicy {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_policies::directus_policies;
         Self::table()
             .filter(directus_policies::name.eq(name))
@@ -62,9 +63,8 @@ impl DirectusPolicy {
         icon: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_policies::directus_policies;
         Self::table()
             .filter(directus_policies::icon.eq(icon))
@@ -76,9 +76,8 @@ impl DirectusPolicy {
         description: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_policies::directus_policies;
         Self::table()
             .filter(directus_policies::description.eq(description))
@@ -90,9 +89,8 @@ impl DirectusPolicy {
         ip_access: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_policies::directus_policies;
         Self::table()
             .filter(directus_policies::ip_access.eq(ip_access))
@@ -130,9 +128,8 @@ impl DirectusPolicy {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_policies::directus_policies;
         Self::table()
             .filter(directus_policies::enforce_tfa.eq(enforce_tfa))
@@ -170,9 +167,8 @@ impl DirectusPolicy {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_policies::directus_policies;
         Self::table()
             .filter(directus_policies::admin_access.eq(admin_access))
@@ -210,9 +206,8 @@ impl DirectusPolicy {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_policies::directus_policies;
         Self::table()
             .filter(directus_policies::app_access.eq(app_access))

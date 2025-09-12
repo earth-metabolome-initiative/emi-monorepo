@@ -194,6 +194,10 @@ pub enum AssetModelBuilderDAG {
     SampleSourceModel(
         crate::codegen::structs_codegen::tables::insertables::InsertableSampleSourceModelBuilder,
     ),
+    ///Builder for the `soil_models` table.
+    SoilModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertableSoilModelBuilder,
+    ),
     ///Builder for the `volume_measuring_device_models` table.
     VolumeMeasuringDeviceModel(
         crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceModelBuilder,
@@ -647,6 +651,15 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableSample
         value: crate::codegen::structs_codegen::tables::insertables::InsertableSampleSourceModelBuilder,
     ) -> Self {
         AssetModelBuilderDAG::SampleSourceModel(value)
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableSoilModelBuilder>
+    for AssetModelBuilderDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertableSoilModelBuilder,
+    ) -> Self {
+        AssetModelBuilderDAG::SoilModel(value)
     }
 }
 impl From<

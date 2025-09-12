@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -33,20 +33,19 @@ pub struct Room {
     pub room_name: String,
     pub comment: String,
     pub address: i32,
-    pub geolocation: postgis_diesel::types::GeometryContainer<
-        postgis_diesel::types::Point,
-    >,
+    pub geolocation: postgis_diesel::types::GeometryContainer<postgis_diesel::types::Point>,
     pub qr_code: ::rosetta_uuid::Uuid,
 }
 impl web_common_traits::prelude::TableName for Room {
     const TABLE_NAME: &'static str = "Rooms";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::rooms::Room,
-> for Room
+impl
+    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::rooms::Room>
+    for Room
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl diesel::Identifiable for Room {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -63,38 +62,24 @@ impl Room {
     pub fn address<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::addresses::Address,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::addresses::Address, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::addresses::Address: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::addresses::Address:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::addresses::Address::read(
-            self.address,
-            conn,
-        )
+        crate::codegen::structs_codegen::tables::addresses::Address::read(self.address, conn)
     }
     pub fn building<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::buildings::Building,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::buildings::Building, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::buildings::Building: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::buildings::Building:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::buildings::Building::read(
-            self.building,
-            conn,
-        )
+        crate::codegen::structs_codegen::tables::buildings::Building::read(self.building, conn)
     }
     pub fn user_created<C: diesel::connection::LoadConnection>(
         &self,
@@ -104,20 +89,19 @@ impl Room {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_created) = self.user_created else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_created,
-                conn,
-            )
-            .optional()
+            user_created,
+            conn,
+        )
+        .optional()
     }
     pub fn user_updated<C: diesel::connection::LoadConnection>(
         &self,
@@ -127,29 +111,27 @@ impl Room {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_updated) = self.user_updated else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_updated,
-                conn,
-            )
-            .optional()
+            user_updated,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_user_created(
         user_created: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::rooms::rooms;
         Self::table()
             .filter(rooms::user_created.eq(user_created))
@@ -161,9 +143,8 @@ impl Room {
         user_updated: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::rooms::rooms;
         Self::table()
             .filter(rooms::user_updated.eq(user_updated))
@@ -175,23 +156,18 @@ impl Room {
         status: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::rooms::rooms;
-        Self::table()
-            .filter(rooms::status.eq(status))
-            .order_by(rooms::id.asc())
-            .load::<Self>(conn)
+        Self::table().filter(rooms::status.eq(status)).order_by(rooms::id.asc()).load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_date_created(
         date_created: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::rooms::rooms;
         Self::table()
             .filter(rooms::date_created.eq(date_created))
@@ -203,9 +179,8 @@ impl Room {
         date_updated: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::rooms::rooms;
         Self::table()
             .filter(rooms::date_updated.eq(date_updated))
@@ -217,9 +192,8 @@ impl Room {
         room_name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::rooms::rooms;
         Self::table()
             .filter(rooms::room_name.eq(room_name))
@@ -231,9 +205,8 @@ impl Room {
         comment: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::rooms::rooms;
         Self::table()
             .filter(rooms::comment.eq(comment))
@@ -271,9 +244,8 @@ impl Room {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::rooms::rooms;
         Self::table()
             .filter(rooms::qr_code.eq(qr_code))

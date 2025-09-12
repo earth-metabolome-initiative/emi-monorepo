@@ -1,5 +1,4 @@
-use crate::codegen::diesel_codegen::tables::ms_data::ms_data;
-use crate::codegen::diesel_codegen::tables::batches::batches;
+use crate::codegen::diesel_codegen::tables::{batches::batches, ms_data::ms_data};
 diesel::allow_tables_to_appear_in_same_query!(ms_data, batches);
 use crate::codegen::diesel_codegen::tables::containers::containers;
 diesel::allow_tables_to_appear_in_same_query!(ms_data, containers);

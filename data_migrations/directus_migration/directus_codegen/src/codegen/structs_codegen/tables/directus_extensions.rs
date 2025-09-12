@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable
+    diesel::Identifiable,
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -21,12 +21,14 @@ pub struct DirectusExtension {
 impl web_common_traits::prelude::TableName for DirectusExtension {
     const TABLE_NAME: &'static str = "directus_extensions";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_extensions::DirectusExtension,
-> for DirectusExtension
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_extensions::DirectusExtension,
+    > for DirectusExtension
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusExtension {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
@@ -71,9 +73,8 @@ impl DirectusExtension {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_extensions::directus_extensions;
         Self::table()
             .filter(directus_extensions::enabled.eq(enabled))
@@ -85,9 +86,8 @@ impl DirectusExtension {
         folder: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_extensions::directus_extensions;
         Self::table()
             .filter(directus_extensions::folder.eq(folder))
@@ -99,9 +99,8 @@ impl DirectusExtension {
         source: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_extensions::directus_extensions;
         Self::table()
             .filter(directus_extensions::source.eq(source))
@@ -113,9 +112,8 @@ impl DirectusExtension {
         bundle: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_extensions::directus_extensions;
         Self::table()
             .filter(directus_extensions::bundle.eq(bundle))

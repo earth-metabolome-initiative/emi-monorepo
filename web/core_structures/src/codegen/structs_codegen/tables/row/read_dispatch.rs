@@ -351,6 +351,12 @@ where
     crate::codegen::structs_codegen::tables::samples::Sample: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::soil_models::SoilModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::soils::Soil: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy: web_common_traits::database::Read<
         C,
     >,
@@ -1483,6 +1489,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::samples::Sample::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::SoilModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::soil_models::SoilModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::Soil(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::soils::Soil::read(
                             primary_key,
                             conn,
                         )?

@@ -115,6 +115,8 @@ pub mod sample_source_models;
 pub mod sample_sources;
 pub mod sample_states;
 pub mod samples;
+pub mod soil_models;
+pub mod soils;
 pub mod spatial_ref_sys;
 pub mod spectra;
 pub mod spectra_collections;

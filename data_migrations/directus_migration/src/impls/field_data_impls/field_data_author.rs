@@ -40,7 +40,9 @@ impl FieldDatumWrapper {
             return Ok(Some(get_or_insert_user("Audrey", "Le Cabec", portal)?));
         }
 
-        if picture_panel.starts_with("DCIM/edouard_brulhart_mw_2023/") || picture_panel.starts_with("DCIM/SBL_20004_2023/") {
+        if picture_panel.starts_with("DCIM/edouard_brulhart_mw_2023/")
+            || picture_panel.starts_with("DCIM/SBL_20004_2023/")
+        {
             return Ok(Some(get_or_insert_user("Edouard", "Brülhart", portal)?));
         }
 
@@ -51,7 +53,9 @@ impl FieldDatumWrapper {
             return Ok(Some(get_or_insert_user("Teo", "Valentino", portal)?));
         }
 
-        if picture_panel.starts_with("DCIM/heloise_coen/") {
+        if picture_panel.starts_with("DCIM/heloise_coen/")
+            || picture_panel.starts_with("DCIM/below_ground/")
+        {
             return Ok(Some(get_or_insert_user("Héloïse", "Coen", portal)?));
         }
 
@@ -70,8 +74,6 @@ impl FieldDatumWrapper {
         if picture_panel.starts_with("files/") && qfield_project.contains("jbn") {
             return Ok(Some(get_or_insert_user("Emmanuel", "Defossez", portal)?));
         }
-
-        
 
         Ok(None)
     }
@@ -92,9 +94,7 @@ fn dispatch_user_from_name(name: &str, portal: &mut PgConnection) -> anyhow::Res
         "Lise Lebrun" => get_or_insert_user("Lise", "Lebrun", portal),
         "Héloïse Coen" => get_or_insert_user("Héloïse", "Coen", portal),
         "Donat Agosti" => get_or_insert_user("Donat", "Agosti", portal),
-        "Marco Andreas Stanley Visani" => {
-            get_or_insert_user("Marco", "Visani", portal)
-        }
+        "Marco Andreas Stanley Visani" => get_or_insert_user("Marco", "Visani", portal),
         "Disha Tandon" => get_or_insert_user("Disha", "Tandon", portal),
         "Simon Rérat" => get_or_insert_user("Simon", "Rérat", portal),
         "Jade Dandois" => get_or_insert_user("Jade", "Dandois", portal),

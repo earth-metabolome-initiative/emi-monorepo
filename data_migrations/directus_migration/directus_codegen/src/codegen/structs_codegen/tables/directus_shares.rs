@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -47,12 +47,14 @@ pub struct DirectusShare {
 impl web_common_traits::prelude::TableName for DirectusShare {
     const TABLE_NAME: &'static str = "directus_shares";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_shares::DirectusShare,
-> for DirectusShare
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_shares::DirectusShare,
+    > for DirectusShare
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusShare {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
@@ -74,9 +76,8 @@ impl DirectusShare {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::directus_collections::DirectusCollection::read(
@@ -92,19 +93,15 @@ impl DirectusShare {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(role) = self.role else {
             return Ok(None);
         };
-        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole::read(
-                role,
-                conn,
-            )
+        crate::codegen::structs_codegen::tables::directus_roles::DirectusRole::read(role, conn)
             .optional()
     }
     pub fn user_created<C: diesel::connection::LoadConnection>(
@@ -115,29 +112,27 @@ impl DirectusShare {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_created) = self.user_created else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_created,
-                conn,
-            )
-            .optional()
+            user_created,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_shares::directus_shares;
         Self::table()
             .filter(directus_shares::name.eq(name))
@@ -149,9 +144,8 @@ impl DirectusShare {
         item: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_shares::directus_shares;
         Self::table()
             .filter(directus_shares::item.eq(item))
@@ -163,9 +157,8 @@ impl DirectusShare {
         password: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_shares::directus_shares;
         Self::table()
             .filter(directus_shares::password.eq(password))
@@ -177,9 +170,8 @@ impl DirectusShare {
         date_created: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_shares::directus_shares;
         Self::table()
             .filter(directus_shares::date_created.eq(date_created))
@@ -191,9 +183,8 @@ impl DirectusShare {
         date_start: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_shares::directus_shares;
         Self::table()
             .filter(directus_shares::date_start.eq(date_start))
@@ -205,9 +196,8 @@ impl DirectusShare {
         date_end: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_shares::directus_shares;
         Self::table()
             .filter(directus_shares::date_end.eq(date_end))
@@ -219,9 +209,8 @@ impl DirectusShare {
         times_used: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_shares::directus_shares;
         Self::table()
             .filter(directus_shares::times_used.eq(times_used))
@@ -233,9 +222,8 @@ impl DirectusShare {
         max_uses: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_shares::directus_shares;
         Self::table()
             .filter(directus_shares::max_uses.eq(max_uses))

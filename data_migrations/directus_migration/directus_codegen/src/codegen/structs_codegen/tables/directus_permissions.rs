@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -31,12 +31,14 @@ pub struct DirectusPermission {
 impl web_common_traits::prelude::TableName for DirectusPermission {
     const TABLE_NAME: &'static str = "directus_permissions";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_permissions::DirectusPermission,
-> for DirectusPermission
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_permissions::DirectusPermission,
+    > for DirectusPermission
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusPermission {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -58,9 +60,8 @@ impl DirectusPermission {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::directus_policies::DirectusPolicy::read(
@@ -73,9 +74,8 @@ impl DirectusPermission {
         collection: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_permissions::directus_permissions;
         Self::table()
             .filter(directus_permissions::collection.eq(collection))
@@ -87,9 +87,8 @@ impl DirectusPermission {
         action: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_permissions::directus_permissions;
         Self::table()
             .filter(directus_permissions::action.eq(action))
@@ -101,9 +100,8 @@ impl DirectusPermission {
         fields: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_permissions::directus_permissions;
         Self::table()
             .filter(directus_permissions::fields.eq(fields))

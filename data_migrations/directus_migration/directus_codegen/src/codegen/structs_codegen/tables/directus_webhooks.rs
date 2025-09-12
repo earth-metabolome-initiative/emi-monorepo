@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -34,12 +34,14 @@ pub struct DirectusWebhook {
 impl web_common_traits::prelude::TableName for DirectusWebhook {
     const TABLE_NAME: &'static str = "directus_webhooks";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_webhooks::DirectusWebhook,
-> for DirectusWebhook
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_webhooks::DirectusWebhook,
+    > for DirectusWebhook
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusWebhook {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -61,29 +63,27 @@ impl DirectusWebhook {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(migrated_flow) = self.migrated_flow else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow::read(
-                migrated_flow,
-                conn,
-            )
-            .optional()
+            migrated_flow,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks;
         Self::table()
             .filter(directus_webhooks::name.eq(name))
@@ -95,9 +95,8 @@ impl DirectusWebhook {
         method: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks;
         Self::table()
             .filter(directus_webhooks::method.eq(method))
@@ -109,9 +108,8 @@ impl DirectusWebhook {
         url: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks;
         Self::table()
             .filter(directus_webhooks::url.eq(url))
@@ -123,9 +121,8 @@ impl DirectusWebhook {
         status: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks;
         Self::table()
             .filter(directus_webhooks::status.eq(status))
@@ -163,9 +160,8 @@ impl DirectusWebhook {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks;
         Self::table()
             .filter(directus_webhooks::data.eq(data))
@@ -177,9 +173,8 @@ impl DirectusWebhook {
         actions: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks;
         Self::table()
             .filter(directus_webhooks::actions.eq(actions))
@@ -191,9 +186,8 @@ impl DirectusWebhook {
         collections: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks;
         Self::table()
             .filter(directus_webhooks::collections.eq(collections))
@@ -231,14 +225,12 @@ impl DirectusWebhook {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_webhooks::directus_webhooks;
         Self::table()
             .filter(
-                directus_webhooks::was_active_before_deprecation
-                    .eq(was_active_before_deprecation),
+                directus_webhooks::was_active_before_deprecation.eq(was_active_before_deprecation),
             )
             .order_by(directus_webhooks::id.asc())
             .load::<Self>(conn)

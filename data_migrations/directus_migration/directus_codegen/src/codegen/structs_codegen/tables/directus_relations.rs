@@ -5,7 +5,7 @@
     diesel::Insertable,
     diesel::AsChangeset,
     diesel::Queryable,
-    diesel::Identifiable
+    diesel::Identifiable,
 )]
 #[diesel(primary_key(id))]
 #[diesel(
@@ -26,12 +26,14 @@ pub struct DirectusRelation {
 impl web_common_traits::prelude::TableName for DirectusRelation {
     const TABLE_NAME: &'static str = "directus_relations";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_relations::DirectusRelation,
-> for DirectusRelation
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_relations::DirectusRelation,
+    > for DirectusRelation
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusRelation {
     type Id = i32;
     fn id(self) -> Self::Id {
@@ -50,9 +52,8 @@ impl DirectusRelation {
         many_collection: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_relations::directus_relations;
         Self::table()
             .filter(directus_relations::many_collection.eq(many_collection))
@@ -64,9 +65,8 @@ impl DirectusRelation {
         many_field: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_relations::directus_relations;
         Self::table()
             .filter(directus_relations::many_field.eq(many_field))
@@ -78,9 +78,8 @@ impl DirectusRelation {
         one_collection: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_relations::directus_relations;
         Self::table()
             .filter(directus_relations::one_collection.eq(one_collection))
@@ -92,9 +91,8 @@ impl DirectusRelation {
         one_field: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_relations::directus_relations;
         Self::table()
             .filter(directus_relations::one_field.eq(one_field))
@@ -106,9 +104,8 @@ impl DirectusRelation {
         one_collection_field: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_relations::directus_relations;
         Self::table()
             .filter(directus_relations::one_collection_field.eq(one_collection_field))
@@ -120,14 +117,11 @@ impl DirectusRelation {
         one_allowed_collections: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_relations::directus_relations;
         Self::table()
-            .filter(
-                directus_relations::one_allowed_collections.eq(one_allowed_collections),
-            )
+            .filter(directus_relations::one_allowed_collections.eq(one_allowed_collections))
             .order_by(directus_relations::id.asc())
             .load::<Self>(conn)
     }
@@ -136,9 +130,8 @@ impl DirectusRelation {
         junction_field: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_relations::directus_relations;
         Self::table()
             .filter(directus_relations::junction_field.eq(junction_field))
@@ -150,9 +143,8 @@ impl DirectusRelation {
         sort_field: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_relations::directus_relations;
         Self::table()
             .filter(directus_relations::sort_field.eq(sort_field))
@@ -164,9 +156,8 @@ impl DirectusRelation {
         one_deselect_action: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_relations::directus_relations;
         Self::table()
             .filter(directus_relations::one_deselect_action.eq(one_deselect_action))

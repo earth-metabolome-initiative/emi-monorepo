@@ -117,6 +117,8 @@ mod sample_source_models;
 mod sample_sources;
 mod sample_states;
 mod samples;
+mod soil_models;
+mod soils;
 mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
@@ -425,6 +427,8 @@ pub enum Row {
     SampleSource(crate::codegen::structs_codegen::tables::sample_sources::SampleSource),
     SampleState(crate::codegen::structs_codegen::tables::sample_states::SampleState),
     Sample(crate::codegen::structs_codegen::tables::samples::Sample),
+    SoilModel(crate::codegen::structs_codegen::tables::soil_models::SoilModel),
+    Soil(crate::codegen::structs_codegen::tables::soils::Soil),
     SpatialRefSy(crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy),
     Spectrum(crate::codegen::structs_codegen::tables::spectra::Spectrum),
     SpectraCollection(
@@ -755,6 +759,8 @@ impl Row {
             Row::SampleSource(sample_sources) => sample_sources.upsert(conn)?.map(Row::from),
             Row::SampleState(sample_states) => sample_states.upsert(conn)?.map(Row::from),
             Row::Sample(samples) => samples.upsert(conn)?.map(Row::from),
+            Row::SoilModel(soil_models) => soil_models.upsert(conn)?.map(Row::from),
+            Row::Soil(soils) => soils.upsert(conn)?.map(Row::from),
             Row::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.upsert(conn)?.map(Row::from),
             Row::Spectrum(spectra) => spectra.upsert(conn)?.map(Row::from),
             Row::SpectraCollection(spectra_collections) => {
@@ -1024,6 +1030,8 @@ impl web_common_traits::prelude::Row for Row {
             Row::SampleSource(sample_sources) => sample_sources.primary_key(),
             Row::SampleState(sample_states) => sample_states.primary_key(),
             Row::Sample(samples) => samples.primary_key(),
+            Row::SoilModel(soil_models) => soil_models.primary_key(),
+            Row::Soil(soils) => soils.primary_key(),
             Row::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.primary_key(),
             Row::Spectrum(spectra) => spectra.primary_key(),
             Row::SpectraCollection(spectra_collections) => spectra_collections.primary_key(),

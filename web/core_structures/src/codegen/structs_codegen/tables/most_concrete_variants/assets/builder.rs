@@ -60,6 +60,8 @@ pub enum AssetBuilderDAG {
     Sample(
         crate::codegen::structs_codegen::tables::insertables::InsertableSampleBuilder,
     ),
+    ///Builder for the `soils` table.
+    Soil(crate::codegen::structs_codegen::tables::insertables::InsertableSoilBuilder),
     ///Builder for the `spectra` table.
     Spectrum(
         crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumBuilder,
@@ -214,6 +216,15 @@ impl From<crate::codegen::structs_codegen::tables::insertables::InsertableSample
         value: crate::codegen::structs_codegen::tables::insertables::InsertableSampleBuilder,
     ) -> Self {
         AssetBuilderDAG::Sample(value)
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableSoilBuilder>
+    for AssetBuilderDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertableSoilBuilder,
+    ) -> Self {
+        AssetBuilderDAG::Soil(value)
     }
 }
 impl From<crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumBuilder>

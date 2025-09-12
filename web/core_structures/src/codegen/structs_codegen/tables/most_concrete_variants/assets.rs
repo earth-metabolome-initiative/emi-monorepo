@@ -22,11 +22,12 @@ pub use builder::AssetBuilderDAG;
 /// v12@{shape: rect, label: "positioning_devices"}
 /// v13@{shape: rect, label: "sample_sources"}
 /// v14@{shape: rect, label: "samples"}
-/// v15@{shape: rect, label: "spectra"}
-/// v16@{shape: rect, label: "spectra_collections"}
-/// v17@{shape: rect, label: "volume_measuring_devices"}
-/// v18@{shape: rect, label: "volumetric_containers"}
-/// v19@{shape: rect, label: "weighing_devices"}
+/// v15@{shape: rect, label: "soils"}
+/// v16@{shape: rect, label: "spectra"}
+/// v17@{shape: rect, label: "spectra_collections"}
+/// v18@{shape: rect, label: "volume_measuring_devices"}
+/// v19@{shape: rect, label: "volumetric_containers"}
+/// v20@{shape: rect, label: "weighing_devices"}
 /// v1 --->|"`extends`"| v10
 /// v2 --->|"`extends`"| v10
 /// v3 --->|"`extends`"| v10
@@ -41,11 +42,12 @@ pub use builder::AssetBuilderDAG;
 /// v12 --->|"`extends`"| v10
 /// v13 --->|"`extends`"| v10
 /// v14 --->|"`extends`"| v10
-/// v15 --->|"`extends`"| v5
+/// v15 --->|"`extends`"| v13
 /// v16 --->|"`extends`"| v5
-/// v17 --->|"`extends`"| v10
-/// v18 --->|"`extends`"| v4
-/// v19 --->|"`extends`"| v10
+/// v17 --->|"`extends`"| v5
+/// v18 --->|"`extends`"| v10
+/// v19 --->|"`extends`"| v4
+/// v20 --->|"`extends`"| v10
 /// ```
 pub enum AssetDAG {
     /// Variant representing the `assets` table.
@@ -80,6 +82,8 @@ pub enum AssetDAG {
     SampleSource(crate::codegen::structs_codegen::tables::sample_sources::SampleSource),
     /// Variant representing the `samples` table.
     Sample(crate::codegen::structs_codegen::tables::samples::Sample),
+    /// Variant representing the `soils` table.
+    Soil(crate::codegen::structs_codegen::tables::soils::Soil),
     /// Variant representing the `spectra` table.
     Spectrum(crate::codegen::structs_codegen::tables::spectra::Spectrum),
     /// Variant representing the `spectra_collections` table.
@@ -182,6 +186,11 @@ impl From<crate::codegen::structs_codegen::tables::samples::Sample> for AssetDAG
         AssetDAG::Sample(value)
     }
 }
+impl From<crate::codegen::structs_codegen::tables::soils::Soil> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::soils::Soil) -> Self {
+        AssetDAG::Soil(value)
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::spectra::Spectrum> for AssetDAG {
     fn from(value: crate::codegen::structs_codegen::tables::spectra::Spectrum) -> Self {
         AssetDAG::Spectrum(value)
@@ -250,6 +259,7 @@ where
     crate::codegen::structs_codegen::tables::sample_sources::SampleSource:
         web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::samples::Sample: web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::soils::Soil: web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::spectra::Spectrum:
         web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection:
@@ -347,6 +357,12 @@ where
                 }
                 "samples" => {
                     <crate::codegen::structs_codegen::tables::samples::Sample as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "soils" => {
+                    <crate::codegen::structs_codegen::tables::soils::Soil as web_common_traits::database::Read<
                         C,
                     >>::read(*self.id(), conn)?
                         .into()

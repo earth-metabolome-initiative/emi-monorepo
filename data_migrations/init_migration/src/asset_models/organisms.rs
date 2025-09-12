@@ -1,4 +1,4 @@
-//! Submodule to initialize the `instruments` in the database.
+//! Submodule to initialize the `organisms` in the database.
 
 use core_structures::{
     OrganismModel, SampleModel, User,

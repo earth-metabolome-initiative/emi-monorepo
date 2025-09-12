@@ -118,6 +118,8 @@ impl super::Rows {
             super::Rows::SampleSource(rows) => rows.len(),
             super::Rows::SampleState(rows) => rows.len(),
             super::Rows::Sample(rows) => rows.len(),
+            super::Rows::SoilModel(rows) => rows.len(),
+            super::Rows::Soil(rows) => rows.len(),
             super::Rows::SpatialRefSy(rows) => rows.len(),
             super::Rows::Spectrum(rows) => rows.len(),
             super::Rows::SpectraCollection(rows) => rows.len(),

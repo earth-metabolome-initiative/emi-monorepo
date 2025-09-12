@@ -5,9 +5,8 @@ use core_structures::{
     tables::insertables::{AddressSettable, CitySettable},
 };
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
-
 use directus_codegen::Address as DirectusAddress;
+use web_common_traits::database::{Insertable, InsertableVariant};
 
 /// Returns (potentially newly created) address for a Directus address.
 pub(crate) fn get_address(

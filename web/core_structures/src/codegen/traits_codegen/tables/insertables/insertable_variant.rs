@@ -115,6 +115,8 @@ mod sample_source_models;
 mod sample_sources;
 mod sample_states;
 mod samples;
+mod soil_models;
+mod soils;
 mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;

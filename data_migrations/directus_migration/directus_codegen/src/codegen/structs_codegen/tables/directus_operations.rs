@@ -6,7 +6,7 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
-    diesel::Associations
+    diesel::Associations,
 )]
 #[diesel(
     belongs_to(
@@ -41,12 +41,14 @@ pub struct DirectusOperation {
 impl web_common_traits::prelude::TableName for DirectusOperation {
     const TABLE_NAME: &'static str = "directus_operations";
 }
-impl web_common_traits::prelude::ExtensionTable<
-    crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation,
-> for DirectusOperation
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation,
+    > for DirectusOperation
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
-{}
+{
+}
 impl diesel::Identifiable for DirectusOperation {
     type Id = ::rosetta_uuid::Uuid;
     fn id(self) -> Self::Id {
@@ -68,65 +70,53 @@ impl DirectusOperation {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow:
+            web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow::read(
-            self.flow,
-            conn,
-        )
+        crate::codegen::structs_codegen::tables::directus_flows::DirectusFlow::read(self.flow, conn)
     }
     pub fn reject<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation,
-        >,
+        Option<crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(reject) = self.reject else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation::read(
-                reject,
-                conn,
-            )
-            .optional()
+            reject, conn,
+        )
+        .optional()
     }
     pub fn resolve<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<
-            crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation,
-        >,
+        Option<crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(resolve) = self.resolve else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_operations::DirectusOperation::read(
-                resolve,
-                conn,
-            )
-            .optional()
+            resolve, conn,
+        )
+        .optional()
     }
     pub fn user_created<C: diesel::connection::LoadConnection>(
         &self,
@@ -136,29 +126,27 @@ impl DirectusOperation {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::directus_users::DirectusUser: web_common_traits::database::Read<
-            C,
-        >,
+        crate::codegen::structs_codegen::tables::directus_users::DirectusUser:
+            web_common_traits::database::Read<C>,
     {
-        use web_common_traits::database::Read;
         use diesel::OptionalExtension;
+        use web_common_traits::database::Read;
         let Some(user_created) = self.user_created else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::directus_users::DirectusUser::read(
-                user_created,
-                conn,
-            )
-            .optional()
+            user_created,
+            conn,
+        )
+        .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn from_reject(
         reject: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_operations::directus_operations;
         Self::table()
             .filter(directus_operations::reject.eq(reject))
@@ -170,9 +158,8 @@ impl DirectusOperation {
         resolve: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_operations::directus_operations;
         Self::table()
             .filter(directus_operations::resolve.eq(resolve))
@@ -184,9 +171,8 @@ impl DirectusOperation {
         name: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_operations::directus_operations;
         Self::table()
             .filter(directus_operations::name.eq(name))
@@ -198,9 +184,8 @@ impl DirectusOperation {
         key: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_operations::directus_operations;
         Self::table()
             .filter(directus_operations::key.eq(key))
@@ -212,9 +197,8 @@ impl DirectusOperation {
         r#type: &str,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_operations::directus_operations;
         Self::table()
             .filter(directus_operations::r#type.eq(r#type))
@@ -252,9 +236,8 @@ impl DirectusOperation {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_operations::directus_operations;
         Self::table()
             .filter(directus_operations::position_x.eq(position_x))
@@ -292,9 +275,8 @@ impl DirectusOperation {
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_operations::directus_operations;
         Self::table()
             .filter(directus_operations::position_y.eq(position_y))
@@ -306,9 +288,8 @@ impl DirectusOperation {
         date_created: ::rosetta_timestamp::TimestampUTC,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use diesel::{QueryDsl, ExpressionMethods};
+        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
+
         use crate::codegen::diesel_codegen::tables::directus_operations::directus_operations;
         Self::table()
             .filter(directus_operations::date_created.eq(date_created))

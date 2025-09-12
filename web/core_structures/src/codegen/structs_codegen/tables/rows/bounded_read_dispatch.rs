@@ -351,6 +351,12 @@ where
     crate::codegen::structs_codegen::tables::samples::Sample: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::soil_models::SoilModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::soils::Soil: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -1366,6 +1372,22 @@ where
             }
             crate::codegen::tables::table_names::TableName::Sample => {
                 crate::codegen::structs_codegen::tables::samples::Sample::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::SoilModel => {
+                crate::codegen::structs_codegen::tables::soil_models::SoilModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::Soil => {
+                crate::codegen::structs_codegen::tables::soils::Soil::bounded_read(
                         offset,
                         limit,
                         conn,
