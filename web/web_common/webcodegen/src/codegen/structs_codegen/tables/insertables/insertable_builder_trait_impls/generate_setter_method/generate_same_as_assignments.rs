@@ -54,7 +54,7 @@ impl Table {
         let required_ancestor_columns: Vec<Column> =
             current_column.all_ancestral_same_as_columns(conn)?;
         involved_columns.extend(required_ancestor_columns.clone());
-        involved_columns.extend(current_column.foreign_defined_columns(conn)?);
+        involved_columns.extend(current_column.foreign_defined_columns(false, conn)?);
 
         // We iterate over the direct ancestor table, as the ancestors must fall
         // within two categories:

@@ -7,6 +7,7 @@ use crate::traits::{
     BidirectionalVocabulary, BipartiteGraph, Edges, Graph, MonoplexGraph, Vocabulary,
 };
 
+#[derive(Clone)]
 /// Struct representing a generic bigraph.
 pub struct GenericBiGraph<LeftNodes, RightNodes, Edges> {
     /// The left nodes of the graph.

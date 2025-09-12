@@ -66,7 +66,7 @@ pub(crate) fn struct_name(name: &str) -> Result<String, WebCodeGenError> {
     create = "{ UnboundCache::new() }",
     convert = r#"{ name.to_owned() }"#
 )]
-fn singular_name(name: &str) -> String {
+pub(crate) fn singular_name(name: &str) -> String {
     // We split the table name by underscores and remove the last element.
     let mut parts = name.split('_').map(std::string::ToString::to_string).collect::<Vec<String>>();
     let last = parts.pop().map(|last| Inflector::default().singularize(&last));

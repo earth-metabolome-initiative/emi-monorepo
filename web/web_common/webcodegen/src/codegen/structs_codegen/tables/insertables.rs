@@ -95,6 +95,59 @@ impl Table {
 
         Ok(insertable_columns)
     }
+
+    /// Returns the list of ancestral insertable columns for the table.
+    ///
+    /// # Implementation details
+    ///
+    /// This method returns the list of insertable columns for the table,
+    /// including the insertable columns of its ancestral extensions. It
+    /// then proceeds to remove any duplicate columns which may arise due to
+    /// overlapping extensions in a DAG, and removes any columns that are
+    /// within ancestral same-as relationships. It also removes columns which
+    /// are defined in either associated same-as relationships or foreign
+    /// defined relationships, allowing the user to focus on the columns that
+    /// are directly relevant to the table itself.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    ///
+    /// # Errors
+    ///
+    /// * If the database connection fails.
+    pub(crate) fn ancestral_insertable_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
+        let mut insertable_columns = self.insertable_columns(conn, false)?;
+        let mut ancestral_insertable_columns = Vec::new();
+        for extension in self.extension_tables(conn)?.iter() {
+            let extension_insertable_columns = extension.ancestral_insertable_columns(conn)?;
+            ancestral_insertable_columns.extend(extension_insertable_columns);
+        }
+        // We deduplicate the columns to avoid duplicates due to overlapping extensions
+        // in a DAG.
+        ancestral_insertable_columns.sort_unstable();
+        ancestral_insertable_columns.dedup();
+
+        // Next, we filter out the columns which are part of ancestral same-as
+        // relationships.
+        for insertable_column in &insertable_columns {
+            ancestral_insertable_columns.retain(|other| {
+                !insertable_column.is_ancestrally_same_as(other, conn).unwrap_or(false)
+            });
+        }
+
+        // Next, we remove columns which are defined in either associated same-as
+        // relationships (i.e. by partial builders) or foreign defined relationships.
+        insertable_columns
+            .retain(|column| !column.is_foreignely_defined(true, conn).unwrap_or(false));
+
+        insertable_columns.extend(ancestral_insertable_columns);
+        insertable_columns.sort_unstable();
+        Ok(insertable_columns)
+    }
 }
 
 impl Codegen<'_> {

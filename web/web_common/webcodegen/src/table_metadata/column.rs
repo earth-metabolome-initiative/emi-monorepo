@@ -1625,6 +1625,8 @@ impl Column {
     ///
     /// # Arguments
     ///
+    /// * `include_mandatory_partial_builder`: Whether to include mandatory
+    ///   partial builders
     /// * `conn`: A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -1632,17 +1634,42 @@ impl Column {
     /// * If an error occurs while querying the database
     pub(crate) fn is_foreign_definer(
         &self,
+        include_mandatory_partial_builder: bool,
         conn: &mut PgConnection,
     ) -> Result<bool, WebCodeGenError> {
-        Ok(!self.foreign_definer_constraints(conn)?.is_empty())
+        Ok(!self.foreign_definer_constraints(include_mandatory_partial_builder, conn)?.is_empty())
+    }
+
+    /// Returns whether the column is foreignely defined.
+    ///
+    /// # Arguments
+    ///
+    /// * `include_mandatory_partial_builder`: Whether to include mandatory
+    ///  partial builders
+    /// * `conn`: A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub(crate) fn is_foreignely_defined(
+        &self,
+        include_mandatory_partial_builder: bool,
+        conn: &mut PgConnection,
+    ) -> Result<bool, WebCodeGenError> {
+        Ok(!self.foreign_definer_columns(include_mandatory_partial_builder, conn)?.is_empty())
     }
 
     pub(crate) fn foreign_definer_constraints(
         &self,
+        include_mandatory_partial_builder: bool,
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
-        if let Some((PartialBuilderKind::Mandatory, _, _)) = self.requires_partial_builder(conn)? {
-            return Ok(Vec::new());
+        if !include_mandatory_partial_builder {
+            if let Some((PartialBuilderKind::Mandatory, _, _)) =
+                self.requires_partial_builder(conn)?
+            {
+                return Ok(Vec::new());
+            }
         }
 
         let mut foreign_definer_constraints = Vec::new();
@@ -1670,12 +1697,27 @@ impl Column {
         Ok(foreign_definer_constraints)
     }
 
+    /// Returns a map of foreign definer constraints by the table they belong
+    /// to.
+    ///
+    /// # Arguments
+    ///
+    /// * `include_mandatory_partial_builder`: Whether to include mandatory
+    ///   partial builders
+    /// * `conn`: A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
     pub(crate) fn foreign_definer_constraints_by_table(
         &self,
+        include_mandatory_partial_builder: bool,
         conn: &mut PgConnection,
     ) -> Result<HashMap<Arc<Table>, Vec<KeyColumnUsage>>, WebCodeGenError> {
         let mut foreign_definer_constraints_by_table = HashMap::new();
-        for foreign_definer_constraint in self.foreign_definer_constraints(conn)? {
+        for foreign_definer_constraint in
+            self.foreign_definer_constraints(include_mandatory_partial_builder, conn)?
+        {
             let foreign_table = foreign_definer_constraint.foreign_table(conn)?;
             foreign_definer_constraints_by_table
                 .entry(foreign_table)
@@ -1690,6 +1732,8 @@ impl Column {
     ///
     /// # Arguments
     ///
+    /// * `include_mandatory_partial_builder` - Whether to include mandatory
+    ///   partial builders
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -1697,10 +1741,13 @@ impl Column {
     /// * If an error occurs while querying the database
     pub(crate) fn foreign_defined_columns(
         &self,
+        include_mandatory_partial_builder: bool,
         conn: &mut PgConnection,
     ) -> Result<Vec<Column>, WebCodeGenError> {
         let mut foreign_defined_columns = Vec::new();
-        for foreign_definer_constraint in self.foreign_definer_constraints(conn)? {
+        for foreign_definer_constraint in
+            self.foreign_definer_constraints(include_mandatory_partial_builder, conn)?
+        {
             foreign_defined_columns.extend(
                 foreign_definer_constraint.columns(conn)?.iter().filter(|c| c != &self).cloned(),
             );
@@ -1715,6 +1762,8 @@ impl Column {
     ///
     /// # Arguments
     ///
+    /// * `include_mandatory_partial_builder` - Whether to include mandatory
+    ///   partial builders
     /// * `conn` - A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -1722,6 +1771,7 @@ impl Column {
     /// * If an error occurs while querying the database
     pub(crate) fn foreign_definer_columns(
         &self,
+        include_mandatory_partial_builder: bool,
         conn: &mut PgConnection,
     ) -> Result<Vec<Column>, WebCodeGenError> {
         let mut foreign_definer_columns = Vec::new();
@@ -1730,7 +1780,10 @@ impl Column {
             if column == self {
                 continue;
             }
-            if column.foreign_defined_columns(conn)?.contains(self) {
+            if column
+                .foreign_defined_columns(include_mandatory_partial_builder, conn)?
+                .contains(self)
+            {
                 foreign_definer_columns.push(column.clone());
             }
         }

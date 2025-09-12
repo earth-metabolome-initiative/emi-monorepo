@@ -86,7 +86,7 @@ impl core::fmt::Display for SampleAttribute {
 pub struct InsertableSample {
     pub(crate) id: ::rosetta_uuid::Uuid,
     pub(crate) model: i32,
-    pub(crate) sample_source: Option<::rosetta_uuid::Uuid>,
+    pub(crate) sample_source: ::rosetta_uuid::Uuid,
     pub(crate) sample_source_model: i32,
 }
 impl InsertableSample {
@@ -163,23 +163,18 @@ impl InsertableSample {
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::sample_sources::SampleSource>,
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
         diesel::result::Error,
     >
     where
         crate::codegen::structs_codegen::tables::sample_sources::SampleSource:
             web_common_traits::database::Read<C>,
     {
-        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        let Some(sample_source) = self.sample_source else {
-            return Ok(None);
-        };
         crate::codegen::structs_codegen::tables::sample_sources::SampleSource::read(
-            sample_source,
+            self.sample_source,
             conn,
         )
-        .optional()
     }
     pub fn sample_source_model<C: diesel::connection::LoadConnection>(
         &self,
@@ -202,30 +197,55 @@ impl InsertableSample {
     pub fn samples_sample_source_sample_source_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
-    {
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
-        };
-        let Some(sample_source) = self.sample_source else {
-            return Ok(None);
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
         crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id
-                    .eq(sample_source)
+                    .eq(&self.sample_source)
                     .and(
                         crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
                             .eq(&self.sample_source_model),
                     ),
             )
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
-            .optional()
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`Sample`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::Sample;
+/// use core_structures::tables::insertables::AssetSettable;
+/// use core_structures::tables::insertables::SampleSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let sample = Sample::new()
+///    // Set mandatory fields
+///    .created_by(created_by)?
+///    .most_concrete_table(most_concrete_table)?
+///    .updated_by(updated_by)?
+///    .model(model)?
+///    .sample_source(sample_source)?
+///    // Optionally set fields with default values
+///    .created_at(created_at)?
+///    .id(id)?
+///    .updated_at(updated_at)?
+///    // Optionally set optional fields
+///    .description(description)?
+///    .name(name)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableSampleBuilder<
     PhysicalAsset
         = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetBuilder<
@@ -252,6 +272,7 @@ where
     fn is_complete(&self) -> bool {
         self.id.is_complete()
             && self.model.is_some()
+            && self.sample_source.is_some()
             && (self.sample_source_model.is_some()
                 || self.model.is_some()
                 || self.sample_source.is_some())
@@ -309,7 +330,7 @@ pub trait SampleSettable: Sized {
         sample_source: SS,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        SS: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
+        SS: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.samples.sample_source_model` column.
     ///
     /// # Arguments
@@ -420,14 +441,14 @@ impl<
         sample_source: SS,
     ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
     where
-        SS: web_common_traits::database::MaybePrimaryKeyLike<
+        SS: web_common_traits::database::PrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
         >,
     {
-        let sample_source = <SS as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+        let sample_source = <SS as web_common_traits::database::PrimaryKeyLike>::primary_key(
             &sample_source,
         );
-        self.sample_source = sample_source;
+        self.sample_source = Some(sample_source);
         Ok(self)
     }
     ///Sets the value of the `public.samples.sample_source_model` column.

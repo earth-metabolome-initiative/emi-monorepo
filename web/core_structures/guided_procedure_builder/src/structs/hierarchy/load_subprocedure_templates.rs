@@ -19,7 +19,17 @@ use diesel::{
     },
 };
 
-fn load_subprocedure_templates<C: LoadConnection>(
+/// Recursively loads all sub-procedure templates of the given procedure
+/// template, returning a vector of all loaded sub-procedure templates and a
+/// vector of edges representing the parent-child relationships between them.
+///
+/// # Arguments
+///
+/// * `procedure_template` - The procedure template whose sub-procedure
+///   templates are to be loaded.
+/// * `conn` - The database connection to use for loading the sub-procedure
+///   templates.
+pub(super) fn load_subprocedure_templates<C: LoadConnection>(
     procedure_template: Rc<ProcedureTemplate>,
     conn: &mut C,
 ) -> Result<

@@ -1,6 +1,6 @@
 //! Submodule providing helpers methods to work with the FieldDatum author.
 
-use core_structures::{User};
+use core_structures::User;
 
 use crate::codegen::FieldDatum;
 
@@ -23,4 +23,3 @@ fn dispatch_user_from_name(name: &str, portal: &mut diesel::PgConnection) -> any
         _ => todo!("implement user dispatch from name: {name}"),
     }
 }
-

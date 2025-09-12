@@ -65,6 +65,29 @@ impl InsertableAddress {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`Address`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::Address;
+/// use core_structures::tables::insertables::AddressSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let address = Address::new()
+///    // Set mandatory fields
+///    .city(city_id)?
+///    .geolocation(geolocation)?
+///    .house_number(house_number)?
+///    .postal_code(postal_code)?
+///    .street_name(street_name)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableAddressBuilder {
     pub(crate) city_id: Option<i32>,
     pub(crate) street_name: Option<String>,

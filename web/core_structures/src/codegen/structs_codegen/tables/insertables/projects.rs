@@ -170,6 +170,41 @@ impl InsertableProject {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`Project`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::Project;
+/// use core_structures::tables::insertables::ProjectSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let project = Project::new()
+///    // Set mandatory fields
+///    .created_by(created_by)?
+///    .description(description)?
+///    .end_date(end_date)?
+///    .expected_end_date(expected_end_date)?
+///    .icon(icon)?
+///    .id(id)?
+///    .name(name)?
+///    .updated_by(updated_by)?
+///    // Optionally set fields with default values
+///    .color(color_id)?
+///    .created_at(created_at)?
+///    .state(state_id)?
+///    .updated_at(updated_at)?
+///    // Optionally set optional fields
+///    .budget(budget)?
+///    .expenses(expenses)?
+///    .parent_project(parent_project_id)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableProjectBuilder {
     pub(crate) id: Option<i32>,
     pub(crate) name: Option<String>,

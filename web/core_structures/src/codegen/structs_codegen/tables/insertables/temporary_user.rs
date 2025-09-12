@@ -59,6 +59,26 @@ impl InsertableTemporaryUser {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`TemporaryUser`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::TemporaryUser;
+/// use core_structures::tables::insertables::TemporaryUserSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let temporary_user = TemporaryUser::new()
+///    // Set mandatory fields
+///    .email(email)?
+///    .login_provider(login_provider_id)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableTemporaryUserBuilder {
     pub(crate) email: Option<String>,
     pub(crate) login_provider_id: Option<i16>,

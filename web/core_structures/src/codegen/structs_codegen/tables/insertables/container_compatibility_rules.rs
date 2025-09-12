@@ -103,6 +103,31 @@ impl InsertableContainerCompatibilityRule {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`ContainerCompatibilityRule`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::ContainerCompatibilityRule;
+/// use core_structures::tables::insertables::ContainerCompatibilityRuleSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let container_compatibility_rule = ContainerCompatibilityRule::new()
+///    // Set mandatory fields
+///    .contained_asset_model(contained_asset_model)?
+///    .container_model(container_model)?
+///    .created_by(created_by)?
+///    // Optionally set fields with default values
+///    .created_at(created_at)?
+///    // Optionally set optional fields
+///    .quantity(quantity)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableContainerCompatibilityRuleBuilder {
     pub(crate) container_model: Option<i32>,
     pub(crate) contained_asset_model: Option<i32>,

@@ -2,7 +2,9 @@
 
 use core_structures::traits::CompatibleWith;
 
-use crate::asset_models::{containers::wrappers::coffee_filter_wrapper, organisms::organism_sample_model};
+use crate::asset_models::{
+    containers::wrappers::coffee_filter_wrapper, organisms::organism_sample_model,
+};
 
 /// Initializes the compatibility rules for samples.
 ///

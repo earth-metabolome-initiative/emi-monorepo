@@ -23,6 +23,8 @@ mod ranged_csr;
 #[cfg(any(feature = "std", feature = "alloc"))]
 mod csr2d;
 #[cfg(any(feature = "std", feature = "alloc"))]
+mod generic_bimatrix;
+#[cfg(any(feature = "std", feature = "alloc"))]
 mod generic_implicit_valued_matrix2d;
 #[cfg(any(feature = "std", feature = "alloc"))]
 mod squared_csr2d;
@@ -32,5 +34,3 @@ mod symmetric_csr;
 mod upper_triangular_csr;
 #[cfg(any(feature = "std", feature = "alloc"))]
 mod valued_csr2d;
-#[cfg(any(feature = "std", feature = "alloc"))]
-mod generic_bimatrix;

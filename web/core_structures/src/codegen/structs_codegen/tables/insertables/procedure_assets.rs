@@ -292,6 +292,32 @@ impl InsertableProcedureAsset {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`ProcedureAsset`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::ProcedureAsset;
+/// use core_structures::tables::insertables::ProcedureAssetSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let procedure_asset = ProcedureAsset::new()
+///    // Set mandatory fields
+///    .created_by(created_by)?
+///    .procedure(procedure)?
+///    .procedure_template_asset_model(procedure_template_asset_model)?
+///    // Optionally set fields with default values
+///    .created_at(created_at)?
+///    .id(id)?
+///    // Optionally set optional fields
+///    .asset(asset)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableProcedureAssetBuilder {
     pub(crate) id: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure: Option<::rosetta_uuid::Uuid>,

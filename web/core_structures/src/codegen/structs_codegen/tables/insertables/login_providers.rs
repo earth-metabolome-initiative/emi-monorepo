@@ -61,6 +61,30 @@ pub struct InsertableLoginProvider {
 impl InsertableLoginProvider {}
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`LoginProvider`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::LoginProvider;
+/// use core_structures::tables::insertables::LoginProviderSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let login_provider = LoginProvider::new()
+///    // Set mandatory fields
+///    .client(client_id)?
+///    .icon(icon)?
+///    .name(name)?
+///    .oauth_url(oauth_url)?
+///    .redirect_uri(redirect_uri)?
+///    .scope(scope)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableLoginProviderBuilder {
     pub(crate) name: Option<String>,
     pub(crate) icon: Option<String>,

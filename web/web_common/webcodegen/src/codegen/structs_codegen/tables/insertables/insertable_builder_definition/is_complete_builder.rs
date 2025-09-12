@@ -59,7 +59,7 @@ impl Codegen<'_> {
             let column_ident = column.snake_case_ident()?;
 
             let foreign_definer_idents = column
-                .foreign_definer_columns(conn)?
+                .foreign_definer_columns(false, conn)?
                 .into_iter()
                 .map(|c| {
                     let ident = c.snake_case_ident()?;

@@ -11,6 +11,7 @@ web_common_traits.workspace = true
 graph.workspace = true
 sorted_vec.workspace = true
 algebra.workspace = true
+guided_procedure_builder.workspace = true
 
 [lints]
 workspace = true

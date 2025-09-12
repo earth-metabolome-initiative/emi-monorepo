@@ -106,6 +106,34 @@ impl InsertableRoom {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`Room`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::Room;
+/// use core_structures::tables::insertables::RoomSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let room = Room::new()
+///    // Set mandatory fields
+///    .addresses(addresses_id)?
+///    .created_by(created_by)?
+///    .description(description)?
+///    .geolocation(geolocation)?
+///    .name(name)?
+///    .qrcode(qrcode)?
+///    .updated_by(updated_by)?
+///    // Optionally set fields with default values
+///    .created_at(created_at)?
+///    .updated_at(updated_at)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableRoomBuilder {
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,

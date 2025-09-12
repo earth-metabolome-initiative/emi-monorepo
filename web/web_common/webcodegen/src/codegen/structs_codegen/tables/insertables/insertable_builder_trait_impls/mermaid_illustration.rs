@@ -213,7 +213,7 @@ pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Ord + Eq + Hash
                 }
             }
 
-            let foreign_associated_same_as_columns = column.foreign_defined_columns(conn)?;
+            let foreign_associated_same_as_columns = column.foreign_defined_columns(false, conn)?;
             for foreign_associated_same_as_column in &foreign_associated_same_as_columns {
                 if let Some(foreign_associated_column_node) =
                     column_nodes.get(&foreign_associated_same_as_column)

@@ -63,6 +63,28 @@ impl InsertablePermanenceCategory {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`PermanenceCategory`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::PermanenceCategory;
+/// use core_structures::tables::insertables::PermanenceCategorySettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let permanence_category = PermanenceCategory::new()
+///    // Set mandatory fields
+///    .color(color_id)?
+///    .description(description)?
+///    .icon(icon)?
+///    .name(name)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertablePermanenceCategoryBuilder {
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,

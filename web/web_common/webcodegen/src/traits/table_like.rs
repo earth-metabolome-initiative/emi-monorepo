@@ -26,6 +26,19 @@ pub trait TableLike: AsRef<Table> {
         crate::utils::snake_case_name(&self.as_ref().table_name)
     }
 
+    /// Returns the sanitized snake case name of the table.
+    ///
+    /// # Errors
+    ///
+    /// * If the snake case name cannot be generated.
+    ///
+    /// # Returns
+    ///
+    /// A string representing the sanitized snake case name of the table.
+    fn singular_snake_case_name(&self) -> Result<String, WebCodeGenError> {
+        Ok(crate::utils::singular_name(&crate::utils::snake_case_name(&self.as_ref().table_name)?))
+    }
+
     /// Returns whether the table has a sanitized snake case name.
     ///
     /// # Errors

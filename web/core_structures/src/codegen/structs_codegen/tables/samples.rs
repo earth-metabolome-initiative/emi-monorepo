@@ -26,7 +26,7 @@
 pub struct Sample {
     pub id: ::rosetta_uuid::Uuid,
     pub model: i32,
-    pub sample_source: Option<::rosetta_uuid::Uuid>,
+    pub sample_source: ::rosetta_uuid::Uuid,
     pub sample_source_model: i32,
 }
 impl web_common_traits::prelude::TableName for Sample {
@@ -152,23 +152,18 @@ impl Sample {
         &self,
         conn: &mut C,
     ) -> Result<
-        Option<crate::codegen::structs_codegen::tables::sample_sources::SampleSource>,
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
         diesel::result::Error,
     >
     where
         crate::codegen::structs_codegen::tables::sample_sources::SampleSource:
             web_common_traits::database::Read<C>,
     {
-        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        let Some(sample_source) = self.sample_source else {
-            return Ok(None);
-        };
         crate::codegen::structs_codegen::tables::sample_sources::SampleSource::read(
-            sample_source,
+            self.sample_source,
             conn,
         )
-        .optional()
     }
     pub fn sample_source_model<C: diesel::connection::LoadConnection>(
         &self,
@@ -191,26 +186,20 @@ impl Sample {
     pub fn samples_sample_source_sample_source_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
-    {
+    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
-            associations::HasTable,
-        };
-        let Some(sample_source) = self.sample_source else {
-            return Ok(None);
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
         crate::codegen::structs_codegen::tables::assets::Asset::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id
-                    .eq(sample_source)
+                    .eq(&self.sample_source)
                     .and(
                         crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
                             .eq(&self.sample_source_model),
                     ),
             )
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
-            .optional()
     }
     pub fn from_id<C>(
         id: ::rosetta_uuid::Uuid,

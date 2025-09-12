@@ -22,11 +22,11 @@ impl Codegen<'_> {
         let mut extra_requirements = Vec::new();
 
         let buildable_trait = table.setter_trait_ty()?;
-        for foreign_define_column in table.foreign_definer_columns(conn)? {
+        for foreign_define_column in table.foreign_definer_columns(false, conn)? {
             let mut foreign_definer_ops = Vec::new();
             let foreign_define_column_ident = foreign_define_column.snake_case_ident()?;
             for (foreign_table, foreign_definer_constraints) in
-                foreign_define_column.foreign_definer_constraints_by_table(conn)?
+                foreign_define_column.foreign_definer_constraints_by_table(false, conn)?
             {
                 let foreign_table_primary_key_columns = foreign_table.primary_key_columns(conn)?;
                 let foreign_table_struct = foreign_table.import_struct_path()?;

@@ -51,6 +51,26 @@ impl InsertableCity {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`City`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::City;
+/// use core_structures::tables::insertables::CitySettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let city = City::new()
+///    // Set mandatory fields
+///    .iso(iso)?
+///    .name(name)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableCityBuilder {
     pub(crate) name: Option<String>,
     pub(crate) iso: Option<::iso_codes::CountryCode>,

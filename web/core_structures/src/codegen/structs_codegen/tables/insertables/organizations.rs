@@ -61,6 +61,31 @@ pub struct InsertableOrganization {
 impl InsertableOrganization {}
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`Organization`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::Organization;
+/// use core_structures::tables::insertables::OrganizationSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let organization = Organization::new()
+///    // Set mandatory fields
+///    .alpha_two_code(alpha_two_code)?
+///    .country(country)?
+///    .domain(domain)?
+///    .name(name)?
+///    .url(url)?
+///    // Optionally set optional fields
+///    .state_province(state_province)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableOrganizationBuilder {
     pub(crate) name: Option<String>,
     pub(crate) url: Option<String>,

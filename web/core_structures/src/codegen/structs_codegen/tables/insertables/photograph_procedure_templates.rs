@@ -373,6 +373,39 @@ impl InsertablePhotographProcedureTemplate {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`PhotographProcedureTemplate`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::PhotographProcedureTemplate;
+/// use core_structures::tables::insertables::PhotographProcedureTemplateSettable;
+/// use core_structures::tables::insertables::ProcedureTemplateSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let photograph_procedure_template = PhotographProcedureTemplate::new()
+///    // Set mandatory fields
+///    .procedure_template_photograph_model(procedure_template_photograph_model)?
+///    .procedure_template_photographed_asset_model(procedure_template_photographed_asset_model)?
+///    .procedure_template_photographed_with_model(procedure_template_photographed_with_model)?
+///    .created_by(created_by)?
+///    .description(description)?
+///    .most_concrete_table(most_concrete_table)?
+///    .name(name)?
+///    .updated_by(updated_by)?
+///    // Optionally set fields with default values
+///    .created_at(created_at)?
+///    .deprecated(deprecated)?
+///    .icon(icon)?
+///    .number_of_subprocedure_templates(number_of_subprocedure_templates)?
+///    .updated_at(updated_at)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertablePhotographProcedureTemplateBuilder<
     ProcedureTemplate
         = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateBuilder,

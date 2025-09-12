@@ -6,6 +6,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 mod from_builder_to_id_or_builder_impl;
+mod generate_builder_documentation;
 mod is_complete_builder;
 use crate::{Codegen, Column, Table, errors::WebCodeGenError, traits::TableLike};
 
@@ -144,10 +145,12 @@ impl Codegen<'_> {
             conn,
             self.check_constraints_extensions.as_slice(),
         )?;
+        let documentation: Vec<String> = self.generate_builder_documentation(table, conn)?;
 
         Ok(quote! {
             #[derive(#(#derives),*)]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+            #(#[doc = #documentation])*
             pub struct #builder_ident #maybe_generics {
                 #(#insertable_builder_attributes),*
             }

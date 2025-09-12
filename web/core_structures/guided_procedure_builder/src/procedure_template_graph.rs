@@ -1,35 +1,42 @@
 //! Submodule defining the `ProcedureTemplateGraph` structure and its associated
 //! methods.
 
-use std::rc::Rc;
-
 use core_structures::{
     NextProcedureTemplate, ParentProcedureTemplate, ProcedureTemplate, ProcedureTemplateAssetModel,
+    codegen::diesel_codegen::tables::{
+        next_procedure_templates::next_procedure_templates,
+        parent_procedure_templates::parent_procedure_templates,
+    },
+    tables::most_concrete_variants::ProcedureTemplateDAG,
 };
-use diesel::{associations::HasTable, connection::LoadConnection, helper_types::Asc};
-use graph::prelude::DiGraph;
+use diesel::{
+    BelongingToDsl, RunQueryDsl,
+    associations::{BelongsTo, HasTable},
+    connection::LoadConnection,
+    dsl::Asc,
+    expression_methods::EqAll,
+    query_dsl::{
+        LoadQuery,
+        methods::{FilterDsl, OrderDsl},
+    },
+};
+use web_common_traits::{database::Read, prelude::MostConcreteVariant};
 
-use crate::structs::{Hierarchy, TaskGraph};
+use crate::structs::{Hierarchy, Ownership, TaskGraph};
 
 #[derive(Debug, Clone)]
 /// Struct providing functionalities to help the user concretely build a
 /// procedure.
 pub struct ProcedureTemplateGraph {
-    /// The procedure template being built.
-    procedure_template: ProcedureTemplate,
     /// The task graphs of each procedure template in the hierarchy.
     /// Leaves of the hierarchy have no task graph, hence the `Option`.
     task_graphs: Vec<Option<TaskGraph>>,
     /// The hierarchy of procedure templates, rooted at the procedure template
     /// being built, and including all its sub-procedure templates.
     hierarchy: Hierarchy,
-    /// The foreign procedures referenced by some procedure template asset model
-    /// which are not among either the root procedure template or any of its
-    /// sub-procedure templates.
-    foreign_procedure_templates: Vec<ProcedureTemplate>,
     /// The procedure template asset models associated to the root procedure
     /// template or any of its sub-procedure templates.
-    procedure_template_asset_models: Vec<ProcedureTemplateAssetModel>,
+    ownership: Ownership,
 }
 
 impl ProcedureTemplateGraph {
@@ -45,16 +52,65 @@ impl ProcedureTemplateGraph {
     ///
     /// * Returns a `diesel::result::Error` if there is an issue querying the
     ///   database.
-    pub fn new<C>(
-        procedure_template: ProcedureTemplate,
+    pub fn new<C: LoadConnection>(
+        procedure_template: &ProcedureTemplate,
         conn: &mut C,
-    ) -> Result<Self, diesel::result::Error> {
-        // Ok(Self {
-        //     procedure_template,
-        //     hierarchy: DiGraph::new(),
-        //     foreign_procedure_templates: Vec::new(),
-        //     procedure_template_asset_models: Vec::new(),
-        // })
-        todo!()
+    ) -> Result<Self, diesel::result::Error>
+    where
+        <NextProcedureTemplate as HasTable>::Table:
+            FilterDsl<<next_procedure_templates::parent as EqAll<i32>>::Output>,
+        <<NextProcedureTemplate as HasTable>::Table as FilterDsl<
+            <next_procedure_templates::parent as EqAll<i32>>::Output,
+        >>::Output: OrderDsl<(
+            Asc<next_procedure_templates::parent>,
+            Asc<next_procedure_templates::predecessor>,
+            Asc<next_procedure_templates::successor>,
+        )>,
+        <<<NextProcedureTemplate as HasTable>::Table as FilterDsl<
+            <next_procedure_templates::parent as EqAll<i32>>::Output,
+        >>::Output as OrderDsl<(
+            Asc<next_procedure_templates::parent>,
+            Asc<next_procedure_templates::predecessor>,
+            Asc<next_procedure_templates::successor>,
+        )>>::Output: RunQueryDsl<C> + for<'a> LoadQuery<'a, C, NextProcedureTemplate>,
+        ProcedureTemplate: web_common_traits::database::Read<C>,
+        <ParentProcedureTemplate as HasTable>::Table:
+            FilterDsl<<parent_procedure_templates::parent as EqAll<i32>>::Output>,
+        <<ParentProcedureTemplate as HasTable>::Table as FilterDsl<
+            <parent_procedure_templates::parent as EqAll<i32>>::Output,
+        >>::Output: OrderDsl<(
+            Asc<parent_procedure_templates::parent>,
+            Asc<parent_procedure_templates::child>,
+        )>,
+        <<<ParentProcedureTemplate as HasTable>::Table as FilterDsl<
+            <parent_procedure_templates::parent as EqAll<i32>>::Output,
+        >>::Output as OrderDsl<(
+            Asc<parent_procedure_templates::parent>,
+            Asc<parent_procedure_templates::child>,
+        )>>::Output: RunQueryDsl<C> + for<'a> LoadQuery<'a, C, ParentProcedureTemplate>,
+        ProcedureTemplate: web_common_traits::database::Read<C>,
+        ProcedureTemplateAssetModel: Read<C>,
+        C: diesel::connection::LoadConnection,
+        ProcedureTemplate: MostConcreteVariant<C, Variant = ProcedureTemplateDAG>,
+        ProcedureTemplateAssetModel: BelongsTo<ProcedureTemplate>,
+        for<'a> <ProcedureTemplateAssetModel as BelongingToDsl<&'a ProcedureTemplate>>::Output:
+            LoadQuery<'a, C, ProcedureTemplateAssetModel>,
+    {
+        let hierarchy = Hierarchy::new(procedure_template, conn)?;
+        let task_graphs = hierarchy.task_graphs(conn)?;
+        let ownership = hierarchy.ownership(conn)?;
+        Ok(Self { task_graphs, hierarchy, ownership })
+    }
+}
+
+impl AsRef<Hierarchy> for ProcedureTemplateGraph {
+    fn as_ref(&self) -> &Hierarchy {
+        &self.hierarchy
+    }
+}
+
+impl AsRef<Ownership> for ProcedureTemplateGraph {
+    fn as_ref(&self) -> &Ownership {
+        &self.ownership
     }
 }

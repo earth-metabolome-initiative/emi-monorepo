@@ -1,4 +1,5 @@
-//! Submodule defining the functions to initialize `liquid_nitrogen` asset models.
+//! Submodule defining the functions to initialize `liquid_nitrogen` asset
+//! models.
 use core_structures::{
     ReagentModel, User,
     tables::insertables::{AssetModelSettable, ReagentModelSettable},

@@ -54,6 +54,30 @@ pub struct InsertableSpatialRefSy {
 impl InsertableSpatialRefSy {}
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new [`SpatialRefSy`].
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::SpatialRefSy;
+/// use core_structures::tables::insertables::SpatialRefSySettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let spatial_ref_sy = SpatialRefSy::new()
+///    // Set mandatory fields
+///    .srid(srid)?
+///    // Optionally set optional fields
+///    .auth_name(auth_name)?
+///    .auth_srid(auth_srid)?
+///    .proj4text(proj4text)?
+///    .srtext(srtext)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableSpatialRefSyBuilder {
     pub(crate) srid: Option<i32>,
     pub(crate) auth_name: Option<String>,

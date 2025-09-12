@@ -21,6 +21,6 @@ where
 }
 
 /// Trait defining the properties of a directed graph.
-pub trait TransposedDirectedGraph: super::TransposedGraph + super::DirectedGraph {}
+pub trait TransposedDirectedGraph: super::DirectedGraph {}
 
-impl<G> TransposedDirectedGraph for G where G: super::DirectedGraph + super::TransposedGraph {}
+impl<G> TransposedDirectedGraph for G where G: super::DirectedGraph {}

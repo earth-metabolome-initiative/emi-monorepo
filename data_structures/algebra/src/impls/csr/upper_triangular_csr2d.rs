@@ -5,7 +5,7 @@ use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use crate::prelude::*;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 /// A compressed sparse row matrix.
 pub struct UpperTriangularCSR2D<M: Matrix2D> {
     /// The underlying matrix.

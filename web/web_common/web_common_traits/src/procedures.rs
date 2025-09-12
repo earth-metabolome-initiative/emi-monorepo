@@ -1,6 +1,8 @@
 //! Submodule providing traits relative to procedure templates, procedures, and
 //! associated builders.
 
+use std::rc::Rc;
+
 use common_traits::{builder::IsCompleteBuilder, prelude::Builder};
 
 use crate::{database::Read, prelude::InsertableVariant};
@@ -8,7 +10,7 @@ use crate::{database::Read, prelude::InsertableVariant};
 /// Trait defining a procedure template.
 pub trait ProcedureTemplate<C> {
     /// Associated procedure type.
-    type Procedure: Procedure<C, Template = Self>;
+    type Procedure: Procedure<C>;
     /// Procedure template asset model type.
     type ProcedureTemplateAssetModel: Read<C>;
 
@@ -18,6 +20,51 @@ pub trait ProcedureTemplate<C> {
         &self,
         conn: &mut C,
     ) -> Result<Vec<Self::ProcedureTemplateAssetModel>, diesel::result::Error>;
+}
+
+impl<C, PT> ProcedureTemplate<C> for &PT
+where
+    PT: ProcedureTemplate<C>,
+{
+    type Procedure = PT::Procedure;
+    type ProcedureTemplateAssetModel = PT::ProcedureTemplateAssetModel;
+
+    fn procedure_template_asset_models(
+        &self,
+        conn: &mut C,
+    ) -> Result<Vec<Self::ProcedureTemplateAssetModel>, diesel::result::Error> {
+        (*self).procedure_template_asset_models(conn)
+    }
+}
+
+impl<C, PT> ProcedureTemplate<C> for Box<PT>
+where
+    PT: ProcedureTemplate<C>,
+{
+    type Procedure = PT::Procedure;
+    type ProcedureTemplateAssetModel = PT::ProcedureTemplateAssetModel;
+
+    fn procedure_template_asset_models(
+        &self,
+        conn: &mut C,
+    ) -> Result<Vec<Self::ProcedureTemplateAssetModel>, diesel::result::Error> {
+        (**self).procedure_template_asset_models(conn)
+    }
+}
+
+impl<C, PT> ProcedureTemplate<C> for Rc<PT>
+where
+    PT: ProcedureTemplate<C>,
+{
+    type Procedure = PT::Procedure;
+    type ProcedureTemplateAssetModel = PT::ProcedureTemplateAssetModel;
+
+    fn procedure_template_asset_models(
+        &self,
+        conn: &mut C,
+    ) -> Result<Vec<Self::ProcedureTemplateAssetModel>, diesel::result::Error> {
+        (**self).procedure_template_asset_models(conn)
+    }
 }
 
 /// Trait defining a procedure.
@@ -51,7 +98,7 @@ impl<InsertErr> From<diesel::result::Error> for ProcedureTemplateError<InsertErr
 }
 
 /// Trait defining a builder of graphs of procedure templates.
-pub trait ProcedureTemplateGraphBuilder<'conn, C>: Builder {
+pub trait ProcedureTemplateBuilderGraphBuilder<'conn, C>: Builder {
     /// Type of the root procedure template
     type ProcedureTemplate;
     /// User type of the user authoring the procedure template graph.
@@ -71,7 +118,7 @@ pub trait ProcedureTemplateGraphBuilder<'conn, C>: Builder {
 }
 
 /// Trait defining a graph of procedure templates.
-pub trait ProcedureTemplateGraph<C> {
+pub trait ProcedureTemplateBuilderGraph<C> {
     /// Procedure template asset model type.
     type ProcedureTemplateAssetModel;
     /// Procedure asset type.
@@ -183,7 +230,7 @@ pub trait ProcedureInitializer<C>: ProcedureTemplate<C> {
     /// The procedure builder type.
     type ProcedureBuilder: IsCompleteBuilder + InsertableVariant<C>;
     /// Associated procedure template graph.
-    type Graph: ProcedureTemplateGraph<C>;
+    type Graph: ProcedureTemplateBuilderGraph<C>;
 
     /// Returns an initialized builder for the procedure.
     ///
