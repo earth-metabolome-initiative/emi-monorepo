@@ -19,7 +19,11 @@ impl FieldDatumWrapper {
     }
 
     fn dispatch_user_from_picture_panel(&self, portal: &mut PgConnection) -> anyhow::Result<Option<User>> {
-        let Some(ref picture_panel) = self.as_ref().picture_panel else {
+        let Some(picture_panel) = &self.as_ref().picture_panel else {
+            return Ok(None);
+        };
+
+        let Some(picture_general) = &self.as_ref().picture_general else {
             return Ok(None);
         };
 
@@ -29,6 +33,14 @@ impl FieldDatumWrapper {
 
         if picture_panel.starts_with("DCIM/edouard_brulhart_mw_2023/")  {
             return Ok(Some(get_or_insert_user("Edouard", "Brülhart", portal)?));
+        }
+
+        if picture_panel.starts_with("DCIM/Teo_Valentino/") || picture_general.starts_with("DCIM/Teo_Valentino/") {
+            return Ok(Some(get_or_insert_user("Teo", "Valentino", portal)?));
+        }
+
+        if picture_panel.starts_with("DCIM/heloise_coen/")  {
+            return Ok(Some(get_or_insert_user("Héloïse", "Coen", portal)?));
         }
         
         Ok(None)

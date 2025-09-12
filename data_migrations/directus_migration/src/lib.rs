@@ -48,7 +48,7 @@ pub fn directus_migration(
     directus_conn: &mut PgConnection,
     portal_conn: &mut PgConnection,
 ) -> Result<(), anyhow::Error> {
-    for field_data_row in directus_codegen::FieldDatum::bounded_read(0, 5, directus_conn)? {
+    for field_data_row in directus_codegen::FieldDatum::bounded_read(0, 100, directus_conn)? {
         let field_data_row:FieldDatumWrapper = field_data_row.into();
         if field_data_row.should_skip() {
             continue;
