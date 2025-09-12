@@ -142,7 +142,8 @@ impl InsertableTeam {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`Team`].
+/// Builder for creating and inserting a new
+/// [`Team`](crate::codegen::structs_codegen::tables::teams::Team).
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

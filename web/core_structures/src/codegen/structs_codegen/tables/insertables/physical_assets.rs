@@ -129,7 +129,9 @@ impl InsertablePhysicalAsset {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`PhysicalAsset`].
+/// Builder for creating and inserting a new
+/// [`PhysicalAsset`](crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

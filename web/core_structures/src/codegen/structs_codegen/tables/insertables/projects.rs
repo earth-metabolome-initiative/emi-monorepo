@@ -170,7 +170,8 @@ impl InsertableProject {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`Project`].
+/// Builder for creating and inserting a new
+/// [`Project`](crate::codegen::structs_codegen::tables::projects::Project).
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

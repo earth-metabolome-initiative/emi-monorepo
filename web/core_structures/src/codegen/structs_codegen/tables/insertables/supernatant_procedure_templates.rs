@@ -486,7 +486,9 @@ impl InsertableSupernatantProcedureTemplate {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`SupernatantProcedureTemplate`].
+/// Builder for creating and inserting a new
+/// [`SupernatantProcedureTemplate`](crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

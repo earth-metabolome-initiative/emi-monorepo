@@ -460,7 +460,9 @@ impl InsertableGeolocationProcedure {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`GeolocationProcedure`].
+/// Builder for creating and inserting a new
+/// [`GeolocationProcedure`](crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

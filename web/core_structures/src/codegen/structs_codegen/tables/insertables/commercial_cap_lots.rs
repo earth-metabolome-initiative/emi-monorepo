@@ -195,7 +195,9 @@ impl InsertableCommercialCapLot {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`CommercialCapLot`].
+/// Builder for creating and inserting a new
+/// [`CommercialCapLot`](crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

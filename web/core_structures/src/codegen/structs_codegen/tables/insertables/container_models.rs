@@ -101,7 +101,9 @@ impl InsertableContainerModel {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`ContainerModel`].
+/// Builder for creating and inserting a new
+/// [`ContainerModel`](crate::codegen::structs_codegen::tables::container_models::ContainerModel).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

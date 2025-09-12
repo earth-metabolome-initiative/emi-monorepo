@@ -54,7 +54,9 @@ pub struct InsertableSpatialRefSy {
 impl InsertableSpatialRefSy {}
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`SpatialRefSy`].
+/// Builder for creating and inserting a new
+/// [`SpatialRefSy`](crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

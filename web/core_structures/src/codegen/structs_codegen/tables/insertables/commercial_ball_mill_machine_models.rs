@@ -206,7 +206,9 @@ impl InsertableCommercialBallMillMachineModel {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`CommercialBallMillMachineModel`].
+/// Builder for creating and inserting a new
+/// [`CommercialBallMillMachineModel`](crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

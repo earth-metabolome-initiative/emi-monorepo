@@ -198,7 +198,9 @@ impl InsertableCommercialFreezerModel {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`CommercialFreezerModel`].
+/// Builder for creating and inserting a new
+/// [`CommercialFreezerModel`](crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

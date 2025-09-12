@@ -132,13 +132,26 @@ pub trait TableLike: AsRef<Table> {
     /// # Errors
     ///
     /// * If the snake case name cannot be generated.
-    fn import_struct_path(&self) -> Result<syn::Type, WebCodeGenError> {
+    fn import_struct_path_str(&self) -> Result<String, WebCodeGenError> {
         let table_name = self.snake_case_name()?;
-        Ok(syn::parse_str::<Type>(&format!(
+        Ok(format!(
             "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{}::{}",
             table_name,
             self.struct_name()?
-        ))?)
+        ))
+    }
+
+    /// Returns a the path to the table struct.
+    ///
+    /// # Returns
+    ///
+    /// A `syn::Type` representing the path to the table struct.
+    ///
+    /// # Errors
+    ///
+    /// * If the snake case name cannot be generated.
+    fn import_struct_path(&self) -> Result<syn::Type, WebCodeGenError> {
+        Ok(syn::parse_str::<Type>(&self.import_struct_path_str()?)?)
     }
 }
 

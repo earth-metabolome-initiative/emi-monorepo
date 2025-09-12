@@ -321,7 +321,9 @@ impl InsertableFreezingProcedureTemplate {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`FreezingProcedureTemplate`].
+/// Builder for creating and inserting a new
+/// [`FreezingProcedureTemplate`](crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

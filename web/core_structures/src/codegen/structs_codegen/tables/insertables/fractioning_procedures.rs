@@ -615,7 +615,9 @@ impl InsertableFractioningProcedure {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`FractioningProcedure`].
+/// Builder for creating and inserting a new
+/// [`FractioningProcedure`](crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

@@ -304,7 +304,9 @@ impl InsertableHarvestingProcedureTemplate {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`HarvestingProcedureTemplate`].
+/// Builder for creating and inserting a new
+/// [`HarvestingProcedureTemplate`](crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

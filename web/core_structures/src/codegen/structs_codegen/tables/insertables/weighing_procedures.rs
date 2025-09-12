@@ -454,7 +454,9 @@ impl InsertableWeighingProcedure {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`WeighingProcedure`].
+/// Builder for creating and inserting a new
+/// [`WeighingProcedure`](crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

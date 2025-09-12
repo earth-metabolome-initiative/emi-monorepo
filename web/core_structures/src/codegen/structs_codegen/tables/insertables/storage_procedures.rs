@@ -537,7 +537,9 @@ impl InsertableStorageProcedure {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`StorageProcedure`].
+/// Builder for creating and inserting a new
+/// [`StorageProcedure`](crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

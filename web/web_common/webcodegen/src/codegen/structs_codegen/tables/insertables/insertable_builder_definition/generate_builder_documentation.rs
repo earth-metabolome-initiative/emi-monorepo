@@ -62,8 +62,9 @@ impl Codegen<'_> {
         let mut documentation = Vec::new();
 
         documentation.push(format!(
-            "Builder for creating and inserting a new [`{}`].",
-            table.struct_name()?
+            "Builder for creating and inserting a new [`{}`]({}).",
+            table.struct_name()?,
+            table.import_struct_path_str()?
         ));
         documentation.push("".to_string());
         documentation.push("# Implementation details".to_string());

@@ -203,7 +203,9 @@ impl InsertableCommercialCentrifugeModel {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`CommercialCentrifugeModel`].
+/// Builder for creating and inserting a new
+/// [`CommercialCentrifugeModel`](crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

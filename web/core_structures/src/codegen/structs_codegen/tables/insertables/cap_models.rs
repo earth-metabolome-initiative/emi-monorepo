@@ -99,7 +99,8 @@ impl InsertableCapModel {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`CapModel`].
+/// Builder for creating and inserting a new
+/// [`CapModel`](crate::codegen::structs_codegen::tables::cap_models::CapModel).
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

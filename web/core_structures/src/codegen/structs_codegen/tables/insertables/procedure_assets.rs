@@ -292,7 +292,9 @@ impl InsertableProcedureAsset {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`ProcedureAsset`].
+/// Builder for creating and inserting a new
+/// [`ProcedureAsset`](crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

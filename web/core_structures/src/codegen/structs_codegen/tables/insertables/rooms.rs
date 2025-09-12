@@ -106,7 +106,8 @@ impl InsertableRoom {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`Room`].
+/// Builder for creating and inserting a new
+/// [`Room`](crate::codegen::structs_codegen::tables::rooms::Room).
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

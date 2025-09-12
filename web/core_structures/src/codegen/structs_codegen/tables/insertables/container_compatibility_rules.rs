@@ -103,7 +103,9 @@ impl InsertableContainerCompatibilityRule {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`ContainerCompatibilityRule`].
+/// Builder for creating and inserting a new
+/// [`ContainerCompatibilityRule`](crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

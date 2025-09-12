@@ -453,7 +453,9 @@ impl InsertableBallMillProcedureTemplate {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`BallMillProcedureTemplate`].
+/// Builder for creating and inserting a new
+/// [`BallMillProcedureTemplate`](crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

@@ -104,7 +104,9 @@ impl InsertableBeadModel {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`BeadModel`].
+/// Builder for creating and inserting a new
+/// [`BeadModel`](crate::codegen::structs_codegen::tables::bead_models::BeadModel).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

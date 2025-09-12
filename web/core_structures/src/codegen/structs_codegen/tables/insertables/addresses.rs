@@ -65,7 +65,8 @@ impl InsertableAddress {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`Address`].
+/// Builder for creating and inserting a new
+/// [`Address`](crate::codegen::structs_codegen::tables::addresses::Address).
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

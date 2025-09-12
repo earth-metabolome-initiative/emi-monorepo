@@ -93,7 +93,9 @@ impl InsertableParentProcedureTemplate {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`ParentProcedureTemplate`].
+/// Builder for creating and inserting a new
+/// [`ParentProcedureTemplate`](crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

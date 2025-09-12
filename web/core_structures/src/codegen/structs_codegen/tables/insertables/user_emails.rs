@@ -60,7 +60,9 @@ impl InsertableUserEmail {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`UserEmail`].
+/// Builder for creating and inserting a new
+/// [`UserEmail`](crate::codegen::structs_codegen::tables::user_emails::UserEmail).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

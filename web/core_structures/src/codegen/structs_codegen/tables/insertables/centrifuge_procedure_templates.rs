@@ -328,7 +328,9 @@ impl InsertableCentrifugeProcedureTemplate {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`CentrifugeProcedureTemplate`].
+/// Builder for creating and inserting a new
+/// [`CentrifugeProcedureTemplate`](crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

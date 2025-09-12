@@ -202,7 +202,9 @@ impl InsertableCommercialPipetteTipLot {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`CommercialPipetteTipLot`].
+/// Builder for creating and inserting a new
+/// [`CommercialPipetteTipLot`](crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

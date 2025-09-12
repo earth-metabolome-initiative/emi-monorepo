@@ -104,7 +104,9 @@ impl InsertableVolumetricContainerModel {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`VolumetricContainerModel`].
+/// Builder for creating and inserting a new
+/// [`VolumetricContainerModel`](crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

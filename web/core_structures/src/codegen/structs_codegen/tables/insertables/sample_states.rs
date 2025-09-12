@@ -63,7 +63,9 @@ impl InsertableSampleState {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`SampleState`].
+/// Builder for creating and inserting a new
+/// [`SampleState`](crate::codegen::structs_codegen::tables::sample_states::SampleState).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

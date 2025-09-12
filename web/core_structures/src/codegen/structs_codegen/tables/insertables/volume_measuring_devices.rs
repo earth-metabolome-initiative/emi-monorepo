@@ -134,7 +134,9 @@ impl InsertableVolumeMeasuringDevice {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`VolumeMeasuringDevice`].
+/// Builder for creating and inserting a new
+/// [`VolumeMeasuringDevice`](crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

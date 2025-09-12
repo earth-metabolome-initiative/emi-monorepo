@@ -58,7 +58,8 @@ impl InsertableTaxon {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`Taxon`].
+/// Builder for creating and inserting a new
+/// [`Taxon`](crate::codegen::structs_codegen::tables::taxa::Taxon).
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

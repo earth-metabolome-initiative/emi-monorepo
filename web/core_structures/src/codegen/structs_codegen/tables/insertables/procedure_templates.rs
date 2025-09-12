@@ -108,7 +108,9 @@ impl InsertableProcedureTemplate {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`ProcedureTemplate`].
+/// Builder for creating and inserting a new
+/// [`ProcedureTemplate`](crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

@@ -130,7 +130,8 @@ impl InsertablePipette {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`Pipette`].
+/// Builder for creating and inserting a new
+/// [`Pipette`](crate::codegen::structs_codegen::tables::pipettes::Pipette).
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

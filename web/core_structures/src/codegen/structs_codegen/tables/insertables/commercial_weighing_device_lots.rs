@@ -206,7 +206,9 @@ impl InsertableCommercialWeighingDeviceLot {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`CommercialWeighingDeviceLot`].
+/// Builder for creating and inserting a new
+/// [`CommercialWeighingDeviceLot`](crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

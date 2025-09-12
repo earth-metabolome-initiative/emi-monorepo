@@ -743,7 +743,9 @@ impl InsertableBallMillProcedure {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`BallMillProcedure`].
+/// Builder for creating and inserting a new
+/// [`BallMillProcedure`](crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

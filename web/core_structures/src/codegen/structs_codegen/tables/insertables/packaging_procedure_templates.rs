@@ -299,7 +299,9 @@ impl InsertablePackagingProcedureTemplate {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`PackagingProcedureTemplate`].
+/// Builder for creating and inserting a new
+/// [`PackagingProcedureTemplate`](crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

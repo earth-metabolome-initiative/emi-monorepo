@@ -92,7 +92,9 @@ impl InsertablePhotograph {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`Photograph`].
+/// Builder for creating and inserting a new
+/// [`Photograph`](crate::codegen::structs_codegen::tables::photographs::Photograph).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

@@ -204,7 +204,9 @@ impl InsertableCommercialFreezeDryerLot {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`CommercialFreezeDryerLot`].
+/// Builder for creating and inserting a new
+/// [`CommercialFreezeDryerLot`](crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

@@ -488,7 +488,9 @@ impl InsertableAliquotingProcedureTemplate {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`AliquotingProcedureTemplate`].
+/// Builder for creating and inserting a new
+/// [`AliquotingProcedureTemplate`](crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

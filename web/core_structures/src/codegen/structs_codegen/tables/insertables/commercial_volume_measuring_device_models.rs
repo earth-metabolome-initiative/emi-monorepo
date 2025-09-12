@@ -214,7 +214,8 @@ impl InsertableCommercialVolumeMeasuringDeviceModel {
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Builder for creating and inserting a new
-/// [`CommercialVolumeMeasuringDeviceModel`].
+/// [`CommercialVolumeMeasuringDeviceModel`](crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

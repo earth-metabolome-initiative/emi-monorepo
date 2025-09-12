@@ -61,7 +61,8 @@ impl InsertableUnit {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`Unit`].
+/// Builder for creating and inserting a new
+/// [`Unit`](crate::codegen::structs_codegen::tables::units::Unit).
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

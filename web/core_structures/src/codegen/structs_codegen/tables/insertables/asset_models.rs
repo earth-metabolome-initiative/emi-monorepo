@@ -111,7 +111,9 @@ impl InsertableAssetModel {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`AssetModel`].
+/// Builder for creating and inserting a new
+/// [`AssetModel`](crate::codegen::structs_codegen::tables::asset_models::AssetModel).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

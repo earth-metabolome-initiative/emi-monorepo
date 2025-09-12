@@ -328,7 +328,9 @@ impl InsertableFreezeDryingProcedureTemplate {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`FreezeDryingProcedureTemplate`].
+/// Builder for creating and inserting a new
+/// [`FreezeDryingProcedureTemplate`](crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

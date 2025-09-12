@@ -98,7 +98,9 @@ impl InsertableAssetCompatibilityRule {
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`AssetCompatibilityRule`].
+/// Builder for creating and inserting a new
+/// [`AssetCompatibilityRule`](crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule).
+///
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete

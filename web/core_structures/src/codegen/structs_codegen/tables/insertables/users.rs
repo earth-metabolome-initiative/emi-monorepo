@@ -49,7 +49,8 @@ pub struct InsertableUser {
 impl InsertableUser {}
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating and inserting a new [`User`].
+/// Builder for creating and inserting a new
+/// [`User`](crate::codegen::structs_codegen::tables::users::User).
 ///
 /// # Implementation details
 /// While this builder implements several methods, a reasonably complete
