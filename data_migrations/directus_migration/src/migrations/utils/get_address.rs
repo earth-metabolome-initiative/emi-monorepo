@@ -7,7 +7,7 @@ use core_structures::{
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::codegen::Address as DirectusAddress;
+use directus_codegen::Address as DirectusAddress;
 
 /// Returns (potentially newly created) address for a Directus address.
 pub(crate) fn get_address(

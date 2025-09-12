@@ -1,7 +1,11 @@
-mod codegen;
+//! This module contains the main logic for migrating data from a Directus
+//! database to the portal database.
+
 mod directus_templates;
+mod structs;
 mod impls;
 mod migrations;
+mod errors;
 mod sample_source_kind;
 use core_structures::{
     Sample,
@@ -14,7 +18,7 @@ use web_common_traits::{
     prelude::Insertable,
 };
 
-use crate::codegen::FieldDatum;
+use crate::structs::FieldDatumWrapper;
 
 const DIRECTUS_DATABASE_NAME: &str = "directus";
 const DIRECTUS_DATABASE_PASSWORD: &str = "directus_dbgi";
@@ -24,7 +28,7 @@ const DIRECTUS_HOSTNAME: &str = "134.21.20.118";
 const DIRECTUS_DATABASE_URL: &str = const_format::formatcp!(
     "postgres://{DIRECTUS_DATABASE_USER}:{DIRECTUS_DATABASE_PASSWORD}@{DIRECTUS_HOSTNAME}:{DIRECTUS_DATABASE_PORT}/{DIRECTUS_DATABASE_NAME}",
 );
-
+/// Establishes a connection to the Directus database.
 pub fn directus_connection() -> Result<PgConnection, anyhow::Error> {
     let conn = PgConnection::establish(DIRECTUS_DATABASE_URL)?;
     Ok(conn)
@@ -44,11 +48,15 @@ pub fn directus_migration(
     directus_conn: &mut PgConnection,
     portal_conn: &mut PgConnection,
 ) -> Result<(), anyhow::Error> {
-    for field_data_row in FieldDatum::bounded_read(0, 5, directus_conn)? {
-        let user = field_data_row.author(portal_conn)?;
+    for field_data_row in directus_codegen::FieldDatum::bounded_read(0, 5, directus_conn)? {
+        let field_data_row:FieldDatumWrapper = field_data_row.into();
+        if field_data_row.should_skip() {
+            continue;
+        }
         println!("Field data row: {:?}", field_data_row);
+        let user = field_data_row.author(portal_conn)?;
         let mut sample_builder = Sample::new()
-            .name(field_data_row.sample_id.clone())?
+            .name(field_data_row.sample_id()?)?
             .sample_source(field_data_row.sample_source(&user, portal_conn)?)?
             .created_by(&user)?;
 

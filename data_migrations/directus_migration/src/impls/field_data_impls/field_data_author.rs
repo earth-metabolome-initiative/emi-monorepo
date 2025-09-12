@@ -4,24 +4,66 @@ use core_structures::{User, tables::insertables::UserSettable};
 use diesel::PgConnection;
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::codegen::FieldDatum;
+use crate::structs::FieldDatumWrapper;
 
-impl FieldDatum {
+impl FieldDatumWrapper {
     /// Returns the author of the field datum if it exists.
     pub fn author(&self, portal: &mut PgConnection) -> anyhow::Result<User> {
-        if let Some(collector_fullname) = &self.collector_fullname {
-            return dispatch_user_from_name(collector_fullname, portal);
+        if let Some(collector_fullname) = &self.as_ref().collector_fullname {
+            return dispatch_user_from_name(collector_fullname.as_str(), portal);
+        }
+        if let Some(user) = self.dispatch_user_from_picture_panel(portal)? {
+            return Ok(user);
         }
         todo!("dispatch author retrieval to field_data_author module")
     }
+
+    fn dispatch_user_from_picture_panel(&self, portal: &mut PgConnection) -> anyhow::Result<Option<User>> {
+        let Some(ref picture_panel) = self.as_ref().picture_panel else {
+            return Ok(None);
+        };
+
+        if picture_panel.starts_with("DCIM/Audrey_layer/") || picture_panel.starts_with("DCIM/Audrey_le_cabec/") {
+            return Ok(Some(get_or_insert_user("Audrey", "Le Cabec", portal)?));
+        }
+
+        if picture_panel.starts_with("DCIM/edouard_brulhart_mw_2023/")  {
+            return Ok(Some(get_or_insert_user("Edouard", "Brülhart", portal)?));
+        }
+        
+        Ok(None)
+    }
+
 }
+
 
 fn dispatch_user_from_name(name: &str, portal: &mut PgConnection) -> anyhow::Result<User> {
     match name {
         "Lysandre Journiac" => get_or_insert_user("Lysandre", "Journiac", portal),
+        "Loic Chalmandrier" => get_or_insert_user("Loic", "Chalmandrier", portal),
+        "Alžběta Kadlecová" | "Alzbeta" => get_or_insert_user("Alžběta", "Kadlecová", portal),
+        "Federico Brigante" => get_or_insert_user("Federico", "Brigante", portal),
+        "Emilie Lab" | "Émilie Lab" | "Lab Emilie" => get_or_insert_user("Émilie", "Lab", portal),
+        "Mazzarine Laboureau" | "Mazzarine laboureau" => get_or_insert_user("Mazzarine", "Laboureau", portal),
+        "Ana Claudia Sima" => get_or_insert_user("Ana Claudia", "Sima", portal),
+        "Maëlle Wannier" => get_or_insert_user("Maëlle", "Wannier", portal),
+        "Lise Lebrun" => get_or_insert_user("Lise", "Lebrun", portal),
+        "Héloïse Coen" => get_or_insert_user("Héloïse", "Coen", portal),
+        "Donat Agosti" => get_or_insert_user("Donat", "Agosti", portal),
+        "Marco Andreas Stanley Visani" => get_or_insert_user("Marco Andreas Stanley", "Visani", portal),
+        "Disha Tandon" => get_or_insert_user("Disha", "Tandon", portal),
+        "Simon Rérat" => get_or_insert_user("Simon", "Rérat", portal),
+        "Jade Dandois" => get_or_insert_user("Jade", "Dandois", portal),
+        "James Smith" => get_or_insert_user("James", "Smith", portal),
+        "Chloé Blanc" => get_or_insert_user("Chloé", "Blanc", portal),
+        "Alexandra Slotte" => get_or_insert_user("Alexandra", "Slotte", portal),
+        "Edouard Brülhart" => get_or_insert_user("Edouard", "Brülhart", portal),
+        "Pierre-Marie Allard" => get_or_insert_user("Pierre-Marie", "Allard", portal),
+        "Emmanuel Defossez" => get_or_insert_user("Emmanuel", "Defossez", portal),
         _ => todo!("implement user dispatch from name: {name}"),
     }
 }
+
 
 fn get_or_insert_user(
     first_name: &str,

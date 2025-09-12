@@ -13,16 +13,18 @@ use web_common_traits::{
     prelude::Insertable,
 };
 
-use crate::{FieldDatum, sample_source_kind::SampleSourceKind};
+use crate::sample_source_kind::SampleSourceKind;
+use crate::structs::FieldDatumWrapper;
 
 mod field_data_author;
+mod should_skip;
 
-impl FieldDatum {
+impl FieldDatumWrapper {
     /// Returns the sample source UUID if the field datum has a sample source.
     /// The sample source is stored in the `comment_eco` field as a string
     /// representing a UUID.
     fn sample_source_uuid(&self) -> Option<rosetta_uuid::Uuid> {
-        rosetta_uuid::Uuid::from_str(self.comment_eco.as_ref()?).ok()
+        rosetta_uuid::Uuid::from_str(self.as_ref().comment_eco.as_ref()?).ok()
     }
     /// Returns a bool indicating whether the field datum has a sample source.
     /// If the fiels `comment_eco` is Some and has vor value a UUID, it is
@@ -62,7 +64,7 @@ impl FieldDatum {
     ///   source kind is `Soil`.
     /// * Otherwise, the sample source kind is `Organism`.
     pub fn sample_source_kind(&self) -> SampleSourceKind {
-        let Some(sample_name) = &self.sample_name else {
+        let Some(ref sample_name) = self.as_ref().sample_name else {
             return SampleSourceKind::Organism;
         };
 
@@ -114,5 +116,18 @@ impl FieldDatum {
             SampleSourceKind::Organism => organism_sample_model(user, portal)?,
             SampleSourceKind::Soil => todo!("implement soil sample source model"),
         })
+    }
+
+    /// Returns the sample id after validation.
+    /// 
+    pub fn sample_id(&self) -> Result<String, anyhow::Error> {
+
+
+
+
+
+        Ok(self.as_ref()
+            .sample_id
+            .clone())
     }
 }

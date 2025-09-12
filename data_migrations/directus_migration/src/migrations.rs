@@ -16,7 +16,7 @@ pub(crate) use utils::{get_room, get_user};
 mod insert_collection_procedures;
 pub use insert_collection_procedures::insert_directus_collection_procedures;
 
-use crate::codegen::Container as DirectusContainer;
+use directus_codegen::Container as DirectusContainer;
 
 fn process_sample(
     user: &User,

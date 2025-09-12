@@ -32,7 +32,6 @@ members = [
   "utils/functional_properties",
   "data_structures/rosetta_uuid",
   "data_structures/sorted_vec",
-  "utils/functional_properties",
   "utils/image_validation",
   "utils/mermaid",
   "web/web_common/media_types",
@@ -58,6 +57,7 @@ members = [
   "data_structures/multi_ranged",
   "web/web_common/procedure_codegen",
   "web/core_structures/guided_procedure_builder",
+  "data_migrations/directus_migration/directus_codegen"
 ]
 
 [workspace.dependencies]
@@ -192,6 +192,7 @@ mermaid = { path = "utils/mermaid" }
 colorsys = "0.7.0"
 prettyplease = "0.2"
 guided_procedure_builder = { path = "web/core_structures/guided_procedure_builder" }
+directus_codegen = { path = "data_migrations/directus_migration/directus_codegen" }
 
 [workspace.lints.rust]
 missing_docs = "forbid"

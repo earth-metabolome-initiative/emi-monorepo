@@ -7,7 +7,7 @@ use core_structures::{
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
-use crate::codegen::{DirectusUser, FieldDatum as DirectusFieldDatum};
+use directus_codegen::{DirectusUser, FieldDatum as DirectusFieldDatum};
 
 /// This module provides a method to retrieve or insert a user in the database.
 pub fn get_user(

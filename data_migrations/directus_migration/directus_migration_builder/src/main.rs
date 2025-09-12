@@ -17,7 +17,7 @@ const DATABASE_URL: &str = const_format::formatcp!(
 /// Executable to generate the code for the Directus database.
 pub async fn main() {
     // Get the output directory
-    let out_dir = Path::new("../src");
+    let out_dir = Path::new("../directus_codegen/src");
 
     let mut conn = PgConnection::establish(DATABASE_URL).unwrap();
 

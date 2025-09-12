@@ -5,7 +5,7 @@ use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{Insertable, InsertableVariant};
 
 use super::{get_address, get_user};
-use crate::codegen::Room as DirectusRoom;
+use directus_codegen::Room as DirectusRoom;
 
 pub(crate) fn get_room(
     directus_room: &DirectusRoom,

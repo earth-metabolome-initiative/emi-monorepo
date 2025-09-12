@@ -15,14 +15,17 @@ tokio.workspace = true
 const_format.workspace = true
 rosetta_timestamp = { workspace = true, features = ["serde", "postgres"] }
 core_structures = { workspace = true, features = ["backend"] }
-init_migration.workspace = true
 anyhow.workspace = true
+init_migration.workspace = true
+directus_codegen.workspace = true
 
 [dev-dependencies]
 init_db.workspace = true
 dotenvy.workspace = true
 reference_docker.workspace = true
 
+[lints]
+workspace = true
 
 [features]
 default = ["serde", "64-column-tables"]

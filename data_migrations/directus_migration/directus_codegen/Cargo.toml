@@ -1,0 +1,25 @@
+[package]
+name = "directus_codegen"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rosetta_uuid = { workspace = true, features = ["serde", "postgres"] }
+chrono.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+diesel.workspace = true
+postgis_diesel.workspace = true
+web_common_traits.workspace = true
+rosetta_timestamp = { workspace = true, features = ["serde", "postgres"] }
+
+
+[features]
+default = ["serde", "64-column-tables"]
+serde = []
+postgres = [
+  "diesel/extras",
+  "postgis_diesel/postgres",
+]
+32-column-tables = ["postgres"]
+64-column-tables = ["32-column-tables", "diesel/64-column-tables"]
