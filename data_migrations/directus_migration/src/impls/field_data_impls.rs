@@ -3,11 +3,10 @@
 use std::str::FromStr;
 
 use core_structures::{
-    Organism, SampleModel, SampleSource, SampleSourceModel, User,
-    tables::insertables::AssetSettable,
+    tables::insertables::AssetSettable, Organism, SampleModel, SampleSource, SampleSourceModel, Soil, User
 };
 use diesel::{OptionalExtension, PgConnection};
-use init_migration::asset_models::organisms::{organism_model, organism_sample_model};
+use init_migration::asset_models::{organisms::{organism_model, organism_sample_model}, soils::{soil_model, soil_sample_model}};
 use web_common_traits::{
     database::{InsertableVariant, Read},
     prelude::Insertable,
@@ -53,7 +52,14 @@ impl FieldDatumWrapper {
                     .insert(user.id, portal)?;
                 Ok(Some(organism.id(portal)?))
             }
-            SampleSourceKind::Soil => todo!("implement soil sample source model"),
+            SampleSourceKind::Soil => {
+                let soil = Soil::new()
+                    .id(uuid)?
+                    .model(&sample_source_model)?
+                    .created_by(user)?
+                    .insert(user.id, portal)?;
+                Ok(Some(soil.id(portal)?))
+            }
         }
     }
     /// Return the sample source kind of the sample.
@@ -93,7 +99,7 @@ impl FieldDatumWrapper {
     ) -> Result<SampleSourceModel, anyhow::Error> {
         Ok(match self.sample_source_kind() {
             SampleSourceKind::Organism => organism_model(user, portal)?.id(portal)?,
-            SampleSourceKind::Soil => todo!("implement soil sample source model"),
+            SampleSourceKind::Soil => soil_model(user, portal)?.id(portal)?,
         })
     }
 
@@ -114,7 +120,7 @@ impl FieldDatumWrapper {
     ) -> Result<SampleModel, anyhow::Error> {
         Ok(match self.sample_source_kind() {
             SampleSourceKind::Organism => organism_sample_model(user, portal)?,
-            SampleSourceKind::Soil => todo!("implement soil sample source model"),
+            SampleSourceKind::Soil => soil_sample_model(user, portal)?,
         })
     }
 
