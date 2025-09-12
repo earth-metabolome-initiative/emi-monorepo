@@ -26,7 +26,7 @@ impl Table {
             .map(Column::to_nullable)
             .collect();
 
-        let check_constraints = columns
+        let mut check_constraints = columns
             .iter()
             .map(|column| Ok(column.as_ref().check_constraints(conn)?.as_ref().clone()))
             .collect::<Result<Vec<_>, WebCodeGenError>>()?
@@ -34,6 +34,8 @@ impl Table {
             .flatten()
             .filter(|constraint| !constraint.is_postgis_constraint())
             .collect::<Vec<_>>();
+
+        check_constraints.sort_unstable();
 
         check_constraints
             .into_iter()

@@ -396,7 +396,6 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
         let graph = ProcedureTemplateGraph::new(self, conn)?;
 
         let parent_direction = Direction::TopToBottom;
-        let metadata = ProcedureTemplateMetadata::new(self.clone(), conn)?;
 
         let mut builder = FlowchartBuilder::default().configuration(
             FlowchartConfigurationBuilder::default()
@@ -458,6 +457,9 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
                 procedure_template_asset_model_nodes
                     .insert(foreign_ptam.clone(), foreign_ptam_node.clone());
 
+                foreign_procedure_template_node_builders.find_mut(|b| {
+                    foreign_procedure_template
+                });
                 foreign_procedure_template_node_builder =
                     foreign_procedure_template_node_builder.subnode(foreign_ptam_node)?;
             }
