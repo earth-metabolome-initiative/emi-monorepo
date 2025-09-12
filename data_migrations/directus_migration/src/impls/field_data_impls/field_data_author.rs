@@ -18,7 +18,10 @@ impl FieldDatumWrapper {
         todo!("dispatch author retrieval to field_data_author module")
     }
 
-    fn dispatch_user_from_picture_panel(&self, portal: &mut PgConnection) -> anyhow::Result<Option<User>> {
+    fn dispatch_user_from_picture_panel(
+        &self,
+        portal: &mut PgConnection,
+    ) -> anyhow::Result<Option<User>> {
         let Some(picture_panel) = &self.as_ref().picture_panel else {
             return Ok(None);
         };
@@ -27,27 +30,52 @@ impl FieldDatumWrapper {
             return Ok(None);
         };
 
-        if picture_panel.starts_with("DCIM/Audrey_layer/") || picture_panel.starts_with("DCIM/Audrey_le_cabec/") {
+        let Some(qfield_project) = &self.as_ref().qfield_project else {
+            return Ok(None);
+        };
+
+        if picture_panel.starts_with("DCIM/Audrey_layer/")
+            || picture_panel.starts_with("DCIM/Audrey_le_cabec/")
+        {
             return Ok(Some(get_or_insert_user("Audrey", "Le Cabec", portal)?));
         }
 
-        if picture_panel.starts_with("DCIM/edouard_brulhart_mw_2023/")  {
+        if picture_panel.starts_with("DCIM/edouard_brulhart_mw_2023/") || picture_panel.starts_with("DCIM/SBL_20004_2023/") {
             return Ok(Some(get_or_insert_user("Edouard", "Brülhart", portal)?));
         }
 
-        if picture_panel.starts_with("DCIM/Teo_Valentino/") || picture_general.starts_with("DCIM/Teo_Valentino/") {
+        if picture_panel.starts_with("DCIM/Teo_Valentino/")
+            || picture_panel.starts_with("DCIM/teo_valentino/")
+            || picture_general.starts_with("DCIM/Teo_Valentino/")
+        {
             return Ok(Some(get_or_insert_user("Teo", "Valentino", portal)?));
         }
 
-        if picture_panel.starts_with("DCIM/heloise_coen/")  {
+        if picture_panel.starts_with("DCIM/heloise_coen/") {
             return Ok(Some(get_or_insert_user("Héloïse", "Coen", portal)?));
         }
+
+        if picture_panel.starts_with("DCIM/Succulent_greenhouse/") {
+            return Ok(Some(get_or_insert_user("Lëndita", "Schwegler", portal)?));
+        }
+
+        if picture_panel.starts_with("DCIM/JPEG_") {
+            return Ok(Some(get_or_insert_user("Stéphanie", "Guetchueng", portal)?));
+        }
+
+        if picture_panel.starts_with("files/") && qfield_project.contains("jbuf") {
+            return Ok(Some(get_or_insert_user("Edouard", "Brülhart", portal)?));
+        }
+
+        if picture_panel.starts_with("files/") && qfield_project.contains("jbn") {
+            return Ok(Some(get_or_insert_user("Emmanuel", "Defossez", portal)?));
+        }
+
         
+
         Ok(None)
     }
-
 }
-
 
 fn dispatch_user_from_name(name: &str, portal: &mut PgConnection) -> anyhow::Result<User> {
     match name {
@@ -56,13 +84,17 @@ fn dispatch_user_from_name(name: &str, portal: &mut PgConnection) -> anyhow::Res
         "Alžběta Kadlecová" | "Alzbeta" => get_or_insert_user("Alžběta", "Kadlecová", portal),
         "Federico Brigante" => get_or_insert_user("Federico", "Brigante", portal),
         "Emilie Lab" | "Émilie Lab" | "Lab Emilie" => get_or_insert_user("Émilie", "Lab", portal),
-        "Mazzarine Laboureau" | "Mazzarine laboureau" => get_or_insert_user("Mazzarine", "Laboureau", portal),
+        "Mazzarine Laboureau" | "Mazzarine laboureau" => {
+            get_or_insert_user("Mazzarine", "Laboureau", portal)
+        }
         "Ana Claudia Sima" => get_or_insert_user("Ana Claudia", "Sima", portal),
         "Maëlle Wannier" => get_or_insert_user("Maëlle", "Wannier", portal),
         "Lise Lebrun" => get_or_insert_user("Lise", "Lebrun", portal),
         "Héloïse Coen" => get_or_insert_user("Héloïse", "Coen", portal),
         "Donat Agosti" => get_or_insert_user("Donat", "Agosti", portal),
-        "Marco Andreas Stanley Visani" => get_or_insert_user("Marco Andreas Stanley", "Visani", portal),
+        "Marco Andreas Stanley Visani" => {
+            get_or_insert_user("Marco", "Visani", portal)
+        }
         "Disha Tandon" => get_or_insert_user("Disha", "Tandon", portal),
         "Simon Rérat" => get_or_insert_user("Simon", "Rérat", portal),
         "Jade Dandois" => get_or_insert_user("Jade", "Dandois", portal),
@@ -75,7 +107,6 @@ fn dispatch_user_from_name(name: &str, portal: &mut PgConnection) -> anyhow::Res
         _ => todo!("implement user dispatch from name: {name}"),
     }
 }
-
 
 fn get_or_insert_user(
     first_name: &str,

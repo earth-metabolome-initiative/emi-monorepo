@@ -50,6 +50,7 @@ impl FieldDatumWrapper {
                 let organism = Organism::new()
                     .id(uuid)?
                     .model(&sample_source_model)?
+                    .created_by(user)?
                     .insert(user.id, portal)?;
                 Ok(Some(organism.id(portal)?))
             }

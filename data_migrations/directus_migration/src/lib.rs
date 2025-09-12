@@ -55,6 +55,7 @@ pub fn directus_migration(
         }
         println!("Field data row: {:?}", field_data_row);
         let user = field_data_row.author(portal_conn)?;
+        println!("Dispatched user: {:?}", user);
         let mut sample_builder = Sample::new()
             .name(field_data_row.sample_id()?)?
             .sample_source(field_data_row.sample_source(&user, portal_conn)?)?
