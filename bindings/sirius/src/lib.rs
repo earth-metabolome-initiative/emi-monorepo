@@ -9,6 +9,7 @@ mod parameters;
 mod sirius;
 mod sirius_config;
 mod sirius_types;
+mod semantic;
 mod traits;
 mod versions;
 
@@ -18,5 +19,6 @@ pub mod prelude {
     pub use crate::parameters::*;
     pub use crate::sirius::Sirius;
     pub use crate::sirius_types::*;
+    pub use crate::semantic::*;
     pub use crate::versions::*;
 }

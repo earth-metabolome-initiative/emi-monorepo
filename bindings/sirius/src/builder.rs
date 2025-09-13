@@ -24,14 +24,14 @@ impl SiriusBuilder<Version5> {
     /// ```
     /// use sirius::prelude::*;
     ///
-    /// let sirius = SiriusBuilder::default()
+    /// let sirius = SiriusBuilder::<Version5>::default()
     ///    .maximal_mz(1000.0).unwrap()
     ///   .build();
     ///
-    /// assert!(SiriusBuilder::default().maximal_mz(-67.0).is_err());
-    /// assert!(SiriusBuilder::default().maximal_mz(0.0).is_err());
-    /// assert!(SiriusBuilder::default().maximal_mz(std::f64::NAN).is_err());
-    /// assert!(SiriusBuilder::default().maximal_mz(std::f64::INFINITY).is_err());
+    /// assert!(SiriusBuilder::<Version5>::default().maximal_mz(-67.0).is_err());
+    /// assert!(SiriusBuilder::<Version5>::default().maximal_mz(0.0).is_err());
+    /// assert!(SiriusBuilder::<Version5>::default().maximal_mz(std::f64::NAN).is_err());
+    /// assert!(SiriusBuilder::<Version5>::default().maximal_mz(std::f64::INFINITY).is_err());
     /// ```
     ///
     pub fn maximal_mz(mut self, maximal_mz: f64) -> Result<Self, String> {
@@ -51,8 +51,7 @@ impl SiriusBuilder<Version5> {
             return Err("Maximal m/z ratio cannot be infinite".to_string());
         }
 
-        self.config
-            .add_core_parameter(CoreV5::MaximalMz(maximal_mz))?;
+        self.config.add_semantic_core(CoreParam::MaxMz(maximal_mz))?;
         Ok(self)
     }
 
@@ -63,7 +62,7 @@ impl SiriusBuilder<Version5> {
     /// # Example
     /// ```
     /// use sirius::prelude::*;
-    /// let sirius = SiriusBuilder::default()
+    /// let sirius = SiriusBuilder::<Version5>::default()
     ///   .isotope_settings_filter(true).unwrap()
     ///   .build();
     /// ```
@@ -82,11 +81,11 @@ impl SiriusBuilder<Version5> {
     /// # Example
     /// ```
     /// use sirius::prelude::*;
-    /// let sirius = SiriusBuilder::default()
+    /// let sirius = SiriusBuilder::<Version5>::default()
     ///  .formula_search_db(SearchDB::Hmdb).unwrap()
     /// .build();
     ///
-    /// assert!(SiriusBuilder::default().formula_search_db(SearchDB::Hmdb).is_ok());
+    /// assert!(SiriusBuilder::<Version5>::default().formula_search_db(SearchDB::Hmdb).is_ok());
     /// ```
     pub fn formula_search_db(
         mut self,
@@ -103,7 +102,7 @@ impl SiriusBuilder<Version5> {
     /// # Example
     /// ```
     /// use sirius::prelude::*;
-    /// let sirius = SiriusBuilder::default()
+    /// let sirius = SiriusBuilder::<Version5>::default()
     /// .structure_search_db(SearchDB::Zincbio).unwrap()
     /// .build();
     /// ```
@@ -119,7 +118,7 @@ impl SiriusBuilder<Version5> {
     /// # Example
     /// ```
     /// use sirius::prelude::*;
-    /// let sirius = SiriusBuilder::default()
+    /// let sirius = SiriusBuilder::<Version5>::default()
     /// .timeout_seconds_per_tree(100).unwrap()
     /// .build();
     /// ```
@@ -219,9 +218,6 @@ impl SiriusBuilder<Version5> {
     }
 
     /// Candidates matching the lipid class estimated by El Gordo will be tagged.
-    /// The lipid class will only be available if El Gordo predicts that the MS/MS is a lipid spectrum.
-    /// If this parameter is set to 'false' El Gordo will still be executed and e.g. improve the fragmentation tree,
-    /// but the matching candidates will not be tagged as lipid class.
     /// # Arguments
     /// * `inject_el_gordo_compounds` - Whether to inject El Gordo compounds.
     pub fn inject_el_gordo_compounds(
@@ -498,7 +494,7 @@ impl SiriusBuilder<Version5> {
     /// # Example
     /// ```
     /// use sirius::prelude::*;
-    /// let sirius = SiriusBuilder::default()
+    /// let sirius = SiriusBuilder::<Version5>::default()
     /// .zodiac_library_scoring_min_cosine(0.5).unwrap()
     /// .build();
     /// ```
@@ -507,8 +503,8 @@ impl SiriusBuilder<Version5> {
     /// # Example
     /// ```
     /// use sirius::prelude::*;
-    /// assert!(SiriusBuilder::default().zodiac_library_scoring_min_cosine(1.1).is_err());
-    /// assert!(SiriusBuilder::default().zodiac_library_scoring_min_cosine(-0.1).is_err());
+    /// assert!(SiriusBuilder::<Version5>::default().zodiac_library_scoring_min_cosine(1.1).is_err());
+    /// assert!(SiriusBuilder::<Version5>::default().zodiac_library_scoring_min_cosine(-0.1).is_err());
     /// ```
     pub fn zodiac_library_scoring_min_cosine(
         mut self,
@@ -936,7 +932,7 @@ impl SiriusBuilder<Version5> {
     ///
     /// Wether to enable the Formula module.
     pub fn enable_formula(mut self) -> Result<Self, String> {
-        self.config.add_formula_parameter(FormulaV5::Enabled)?;
+        self.config.enable_formulas()?;
         Ok(self)
     }
 
@@ -954,7 +950,7 @@ impl SiriusBuilder<Version5> {
 
     /// Wether to enable the Zodiac module.
     pub fn enable_zodiac(mut self) -> Result<Self, String> {
-        self.config.add_zodiac_parameter(ZodiacV5::Enabled)?;
+        self.config.enable_zodiac()?;
         Ok(self)
     }
 
@@ -972,8 +968,7 @@ impl SiriusBuilder<Version5> {
 
     /// Wether to enable the Fingerprint module.
     pub fn enable_fingerprint(mut self) -> Result<Self, String> {
-        self.config
-            .add_fingerprint_parameter(FingerprintV5::Enabled)?;
+        self.config.enable_fingerprints()?;
         Ok(self)
     }
 
@@ -992,7 +987,7 @@ impl SiriusBuilder<Version5> {
 
     /// Wether to enable the Structure module.
     pub fn enable_structure(mut self) -> Result<Self, String> {
-        self.config.add_structure_parameter(StructureV5::Enabled)?;
+        self.config.enable_structures()?;
         Ok(self)
     }
 
@@ -1010,7 +1005,7 @@ impl SiriusBuilder<Version5> {
 
     /// Whether to enable the Canopus module.
     pub fn enable_canopus(mut self) -> Result<Self, String> {
-        self.config.add_canopus_parameter(CanopusV5::Enabled)?;
+        self.config.enable_classes()?;
         Ok(self)
     }
 
@@ -1028,8 +1023,7 @@ impl SiriusBuilder<Version5> {
 
     /// Whether to enable the WriteSummaries module.
     pub fn enable_write_summaries(mut self) -> Result<Self, String> {
-        self.config
-            .add_write_summaries_parameter(WriteSummariesV5::Enabled)?;
+        self.config.enable_write_summaries()?;
         Ok(self)
     }
 
@@ -1048,6 +1042,199 @@ impl SiriusBuilder<Version5> {
     }
 }
 
+/// Builder functions for SIRIUS Version6 (6.x)
+impl SiriusBuilder<Version6> {
+    /// Set the maximal value of m/z ratio on which Sirius calculation will be carried (V6).
+    pub fn maximal_mz(mut self, maximal_mz: f64) -> Result<Self, String> {
+        if maximal_mz < 0.0 {
+            return Err(format!(
+                concat!("Maximal m/z ratio must be positive. ", "You provided {}."),
+                maximal_mz
+            ));
+        }
+        if maximal_mz == 0.0 {
+            return Err("Maximal m/z ratio cannot be 0".to_string());
+        }
+        if maximal_mz.is_nan() {
+            return Err("Maximal m/z ratio cannot be NaN".to_string());
+        }
+        if maximal_mz.is_infinite() {
+            return Err("Maximal m/z ratio cannot be infinite".to_string());
+        }
+
+        self.config.add_semantic_core(CoreParam::MaxMz(maximal_mz))?;
+        Ok(self)
+    }
+
+    /// Add any V6 config parameter directly.
+    pub fn add_config_parameter(mut self, parameter: ConfigV6) -> Result<Self, String> {
+        self.config.add_config_parameter(parameter)?;
+        Ok(self)
+    }
+
+    /// Convenience: set candidates per ionization (V6 name change).
+    pub fn number_of_candidates_per_ion(
+        mut self,
+        number_of_candidates_per_ion: u32,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV6::NumberOfCandidatesPerIonization(
+                number_of_candidates_per_ion,
+            ))?;
+        Ok(self)
+    }
+
+    /// Convenience: map El Gordo fix for V6.
+    pub fn inject_el_gordo_compounds(
+        mut self,
+        enforce: bool,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV6::EnforceElGordoFormula(enforce))?;
+        Ok(self)
+    }
+
+    /// Convenience: MS1 isotopic intensity absolute error (V6).
+    pub fn ms1_absolute_intensity_error(
+        mut self,
+        v: f32,
+    ) -> Result<Self, String> {
+        if v < 0.0 {
+            return Err(format!(
+                concat!(
+                    "MS1 absolute intensity error must be positive. ",
+                    "You provided {}."
+                ),
+                v
+            ));
+        }
+        self.config
+            .add_config_parameter(ConfigV6::IsotopicIntensitySettingsAbsoluteIntensityError(
+                v,
+            ))?;
+        Ok(self)
+    }
+
+    /// Convenience: MS1 isotopic minimal intensity to consider (V6).
+    pub fn ms1_minimal_intensity_to_consider(
+        mut self,
+        v: f32,
+    ) -> Result<Self, String> {
+        if v < 0.0 {
+            return Err(format!(
+                concat!(
+                    "MS1 minimal intensity to consider must be positive. ",
+                    "You provided {}."
+                ),
+                v
+            ));
+        }
+        self.config
+            .add_config_parameter(ConfigV6::IsotopicIntensitySettingsMinimalIntensityToConsider(
+                v,
+            ))?;
+        Ok(self)
+    }
+
+    /// Convenience: MS1 isotopic relative error (V6).
+    pub fn ms1_relative_intensity_error(
+        mut self,
+        v: f32,
+    ) -> Result<Self, String> {
+        if v < 0.0 {
+            return Err(format!(
+                concat!(
+                    "MS1 relative intensity error must be positive. ",
+                    "You provided {}."
+                ),
+                v
+            ));
+        }
+        self.config
+            .add_config_parameter(ConfigV6::IsotopicIntensitySettingsRelativeIntensityError(
+                v,
+            ))?;
+        Ok(self)
+    }
+
+    /// Convenience: heuristic thresholds (V6 names).
+    pub fn use_heuristic_mz_to_use_heuristic(
+        mut self,
+        v: u32,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV6::UseHeuristicUseHeuristicAboveMz(v))?;
+        Ok(self)
+    }
+
+    /// Convenience: heuristic only (V6).
+    pub fn use_heuristic_mz_to_use_heuristic_only(
+        mut self,
+        v: u32,
+    ) -> Result<Self, String> {
+        self.config
+            .add_config_parameter(ConfigV6::UseHeuristicUseOnlyHeuristicAboveMz(v))?;
+        Ok(self)
+    }
+
+    /// Convenience: ZODIAC min similarity (V6 name).
+    pub fn zodiac_library_scoring_min_cosine(
+        mut self,
+        v: f32,
+    ) -> Result<Self, String> {
+        if !(0.0..=1.0).contains(&v) {
+            return Err(format!(
+                concat!(
+                    "ZODIAC library min similarity must be in [0,1]. ",
+                    "You provided {}."
+                ),
+                v
+            ));
+        }
+        self.config
+            .add_config_parameter(ConfigV6::ZodiacLibraryScoringMinSimilarity(v))?;
+        Ok(self)
+    }
+
+    /// Enable Formula module.
+    pub fn enable_formula(mut self) -> Result<Self, String> {
+        self.config.add_formula_parameter(FormulaV5::Enabled)?;
+        Ok(self)
+    }
+    /// Enable Zodiac module.
+    pub fn enable_zodiac(mut self) -> Result<Self, String> {
+        self.config.add_zodiac_parameter(ZodiacV5::Enabled)?;
+        Ok(self)
+    }
+    /// Enable Fingerprint module.
+    pub fn enable_fingerprint(mut self) -> Result<Self, String> {
+        self.config.add_fingerprint_parameter(FingerprintV5::Enabled)?;
+        Ok(self)
+    }
+    /// Enable Structure module.
+    pub fn enable_structure(mut self) -> Result<Self, String> {
+        self.config.add_structure_parameter(StructureV5::Enabled)?;
+        Ok(self)
+    }
+    /// Enable Canopus module.
+    pub fn enable_canopus(mut self) -> Result<Self, String> {
+        self.config.add_canopus_parameter(CanopusV5::Enabled)?;
+        Ok(self)
+    }
+    /// Enable Write Summaries module.
+    pub fn enable_write_summaries(mut self) -> Result<Self, String> {
+        self.config
+            .add_write_summaries_parameter(WriteSummariesV5::Enabled)?;
+        Ok(self)
+    }
+
+    /// Set default maximal m/z (V6).
+    pub fn maximal_mz_default(mut self) -> Result<Self, String> {
+        self.config.add_semantic_core(CoreParam::MaxMz(800.0))?;
+        Ok(self)
+    }
+}
+
 impl<V: Version> SiriusBuilder<V> {
     /// Build the Sirius instance from the configuration.
     /// # Example
@@ -1057,6 +1244,18 @@ impl<V: Version> SiriusBuilder<V> {
     /// ```
     pub fn build(self) -> Sirius<V> {
         Sirius::from(self.config)
+    }
+
+    /// Add a semantic (version-agnostic) config parameter.
+    pub fn semantic_config(mut self, p: ConfigParam) -> Result<Self, String> {
+        self.config.add_semantic_config(p)?;
+        Ok(self)
+    }
+
+    /// Append a raw post-tool argument (emitted after tool list).
+    pub fn post_tool_arg(mut self, s: impl Into<String>) -> Self {
+        self.config.push_post_tool_arg(s.into());
+        self
     }
 }
 
@@ -1068,19 +1267,18 @@ impl SiriusBuilder<Version5> {
     /// ```
     /// use sirius::prelude::*;
     ///
-    /// let sirius = SiriusBuilder::default()
+    /// let sirius = SiriusBuilder::<Version5>::default()
     ///    .maximal_mz_default().unwrap()
     ///  .build();
     ///
-    /// assert!(SiriusBuilder::default().maximal_mz_default().is_ok());
+    /// assert!(SiriusBuilder::<Version5>::default().maximal_mz_default().is_ok());
     ///
-    /// assert!(SiriusBuilder::default().maximal_mz_default().unwrap().maximal_mz_default().is_err());
+    /// assert!(SiriusBuilder::<Version5>::default().maximal_mz_default().unwrap().maximal_mz_default().is_err());
     ///
     ///
     /// ```
     pub fn maximal_mz_default(mut self) -> Result<Self, String> {
-        self.config
-            .add_core_parameter(CoreV5::MaximalMz(f64::default()).into_default())?;
+        self.config.add_semantic_core(CoreParam::MaxMz(800.0))?;
         Ok(self)
     }
 

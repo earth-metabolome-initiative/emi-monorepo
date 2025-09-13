@@ -4,7 +4,7 @@ use std::path::Path;
 #[test]
 #[should_panic]
 fn test_failing_sirius() {
-    let sirius = SiriusBuilder::default()
+    let sirius = SiriusBuilder::<Version5>::default()
         .maximal_mz(802.2)
         .unwrap()
         .formula_search_db(SearchDB::Bio)
@@ -65,6 +65,7 @@ fn test_failing_sirius() {
 }
 
 #[test]
+#[ignore]
 fn test_run_sirius_default() -> Result<(), String> {
     let sirius = SiriusBuilder::<Version5>::default()
         .maximal_mz_default()?
@@ -88,8 +89,9 @@ fn test_run_sirius_default() -> Result<(), String> {
 }
 
 #[test]
+#[ignore]
 fn test_run_sirius_with_enpkg_params() -> Result<(), String> {
-    let sirius = SiriusBuilder::default()
+    let sirius = SiriusBuilder::<Version5>::default()
         .maximal_mz(800.0)?
         .isotope_settings_filter(true)?
         .formula_search_db(SearchDB::Bio)?

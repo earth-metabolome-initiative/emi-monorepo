@@ -49,3 +49,20 @@ impl Version for Version5 {
     type Structure = crate::parameters::structure::StructureV5;
     type WriteSummaries = crate::parameters::write_summaries::WriteSummariesV5;
 }
+
+/// Implementation of the Sirius version 6
+#[derive(Default)]
+pub struct Version6;
+
+impl Version for Version6 {
+    const VERSION: usize = 6;
+    type Core = crate::parameters::core::CoreV6;
+    type Config = crate::parameters::config::ConfigV6;
+    // Reuse unchanged parameter sets from V5
+    type Canopus = crate::parameters::canopus::CanopusV5;
+    type Formula = crate::parameters::formula::FormulaV5;
+    type Zodiac = crate::parameters::zodiac::ZodiacV5;
+    type Fingerprint = crate::parameters::fingerprint::FingerprintV5;
+    type Structure = crate::parameters::structure::StructureV5;
+    type WriteSummaries = crate::parameters::write_summaries::WriteSummariesV5;
+}

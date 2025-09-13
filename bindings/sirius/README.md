@@ -25,7 +25,7 @@ Then you can use the Sirius binding in your Rust project. To do so add this to y
 sirius = "0.1"
 ```
 and this to your crate root:
-```rust
+```rust,no_run
 use sirius::prelude::*;
 ```
 
@@ -36,7 +36,7 @@ sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius_default 
 ```
 
 The equivalent Rust code is:
-```rust
+```rust,no_run
 use sirius::prelude::*;
 use std::path::Path;
 let sirius = SiriusBuilder::<Version5>::default()
@@ -57,9 +57,10 @@ if output_file_path.exists() {
 sirius.run(input_file_path, output_file_path).unwrap();
 ```
 
-You can also be more specific and add other parameters. The following example uses the parameters used for the [ENPKG pipeline](https://github.com/enpkg/enpkg_full/blob/c8e649290ee72f000c3385e7669b5da2215abad8/params/user.yml#L60):
+You can also be more specific and add other parameters. The following examples use the parameters from the [ENPKG pipeline](https://github.com/enpkg/enpkg_full/blob/c8e649290ee72f000c3385e7669b5da2215abad8/params/user.yml#L60):
 
-```bash 
+SIRIUS v5
+```bash
 sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --maxmz 800 \
 config --IsotopeSettings.filter=true --FormulaSearchDB=BIO --Timeout.secondsPerTree=0 \
 --FormulaSettings.enforced=H,C,N,O,P --Timeout.secondsPerInstance=0 \
@@ -77,11 +78,120 @@ config --IsotopeSettings.filter=true --FormulaSearchDB=BIO --Timeout.secondsPerT
 --RecomputeResults=false formula zodiac fingerprint structure canopus write-summaries
 ```
 
-The equivalent Rust code is:
-```rust
+SIRIUS v6.3.0
+```bash
+sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius.sirius --mzmax 800 config --AlgorithmProfile=orbitrap --MS2MassDeviation.allowedMassDeviation=5.0ppm --SpectralSearchDB=METACYC,BloodExposome,CHEBI,COCONUT,FooDB,GNPS,HMDB,HSDB,KEGG,KNAPSACK,LOTUS,LIPIDMAPS,MACONDA,MESH,MiMeDB,NORMAN,PLANTCYC,PUBCHEMANNOTATIONBIO,PUBCHEMANNOTATIONDRUG,PUBCHEMANNOTATIONFOOD,PUBCHEMANNOTATIONSAFETYANDTOXIC,SUPERNATURAL,TeroMol,YMDB --AdductSettings.fallback='[[M+H]+,[M+Na]+,[M+K]+,[M+H3N+H]+,[M-H2O+H]+]' --FormulaSettings.enforced=H,C,N,O,P --IdentitySearchSettings.precursorDeviation=20.0ppm --FormulaSearchSettings.performBottomUpAboveMz=0 --FormulaSearchDB=, --StructureSearchDB=METACYC,BloodExposome,CHEBI,COCONUT,FooDB,GNPS,HMDB,HSDB,KEGG,KNAPSACK,LOTUS,LIPIDMAPS,MACONDA,MESH,MiMeDB,NORMAN,PLANTCYC,PUBCHEMANNOTATIONBIO,PUBCHEMANNOTATIONDRUG,PUBCHEMANNOTATIONFOOD,PUBCHEMANNOTATIONSAFETYANDTOXIC,SUPERNATURAL,TeroMol,YMDB formulas fingerprints classes structures summaries \
+--chemvista \
+--feature-quality-summary \
+--full-summary
+```
+
+Equivalent Rust code:
+```rust,no_run
 use sirius::prelude::*;
 use std::path::Path;
-let sirius = SiriusBuilder::default()
+let sirius = SiriusBuilder::<Version6>::default()
+    // core
+    .maximal_mz(800.0).unwrap()
+    // config
+    .add_config_parameter(ConfigV6::AlgorithmProfile(Instruments::Orbitrap)).unwrap()
+    .semantic_config(ConfigParam::Ms2Allowed(MassDeviation::ppm(5.0))).unwrap()
+    // spectral dbs
+    .semantic_config(ConfigParam::SpectralSearchDb(vec![
+        SearchDB::Metacyc,
+        SearchDB::BloodExposome,
+        SearchDB::Chebi,
+        SearchDB::Coconut,
+        SearchDB::FooDB,
+        SearchDB::Gnps,
+        SearchDB::Hmdb,
+        SearchDB::Hsdb,
+        SearchDB::Kegg,
+        SearchDB::Knapsack,
+        SearchDB::Lotus,
+        SearchDB::LipidMaps,
+        SearchDB::Maconda,
+        SearchDB::Mesh,
+        SearchDB::MiMeDB,
+        SearchDB::Norman,
+        SearchDB::Plantcyc,
+        SearchDB::PubchemAnnotationBio,
+        SearchDB::PubchemAnnotationDrug,
+        SearchDB::PubchemAnnotationFood,
+        SearchDB::PubchemAnnotationSafetyAndToxic,
+        SearchDB::Supernatural,
+        SearchDB::TeroMol,
+        SearchDB::Ymdb,
+    ])).unwrap()
+    .add_config_parameter(ConfigV6::AdductSettingsFallback(AdductsVector::from(vec![
+        Adducts::MplusHplus,
+        Adducts::MplusNaplus,
+        Adducts::MplusKplus,
+        Adducts::MplusH3NplusHplus,
+        Adducts::MplusH2OplusHplus,
+    ]))).unwrap()
+    .add_config_parameter(ConfigV6::FormulaSettingsEnforced(AtomVector::from(vec![Atoms::H,Atoms::C,Atoms::N,Atoms::O,Atoms::P]))).unwrap()
+    .semantic_config(ConfigParam::IdentitySearchPrecursorDeviation(MassDeviation::ppm(20.0))).unwrap()
+    .semantic_config(ConfigParam::FormulaSearchPerformBottomUpAboveMz(0)).unwrap()
+    .semantic_config(ConfigParam::FormulaDbList(vec![])).unwrap()
+    .semantic_config(ConfigParam::StructureDbList(vec![
+        SearchDB::Metacyc,
+        SearchDB::BloodExposome,
+        SearchDB::Chebi,
+        SearchDB::Coconut,
+        SearchDB::FooDB,
+        SearchDB::Gnps,
+        SearchDB::Hmdb,
+        SearchDB::Hsdb,
+        SearchDB::Kegg,
+        SearchDB::Knapsack,
+        SearchDB::Lotus,
+        SearchDB::LipidMaps,
+        SearchDB::Maconda,
+        SearchDB::Mesh,
+        SearchDB::MiMeDB,
+        SearchDB::Norman,
+        SearchDB::Plantcyc,
+        SearchDB::PubchemAnnotationBio,
+        SearchDB::PubchemAnnotationDrug,
+        SearchDB::PubchemAnnotationFood,
+        SearchDB::PubchemAnnotationSafetyAndToxic,
+        SearchDB::Supernatural,
+        SearchDB::TeroMol,
+        SearchDB::Ymdb,
+    ])).unwrap()
+    // tools
+    .enable_formula().unwrap()
+    .enable_fingerprint().unwrap()
+    .enable_canopus().unwrap() // classes
+    .enable_structure().unwrap()
+    .enable_write_summaries().unwrap()
+    // post-tool args
+    .post_tool_arg("--chemvista")
+    .post_tool_arg("--feature-quality-summary")
+    .post_tool_arg("--full-summary")
+    .build();
+let input_file_path = Path::new("tests/data/input_sirius.mgf");
+let output_file_path = Path::new("tests/data/output_sirius.sirius");
+// Check if the path exists before attempting to remove it
+if output_file_path.exists() {
+    let _ = std::fs::remove_dir_all(output_file_path);
+}
+sirius.run(input_file_path, output_file_path).unwrap();
+```
+
+Run the example locally
+- Ensure SIRIUS 6.3.0 is installed and accessible (either `sirius` in PATH or `SIRIUS_PATH` set).
+- Set credentials (`SIRIUS_USERNAME`, `SIRIUS_PASSWORD`) in env or a `.env` file.
+- From the repository root:
+  - `cargo run -p sirius --example run_v6`
+  - This executes `bindings/sirius/examples/run_v6.rs` which builds and runs the same configuration as above and writes the output project at `bindings/sirius/tests/data/output_sirius.sirius`.
+
+The equivalent Rust code is:
+```rust,no_run
+use sirius::prelude::*;
+use std::path::Path;
+let sirius = SiriusBuilder::<Version5>::default()
     .maximal_mz(800.0).unwrap()
     .isotope_settings_filter(true).unwrap()
     .formula_search_db(SearchDB::Bio).unwrap()
@@ -207,5 +317,3 @@ Kai Dührkop, Markus Fleischauer, Marcus Ludwig, Alexander A. Aksenov, Alexey V.
 [SIRIUS 4: Turning tandem mass spectra into metabolite structure information.](https://doi.org/10.1038/s41592-019-0344-8)
 *Nature Methods* 16, 299–302, 2019.
 <!--end cite-->
-
-

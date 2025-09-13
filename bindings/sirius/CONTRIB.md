@@ -10,8 +10,14 @@ sirius login --user-env SIRIUS_USERNAME --password-env SIRIUS_PASSWORD
 
 Example of a minimal sirius command line 
 
+SIRIUS v5
 ```bash
 sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --maxmz=1000 config --IsotopeSettings.filter=False formula zodiac fingerprint structure canopus write-summaries
+```
+
+SIRIUS v6.3.0
+```bash
+sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --mzmax=1000 config --IsotopeSettings.filter=False formulas zodiac fingerprints structures canopus write-summaries
 ```
 
 sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --maxmz=802.2 config --IsotopeSettings.filter=False --FormulaSearchDB=BIO canopus write-summaries
@@ -20,22 +26,34 @@ sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --maxmz=
 
 Example of a typical sirius command line see https://github.com/enpkg/enpkg_full/blob/c8e649290ee72f000c3385e7669b5da2215abad8/params/user.yml#L60
 
+SIRIUS v5
 ```bash
 sirius -i 'tests/data/input_sirius.mgf' --output 'tests/data/output_sirius' --maxmz 800 config --IsotopeSettings.filter=true --FormulaSearchDB=BIO --Timeout.secondsPerTree=0 --FormulaSettings.enforced=HCNOP --Timeout.secondsPerInstance=0 --AdductSettings.detectable=[[M+Na]+,[M+H3N+H]+,[M-H4O2+H]+,[M+K]+,[M+H]+,[M-H2O+H]+] --UseHeuristic.mzToUseHeuristicOnly=650 --AlgorithmProfile=qtof --IsotopeMs2Settings=IGNORE --MS2MassDeviation.allowedMassDeviation=10.0ppm --NumberOfCandidatesPerIon=1 --UseHeuristic.mzToUseHeuristic=300 --FormulaSettings.detectable=B,Cl,Br,Se,S --NumberOfCandidates=10 --ZodiacNumberOfConsideredCandidatesAt300Mz=10 --ZodiacRunInTwoSteps=true --ZodiacEdgeFilterThresholds.minLocalConnections=10 --ZodiacEdgeFilterThresholds.thresholdFilter=0.95 --ZodiacEpochs.burnInPeriod=2000 --ZodiacEpochs.numberOfMarkovChains=10 --ZodiacNumberOfConsideredCandidatesAt800Mz=50 --ZodiacEpochs.iterations=20000 --AdductSettings.enforced=, --AdductSettings.fallback=[[M+Na]+,[M-H+K+K]+,[M+K]+,[M+H]+,[M-H2O+H]+] --FormulaResultThreshold=true --InjectElGordoCompounds=true --StructureSearchDB=BIO --RecomputeResults=false formula zodiac fingerprint structure canopus write-summaries --output 'tests/data/output_sirius'
+```
+
+SIRIUS v6.3.0
+```bash
+sirius -i 'tests/data/input_sirius.mgf' --output 'tests/data/output_sirius' --mzmax 800 config --IsotopeSettings.filter=true --FormulaSearchDB=BIO --Timeout.secondsPerTree=0 --FormulaSettings.enforced=HCNOP --Timeout.secondsPerInstance=0 --AdductSettings.detectable=[[M+Na]+,[M+H3N+H]+,[M-H4O2+H]+,[M+K]+,[M+H]+,[M-H2O+H]+] --UseHeuristic.useOnlyHeuristicAboveMz=650 --AlgorithmProfile=qtof --IsotopeMs2Settings=IGNORE --MS2MassDeviation.allowedMassDeviation=10.0ppm --NumberOfCandidatesPerIonization=1 --UseHeuristic.useHeuristicAboveMz=300 --FormulaSettings.detectable=B,Cl,Br,Se,S --NumberOfCandidates=10 --ZodiacNumberOfConsideredCandidatesAt300Mz=10 --ZodiacRunInTwoSteps=true --ZodiacEdgeFilterThresholds.minLocalConnections=10 --ZodiacEdgeFilterThresholds.thresholdFilter=0.95 --ZodiacEpochs.burnInPeriod=2000 --ZodiacEpochs.numberOfMarkovChains=10 --ZodiacNumberOfConsideredCandidatesAt800Mz=50 --ZodiacEpochs.iterations=20000 --AdductSettings.enforced=, --AdductSettings.fallback=[[M+Na]+,[M-H+K+K]+,[M+K]+,[M+H]+,[M-H2O+H]+] --FormulaResultThreshold=true --EnforceElGordoFormula=true --StructureSearchDB=BIO --RecomputeResults=false formulas zodiac fingerprints structures canopus write-summaries --output 'tests/data/output_sirius'
 ```
 
 The order of the arguments is important.
 This will work 
 
+SIRIUS v5
 ```bash
 /Applications/sirius.app/Contents/MacOS/sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --maxmz 800 config --IsotopeSettings.filter=true --FormulaSearchDB=BIO --Timeout.secondsPerTree=0 --FormulaSettings.enforced=HCNOP --Timeout.secondsPerInstance=0 --AdductSettings.detectable='[[M+H]+,[M-H4O2+H]+,[M+Na]+,[M+K]+,[M+H3N+H]+,[M-H2O+H]+]' --UseHeuristic.mzToUseHeuristicOnly=650 --AlgorithmProfile=orbitrap --IsotopeMs2Settings=IGNORE --MS2MassDeviation.allowedMassDeviation=5.0ppm --NumberOfCandidatesPerIon=1 --UseHeuristic.mzToUseHeuristic=300 --FormulaSettings.detectable=B,Cl,Br,Se,S --NumberOfCandidates=10 --ZodiacNumberOfConsideredCandidatesAt300Mz=10 --ZodiacRunInTwoSteps=true --ZodiacEdgeFilterThresholds.minLocalConnections=10 --ZodiacEdgeFilterThresholds.thresholdFilter=0.95 --ZodiacEpochs.burnInPeriod=2000 --ZodiacEpochs.numberOfMarkovChains=10 --ZodiacNumberOfConsideredCandidatesAt800Mz=50 --ZodiacEpochs.iterations=20000 --AdductSettings.enforced=, --AdductSettings.fallback='[[M+H]+,[M+Na]+,[M+K]+]' --FormulaResultThreshold=true --InjectElGordoCompounds=true --StructureSearchDB=BIO --RecomputeResults=false formula zodiac fingerprint structure canopus write-summaries
+```
+
+SIRIUS v6.3.0
+```bash
+/Applications/sirius.app/Contents/MacOS/sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --mzmax 800 config --IsotopeSettings.filter=true --FormulaSearchDB=BIO --Timeout.secondsPerTree=0 --FormulaSettings.enforced=HCNOP --Timeout.secondsPerInstance=0 --AdductSettings.detectable='[[M+H]+,[M-H4O2+H]+,[M+Na]+,[M+K]+,[M+H3N+H]+,[M-H2O+H]+]' --UseHeuristic.useOnlyHeuristicAboveMz=650 --AlgorithmProfile=orbitrap --IsotopeMs2Settings=IGNORE --MS2MassDeviation.allowedMassDeviation=5.0ppm --NumberOfCandidatesPerIonization=1 --UseHeuristic.useHeuristicAboveMz=300 --FormulaSettings.detectable=B,Cl,Br,Se,S --NumberOfCandidates=10 --ZodiacNumberOfConsideredCandidatesAt300Mz=10 --ZodiacRunInTwoSteps=true --ZodiacEdgeFilterThresholds.minLocalConnections=10 --ZodiacEdgeFilterThresholds.thresholdFilter=0.95 --ZodiacEpochs.burnInPeriod=2000 --ZodiacEpochs.numberOfMarkovChains=10 --ZodiacNumberOfConsideredCandidatesAt800Mz=50 --ZodiacEpochs.iterations=20000 --AdductSettings.enforced=, --AdductSettings.fallback='[[M+H]+,[M+Na]+,[M+K]+]' --FormulaResultThreshold=true --EnforceElGordoFormula=true --StructureSearchDB=BIO --RecomputeResults=false formulas zodiac fingerprints structures canopus write-summaries
 ```
 
 
 This wil not 
 
+SIRIUS v5 (wrong order — will not work)
 ```bash
-
 /Applications/sirius.app/Contents/MacOS/sirius -i tests/data/input_sirius.mgf --output tests/data/output_sirius --maxmz 800 formula zodiac fingerprint structure canopus write-summaries config --IsotopeSettings.filter=true --FormulaSearchDB=BIO --Timeout.secondsPerTree=0 --FormulaSettings.enforced=HCNOP --Timeout.secondsPerInstance=0 --AdductSettings.detectable='[[M+H]+,[M-H4O2+H]+,[M+Na]+,[M+K]+,[M+H3N+H]+,[M-H2O+H]+]' --UseHeuristic.mzToUseHeuristicOnly=650 --AlgorithmProfile=orbitrap --IsotopeMs2Settings=IGNORE --MS2MassDeviation.allowedMassDeviation=5.0ppm --NumberOfCandidatesPerIon=1 --UseHeuristic.mzToUseHeuristic=300 --FormulaSettings.detectable=B,Cl,Br,Se,S --NumberOfCandidates=10 --ZodiacNumberOfConsideredCandidatesAt300Mz=10 --ZodiacRunInTwoSteps=true --ZodiacEdgeFilterThresholds.minLocalConnections=10 --ZodiacEdgeFilterThresholds.thresholdFilter=0.95 --ZodiacEpochs.burnInPeriod=2000 --ZodiacEpochs.numberOfMarkovChains=10 --ZodiacNumberOfConsideredCandidatesAt800Mz=50 --ZodiacEpochs.iterations=20000 --AdductSettings.enforced=, --AdductSettings.fallback='[[M+H]+,[M+Na]+,[M+K]+]' --FormulaResultThreshold=true --InjectElGordoCompounds=true --StructureSearchDB=BIO --RecomputeResults=false
 ```
 

@@ -599,6 +599,542 @@ impl NamedParametersSet for ConfigV5 {
     }
 }
 
+/// The possible config settings for SIRIUS 6.x
+#[derive(Debug, Clone, PartialEq)]
+pub enum ConfigV6 {
+    /// If the config is enabled
+    Enabled,
+
+    /// The isotope settings filter
+    IsotopeSettingsFilter(bool),
+
+    /// The formula search db
+    FormulaSearchDB(SearchDB),
+
+    /// The structure search db
+    StructureSearchDB(SearchDB),
+
+    /// The timeout seconds per tree
+    TimeoutSecondsPerTree(u32),
+
+    /// The number of candidates per ionization
+    NumberOfCandidatesPerIonization(u32),
+
+    /// The number of structure candidates
+    NumberOfStructureCandidates(u32),
+
+    /// Whether to recompute results
+    RecomputeResults(bool),
+
+    /// Whether to print citations
+    PrintCitations(bool),
+
+    /// The timeout seconds per instance
+    TimeoutSecondsPerInstance(u32),
+
+    /// Whether to use formula result threshold
+    FormulaResultThreshold(bool),
+
+    /// Fix the single molecular formula determined by El Gordo if a lipid class is detected.
+    EnforceElGordoFormula(bool),
+
+    /// The median noise intensity
+    MedianNoiseIntensity(f32),
+
+    /// Isotopic intensity absolute error (MS1)
+    IsotopicIntensitySettingsAbsoluteIntensityError(f32),
+
+    /// Isotopic intensity minimal intensity to consider (MS1)
+    IsotopicIntensitySettingsMinimalIntensityToConsider(f32),
+
+    /// Isotopic intensity relative error (MS1)
+    IsotopicIntensitySettingsRelativeIntensityError(f32),
+
+    /// The noise threshold settings intensity threshold
+    NoiseThresholdSettingsIntensityThreshold(f32),
+
+    /// The noise threshold settings maximal number of peaks
+    NoiseThresholdSettingsMaximalNumberOfPeaks(u32),
+
+    /// Whether to cluster compounds before running zodiac
+    ZodiacClusterCompounds(bool),
+
+    /// The zodiac edge filter thresholds min local candidates
+    ZodiacEdgeFilterThresholdsMinLocalCandidates(u32),
+
+    /// The zodiac edge filter thresholds min local connections
+    ZodiacEdgeFilterThresholdsMinLocalConnections(u32),
+
+    /// The zodiac edge filter thresholds threshold filter
+    ZodiacEdgeFilterThresholdsThresholdFilter(f32),
+
+    /// The zodiac epochs burn in period
+    ZodiacEpochsBurnInPeriod(u32),
+
+    /// The zodiac epochs iterations
+    ZodiacEpochsIterations(u32),
+
+    /// The number of markov chains for zodiac
+    ZodiacEpochsNumberOfMarkovChains(u32),
+
+    /// The zodiac library scoring lambda
+    ZodiacLibraryScoringLambda(u32),
+
+    /// The zodiac library scoring min similarity
+    ZodiacLibraryScoringMinSimilarity(f32),
+
+    /// The zodiac number of considered candidates at 300 mz
+    ZodiacNumberOfConsideredCandidatesAt300Mz(i32),
+
+    /// The zodiac number of considered candidates at 800 mz
+    ZodiacNumberOfConsideredCandidatesAt800Mz(i32),
+
+    /// The zodiac ratio of considered candidates per ionization
+    ZodiacRatioOfConsideredCandidatesPerIonization(f32),
+
+    /// Whether to run zodiac in two steps
+    ZodiacRunInTwoSteps(bool),
+
+    /// The MS1 mass deviation allowed mass deviation
+    MS1MassDeviationAllowedMassDeviation(MassDeviation),
+
+    /// The MS1 mass deviation mass difference deviation
+    MS1MassDeviationMassDifferenceDeviation(MassDeviation),
+
+    /// The MS1 mass deviation standard mass deviation
+    MS1MassDeviationStandardMassDeviation(MassDeviation),
+
+    /// The MS2 mass deviation allowed mass deviation
+    MS2MassDeviationAllowedMassDeviation(MassDeviation),
+
+    /// The MS2 mass deviation standard mass deviation
+    MS2MassDeviationStandardMassDeviation(MassDeviation),
+
+    /// The formula settings detectable
+    FormulaSettingsDetectable(AtomVector),
+
+    /// The formula settings enforced
+    FormulaSettingsEnforced(AtomVector),
+
+    /// The formula settings fallback
+    FormulaSettingsFallback(AtomVector),
+
+    /// Whether to forbid recalibration
+    ForbidRecalibration(ForbidRecalibration),
+
+    /// Minimum m/z to enable heuristic preprocessing
+    UseHeuristicUseHeuristicAboveMz(u32),
+
+    /// Minimum m/z to use only heuristic preprocessing
+    UseHeuristicUseOnlyHeuristicAboveMz(u32),
+
+    /// The detectable adducts
+    AdductSettingsDetectable(AdductsVector),
+
+    /// The fallback adducts
+    AdductSettingsFallback(AdductsVector),
+
+    /// The algorithm profile
+    AlgorithmProfile(Instruments),
+
+    /// The compound quality
+    CompoundQuality(CompoundQuality),
+
+    /// The enforced adducts
+    AdductSettingsEnforced(AdductSettingsEnforced),
+
+    /// The candidate formulas
+    CandidateFormulas(CandidateFormulas),
+
+    /// The formula result ranking score
+    FormulaResultRankingScore(FormulaResultRankingScore),
+
+    /// The isotope ms2 settings
+    IsotopeMS2Settings(IsotopeMS2Settings),
+
+    /// The isotope settings multiplier
+    IsotopeSettingsMultiplier(u32),
+
+    /// The noise threshold settings absolute threshold
+    NoiseThresholdSettingsAbsoluteThreshold(u32),
+
+    /// The noise threshold settings base peak
+    NoiseThresholdSettingsBasePeak(BasePeak),
+
+    /// The structure predictors
+    StructurePredictors(StructurePredictors),
+
+    /// The possible adduct switches
+    PossibleAdductSwitches(PossibleAdductSwitches),
+}
+
+impl ToString for ConfigV6 {
+    fn to_string(&self) -> String {
+        match self {
+            ConfigV6::Enabled => Self::parameter_set_name().to_string(),
+            ConfigV6::IsotopeSettingsFilter(isotope_settings_filter) => {
+                format!("--IsotopeSettings.filter={}", isotope_settings_filter)
+            }
+            ConfigV6::FormulaSearchDB(formula_search_db) => {
+                format!("--FormulaSearchDB={}", formula_search_db)
+            }
+            ConfigV6::StructureSearchDB(structure_search_db) => {
+                format!("--StructureSearchDB={}", structure_search_db)
+            }
+            ConfigV6::TimeoutSecondsPerTree(timeout_seconds_per_tree) => {
+                format!("--Timeout.secondsPerTree={}", timeout_seconds_per_tree)
+            }
+            ConfigV6::NumberOfCandidatesPerIonization(number_of_candidates_per_ion) => {
+                format!(
+                    "--NumberOfCandidatesPerIonization={}",
+                    number_of_candidates_per_ion
+                )
+            }
+            ConfigV6::NumberOfStructureCandidates(number_of_structure_candidates) => {
+                format!(
+                    "--NumberOfStructureCandidates={}",
+                    number_of_structure_candidates
+                )
+            }
+            ConfigV6::RecomputeResults(recompute_results) => {
+                format!("--RecomputeResults={}", recompute_results)
+            }
+            ConfigV6::PrintCitations(print_citations) => {
+                format!("--PrintCitations={}", print_citations)
+            }
+            ConfigV6::TimeoutSecondsPerInstance(timeout_seconds_per_instance) => {
+                format!(
+                    "--Timeout.secondsPerInstance={}",
+                    timeout_seconds_per_instance
+                )
+            }
+            ConfigV6::FormulaResultThreshold(formula_result_threshold) => {
+                format!("--FormulaResultThreshold={}", formula_result_threshold)
+            }
+            ConfigV6::EnforceElGordoFormula(enforce_el_gordo_formula) => {
+                format!("--EnforceElGordoFormula={}", enforce_el_gordo_formula)
+            }
+            ConfigV6::MedianNoiseIntensity(median_noise_intensity) => {
+                format!("--MedianNoiseIntensity={}", median_noise_intensity)
+            }
+            ConfigV6::IsotopicIntensitySettingsAbsoluteIntensityError(v) => {
+                format!("--IsotopicIntensitySettings.absoluteIntensityError={}", v)
+            }
+            ConfigV6::IsotopicIntensitySettingsMinimalIntensityToConsider(v) => {
+                format!("--IsotopicIntensitySettings.minimalIntensityToConsider={}", v)
+            }
+            ConfigV6::IsotopicIntensitySettingsRelativeIntensityError(v) => {
+                format!("--IsotopicIntensitySettings.relativeIntensityError={}", v)
+            }
+            ConfigV6::NoiseThresholdSettingsIntensityThreshold(v) => format!(
+                "--NoiseThresholdSettings.intensityThreshold={}",
+                v
+            ),
+            ConfigV6::NoiseThresholdSettingsMaximalNumberOfPeaks(v) => format!(
+                "--NoiseThresholdSettings.maximalNumberOfPeaks={}",
+                v
+            ),
+            ConfigV6::ZodiacClusterCompounds(v) => {
+                format!("--ZodiacClusterCompounds={}", v)
+            }
+            ConfigV6::ZodiacEdgeFilterThresholdsMinLocalCandidates(v) => format!(
+                "--ZodiacEdgeFilterThresholds.minLocalCandidates={}",
+                v
+            ),
+            ConfigV6::ZodiacEdgeFilterThresholdsMinLocalConnections(v) => format!(
+                "--ZodiacEdgeFilterThresholds.minLocalConnections={}",
+                v
+            ),
+            ConfigV6::ZodiacEdgeFilterThresholdsThresholdFilter(v) => format!(
+                "--ZodiacEdgeFilterThresholds.thresholdFilter={}",
+                v
+            ),
+            ConfigV6::ZodiacEpochsBurnInPeriod(v) => format!(
+                "--ZodiacEpochs.burnInPeriod={}",
+                v
+            ),
+            ConfigV6::ZodiacEpochsIterations(v) => {
+                format!("--ZodiacEpochs.iterations={}", v)
+            }
+            ConfigV6::ZodiacEpochsNumberOfMarkovChains(v) => {
+                format!("--ZodiacEpochs.numberOfMarkovChains={}", v)
+            }
+            ConfigV6::ZodiacLibraryScoringLambda(v) => format!(
+                "--ZodiacLibraryScoring.lambda={}",
+                v
+            ),
+            ConfigV6::ZodiacLibraryScoringMinSimilarity(v) => format!(
+                "--ZodiacLibraryScoring.minSimilarity={}",
+                v
+            ),
+            ConfigV6::ZodiacNumberOfConsideredCandidatesAt300Mz(v) => format!(
+                "--ZodiacNumberOfConsideredCandidatesAt300Mz={}",
+                v
+            ),
+            ConfigV6::ZodiacNumberOfConsideredCandidatesAt800Mz(v) => format!(
+                "--ZodiacNumberOfConsideredCandidatesAt800Mz={}",
+                v
+            ),
+            ConfigV6::ZodiacRatioOfConsideredCandidatesPerIonization(v) => format!(
+                "--ZodiacRatioOfConsideredCandidatesPerIonization={}",
+                v
+            ),
+            ConfigV6::ZodiacRunInTwoSteps(v) => {
+                format!("--ZodiacRunInTwoSteps={}", v)
+            }
+            ConfigV6::MS1MassDeviationAllowedMassDeviation(v) => format!(
+                "--MS1MassDeviation.allowedMassDeviation={}",
+                v
+            ),
+            ConfigV6::MS1MassDeviationMassDifferenceDeviation(v) => format!(
+                "--MS1MassDeviation.massDifferenceDeviation={}",
+                v
+            ),
+            ConfigV6::MS1MassDeviationStandardMassDeviation(v) => format!(
+                "--MS1MassDeviation.standardMassDeviation={}",
+                v
+            ),
+            ConfigV6::MS2MassDeviationAllowedMassDeviation(v) => format!(
+                "--MS2MassDeviation.allowedMassDeviation={}",
+                v
+            ),
+            ConfigV6::MS2MassDeviationStandardMassDeviation(v) => format!(
+                "--MS2MassDeviation.standardMassDeviation={}",
+                v
+            ),
+            ConfigV6::FormulaSettingsDetectable(v) => format!(
+                "--FormulaSettings.detectable={}",
+                v
+            ),
+            ConfigV6::FormulaSettingsEnforced(v) => {
+                format!("--FormulaSettings.enforced={}", v)
+            }
+            ConfigV6::FormulaSettingsFallback(v) => {
+                format!("--FormulaSettings.fallback={}", v)
+            }
+            ConfigV6::ForbidRecalibration(v) => {
+                format!("--ForbidRecalibration={}", v)
+            }
+            ConfigV6::UseHeuristicUseHeuristicAboveMz(v) => {
+                format!("--UseHeuristic.useHeuristicAboveMz={}", v)
+            }
+            ConfigV6::UseHeuristicUseOnlyHeuristicAboveMz(v) => {
+                format!("--UseHeuristic.useOnlyHeuristicAboveMz={}", v)
+            }
+            ConfigV6::AdductSettingsDetectable(v) => {
+                format!("--AdductSettings.detectable={}", v)
+            }
+            ConfigV6::AdductSettingsFallback(v) => {
+                format!("--AdductSettings.fallback={}", v)
+            }
+            ConfigV6::AlgorithmProfile(v) => {
+                format!("--AlgorithmProfile={}", v)
+            }
+            ConfigV6::CompoundQuality(v) => {
+                format!("--CompoundQuality={}", v)
+            }
+            ConfigV6::AdductSettingsEnforced(v) => {
+                format!("--AdductSettings.enforced={}", v)
+            }
+            ConfigV6::CandidateFormulas(v) => {
+                format!("--CandidateFormulas={}", v)
+            }
+            ConfigV6::FormulaResultRankingScore(v) => {
+                format!("--FormulaResultRankingScore={}", v)
+            }
+            ConfigV6::IsotopeMS2Settings(v) => {
+                format!("--IsotopeMs2Settings={}", v)
+            }
+            ConfigV6::IsotopeSettingsMultiplier(v) => {
+                format!("--IsotopeSettings.multiplier={}", v)
+            }
+            ConfigV6::NoiseThresholdSettingsAbsoluteThreshold(v) => format!(
+                "--NoiseThresholdSettings.absoluteThreshold={}",
+                v
+            ),
+            ConfigV6::NoiseThresholdSettingsBasePeak(v) => {
+                format!("--NoiseThresholdSettings.basePeak={}", v)
+            }
+            ConfigV6::StructurePredictors(v) => {
+                format!("--StructurePredictors={}", v)
+            }
+            ConfigV6::PossibleAdductSwitches(v) => {
+                format!("--PossibleAdductSwitches={}", v)
+            }
+        }
+    }
+}
+
+impl IntoDefault for ConfigV6 {
+    fn into_default(self) -> Self {
+        match self {
+            ConfigV6::Enabled => ConfigV6::Enabled,
+            ConfigV6::IsotopeSettingsFilter(_) => ConfigV6::IsotopeSettingsFilter(true),
+            ConfigV6::FormulaSearchDB(_) => ConfigV6::FormulaSearchDB(SearchDB::None),
+            ConfigV6::StructureSearchDB(_) => ConfigV6::StructureSearchDB(SearchDB::Bio),
+            ConfigV6::TimeoutSecondsPerTree(_) => ConfigV6::TimeoutSecondsPerTree(0),
+            ConfigV6::NumberOfCandidatesPerIonization(_) => ConfigV6::NumberOfCandidatesPerIonization(1),
+            ConfigV6::NumberOfStructureCandidates(_) => {
+                ConfigV6::NumberOfStructureCandidates(10000)
+            }
+            ConfigV6::RecomputeResults(_) => ConfigV6::RecomputeResults(false),
+            ConfigV6::PrintCitations(_) => ConfigV6::PrintCitations(true),
+            ConfigV6::TimeoutSecondsPerInstance(_) => ConfigV6::TimeoutSecondsPerInstance(0),
+            ConfigV6::FormulaResultThreshold(_) => ConfigV6::FormulaResultThreshold(true),
+            ConfigV6::EnforceElGordoFormula(_) => ConfigV6::EnforceElGordoFormula(true),
+            ConfigV6::MedianNoiseIntensity(_) => ConfigV6::MedianNoiseIntensity(0.015),
+            ConfigV6::IsotopicIntensitySettingsAbsoluteIntensityError(_) => ConfigV6::IsotopicIntensitySettingsAbsoluteIntensityError(0.02),
+            ConfigV6::IsotopicIntensitySettingsMinimalIntensityToConsider(_) => {
+                ConfigV6::IsotopicIntensitySettingsMinimalIntensityToConsider(0.01)
+            }
+            ConfigV6::IsotopicIntensitySettingsRelativeIntensityError(_) => ConfigV6::IsotopicIntensitySettingsRelativeIntensityError(0.08),
+            ConfigV6::NoiseThresholdSettingsIntensityThreshold(_) => {
+                ConfigV6::NoiseThresholdSettingsIntensityThreshold(0.005)
+            }
+            ConfigV6::NoiseThresholdSettingsMaximalNumberOfPeaks(_) => {
+                ConfigV6::NoiseThresholdSettingsMaximalNumberOfPeaks(60)
+            }
+            ConfigV6::ZodiacClusterCompounds(_) => ConfigV6::ZodiacClusterCompounds(false),
+            ConfigV6::ZodiacEdgeFilterThresholdsMinLocalCandidates(_) => {
+                ConfigV6::ZodiacEdgeFilterThresholdsMinLocalCandidates(1)
+            }
+            ConfigV6::ZodiacEdgeFilterThresholdsMinLocalConnections(_) => {
+                ConfigV6::ZodiacEdgeFilterThresholdsMinLocalConnections(10)
+            }
+            ConfigV6::ZodiacEdgeFilterThresholdsThresholdFilter(_) => {
+                ConfigV6::ZodiacEdgeFilterThresholdsThresholdFilter(0.95)
+            }
+            ConfigV6::ZodiacEpochsBurnInPeriod(_) => ConfigV6::ZodiacEpochsBurnInPeriod(2000),
+            ConfigV6::ZodiacEpochsIterations(_) => ConfigV6::ZodiacEpochsIterations(20000),
+            ConfigV6::ZodiacEpochsNumberOfMarkovChains(_) => {
+                ConfigV6::ZodiacEpochsNumberOfMarkovChains(10)
+            }
+            ConfigV6::ZodiacLibraryScoringLambda(_) => ConfigV6::ZodiacLibraryScoringLambda(1000),
+            ConfigV6::ZodiacLibraryScoringMinSimilarity(_) => {
+                ConfigV6::ZodiacLibraryScoringMinSimilarity(0.5)
+            }
+            ConfigV6::ZodiacNumberOfConsideredCandidatesAt300Mz(_) => {
+                ConfigV6::ZodiacNumberOfConsideredCandidatesAt300Mz(10)
+            }
+            ConfigV6::ZodiacNumberOfConsideredCandidatesAt800Mz(_) => {
+                ConfigV6::ZodiacNumberOfConsideredCandidatesAt800Mz(50)
+            }
+            ConfigV6::ZodiacRatioOfConsideredCandidatesPerIonization(_) => {
+                ConfigV6::ZodiacRatioOfConsideredCandidatesPerIonization(0.2)
+            }
+            ConfigV6::ZodiacRunInTwoSteps(_) => ConfigV6::ZodiacRunInTwoSteps(true),
+            ConfigV6::MS1MassDeviationAllowedMassDeviation(_) => {
+                ConfigV6::MS1MassDeviationAllowedMassDeviation(MassDeviation::ppm(10.0))
+            }
+            ConfigV6::MS1MassDeviationMassDifferenceDeviation(_) => {
+                ConfigV6::MS1MassDeviationMassDifferenceDeviation(MassDeviation::ppm(5.0))
+            }
+            ConfigV6::MS1MassDeviationStandardMassDeviation(_) => {
+                ConfigV6::MS1MassDeviationStandardMassDeviation(MassDeviation::ppm(10.0))
+            }
+            ConfigV6::MS2MassDeviationAllowedMassDeviation(_) => {
+                ConfigV6::MS2MassDeviationAllowedMassDeviation(MassDeviation::ppm(10.0))
+            }
+            ConfigV6::MS2MassDeviationStandardMassDeviation(_) => {
+                ConfigV6::MS2MassDeviationStandardMassDeviation(MassDeviation::ppm(10.0))
+            }
+            ConfigV6::FormulaSettingsDetectable(_) => {
+                ConfigV6::FormulaSettingsDetectable(AtomVector::from(vec![
+                    Atoms::S,
+                    Atoms::Br,
+                    Atoms::Cl,
+                    Atoms::B,
+                    Atoms::Se,
+                ]))
+            }
+            ConfigV6::FormulaSettingsEnforced(_) => {
+                ConfigV6::FormulaSettingsEnforced(AtomVector::from(vec![
+                    Atoms::C,
+                    Atoms::H,
+                    Atoms::N,
+                    Atoms::O,
+                    Atoms::P,
+                ]))
+            }
+            ConfigV6::FormulaSettingsFallback(_) => {
+                ConfigV6::FormulaSettingsFallback(AtomVector::from(vec![Atoms::S]))
+            }
+            ConfigV6::ForbidRecalibration(_) => {
+                ConfigV6::ForbidRecalibration(ForbidRecalibration::Allowed)
+            }
+            ConfigV6::UseHeuristicUseHeuristicAboveMz(_) => {
+                ConfigV6::UseHeuristicUseHeuristicAboveMz(300)
+            }
+            ConfigV6::UseHeuristicUseOnlyHeuristicAboveMz(_) => {
+                ConfigV6::UseHeuristicUseOnlyHeuristicAboveMz(650)
+            }
+            ConfigV6::AdductSettingsDetectable(_) => {
+                ConfigV6::AdductSettingsDetectable(AdductsVector::from(vec![
+                    Adducts::MplusHplus,
+                    Adducts::MplusKplus,
+                    Adducts::MplusNaplus,
+                    Adducts::MplusHminusH2Oplus,
+                    Adducts::MplusHminusTwoH2Oplus,
+                    Adducts::MplusNH4plus,
+                    Adducts::MminusHminus,
+                    Adducts::MplusClminus,
+                    Adducts::MminusH20minusHminus,
+                    Adducts::MplusBromideminus,
+                ]))
+            }
+            ConfigV6::AdductSettingsFallback(_) => {
+                ConfigV6::AdductSettingsFallback(AdductsVector::from(vec![
+                    Adducts::MplusHplus,
+                    Adducts::MminusHminus,
+                    Adducts::MplusKplus,
+                    Adducts::MplusNaplus,
+                ]))
+            }
+            ConfigV6::AlgorithmProfile(_) => ConfigV6::AlgorithmProfile(Instruments::Default),
+            ConfigV6::CompoundQuality(_) => ConfigV6::CompoundQuality(CompoundQuality::Unknown),
+            ConfigV6::AdductSettingsEnforced(_) => {
+                ConfigV6::AdductSettingsEnforced(AdductSettingsEnforced::Comma)
+            }
+            ConfigV6::CandidateFormulas(_) => ConfigV6::CandidateFormulas(CandidateFormulas::Comma),
+            ConfigV6::FormulaResultRankingScore(_) => {
+                ConfigV6::FormulaResultRankingScore(FormulaResultRankingScore::Auto)
+            }
+            ConfigV6::IsotopeMS2Settings(_) => {
+                ConfigV6::IsotopeMS2Settings(IsotopeMS2Settings::Ignore)
+            }
+            ConfigV6::IsotopeSettingsMultiplier(_) => ConfigV6::IsotopeSettingsMultiplier(1),
+            ConfigV6::NoiseThresholdSettingsAbsoluteThreshold(_) => {
+                ConfigV6::NoiseThresholdSettingsAbsoluteThreshold(0)
+            }
+            ConfigV6::NoiseThresholdSettingsBasePeak(_) => {
+                ConfigV6::NoiseThresholdSettingsBasePeak(BasePeak::NotPrecursor)
+            }
+            ConfigV6::StructurePredictors(_) => {
+                ConfigV6::StructurePredictors(StructurePredictors::CsiFingerId)
+            }
+            ConfigV6::PossibleAdductSwitches(_) => {
+                ConfigV6::PossibleAdductSwitches(PossibleAdductSwitches::DefaultAdductsSwitches)
+            }
+        }
+    }
+}
+
+impl Enablable for ConfigV6 {
+    fn is_enabler(&self) -> bool {
+        matches!(self, ConfigV6::Enabled)
+    }
+
+    fn enabler() -> Self {
+        ConfigV6::Enabled
+    }
+}
+
+impl NamedParametersSet for ConfigV6 {
+    fn parameter_set_name() -> &'static str {
+        "config"
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -720,5 +1256,41 @@ mod tests {
     fn check_negative_mass_deviation_panics() {
         assert!(std::panic::catch_unwind(|| MassDeviation::ppm(-1.0)).is_err());
         assert!(std::panic::catch_unwind(|| MassDeviation::da(-1.0)).is_err());
+    }
+
+    #[test]
+    fn test_v6_isotopic_intensity_to_string() {
+        assert_eq!(
+            "--IsotopicIntensitySettings.absoluteIntensityError=0.02",
+            ConfigV6::IsotopicIntensitySettingsAbsoluteIntensityError(0.02).to_string()
+        );
+        assert_eq!(
+            "--IsotopicIntensitySettings.minimalIntensityToConsider=0.01",
+            ConfigV6::IsotopicIntensitySettingsMinimalIntensityToConsider(0.01).to_string()
+        );
+        assert_eq!(
+            "--IsotopicIntensitySettings.relativeIntensityError=0.08",
+            ConfigV6::IsotopicIntensitySettingsRelativeIntensityError(0.08).to_string()
+        );
+    }
+
+    #[test]
+    fn test_v6_candidates_per_ionization_to_string() {
+        assert_eq!(
+            "--NumberOfCandidatesPerIonization=3",
+            ConfigV6::NumberOfCandidatesPerIonization(3).to_string()
+        );
+    }
+
+    #[test]
+    fn test_v6_heuristic_flags_to_string() {
+        assert_eq!(
+            "--UseHeuristic.useHeuristicAboveMz=300",
+            ConfigV6::UseHeuristicUseHeuristicAboveMz(300).to_string()
+        );
+        assert_eq!(
+            "--UseHeuristic.useOnlyHeuristicAboveMz=650",
+            ConfigV6::UseHeuristicUseOnlyHeuristicAboveMz(650).to_string()
+        );
     }
 }

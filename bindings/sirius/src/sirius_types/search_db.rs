@@ -70,6 +70,39 @@ pub enum SearchDB {
 
     /// The ZINCBIO search db
     Zincbio,
+
+    /// BloodExposome search db
+    BloodExposome,
+
+    /// FooDB search db
+    FooDB,
+
+    /// LOTUS search db
+    Lotus,
+
+    /// LIPIDMAPS search db
+    LipidMaps,
+
+    /// MiMeDB search db
+    MiMeDB,
+
+    /// PubChem Annotation Bio
+    PubchemAnnotationBio,
+
+    /// PubChem Annotation Drug
+    PubchemAnnotationDrug,
+
+    /// PubChem Annotation Food
+    PubchemAnnotationFood,
+
+    /// PubChem Annotation Safety and Toxic
+    PubchemAnnotationSafetyAndToxic,
+
+    /// SuperNatural search db
+    Supernatural,
+
+    /// TeroMol search db
+    TeroMol,
 }
 
 impl Display for SearchDB {
@@ -97,6 +130,17 @@ impl Display for SearchDB {
             SearchDB::Ymdb => write!(f, "YMDB"),
             SearchDB::Ymdbmine => write!(f, "YMDBMINE"),
             SearchDB::Zincbio => write!(f, "ZINCBIO"),
+            SearchDB::BloodExposome => write!(f, "BloodExposome"),
+            SearchDB::FooDB => write!(f, "FooDB"),
+            SearchDB::Lotus => write!(f, "LOTUS"),
+            SearchDB::LipidMaps => write!(f, "LIPIDMAPS"),
+            SearchDB::MiMeDB => write!(f, "MiMeDB"),
+            SearchDB::PubchemAnnotationBio => write!(f, "PUBCHEMANNOTATIONBIO"),
+            SearchDB::PubchemAnnotationDrug => write!(f, "PUBCHEMANNOTATIONDRUG"),
+            SearchDB::PubchemAnnotationFood => write!(f, "PUBCHEMANNOTATIONFOOD"),
+            SearchDB::PubchemAnnotationSafetyAndToxic => write!(f, "PUBCHEMANNOTATIONSAFETYANDTOXIC"),
+            SearchDB::Supernatural => write!(f, "SUPERNATURAL"),
+            SearchDB::TeroMol => write!(f, "TeroMol"),
         }
     }
 }
@@ -128,6 +172,17 @@ impl<'a> TryFrom<&'a str> for SearchDB {
             "YMDB" => Ok(SearchDB::Ymdb),
             "YMDBMINE" => Ok(SearchDB::Ymdbmine),
             "ZINCBIO" => Ok(SearchDB::Zincbio),
+            "BloodExposome" => Ok(SearchDB::BloodExposome),
+            "FooDB" => Ok(SearchDB::FooDB),
+            "LOTUS" => Ok(SearchDB::Lotus),
+            "LIPIDMAPS" => Ok(SearchDB::LipidMaps),
+            "MiMeDB" => Ok(SearchDB::MiMeDB),
+            "PUBCHEMANNOTATIONBIO" => Ok(SearchDB::PubchemAnnotationBio),
+            "PUBCHEMANNOTATIONDRUG" => Ok(SearchDB::PubchemAnnotationDrug),
+            "PUBCHEMANNOTATIONFOOD" => Ok(SearchDB::PubchemAnnotationFood),
+            "PUBCHEMANNOTATIONSAFETYANDTOXIC" => Ok(SearchDB::PubchemAnnotationSafetyAndToxic),
+            "SUPERNATURAL" => Ok(SearchDB::Supernatural),
+            "TeroMol" => Ok(SearchDB::TeroMol),
             _ => Err(format!("Unknown formula search db: {}", s)),
         }
     }

@@ -31,17 +31,11 @@ impl<V: Version> Sirius<V> {
         // Load environment variables from .env file
         dotenv().ok();
 
-        // Fetch the path of the sirius command from environment variables
-        let sirius_path = env::var("SIRIUS_PATH").map_err(|_| {
-            concat!(
-                "The environment variable SIRIUS_PATH is not set. ",
-                "We expected there to exist a .env file in the current directory ",
-                "with the SIRIUS_PATH variable set to the path of the sirius executable. ",
-                "The variable may also be set in the environment directly, for instance ",
-                "in the .bashrc file."
-            )
-            .to_string()
-        })?;
+        // Resolve the sirius executable path: prefer SIRIUS_PATH, otherwise fallback to `sirius` from PATH
+        let sirius_path = match env::var("SIRIUS_PATH") {
+            Ok(p) => p,
+            Err(_) => "sirius".to_string(),
+        };
 
         // Fetch the SIRIUS_USERNAME and the SIRIUS_PASSWORD from environment variables
         // in order to login before launching the sirius command
@@ -122,5 +116,10 @@ impl<V: Version> Sirius<V> {
         }
 
         Ok(())
+    }
+
+    /// Expose underlying arguments (without input/output) for testing and inspection.
+    pub fn args(&self) -> Vec<String> {
+        self.config.args()
     }
 }
