@@ -12,7 +12,7 @@ use init_migration::asset_models::{
     soils::{soil_model, soil_sample_model},
 };
 use web_common_traits::{
-    database::{InsertableVariant, Read},
+    database::{InsertableVariant, PrimaryKeyLike, Read},
     prelude::Insertable,
 };
 
@@ -47,14 +47,14 @@ impl FieldDatumWrapper {
             return Ok(Some(sample_source));
         }
         let sample_source_model = self.sample_source_model(user, portal)?;
-        match self.sample_source_kind() {
+        let pk = match self.sample_source_kind() {
             SampleSourceKind::Organism => {
                 let organism = Organism::new()
                     .id(uuid)?
                     .model(&sample_source_model)?
                     .created_by(user)?
                     .insert(user.id, portal)?;
-                Ok(Some(organism.id(portal)?))
+                organism.primary_key()
             }
             SampleSourceKind::Soil => {
                 let soil = Soil::new()
@@ -62,9 +62,10 @@ impl FieldDatumWrapper {
                     .model(&sample_source_model)?
                     .created_by(user)?
                     .insert(user.id, portal)?;
-                Ok(Some(soil.id(portal)?))
+                soil.primary_key()
             }
-        }
+        };
+        Ok(Some(SampleSource::read(pk, portal)?))
     }
     /// Return the sample source kind of the sample.
     ///
@@ -101,10 +102,13 @@ impl FieldDatumWrapper {
         user: &User,
         portal: &mut PgConnection,
     ) -> Result<SampleSourceModel, anyhow::Error> {
-        Ok(match self.sample_source_kind() {
-            SampleSourceKind::Organism => organism_model(user, portal)?.id(portal)?,
-            SampleSourceKind::Soil => soil_model(user, portal)?.id(portal)?,
-        })
+        Ok(SampleSourceModel::read(
+            match self.sample_source_kind() {
+                SampleSourceKind::Organism => organism_model(user, portal)?.primary_key(),
+                SampleSourceKind::Soil => soil_model(user, portal)?.primary_key(),
+            },
+            portal,
+        )?)
     }
 
     /// Returns the sample model of the sample.
