@@ -64,6 +64,10 @@ impl DiagramBuilder for FlowchartBuilder {
         self.generic.node(node)
     }
 
+    fn nodes(&self) -> impl Iterator<Item = &std::rc::Rc<Self::Node>> + '_ {
+        self.generic.nodes()
+    }
+
     fn number_of_edges(&self) -> usize {
         self.generic.number_of_edges()
     }

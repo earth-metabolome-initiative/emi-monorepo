@@ -164,25 +164,115 @@ impl ProcedureTemplateGraph {
         self.task_graphs[procedure_node_id].as_ref()
     }
 
-    /// Returns an iterator over the
-
-    /// Returns the root analogue of the given procedure template
-    /// asset model.
+    /// Returns the closest procedure template which also uses the given
+    /// procedure template asset model, as defined by the ownership graph.
     ///
     /// # Arguments
     ///
-    /// * `procedure_template_asset_model` - The procedure template asset model
-    ///   to find the analogue for.
-    ///
-    /// # Panics
-    ///
-    /// * If the provided procedure template asset model is not owned by either
-    ///   the root procedure template
-    pub fn root_analogue_ptam(
-        &self,
-        procedure_template_asset_model: &ProcedureTemplateAssetModel,
-    ) -> &ProcedureTemplateAssetModel {
-        assert!(self.root_owned_ptam(procedure_template_asset_model));
-        todo!()
+    /// * `parents` - The parents of the current procedure template, in order
+    ///   from the root to the direct parent.
+    /// * `parent` - The direct parent of the current procedure template.
+    /// * `current` - The current procedure template.
+    /// * `reference_ptam` - The procedure template asset model to find the
+    ///   closest procedure template for.
+    /// * `allow_self` - Whether to allow the current procedure template to be
+    ///   returned if it employs the given procedure template asset model.
+    pub fn closest_paths_to_procedure_template_using_ptam<'graph>(
+        &'graph self,
+        parents: &[&'graph ProcedureTemplate],
+        parent: &'graph ProcedureTemplate,
+        current: &'graph ProcedureTemplate,
+        reference_ptam: &ProcedureTemplateAssetModel,
+        allow_self: bool,
+    ) -> Vec<Vec<&'graph ProcedureTemplate>> {
+        let mut paths: Vec<Vec<&'graph ProcedureTemplate>> = if let Some(task_graph) =
+            self.task_graph_of(current)
+        {
+            // If this is a recursion step, we check if the current procedure is associated
+            // to a task graph. If it is, we search starting from the leaf task nodes
+            // whether they employ or contain subprocedures that employ the given
+            // procedure template asset model. If it is not, we continue the search
+            // recursively in the parents.
+
+            let mut parents = parents.to_vec();
+            parents.push(parent);
+            task_graph
+                .sink_nodes()
+                .flat_map(|sink_node| {
+                    self.closest_paths_to_procedure_template_using_ptam(
+                        &parents,
+                        current,
+                        sink_node,
+                        reference_ptam,
+                        true,
+                    )
+                })
+                .collect()
+        } else {
+            if allow_self {
+                let this_complete_parents = {
+                    let mut p = parents.to_vec();
+                    p.push(parent);
+                    p.push(current);
+                    p
+                };
+                for ptam in self.employed_by(current) {
+                    if self.reference_based_on_alias(&this_complete_parents, ptam)
+                        == Some(reference_ptam)
+                    {
+                        return vec![this_complete_parents];
+                    }
+                }
+            }
+
+            // We are in a leaf node, so we search through the predecessor of the current
+            // node within the task graph of the parent procedure template.
+            let task_graph = self.task_graph_of(parent).expect(
+                "Parent procedure template must have a task graph if the current one does not.",
+            );
+
+            if !task_graph.has_predecessors(current) {
+                // If the current node does not have predecessors, it means we need to move to
+                // the parent's predecessors.
+                let (grand_parent, parents) = parents.split_last().unwrap();
+                let grand_parent_task_graph = self.task_graph_of(grand_parent).expect(
+                    "Grand parent procedure template must have a task graph if the parent's does not.",
+                );
+
+                grand_parent_task_graph
+                    .predecessors(parent)
+                    .flat_map(|parent_predecessor| {
+                        self.closest_paths_to_procedure_template_using_ptam(
+                            parents,
+                            grand_parent,
+                            parent_predecessor,
+                            reference_ptam,
+                            true,
+                        )
+                    })
+                    .collect()
+            } else {
+                task_graph
+                    .predecessors(current)
+                    .flat_map(|predecessor| {
+                        self.closest_paths_to_procedure_template_using_ptam(
+                            parents,
+                            parent,
+                            predecessor,
+                            reference_ptam,
+                            true,
+                        )
+                    })
+                    .collect()
+            }
+        };
+        // Then, we deduplicate the paths, as even if the search starts from distinct
+        // sink nodes it is possible that they converge to the same procedure template
+        // using the given procedure template asset model.
+
+        paths.sort_unstable();
+        paths.dedup();
+
+        paths
     }
 }

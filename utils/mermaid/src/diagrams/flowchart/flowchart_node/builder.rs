@@ -88,6 +88,19 @@ impl FlowchartNodeBuilder {
         self.direction = Some(direction);
         self
     }
+
+    #[must_use]
+    /// Returns the direction of the subgraph, if set.
+    pub fn get_direction(&self) -> Option<Direction> {
+        self.direction
+    }
+
+    #[must_use]
+    /// Resets the direction of the subgraph for the flowchart node.
+    pub fn reset_direction(mut self) -> Self {
+        self.direction = None;
+        self
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

@@ -57,10 +57,7 @@ where
     }
 
     fn get_node_by_id(&self, id: u64) -> Option<Rc<Self::Node>> {
-        self.nodes
-            .binary_search_by_key(&id, |node| node.id())
-            .ok()
-            .map(|index| self.nodes[index].clone())
+        self.nodes.iter().find(|node| node.id() == id).cloned()
     }
 
     fn get_style_class_by_name(&self, name: &str) -> Option<Rc<StyleClass>> {
@@ -92,10 +89,7 @@ impl<Node, Edge, Config: Default> Default for GenericDiagramBuilder<Node, Edge, 
 impl<N: Node + Display, E: Edge<Node = N> + Display, C: Configuration>
     From<GenericDiagramBuilder<N, E, C>> for GenericDiagram<N, E, C>
 {
-    fn from(mut builder: GenericDiagramBuilder<N, E, C>) -> Self {
-        builder.generic_diagram.nodes.sort_unstable();
-        builder.generic_diagram.edges.sort_unstable();
-        builder.generic_diagram.style_classes.sort_unstable();
+    fn from(builder: GenericDiagramBuilder<N, E, C>) -> Self {
         builder.generic_diagram
     }
 }
@@ -174,6 +168,10 @@ where
         let rc = Rc::new(node);
         self.generic_diagram.nodes.push(rc.clone());
         Ok(rc)
+    }
+
+    fn nodes(&self) -> impl Iterator<Item = &Rc<Self::Node>> + '_ {
+        self.generic_diagram.nodes.iter()
     }
 
     fn get_node_by_id(&self, id: u64) -> Option<Rc<Self::Node>> {

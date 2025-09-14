@@ -11,7 +11,8 @@ use graph::{
         GenericBiGraph, GenericEdgesBuilder, GenericGraph, GenericMonoplexMonopartiteGraphBuilder,
     },
     traits::{
-        BipartiteGraph, EdgesBuilder, MonopartiteGraphBuilder, MonoplexGraph, MonoplexGraphBuilder,
+        BipartiteGraph, EdgesBuilder, MonopartiteGraph, MonopartiteGraphBuilder, MonoplexGraph,
+        MonoplexGraphBuilder, TransposedMonoplexGraph,
     },
 };
 use sorted_vec::prelude::SortedVec;
@@ -57,12 +58,12 @@ impl Ownership {
     {
         let mut edges = Vec::new();
         let ptams = graph.right_nodes_vocabulary().clone();
-        for (i, asset_model) in ptams.iter().enumerate() {
-            if let Some(original_ptam) = asset_model.based_on {
+        for (i, ptam) in ptams.iter().enumerate() {
+            if let Some(original_ptam) = ptam.based_on {
                 let original_index = ptams
                     .binary_search_by(|am| am.id.cmp(&original_ptam))
                     .expect("Based on asset model not found in vocabulary");
-                edges.push((original_index, i));
+                edges.push((i, original_index));
             }
         }
 
@@ -237,6 +238,68 @@ pub trait OwnershipLike: AsRef<Ownership> {
             .expect("Procedure template asset model not part of ownership graph");
 
         self.as_ref().asset_models.get(ptam_id).expect("Asset model id out of bounds")
+    }
+
+    /// Returns the certain based on aliases of the given procedure
+    /// template asset model.
+    ///
+    /// # Arguments
+    /// * `parents` - The parent procedure templates of the given procedure
+    ///   template asset model.
+    /// * `procedure_template_asset_model` - The procedure template asset model
+    ///   whose certain based on aliases are to be retrieved.
+    ///
+    /// # Implementation details
+    ///
+    /// Given a procedure template asset model A, if it has only a single
+    /// ancestor B which is based on A, then B is considered an certain
+    /// based on alias of A. If A has multiple ancestors, then none of them
+    /// are considered certain based on aliases, as it is unclear which
+    /// one is the true alias.
+    fn reference_based_on_alias<'graph>(
+        &'graph self,
+        parents: &[&ProcedureTemplate],
+        procedure_template_asset_model: &'graph ProcedureTemplateAssetModel,
+    ) -> Option<&'graph ProcedureTemplateAssetModel> {
+        if procedure_template_asset_model.procedure_template == parents[0].procedure_template {
+            // If the PTAM is owned by the root procedure template, it is its own
+            // certain based on alias.
+            return Some(procedure_template_asset_model);
+        }
+
+        let nv = self.as_ref().derivatives.nodes_vocabulary();
+
+        let ptam_id = nv
+            .binary_search(procedure_template_asset_model)
+            .expect("Procedure template asset model not part of ownership graph");
+
+        // Either the current PTAM has a single predecessor, or if they are
+        // multiple ones we employ the parents to disambiguate which one
+        // is the true alias.
+
+        let certain_based_on_alias = if self.as_ref().derivatives.in_degree(ptam_id) == 1 {
+            nv.get(self.as_ref().derivatives.predecessors(ptam_id).next()?)
+                .expect("Procedure template asset model id out of bounds")
+                .as_ref()
+        } else {
+            let mut certain_based_on_alias = None;
+            for predecessor in self.as_ref().derivatives.predecessors(ptam_id) {
+                let predecessor_pt = nv
+                    .get(predecessor)
+                    .expect("Procedure template asset model id out of bounds")
+                    .as_ref();
+
+                for parent in parents {
+                    if predecessor_pt.procedure_template == parent.procedure_template {
+                        certain_based_on_alias = Some(predecessor_pt);
+                        break;
+                    }
+                }
+            }
+            certain_based_on_alias?
+        };
+
+        self.reference_based_on_alias(parents, certain_based_on_alias)
     }
 }
 

@@ -70,15 +70,17 @@ impl Hierarchy {
 
         for (i, procedure_template) in self.hierarchy.nodes_vocabulary().iter().enumerate() {
             for ptam in procedure_template.procedure_template_asset_models(conn)? {
-                let ptam_owner = ptam.procedure_template(conn)?;
                 // If the owner of the procedure template asset model is not in
                 // the hierarchy, add it to the foreign procedure templates.
                 if self
                     .hierarchy
                     .nodes_vocabulary()
-                    .binary_search_by(|pt| pt.as_ref().cmp(&ptam_owner))
+                    .binary_search_by(|pt| {
+                        pt.as_ref().procedure_template.cmp(&ptam.procedure_template)
+                    })
                     .is_err()
                 {
+                    let ptam_owner = ptam.procedure_template(conn)?;
                     foreign_procedure_templates.push(ptam_owner);
                 }
 

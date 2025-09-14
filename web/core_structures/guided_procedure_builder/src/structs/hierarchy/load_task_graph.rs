@@ -119,15 +119,15 @@ impl Hierarchy {
 
         let mut edges: Vec<(usize, usize)> = Vec::new();
         for next_relation in next_relations {
-            let successor = next_relation.successor(conn)?;
             let predecessor = next_relation.predecessor(conn)?;
+            let successor = next_relation.successor(conn)?;
 
             let source_index = sorted_nodes
-                .binary_search_by(|pt| pt.as_ref().cmp(&successor))
-                .expect("Successor not found in nodes vocabulary");
-            let destination_index = sorted_nodes
                 .binary_search_by(|pt| pt.as_ref().cmp(&predecessor))
                 .expect("Predecessor not found in nodes vocabulary");
+            let destination_index = sorted_nodes
+                .binary_search_by(|pt| pt.as_ref().cmp(&successor))
+                .expect("Successor not found in nodes vocabulary");
             edges.push((source_index, destination_index));
         }
 

@@ -74,7 +74,7 @@ impl Hierarchy {
         let (mut procedure_nodes, edges) =
             load_subprocedure_templates(procedure_template.clone(), conn)?;
         procedure_nodes.push(procedure_template);
-        procedure_nodes.sort_unstable();
+        procedure_nodes.sort_unstable_by(|a, b| a.procedure_template.cmp(&b.procedure_template));
         procedure_nodes.dedup();
         let procedure_nodes = SortedVec::try_from(procedure_nodes).unwrap();
         let mut numerical_edges = edges

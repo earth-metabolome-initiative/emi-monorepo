@@ -91,14 +91,13 @@ impl ProcedureTemplateGraph {
         visitor.visit_procedure_template(parents.as_slice(), current_node)?;
         if let Some(task_graph) = self.task_graph_of(current_node) {
             parents.push(current_node);
-            let current_node = task_graph.root_node();
-            let mut nodes_to_visit = vec![(Vec::new(), current_node)];
+            let root_node = task_graph.root_node();
+            self.visit_recursive(visitor, parents, root_node)?;
+            let mut nodes_to_visit = vec![(Vec::new(), root_node)];
             let mut nodes_to_visit_tmp = Vec::new();
 
             while !nodes_to_visit.is_empty() {
                 for (mut predecessors, node) in nodes_to_visit.drain(..) {
-                    self.visit_recursive(visitor, parents, node)?;
-
                     if task_graph.has_successors(node) {
                         predecessors.push(node);
                         let successors = visitor.filter_successors(

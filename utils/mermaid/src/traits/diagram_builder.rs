@@ -83,6 +83,9 @@ where
     /// * If the node cannot be built due to missing attributes or other issues.
     fn node(&mut self, node: Self::NodeBuilder) -> Result<Rc<Self::Node>, Self::Error>;
 
+    /// Iterates over the nodes in the diagram being built.
+    fn nodes(&self) -> impl Iterator<Item = &Rc<Self::Node>> + '_;
+
     /// Returns a reference to the requested node by ID if it exists.
     fn get_node_by_id(&self, id: u64) -> Option<Rc<Self::Node>>;
 
