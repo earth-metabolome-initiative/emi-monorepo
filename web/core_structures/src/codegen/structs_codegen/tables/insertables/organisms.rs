@@ -19,6 +19,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::SampleSourceAttr
         Self::SampleSource(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for OrganismExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum OrganismAttribute {
@@ -36,31 +41,10 @@ impl core::str::FromStr for OrganismAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::SampleSourceAttribute,
-    > for OrganismAttribute
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder<T1>
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::SampleSourceAttribute::Id.into(),
-        )
-    }
-}
-impl<PhysicalAsset>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::SampleSourceAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableSampleSourceBuilder<
-            PhysicalAsset,
-        >,
-    > for OrganismAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::SampleSourceAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = OrganismAttribute;
 }
 impl core::fmt::Display for OrganismAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -82,37 +66,6 @@ pub struct InsertableOrganism {
     pub(crate) model: i32,
 }
 impl InsertableOrganism {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::sample_sources::SampleSource::read(self.id, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn organisms_id_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::assets::Asset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
-                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
-                        .eq(&self.model),
-                ),
-            )
-            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
-    }
     pub fn model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -642,12 +595,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::organisms::Organism,
-            Error = web_common_traits::database::InsertError<OrganismAttribute>,
+            Attribute = OrganismAttribute,
         >,
     SampleSource:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attribute = OrganismAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

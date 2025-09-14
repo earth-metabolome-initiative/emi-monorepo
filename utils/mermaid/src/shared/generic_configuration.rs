@@ -4,7 +4,10 @@
 mod renderers;
 use std::fmt::Display;
 
-use common_traits::{builder::IsCompleteBuilder, prelude::Builder};
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::Builder,
+};
 pub use renderers::Renderer;
 mod direction;
 pub use direction::Direction;
@@ -123,10 +126,13 @@ impl IsCompleteBuilder for GenericConfigurationBuilder {
     }
 }
 
+impl Attributed for GenericConfigurationBuilder {
+    type Attribute = GenericConfigurationAttribute;
+}
+
 impl Builder for GenericConfigurationBuilder {
     type Error = ConfigError<GenericConfigurationAttribute>;
     type Object = GenericConfiguration;
-    type Attribute = GenericConfigurationAttribute;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(GenericConfiguration {

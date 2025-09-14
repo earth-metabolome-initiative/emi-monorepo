@@ -166,45 +166,6 @@ impl DirectusShare {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_date_created(
-        date_created: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_shares::directus_shares;
-        Self::table()
-            .filter(directus_shares::date_created.eq(date_created))
-            .order_by(directus_shares::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_start(
-        date_start: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_shares::directus_shares;
-        Self::table()
-            .filter(directus_shares::date_start.eq(date_start))
-            .order_by(directus_shares::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_end(
-        date_end: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_shares::directus_shares;
-        Self::table()
-            .filter(directus_shares::date_end.eq(date_end))
-            .order_by(directus_shares::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_times_used(
         times_used: i32,
         conn: &mut diesel::PgConnection,

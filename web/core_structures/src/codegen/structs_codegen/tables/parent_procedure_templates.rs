@@ -203,58 +203,6 @@ impl ParentProcedureTemplate {
             ))
             .load::<Self>(conn)
     }
-    pub fn from_created_at<C>(
-        created_at: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::parent_procedure_templates::parent_procedure_templates::created_at as diesel::expression_methods::EqAll<
-                ::rosetta_timestamp::TimestampUTC,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::parent_procedure_templates::parent_procedure_templates::created_at as diesel::expression_methods::EqAll<
-                ::rosetta_timestamp::TimestampUTC,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            (
-                diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::parent_procedure_templates::parent_procedure_templates::parent,
-                >,
-                diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::parent_procedure_templates::parent_procedure_templates::child,
-                >,
-            ),
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::parent_procedure_templates::parent_procedure_templates::created_at as diesel::expression_methods::EqAll<
-                ::rosetta_timestamp::TimestampUTC,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            (
-                diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::parent_procedure_templates::parent_procedure_templates::parent,
-                >,
-                diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::parent_procedure_templates::parent_procedure_templates::child,
-                >,
-            ),
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::parent_procedure_templates::parent_procedure_templates;
-        Self::table()
-            .filter(parent_procedure_templates::created_at.eq(created_at))
-            .order_by((
-                parent_procedure_templates::parent.asc(),
-                parent_procedure_templates::child.asc(),
-            ))
-            .load::<Self>(conn)
-    }
 }
 impl AsRef<ParentProcedureTemplate> for ParentProcedureTemplate {
     fn as_ref(&self) -> &ParentProcedureTemplate {

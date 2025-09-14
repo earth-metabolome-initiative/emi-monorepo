@@ -252,6 +252,11 @@ impl From<crate::codegen::structs_codegen::tables::weighing_procedures::Weighing
         ProcedureDAG::WeighingProcedure(value)
     }
 }
+impl web_common_traits::database::MostConcreteVariantMetadata
+    for crate::codegen::structs_codegen::tables::procedures::Procedure
+{
+    type Variant = ProcedureDAG;
+}
 impl<C> web_common_traits::database::MostConcreteVariant<C>
     for crate::codegen::structs_codegen::tables::procedures::Procedure
 where
@@ -288,7 +293,6 @@ where
     crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure:
         web_common_traits::database::Read<C>,
 {
-    type Variant = ProcedureDAG;
     fn most_concrete_variant(&self, conn: &mut C) -> Result<Self::Variant, diesel::result::Error> {
         use diesel::Identifiable;
         Ok(

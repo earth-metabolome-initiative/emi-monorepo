@@ -19,6 +19,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::ProcedureAttribu
         Self::Procedure(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for SupernatantProcedureExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SupernatantProcedureAttribute {
@@ -111,30 +116,12 @@ impl core::str::FromStr for SupernatantProcedureAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
-    > for SupernatantProcedureAttribute
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder<
+        T1,
+    >
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::Procedure
-                .into(),
-        )
-    }
-}
-impl
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    > for SupernatantProcedureAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = SupernatantProcedureAttribute;
 }
 impl core::fmt::Display for SupernatantProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -220,17 +207,6 @@ impl InsertableSupernatantProcedure {
             self.pipette_tip_model,
             conn,
         )
-    }
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
     }
     pub fn procedure_pipette_tip<C: diesel::connection::LoadConnection>(
         &self,
@@ -319,28 +295,6 @@ impl InsertableSupernatantProcedure {
             )
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            >(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn supernatant_procedures_procedure_procedure_template_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
-                    .eq(&self.procedure)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
-                            .eq(&self.procedure_template),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedures::Procedure,
             >(conn)
     }
     pub fn procedure_stratified_source<C: diesel::connection::LoadConnection>(
@@ -2881,7 +2835,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
-        Error = web_common_traits::database::InsertError<SupernatantProcedureAttribute>,
+        Attribute = SupernatantProcedureAttribute,
     >,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -2891,7 +2845,6 @@ where
         C,
     >,
 {
-    type Attribute = SupernatantProcedureAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

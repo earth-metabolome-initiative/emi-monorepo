@@ -83,8 +83,8 @@ where
     /// * If the node cannot be built due to missing attributes or other issues.
     fn node(&mut self, node: Self::NodeBuilder) -> Result<Rc<Self::Node>, Self::Error>;
 
-    /// Returns a reference to the requested node by label if it exists.
-    fn get_node_by_label(&self, label: &str) -> Option<Rc<Self::Node>>;
+    /// Returns a reference to the requested node by ID if it exists.
+    fn get_node_by_id(&self, id: u64) -> Option<Rc<Self::Node>>;
 
     /// Returns a reference to the request style class by name if it exists.
     fn get_style_class_by_name(&self, name: &str) -> Option<Rc<StyleClass>>;

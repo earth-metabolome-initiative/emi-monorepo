@@ -11,6 +11,7 @@ type FromMethods = Vec<(Vec<Arc<Table>>, Arc<Vec<Column>>, bool, Option<TokenStr
 impl Table {
     fn ancestral_from_attributes(
         &self,
+        maybe_most_concrete_column: Option<&Column>,
         root_table: &Arc<Table>,
         conn: &mut PgConnection,
     ) -> Result<FromMethods, WebCodeGenError> {
@@ -52,7 +53,7 @@ impl Table {
             };
 
             for index in extension_table.indices(conn)? {
-                if index.is_primary_key() {
+                if index.is_primary_key() || index.is_same_as(conn)? {
                     continue;
                 }
 
@@ -76,6 +77,7 @@ impl Table {
                 // The foreign keys which are either a single column or part
                 // of a unique constraints are already covered by other methods.
                 if columns.len() == 1
+                    || foreign_key_constraint.includes_local_primary_key(conn)?
                     || foreign_key_constraint.is_foreign_unique_key(conn)?.is_some()
                 {
                     continue;
@@ -92,7 +94,11 @@ impl Table {
             for column in extension_table.columns(conn)?.as_ref() {
                 // If the column is a UNIQUE index or a foreign key, skip it, as
                 // the method generation is already taken care of elsewhere.
-                if column.is_unique(conn)? || !column.supports_eq(conn)? {
+                if column.is_unique(conn)?
+                    || !column.supports_eq(conn)?
+                    || column.has_datetime_type()
+                    || maybe_most_concrete_column == Some(column)
+                {
                     continue;
                 }
 
@@ -108,8 +114,11 @@ impl Table {
         // Secondly, we recursively call this method on the extension tables
         // to cover the higher-level extension tables.
         for extension_table in extension_tables.as_ref() {
-            ancestral_from_attributes
-                .extend(extension_table.ancestral_from_attributes(root_table, conn)?);
+            ancestral_from_attributes.extend(extension_table.ancestral_from_attributes(
+                maybe_most_concrete_column,
+                root_table,
+                conn,
+            )?);
         }
 
         Ok(ancestral_from_attributes)
@@ -122,7 +131,6 @@ impl Table {
     ///
     /// # Arguments
     ///
-    /// * `table` - The table corresponding to the struct.
     /// * `conn` - The Diesel connection to the database.
     ///
     /// # Errors
@@ -136,6 +144,7 @@ impl Table {
         let mut from_attributes = TokenStream::new();
         let mut from_methods: FromMethods = Vec::new();
         let arc_table = Arc::new(self.clone());
+        let maybe_most_concrete_column = self.most_concrete_table_column(true, conn)?;
         let primary_key_order_by = self
             .primary_key_idents(conn)?
             .into_iter()
@@ -175,7 +184,7 @@ impl Table {
         };
 
         for index in self.indices(conn)? {
-            if index.is_primary_key() {
+            if index.is_primary_key() || index.is_same_as(conn)? {
                 continue;
             }
 
@@ -191,7 +200,9 @@ impl Table {
         for foreign_key_constraint in self.foreign_keys(conn)?.as_ref() {
             // The foreign keys which are either a single column or part
             // of a unique constraints are already covered by other methods.
-            if foreign_key_constraint.is_singleton(conn)? {
+            if foreign_key_constraint.is_singleton(conn)?
+                || foreign_key_constraint.includes_local_primary_key(conn)?
+            {
                 continue;
             }
 
@@ -205,7 +216,9 @@ impl Table {
             // the method generation is already taken care of elsewhere.
             if column.is_unique(conn)?
                 || !column.supports_eq(conn)?
+                || column.has_datetime_type()
                 || column.has_singleton_foreign_key(conn)?
+                || Some(column) == maybe_most_concrete_column.as_ref()
             {
                 continue;
             }
@@ -221,7 +234,11 @@ impl Table {
         let extension_tables = self.ancestral_extension_tables(conn)?;
 
         if !extension_tables.is_empty() {
-            from_methods.extend(self.ancestral_from_attributes(&arc_table, conn)?);
+            from_methods.extend(self.ancestral_from_attributes(
+                maybe_most_concrete_column.as_ref(),
+                &arc_table,
+                conn,
+            )?);
         }
 
         let mut method_names = std::collections::HashSet::new();

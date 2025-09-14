@@ -4,7 +4,7 @@
 use std::{fmt::Display, iter::empty, rc::Rc};
 
 use common_traits::{
-    builder::IsCompleteBuilder,
+    builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
 
@@ -133,8 +133,11 @@ impl<N> IsCompleteBuilder for GenericEdgeBuilder<N> {
     }
 }
 
-impl<N> Builder for GenericEdgeBuilder<N> {
+impl<N> Attributed for GenericEdgeBuilder<N> {
     type Attribute = GenericEdgeAttribute;
+}
+
+impl<N> Builder for GenericEdgeBuilder<N> {
     type Error = EdgeError<Self::Attribute>;
     type Object = GenericEdge<N>;
 

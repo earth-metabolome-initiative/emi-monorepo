@@ -37,6 +37,11 @@ impl core::str::FromStr for AssetAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableAssetBuilder
+{
+    type Attribute = AssetAttribute;
+}
 impl core::fmt::Display for AssetAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -593,10 +598,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::assets::Asset,
-            Error = web_common_traits::database::InsertError<AssetAttribute>,
+            Attribute = AssetAttribute,
         >,
 {
-    type Attribute = AssetAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

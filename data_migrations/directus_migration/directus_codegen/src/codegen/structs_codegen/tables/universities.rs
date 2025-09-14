@@ -147,32 +147,6 @@ impl University {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_date_created(
-        date_created: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::universities::universities;
-        Self::table()
-            .filter(universities::date_created.eq(date_created))
-            .order_by(universities::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_updated(
-        date_updated: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::universities::universities;
-        Self::table()
-            .filter(universities::date_updated.eq(date_updated))
-            .order_by(universities::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_uuid_university(
         uuid_university: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,

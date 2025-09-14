@@ -1,4 +1,16 @@
 impl<
+    CommercialProduct,
+    PackagingModel,
+> web_common_traits::database::InsertableVariantMetadata
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModelBuilder<
+    CommercialProduct,
+    PackagingModel,
+> {
+    type Row = crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel;
+    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModel;
+    type UserId = i32;
+}
+impl<
     C: diesel::connection::LoadConnection,
     CommercialProduct,
     PackagingModel,
@@ -18,39 +30,29 @@ where
         C,
         crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel,
     >,
-    C: diesel::connection::LoadConnection,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
     PackagingModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute,
-        PackagingModel,
-        EffectiveExtensionAttribute = <PackagingModel as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelExtensionAttribute: From<
+        <PackagingModel as common_traits::builder::Attributed>::Attribute,
     >,
-    crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-        CommercialProduct,
-        EffectiveExtensionAttribute = <CommercialProduct as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelExtensionAttribute: From<
+        <CommercialProduct as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingModel;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute,
-    >;
-    type UserId = i32;
     fn insert(
         mut self,
         user_id: Self::UserId,
         conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    ) -> Result<
+        Self::Row,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute,
+        >,
+    > {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         use web_common_traits::database::MostConcreteTable;
@@ -67,7 +69,12 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::InsertableVariant, Self::Error> {
+    ) -> Result<
+        Self::InsertableVariant,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute,
+        >,
+    > {
         let packaging_model = self
             .packaging_model
             .ok_or(
@@ -81,10 +88,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-                            CommercialProduct,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             let _ = self
@@ -93,10 +99,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute,
-                            PackagingModel,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             id
@@ -106,10 +111,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute,
-                            PackagingModel,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             let _ = self
@@ -118,10 +122,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-                            CommercialProduct,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialPackagingModelAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             id

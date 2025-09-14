@@ -2,7 +2,10 @@
 //! graph.
 
 use algebra::{impls::MutabilityError, prelude::SparseMatrixMut};
-use common_traits::{builder::IsCompleteBuilder, prelude::Builder};
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::Builder,
+};
 
 use crate::{
     errors::builder::edges::EdgesBuilderError,
@@ -96,6 +99,15 @@ where
     }
 }
 
+impl<EdgeIterator, GE> Attributed for GenericEdgesBuilder<EdgeIterator, GE>
+where
+    GE: GrowableEdges<Error = EdgesBuilderError<GE>>,
+    Self: EdgesBuilder<EdgeIterator = EdgeIterator, Edges = GE, IntermediateEdges = GE>,
+    EdgeIterator: IntoIterator<Item = <<Self as EdgesBuilder>::Edges as Edges>::Edge>,
+{
+    type Attribute = EdgesBuilderOptions;
+}
+
 impl<EdgeIterator, GE> Builder for GenericEdgesBuilder<EdgeIterator, GE>
 where
     GE: GrowableEdges<Error = EdgesBuilderError<GE>>,
@@ -104,7 +116,6 @@ where
 {
     type Object = GE;
     type Error = EdgesBuilderError<GE>;
-    type Attribute = EdgesBuilderOptions;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         let expected_number_of_edges = self.get_expected_number_of_edges();

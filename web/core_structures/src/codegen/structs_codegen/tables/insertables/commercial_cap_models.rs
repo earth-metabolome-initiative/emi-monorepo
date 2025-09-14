@@ -32,6 +32,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::CommercialProduc
         Self::CommercialProduct(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for CommercialCapModelExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum CommercialCapModelAttribute {
@@ -49,58 +54,13 @@ impl core::str::FromStr for CommercialCapModelAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CapModelAttribute,
-    > for CommercialCapModelAttribute
+impl<T1, T2> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCapModelBuilder<
+        T1,
+        T2,
+    >
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::CapModelAttribute::Id.into(),
-        )
-    }
-}
-impl<PhysicalAssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CapModelAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableCapModelBuilder<
-            PhysicalAssetModel,
-        >,
-    > for CommercialCapModelAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::CapModelAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
-}
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-    > for CommercialCapModelAttribute
-{
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id
-                .into(),
-        )
-    }
-}
-impl<AssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-            AssetModel,
-        >,
-    > for CommercialCapModelAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = CommercialCapModelAttribute;
 }
 impl core::fmt::Display for CommercialCapModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -134,57 +94,6 @@ impl InsertableCommercialCapModel {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::cap_models::CapModel::read(self.cap_model, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn commercial_cap_models_id_cap_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
-                    .eq(&self.id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
-                            .eq(&self.cap_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
-    }
-    pub fn commercial_cap_models_id_fkey<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::cap_models::CapModel, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::cap_models::CapModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::cap_models::CapModel::read(self.id, conn)
-    }
-    pub fn commercial_cap_models_id_fkey1<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
-            self.id, conn,
-        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -693,7 +602,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel,
-        Error = web_common_traits::database::InsertError<CommercialCapModelAttribute>,
+        Attribute = CommercialCapModelAttribute,
     >,
     CapModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
@@ -701,7 +610,6 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attribute = CommercialCapModelAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

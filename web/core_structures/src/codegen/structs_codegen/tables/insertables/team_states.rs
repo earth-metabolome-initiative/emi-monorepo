@@ -23,6 +23,11 @@ impl core::str::FromStr for TeamStateAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableTeamStateBuilder
+{
+    type Attribute = TeamStateAttribute;
+}
 impl core::fmt::Display for TeamStateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -287,10 +292,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::team_states::TeamState,
-            Error = web_common_traits::database::InsertError<TeamStateAttribute>,
+            Attribute = TeamStateAttribute,
         >,
 {
-    type Attribute = TeamStateAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

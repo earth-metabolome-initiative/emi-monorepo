@@ -3,9 +3,11 @@
 
 use mermaid::prelude::{Color, StyleClassBuilder, StyleProperty};
 
+pub(super) const PROCEDURE_TEMPLATE_CLASS_NAME: &str = "procedure_template";
+
 pub(super) fn procedure_template_class() -> StyleClassBuilder {
     StyleClassBuilder::default()
-        .name("procedure_template")
+        .name(PROCEDURE_TEMPLATE_CLASS_NAME)
         .unwrap()
         .property(StyleProperty::Fill(Color::pastel_red()))
         .unwrap()

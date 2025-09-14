@@ -34,6 +34,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::BallMillMachineM
         Self::BallMillMachineModel(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for CommercialBallMillMachineLotExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum CommercialBallMillMachineLotAttribute {
@@ -51,59 +56,12 @@ impl core::str::FromStr for CommercialBallMillMachineLotAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
-    > for CommercialBallMillMachineLotAttribute
-{
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute::Id
-                .into(),
-        )
-    }
-}
-impl<PhysicalAssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotBuilder<
-            PhysicalAssetModel,
-        >,
-    > for CommercialBallMillMachineLotAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
-}
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute,
-    > for CommercialBallMillMachineLotAttribute
-{
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute::Id
-                .into(),
-        )
-    }
-}
-impl<PhysicalAssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableBallMillMachineModelBuilder<
-            PhysicalAssetModel,
-        >,
-    > for CommercialBallMillMachineLotAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+impl<T1, T2> common_traits::builder::Attributed
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBallMillMachineLotBuilder<
+    T1,
+    T2,
+> {
+    type Attribute = CommercialBallMillMachineLotAttribute;
 }
 impl core::fmt::Display for CommercialBallMillMachineLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -129,63 +87,6 @@ pub struct InsertableCommercialBallMillMachineLot {
     pub(crate) product_model: i32,
 }
 impl InsertableCommercialBallMillMachineLot {
-    pub fn commercial_ball_mill_machine_lots_id_fkey<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::read(
-            self.id, conn,
-        )
-    }
-    pub fn commercial_ball_mill_machine_lots_id_fkey1<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel::read(
-            self.id,
-            conn,
-        )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn commercial_ball_mill_machine_lots_id_product_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
-                    .eq(&self.id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
-                            .eq(&self.product_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
-    }
     pub fn product_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -786,9 +687,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
-        Error = web_common_traits::database::InsertError<
-            CommercialBallMillMachineLotAttribute,
-        >,
+        Attribute = CommercialBallMillMachineLotAttribute,
     >,
     BallMillMachineModel: web_common_traits::database::TryInsertGeneric<
         C,
@@ -799,7 +698,6 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attribute = CommercialBallMillMachineLotAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

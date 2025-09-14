@@ -19,6 +19,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::ProcedureAttribu
         Self::Procedure(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for HarvestingProcedureExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum HarvestingProcedureAttribute {
@@ -66,30 +71,12 @@ impl core::str::FromStr for HarvestingProcedureAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
-    > for HarvestingProcedureAttribute
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableHarvestingProcedureBuilder<
+        T1,
+    >
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::Procedure
-                .into(),
-        )
-    }
-}
-impl
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
-    > for HarvestingProcedureAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = HarvestingProcedureAttribute;
 }
 impl core::fmt::Display for HarvestingProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -131,39 +118,6 @@ pub struct InsertableHarvestingProcedure {
     pub(crate) procedure_sample: ::rosetta_uuid::Uuid,
 }
 impl InsertableHarvestingProcedure {
-    pub fn procedure<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::procedures::Procedure:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn harvesting_procedures_procedure_procedure_template_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
-    {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::procedures::Procedure::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure
-                    .eq(&self.procedure)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
-                            .eq(&self.procedure_template),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::procedures::Procedure,
-            >(conn)
-    }
     pub fn procedure_sample<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -1561,7 +1515,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure,
-        Error = web_common_traits::database::InsertError<HarvestingProcedureAttribute>,
+        Attribute = HarvestingProcedureAttribute,
     >,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -1571,7 +1525,6 @@ where
         C,
     >,
 {
-    type Attribute = HarvestingProcedureAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

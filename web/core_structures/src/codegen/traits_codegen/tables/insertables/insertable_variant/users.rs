@@ -1,3 +1,10 @@
+impl web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder
+{
+    type Row = crate::codegen::structs_codegen::tables::users::User;
+    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUser;
+    type UserId = i32;
+}
 impl<
     C: diesel::connection::LoadConnection,
 > web_common_traits::database::InsertableVariant<C>
@@ -13,19 +20,17 @@ where
         C,
         crate::codegen::structs_codegen::tables::users::User,
     >,
-    C: diesel::connection::LoadConnection,
 {
-    type Row = crate::codegen::structs_codegen::tables::users::User;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUser;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::UserAttribute,
-    >;
-    type UserId = i32;
     fn insert(
         self,
         user_id: Self::UserId,
         conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    ) -> Result<
+        Self::Row,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::UserAttribute,
+        >,
+    > {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableUser = self
@@ -40,7 +45,12 @@ where
         self,
         _user_id: i32,
         _conn: &mut C,
-    ) -> Result<Self::InsertableVariant, Self::Error> {
+    ) -> Result<
+        Self::InsertableVariant,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::UserAttribute,
+        >,
+    > {
         let first_name = self
             .first_name
             .ok_or(

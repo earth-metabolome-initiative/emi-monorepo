@@ -259,19 +259,6 @@ impl DirectusUser {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_last_access(
-        last_access: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_users::directus_users;
-        Self::table()
-            .filter(directus_users::last_access.eq(last_access))
-            .order_by(directus_users::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_last_page(
         last_page: &str,
         conn: &mut diesel::PgConnection,

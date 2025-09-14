@@ -11,7 +11,7 @@ pub trait Node: PartialOrd + Ord + Eq + PartialEq {
     type Builder: NodeBuilder<Node = Self>;
 
     /// Returns the identifier of the node.
-    fn id(&self) -> usize;
+    fn id(&self) -> u64;
 
     /// Returns the label of the node.
     fn label(&self) -> &str;

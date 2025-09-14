@@ -53,19 +53,6 @@ impl DirectusMigration {
             .order_by(directus_migrations::version.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_timestamp(
-        timestamp: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_migrations::directus_migrations;
-        Self::table()
-            .filter(directus_migrations::timestamp.eq(timestamp))
-            .order_by(directus_migrations::version.asc())
-            .load::<Self>(conn)
-    }
 }
 impl AsRef<DirectusMigration> for DirectusMigration {
     fn as_ref(&self) -> &DirectusMigration {

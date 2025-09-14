@@ -1,4 +1,16 @@
 impl<
+    CommercialProduct,
+    FreezerModel,
+> web_common_traits::database::InsertableVariantMetadata
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModelBuilder<
+    CommercialProduct,
+    FreezerModel,
+> {
+    type Row = crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel;
+    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModel;
+    type UserId = i32;
+}
+impl<
     C: diesel::connection::LoadConnection,
     CommercialProduct,
     FreezerModel,
@@ -18,68 +30,35 @@ where
         C,
         crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
     >,
-    C: diesel::connection::LoadConnection,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
     FreezerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    crate::codegen::structs_codegen::tables::freezer_models::FreezerModel: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::freezer_models::FreezerModel: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute,
-        FreezerModel,
-        EffectiveExtensionAttribute = <FreezerModel as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelExtensionAttribute: From<
+        <FreezerModel as common_traits::builder::Attributed>::Attribute,
     >,
-    crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-        CommercialProduct,
-        EffectiveExtensionAttribute = <CommercialProduct as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelExtensionAttribute: From<
+        <CommercialProduct as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModel;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute,
-    >;
-    type UserId = i32;
     fn insert(
         mut self,
         user_id: Self::UserId,
         conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    ) -> Result<
+        Self::Row,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute,
+        >,
+    > {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use web_common_traits::database::Updatable;
         use web_common_traits::database::MostConcreteTable;
         self.set_most_concrete_table("commercial_freezer_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerModel = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.freezer_model(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
-        if !insertable_struct
-            .commercial_freezer_models_id_fkey(conn)?
-            .can_update(user_id, conn)?
-        {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
@@ -90,7 +69,12 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::InsertableVariant, Self::Error> {
+    ) -> Result<
+        Self::InsertableVariant,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute,
+        >,
+    > {
         let freezer_model = self
             .freezer_model
             .ok_or(
@@ -104,10 +88,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-                            CommercialProduct,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             let _ = self
@@ -116,10 +99,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute,
-                            FreezerModel,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             id
@@ -129,10 +111,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute,
-                            FreezerModel,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             let _ = self
@@ -141,10 +122,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-                            CommercialProduct,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialFreezerModelAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             id

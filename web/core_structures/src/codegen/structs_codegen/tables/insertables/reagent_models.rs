@@ -19,6 +19,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::AssetModelAttrib
         Self::AssetModel(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for ReagentModelExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ReagentModelAttribute {
@@ -42,29 +47,10 @@ impl core::str::FromStr for ReagentModelAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
-    > for ReagentModelAttribute
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder<T1>
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Id.into(),
-        )
-    }
-}
-impl
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
-    > for ReagentModelAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = ReagentModelAttribute;
 }
 impl core::fmt::Display for ReagentModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -91,22 +77,7 @@ pub struct InsertableReagentModel {
     pub(crate) cas_code: ::cas_codes::CAS,
     pub(crate) molecular_formula: ::molecular_formulas::MolecularFormula,
 }
-impl InsertableReagentModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(self.id, conn)
-    }
-}
+impl InsertableReagentModel {}
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Builder for creating and inserting a new
@@ -513,11 +484,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::reagent_models::ReagentModel,
-            Error = web_common_traits::database::InsertError<ReagentModelAttribute>,
+            Attribute = ReagentModelAttribute,
         >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attribute = ReagentModelAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

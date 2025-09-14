@@ -22,6 +22,10 @@ impl core::str::FromStr for ParentProcedureTemplateAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+for crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateBuilder {
+    type Attribute = ParentProcedureTemplateAttribute;
+}
 impl core::fmt::Display for ParentProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -341,12 +345,9 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
-        Error = web_common_traits::database::InsertError<
-            ParentProcedureTemplateAttribute,
-        >,
+        Attribute = ParentProcedureTemplateAttribute,
     >,
 {
-    type Attribute = ParentProcedureTemplateAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

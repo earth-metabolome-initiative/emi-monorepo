@@ -21,7 +21,10 @@ use diesel::{
 };
 use graph::{
     prelude::{GenericEdgesBuilder, GenericGraph, GenericMonoplexMonopartiteGraphBuilder},
-    traits::{EdgesBuilder, MonopartiteGraph, MonopartiteGraphBuilder, MonoplexGraphBuilder},
+    traits::{
+        EdgesBuilder, MonopartiteGraph, MonopartiteGraphBuilder, MonoplexGraph,
+        MonoplexGraphBuilder,
+    },
 };
 use sorted_vec::prelude::SortedVec;
 use web_common_traits::prelude::Builder;
@@ -68,21 +71,27 @@ impl Hierarchy {
         ProcedureTemplate: web_common_traits::database::Read<C>,
     {
         let procedure_template = Rc::new(procedure_template.clone());
-        let (mut procedure_nodes, edges) = load_subprocedure_templates(procedure_template, conn)?;
+        let (mut procedure_nodes, edges) =
+            load_subprocedure_templates(procedure_template.clone(), conn)?;
+        procedure_nodes.push(procedure_template);
         procedure_nodes.sort_unstable();
         procedure_nodes.dedup();
         let procedure_nodes = SortedVec::try_from(procedure_nodes).unwrap();
-        let numerical_edges = edges
+        let mut numerical_edges = edges
             .into_iter()
             .map(|(source, destination)| {
                 (
-                    procedure_nodes.binary_search(&source).expect("Source node not found"),
+                    procedure_nodes
+                        .binary_search(&source)
+                        .expect(&format!("Source node not found: `{}`", source.name)),
                     procedure_nodes
                         .binary_search(&destination)
-                        .expect("Destination node not found"),
+                        .expect(&format!("Destination node not found: `{}`", destination.name)),
                 )
             })
             .collect::<Vec<(usize, usize)>>();
+        numerical_edges.sort_unstable();
+        numerical_edges.dedup();
         let number_of_nodes = procedure_nodes.len();
         let directed: SquareCSR2D<CSR2D<u16, usize, usize>> = GenericEdgesBuilder::default()
             .expected_number_of_edges(numerical_edges.len() as u16)
@@ -117,6 +126,47 @@ pub trait HierarchyLike: AsRef<Hierarchy> {
     /// Returns a reference to the root procedure template name.
     fn root_procedure_template_name(&self) -> &str {
         &self.root_procedure_template().name
+    }
+
+    /// Returns whether the provided procedure template is a leaf in the
+    /// hierarchy (i.e., it has no sub-procedure templates).
+    ///
+    /// # Panics
+    ///
+    /// * Panics if the provided procedure template is not part of the
+    ///   hierarchy.
+    fn is_leaf(&self, procedure_template: &ProcedureTemplate) -> bool {
+        let procedure_template_id = self
+            .as_ref()
+            .hierarchy
+            .nodes_vocabulary()
+            .binary_search_by(|pt| {
+                pt.procedure_template.cmp(&procedure_template.procedure_template)
+            })
+            .expect("Procedure template not part of hierarchy graph");
+
+        !self.as_ref().hierarchy.has_successors(procedure_template_id)
+    }
+
+    /// Returns the internal node identifier for the given procedure template.
+    ///
+    /// # Arguments
+    ///
+    /// * `procedure_template` - The procedure template to get the node
+    ///   identifier for.
+    ///
+    /// # Panics
+    ///
+    /// * Panics if the provided procedure template is not part of the
+    ///   hierarchy.
+    fn procedure_node_id(&self, procedure_template: &ProcedureTemplate) -> usize {
+        self.as_ref()
+            .hierarchy
+            .nodes_vocabulary()
+            .binary_search_by(|pt| {
+                pt.procedure_template.cmp(&procedure_template.procedure_template)
+            })
+            .expect("Procedure template not part of hierarchy graph")
     }
 }
 

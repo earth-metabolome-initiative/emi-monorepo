@@ -16,6 +16,11 @@ impl core::str::FromStr for UserOrganizationAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationBuilder
+{
+    type Attribute = UserOrganizationAttribute;
+}
 impl core::fmt::Display for UserOrganizationAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -197,10 +202,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
-            Error = web_common_traits::database::InsertError<UserOrganizationAttribute>,
+            Attribute = UserOrganizationAttribute,
         >,
 {
-    type Attribute = UserOrganizationAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -37,6 +37,11 @@ impl core::str::FromStr for ProcedureAssetAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder
+{
+    type Attribute = ProcedureAssetAttribute;
+}
 impl core::fmt::Display for ProcedureAssetAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -794,10 +799,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
-            Error = web_common_traits::database::InsertError<ProcedureAssetAttribute>,
+            Attribute = ProcedureAssetAttribute,
         >,
 {
-    type Attribute = ProcedureAssetAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -3,7 +3,7 @@
 use std::fmt::Display;
 
 use common_traits::{
-    builder::IsCompleteBuilder,
+    builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
 
@@ -44,8 +44,11 @@ impl IsCompleteBuilder for StyleClassBuilder {
     }
 }
 
-impl Builder for StyleClassBuilder {
+impl Attributed for StyleClassBuilder {
     type Attribute = StyleClassAttribute;
+}
+
+impl Builder for StyleClassBuilder {
     type Error = StyleClassError;
     type Object = StyleClass;
 

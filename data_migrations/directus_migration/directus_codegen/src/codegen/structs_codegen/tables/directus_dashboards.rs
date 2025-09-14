@@ -113,19 +113,6 @@ impl DirectusDashboard {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_date_created(
-        date_created: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_dashboards::directus_dashboards;
-        Self::table()
-            .filter(directus_dashboards::date_created.eq(date_created))
-            .order_by(directus_dashboards::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_color(
         color: &str,
         conn: &mut diesel::PgConnection,

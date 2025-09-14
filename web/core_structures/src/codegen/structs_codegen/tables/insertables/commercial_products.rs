@@ -19,6 +19,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::AssetModelAttrib
         Self::AssetModel(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for CommercialProductExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum CommercialProductAttribute {
@@ -39,29 +44,10 @@ impl core::str::FromStr for CommercialProductAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
-    > for CommercialProductAttribute
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<T1>
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute::Id.into(),
-        )
-    }
-}
-impl
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
-    > for CommercialProductAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = CommercialProductAttribute;
 }
 impl core::fmt::Display for CommercialProductAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -97,20 +83,6 @@ impl InsertableCommercialProduct {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::brands::Brand::read(self.brand_id, conn)
-    }
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(self.id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -455,11 +427,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-            Error = web_common_traits::database::InsertError<CommercialProductAttribute>,
+            Attribute = CommercialProductAttribute,
         >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attribute = CommercialProductAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

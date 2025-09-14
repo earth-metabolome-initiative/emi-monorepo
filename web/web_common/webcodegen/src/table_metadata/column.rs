@@ -945,6 +945,11 @@ impl Column {
         }
     }
 
+    /// Returns whether the column has a date time type.
+    pub(crate) fn has_datetime_type(&self) -> bool {
+        self.data_type.contains("timestamp")
+    }
+
     /// Returns whether the column type supports the `PartialOrd` trait.
     ///
     /// # Arguments

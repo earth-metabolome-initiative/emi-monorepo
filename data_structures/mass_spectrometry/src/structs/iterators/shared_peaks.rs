@@ -3,7 +3,7 @@
 use core::iter::Peekable;
 
 use common_traits::{
-    builder::IsCompleteBuilder,
+    builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
 use num_traits::ConstZero;
@@ -145,6 +145,15 @@ where
     }
 }
 
+impl<'spectra, LeftSpectrum, RightSpectrum> Attributed
+    for GreedySharedPeaksBuilder<'spectra, LeftSpectrum, RightSpectrum>
+where
+    LeftSpectrum: Spectrum,
+    RightSpectrum: Spectrum<Mz = LeftSpectrum::Mz>,
+{
+    type Attribute = GreedySharedPeaksAttribute;
+}
+
 impl<'spectra, LeftSpectrum, RightSpectrum> Builder
     for GreedySharedPeaksBuilder<'spectra, LeftSpectrum, RightSpectrum>
 where
@@ -153,7 +162,6 @@ where
 {
     type Object = GreedySharedPeaks<'spectra, LeftSpectrum, RightSpectrum>;
     type Error = BuilderError<Self::Attribute>;
-    type Attribute = GreedySharedPeaksAttribute;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Self::Object {

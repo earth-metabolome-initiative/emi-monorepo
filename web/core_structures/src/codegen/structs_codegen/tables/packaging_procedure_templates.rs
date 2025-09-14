@@ -155,23 +155,6 @@ impl PackagingProcedureTemplate {
             conn,
         )
     }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
-            self.procedure_template,
-            conn,
-        )
-    }
     pub fn procedure_template_packaged_with_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -224,48 +207,6 @@ impl PackagingProcedureTemplate {
             self.sample_model,
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_and_procedure_template_packaged_with_model(
-        procedure_template: i32,
-        procedure_template_packaged_with_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates;
-        Self::table()
-            .filter(
-                packaging_procedure_templates::procedure_template.eq(procedure_template).and(
-                    packaging_procedure_templates::procedure_template_packaged_with_model
-                        .eq(procedure_template_packaged_with_model),
-                ),
-            )
-            .order_by(packaging_procedure_templates::procedure_template.asc())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_procedure_template_and_procedure_template_sample_model(
-        procedure_template: i32,
-        procedure_template_sample_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates;
-        Self::table()
-            .filter(
-                packaging_procedure_templates::procedure_template.eq(procedure_template).and(
-                    packaging_procedure_templates::procedure_template_sample_model
-                        .eq(procedure_template_sample_model),
-                ),
-            )
-            .order_by(packaging_procedure_templates::procedure_template.asc())
-            .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_procedure_template_packaged_with_model_and_packaged_with_model(
@@ -326,45 +267,6 @@ impl PackagingProcedureTemplate {
                     .eq(packaged_with_model)
                     .and(packaging_procedure_templates::sample_model.eq(sample_model)),
             )
-            .order_by(packaging_procedure_templates::procedure_template.asc())
-            .load::<Self>(conn)
-    }
-    pub fn from_procedure_template<C>(
-        procedure_template: i32,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::procedure_template,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates;
-        Self::table()
-            .filter(packaging_procedure_templates::procedure_template.eq(procedure_template))
             .order_by(packaging_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
     }
@@ -477,30 +379,6 @@ impl PackagingProcedureTemplate {
             .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_most_concrete_table(
-        most_concrete_table: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            packaging_procedure_templates::packaging_procedure_templates,
-            procedure_templates::procedure_templates,
-        };
-        Self::table()
-            .inner_join(
-                procedure_templates::table.on(packaging_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
-            )
-            .filter(procedure_templates::most_concrete_table.eq(most_concrete_table))
-            .order_by(packaging_procedure_templates::procedure_template.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_description(
         description: &str,
         conn: &mut diesel::PgConnection,
@@ -573,30 +451,6 @@ impl PackagingProcedureTemplate {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            packaging_procedure_templates::packaging_procedure_templates,
-            procedure_templates::procedure_templates,
-        };
-        Self::table()
-            .inner_join(
-                procedure_templates::table.on(packaging_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
-            )
-            .filter(procedure_templates::created_at.eq(created_at))
-            .order_by(packaging_procedure_templates::procedure_template.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_updated_by(
         updated_by: i32,
         conn: &mut diesel::PgConnection,
@@ -616,30 +470,6 @@ impl PackagingProcedureTemplate {
                     .eq(procedure_templates::procedure_template)),
             )
             .filter(procedure_templates::updated_by.eq(updated_by))
-            .order_by(packaging_procedure_templates::procedure_template.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_at(
-        updated_at: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            packaging_procedure_templates::packaging_procedure_templates,
-            procedure_templates::procedure_templates,
-        };
-        Self::table()
-            .inner_join(
-                procedure_templates::table.on(packaging_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
-            )
-            .filter(procedure_templates::updated_at.eq(updated_at))
             .order_by(packaging_procedure_templates::procedure_template.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

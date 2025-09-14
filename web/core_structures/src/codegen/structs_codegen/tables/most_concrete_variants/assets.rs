@@ -230,6 +230,11 @@ impl From<crate::codegen::structs_codegen::tables::weighing_devices::WeighingDev
         AssetDAG::WeighingDevice(value)
     }
 }
+impl web_common_traits::database::MostConcreteVariantMetadata
+    for crate::codegen::structs_codegen::tables::assets::Asset
+{
+    type Variant = AssetDAG;
+}
 impl<C> web_common_traits::database::MostConcreteVariant<C>
     for crate::codegen::structs_codegen::tables::assets::Asset
 where
@@ -271,7 +276,6 @@ where
     crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice:
         web_common_traits::database::Read<C>,
 {
-    type Variant = AssetDAG;
     fn most_concrete_variant(&self, conn: &mut C) -> Result<Self::Variant, diesel::result::Error> {
         use diesel::Identifiable;
         Ok(

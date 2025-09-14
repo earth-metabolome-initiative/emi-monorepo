@@ -32,6 +32,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::CentrifugeModelA
         Self::CentrifugeModel(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for CommercialCentrifugeLotExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum CommercialCentrifugeLotAttribute {
@@ -49,59 +54,12 @@ impl core::str::FromStr for CommercialCentrifugeLotAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
-    > for CommercialCentrifugeLotAttribute
-{
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute::Id
-                .into(),
-        )
-    }
-}
-impl<PhysicalAssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotBuilder<
-            PhysicalAssetModel,
-        >,
-    > for CommercialCentrifugeLotAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
-}
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute,
-    > for CommercialCentrifugeLotAttribute
-{
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute::Id
-                .into(),
-        )
-    }
-}
-impl<PhysicalAssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeModelBuilder<
-            PhysicalAssetModel,
-        >,
-    > for CommercialCentrifugeLotAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+impl<T1, T2> common_traits::builder::Attributed
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialCentrifugeLotBuilder<
+    T1,
+    T2,
+> {
+    type Attribute = CommercialCentrifugeLotAttribute;
 }
 impl core::fmt::Display for CommercialCentrifugeLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -125,62 +83,6 @@ pub struct InsertableCommercialCentrifugeLot {
     pub(crate) product_model: i32,
 }
 impl InsertableCommercialCentrifugeLot {
-    pub fn commercial_centrifuge_lots_id_fkey<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::read(
-            self.id, conn,
-        )
-    }
-    pub fn commercial_centrifuge_lots_id_fkey1<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel::read(
-            self.id, conn,
-        )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn commercial_centrifuge_lots_id_product_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
-                    .eq(&self.id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
-                            .eq(&self.product_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
-    }
     pub fn product_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -760,9 +662,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
-        Error = web_common_traits::database::InsertError<
-            CommercialCentrifugeLotAttribute,
-        >,
+        Attribute = CommercialCentrifugeLotAttribute,
     >,
     CentrifugeModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<
@@ -770,7 +670,6 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attribute = CommercialCentrifugeLotAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

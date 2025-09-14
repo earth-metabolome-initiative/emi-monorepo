@@ -21,6 +21,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetMod
         Self::PhysicalAssetModel(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for BeadModelExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum BeadModelAttribute {
@@ -38,32 +43,10 @@ impl core::str::FromStr for BeadModelAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
-    > for BeadModelAttribute
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableBeadModelBuilder<T1>
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute::Id
-                .into(),
-        )
-    }
-}
-impl<AssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
-            AssetModel,
-        >,
-    > for BeadModelAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = BeadModelAttribute;
 }
 impl core::fmt::Display for BeadModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -84,24 +67,7 @@ pub struct InsertableBeadModel {
     pub(crate) id: i32,
     pub(crate) diameter_millimeters: f32,
 }
-impl InsertableBeadModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.id, conn,
-        )
-    }
-}
+impl InsertableBeadModel {}
 #[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Builder for creating and inserting a new
@@ -460,11 +426,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::bead_models::BeadModel,
-            Error = web_common_traits::database::InsertError<BeadModelAttribute>,
+            Attribute = BeadModelAttribute,
         >,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attribute = BeadModelAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

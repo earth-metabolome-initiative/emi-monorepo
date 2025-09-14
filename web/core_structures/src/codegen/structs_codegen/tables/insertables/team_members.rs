@@ -16,6 +16,11 @@ impl core::str::FromStr for TeamMemberAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberBuilder
+{
+    type Attribute = TeamMemberAttribute;
+}
 impl core::fmt::Display for TeamMemberAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -187,10 +192,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::team_members::TeamMember,
-            Error = web_common_traits::database::InsertError<TeamMemberAttribute>,
+            Attribute = TeamMemberAttribute,
         >,
 {
-    type Attribute = TeamMemberAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

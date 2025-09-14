@@ -21,6 +21,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::ProcedureTemplat
         Self::ProcedureTemplate(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for AliquotingProcedureTemplateExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum AliquotingProcedureTemplateAttribute {
@@ -124,30 +129,11 @@ impl core::str::FromStr for AliquotingProcedureTemplateAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
-    > for AliquotingProcedureTemplateAttribute
-{
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::ProcedureTemplate
-                .into(),
-        )
-    }
-}
-impl
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateBuilder,
-    > for AliquotingProcedureTemplateAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+impl<T1> common_traits::builder::Attributed
+for crate::codegen::structs_codegen::tables::insertables::InsertableAliquotingProcedureTemplateBuilder<
+    T1,
+> {
+    type Attribute = AliquotingProcedureTemplateAttribute;
 }
 impl core::fmt::Display for AliquotingProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -465,23 +451,6 @@ impl InsertableAliquotingProcedureTemplate {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel::read(
             self.pipette_tip_model,
-            conn,
-        )
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
-            self.procedure_template,
             conn,
         )
     }
@@ -1695,9 +1664,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
-        Error = web_common_traits::database::InsertError<
-            AliquotingProcedureTemplateAttribute,
-        >,
+        Attribute = AliquotingProcedureTemplateAttribute,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
         C,
@@ -1707,7 +1674,6 @@ where
         C,
     >,
 {
-    type Attribute = AliquotingProcedureTemplateAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

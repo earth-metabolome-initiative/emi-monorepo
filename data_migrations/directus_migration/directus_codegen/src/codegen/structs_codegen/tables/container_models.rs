@@ -193,32 +193,6 @@ impl ContainerModel {
             .order_by(container_models::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_created(
-        date_created: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::container_models::container_models;
-        Self::table()
-            .filter(container_models::date_created.eq(date_created))
-            .order_by(container_models::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_updated(
-        date_updated: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::container_models::container_models;
-        Self::table()
-            .filter(container_models::date_updated.eq(date_updated))
-            .order_by(container_models::id.asc())
-            .load::<Self>(conn)
-    }
     pub fn from_is_sample_container<C>(
         is_sample_container: bool,
         conn: &mut C,

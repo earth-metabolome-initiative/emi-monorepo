@@ -17,6 +17,11 @@ impl core::str::FromStr for TemporaryUserAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserBuilder
+{
+    type Attribute = TemporaryUserAttribute;
+}
 impl core::fmt::Display for TemporaryUserAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -204,10 +209,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser,
-            Error = web_common_traits::database::InsertError<TemporaryUserAttribute>,
+            Attribute = TemporaryUserAttribute,
         >,
 {
-    type Attribute = TemporaryUserAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

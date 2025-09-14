@@ -283,19 +283,6 @@ impl DirectusOperation {
             .order_by(directus_operations::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_created(
-        date_created: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_operations::directus_operations;
-        Self::table()
-            .filter(directus_operations::date_created.eq(date_created))
-            .order_by(directus_operations::id.asc())
-            .load::<Self>(conn)
-    }
 }
 impl AsRef<DirectusOperation> for DirectusOperation {
     fn as_ref(&self) -> &DirectusOperation {

@@ -17,6 +17,11 @@ impl core::str::FromStr for RankAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableRankBuilder
+{
+    type Attribute = RankAttribute;
+}
 impl core::fmt::Display for RankAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -180,10 +185,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::ranks::Rank,
-            Error = web_common_traits::database::InsertError<RankAttribute>,
+            Attribute = RankAttribute,
         >,
 {
-    type Attribute = RankAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

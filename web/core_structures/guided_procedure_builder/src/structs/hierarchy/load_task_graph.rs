@@ -87,6 +87,10 @@ impl Hierarchy {
         let parent_child_relations =
             ParentProcedureTemplate::from_parent(procedure_template.procedure_template, conn)?;
 
+        if parent_child_relations.is_empty() {
+            return Ok(None);
+        }
+
         let mut nodes = parent_child_relations
             .iter()
             .map(|relation| {
@@ -126,6 +130,8 @@ impl Hierarchy {
                 .expect("Predecessor not found in nodes vocabulary");
             edges.push((source_index, destination_index));
         }
+
+        edges.sort_unstable();
 
         let number_of_nodes = sorted_nodes.len();
         let edges = GenericEdgesBuilder::default()

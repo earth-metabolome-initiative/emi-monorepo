@@ -172,32 +172,6 @@ impl InstrumentModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_date_created(
-        date_created: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::instrument_models::instrument_models;
-        Self::table()
-            .filter(instrument_models::date_created.eq(date_created))
-            .order_by(instrument_models::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_updated(
-        date_updated: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::instrument_models::instrument_models;
-        Self::table()
-            .filter(instrument_models::date_updated.eq(date_updated))
-            .order_by(instrument_models::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_instrument_model(
         instrument_model: &str,
         conn: &mut diesel::PgConnection,

@@ -19,6 +19,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttr
         Self::DigitalAsset(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for SpectraCollectionExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SpectraCollectionAttribute {
@@ -33,29 +38,10 @@ impl core::str::FromStr for SpectraCollectionAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
-    > for SpectraCollectionAttribute
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder<T1>
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute::Id.into(),
-        )
-    }
-}
-impl<Asset>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetBuilder<Asset>,
-    > for SpectraCollectionAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = SpectraCollectionAttribute;
 }
 impl core::fmt::Display for SpectraCollectionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -76,22 +62,7 @@ impl core::fmt::Display for SpectraCollectionAttribute {
 pub struct InsertableSpectraCollection {
     pub(crate) id: ::rosetta_uuid::Uuid,
 }
-impl InsertableSpectraCollection {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset::read(self.id, conn)
-    }
-}
+impl InsertableSpectraCollection {}
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Builder for creating and inserting a new
@@ -427,12 +398,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
-            Error = web_common_traits::database::InsertError<SpectraCollectionAttribute>,
+            Attribute = SpectraCollectionAttribute,
         >,
     DigitalAsset:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attribute = SpectraCollectionAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

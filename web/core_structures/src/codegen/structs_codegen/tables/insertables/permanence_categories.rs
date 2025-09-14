@@ -23,6 +23,11 @@ impl core::str::FromStr for PermanenceCategoryAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryBuilder
+{
+    type Attribute = PermanenceCategoryAttribute;
+}
 impl core::fmt::Display for PermanenceCategoryAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -295,10 +300,9 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
-        Error = web_common_traits::database::InsertError<PermanenceCategoryAttribute>,
+        Attribute = PermanenceCategoryAttribute,
     >,
 {
-    type Attribute = PermanenceCategoryAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

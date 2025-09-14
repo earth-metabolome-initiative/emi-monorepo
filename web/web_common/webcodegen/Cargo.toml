@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 diesel = { workspace = true, features = ["postgres", "chrono", "uuid"] }
-itertools = "0.13.0"
+itertools = "0.14.0"
 serde.workspace = true
 syn.workspace = true
 quote.workspace = true
@@ -34,7 +34,7 @@ tokio.workspace = true
 trybuild.workspace = true
 serde_json.workspace = true
 chrono.workspace = true
-ipnetwork = "0.20.0"
+ipnetwork = "0.21.1"
 rosetta_uuid = { workspace = true, features = ["diesel", "serde", "postgres"] }
 rosetta_timestamp = { workspace = true, features = [
   "diesel",
@@ -44,7 +44,7 @@ rosetta_timestamp = { workspace = true, features = [
 web_common_traits = { workspace = true, features = ["backend"] }
 macaddr = "1.0.1"
 postgis_diesel.workspace = true
-diesel_full_text_search.workspace = true
+# diesel_full_text_search.workspace = true
 diesel = { workspace = true, features = ["postgres", "r2d2"] }
 validation_errors.workspace = true
 pgrx_validation.workspace = true

@@ -3,7 +3,7 @@
 use core::marker::PhantomData;
 
 use common_traits::{
-    builder::IsCompleteBuilder,
+    builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
 
@@ -111,13 +111,19 @@ where
     }
 }
 
+impl<G: MonoplexBipartiteGraph> Attributed for GenericMonoplexBipartiteGraphBuilder<G>
+where
+    G: TryFrom<(G::LeftNodes, G::RightNodes, G::Edges), Error = MonoplexBipartiteGraphBuilderError>,
+{
+    type Attribute = MonoplexBipartiteGraphBuilder;
+}
+
 impl<G: MonoplexBipartiteGraph> Builder for GenericMonoplexBipartiteGraphBuilder<G>
 where
     G: TryFrom<(G::LeftNodes, G::RightNodes, G::Edges), Error = MonoplexBipartiteGraphBuilderError>,
 {
     type Object = G;
     type Error = MonoplexBipartiteGraphBuilderError;
-    type Attribute = MonoplexBipartiteGraphBuilder;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         G::try_from((

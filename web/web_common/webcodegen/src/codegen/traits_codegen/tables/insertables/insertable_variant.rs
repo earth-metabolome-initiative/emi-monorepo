@@ -50,6 +50,7 @@ impl Codegen<'_> {
         let user_id_type = user_table.primary_key_type(conn)?;
         let insertable_enum = table.insertable_enum_ty()?;
         let mut maybe_mut_self = false;
+        let attributes_enum = table.insertable_enum_ty()?;
         let table_extension_network = self.table_extension_network().unwrap();
         let extension_tables = table_extension_network.extension_tables(table);
         let mut additional_use_imports = Vec::new();
@@ -61,12 +62,9 @@ impl Codegen<'_> {
             })
             .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
         let primary_key_type = table.primary_key_type(conn)?;
-        let mut additional_where_requirements = vec![quote! {
-            C: diesel::connection::LoadConnection
-        }];
+        let mut additional_where_requirements = vec![];
         let mut try_insert_generic_constraint: HashSet<Arc<Table>> = HashSet::new();
         let mut attribute_availability_checks = Vec::new();
-        let attributes_enum = table.insertable_enum_ty()?;
 
         let generics_recursive_operation = if !right_generics.is_empty() {
             let extension_foreign_keys =
@@ -96,23 +94,18 @@ impl Codegen<'_> {
                         extension_foreign_key.constraint_ident(conn)?;
                     let foreign_table = extension_foreign_key.foreign_table(conn)?;
                     let foreign_table_generic = foreign_table.struct_ident()?;
-                    let expected_attribute = foreign_table.insertable_enum_ty()?;
 
                     additional_where_requirements.push(quote! {
-                        #foreign_table_generic: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = #primary_key_type>
+                        #foreign_table_generic: web_common_traits::database::TryInsertGeneric<
+                            C,
+                            PrimaryKey = #primary_key_type
+                        >
                     });
                     quote! {
                         self.#extension_foreign_key_ident
                             .mint_primary_key(user_id, conn)
                             .map_err(|err| {
-                                err.into_field_name(|attribute| {
-                                    <
-                                        #attributes_enum as web_common_traits::database::FromExtensionAttribute<
-                                            #expected_attribute,
-                                            #foreign_table_generic,
-                                        >
-                                    >::from_extension_attribute(attribute)
-                                })
+                                err.into_field_name(|attribute| {#attributes_enum::Extension(From::from(attribute))})
                             })?
                     }
                 }
@@ -128,7 +121,10 @@ impl Codegen<'_> {
                         let foreign_table = extension_foreign_key.foreign_table(conn)?;
                         let foreign_table_generic = foreign_table.struct_ident()?;
                         additional_where_requirements.push(quote! {
-                            #foreign_table_generic: web_common_traits::database::TryInsertGeneric<C, PrimaryKey=#primary_key_type>
+                            #foreign_table_generic: web_common_traits::database::TryInsertGeneric<
+                                C,
+                                PrimaryKey = #primary_key_type
+                            >
                         });
                     }
 
@@ -138,31 +134,18 @@ impl Codegen<'_> {
                             let is_last = extension_foreign_key == extension_foreign_keys.last().unwrap();
                             let is_first = extension_foreign_key == extension_foreign_keys.first().unwrap();
                             let extension_foreign_key_ident = extension_foreign_key.constraint_ident(conn)?;
-                            let foreign_table = extension_foreign_key.foreign_table(conn)?;
-                            let foreign_table_generic = foreign_table.struct_ident()?;
-                            let expected_attribute = foreign_table.insertable_enum_ty()?;
 
                             let other_foreign_keys_handling = extension_foreign_keys.iter().filter(|other_extension_foreign_key| {
                                 other_extension_foreign_key != &extension_foreign_key
                             })
                             .map(|other_extension_foreign_key| {
-                                let other_foreign_table = other_extension_foreign_key.foreign_table(conn)?;
-                                let other_foreign_table_generic = other_foreign_table.struct_ident()?;
-                                let other_expected_attribute = other_foreign_table.insertable_enum_ty()?;
                                 let other_extension_foreign_key_ident = other_extension_foreign_key.constraint_ident(conn)?;
                                 Ok(quote! {
                                     let _ = self.#other_extension_foreign_key_ident
                                         .set_primary_key(#primary_key_ident)
                                         .mint_primary_key(user_id, conn)
                                         .map_err(|err| {
-                                            err.into_field_name(|attribute| {
-                                                <
-                                                    #attributes_enum as web_common_traits::database::FromExtensionAttribute<
-                                                        #other_expected_attribute,
-                                                        #other_foreign_table_generic,
-                                                    >
-                                                >::from_extension_attribute(attribute)
-                                            })
+                                            err.into_field_name(|attribute| {#attributes_enum::Extension(From::from(attribute))})
                                         })?;
                                 })
                             }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
@@ -190,14 +173,7 @@ impl Codegen<'_> {
                                     // the primary key.
                                     let #primary_key_ident = self.#extension_foreign_key_ident.mint_primary_key(user_id, conn)
                                         .map_err(|err| {
-                                            err.into_field_name(|attribute| {
-                                                <
-                                                    #attributes_enum as web_common_traits::database::FromExtensionAttribute<
-                                                        #expected_attribute,
-                                                        #foreign_table_generic,
-                                                    >
-                                                >::from_extension_attribute(attribute)
-                                            })
+                                            err.into_field_name(|attribute| {#attributes_enum::Extension(From::from(attribute))})
                                         })?;
                                     #(#other_foreign_keys_handling)*
 
@@ -450,7 +426,7 @@ impl Codegen<'_> {
                     #conn_ident: &mut C
                 ) -> Result<
                     Self::InsertableVariant,
-                    Self::Error
+                    web_common_traits::database::InsertError<#attributes_enum>
                 >
                 {
                     #(#additional_use_imports)*
@@ -553,6 +529,7 @@ impl Codegen<'_> {
             }
 
             let attributes_enum = table.insertable_enum_ty()?;
+            let attributes_extension_enum = table.attributes_extension_enum_ty()?;
 
             let (try_insert, try_insert_additional_where_clause) =
                 self.generate_insertable_builder_try_insert_implementation(table, conn)?;
@@ -567,7 +544,7 @@ impl Codegen<'_> {
                 .iter()
                 .map(|extension_table| extension_table.struct_ident())
                 .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
-            let maybe_right_generics =
+            let maybe_generics =
                 if generics.is_empty() { None } else { Some(quote! {<#(#generics),*>}) };
 
             let mut maybe_mut: Option<TokenStream> = None;
@@ -588,23 +565,29 @@ impl Codegen<'_> {
                     None
                 };
 
-            // We add to the additional where clause the requirements
-            // for FromExtensionAttribute
-
-            additional_where_clause.extend(extension_tables.iter().map(|extension_table| {
-                let struct_ident = extension_table.struct_ident()?;
-                let expected_attribute = extension_table.insertable_enum_ty()?;
-                Ok(quote! {
-                    #attributes_enum: web_common_traits::database::FromExtensionAttribute<
-                        #expected_attribute,
-                        #struct_ident,
-                        EffectiveExtensionAttribute=<#struct_ident as web_common_traits::database::TryInsertGeneric<C>>::Attribute
-                    >
-                })
-            }).collect::<Result<Vec<_>, WebCodeGenError>>()?);
+            additional_where_clause.extend(
+                extension_tables
+                    .iter()
+                    .map(|extension_table| {
+                        let struct_ident = extension_table.struct_ident()?;
+                        Ok(quote! {
+                            #attributes_extension_enum: From<<#struct_ident as common_traits::builder::Attributed>::Attribute>
+                        })
+                    })
+                    .collect::<Result<Vec<_>, WebCodeGenError>>()?,
+            );
 
             std::fs::write(&table_file, self.beautify_code(&quote::quote!{
-				impl<C: diesel::connection::LoadConnection, #(#generics),*> web_common_traits::database::InsertableVariant<C> for #insertable_builder #maybe_right_generics
+
+
+				impl #maybe_generics web_common_traits::database::InsertableVariantMetadata for #insertable_builder #maybe_generics
+                {
+					type Row = #table_path;
+                    type InsertableVariant = #insertable_struct;
+                    type UserId = #user_id_type;
+                }
+
+				impl<C: diesel::connection::LoadConnection, #(#generics),*> web_common_traits::database::InsertableVariant<C> for #insertable_builder #maybe_generics
                 where
                     diesel::query_builder::InsertStatement<
                         <#table_path as diesel::associations::HasTable>::Table,
@@ -612,16 +595,11 @@ impl Codegen<'_> {
                     >: for<'query> diesel::query_dsl::LoadQuery<'query, C, #table_path>,
                     #(#additional_where_clause),*
                 {
-					type Row = #table_path;
-                    type InsertableVariant = #insertable_struct;
-                    type Error = web_common_traits::database::InsertError<#attributes_enum>;
-                    type UserId = #user_id_type;
-
                     fn insert(
                         #maybe_mut self,
                         user_id: Self::UserId,
                         conn: &mut C,
-                    ) -> Result<Self::Row, Self::Error> {
+                    ) -> Result<Self::Row, web_common_traits::database::InsertError<#attributes_enum>> {
                         use diesel::RunQueryDsl;
                         use diesel::associations::HasTable;
                         #(#additional_imports)*

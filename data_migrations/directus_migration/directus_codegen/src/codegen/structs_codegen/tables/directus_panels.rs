@@ -364,19 +364,6 @@ impl DirectusPanel {
             .order_by(directus_panels::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_created(
-        date_created: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_panels::directus_panels;
-        Self::table()
-            .filter(directus_panels::date_created.eq(date_created))
-            .order_by(directus_panels::id.asc())
-            .load::<Self>(conn)
-    }
 }
 impl AsRef<DirectusPanel> for DirectusPanel {
     fn as_ref(&self) -> &DirectusPanel {

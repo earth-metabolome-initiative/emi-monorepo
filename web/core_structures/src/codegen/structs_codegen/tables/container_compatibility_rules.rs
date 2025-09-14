@@ -132,58 +132,6 @@ impl ContainerCompatibilityRule {
             ))
             .load::<Self>(conn)
     }
-    pub fn from_created_at<C>(
-        created_at: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules::created_at as diesel::expression_methods::EqAll<
-                ::rosetta_timestamp::TimestampUTC,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules::created_at as diesel::expression_methods::EqAll<
-                ::rosetta_timestamp::TimestampUTC,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            (
-                diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules::container_model,
-                >,
-                diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules::contained_asset_model,
-                >,
-            ),
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules::created_at as diesel::expression_methods::EqAll<
-                ::rosetta_timestamp::TimestampUTC,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            (
-                diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules::container_model,
-                >,
-                diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules::contained_asset_model,
-                >,
-            ),
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules;
-        Self::table()
-            .filter(container_compatibility_rules::created_at.eq(created_at))
-            .order_by((
-                container_compatibility_rules::container_model.asc(),
-                container_compatibility_rules::contained_asset_model.asc(),
-            ))
-            .load::<Self>(conn)
-    }
 }
 impl AsRef<ContainerCompatibilityRule> for ContainerCompatibilityRule {
     fn as_ref(&self) -> &ContainerCompatibilityRule {

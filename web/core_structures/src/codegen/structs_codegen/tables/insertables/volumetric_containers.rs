@@ -19,6 +19,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::ContainerAttribu
         Self::Container(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for VolumetricContainerExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum VolumetricContainerAttribute {
@@ -36,31 +41,12 @@ impl core::str::FromStr for VolumetricContainerAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
-    > for VolumetricContainerAttribute
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerBuilder<
+        T1,
+    >
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::ContainerAttribute::Id.into(),
-        )
-    }
-}
-impl<PhysicalAsset>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
-            PhysicalAsset,
-        >,
-    > for VolumetricContainerAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::ContainerAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = VolumetricContainerAttribute;
 }
 impl core::fmt::Display for VolumetricContainerAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -86,34 +72,6 @@ pub struct InsertableVolumetricContainer {
     pub(crate) volumetric_container_model: i32,
 }
 impl InsertableVolumetricContainer {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::containers::Container, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::containers::Container:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::containers::Container::read(self.id, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn volumetric_containers_id_volumetric_container_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::assets::Asset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
-                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
-                        .eq(&self.volumetric_container_model),
-                ),
-            )
-            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
-    }
     pub fn volumetric_container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -658,14 +616,13 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-        Error = web_common_traits::database::InsertError<VolumetricContainerAttribute>,
+        Attribute = VolumetricContainerAttribute,
     >,
     Container: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
 {
-    type Attribute = VolumetricContainerAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

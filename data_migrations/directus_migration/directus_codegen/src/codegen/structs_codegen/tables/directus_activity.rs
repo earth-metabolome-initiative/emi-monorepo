@@ -72,45 +72,6 @@ impl DirectusActivity {
             .order_by(directus_activity::id.asc())
             .load::<Self>(conn)
     }
-    pub fn from_timestamp<C>(
-        timestamp: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::directus_activity::directus_activity::timestamp as diesel::expression_methods::EqAll<
-                ::rosetta_timestamp::TimestampUTC,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::directus_activity::directus_activity::timestamp as diesel::expression_methods::EqAll<
-                ::rosetta_timestamp::TimestampUTC,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::directus_activity::directus_activity::id,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::directus_activity::directus_activity::timestamp as diesel::expression_methods::EqAll<
-                ::rosetta_timestamp::TimestampUTC,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::directus_activity::directus_activity::id,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_activity::directus_activity;
-        Self::table()
-            .filter(directus_activity::timestamp.eq(timestamp))
-            .order_by(directus_activity::id.asc())
-            .load::<Self>(conn)
-    }
     #[cfg(feature = "postgres")]
     pub fn from_ip(
         ip: &str,

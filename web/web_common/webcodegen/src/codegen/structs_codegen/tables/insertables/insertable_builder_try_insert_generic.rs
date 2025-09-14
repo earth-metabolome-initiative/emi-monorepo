@@ -41,7 +41,7 @@ impl Codegen<'_> {
                 C,
                 UserId=#user_id_type,
                 Row=#row_path,
-                Error=web_common_traits::database::InsertError<#attributes_enum>
+                Attribute=#attributes_enum
             >
         }];
         let mut try_insert_generic_where_constraint: HashSet<Table> = HashSet::new();
@@ -64,7 +64,7 @@ impl Codegen<'_> {
                 continue;
             }
 
-            if let Some((partial_builder_kind, _, partial_builder_constraint)) =
+            if let Some((_partial_builder_kind, _, partial_builder_constraint)) =
                 column.requires_partial_builder(conn)?
             {
                 let foreign_table = partial_builder_constraint.foreign_table(conn)?;
@@ -95,8 +95,6 @@ impl Codegen<'_> {
                 where
                     #(#where_constraints),*
             {
-                type Attribute = #attributes_enum;
-
                 fn mint_primary_key(
                     self,
                     user_id: #user_id_type,

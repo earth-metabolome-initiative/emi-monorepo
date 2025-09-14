@@ -8,7 +8,7 @@ use diesel::{
 use itertools::Itertools;
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{Ident, Type, parse_str};
+use syn::{Ident, Type};
 
 use super::{KeyColumnUsage, PgTrigger};
 use crate::{
@@ -642,68 +642,6 @@ impl Table {
             .collect())
     }
 
-    /// Returns the diesel derives supported by the table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A vector of `Type` representing the diesel derives.
-    ///
-    /// # Errors
-    ///
-    /// * If the primary key columns cannot be loaded from the database.
-    pub fn diesel_derives(&self, conn: &mut PgConnection) -> Result<Vec<Type>, WebCodeGenError> {
-        let mut derives = Vec::new();
-
-        derives.push(parse_str("diesel::Selectable")?);
-        derives.push(parse_str("diesel::Insertable")?);
-
-        if self.has_non_primary_keys(conn)? {
-            derives.push(parse_str("diesel::AsChangeset")?);
-        }
-
-        if self.has_primary_keys(conn)? {
-            derives.push(parse_str("diesel::Queryable")?);
-            derives.push(parse_str("diesel::Identifiable")?);
-        }
-
-        if self.has_singleton_foreign_keys(conn)? {
-            derives.push(parse_str("diesel::Associations")?);
-        }
-
-        Ok(derives)
-    }
-
-    /// Returns the diesel derives decorator for the table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A `TokenStream` representing the diesel derives decorator.
-    ///
-    /// # Errors
-    ///
-    /// * If the diesel derives cannot be loaded.
-    pub fn diesel_derives_decorator(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<TokenStream, WebCodeGenError> {
-        let diesel_derives = self.diesel_derives(conn)?;
-        Ok(if diesel_derives.is_empty() {
-            TokenStream::new()
-        } else {
-            quote! {
-                #[derive(#(#diesel_derives),*)]
-            }
-        })
-    }
-
     /// Returns the foreign keys of the table.
     ///
     /// # Arguments
@@ -743,9 +681,10 @@ impl Table {
     ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
         let mut parent_keys = Vec::new();
         for foreign_key in self.foreign_keys(conn)?.as_ref() {
-            if foreign_key.has_on_delete_cascade(conn)?
+            if !foreign_key.has_on_delete_cascade(conn)?
                 && foreign_key.is_foreign_primary_key(conn)?
                 && !foreign_key.is_self_referential(conn)?
+                && !foreign_key.is_ancestral_same_as_constraint(conn)?.is_some()
             {
                 parent_keys.push(foreign_key.clone());
             }

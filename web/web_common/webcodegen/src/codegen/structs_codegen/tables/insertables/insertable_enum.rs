@@ -48,7 +48,7 @@ impl Table {
     }
 
     /// Returns the [`Type`](syn::Type) for the extension attributes.
-    fn attributes_extension_enum_ty(&self) -> Result<syn::Type, WebCodeGenError> {
+    pub fn attributes_extension_enum_ty(&self) -> Result<syn::Type, WebCodeGenError> {
         Ok(syn::parse_str(&format!(
             "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_INSERTABLES_PATH}::{}",
             self.attributes_extension_enum_name()?
@@ -151,6 +151,16 @@ impl Table {
                 impl From<#extension_table_enum_ty> for #insertable_extension_enum {
                     fn from(attribute: #extension_table_enum_ty) -> Self {
                         Self::#struct_ident(attribute)
+                    }
+                }
+            });
+        }
+
+        if !extension_tables.is_empty() {
+            from_implementations.push(quote::quote! {
+                impl From<common_traits::builder::EmptyTuple> for #insertable_extension_enum {
+                    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+                        unreachable!("Some code generation error occurred to reach this point.")
                     }
                 }
             });
@@ -370,50 +380,24 @@ impl Table {
             .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
         let from_str_impl = self.insertable_enum_from_str_impl(conn)?;
-        let from_extension_implementations = self.extension_tables(conn)?
-            .iter()
-            .map(|extension_table| {
-                let insertable_enum = self.attributes_enum_ident()?;
-                let extension_table_enum_ty = extension_table.insertable_enum_ty()?;
-                let builder_type = extension_table.insertable_builder_ty()?;
-                let builder_generics = extension_table.extension_tables(conn)?.iter().map(|ancestor| {
-                    ancestor.struct_ident()
-                }).collect::<Result<Vec<_>, WebCodeGenError>>()?;
-                let maybe_builder_generics = if builder_generics.is_empty() {
-                    quote::quote! {}
-                } else {
-                    quote::quote! { <#(#builder_generics),*> }
-                };
-                let primary_key_columns = extension_table.primary_key_columns(conn)?;
-                assert_eq!(
-                    primary_key_columns.len(),
-                    1,
-                    "The extension table `{}` must have a single-column primary key",
-                    extension_table.table_name
-                );
-                let primary_key_column = &primary_key_columns[0];
-                let primary_key_column_ident = primary_key_column.camel_case_ident()?;
+        let builder = self.insertable_builder_ty()?;
 
-                Ok(quote::quote! {
-                    impl web_common_traits::database::DefaultExtensionAttribute<#extension_table_enum_ty> for #insertable_enum {
-                        /// Returns the default value for the target attribute.
-                        fn target_default() -> Self {
-                            Self::Extension(#extension_table_enum_ty::#primary_key_column_ident.into())
-                        }
-                    }
-
-                    impl<#(#builder_generics),*>
-                        web_common_traits::database::FromExtensionAttribute<#extension_table_enum_ty, #builder_type #maybe_builder_generics> for #insertable_enum
-                    {
-                        type EffectiveExtensionAttribute = #extension_table_enum_ty;
-
-                        fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-                            Self::Extension(extension_attribute.into())
-                        }
-                    }
+        let maybe_generics = if extension_tables.is_empty() {
+            quote::quote! {}
+        } else {
+            let generics = extension_tables
+                .iter()
+                .enumerate()
+                .map(|(table_number, _)| {
+                    let generic_ident = syn::Ident::new(
+                        &format!("T{}", table_number + 1),
+                        proc_macro2::Span::call_site(),
+                    );
+                    generic_ident
                 })
-            })
-            .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+                .collect::<Vec<_>>();
+            quote::quote! { <#(#generics),*> }
+        };
 
         Ok(quote::quote! {
             #insertable_extension_enum_definition
@@ -428,7 +412,9 @@ impl Table {
 
             #from_str_impl
 
-            #(#from_extension_implementations)*
+            impl #maybe_generics common_traits::builder::Attributed for #builder #maybe_generics{
+                type Attribute = #insertable_enum;
+            }
 
             impl core::fmt::Display for #insertable_enum {
                 fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {

@@ -23,6 +23,11 @@ impl core::str::FromStr for UnitAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder
+{
+    type Attribute = UnitAttribute;
+}
 impl core::fmt::Display for UnitAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -280,10 +285,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::units::Unit,
-            Error = web_common_traits::database::InsertError<UnitAttribute>,
+            Attribute = UnitAttribute,
         >,
 {
-    type Attribute = UnitAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

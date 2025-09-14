@@ -43,8 +43,8 @@ impl Diagram for Flowchart {
         self.generic.edges()
     }
 
-    fn get_node_by_label(&self, label: &str) -> Option<std::rc::Rc<Self::Node>> {
-        self.generic.get_node_by_label(label)
+    fn get_node_by_id(&self, id: u64) -> Option<std::rc::Rc<Self::Node>> {
+        self.generic.get_node_by_id(id)
     }
 
     fn get_style_class_by_name(

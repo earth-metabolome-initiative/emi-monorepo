@@ -140,32 +140,6 @@ impl ContainerType {
             .order_by(container_types::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_created(
-        date_created: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::container_types::container_types;
-        Self::table()
-            .filter(container_types::date_created.eq(date_created))
-            .order_by(container_types::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_updated(
-        date_updated: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::container_types::container_types;
-        Self::table()
-            .filter(container_types::date_updated.eq(date_updated))
-            .order_by(container_types::id.asc())
-            .load::<Self>(conn)
-    }
 }
 impl AsRef<ContainerType> for ContainerType {
     fn as_ref(&self) -> &ContainerType {

@@ -103,11 +103,13 @@ impl Codegen<'_> {
 
             #(#from_variant_impls)*
 
+            impl web_common_traits::database::MostConcreteVariantMetadata for #struct_path {
+                type Variant = #dag_ident;
+            }
+
             impl<C> web_common_traits::database::MostConcreteVariant<C> for #struct_path
                 where #(#where_requirements),*
             {
-                type Variant = #dag_ident;
-
                 fn most_concrete_variant(&self, conn: &mut C) -> Result<Self::Variant, diesel::result::Error> {
                     use diesel::Identifiable;
                     Ok(match self.#most_concrete_table_ident.as_str() {

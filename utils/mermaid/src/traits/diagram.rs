@@ -30,8 +30,8 @@ pub trait Diagram {
     /// Returns an iterator over the style classes associated with the diagram.
     fn style_classes(&self) -> impl Iterator<Item = &StyleClass>;
 
-    /// Returns the reference to the requested node by label if it exists.
-    fn get_node_by_label(&self, label: &str) -> Option<Rc<Self::Node>>;
+    /// Returns the reference to the requested node by ID if it exists.
+    fn get_node_by_id(&self, id: u64) -> Option<Rc<Self::Node>>;
 
     /// Returns the reference to the requested style class by name if it exists.
     fn get_style_class_by_name(&self, name: &str) -> Option<Rc<StyleClass>>;

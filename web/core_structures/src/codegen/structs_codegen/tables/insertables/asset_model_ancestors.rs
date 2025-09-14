@@ -16,6 +16,11 @@ impl core::str::FromStr for AssetModelAncestorAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestorBuilder
+{
+    type Attribute = AssetModelAncestorAttribute;
+}
 impl core::fmt::Display for AssetModelAncestorAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -208,10 +213,9 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
-        Error = web_common_traits::database::InsertError<AssetModelAncestorAttribute>,
+        Attribute = AssetModelAncestorAttribute,
     >,
 {
-    type Attribute = AssetModelAncestorAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

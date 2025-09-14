@@ -21,6 +21,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetMod
         Self::PhysicalAssetModel(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for PackagingModelExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum PackagingModelAttribute {
@@ -35,32 +40,10 @@ impl core::str::FromStr for PackagingModelAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
-    > for PackagingModelAttribute
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder<T1>
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute::Id
-                .into(),
-        )
-    }
-}
-impl<AssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
-            AssetModel,
-        >,
-    > for PackagingModelAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = PackagingModelAttribute;
 }
 impl core::fmt::Display for PackagingModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -81,24 +64,7 @@ impl core::fmt::Display for PackagingModelAttribute {
 pub struct InsertablePackagingModel {
     pub(crate) id: i32,
 }
-impl InsertablePackagingModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.id, conn,
-        )
-    }
-}
+impl InsertablePackagingModel {}
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Builder for creating and inserting a new
@@ -408,11 +374,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-            Error = web_common_traits::database::InsertError<PackagingModelAttribute>,
+            Attribute = PackagingModelAttribute,
         >,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attribute = PackagingModelAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

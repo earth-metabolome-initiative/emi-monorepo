@@ -2,7 +2,10 @@
 //! rows.
 use std::{convert::Infallible, str::FromStr};
 
-use common_traits::{builder::IsCompleteBuilder, prelude::BuilderError};
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::BuilderError,
+};
 use generic_backend_request_errors::GenericBackendRequestError;
 
 #[derive(
@@ -132,20 +135,21 @@ impl<T> MostConcreteTable for Option<T> {
     fn set_most_concrete_table(&mut self, _table_name: &str) {}
 }
 
-/// A trait for types that can be constructed in the frontend or backend to
-/// execute the insert operation.
-pub trait InsertableVariant<C> {
+/// A trait for types that provide metadata for insertable variants.
+pub trait InsertableVariantMetadata: Attributed {
     /// The associated row type which can be inserted into the database.
-    type Row: Insertable<InsertableVariant = <Self as InsertableVariant<C>>::InsertableVariant>
+    type Row: Insertable<InsertableVariant = <Self as InsertableVariantMetadata>::InsertableVariant>
         + diesel::associations::HasTable;
     /// The associated insertable variant type which can be constructed in the
     /// frontend or backend to execute the insert operation.
     type InsertableVariant: diesel::Insertable<<Self::Row as diesel::associations::HasTable>::Table>;
     /// The expected user ID type.
     type UserId;
-    /// The error type returned by the insert operation.
-    type Error: From<diesel::result::Error>;
+}
 
+/// A trait for types that can be constructed in the frontend or backend to
+/// execute the insert operation.
+pub trait InsertableVariant<C>: InsertableVariantMetadata {
     /// Inserts the row into the database.
     ///
     /// # Arguments
@@ -161,7 +165,11 @@ pub trait InsertableVariant<C> {
     ///
     /// * If the row cannot be inserted.
     /// * If the user is not authorized to insert the row.
-    fn insert(self, user_id: Self::UserId, conn: &mut C) -> Result<Self::Row, Self::Error>;
+    fn insert(
+        self,
+        user_id: Self::UserId,
+        conn: &mut C,
+    ) -> Result<Self::Row, InsertError<Self::Attribute>>;
 
     /// Attempts to convert the builder into an insertable object, executing
     /// the necessary database operations if required.
@@ -175,11 +183,14 @@ pub trait InsertableVariant<C> {
     ///
     /// * `InsertError` - If the insert operation fails, it returns an error
     ///   containing the attributes of the insertable object.
-    fn try_insert(self, user_id: i32, conn: &mut C)
-    -> Result<Self::InsertableVariant, Self::Error>;
+    fn try_insert(
+        self,
+        user_id: i32,
+        conn: &mut C,
+    ) -> Result<Self::InsertableVariant, InsertError<Self::Attribute>>;
 }
 
-#[derive(Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
 /// Enumeration of the possible errors associated to the frontend insert
 /// operations.
 pub enum InsertError<FieldName> {
@@ -313,30 +324,6 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName
             }
             InsertError::ServerError(error) => {
                 <GenericBackendRequestError as core::fmt::Display>::fmt(error, f)
-            }
-        }
-    }
-}
-
-impl<FieldName: core::fmt::Debug + core::fmt::Display> core::fmt::Debug for InsertError<FieldName> {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-        match self {
-            InsertError::BuilderError(error) => {
-                <BuilderError<FieldName> as core::fmt::Debug>::fmt(error, f)
-            }
-            InsertError::ValidationError(error) => {
-                <validation_errors::Error<FieldName> as core::fmt::Debug>::fmt(error, f)
-            }
-            InsertError::DieselError(error) => {
-                write!(f, "Diesel error: {error:?}")
-            }
-            InsertError::UniqueConstraintViolation { .. }
-            | InsertError::ForeignKeyViolation { .. } => <Self as core::fmt::Display>::fmt(self, f),
-            InsertError::UnknownAttribute(attribute) => {
-                write!(f, "Unknown attribute error: `{attribute:?}`")
-            }
-            InsertError::ServerError(error) => {
-                <GenericBackendRequestError as core::fmt::Debug>::fmt(error, f)
             }
         }
     }

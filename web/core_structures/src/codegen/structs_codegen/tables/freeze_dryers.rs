@@ -73,37 +73,6 @@ impl web_common_traits::database::PrimaryKeyLike for FreezeDryer {
     }
 }
 impl FreezeDryer {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn freeze_dryers_id_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::assets::Asset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
-                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
-                        .eq(&self.model),
-                ),
-            )
-            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
-    }
     pub fn model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -121,61 +90,6 @@ impl FreezeDryer {
             self.model,
             conn,
         )
-    }
-    pub fn from_id<C>(
-        id: ::rosetta_uuid::Uuid,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::freeze_dryers::freeze_dryers::id as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::freeze_dryers::freeze_dryers::id as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::freeze_dryers::freeze_dryers::id,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::freeze_dryers::freeze_dryers::id as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::freeze_dryers::freeze_dryers::id,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::freeze_dryers::freeze_dryers;
-        Self::table()
-            .filter(freeze_dryers::id.eq(id))
-            .order_by(freeze_dryers::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_id_and_model(
-        id: ::rosetta_uuid::Uuid,
-        model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::freeze_dryers::freeze_dryers;
-        Self::table()
-            .filter(freeze_dryers::id.eq(id).and(freeze_dryers::model.eq(model)))
-            .order_by(freeze_dryers::id.asc())
-            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_model(
@@ -198,27 +112,6 @@ impl FreezeDryer {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_model_and_id(
-        model: i32,
-        id: ::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl,
-            SelectableHelper, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            assets::assets, freeze_dryers::freeze_dryers,
-        };
-        Self::table()
-            .inner_join(assets::table.on(freeze_dryers::id.eq(assets::id)))
-            .filter(assets::model.eq(model).and(assets::id.eq(id)))
-            .order_by(freeze_dryers::id.asc())
-            .select(Self::as_select())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_name_and_model(
         name: &str,
         model: i32,
@@ -238,26 +131,6 @@ impl FreezeDryer {
             .order_by(freeze_dryers::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_most_concrete_table(
-        most_concrete_table: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            assets::assets, freeze_dryers::freeze_dryers,
-        };
-        Self::table()
-            .inner_join(assets::table.on(freeze_dryers::id.eq(assets::id)))
-            .filter(assets::most_concrete_table.eq(most_concrete_table))
-            .order_by(freeze_dryers::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(
@@ -320,26 +193,6 @@ impl FreezeDryer {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            assets::assets, freeze_dryers::freeze_dryers,
-        };
-        Self::table()
-            .inner_join(assets::table.on(freeze_dryers::id.eq(assets::id)))
-            .filter(assets::created_at.eq(created_at))
-            .order_by(freeze_dryers::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_updated_by(
         updated_by: i32,
         conn: &mut diesel::PgConnection,
@@ -355,26 +208,6 @@ impl FreezeDryer {
         Self::table()
             .inner_join(assets::table.on(freeze_dryers::id.eq(assets::id)))
             .filter(assets::updated_by.eq(updated_by))
-            .order_by(freeze_dryers::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_at(
-        updated_at: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            assets::assets, freeze_dryers::freeze_dryers,
-        };
-        Self::table()
-            .inner_join(assets::table.on(freeze_dryers::id.eq(assets::id)))
-            .filter(assets::updated_at.eq(updated_at))
             .order_by(freeze_dryers::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

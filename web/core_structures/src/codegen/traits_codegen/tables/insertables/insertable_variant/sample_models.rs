@@ -1,3 +1,13 @@
+impl<PhysicalAssetModel> web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSampleModelBuilder<
+        PhysicalAssetModel,
+    >
+{
+    type Row = crate::codegen::structs_codegen::tables::sample_models::SampleModel;
+    type InsertableVariant =
+        crate::codegen::structs_codegen::tables::insertables::InsertableSampleModel;
+    type UserId = i32;
+}
 impl<
     C: diesel::connection::LoadConnection,
     PhysicalAssetModel,
@@ -16,31 +26,25 @@ where
         C,
         crate::codegen::structs_codegen::tables::sample_models::SampleModel,
     >,
-    C: diesel::connection::LoadConnection,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
-        PhysicalAssetModel,
-        EffectiveExtensionAttribute = <PhysicalAssetModel as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::SampleModelExtensionAttribute: From<
+        <PhysicalAssetModel as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::sample_models::SampleModel;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSampleModel;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute,
-    >;
-    type UserId = i32;
     fn insert(
         mut self,
         user_id: Self::UserId,
         conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    ) -> Result<
+        Self::Row,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute,
+        >,
+    > {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         use web_common_traits::database::MostConcreteTable;
@@ -57,7 +61,12 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::InsertableVariant, Self::Error> {
+    ) -> Result<
+        Self::InsertableVariant,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute,
+        >,
+    > {
         let sample_source_model = self
             .sample_source_model
             .ok_or(
@@ -70,10 +79,9 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(|attribute| {
-                    <crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
-                        PhysicalAssetModel,
-                    >>::from_extension_attribute(attribute)
+                    crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute::Extension(
+                        From::from(attribute),
+                    )
                 })
             })?;
         Ok(Self::InsertableVariant {

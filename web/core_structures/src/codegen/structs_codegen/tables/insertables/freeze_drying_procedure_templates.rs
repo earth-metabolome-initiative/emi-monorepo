@@ -21,6 +21,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::ProcedureTemplat
         Self::ProcedureTemplate(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for FreezeDryingProcedureTemplateExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum FreezeDryingProcedureTemplateAttribute {
@@ -93,30 +98,11 @@ impl core::str::FromStr for FreezeDryingProcedureTemplateAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
-    > for FreezeDryingProcedureTemplateAttribute
-{
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::ProcedureTemplate
-                .into(),
-        )
-    }
-}
-impl
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateBuilder,
-    > for FreezeDryingProcedureTemplateAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+impl<T1> common_traits::builder::Attributed
+for crate::codegen::structs_codegen::tables::insertables::InsertableFreezeDryingProcedureTemplateBuilder<
+    T1,
+> {
+    type Attribute = FreezeDryingProcedureTemplateAttribute;
 }
 impl core::fmt::Display for FreezeDryingProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -305,23 +291,6 @@ impl InsertableFreezeDryingProcedureTemplate {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel::read(
             self.freeze_dried_with_model,
-            conn,
-        )
-    }
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
-            self.procedure_template,
             conn,
         )
     }
@@ -1337,9 +1306,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
-        Error = web_common_traits::database::InsertError<
-            FreezeDryingProcedureTemplateAttribute,
-        >,
+        Attribute = FreezeDryingProcedureTemplateAttribute,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
         C,
@@ -1349,7 +1316,6 @@ where
         C,
     >,
 {
-    type Attribute = FreezeDryingProcedureTemplateAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

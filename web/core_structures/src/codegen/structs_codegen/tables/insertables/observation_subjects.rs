@@ -23,6 +23,11 @@ impl core::str::FromStr for ObservationSubjectAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableObservationSubjectBuilder
+{
+    type Attribute = ObservationSubjectAttribute;
+}
 impl core::fmt::Display for ObservationSubjectAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -294,10 +299,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
-            Error = web_common_traits::database::InsertError<ObservationSubjectAttribute>,
+            Attribute = ObservationSubjectAttribute,
         >,
 {
-    type Attribute = ObservationSubjectAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

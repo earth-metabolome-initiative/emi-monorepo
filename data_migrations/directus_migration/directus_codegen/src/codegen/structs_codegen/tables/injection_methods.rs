@@ -142,32 +142,6 @@ impl InjectionMethod {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_date_created(
-        date_created: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::injection_methods::injection_methods;
-        Self::table()
-            .filter(injection_methods::date_created.eq(date_created))
-            .order_by(injection_methods::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_updated(
-        date_updated: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::injection_methods::injection_methods;
-        Self::table()
-            .filter(injection_methods::date_updated.eq(date_updated))
-            .order_by(injection_methods::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_method_description(
         method_description: &str,
         conn: &mut diesel::PgConnection,

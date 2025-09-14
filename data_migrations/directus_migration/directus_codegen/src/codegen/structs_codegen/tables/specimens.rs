@@ -124,32 +124,6 @@ impl Specimen {
             .order_by(specimens::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_created(
-        date_created: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::specimens::specimens;
-        Self::table()
-            .filter(specimens::date_created.eq(date_created))
-            .order_by(specimens::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_updated(
-        date_updated: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::specimens::specimens;
-        Self::table()
-            .filter(specimens::date_updated.eq(date_updated))
-            .order_by(specimens::id.asc())
-            .load::<Self>(conn)
-    }
 }
 impl AsRef<Specimen> for Specimen {
     fn as_ref(&self) -> &Specimen {

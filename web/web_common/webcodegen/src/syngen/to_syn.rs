@@ -3,7 +3,7 @@
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::Ident;
+use syn::{Ident, parse_str};
 
 use crate::{Table, errors::WebCodeGenError, traits::TableLike};
 
@@ -24,6 +24,75 @@ impl Table {
                 fn id(self) -> Self::Id {
                     #primary_key_attribute
                 }
+            }
+        })
+    }
+
+    /// Returns the diesel derives supported by the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `enable_belongs_to` - Whether to include `belongs_to` associations.
+    /// * `conn` - The database connection.
+    ///
+    /// # Returns
+    ///
+    /// A vector of `Type` representing the diesel derives.
+    ///
+    /// # Errors
+    ///
+    /// * If the primary key columns cannot be loaded from the database.
+    fn diesel_derives(
+        &self,
+        enable_belongs_to: bool,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<syn::Type>, WebCodeGenError> {
+        let mut derives = Vec::new();
+
+        derives.push(parse_str("diesel::Selectable")?);
+        derives.push(parse_str("diesel::Insertable")?);
+
+        if self.has_non_primary_keys(conn)? {
+            derives.push(parse_str("diesel::AsChangeset")?);
+        }
+
+        if self.has_primary_keys(conn)? {
+            derives.push(parse_str("diesel::Queryable")?);
+            derives.push(parse_str("diesel::Identifiable")?);
+        }
+
+        if enable_belongs_to && self.has_singleton_foreign_keys(conn)? {
+            derives.push(parse_str("diesel::Associations")?);
+        }
+
+        Ok(derives)
+    }
+
+    /// Returns the diesel derives decorator for the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `enable_belongs_to` - Whether to include `belongs_to` associations.
+    /// * `conn` - The database connection.
+    ///
+    /// # Returns
+    ///
+    /// A `TokenStream` representing the diesel derives decorator.
+    ///
+    /// # Errors
+    ///
+    /// * If the diesel derives cannot be loaded.
+    fn diesel_derives_decorator(
+        &self,
+        enable_belongs_to: bool,
+        conn: &mut PgConnection,
+    ) -> Result<TokenStream, WebCodeGenError> {
+        let diesel_derives = self.diesel_derives(enable_belongs_to, conn)?;
+        Ok(if diesel_derives.is_empty() {
+            TokenStream::new()
+        } else {
+            quote! {
+                #[derive(#(#diesel_derives),*)]
             }
         })
     }
@@ -55,6 +124,8 @@ impl Table {
     ///
     /// # Arguments
     ///
+    /// * `enable_yew` - Whether to include Yew properties.
+    /// * `enable_insertables` - Whether to implement `IdOrBuilder`.
     /// * `conn` - The database connection.
     ///
     /// # Errors
@@ -86,7 +157,7 @@ impl Table {
                 pub #column_attribute: #column_type
             });
         }
-        let mut diesel_derives_decorator = self.diesel_derives_decorator(conn)?;
+        let mut diesel_derives_decorator = self.diesel_derives_decorator(true, conn)?;
         let primary_key_decorator = self.primary_key_decorator(conn)?;
         let mut default_derives = vec![quote!(Debug), quote!(Clone), quote!(PartialEq)];
         if self.supports_copy(conn)? {

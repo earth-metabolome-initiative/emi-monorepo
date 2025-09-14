@@ -25,6 +25,11 @@ impl core::str::FromStr for SpatialRefSyAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder
+{
+    type Attribute = SpatialRefSyAttribute;
+}
 impl core::fmt::Display for SpatialRefSyAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -324,10 +329,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy,
-            Error = web_common_traits::database::InsertError<SpatialRefSyAttribute>,
+            Attribute = SpatialRefSyAttribute,
         >,
 {
-    type Attribute = SpatialRefSyAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

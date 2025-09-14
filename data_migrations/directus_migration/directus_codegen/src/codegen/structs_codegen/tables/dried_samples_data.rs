@@ -241,32 +241,6 @@ impl DriedSamplesDatum {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_date_created(
-        date_created: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data;
-        Self::table()
-            .filter(dried_samples_data::date_created.eq(date_created))
-            .order_by(dried_samples_data::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_date_updated(
-        date_updated: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::dried_samples_data::dried_samples_data;
-        Self::table()
-            .filter(dried_samples_data::date_updated.eq(date_updated))
-            .order_by(dried_samples_data::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_uuid_dried_sample(
         uuid_dried_sample: ::rosetta_uuid::Uuid,
         conn: &mut diesel::PgConnection,

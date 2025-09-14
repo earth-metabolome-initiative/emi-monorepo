@@ -19,6 +19,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttr
         Self::DigitalAsset(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for SpectrumExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SpectrumAttribute {
@@ -36,29 +41,10 @@ impl core::str::FromStr for SpectrumAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
-    > for SpectrumAttribute
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSpectrumBuilder<T1>
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute::Id.into(),
-        )
-    }
-}
-impl<Asset>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetBuilder<Asset>,
-    > for SpectrumAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = SpectrumAttribute;
 }
 impl core::fmt::Display for SpectrumAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -80,20 +66,6 @@ pub struct InsertableSpectrum {
     pub(crate) spectra_collection_id: ::rosetta_uuid::Uuid,
 }
 impl InsertableSpectrum {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset::read(self.id, conn)
-    }
     pub fn spectra_collection<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -485,12 +457,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::spectra::Spectrum,
-            Error = web_common_traits::database::InsertError<SpectrumAttribute>,
+            Attribute = SpectrumAttribute,
         >,
     DigitalAsset:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attribute = SpectrumAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

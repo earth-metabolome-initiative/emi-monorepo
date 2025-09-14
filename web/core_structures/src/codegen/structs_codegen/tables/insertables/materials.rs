@@ -23,6 +23,11 @@ impl core::str::FromStr for MaterialAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableMaterialBuilder
+{
+    type Attribute = MaterialAttribute;
+}
 impl core::fmt::Display for MaterialAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -286,10 +291,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::materials::Material,
-            Error = web_common_traits::database::InsertError<MaterialAttribute>,
+            Attribute = MaterialAttribute,
         >,
 {
-    type Attribute = MaterialAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

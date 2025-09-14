@@ -1,3 +1,14 @@
+impl<PhysicalAssetModel> web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotBuilder<
+        PhysicalAssetModel,
+    >
+{
+    type Row =
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot;
+    type InsertableVariant =
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLot;
+    type UserId = i32;
+}
 impl<
     C: diesel::connection::LoadConnection,
     PhysicalAssetModel,
@@ -16,51 +27,31 @@ where
         C,
         crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
     >,
-    C: diesel::connection::LoadConnection,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
-    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
-        PhysicalAssetModel,
-        EffectiveExtensionAttribute = <PhysicalAssetModel as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::CommercialProductLotExtensionAttribute: From<
+        <PhysicalAssetModel as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLot;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
-    >;
-    type UserId = i32;
     fn insert(
         mut self,
         user_id: Self::UserId,
         conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    ) -> Result<
+        Self::Row,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+        >,
+    > {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use web_common_traits::database::Updatable;
         use web_common_traits::database::MostConcreteTable;
         self.set_most_concrete_table("commercial_product_lots");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLot = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.id(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
@@ -71,7 +62,12 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::InsertableVariant, Self::Error> {
+    ) -> Result<
+        Self::InsertableVariant,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+        >,
+    > {
         let lot = self
             .lot
             .ok_or(
@@ -91,10 +87,9 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(|attribute| {
-                    <crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute as web_common_traits::database::FromExtensionAttribute<
-                        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
-                        PhysicalAssetModel,
-                    >>::from_extension_attribute(attribute)
+                    crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute::Extension(
+                        From::from(attribute),
+                    )
                 })
             })?;
         Ok(Self::InsertableVariant {

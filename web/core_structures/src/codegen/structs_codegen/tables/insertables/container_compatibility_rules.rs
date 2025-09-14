@@ -25,6 +25,10 @@ impl core::str::FromStr for ContainerCompatibilityRuleAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+for crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleBuilder {
+    type Attribute = ContainerCompatibilityRuleAttribute;
+}
 impl core::fmt::Display for ContainerCompatibilityRuleAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -415,12 +419,9 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
-        Error = web_common_traits::database::InsertError<
-            ContainerCompatibilityRuleAttribute,
-        >,
+        Attribute = ContainerCompatibilityRuleAttribute,
     >,
 {
-    type Attribute = ContainerCompatibilityRuleAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

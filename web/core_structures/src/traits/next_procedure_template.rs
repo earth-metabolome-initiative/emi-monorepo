@@ -32,27 +32,19 @@ where
     /// # Errors
     ///
     /// * If the insertion fails, an `InsertError` is returned.
-    fn append<C1, C2>(
+    fn append(
         &self,
-        current_procedure: &C1,
-        successor_procedure: &C2,
+        current_procedure: &Box<dyn ExtensionTable<ProcedureTemplate>>,
+        successor_procedure: &Box<dyn ExtensionTable<ProcedureTemplate>>,
         user: &crate::User,
         conn: &mut diesel::PgConnection,
-    ) -> Result<crate::NextProcedureTemplate, InsertError<NextProcedureTemplateAttribute>>
-    where
-        C1: ExtensionTable<ProcedureTemplate>,
-        C2: ExtensionTable<ProcedureTemplate>,
-        for<'a> &'a C1: diesel::Identifiable<Id = &'a i32>,
-        for<'a> &'a C2: diesel::Identifiable<Id = &'a i32>,
-    {
-        use diesel::Identifiable;
-
+    ) -> Result<crate::NextProcedureTemplate, InsertError<NextProcedureTemplateAttribute>> {
         // Then, we create a new NextProcedureTemplate entry linking the parent
         // procedure to the new child procedure.
         let next_procedure = NextProcedureTemplate::new()
-            .parent(*self.id())?
-            .predecessor(*current_procedure.id())?
-            .successor(*successor_procedure.id())?
+            .parent(self.primary_key())?
+            .predecessor(current_procedure.primary_key())?
+            .successor(successor_procedure.primary_key())?
             .created_by(user.id)?
             .insert(user.id, conn)?;
 
@@ -70,21 +62,18 @@ where
     /// # Errors
     ///
     /// * If the insertion fails, an `InsertError` is returned.
-    fn extend<C>(
+    fn extend(
         &self,
-        children: &[&C],
+        children: &[Box<dyn ExtensionTable<ProcedureTemplate>>],
         user: &crate::User,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<crate::NextProcedureTemplate>, InsertError<NextProcedureTemplateAttribute>>
-    where
-        C: ExtensionTable<ProcedureTemplate>,
-        for<'a> &'a C: diesel::Identifiable<Id = &'a i32>,
     {
         children
             .iter()
             .zip(children.iter().skip(1))
             .map(|(current_procedure, successor_procedure)| {
-                self.append(*current_procedure, *successor_procedure, user, conn)
+                self.append(current_procedure, successor_procedure, user, conn)
             })
             .collect()
     }

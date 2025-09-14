@@ -3,7 +3,7 @@
 use std::{fmt::Display, rc::Rc};
 
 use common_traits::{
-    builder::IsCompleteBuilder,
+    builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
 
@@ -149,9 +149,12 @@ impl IsCompleteBuilder for FlowchartEdgeBuilder {
     }
 }
 
+impl Attributed for FlowchartEdgeBuilder {
+    type Attribute = FlowchartEdgeAttribute;
+}
+
 impl Builder for FlowchartEdgeBuilder {
     type Error = EdgeError<Self::Attribute>;
-    type Attribute = FlowchartEdgeAttribute;
     type Object = FlowchartEdge;
 
     fn build(self) -> Result<Self::Object, Self::Error> {

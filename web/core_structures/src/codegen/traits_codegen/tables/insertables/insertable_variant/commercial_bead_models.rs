@@ -1,3 +1,14 @@
+impl<BeadModel, CommercialProduct> web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModelBuilder<
+        BeadModel,
+        CommercialProduct,
+    >
+{
+    type Row = crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel;
+    type InsertableVariant =
+        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModel;
+    type UserId = i32;
+}
 impl<
     C: diesel::connection::LoadConnection,
     BeadModel,
@@ -19,38 +30,28 @@ where
         crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel,
     >,
     BeadModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    C: diesel::connection::LoadConnection,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
-        BeadModel,
-        EffectiveExtensionAttribute = <BeadModel as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelExtensionAttribute: From<
+        <BeadModel as common_traits::builder::Attributed>::Attribute,
     >,
-    crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-        CommercialProduct,
-        EffectiveExtensionAttribute = <CommercialProduct as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelExtensionAttribute: From<
+        <CommercialProduct as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBeadModel;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
-    >;
-    type UserId = i32;
     fn insert(
         mut self,
         user_id: Self::UserId,
         conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    ) -> Result<
+        Self::Row,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
+        >,
+    > {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         use web_common_traits::database::MostConcreteTable;
@@ -67,7 +68,12 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::InsertableVariant, Self::Error> {
+    ) -> Result<
+        Self::InsertableVariant,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
+        >,
+    > {
         let bead_model = self
             .bead_model
             .ok_or(
@@ -81,10 +87,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
-                            BeadModel,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             let _ = self
@@ -93,10 +98,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-                            CommercialProduct,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             id
@@ -106,10 +110,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-                            CommercialProduct,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             let _ = self
@@ -118,10 +121,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
-                            BeadModel,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             id

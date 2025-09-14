@@ -20,6 +20,11 @@ impl core::str::FromStr for ColorAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableColorBuilder
+{
+    type Attribute = ColorAttribute;
+}
 impl core::fmt::Display for ColorAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -229,10 +234,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::colors::Color,
-            Error = web_common_traits::database::InsertError<ColorAttribute>,
+            Attribute = ColorAttribute,
         >,
 {
-    type Attribute = ColorAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -50,12 +50,12 @@ pub fn init_dbgi_plan(
 
     dbgi_plan.extend(
         &[
-            &observation_procedure,
-            &part_of_organism_collection,
-            &sample_processing_procedure,
-            &positive_lcms_procedure,
-            &negative_lcms_procedure,
-            &data_enrichment,
+            observation_procedure.into(),
+            part_of_organism_collection.into(),
+            sample_processing_procedure.into(),
+            positive_lcms_procedure.into(),
+            negative_lcms_procedure.into(),
+            data_enrichment.into(),
         ],
         user,
         conn,

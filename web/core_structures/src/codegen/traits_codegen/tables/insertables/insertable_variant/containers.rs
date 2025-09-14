@@ -1,3 +1,13 @@
+impl<PhysicalAsset> web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<
+        PhysicalAsset,
+    >
+{
+    type Row = crate::codegen::structs_codegen::tables::containers::Container;
+    type InsertableVariant =
+        crate::codegen::structs_codegen::tables::insertables::InsertableContainer;
+    type UserId = i32;
+}
 impl<
     C: diesel::connection::LoadConnection,
     PhysicalAsset,
@@ -16,51 +26,31 @@ where
         C,
         crate::codegen::structs_codegen::tables::containers::Container,
     >,
-    C: diesel::connection::LoadConnection,
     PhysicalAsset: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
-    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::ContainerAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
-        PhysicalAsset,
-        EffectiveExtensionAttribute = <PhysicalAsset as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::ContainerExtensionAttribute: From<
+        <PhysicalAsset as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::containers::Container;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableContainer;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
-    >;
-    type UserId = i32;
     fn insert(
         mut self,
         user_id: Self::UserId,
         conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    ) -> Result<
+        Self::Row,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
+        >,
+    > {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use web_common_traits::database::Updatable;
         use web_common_traits::database::MostConcreteTable;
         self.set_most_concrete_table("containers");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableContainer = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.id(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
@@ -71,7 +61,12 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::InsertableVariant, Self::Error> {
+    ) -> Result<
+        Self::InsertableVariant,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
+        >,
+    > {
         let container_model = self
             .container_model
             .ok_or(
@@ -84,10 +79,9 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(|attribute| {
-                    <crate::codegen::structs_codegen::tables::insertables::ContainerAttribute as web_common_traits::database::FromExtensionAttribute<
-                        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
-                        PhysicalAsset,
-                    >>::from_extension_attribute(attribute)
+                    crate::codegen::structs_codegen::tables::insertables::ContainerAttribute::Extension(
+                        From::from(attribute),
+                    )
                 })
             })?;
         Ok(Self::InsertableVariant {

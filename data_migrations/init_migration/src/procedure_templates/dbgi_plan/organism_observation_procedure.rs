@@ -138,13 +138,13 @@ pub(crate) fn organism_observation_procedure(
 
     observation_procedure.extend(
         &[
-            &arrow_reminder,
-            &organism_and_panel_picture.procedure_template(conn)?,
-            &organism_picture.procedure_template(conn)?,
-            &organism_details_picture.procedure_template(conn)?,
-            &organism_collected_part_picture.procedure_template(conn)?,
-            &sample_label_and_panel_picture.procedure_template(conn)?,
-            &organism_geolocation.procedure_template(conn)?,
+            arrow_reminder.into(),
+            organism_and_panel_picture.into(),
+            organism_picture.into(),
+            organism_details_picture.into(),
+            organism_collected_part_picture.into(),
+            sample_label_and_panel_picture.into(),
+            organism_geolocation.into(),
         ],
         user,
         conn,

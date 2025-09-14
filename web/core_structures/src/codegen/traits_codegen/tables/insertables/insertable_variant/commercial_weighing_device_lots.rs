@@ -1,4 +1,16 @@
 impl<
+    CommercialProductLot,
+    WeighingDeviceModel,
+> web_common_traits::database::InsertableVariantMetadata
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLotBuilder<
+    CommercialProductLot,
+    WeighingDeviceModel,
+> {
+    type Row = crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot;
+    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLot;
+    type UserId = i32;
+}
+impl<
     C: diesel::connection::LoadConnection,
     CommercialProductLot,
     WeighingDeviceModel,
@@ -18,7 +30,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot,
     >,
-    C: diesel::connection::LoadConnection,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
@@ -27,56 +38,30 @@ where
         C,
         PrimaryKey = i32,
     >,
-    crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
-        CommercialProductLot,
-        EffectiveExtensionAttribute = <CommercialProductLot as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotExtensionAttribute: From<
+        <CommercialProductLot as common_traits::builder::Attributed>::Attribute,
     >,
-    crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute,
-        WeighingDeviceModel,
-        EffectiveExtensionAttribute = <WeighingDeviceModel as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotExtensionAttribute: From<
+        <WeighingDeviceModel as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLot;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute,
-    >;
-    type UserId = i32;
     fn insert(
         mut self,
         user_id: Self::UserId,
         conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    ) -> Result<
+        Self::Row,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute,
+        >,
+    > {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use web_common_traits::database::Updatable;
         use web_common_traits::database::MostConcreteTable;
         self.set_most_concrete_table("commercial_weighing_device_lots");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceLot = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct
-            .commercial_weighing_device_lots_id_fkey1(conn)?
-            .can_update(user_id, conn)?
-        {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
@@ -87,7 +72,12 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::InsertableVariant, Self::Error> {
+    ) -> Result<
+        Self::InsertableVariant,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute,
+        >,
+    > {
         let product_model = self
             .product_model
             .ok_or(
@@ -101,10 +91,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
-                            CommercialProductLot,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             let _ = self
@@ -113,10 +102,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute,
-                            WeighingDeviceModel,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             id
@@ -126,10 +114,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute,
-                            WeighingDeviceModel,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             let _ = self
@@ -138,10 +125,9 @@ where
                 .mint_primary_key(user_id, conn)
                 .map_err(|err| {
                     err.into_field_name(|attribute| {
-                        <crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute as web_common_traits::database::FromExtensionAttribute<
-                            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
-                            CommercialProductLot,
-                        >>::from_extension_attribute(attribute)
+                        crate::codegen::structs_codegen::tables::insertables::CommercialWeighingDeviceLotAttribute::Extension(
+                            From::from(attribute),
+                        )
                     })
                 })?;
             id

@@ -2,7 +2,8 @@
 //! methods.
 
 use core_structures::{
-    NextProcedureTemplate, ParentProcedureTemplate, ProcedureTemplate, ProcedureTemplateAssetModel,
+    AssetModel, NextProcedureTemplate, ParentProcedureTemplate, ProcedureTemplate,
+    ProcedureTemplateAssetModel,
     codegen::diesel_codegen::tables::{
         next_procedure_templates::next_procedure_templates,
         parent_procedure_templates::parent_procedure_templates,
@@ -22,7 +23,7 @@ use diesel::{
 };
 use web_common_traits::{database::Read, prelude::MostConcreteVariant};
 
-use crate::structs::{Hierarchy, Ownership, TaskGraph};
+use crate::structs::{Hierarchy, HierarchyLike, Ownership, OwnershipLike, TaskGraph};
 
 #[derive(Debug, Clone)]
 /// Struct providing functionalities to help the user concretely build a
@@ -89,6 +90,7 @@ impl ProcedureTemplateGraph {
             Asc<parent_procedure_templates::child>,
         )>>::Output: RunQueryDsl<C> + for<'a> LoadQuery<'a, C, ParentProcedureTemplate>,
         ProcedureTemplate: web_common_traits::database::Read<C>,
+        AssetModel: Read<C>,
         ProcedureTemplateAssetModel: Read<C>,
         C: diesel::connection::LoadConnection,
         ProcedureTemplate: MostConcreteVariant<C, Variant = ProcedureTemplateDAG>,
@@ -112,5 +114,75 @@ impl AsRef<Hierarchy> for ProcedureTemplateGraph {
 impl AsRef<Ownership> for ProcedureTemplateGraph {
     fn as_ref(&self) -> &Ownership {
         &self.ownership
+    }
+}
+
+impl ProcedureTemplateGraph {
+    /// Returns whether the provided procedure template asset model is owned by
+    /// the root procedure template.
+    ///
+    /// # Arguments
+    ///
+    /// * `procedure_template_asset_model` - The procedure template asset model
+    ///   to check ownership for.
+    pub fn root_owned_ptam(
+        &self,
+        procedure_template_asset_model: &ProcedureTemplateAssetModel,
+    ) -> bool {
+        let root_procedure_template = self.root_procedure_template();
+        root_procedure_template.procedure_template
+            == procedure_template_asset_model.procedure_template
+    }
+
+    /// Returns whether the provided procedure template asset model is owned by
+    /// either the root procedure template or by a foreign procedure template in
+    /// the hierarchy.
+    ///
+    /// # Arguments
+    ///
+    /// * `procedure_template_asset_model` - The procedure template asset model
+    ///   to check ownership for.
+    pub fn root_or_foreign_owned_ptam(
+        &self,
+        procedure_template_asset_model: &ProcedureTemplateAssetModel,
+    ) -> bool {
+        self.root_owned_ptam(procedure_template_asset_model)
+            || self.foreign_owned_ptam(procedure_template_asset_model)
+    }
+
+    /// Returns an iterator over the procedure template asset models which are
+    /// either owned by the root procedure template or by the foreign
+    /// procedure templates in the hierarchy rooted at the given procedure
+    /// template.
+    pub fn root_and_foreign_ptams(&self) -> impl Iterator<Item = &ProcedureTemplateAssetModel> {
+        self.procedure_template_asset_models().filter(|ptam| self.root_or_foreign_owned_ptam(ptam))
+    }
+
+    /// Returns the task graph of the given procedure template, if it exists.
+    pub fn task_graph_of(&self, procedure_template: &ProcedureTemplate) -> Option<&TaskGraph> {
+        let procedure_node_id = self.procedure_node_id(procedure_template);
+        self.task_graphs[procedure_node_id].as_ref()
+    }
+
+    /// Returns an iterator over the
+
+    /// Returns the root analogue of the given procedure template
+    /// asset model.
+    ///
+    /// # Arguments
+    ///
+    /// * `procedure_template_asset_model` - The procedure template asset model
+    ///   to find the analogue for.
+    ///
+    /// # Panics
+    ///
+    /// * If the provided procedure template asset model is not owned by either
+    ///   the root procedure template
+    pub fn root_analogue_ptam(
+        &self,
+        procedure_template_asset_model: &ProcedureTemplateAssetModel,
+    ) -> &ProcedureTemplateAssetModel {
+        assert!(self.root_owned_ptam(procedure_template_asset_model));
+        todo!()
     }
 }

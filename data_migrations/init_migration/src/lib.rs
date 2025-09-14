@@ -1,3 +1,4 @@
+#![recursion_limit = "64"]
 #![doc = include_str!("../README.md")]
 use diesel::{Connection, PgConnection};
 

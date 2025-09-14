@@ -47,7 +47,7 @@ impl Node for FlowchartNode {
         self.node.label()
     }
 
-    fn id(&self) -> usize {
+    fn id(&self) -> u64 {
         self.node.id()
     }
 

@@ -14,12 +14,8 @@ pub fn create_photograph<C: LoadConnection>(
     conn: &mut C,
 ) -> Result<Photograph, InsertError<PhotographAttribute>>
 where
-    <Photograph as Insertable>::InsertableBuilder: InsertableVariant<
-            C,
-            Error = InsertError<PhotographAttribute>,
-            Row = Photograph,
-            UserId = i32,
-        >,
+    <Photograph as Insertable>::InsertableBuilder:
+        InsertableVariant<C, Attribute = PhotographAttribute, Row = Photograph, UserId = i32>,
 {
     let info = infer::get(photograph).expect("Failed to infer document type");
 

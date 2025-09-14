@@ -3,7 +3,7 @@
 
 use std::{fmt::Display, rc::Rc};
 
-use common_traits::prelude::Builder;
+use common_traits::{builder::Attributed, prelude::Builder};
 
 use crate::{
     shared::{StyleClass, StyleClassError},
@@ -28,9 +28,9 @@ impl<N: Node + Display, E: Edge<Node = N> + Display, C: Configuration> Diagram
     for GenericDiagram<N, E, C>
 where
     crate::errors::Error<
-        <N::Builder as Builder>::Attribute,
-        <E::Builder as Builder>::Attribute,
-        <C::Builder as Builder>::Attribute,
+        <N::Builder as Attributed>::Attribute,
+        <E::Builder as Attributed>::Attribute,
+        <C::Builder as Attributed>::Attribute,
     >: From<<N::Builder as Builder>::Error>
         + From<<E::Builder as Builder>::Error>
         + From<<C::Builder as Builder>::Error>,
@@ -56,8 +56,11 @@ where
         self.style_classes.iter().map(AsRef::as_ref)
     }
 
-    fn get_node_by_label(&self, label: &str) -> Option<Rc<Self::Node>> {
-        self.nodes.iter().find(|node| node.label() == label).cloned()
+    fn get_node_by_id(&self, id: u64) -> Option<Rc<Self::Node>> {
+        self.nodes
+            .binary_search_by_key(&id, |node| node.id())
+            .ok()
+            .map(|index| self.nodes[index].clone())
     }
 
     fn get_style_class_by_name(&self, name: &str) -> Option<Rc<StyleClass>> {
@@ -101,9 +104,9 @@ impl<N: Node + Display, E: Edge<Node = N> + Display, C: Configuration> DiagramBu
     for GenericDiagramBuilder<N, E, C>
 where
     crate::errors::Error<
-        <N::Builder as Builder>::Attribute,
-        <E::Builder as Builder>::Attribute,
-        <C::Builder as Builder>::Attribute,
+        <N::Builder as Attributed>::Attribute,
+        <E::Builder as Attributed>::Attribute,
+        <C::Builder as Attributed>::Attribute,
     >: From<<N::Builder as Builder>::Error>
         + From<<E::Builder as Builder>::Error>
         + From<<C::Builder as Builder>::Error>,
@@ -117,9 +120,9 @@ where
     type Configuration = C;
     type ConfigurationBuilder = C::Builder;
     type Error = crate::errors::Error<
-        <Self::NodeBuilder as Builder>::Attribute,
-        <Self::EdgeBuilder as Builder>::Attribute,
-        <Self::ConfigurationBuilder as Builder>::Attribute,
+        <Self::NodeBuilder as Attributed>::Attribute,
+        <Self::EdgeBuilder as Attributed>::Attribute,
+        <Self::ConfigurationBuilder as Attributed>::Attribute,
     >;
 
     fn configuration(
@@ -152,12 +155,15 @@ where
         Ok(rc)
     }
 
-    fn node(&mut self, node: Self::NodeBuilder) -> Result<Rc<Self::Node>, Self::Error> {
+    fn node(&mut self, mut node: Self::NodeBuilder) -> Result<Rc<Self::Node>, Self::Error> {
         let number_of_nodes = self.generic_diagram.nodes.len();
-        let node: N = {
+        {
             use crate::traits::node_builder::NodeBuilder;
-            node.id(number_of_nodes).build()?
-        };
+            if node.get_id().is_none() {
+                node = node.id(number_of_nodes as u64);
+            }
+        }
+        let node = node.build()?;
 
         for class in node.classes() {
             if !self.generic_diagram.style_classes.iter().any(|sc| sc.name() == class.name()) {
@@ -170,8 +176,8 @@ where
         Ok(rc)
     }
 
-    fn get_node_by_label(&self, label: &str) -> Option<Rc<Self::Node>> {
-        self.generic_diagram.get_node_by_label(label)
+    fn get_node_by_id(&self, id: u64) -> Option<Rc<Self::Node>> {
+        self.generic_diagram.get_node_by_id(id)
     }
 
     fn get_style_class_by_name(&self, name: &str) -> Option<Rc<StyleClass>> {

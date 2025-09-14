@@ -760,6 +760,11 @@ impl From<crate::codegen::structs_codegen::tables::weighing_device_models::Weigh
         AssetModelDAG::WeighingDeviceModel(value)
     }
 }
+impl web_common_traits::database::MostConcreteVariantMetadata
+    for crate::codegen::structs_codegen::tables::asset_models::AssetModel
+{
+    type Variant = AssetModelDAG;
+}
 impl<C> web_common_traits::database::MostConcreteVariant<C>
 for crate::codegen::structs_codegen::tables::asset_models::AssetModel
 where
@@ -917,7 +922,6 @@ where
         C,
     >,
 {
-    type Variant = AssetModelDAG;
     fn most_concrete_variant(
         &self,
         conn: &mut C,

@@ -135,19 +135,6 @@ impl DirectusNotification {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_timestamp(
-        timestamp: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::directus_notifications::directus_notifications;
-        Self::table()
-            .filter(directus_notifications::timestamp.eq(timestamp))
-            .order_by(directus_notifications::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_status(
         status: &str,
         conn: &mut diesel::PgConnection,

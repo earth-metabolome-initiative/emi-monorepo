@@ -184,27 +184,25 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .insert(user.id, conn)?;
 
     let subprocedures = vec![
-        freezing_procedure.procedure_template(conn)?,
-        freeze_drying_procedure.procedure_template(conn)?,
-        falcon_storage_procedure.procedure_template(conn)?,
-        fractioning_procedure.procedure_template(conn)?,
-        first_ball_mill_procedure.procedure_template(conn)?,
-        pouring_solvent_procedure.procedure_template(conn)?,
-        second_ball_mill_procedure.procedure_template(conn)?,
-        centrifuge_procedure.procedure_template(conn)?,
-        prelevate_supernatant_procedure.procedure_template(conn)?,
-        dispose_of_eppendorf_tube_procedure.procedure_template(conn)?,
-        dispose_of_pipette_tips_procedure.procedure_template(conn)?,
+        freezing_procedure.into(),
+        freeze_drying_procedure.into(),
+        falcon_storage_procedure.into(),
+        fractioning_procedure.into(),
+        first_ball_mill_procedure.into(),
+        pouring_solvent_procedure.into(),
+        second_ball_mill_procedure.into(),
+        centrifuge_procedure.into(),
+        prelevate_supernatant_procedure.into(),
+        dispose_of_eppendorf_tube_procedure.into(),
+        dispose_of_pipette_tips_procedure.into(),
         // TODO: potentially dispose of the conical tube if it is empty!
-        capping_procedure.procedure_template(conn)?,
-        long_term_storage_vial_storage_procedure.procedure_template(conn)?,
+        capping_procedure.into(),
+        long_term_storage_vial_storage_procedure.into(),
         // TODO: store the long term storage vial rack in a -80 freezer
         // TODO: store the non-disposed-of conical tube rack in a room temperature shelf
     ];
 
-    let subprocedures_ref = subprocedures.iter().collect::<Vec<_>>();
-
-    dbgi_sample_processing_procedure.extend(&subprocedures_ref, user, conn)?;
+    dbgi_sample_processing_procedure.extend(&subprocedures, user, conn)?;
 
     Ok(dbgi_sample_processing_procedure)
 }

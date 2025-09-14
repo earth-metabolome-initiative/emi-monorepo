@@ -1,3 +1,11 @@
+impl<ProcedureTemplate> web_common_traits::database::InsertableVariantMetadata
+for crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplateBuilder<
+    ProcedureTemplate,
+> {
+    type Row = crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate;
+    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplate;
+    type UserId = i32;
+}
 impl<
     C: diesel::connection::LoadConnection,
     ProcedureTemplate,
@@ -16,7 +24,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
     >,
-    C: diesel::connection::LoadConnection,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
@@ -32,59 +39,27 @@ where
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
-        ProcedureTemplate,
-        EffectiveExtensionAttribute = <ProcedureTemplate as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateExtensionAttribute: From<
+        <ProcedureTemplate as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplate;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute,
-    >;
-    type UserId = i32;
     fn insert(
         mut self,
         user_id: Self::UserId,
         conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    ) -> Result<
+        Self::Row,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute,
+        >,
+    > {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use web_common_traits::database::Updatable;
         use web_common_traits::database::MostConcreteTable;
         self.set_most_concrete_table("centrifuge_procedure_templates");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureTemplate = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct
-            .procedure_template_centrifuged_with_model(conn)?
-            .can_update(user_id, conn)?
-        {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
-        if !insertable_struct.procedure_template(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
@@ -95,7 +70,12 @@ where
         mut self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::InsertableVariant, Self::Error> {
+    ) -> Result<
+        Self::InsertableVariant,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute,
+        >,
+    > {
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let web_common_traits::database::IdOrBuilder::Id(
@@ -171,10 +151,9 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(|attribute| {
-                    <crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute as web_common_traits::database::FromExtensionAttribute<
-                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
-                        ProcedureTemplate,
-                    >>::from_extension_attribute(attribute)
+                    crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureTemplateAttribute::Extension(
+                        From::from(attribute),
+                    )
                 })
             })?;
         let procedure_template_centrifuged_with_model = match self

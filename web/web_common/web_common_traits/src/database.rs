@@ -21,13 +21,14 @@ pub use deletable::{Deletable, DeleteError, DeleteFromVec};
 pub use extension::ExtensionTable;
 pub use foreign::{ForeignKeys, HasForeignKeys};
 pub use insertable::{
-    IdOrBuilder, InsertError, Insertable, InsertableVariant, MostConcreteTable, SetPrimaryKey,
+    IdOrBuilder, InsertError, Insertable, InsertableVariant, InsertableVariantMetadata,
+    MostConcreteTable, SetPrimaryKey,
 };
-pub use most_concrete_variant::MostConcreteVariant;
+pub use most_concrete_variant::{MostConcreteVariant, MostConcreteVariantMetadata};
 pub use primary_key_like::{MaybePrimaryKeyLike, PrimaryKeyLike};
 pub use read::{BoundedRead, BoundedReadDispatch, Read, ReadDispatch};
 pub use table_name::TableName;
 pub use tabular::{Row, Rows, StaticTabular, Tabular};
-pub use try_insert::{DefaultExtensionAttribute, FromExtensionAttribute, TryInsertGeneric};
+pub use try_insert::TryInsertGeneric;
 pub use updatable::Updatable;
 pub use upsertable::{UpsertVec, Upsertable};

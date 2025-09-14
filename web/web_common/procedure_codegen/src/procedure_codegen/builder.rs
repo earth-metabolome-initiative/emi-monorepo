@@ -2,7 +2,7 @@
 use std::{fmt::Display, path::Path};
 
 use common_traits::{
-    builder::IsCompleteBuilder,
+    builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
 use webcodegen::TableExtensionNetwork;
@@ -136,8 +136,11 @@ impl<'a> IsCompleteBuilder for ProcedureCodegenBuilder<'a> {
     }
 }
 
-impl<'a> Builder for ProcedureCodegenBuilder<'a> {
+impl<'a> Attributed for ProcedureCodegenBuilder<'a> {
     type Attribute = ProcedureCodegenAttribute;
+}
+
+impl<'a> Builder for ProcedureCodegenBuilder<'a> {
     type Error = ProcedureCodegenBuilderError;
     type Object = ProcedureCodegen<'a>;
 

@@ -29,6 +29,11 @@ impl core::str::FromStr for LoginProviderAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder
+{
+    type Attribute = LoginProviderAttribute;
+}
 impl core::fmt::Display for LoginProviderAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -407,10 +412,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
-            Error = web_common_traits::database::InsertError<LoginProviderAttribute>,
+            Attribute = LoginProviderAttribute,
         >,
 {
-    type Attribute = LoginProviderAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

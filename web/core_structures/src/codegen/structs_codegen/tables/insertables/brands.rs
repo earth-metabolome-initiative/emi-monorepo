@@ -26,6 +26,11 @@ impl core::str::FromStr for BrandAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableBrandBuilder
+{
+    type Attribute = BrandAttribute;
+}
 impl core::fmt::Display for BrandAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -396,10 +401,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::brands::Brand,
-            Error = web_common_traits::database::InsertError<BrandAttribute>,
+            Attribute = BrandAttribute,
         >,
 {
-    type Attribute = BrandAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -22,6 +22,11 @@ impl core::str::FromStr for TaxonAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableTaxonBuilder
+{
+    type Attribute = TaxonAttribute;
+}
 impl core::fmt::Display for TaxonAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -272,10 +277,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::taxa::Taxon,
-            Error = web_common_traits::database::InsertError<TaxonAttribute>,
+            Attribute = TaxonAttribute,
         >,
 {
-    type Attribute = TaxonAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -25,6 +25,11 @@ impl core::str::FromStr for NextProcedureTemplateAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableNextProcedureTemplateBuilder
+{
+    type Attribute = NextProcedureTemplateAttribute;
+}
 impl core::fmt::Display for NextProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -452,10 +457,9 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate,
-        Error = web_common_traits::database::InsertError<NextProcedureTemplateAttribute>,
+        Attribute = NextProcedureTemplateAttribute,
     >,
 {
-    type Attribute = NextProcedureTemplateAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

@@ -67,58 +67,6 @@ impl web_common_traits::database::PrimaryKeyLike for OrganismModel {
     }
 }
 impl OrganismModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel::read(
-            self.id, conn,
-        )
-    }
-    pub fn from_id<C>(id: i32, conn: &mut C) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::organism_models::organism_models::id as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::organism_models::organism_models::id as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::organism_models::organism_models::id,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::organism_models::organism_models::id as diesel::expression_methods::EqAll<
-                i32,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::organism_models::organism_models::id,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::organism_models::organism_models;
-        Self::table()
-            .filter(organism_models::id.eq(id))
-            .order_by(organism_models::id.asc())
-            .load::<Self>(conn)
-    }
     #[cfg(feature = "postgres")]
     pub fn from_parent_model(
         parent_model: i32,
@@ -162,47 +110,6 @@ impl OrganismModel {
             .first::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_parent_model_and_id(
-        parent_model: i32,
-        id: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl,
-            SelectableHelper, associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, organism_models::organism_models,
-        };
-        Self::table()
-            .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
-            .filter(asset_models::parent_model.eq(parent_model).and(asset_models::id.eq(id)))
-            .order_by(organism_models::id.asc())
-            .select(Self::as_select())
-            .first::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_most_concrete_table(
-        most_concrete_table: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, organism_models::organism_models,
-        };
-        Self::table()
-            .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
-            .filter(asset_models::most_concrete_table.eq(most_concrete_table))
-            .order_by(organism_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_description(
         description: &str,
         conn: &mut diesel::PgConnection,
@@ -243,26 +150,6 @@ impl OrganismModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, organism_models::organism_models,
-        };
-        Self::table()
-            .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
-            .filter(asset_models::created_at.eq(created_at))
-            .order_by(organism_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
     pub fn from_updated_by(
         updated_by: i32,
         conn: &mut diesel::PgConnection,
@@ -278,26 +165,6 @@ impl OrganismModel {
         Self::table()
             .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
             .filter(asset_models::updated_by.eq(updated_by))
-            .order_by(organism_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_at(
-        updated_at: ::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, organism_models::organism_models,
-        };
-        Self::table()
-            .inner_join(asset_models::table.on(organism_models::id.eq(asset_models::id)))
-            .filter(asset_models::updated_at.eq(updated_at))
             .order_by(organism_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

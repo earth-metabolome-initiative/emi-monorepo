@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS commercial_products (
 	id INTEGER PRIMARY KEY REFERENCES asset_models(id),
 	deprecation_date TIMESTAMP WITH TIME ZONE,
-	brand_id INTEGER NOT NULL REFERENCES brands(id)
+	brand_id INTEGER NOT NULL REFERENCES brands(id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS commercial_weighing_device_models (
 	id INTEGER PRIMARY KEY,

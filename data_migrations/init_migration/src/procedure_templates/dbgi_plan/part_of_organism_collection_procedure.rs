@@ -121,12 +121,12 @@ pub(crate) fn part_of_organism_collection(
 
     collection.extend(
         &[
-            &gloves_reminder,
-            &sterilization_reminder,
-            &sample_harvesting.procedure_template(conn)?,
-            &coffee_filter_wrapping.procedure_template(conn)?,
-            &place_in_tube.procedure_template(conn)?,
-            &place_in_storage_box.procedure_template(conn)?,
+            gloves_reminder.into(),
+            sterilization_reminder.into(),
+            sample_harvesting.into(),
+            coffee_filter_wrapping.into(),
+            place_in_tube.into(),
+            place_in_storage_box.into(),
         ],
         user,
         conn,

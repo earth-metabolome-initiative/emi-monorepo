@@ -21,6 +21,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::ProcedureTemplat
         Self::ProcedureTemplate(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for WeighingProcedureTemplateExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum WeighingProcedureTemplateAttribute {
@@ -81,30 +86,11 @@ impl core::str::FromStr for WeighingProcedureTemplateAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
-    > for WeighingProcedureTemplateAttribute
-{
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::ProcedureTemplate
-                .into(),
-        )
-    }
-}
-impl
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateBuilder,
-    > for WeighingProcedureTemplateAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+impl<T1> common_traits::builder::Attributed
+for crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureTemplateBuilder<
+    T1,
+> {
+    type Attribute = WeighingProcedureTemplateAttribute;
 }
 impl core::fmt::Display for WeighingProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -144,23 +130,6 @@ pub struct InsertableWeighingProcedureTemplate {
     pub(crate) procedure_template_weighed_with_model: i32,
 }
 impl InsertableWeighingProcedureTemplate {
-    pub fn procedure_template<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
-            self.procedure_template,
-            conn,
-        )
-    }
     #[cfg(feature = "postgres")]
     pub fn weighing_procedure_templates_procedure_template_weighed_c_fkey1(
         &self,
@@ -1018,9 +987,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
-        Error = web_common_traits::database::InsertError<
-            WeighingProcedureTemplateAttribute,
-        >,
+        Attribute = WeighingProcedureTemplateAttribute,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
         C,
@@ -1030,7 +997,6 @@ where
         C,
     >,
 {
-    type Attribute = WeighingProcedureTemplateAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

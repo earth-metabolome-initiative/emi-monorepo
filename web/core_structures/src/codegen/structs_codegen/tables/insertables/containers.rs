@@ -19,6 +19,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAtt
         Self::PhysicalAsset(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for ContainerExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ContainerAttribute {
@@ -36,29 +41,10 @@ impl core::str::FromStr for ContainerAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
-    > for ContainerAttribute
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder<T1>
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute::Id.into(),
-        )
-    }
-}
-impl<Asset>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetBuilder<Asset>,
-    > for ContainerAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = ContainerAttribute;
 }
 impl core::fmt::Display for ContainerAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -96,37 +82,6 @@ impl InsertableContainer {
             self.container_model,
             conn,
         )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn containers_id_container_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<crate::codegen::structs_codegen::tables::assets::Asset, diesel::result::Error> {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::assets::Asset::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(&self.id).and(
-                    crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
-                        .eq(&self.container_model),
-                ),
-            )
-            .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
-    }
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(self.id, conn)
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -563,12 +518,11 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::containers::Container,
-            Error = web_common_traits::database::InsertError<ContainerAttribute>,
+            Attribute = ContainerAttribute,
         >,
     PhysicalAsset:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attribute = ContainerAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

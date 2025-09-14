@@ -4,7 +4,7 @@
 use std::{fmt::Display, rc::Rc};
 
 use common_traits::{
-    builder::IsCompleteBuilder,
+    builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
 
@@ -133,8 +133,11 @@ impl IsCompleteBuilder for FlowchartNodeBuilder {
     }
 }
 
-impl Builder for FlowchartNodeBuilder {
+impl Attributed for FlowchartNodeBuilder {
     type Attribute = FlowchartNodeAttribute;
+}
+
+impl Builder for FlowchartNodeBuilder {
     type Object = FlowchartNode;
     type Error = NodeError<Self::Attribute>;
 
@@ -158,14 +161,22 @@ impl Builder for FlowchartNodeBuilder {
 impl NodeBuilder for FlowchartNodeBuilder {
     type Node = FlowchartNode;
 
-    fn id(mut self, id: usize) -> Self {
+    fn id(mut self, id: u64) -> Self {
         self.builder = self.builder.id(id);
         self
+    }
+
+    fn get_id(&self) -> Option<u64> {
+        self.builder.get_id()
     }
 
     fn label<S: ToString>(mut self, label: S) -> Result<Self, Self::Error> {
         self.builder = self.builder.label(label)?;
         Ok(self)
+    }
+
+    fn get_label(&self) -> Option<&String> {
+        self.builder.get_label()
     }
 
     fn style_class(mut self, style_class: Rc<StyleClass>) -> Result<Self, StyleClassError> {

@@ -55,6 +55,11 @@ impl core::str::FromStr for ProjectAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableProjectBuilder
+{
+    type Attribute = ProjectAttribute;
+}
 impl core::fmt::Display for ProjectAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -977,10 +982,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::projects::Project,
-            Error = web_common_traits::database::InsertError<ProjectAttribute>,
+            Attribute = ProjectAttribute,
         >,
 {
-    type Attribute = ProjectAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

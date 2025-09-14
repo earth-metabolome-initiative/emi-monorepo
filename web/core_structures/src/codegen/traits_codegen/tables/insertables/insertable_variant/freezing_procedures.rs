@@ -1,3 +1,13 @@
+impl<Procedure> web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedureBuilder<
+        Procedure,
+    >
+{
+    type Row = crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure;
+    type InsertableVariant =
+        crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedure;
+    type UserId = i32;
+}
 impl<
     C: diesel::connection::LoadConnection,
     Procedure,
@@ -16,7 +26,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure,
     >,
-    C: diesel::connection::LoadConnection,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
@@ -35,46 +44,27 @@ where
     crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute: web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
-        Procedure,
-        EffectiveExtensionAttribute = <Procedure as web_common_traits::database::TryInsertGeneric<
-            C,
-        >>::Attribute,
+    crate::codegen::structs_codegen::tables::insertables::FreezingProcedureExtensionAttribute: From<
+        <Procedure as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedure;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute,
-    >;
-    type UserId = i32;
     fn insert(
         mut self,
         user_id: Self::UserId,
         conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    ) -> Result<
+        Self::Row,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute,
+        >,
+    > {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use web_common_traits::database::Updatable;
         use web_common_traits::database::MostConcreteTable;
         self.set_most_concrete_table("freezing_procedures");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableFreezingProcedure = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.procedure(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
@@ -85,7 +75,12 @@ where
         mut self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::InsertableVariant, Self::Error> {
+    ) -> Result<
+        Self::InsertableVariant,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute,
+        >,
+    > {
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
@@ -192,10 +187,9 @@ where
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
                 err.into_field_name(|attribute| {
-                    <crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute as web_common_traits::database::FromExtensionAttribute<
-                        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
-                        Procedure,
-                    >>::from_extension_attribute(attribute)
+                    crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::Extension(
+                        From::from(attribute),
+                    )
                 })
             })?;
         let procedure_frozen_container = match self.procedure_frozen_container {

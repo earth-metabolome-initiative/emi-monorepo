@@ -16,6 +16,11 @@ impl core::str::FromStr for CountryAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCountryBuilder
+{
+    type Attribute = CountryAttribute;
+}
 impl core::fmt::Display for CountryAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -173,10 +178,9 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::countries::Country,
-            Error = web_common_traits::database::InsertError<CountryAttribute>,
+            Attribute = CountryAttribute,
         >,
 {
-    type Attribute = CountryAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

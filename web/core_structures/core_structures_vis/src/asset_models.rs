@@ -8,6 +8,13 @@ use web_common_traits::database::BoundedRead;
 
 use crate::Error;
 
+fn asset_model_hash(asset_model: &AssetModel) -> u64 {
+    use std::hash::{Hash, Hasher};
+    let mut hasher = std::collections::hash_map::DefaultHasher::new();
+    asset_model.hash(&mut hasher);
+    hasher.finish()
+}
+
 /// Generates an Entity-Relationship Diagram (ERD) for the asset models
 /// hierarchy.
 pub fn asset_model_hierarchy(conn: &mut PgConnection) -> Result<ERDiagram, Error> {
@@ -20,7 +27,9 @@ pub fn asset_model_hierarchy(conn: &mut PgConnection) -> Result<ERDiagram, Error
 
     // First, we inser all of the asset_models as nodes.
     for asset_model in &asset_models {
-        builder.node(ERNodeBuilder::default().label(&asset_model.name)?)?;
+        builder.node(
+            ERNodeBuilder::default().id(asset_model_hash(asset_model)).label(&asset_model.name)?,
+        )?;
     }
 
     // Next, we insert the asset_models' parent-child relationships as edges.
@@ -29,10 +38,12 @@ pub fn asset_model_hierarchy(conn: &mut PgConnection) -> Result<ERDiagram, Error
             continue;
         };
 
-        let child_node =
-            builder.get_node_by_label(&asset_model.name).expect("Trackable node not found");
+        let parent_node_id = asset_model_hash(&parent);
+        let child_node_id = asset_model_hash(asset_model);
+
+        let child_node = builder.get_node_by_id(child_node_id).expect("Trackable node not found");
         let parent_node =
-            builder.get_node_by_label(&parent.name).expect("Parent asset_model node not found");
+            builder.get_node_by_id(parent_node_id).expect("Parent asset_model node not found");
 
         builder.edge(EREdgeBuilder::one_to_one(child_node, parent_node).label("child of")?)?;
     }
@@ -41,12 +52,14 @@ pub fn asset_model_hierarchy(conn: &mut PgConnection) -> Result<ERDiagram, Error
     for rule in &compatibility_rules {
         let left_asset_model = rule.left_asset_model(conn)?;
         let right_asset_model = rule.right_asset_model(conn)?;
-        let left_node = builder
-            .get_node_by_label(&left_asset_model.name)
-            .expect("Left asset_model node not found");
-        let right_node = builder
-            .get_node_by_label(&right_asset_model.name)
-            .expect("Right asset_model node not found");
+
+        let left_node_id = asset_model_hash(&left_asset_model);
+        let right_node_id = asset_model_hash(&right_asset_model);
+
+        let left_node =
+            builder.get_node_by_id(left_node_id).expect("Left asset_model node not found");
+        let right_node =
+            builder.get_node_by_id(right_node_id).expect("Right asset_model node not found");
         builder.edge(EREdgeBuilder::one_to_one(left_node, right_node).label("compatible with")?)?;
     }
 

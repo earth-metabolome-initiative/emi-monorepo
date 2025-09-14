@@ -32,6 +32,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::PackagingModelAt
         Self::PackagingModel(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for CommercialPackagingLotExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum CommercialPackagingLotAttribute {
@@ -49,59 +54,12 @@ impl core::str::FromStr for CommercialPackagingLotAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
-    > for CommercialPackagingLotAttribute
-{
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute::Id
-                .into(),
-        )
-    }
-}
-impl<PhysicalAssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotBuilder<
-            PhysicalAssetModel,
-        >,
-    > for CommercialPackagingLotAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
-}
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute,
-    > for CommercialPackagingLotAttribute
-{
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute::Id
-                .into(),
-        )
-    }
-}
-impl<PhysicalAssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder<
-            PhysicalAssetModel,
-        >,
-    > for CommercialPackagingLotAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+impl<T1, T2> common_traits::builder::Attributed
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPackagingLotBuilder<
+    T1,
+    T2,
+> {
+    type Attribute = CommercialPackagingLotAttribute;
 }
 impl core::fmt::Display for CommercialPackagingLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -125,62 +83,6 @@ pub struct InsertableCommercialPackagingLot {
     pub(crate) product_model: i32,
 }
 impl InsertableCommercialPackagingLot {
-    pub fn commercial_packaging_lots_id_fkey<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot::read(
-            self.id, conn,
-        )
-    }
-    pub fn commercial_packaging_lots_id_fkey1<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::packaging_models::PackagingModel::read(
-            self.id, conn,
-        )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn commercial_packaging_lots_id_product_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
-                    .eq(&self.id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
-                            .eq(&self.product_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
-    }
     pub fn product_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -761,7 +663,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_packaging_lots::CommercialPackagingLot,
-        Error = web_common_traits::database::InsertError<CommercialPackagingLotAttribute>,
+        Attribute = CommercialPackagingLotAttribute,
     >,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<
         C,
@@ -769,7 +671,6 @@ where
     >,
     PackagingModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attribute = CommercialPackagingLotAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

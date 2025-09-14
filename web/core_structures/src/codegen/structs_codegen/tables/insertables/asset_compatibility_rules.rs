@@ -22,6 +22,10 @@ impl core::str::FromStr for AssetCompatibilityRuleAttribute {
         }
     }
 }
+impl common_traits::builder::Attributed
+for crate::codegen::structs_codegen::tables::insertables::InsertableAssetCompatibilityRuleBuilder {
+    type Attribute = AssetCompatibilityRuleAttribute;
+}
 impl core::fmt::Display for AssetCompatibilityRuleAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -352,10 +356,9 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
-        Error = web_common_traits::database::InsertError<AssetCompatibilityRuleAttribute>,
+        Attribute = AssetCompatibilityRuleAttribute,
     >,
 {
-    type Attribute = AssetCompatibilityRuleAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

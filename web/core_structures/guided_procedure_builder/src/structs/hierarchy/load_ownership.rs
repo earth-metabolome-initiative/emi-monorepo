@@ -3,9 +3,9 @@
 
 use std::rc::Rc;
 
-use algebra::impls::GenericBiMatrix2D;
+use algebra::impls::{CSR2D, GenericBiMatrix2D};
 use core_structures::{
-    NextProcedureTemplate, ParentProcedureTemplate, Procedure, ProcedureTemplate,
+    AssetModel, NextProcedureTemplate, ParentProcedureTemplate, Procedure, ProcedureTemplate,
     ProcedureTemplateAssetModel,
     codegen::diesel_codegen::tables::{
         next_procedure_templates::next_procedure_templates,
@@ -62,6 +62,7 @@ impl Hierarchy {
         ProcedureTemplate: Read<C>,
         for<'a> <ProcedureTemplateAssetModel as BelongingToDsl<&'a ProcedureTemplate>>::Output:
             LoadQuery<'a, C, ProcedureTemplateAssetModel>,
+        AssetModel: Read<C>,
     {
         let mut foreign_procedure_templates = Vec::new();
         let mut procedure_template_asset_models = Vec::new();
@@ -102,7 +103,12 @@ impl Hierarchy {
         edges.sort_unstable();
         edges.dedup();
 
-        let edges = BiEdgesBuilder::default()
+        let edges: CSR2D<usize, usize, usize> = GenericEdgesBuilder::default()
+            .expected_number_of_edges(edges.len())
+            .expected_shape((
+                self.hierarchy.nodes_vocabulary().len(),
+                procedure_template_asset_models.len(),
+            ))
             .edges(edges)
             .build()
             .expect("Failed to build ownership edges");
@@ -114,6 +120,6 @@ impl Hierarchy {
         ))
         .expect("Failed to build ownership graph");
 
-        Ok(Ownership::new(graph, foreign_procedure_templates))
+        Ok(Ownership::new(graph, foreign_procedure_templates, conn)?)
     }
 }

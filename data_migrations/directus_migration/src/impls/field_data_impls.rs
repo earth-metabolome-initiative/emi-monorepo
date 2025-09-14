@@ -3,10 +3,14 @@
 use std::str::FromStr;
 
 use core_structures::{
-    tables::insertables::AssetSettable, Organism, SampleModel, SampleSource, SampleSourceModel, Soil, User
+    Organism, SampleModel, SampleSource, SampleSourceModel, Soil, User,
+    tables::insertables::AssetSettable,
 };
 use diesel::{OptionalExtension, PgConnection};
-use init_migration::asset_models::{organisms::{organism_model, organism_sample_model}, soils::{soil_model, soil_sample_model}};
+use init_migration::asset_models::{
+    organisms::{organism_model, organism_sample_model},
+    soils::{soil_model, soil_sample_model},
+};
 use web_common_traits::{
     database::{InsertableVariant, Read},
     prelude::Insertable,

@@ -34,6 +34,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::CommercialProduc
         Self::CommercialProduct(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for CommercialWeighingDeviceModelExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum CommercialWeighingDeviceModelAttribute {
@@ -51,59 +56,12 @@ impl core::str::FromStr for CommercialWeighingDeviceModelAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute,
-    > for CommercialWeighingDeviceModelAttribute
-{
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute::Id
-                .into(),
-        )
-    }
-}
-impl<PhysicalAssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableWeighingDeviceModelBuilder<
-            PhysicalAssetModel,
-        >,
-    > for CommercialWeighingDeviceModelAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::WeighingDeviceModelAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
-}
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-    > for CommercialWeighingDeviceModelAttribute
-{
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Id
-                .into(),
-        )
-    }
-}
-impl<AssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-            AssetModel,
-        >,
-    > for CommercialWeighingDeviceModelAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+impl<T1, T2> common_traits::builder::Attributed
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialWeighingDeviceModelBuilder<
+    T1,
+    T2,
+> {
+    type Attribute = CommercialWeighingDeviceModelAttribute;
 }
 impl core::fmt::Display for CommercialWeighingDeviceModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -129,62 +87,6 @@ pub struct InsertableCommercialWeighingDeviceModel {
     pub(crate) weighing_device_model: i32,
 }
 impl InsertableCommercialWeighingDeviceModel {
-    pub fn commercial_weighing_device_models_id_fkey<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel::read(
-            self.id, conn,
-        )
-    }
-    pub fn commercial_weighing_device_models_id_fkey1<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct::read(
-            self.id, conn,
-        )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn commercial_weighing_device_models_id_weighing_device_model_fkey(
-        &self,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-        diesel::result::Error,
-    > {
-        use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
-        };
-        crate::codegen::structs_codegen::tables::asset_models::AssetModel::table()
-            .filter(
-                crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::id
-                    .eq(&self.id)
-                    .and(
-                        crate::codegen::diesel_codegen::tables::asset_models::asset_models::dsl::parent_model
-                            .eq(&self.weighing_device_model),
-                    ),
-            )
-            .first::<
-                crate::codegen::structs_codegen::tables::asset_models::AssetModel,
-            >(conn)
-    }
     pub fn weighing_device_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -732,9 +634,7 @@ where
         C,
         UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel,
-        Error = web_common_traits::database::InsertError<
-            CommercialWeighingDeviceModelAttribute,
-        >,
+        Attribute = CommercialWeighingDeviceModelAttribute,
     >,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
         C,
@@ -745,7 +645,6 @@ where
         PrimaryKey = i32,
     >,
 {
-    type Attribute = CommercialWeighingDeviceModelAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,

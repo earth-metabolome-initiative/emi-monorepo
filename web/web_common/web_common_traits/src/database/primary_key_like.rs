@@ -83,7 +83,6 @@ impl_primary_key_like_for_pk_clone!(String);
 impl<T, PK> PrimaryKeyLike for &T
 where
     T: PrimaryKeyLike<PrimaryKey = PK>,
-    PK: Clone,
 {
     type PrimaryKey = PK;
 
@@ -95,7 +94,6 @@ where
 impl<T, PK> PrimaryKeyLike for Rc<T>
 where
     T: PrimaryKeyLike<PrimaryKey = PK>,
-    PK: Clone,
 {
     type PrimaryKey = PK;
 
@@ -107,7 +105,6 @@ where
 impl<T, PK> PrimaryKeyLike for Box<T>
 where
     T: PrimaryKeyLike<PrimaryKey = PK>,
-    PK: Clone,
 {
     type PrimaryKey = PK;
 

@@ -26,6 +26,10 @@ impl Table {
         let mut foreign_key_methods = TokenStream::new();
 
         for foreign_key_constraint in self.foreign_keys(conn)?.as_ref() {
+            if foreign_key_constraint.includes_local_primary_key(conn)? {
+                continue;
+            }
+
             let foreign_key_table = foreign_key_constraint.foreign_table(conn)?;
 
             let columns = foreign_key_constraint.columns(conn)?;

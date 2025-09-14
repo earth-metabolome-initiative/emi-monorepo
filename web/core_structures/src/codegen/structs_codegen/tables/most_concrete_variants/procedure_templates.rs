@@ -265,6 +265,11 @@ impl From<
         ProcedureTemplateDAG::WeighingProcedureTemplate(value)
     }
 }
+impl web_common_traits::database::MostConcreteVariantMetadata
+    for crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate
+{
+    type Variant = ProcedureTemplateDAG;
+}
 impl<C> web_common_traits::database::MostConcreteVariant<C>
 for crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate
 where
@@ -317,7 +322,6 @@ where
         C,
     >,
 {
-    type Variant = ProcedureTemplateDAG;
     fn most_concrete_variant(
         &self,
         conn: &mut C,

@@ -1,3 +1,10 @@
+impl web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableAssetBuilder
+{
+    type Row = crate::codegen::structs_codegen::tables::assets::Asset;
+    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAsset;
+    type UserId = i32;
+}
 impl<
     C: diesel::connection::LoadConnection,
 > web_common_traits::database::InsertableVariant<C>
@@ -13,40 +20,24 @@ where
         C,
         crate::codegen::structs_codegen::tables::assets::Asset,
     >,
-    C: diesel::connection::LoadConnection,
-    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Updatable<
-        C,
-        UserId = i32,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::assets::Asset;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAsset;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::AssetAttribute,
-    >;
-    type UserId = i32;
     fn insert(
         mut self,
         user_id: Self::UserId,
         conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    ) -> Result<
+        Self::Row,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::AssetAttribute,
+        >,
+    > {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use web_common_traits::database::Updatable;
         use web_common_traits::database::MostConcreteTable;
         self.set_most_concrete_table("assets");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableAsset = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.model(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
         Ok(
             diesel::insert_into(Self::Row::table())
                 .values(insertable_struct)
@@ -57,7 +48,12 @@ where
         self,
         _user_id: i32,
         _conn: &mut C,
-    ) -> Result<Self::InsertableVariant, Self::Error> {
+    ) -> Result<
+        Self::InsertableVariant,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::AssetAttribute,
+        >,
+    > {
         let id = self
             .id
             .ok_or(

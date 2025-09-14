@@ -1,3 +1,11 @@
+impl web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder
+{
+    type Row = crate::codegen::structs_codegen::tables::asset_models::AssetModel;
+    type InsertableVariant =
+        crate::codegen::structs_codegen::tables::insertables::InsertableAssetModel;
+    type UserId = i32;
+}
 impl<
     C: diesel::connection::LoadConnection,
 > web_common_traits::database::InsertableVariant<C>
@@ -13,20 +21,18 @@ where
         C,
         crate::codegen::structs_codegen::tables::asset_models::AssetModel,
     >,
-    C: diesel::connection::LoadConnection,
     Self: web_common_traits::database::MostConcreteTable,
 {
-    type Row = crate::codegen::structs_codegen::tables::asset_models::AssetModel;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModel;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
-    >;
-    type UserId = i32;
     fn insert(
         mut self,
         user_id: Self::UserId,
         conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    ) -> Result<
+        Self::Row,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+        >,
+    > {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
         use web_common_traits::database::MostConcreteTable;
@@ -43,7 +49,12 @@ where
         self,
         _user_id: i32,
         _conn: &mut C,
-    ) -> Result<Self::InsertableVariant, Self::Error> {
+    ) -> Result<
+        Self::InsertableVariant,
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+        >,
+    > {
         let most_concrete_table = self
             .most_concrete_table
             .ok_or(

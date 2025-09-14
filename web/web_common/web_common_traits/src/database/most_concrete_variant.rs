@@ -1,12 +1,15 @@
 //! Submodule providing traits to execute queries to load the most concrete
 //! variant of a table DAG.
 
-/// Trait defining the ability to load the most concrete variant of a table DAG.
-pub trait MostConcreteVariant<C> {
+/// Trait defining metadata for the most concrete variant of a table DAG.
+pub trait MostConcreteVariantMetadata {
     /// Type of the enumeration representing the possible variants
     /// of the table DAG.
     type Variant;
+}
 
+/// Trait defining the ability to load the most concrete variant of a table DAG.
+pub trait MostConcreteVariant<C>: MostConcreteVariantMetadata {
     /// Returns the most concrete variant of the table DAG for the current
     /// instance.
     ///

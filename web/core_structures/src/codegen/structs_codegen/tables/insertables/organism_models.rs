@@ -21,6 +21,11 @@ impl From<crate::codegen::structs_codegen::tables::insertables::SampleSourceMode
         Self::SampleSourceModel(attribute)
     }
 }
+impl From<common_traits::builder::EmptyTuple> for OrganismModelExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum OrganismModelAttribute {
@@ -35,32 +40,10 @@ impl core::str::FromStr for OrganismModelAttribute {
         }
     }
 }
-impl
-    web_common_traits::database::DefaultExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
-    > for OrganismModelAttribute
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableOrganismModelBuilder<T1>
 {
-    /// Returns the default value for the target attribute.
-    fn target_default() -> Self {
-        Self::Extension(
-            crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute::Id
-                .into(),
-        )
-    }
-}
-impl<PhysicalAssetModel>
-    web_common_traits::database::FromExtensionAttribute<
-        crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
-        crate::codegen::structs_codegen::tables::insertables::InsertableSampleSourceModelBuilder<
-            PhysicalAssetModel,
-        >,
-    > for OrganismModelAttribute
-{
-    type EffectiveExtensionAttribute =
-        crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute;
-    fn from_extension_attribute(extension_attribute: Self::EffectiveExtensionAttribute) -> Self {
-        Self::Extension(extension_attribute.into())
-    }
+    type Attribute = OrganismModelAttribute;
 }
 impl core::fmt::Display for OrganismModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
@@ -81,24 +64,7 @@ impl core::fmt::Display for OrganismModelAttribute {
 pub struct InsertableOrganismModel {
     pub(crate) id: i32,
 }
-impl InsertableOrganismModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel:
-            web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel::read(
-            self.id, conn,
-        )
-    }
-}
+impl InsertableOrganismModel {}
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Builder for creating and inserting a new
@@ -416,11 +382,10 @@ where
             C,
             UserId = i32,
             Row = crate::codegen::structs_codegen::tables::organism_models::OrganismModel,
-            Error = web_common_traits::database::InsertError<OrganismModelAttribute>,
+            Attribute = OrganismModelAttribute,
         >,
     SampleSourceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attribute = OrganismModelAttribute;
     fn mint_primary_key(
         self,
         user_id: i32,
