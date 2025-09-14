@@ -17,9 +17,6 @@ rosetta_timestamp = { workspace = true, features = ["serde", "postgres"] }
 [features]
 default = ["serde", "64-column-tables"]
 serde = []
-postgres = [
-  "diesel/extras",
-  "postgis_diesel/postgres",
-]
+postgres = ["diesel/extras", "postgis_diesel/postgres"]
 32-column-tables = ["postgres"]
 64-column-tables = ["32-column-tables", "diesel/64-column-tables"]
