@@ -313,14 +313,18 @@ impl PTGVisitor for ProcedureTemplateVisualization<'_> {
         let (shape, reference_ptam) = if maybe_foreign_owner.is_some() {
             (FlowchartNodeShape::LRParallelogram, ptam)
         } else {
-            (FlowchartNodeShape::Rectangle, self.graph
-                .reference_based_on_alias(parents, &ptam)
-                .expect(&format!(
-                    "Expected PTAM \"{}\" from leaf PT \"{}\" to be either foreign-owned or have a reference based on alias using parents [{}]",
-                    ptam.name,
-                    leaf.name,
-                    parents.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(", ")
-                )))
+            (if ptam.procedure_template == leaf.procedure_template {
+                FlowchartNodeShape::Rectangle
+            } else {
+                FlowchartNodeShape::Hexagon
+            }, self.graph
+            .reference_based_on_alias(parents, &ptam)
+            .expect(&format!(
+                "Expected PTAM \"{}\" from leaf PT \"{}\" to be either foreign-owned or have a reference based on alias using parents [{}]",
+                ptam.name,
+                leaf.name,
+                parents.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(", ")
+            )))
         };
 
         let procedure_template_asset_model_node_builder = FlowchartNodeBuilder::default()

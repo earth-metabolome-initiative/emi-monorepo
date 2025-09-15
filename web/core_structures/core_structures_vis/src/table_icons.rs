@@ -30,6 +30,8 @@ pub(crate) fn procedure_template_icon(
         "freeze_drying_procedure_templates" => "fa:fa-icicles",
         "weighing_procedure_templates" => "fa:fa-scale-unbalanced",
         "supernatant_procedure_templates" => "fa:fa-eye-dropper",
+        "geolocation_procedure_templates" => "fa:fa-map-location-dot",
+        "storage_procedure_templates" => "fa:fa-warehouse",
         _ => return None,
     })
 }
