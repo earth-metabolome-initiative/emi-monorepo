@@ -985,30 +985,6 @@ impl FreezingProcedure {
             .select(Self::as_select())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_number_of_completed_subprocedures(
-        number_of_completed_subprocedures: i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            freezing_procedures::freezing_procedures, procedures::procedures,
-        };
-        Self::table()
-            .inner_join(
-                procedures::table.on(freezing_procedures::procedure.eq(procedures::procedure)),
-            )
-            .filter(
-                procedures::number_of_completed_subprocedures.eq(number_of_completed_subprocedures),
-            )
-            .order_by(freezing_procedures::procedure.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
 }
 impl AsRef<FreezingProcedure> for FreezingProcedure {
     fn as_ref(&self) -> &FreezingProcedure {

@@ -2,8 +2,9 @@
 //! models [`StyleClass`] objects.
 
 use core_structures::ProcedureTemplateAssetModel;
+use guided_procedure_builder::{OwnershipLike, ProcedureTemplateGraph};
 use mermaid::{
-    prelude::{Color, FlowchartBuilder, StyleClassBuilder, StyleProperty},
+    prelude::{Color, FlowchartBuilder, StyleClassBuilder, StyleProperty, Unit},
     traits::DiagramBuilder,
 };
 
@@ -16,6 +17,7 @@ pub(super) fn ptam_edge_class_name(ptam: &ProcedureTemplateAssetModel) -> String
 }
 
 pub(super) fn ptam_classes<'graph, I>(
+    graph: &'graph ProcedureTemplateGraph,
     ptams: I,
     builder: &mut FlowchartBuilder,
 ) -> Result<(), mermaid::FlowchartError>
@@ -24,14 +26,19 @@ where
 {
     let mut ptam_builders = Vec::new();
     for procedure_template_asset_model in ptams {
-        ptam_builders.push((
-            StyleClassBuilder::default()
-                .name(ptam_node_class_name(procedure_template_asset_model))
-                .unwrap(),
-            StyleClassBuilder::default()
-                .name(ptam_edge_class_name(procedure_template_asset_model))
-                .unwrap(),
-        ));
+        let mut node = StyleClassBuilder::default()
+            .name(ptam_node_class_name(procedure_template_asset_model))
+            .unwrap()
+            .property(StyleProperty::BorderRadius(Unit::Pixel(2)))
+            .unwrap();
+        let mut edge = StyleClassBuilder::default()
+            .name(ptam_edge_class_name(procedure_template_asset_model))
+            .unwrap();
+        if graph.foreign_owned_ptam(procedure_template_asset_model) {
+            node = node.property(StyleProperty::StrokeDasharray(5, 5)).unwrap();
+            edge = edge.property(StyleProperty::StrokeDasharray(5, 5)).unwrap();
+        }
+        ptam_builders.push((node, edge));
     }
 
     let colors = Color::maximally_distinct(ptam_builders.len() as u16, 70, 80);
@@ -44,8 +51,13 @@ where
                 .property(StyleProperty::Stroke(color.darken(30)))
                 .unwrap(),
         )?;
-        builder
-            .style_class(edge_builder.property(StyleProperty::Stroke(color.darken(40))).unwrap())?;
+        builder.style_class(
+            edge_builder
+                .property(StyleProperty::Stroke(color.darken(30)))
+                .unwrap()
+                .property(StyleProperty::StrokeWidth(Unit::Pixel(2)))
+                .unwrap(),
+        )?;
     }
 
     Ok(())

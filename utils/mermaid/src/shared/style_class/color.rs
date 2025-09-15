@@ -14,6 +14,12 @@ pub struct Color {
     blue: u8,
 }
 
+impl From<(u8, u8, u8)> for Color {
+    fn from(rgb: (u8, u8, u8)) -> Self {
+        Color { red: rgb.0, green: rgb.1, blue: rgb.2 }
+    }
+}
+
 impl From<Rgb> for Color {
     fn from(rgb: Rgb) -> Self {
         Color { red: rgb.red() as u8, green: rgb.green() as u8, blue: rgb.blue() as u8 }

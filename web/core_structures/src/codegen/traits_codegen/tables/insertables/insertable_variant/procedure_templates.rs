@@ -76,13 +76,6 @@ where
                     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Description,
                 ),
             )?;
-        let icon = self
-            .icon
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Icon,
-                ),
-            )?;
         let created_by = self
             .created_by
             .ok_or(
@@ -118,24 +111,15 @@ where
                     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Deprecated,
                 ),
             )?;
-        let number_of_subprocedure_templates = self
-            .number_of_subprocedure_templates
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::NumberOfSubprocedureTemplates,
-                ),
-            )?;
         Ok(Self::InsertableVariant {
             most_concrete_table,
             name,
             description,
-            icon,
             created_by,
             created_at,
             updated_by,
             updated_at,
             deprecated,
-            number_of_subprocedure_templates,
         })
     }
 }

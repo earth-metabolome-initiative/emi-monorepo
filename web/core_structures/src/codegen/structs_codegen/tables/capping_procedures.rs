@@ -907,30 +907,6 @@ impl CappingProcedure {
             .select(Self::as_select())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_number_of_completed_subprocedures(
-        number_of_completed_subprocedures: i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            capping_procedures::capping_procedures, procedures::procedures,
-        };
-        Self::table()
-            .inner_join(
-                procedures::table.on(capping_procedures::procedure.eq(procedures::procedure)),
-            )
-            .filter(
-                procedures::number_of_completed_subprocedures.eq(number_of_completed_subprocedures),
-            )
-            .order_by(capping_procedures::procedure.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
 }
 impl AsRef<CappingProcedure> for CappingProcedure {
     fn as_ref(&self) -> &CappingProcedure {

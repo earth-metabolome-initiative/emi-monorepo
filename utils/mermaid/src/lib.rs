@@ -15,7 +15,7 @@ pub mod prelude {
         diagrams::{class_diagram::*, entity_relationship::*, flowchart::*},
         shared::{
             ArrowShape, Color, Direction, LineStyle, Renderer, StyleClass, StyleClassBuilder,
-            StyleProperty,
+            StyleProperty, Unit,
         },
         traits::*,
     };

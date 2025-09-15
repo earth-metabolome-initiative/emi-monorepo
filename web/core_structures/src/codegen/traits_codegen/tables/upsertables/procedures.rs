@@ -28,9 +28,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at)))
-                    .or(number_of_completed_subprocedures
-                        .ne(excluded(number_of_completed_subprocedures))),
+                    .or(updated_at.ne(excluded(updated_at))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -66,9 +64,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))
-                    .or(updated_at.ne(excluded(updated_at)))
-                    .or(number_of_completed_subprocedures
-                        .ne(excluded(number_of_completed_subprocedures))),
+                    .or(updated_at.ne(excluded(updated_at))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

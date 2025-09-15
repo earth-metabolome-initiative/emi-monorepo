@@ -275,4 +275,53 @@ impl ProcedureTemplateGraph {
 
         paths
     }
+
+    /// Returns the leaf node associated to the provided procedure template
+    /// which is the root of the root-most task graph which is contained
+    /// within the provided procedure template.
+    ///
+    /// # Arguments
+    ///
+    /// * `procedure_template` - The procedure template to find the leaf node
+    ///   for.
+    pub fn root_leaf_node_of<'graph>(
+        &'graph self,
+        parents: &[&'graph ProcedureTemplate],
+        procedure_template: &'graph ProcedureTemplate,
+    ) -> (Vec<&'graph ProcedureTemplate>, &'graph ProcedureTemplate) {
+        if let Some(task_graph) = self.task_graph_of(procedure_template) {
+            let root_node = task_graph.root_node();
+            let mut parents = parents.to_vec();
+            parents.push(procedure_template);
+            self.root_leaf_node_of(&parents, root_node)
+        } else {
+            (parents.to_vec(), procedure_template)
+        }
+    }
+
+    /// Returns the leaf nodes associated to the provided procedure template
+    /// which are the sinks of the sink-most task graphs which are contained
+    /// within the provided procedure template.
+    ///
+    /// # Arguments
+    ///
+    /// * `procedure_template` - The procedure template to find the leaf nodes
+    ///   for.
+    pub fn sink_leaf_nodes_of<'graph>(
+        &'graph self,
+        parents: &[&'graph ProcedureTemplate],
+        procedure_template: &'graph ProcedureTemplate,
+    ) -> Vec<(Vec<&'graph ProcedureTemplate>, &'graph ProcedureTemplate)> {
+        if let Some(task_graph) = self.task_graph_of(procedure_template) {
+            let mut result = Vec::new();
+            let mut parents = parents.to_vec();
+            parents.push(procedure_template);
+            for sink_node in task_graph.sink_nodes() {
+                result.extend(self.sink_leaf_nodes_of(&parents, sink_node));
+            }
+            result
+        } else {
+            vec![(parents.to_vec(), procedure_template)]
+        }
+    }
 }

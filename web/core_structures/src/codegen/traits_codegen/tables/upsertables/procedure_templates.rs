@@ -22,14 +22,11 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                     .ne(excluded(most_concrete_table))
                     .or(name.ne(excluded(name)))
                     .or(description.ne(excluded(description)))
-                    .or(icon.ne(excluded(icon)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))
                     .or(updated_at.ne(excluded(updated_at)))
-                    .or(deprecated.ne(excluded(deprecated)))
-                    .or(number_of_subprocedure_templates
-                        .ne(excluded(number_of_subprocedure_templates))),
+                    .or(deprecated.ne(excluded(deprecated))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -59,14 +56,11 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                     .ne(excluded(most_concrete_table))
                     .or(name.ne(excluded(name)))
                     .or(description.ne(excluded(description)))
-                    .or(icon.ne(excluded(icon)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))
                     .or(updated_at.ne(excluded(updated_at)))
-                    .or(deprecated.ne(excluded(deprecated)))
-                    .or(number_of_subprocedure_templates
-                        .ne(excluded(number_of_subprocedure_templates))),
+                    .or(deprecated.ne(excluded(deprecated))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

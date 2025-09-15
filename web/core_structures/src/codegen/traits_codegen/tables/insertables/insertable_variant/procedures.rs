@@ -161,13 +161,6 @@ where
                     crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::UpdatedAt,
                 ),
             )?;
-        let number_of_completed_subprocedures = self
-            .number_of_completed_subprocedures
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::NumberOfCompletedSubprocedures,
-                ),
-            )?;
         Ok(Self::InsertableVariant {
             procedure,
             procedure_template,
@@ -180,7 +173,6 @@ where
             created_at,
             updated_by,
             updated_at,
-            number_of_completed_subprocedures,
         })
     }
 }

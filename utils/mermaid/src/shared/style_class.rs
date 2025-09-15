@@ -13,6 +13,7 @@ pub use builder::StyleClassBuilder;
 pub use color::Color;
 pub use error::StyleClassError;
 pub use style_properties::StyleProperty;
+pub use units::Unit;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

@@ -5,13 +5,11 @@ pub enum ProcedureTemplateAttribute {
     MostConcreteTable,
     Name,
     Description,
-    Icon,
     CreatedBy,
     CreatedAt,
     UpdatedBy,
     UpdatedAt,
     Deprecated,
-    NumberOfSubprocedureTemplates,
 }
 impl core::str::FromStr for ProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
@@ -20,23 +18,19 @@ impl core::str::FromStr for ProcedureTemplateAttribute {
             "MostConcreteTable" => Ok(Self::MostConcreteTable),
             "Name" => Ok(Self::Name),
             "Description" => Ok(Self::Description),
-            "Icon" => Ok(Self::Icon),
             "CreatedBy" => Ok(Self::CreatedBy),
             "CreatedAt" => Ok(Self::CreatedAt),
             "UpdatedBy" => Ok(Self::UpdatedBy),
             "UpdatedAt" => Ok(Self::UpdatedAt),
             "Deprecated" => Ok(Self::Deprecated),
-            "NumberOfSubprocedureTemplates" => Ok(Self::NumberOfSubprocedureTemplates),
             "most_concrete_table" => Ok(Self::MostConcreteTable),
             "name" => Ok(Self::Name),
             "description" => Ok(Self::Description),
-            "icon" => Ok(Self::Icon),
             "created_by" => Ok(Self::CreatedBy),
             "created_at" => Ok(Self::CreatedAt),
             "updated_by" => Ok(Self::UpdatedBy),
             "updated_at" => Ok(Self::UpdatedAt),
             "deprecated" => Ok(Self::Deprecated),
-            "number_of_subprocedure_templates" => Ok(Self::NumberOfSubprocedureTemplates),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
@@ -57,15 +51,11 @@ impl core::fmt::Display for ProcedureTemplateAttribute {
             }
             Self::Name => write!(f, "procedure_templates.name"),
             Self::Description => write!(f, "procedure_templates.description"),
-            Self::Icon => write!(f, "procedure_templates.icon"),
             Self::CreatedBy => write!(f, "procedure_templates.created_by"),
             Self::CreatedAt => write!(f, "procedure_templates.created_at"),
             Self::UpdatedBy => write!(f, "procedure_templates.updated_by"),
             Self::UpdatedAt => write!(f, "procedure_templates.updated_at"),
             Self::Deprecated => write!(f, "procedure_templates.deprecated"),
-            Self::NumberOfSubprocedureTemplates => {
-                write!(f, "procedure_templates.number_of_subprocedure_templates")
-            }
         }
     }
 }
@@ -81,13 +71,11 @@ pub struct InsertableProcedureTemplate {
     pub(crate) most_concrete_table: String,
     pub(crate) name: String,
     pub(crate) description: String,
-    pub(crate) icon: String,
     pub(crate) created_by: i32,
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
     pub(crate) updated_by: i32,
     pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
     pub(crate) deprecated: bool,
-    pub(crate) number_of_subprocedure_templates: i16,
 }
 impl InsertableProcedureTemplate {
     pub fn created_by<C: diesel::connection::LoadConnection>(
@@ -138,8 +126,6 @@ impl InsertableProcedureTemplate {
 ///    // Optionally set fields with default values
 ///    .created_at(created_at)?
 ///    .deprecated(deprecated)?
-///    .icon(icon)?
-///    .number_of_subprocedure_templates(number_of_subprocedure_templates)?
 ///    .updated_at(updated_at)?
 ///    // Finally, insert the new record in the database
 ///    .insert(user.id, conn)?;
@@ -148,13 +134,11 @@ pub struct InsertableProcedureTemplateBuilder {
     pub(crate) most_concrete_table: Option<String>,
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
-    pub(crate) icon: Option<String>,
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) updated_by: Option<i32>,
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) deprecated: Option<bool>,
-    pub(crate) number_of_subprocedure_templates: Option<i16>,
 }
 impl From<InsertableProcedureTemplateBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableProcedureTemplateBuilder>
@@ -169,13 +153,11 @@ impl Default for InsertableProcedureTemplateBuilder {
             most_concrete_table: Default::default(),
             name: Default::default(),
             description: Default::default(),
-            icon: Some("book".to_owned()),
             created_by: Default::default(),
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_by: Default::default(),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
             deprecated: Some(false),
-            number_of_subprocedure_templates: Some(0i16),
         }
     }
 }
@@ -186,13 +168,11 @@ impl common_traits::builder::IsCompleteBuilder
         self.most_concrete_table.is_some()
             && self.name.is_some()
             && self.description.is_some()
-            && self.icon.is_some()
             && self.created_by.is_some()
             && self.created_at.is_some()
             && self.updated_by.is_some()
             && self.updated_at.is_some()
             && self.deprecated.is_some()
-            && self.number_of_subprocedure_templates.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `ProcedureTemplate`
@@ -252,32 +232,6 @@ pub trait ProcedureTemplateSettable: Sized {
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
-    /// Sets the value of the `public.procedure_templates.icon` column.
-    ///
-    /// # Arguments
-    /// * `icon`: The value to set for the `public.procedure_templates.icon`
-    ///   column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type
-    ///   `String`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn icon<I>(
-        self,
-        icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
     /// Sets the value of the `public.procedure_templates.created_by` column.
     ///
     /// # Arguments
@@ -405,32 +359,6 @@ pub trait ProcedureTemplateSettable: Sized {
     where
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>;
-    /// Sets the value of the
-    /// `public.procedure_templates.number_of_subprocedure_templates` column.
-    ///
-    /// # Arguments
-    /// * `number_of_subprocedure_templates`: The value to set for the
-    ///   `public.procedure_templates.number_of_subprocedure_templates` column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type `i16`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn number_of_subprocedure_templates<NOST>(
-        self,
-        number_of_subprocedure_templates: NOST,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        NOST: TryInto<i16>,
-        validation_errors::SingleFieldError: From<<NOST as TryInto<i16>>::Error>;
 }
 impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
     type Attributes =
@@ -499,29 +427,6 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
                     )
             })?;
         self.description = Some(description);
-        Ok(self)
-    }
-    /// Sets the value of the `public.procedure_templates.icon` column.
-    fn icon<I>(
-        mut self,
-        icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
-    {
-        let icon = icon.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(ProcedureTemplateAttribute::Icon)
-        })?;
-        pgrx_validation::must_be_font_awesome_class(icon.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::Icon,
-                    )
-            })?;
-        self.icon = Some(icon);
         Ok(self)
     }
     /// Sets the value of the `public.procedure_templates.created_by` column.
@@ -635,31 +540,6 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
                 .rename_field(ProcedureTemplateAttribute::Deprecated)
         })?;
         self.deprecated = Some(deprecated);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.procedure_templates.number_of_subprocedure_templates` column.
-    fn number_of_subprocedure_templates<NOST>(
-        mut self,
-        number_of_subprocedure_templates: NOST,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        NOST: TryInto<i16>,
-        validation_errors::SingleFieldError: From<<NOST as TryInto<i16>>::Error>,
-    {
-        let number_of_subprocedure_templates =
-            number_of_subprocedure_templates.try_into().map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(ProcedureTemplateAttribute::NumberOfSubprocedureTemplates)
-            })?;
-        pgrx_validation::must_be_positive_i16(number_of_subprocedure_templates)
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute::NumberOfSubprocedureTemplates,
-                    )
-            })?;
-        self.number_of_subprocedure_templates = Some(number_of_subprocedure_templates);
         Ok(self)
     }
 }

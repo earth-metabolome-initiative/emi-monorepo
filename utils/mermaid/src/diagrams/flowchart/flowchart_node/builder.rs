@@ -204,4 +204,8 @@ impl NodeBuilder for FlowchartNodeBuilder {
         self.builder = self.builder.style_property(property)?;
         Ok(self)
     }
+
+    fn style_properties(&self) -> impl Iterator<Item = &crate::prelude::StyleProperty> {
+        self.builder.style_properties()
+    }
 }

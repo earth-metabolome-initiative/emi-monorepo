@@ -9,8 +9,6 @@ CREATE TABLE IF NOT EXISTS procedure_templates (
 	name TEXT UNIQUE NOT NULL CHECK (must_be_paragraph(name)),
 	-- Human-readable description of the procedure template
 	description TEXT NOT NULL CHECK (must_be_paragraph(description)),
-	-- photograph_id UUID REFERENCES documents(id),
-	icon TEXT NOT NULL DEFAULT 'book' CHECK (must_be_font_awesome_class(icon)),
 	-- The user who created this procedure template
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	-- The timestamp when this procedure template was created
@@ -21,12 +19,6 @@ CREATE TABLE IF NOT EXISTS procedure_templates (
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP CHECK (must_be_smaller_than_utc(created_at, updated_at)),
 	-- Whether this procedure template is deprecated and should not be used for new procedures
 	deprecated BOOLEAN NOT NULL DEFAULT FALSE,
-	-- The number of subprocedures this procedure template has. This field
-	-- is generally automatically updated via triggers on the parent_procedure_templates
-	-- table, but it can also be manually updated if needed.
-	number_of_subprocedure_templates SMALLINT NOT NULL DEFAULT 0 CHECK (
-		must_be_positive_i16(number_of_subprocedure_templates)
-	),
 	-- We enforce that the name and description are distinct to avoid lazy duplicates
 	CHECK (must_be_distinct(name, description))
 );
@@ -41,20 +33,6 @@ CREATE TABLE IF NOT EXISTS parent_procedure_templates (
 	-- The timestamp when this relationship was created
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
--- Upon inserting a new parent-child relationship, we increment the number_of_subprocedure_templates
--- of the parent procedure template and update the `updated_at` and `updated_by` fields.
-CREATE OR REPLACE FUNCTION increment_number_of_subprocedure_templates() RETURNS TRIGGER AS $$ BEGIN
-UPDATE procedure_templates
-SET number_of_subprocedure_templates = number_of_subprocedure_templates + 1,
-	updated_at = CURRENT_TIMESTAMP,
-	updated_by = NEW.created_by
-WHERE procedure_template = NEW.parent;
-RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-CREATE OR REPLACE TRIGGER trg_increment_number_of_subprocedure_templates
-AFTER
-INSERT ON parent_procedure_templates FOR EACH ROW EXECUTE FUNCTION increment_number_of_subprocedure_templates();
 CREATE TABLE IF NOT EXISTS next_procedure_templates (
 	PRIMARY KEY (parent, predecessor, successor),
 	-- The parent procedure template

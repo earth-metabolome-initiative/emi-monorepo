@@ -156,4 +156,8 @@ impl NodeBuilder for GenericNodeBuilder {
         self.style.push(property);
         Ok(self)
     }
+
+    fn style_properties(&self) -> impl Iterator<Item = &StyleProperty> {
+        self.style.iter()
+    }
 }

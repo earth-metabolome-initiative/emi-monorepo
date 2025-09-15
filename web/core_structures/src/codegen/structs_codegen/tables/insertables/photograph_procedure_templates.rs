@@ -371,8 +371,6 @@ impl InsertablePhotographProcedureTemplate {
 ///    // Optionally set fields with default values
 ///    .created_at(created_at)?
 ///    .deprecated(deprecated)?
-///    .icon(icon)?
-///    .number_of_subprocedure_templates(number_of_subprocedure_templates)?
 ///    .updated_at(updated_at)?
 ///    // Finally, insert the new record in the database
 ///    .insert(user.id, conn)?;
@@ -1108,28 +1106,6 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.procedure_templates.icon` column.
-    fn icon<I>(
-        mut self,
-        icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
-    {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::icon(
-                self.procedure_template,
-                icon,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
-    #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
     fn created_by<CB>(
         mut self,
@@ -1232,28 +1208,6 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
                 self.procedure_template,
                 deprecated,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
-    #[inline]
-    ///Sets the value of the `public.procedure_templates.number_of_subprocedure_templates` column.
-    fn number_of_subprocedure_templates<NOST>(
-        mut self,
-        number_of_subprocedure_templates: NOST,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        NOST: TryInto<i16>,
-        validation_errors::SingleFieldError: From<<NOST as TryInto<i16>>::Error>,
-    {
-        self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::number_of_subprocedure_templates(
-                self.procedure_template,
-                number_of_subprocedure_templates,
             )
             .map_err(|e| {
                 e

@@ -10,7 +10,7 @@ use mermaid::{
     prelude::{
         ArrowShape, ConfigurationBuilder, DiagramBuilder, Direction, Flowchart, FlowchartBuilder,
         FlowchartConfigurationBuilder, FlowchartEdgeBuilder, FlowchartNode, FlowchartNodeBuilder,
-        FlowchartNodeShape, LineStyle, Renderer, StyleClass,
+        FlowchartNodeShape, LineStyle, Renderer, StyleClass, StyleProperty, Unit,
     },
     traits::{EdgeBuilder, NodeBuilder},
 };
@@ -19,7 +19,13 @@ mod foreign_procedure_template_class;
 mod procedure_template_class;
 mod ptam_style_classes;
 
-use crate::{MermaidDB, asset_model_icon};
+use crate::{
+    MermaidDB, asset_model_icon,
+    procedure_templates_vis::procedure_template_class::{
+        procedure_fill_color, procedure_stroke_color,
+    },
+    table_icons::procedure_template_icon,
+};
 
 struct ProcedureTemplateVisualization<'graph> {
     graph: &'graph ProcedureTemplateGraph,
@@ -37,16 +43,24 @@ impl<'graph> ProcedureTemplateVisualization<'graph> {
                 .title(&graph.root_procedure_template_name())?,
         )?;
 
-        builder.style_class(procedure_template_class::procedure_template_class())?;
-        ptam_style_classes::ptam_classes(graph.root_and_foreign_ptams(), &mut builder)?;
+        ptam_style_classes::ptam_classes(graph, graph.root_and_foreign_ptams(), &mut builder)?;
         builder.style_class(foreign_procedure_template_class::foreign_procedure_template_class())?;
+        builder.style_class(procedure_template_class::procedure_arrow_class())?;
 
         Ok(Self {
             graph,
             builder,
             node_builders_stack: Vec::new(),
             required_procedures: FlowchartNodeBuilder::default()
-                .label("**Required Procedures**")?,
+                .label("**Required Procedures**")?
+                .style_property(StyleProperty::Fill(procedure_fill_color()))
+                .unwrap()
+                .style_property(StyleProperty::Stroke(procedure_stroke_color()))
+                .unwrap()
+                .style_property(StyleProperty::BorderRadius(Unit::Pixel(3)))
+                .unwrap()
+                .style_property(StyleProperty::StrokeDasharray(5, 5))
+                .unwrap(),
         })
     }
 
@@ -60,22 +74,6 @@ impl<'graph> ProcedureTemplateVisualization<'graph> {
         self.builder
             .get_style_class_by_name(&ptam_style_classes::ptam_edge_class_name(ptam))
             .unwrap()
-    }
-
-    fn foreign_procedure_template_class(&self) -> Rc<StyleClass> {
-        self.builder
-            .get_style_class_by_name(
-                foreign_procedure_template_class::FOREIGN_PROCEDURE_TEMPLATE_CLASS_NAME,
-            )
-            .unwrap()
-            .clone()
-    }
-
-    fn procedure_template_class(&self) -> Rc<StyleClass> {
-        self.builder
-            .get_style_class_by_name(procedure_template_class::PROCEDURE_TEMPLATE_CLASS_NAME)
-            .unwrap()
-            .clone()
     }
 
     fn get_pt_node(
@@ -145,10 +143,20 @@ impl PTGVisitor for ProcedureTemplateVisualization<'_> {
         &mut self,
         foreign_procedure_template: &ProcedureTemplate,
     ) -> Result<(), Self::Error> {
+        let procedure_name = procedure_template_icon(foreign_procedure_template)
+            .map(|icon| format!("{} *{}*", icon, foreign_procedure_template.name))
+            .unwrap_or_else(|| format!("*{}*", foreign_procedure_template.name));
+
         let mut node_builder = FlowchartNodeBuilder::default()
-            .label(&foreign_procedure_template.name)?
+            .label(procedure_name)?
             .shape(FlowchartNodeShape::RoundEdges)
-            .style_class(self.foreign_procedure_template_class())
+            .style_property(StyleProperty::BorderRadius(Unit::Pixel(3)))
+            .unwrap()
+            .style_property(StyleProperty::Fill(procedure_fill_color().darken(2)))
+            .unwrap()
+            .style_property(StyleProperty::Stroke(procedure_stroke_color().darken(2)))
+            .unwrap()
+            .style_property(StyleProperty::StrokeDasharray(5, 5))
             .unwrap();
         for foreign_ptam in self.graph.foreign_ptams_of(foreign_procedure_template) {
             let foreign_ptam_node = self.builder.node(
@@ -190,19 +198,40 @@ impl PTGVisitor for ProcedureTemplateVisualization<'_> {
         child: &ProcedureTemplate,
     ) -> Result<(), Self::Error> {
         let node_id = procedure_template_hash(parents, child);
+
+        let procedure_name = procedure_template_icon(child)
+            .map(|icon| format!("{} *{}*", icon, child.name))
+            .unwrap_or_else(|| format!("*{}*", child.name));
+
         let mut node_builder = FlowchartNodeBuilder::default()
             .id(node_id)
-            .label(&child.name)?
+            .label(&procedure_name)?
             .shape(FlowchartNodeShape::RoundEdges)
-            .style_class(self.procedure_template_class())
+            .style_property(StyleProperty::BorderRadius(Unit::Pixel(3)))
             .unwrap();
 
-        if let Some(previous_direction) =
-            self.node_builders_stack.last().and_then(|previous| previous.get_direction())
-        {
-            node_builder = node_builder.direction(previous_direction.flip());
+        if let Some(previous_builder) = self.node_builders_stack.last() {
+            for style_property in previous_builder.style_properties() {
+                match style_property {
+                    StyleProperty::Fill(fill) => {
+                        node_builder = node_builder
+                            .style_property(StyleProperty::Fill(fill.darken(3)))
+                            .unwrap();
+                    }
+                    StyleProperty::Stroke(stroke) => {
+                        node_builder = node_builder
+                            .style_property(StyleProperty::Stroke(stroke.darken(3)))
+                            .unwrap();
+                    }
+                    _ => {}
+                }
+            }
         } else {
-            node_builder = node_builder.direction(Direction::TopToBottom);
+            node_builder = node_builder
+                .style_property(StyleProperty::Fill(procedure_fill_color()))
+                .unwrap()
+                .style_property(StyleProperty::Stroke(procedure_stroke_color()))
+                .unwrap();
         }
 
         self.node_builders_stack.push(node_builder);
@@ -216,12 +245,26 @@ impl PTGVisitor for ProcedureTemplateVisualization<'_> {
         child: &ProcedureTemplate,
     ) -> Result<(), Self::Error> {
         if let Some(&predecessor) = predecessors.last() {
-            self.builder.edge(
-                FlowchartEdgeBuilder::default()
-                    .source(self.get_pt_node(parents, predecessor))?
-                    .destination(self.get_pt_node(parents, child))?
-                    .right_arrow_shape(ArrowShape::Normal)?,
-            )?;
+            let (root_leaf_node_parents, root_leaf_node) =
+                self.graph.root_leaf_node_of(parents, child);
+            for (sink_leaf_node_parents, sink_leaf_node) in
+                self.graph.sink_leaf_nodes_of(parents, predecessor)
+            {
+                self.builder.edge(
+                    FlowchartEdgeBuilder::default()
+                        .source(self.get_pt_node(&sink_leaf_node_parents, sink_leaf_node))?
+                        .destination(self.get_pt_node(&root_leaf_node_parents, root_leaf_node))?
+                        .right_arrow_shape(ArrowShape::Normal)?
+                        .style_class(
+                            self.builder
+                                .get_style_class_by_name(
+                                    procedure_template_class::PROCEDURE_ARROW_CLASS_NAME,
+                                )
+                                .unwrap(),
+                        )
+                        .unwrap(),
+                )?;
+            }
         }
         Ok(())
     }
@@ -229,14 +272,15 @@ impl PTGVisitor for ProcedureTemplateVisualization<'_> {
     fn leave_procedure_template(
         &mut self,
         parents: &[&ProcedureTemplate],
-        child: &ProcedureTemplate,
+        _child: &ProcedureTemplate,
     ) -> Result<(), Self::Error> {
         let mut node_builder = self.node_builders_stack.pop().unwrap();
-        assert_eq!(
-            node_builder.get_label().unwrap(),
-            &child.name,
-            "Mismatched node builder stack state"
-        );
+
+        // If we are back to the root, we skip adding the root node as we imply
+        // that the overall diagram represents the root procedure template.
+        if self.node_builders_stack.is_empty() {
+            return Ok(());
+        }
 
         if !node_builder.is_subgraph() {
             node_builder = node_builder.reset_direction();
@@ -244,14 +288,8 @@ impl PTGVisitor for ProcedureTemplateVisualization<'_> {
 
         let node = self.builder.node(node_builder.clone())?;
 
-        if let Some(parent) = parents.last() {
+        if let Some(_parent) = parents.last() {
             let parent_node_builder = self.node_builders_stack.pop().unwrap();
-            assert_eq!(
-                parent_node_builder.get_label().unwrap(),
-                &parent.name,
-                "Mismatched node builder stack state when adding child node"
-            );
-
             self.node_builders_stack.push(parent_node_builder.subnode(node.clone())?);
         }
 
@@ -302,11 +340,7 @@ impl PTGVisitor for ProcedureTemplateVisualization<'_> {
             self.builder.node(procedure_template_asset_model_node_builder)?;
 
         let current_node_builder = self.node_builders_stack.pop().unwrap();
-        assert_eq!(
-            current_node_builder.get_label().unwrap(),
-            &leaf.name,
-            "Mismatched node builder stack state when adding PTAM node"
-        );
+
         self.node_builders_stack
             .push(current_node_builder.subnode(procedure_template_asset_model_node.clone())?);
 

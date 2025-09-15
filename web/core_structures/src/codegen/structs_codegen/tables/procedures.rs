@@ -22,7 +22,6 @@ pub struct Procedure {
     pub created_at: ::rosetta_timestamp::TimestampUTC,
     pub updated_by: i32,
     pub updated_at: ::rosetta_timestamp::TimestampUTC,
-    pub number_of_completed_subprocedures: i16,
 }
 impl web_common_traits::prelude::TableName for Procedure {
     const TABLE_NAME: &'static str = "procedures";
@@ -556,47 +555,6 @@ impl Procedure {
         use crate::codegen::diesel_codegen::tables::procedures::procedures;
         Self::table()
             .filter(procedures::updated_by.eq(updated_by))
-            .order_by(procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    pub fn from_number_of_completed_subprocedures<C>(
-        number_of_completed_subprocedures: i16,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedures::procedures::number_of_completed_subprocedures as diesel::expression_methods::EqAll<
-                i16,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedures::procedures::number_of_completed_subprocedures as diesel::expression_methods::EqAll<
-                i16,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::procedures::procedures::procedure,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedures::procedures::number_of_completed_subprocedures as diesel::expression_methods::EqAll<
-                i16,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::procedures::procedures::procedure,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::procedures::procedures;
-        Self::table()
-            .filter(
-                procedures::number_of_completed_subprocedures.eq(number_of_completed_subprocedures),
-            )
             .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
     }

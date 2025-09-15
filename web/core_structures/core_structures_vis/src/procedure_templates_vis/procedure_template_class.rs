@@ -3,14 +3,20 @@
 
 use mermaid::prelude::{Color, StyleClassBuilder, StyleProperty};
 
-pub(super) const PROCEDURE_TEMPLATE_CLASS_NAME: &str = "procedure_template";
+pub(super) fn procedure_fill_color() -> Color {
+    Color::from((236, 237, 238))
+}
 
-pub(super) fn procedure_template_class() -> StyleClassBuilder {
+pub(super) fn procedure_stroke_color() -> Color {
+    Color::from((213, 212, 211))
+}
+
+pub(super) const PROCEDURE_ARROW_CLASS_NAME: &str = "procedure_arrow";
+
+pub(super) fn procedure_arrow_class() -> StyleClassBuilder {
     StyleClassBuilder::default()
-        .name(PROCEDURE_TEMPLATE_CLASS_NAME)
+        .name(PROCEDURE_ARROW_CLASS_NAME)
         .unwrap()
-        .property(StyleProperty::Fill(Color::pastel_red()))
-        .unwrap()
-        .property(StyleProperty::Stroke(Color::pastel_red().darken(20)))
+        .property(StyleProperty::Stroke(Color::from((26, 26, 26))))
         .unwrap()
 }

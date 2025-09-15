@@ -515,7 +515,6 @@ impl InsertableStorageProcedure {
 ///    .procedure_template(procedure_template)?
 ///    // Optionally set fields with default values
 ///    .created_at(created_at)?
-///    .number_of_completed_subprocedures(number_of_completed_subprocedures)?
 ///    .procedure(procedure)?
 ///    .updated_at(updated_at)?
 ///    // Optionally set optional fields
@@ -1814,28 +1813,6 @@ where
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
                 self.procedure,
                 updated_at,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
-    }
-    #[inline]
-    ///Sets the value of the `public.procedures.number_of_completed_subprocedures` column.
-    fn number_of_completed_subprocedures<NOCS>(
-        mut self,
-        number_of_completed_subprocedures: NOCS,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        NOCS: TryInto<i16>,
-        validation_errors::SingleFieldError: From<<NOCS as TryInto<i16>>::Error>,
-    {
-        self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::number_of_completed_subprocedures(
-                self.procedure,
-                number_of_completed_subprocedures,
             )
             .map_err(|e| {
                 e

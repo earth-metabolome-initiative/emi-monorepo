@@ -12,7 +12,6 @@ pub enum ProcedureAttribute {
     CreatedAt,
     UpdatedBy,
     UpdatedAt,
-    NumberOfCompletedSubprocedures,
 }
 impl core::str::FromStr for ProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
@@ -29,7 +28,6 @@ impl core::str::FromStr for ProcedureAttribute {
             "CreatedAt" => Ok(Self::CreatedAt),
             "UpdatedBy" => Ok(Self::UpdatedBy),
             "UpdatedAt" => Ok(Self::UpdatedAt),
-            "NumberOfCompletedSubprocedures" => Ok(Self::NumberOfCompletedSubprocedures),
             "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "parent_procedure" => Ok(Self::ParentProcedure),
@@ -41,7 +39,6 @@ impl core::str::FromStr for ProcedureAttribute {
             "created_at" => Ok(Self::CreatedAt),
             "updated_by" => Ok(Self::UpdatedBy),
             "updated_at" => Ok(Self::UpdatedAt),
-            "number_of_completed_subprocedures" => Ok(Self::NumberOfCompletedSubprocedures),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
@@ -69,9 +66,6 @@ impl core::fmt::Display for ProcedureAttribute {
             Self::CreatedAt => write!(f, "procedures.created_at"),
             Self::UpdatedBy => write!(f, "procedures.updated_by"),
             Self::UpdatedAt => write!(f, "procedures.updated_at"),
-            Self::NumberOfCompletedSubprocedures => {
-                write!(f, "procedures.number_of_completed_subprocedures")
-            }
         }
     }
 }
@@ -93,7 +87,6 @@ pub struct InsertableProcedure {
     pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
     pub(crate) updated_by: i32,
     pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
-    pub(crate) number_of_completed_subprocedures: i16,
 }
 impl InsertableProcedure {
     pub fn created_by<C: diesel::connection::LoadConnection>(
@@ -369,7 +362,6 @@ impl InsertableProcedure {
 ///    .updated_by(updated_by)?
 ///    // Optionally set fields with default values
 ///    .created_at(created_at)?
-///    .number_of_completed_subprocedures(number_of_completed_subprocedures)?
 ///    .procedure(procedure)?
 ///    .updated_at(updated_at)?
 ///    // Optionally set optional fields
@@ -390,7 +382,6 @@ pub struct InsertableProcedureBuilder {
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) updated_by: Option<i32>,
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
-    pub(crate) number_of_completed_subprocedures: Option<i16>,
 }
 impl From<InsertableProcedureBuilder>
     for web_common_traits::database::IdOrBuilder<::rosetta_uuid::Uuid, InsertableProcedureBuilder>
@@ -413,7 +404,6 @@ impl Default for InsertableProcedureBuilder {
             created_at: Some(rosetta_timestamp::TimestampUTC::default()),
             updated_by: Default::default(),
             updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            number_of_completed_subprocedures: Some(0i16),
         }
     }
 }
@@ -428,7 +418,6 @@ impl common_traits::builder::IsCompleteBuilder
             && self.created_at.is_some()
             && self.updated_by.is_some()
             && self.updated_at.is_some()
-            && self.number_of_completed_subprocedures.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of `Procedure` or
@@ -687,32 +676,6 @@ pub trait ProcedureSettable: Sized {
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
-    /// Sets the value of the
-    /// `public.procedures.number_of_completed_subprocedures` column.
-    ///
-    /// # Arguments
-    /// * `number_of_completed_subprocedures`: The value to set for the
-    ///   `public.procedures.number_of_completed_subprocedures` column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type `i16`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn number_of_completed_subprocedures<NOCS>(
-        self,
-        number_of_completed_subprocedures: NOCS,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        NOCS: TryInto<i16>,
-        validation_errors::SingleFieldError: From<<NOCS as TryInto<i16>>::Error>;
 }
 impl ProcedureSettable for InsertableProcedureBuilder {
     type Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute;
@@ -1030,31 +993,6 @@ impl ProcedureSettable for InsertableProcedureBuilder {
                 })?;
         }
         self.updated_at = Some(updated_at);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.procedures.number_of_completed_subprocedures` column.
-    fn number_of_completed_subprocedures<NOCS>(
-        mut self,
-        number_of_completed_subprocedures: NOCS,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        NOCS: TryInto<i16>,
-        validation_errors::SingleFieldError: From<<NOCS as TryInto<i16>>::Error>,
-    {
-        let number_of_completed_subprocedures =
-            number_of_completed_subprocedures.try_into().map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
-                    .rename_field(ProcedureAttribute::NumberOfCompletedSubprocedures)
-            })?;
-        pgrx_validation::must_be_positive_i16(number_of_completed_subprocedures)
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute::NumberOfCompletedSubprocedures,
-                    )
-            })?;
-        self.number_of_completed_subprocedures = Some(number_of_completed_subprocedures);
         Ok(self)
     }
 }
