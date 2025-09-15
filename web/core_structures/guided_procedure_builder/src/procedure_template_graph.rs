@@ -1,6 +1,8 @@
 //! Submodule defining the `ProcedureTemplateGraph` structure and its associated
 //! methods.
 
+use std::rc::Rc;
+
 use core_structures::{
     AssetModel, NextProcedureTemplate, ParentProcedureTemplate, ProcedureTemplate,
     ProcedureTemplateAssetModel,
@@ -38,6 +40,12 @@ pub struct ProcedureTemplateGraph {
     /// The procedure template asset models associated to the root procedure
     /// template or any of its sub-procedure templates.
     ownership: Ownership,
+}
+
+impl AsRef<ProcedureTemplateGraph> for ProcedureTemplateGraph {
+    fn as_ref(&self) -> &ProcedureTemplateGraph {
+        self
+    }
 }
 
 impl ProcedureTemplateGraph {

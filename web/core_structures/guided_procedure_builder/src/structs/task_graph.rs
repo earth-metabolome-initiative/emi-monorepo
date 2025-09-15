@@ -13,7 +13,7 @@ use graph::{
 };
 use sorted_vec::prelude::SortedVec;
 use web_common_traits::prelude::Builder;
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Represents the task graph of a procedure template, including its nodes,
 /// edges, and a Kahn topological ordering of the nodes.
 pub struct TaskGraph {

@@ -126,7 +126,7 @@ pub trait OwnershipLike: AsRef<Ownership> {
 
     /// Returns an iterator over all foreign procedure templates in the
     /// ownership graph.
-    fn foreign_procedure_templates(&self) -> impl Iterator<Item = &ProcedureTemplate> {
+    fn foreign_procedure_templates(&self) -> core::slice::Iter<'_, ProcedureTemplate> {
         self.as_ref().foreign_procedure_templates.iter()
     }
 
