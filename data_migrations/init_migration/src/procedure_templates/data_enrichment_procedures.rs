@@ -3,7 +3,7 @@
 
 use core_structures::{ProcedureTemplate, traits::ParentProcedureTemplate};
 use diesel::OptionalExtension;
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 mod weather_retrieval_procedure;
 use core_structures::tables::insertables::ProcedureTemplateSettable;
 const DATA_ENRICHMENT_PROCEDURES: &str = "Data Enrichment Procedure";

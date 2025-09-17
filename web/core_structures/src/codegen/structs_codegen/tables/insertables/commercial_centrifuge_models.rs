@@ -9,8 +9,8 @@ pub enum CommercialCentrifugeModelExtensionAttribute {
 impl core::fmt::Display for CommercialCentrifugeModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::CentrifugeModel(e) => write!(f, "{e}"),
-            Self::CommercialProduct(e) => write!(f, "{e}"),
+            Self::CentrifugeModel(e) => write!(f, "commercial_centrifuge_models({e})"),
+            Self::CommercialProduct(e) => write!(f, "commercial_centrifuge_models({e})"),
         }
     }
 }
@@ -72,6 +72,7 @@ impl core::fmt::Display for CommercialCentrifugeModelAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -156,6 +157,14 @@ pub struct InsertableCommercialCentrifugeModelBuilder<
     pub(crate) commercial_centrifuge_models_id_fkey: CentrifugeModel,
     pub(crate) commercial_centrifuge_models_id_fkey1: CommercialProduct,
 }
+impl<CentrifugeModel, CommercialProduct> diesel::associations::HasTable
+    for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct>
+{
+    type Table = crate::codegen::diesel_codegen::tables::commercial_centrifuge_models::commercial_centrifuge_models::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::commercial_centrifuge_models::commercial_centrifuge_models::table
+    }
+}
 impl From<InsertableCommercialCentrifugeModelBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialCentrifugeModelBuilder>
 {
@@ -181,8 +190,8 @@ where
 /// Trait defining setters for attributes of an instance of
 /// `CommercialCentrifugeModel` or descendant tables.
 pub trait CommercialCentrifugeModelSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the
     /// `public.commercial_centrifuge_models.centrifuge_model` column.
     ///
@@ -202,21 +211,27 @@ pub trait CommercialCentrifugeModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn centrifuge_model<CM>(
-        self,
-        centrifuge_model: CM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn centrifuge_model<CM>(self, centrifuge_model: CM) -> Result<Self, Self::Error>
     where
         CM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl<
     CentrifugeModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute,
+            >,
         >,
     CommercialProduct,
 > CommercialCentrifugeModelSettable
-for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute;
+for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     ///Sets the value of the `public.commercial_centrifuge_models.centrifuge_model` column.
     ///
     ///# Implementation notes
@@ -247,10 +262,7 @@ for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduc
     ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
-    fn centrifuge_model<CM>(
-        mut self,
-        centrifuge_model: CM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn centrifuge_model<CM>(mut self, centrifuge_model: CM) -> Result<Self, Self::Error>
     where
         CM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -262,7 +274,7 @@ for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduc
                 centrifuge_model,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
@@ -272,23 +284,29 @@ for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduc
 }
 impl<
     CentrifugeModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::CentrifugeModelAttribute,
+            >,
         >,
     CommercialProduct,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -299,7 +317,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -307,10 +325,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -321,7 +336,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -351,10 +366,7 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn parent_model<PM>(
-        self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -365,10 +377,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -378,7 +387,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -386,10 +395,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -402,7 +408,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -410,10 +416,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -423,7 +426,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -431,10 +434,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -447,34 +447,47 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
 }
-impl<CentrifugeModel, CommercialProduct>
-    crate::codegen::structs_codegen::tables::insertables::CentrifugeModelSettable
-    for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct>
+impl<
+    CentrifugeModel,
+    CommercialProduct,
+> crate::codegen::structs_codegen::tables::insertables::CentrifugeModelSettable
+for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
 }
 impl<
     CentrifugeModel,
     CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable
-for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute;
+for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.commercial_products.deprecation_date` column.
-    fn deprecation_date<DD>(
-        mut self,
-        deprecation_date: DD,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn deprecation_date<DD>(mut self, deprecation_date: DD) -> Result<Self, Self::Error>
     where
         DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
         validation_errors::SingleFieldError: From<
@@ -487,7 +500,7 @@ for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduc
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -495,10 +508,7 @@ for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduc
     }
     #[inline]
     ///Sets the value of the `public.commercial_products.brand_id` column.
-    fn brand<BI>(
-        mut self,
-        brand_id: BI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn brand<BI>(mut self, brand_id: BI) -> Result<Self, Self::Error>
     where
         BI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -508,7 +518,7 @@ for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduc
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -521,11 +531,18 @@ impl<
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCentrifugeModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -557,10 +574,7 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
-    fn parent_model<PM>(
-        self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -571,7 +585,7 @@ where
                 )
                 .ok_or(
                     common_traits::prelude::BuilderError::IncompleteBuild(
-                        Self::Attributes::CentrifugeModel,
+                        <Self as common_traits::builder::Attributed>::Attribute::CentrifugeModel,
                     ),
                 )?,
         )
@@ -610,11 +624,12 @@ impl<
 > web_common_traits::database::TryInsertGeneric<C>
 for InsertableCommercialCentrifugeModelBuilder<CentrifugeModel, CommercialProduct>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel,
-        Attribute = CommercialCentrifugeModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            CommercialCentrifugeModelAttribute,
+        >,
     >,
     CentrifugeModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
@@ -628,10 +643,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<CommercialCentrifugeModelAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

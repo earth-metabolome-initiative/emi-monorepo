@@ -43,6 +43,7 @@ impl core::fmt::Display for BrandAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -113,6 +114,12 @@ pub struct InsertableBrandBuilder {
     pub(crate) updated_by: Option<i32>,
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
+impl diesel::associations::HasTable for InsertableBrandBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::brands::brands::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::brands::brands::table
+    }
+}
 impl From<InsertableBrandBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableBrandBuilder>
 {
@@ -145,8 +152,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `Brand` or
 /// descendant tables.
 pub trait BrandSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.brands.name` column.
     ///
     /// # Arguments
@@ -165,10 +172,7 @@ pub trait BrandSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
@@ -190,10 +194,7 @@ pub trait BrandSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by<CB>(
-        self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.brands.created_at` column.
@@ -215,10 +216,7 @@ pub trait BrandSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<CA>(
-        self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -241,10 +239,7 @@ pub trait BrandSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_by<UB>(
-        self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.brands.updated_at` column.
@@ -266,22 +261,23 @@ pub trait BrandSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_at<UA>(
-        self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl BrandSettable for InsertableBrandBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::BrandAttribute;
+impl BrandSettable for InsertableBrandBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::BrandAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.brands.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -314,10 +310,7 @@ impl BrandSettable for InsertableBrandBuilder {
     /// v1@{shape: rounded, label: "updated_by"}
     /// class v1 directly-involved-column
     /// ```
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -328,10 +321,7 @@ impl BrandSettable for InsertableBrandBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.brands.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -352,10 +342,7 @@ impl BrandSettable for InsertableBrandBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.brands.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -365,10 +352,7 @@ impl BrandSettable for InsertableBrandBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.brands.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -397,20 +381,19 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableBrandBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableBrandBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::brands::Brand,
-            Attribute = BrandAttribute,
+            Error = web_common_traits::database::InsertError<BrandAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<BrandAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::brands::Brand =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

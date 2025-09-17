@@ -36,6 +36,7 @@ impl core::fmt::Display for ParentProcedureTemplateAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -128,6 +129,12 @@ pub struct InsertableParentProcedureTemplateBuilder {
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
+impl diesel::associations::HasTable for InsertableParentProcedureTemplateBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::parent_procedure_templates::parent_procedure_templates::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::parent_procedure_templates::parent_procedure_templates::table
+    }
+}
 impl Default for InsertableParentProcedureTemplateBuilder {
     fn default() -> Self {
         Self {
@@ -148,8 +155,8 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableParentProced
 /// Trait defining setters for attributes of an instance of
 /// `ParentProcedureTemplate` or descendant tables.
 pub trait ParentProcedureTemplateSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.parent_procedure_templates.parent` column.
     ///
     /// # Arguments
@@ -168,10 +175,7 @@ pub trait ParentProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn parent<P>(
-        self,
-        parent: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent<P>(self, parent: P) -> Result<Self, Self::Error>
     where
         P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.parent_procedure_templates.child` column.
@@ -192,10 +196,7 @@ pub trait ParentProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn child<C>(
-        self,
-        child: C,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn child<C>(self, child: C) -> Result<Self, Self::Error>
     where
         C: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.parent_procedure_templates.created_by`
@@ -217,10 +218,7 @@ pub trait ParentProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by<CB>(
-        self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.parent_procedure_templates.created_at`
@@ -243,27 +241,29 @@ pub trait ParentProcedureTemplateSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<CA>(
-        self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute;
-    /// Sets the value of the `public.parent_procedure_templates.parent` column.
-    fn parent<P>(
-        mut self,
-        parent: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilder
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::ParentProcedureTemplateAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.parent_procedure_templates.parent` column.
+    fn parent<P>(mut self, parent: P) -> Result<Self, Self::Error>
     where
         P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let parent = <P as web_common_traits::database::PrimaryKeyLike>::primary_key(&parent);
+        let parent = <P as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &parent,
+        );
         if let Some(child) = self.child {
             pgrx_validation::must_be_distinct_i32(parent, child)
                 .map_err(|e| {
@@ -277,15 +277,14 @@ impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilde
         self.parent = Some(parent);
         Ok(self)
     }
-    /// Sets the value of the `public.parent_procedure_templates.child` column.
-    fn child<C>(
-        mut self,
-        child: C,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.parent_procedure_templates.child` column.
+    fn child<C>(mut self, child: C) -> Result<Self, Self::Error>
     where
         C: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let child = <C as web_common_traits::database::PrimaryKeyLike>::primary_key(&child);
+        let child = <C as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &child,
+        );
         if let Some(parent) = self.parent {
             pgrx_validation::must_be_distinct_i32(parent, child)
                 .map_err(|e| {
@@ -299,35 +298,31 @@ impl ParentProcedureTemplateSettable for InsertableParentProcedureTemplateBuilde
         self.child = Some(child);
         Ok(self)
     }
-    /// Sets the value of the `public.parent_procedure_templates.created_by`
-    /// column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.parent_procedure_templates.created_by` column.
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let created_by =
-            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
+        let created_by = <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &created_by,
+        );
         self.created_by = Some(created_by);
         Ok(self)
     }
-    /// Sets the value of the `public.parent_procedure_templates.created_at`
-    /// column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.parent_procedure_templates.created_at` column.
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+        validation_errors::SingleFieldError: From<
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
     {
-        let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(ParentProcedureTemplateAttribute::CreatedAt)
-        })?;
+        let created_at = created_at
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(ParentProcedureTemplateAttribute::CreatedAt)
+            })?;
         self.created_at = Some(created_at);
         Ok(self)
     }
@@ -341,11 +336,12 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableParentProcedureTemp
 impl<C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableParentProcedureTemplateBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
-        Attribute = ParentProcedureTemplateAttribute,
+        Error = web_common_traits::database::InsertError<
+            ParentProcedureTemplateAttribute,
+        >,
     >,
 {
     fn mint_primary_key(
@@ -354,10 +350,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<ParentProcedureTemplateAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

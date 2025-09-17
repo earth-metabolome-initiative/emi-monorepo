@@ -27,7 +27,7 @@ pub use users::init_root_user;
 pub fn init_migration(conn: &mut PgConnection) -> anyhow::Result<()> {
     conn.transaction(|conn| {
         let darwin = init_root_user(conn)?;
-        init_login_providers(&darwin, conn)?;
+        init_login_providers(conn)?;
         init_compatibility_rules(&darwin, conn)?;
         Ok(())
     })

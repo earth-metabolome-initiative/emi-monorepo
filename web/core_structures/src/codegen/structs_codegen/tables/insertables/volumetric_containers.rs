@@ -6,7 +6,7 @@ pub enum VolumetricContainerExtensionAttribute {
 impl core::fmt::Display for VolumetricContainerExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Container(e) => write!(f, "{e}"),
+            Self::Container(e) => write!(f, "volumetric_containers({e})"),
         }
     }
 }
@@ -59,6 +59,7 @@ impl core::fmt::Display for VolumetricContainerAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -135,6 +136,13 @@ pub struct InsertableVolumetricContainerBuilder<
     pub(crate) volumetric_container_model: Option<i32>,
     pub(crate) id: Container,
 }
+impl<Container> diesel::associations::HasTable for InsertableVolumetricContainerBuilder<Container> {
+    type Table =
+        crate::codegen::diesel_codegen::tables::volumetric_containers::volumetric_containers::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::volumetric_containers::volumetric_containers::table
+    }
+}
 impl From<InsertableVolumetricContainerBuilder>
     for web_common_traits::database::IdOrBuilder<
         ::rosetta_uuid::Uuid,
@@ -159,8 +167,8 @@ where
 /// Trait defining setters for attributes of an instance of
 /// `VolumetricContainer` or descendant tables.
 pub trait VolumetricContainerSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the
     /// `public.volumetric_containers.volumetric_container_model` column.
     ///
@@ -183,77 +191,85 @@ pub trait VolumetricContainerSettable: Sized {
     fn volumetric_container_model<VCM>(
         self,
         volumetric_container_model: VCM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         VCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl<
     Container: crate::codegen::structs_codegen::tables::insertables::ContainerSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
-        > + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
+            >,
+        >
+        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
+            >,
         >,
 > VolumetricContainerSettable for InsertableVolumetricContainerBuilder<Container>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute;
-    /// Sets the value of the
-    /// `public.volumetric_containers.volumetric_container_model` column.
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.volumetric_containers.volumetric_container_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`assets`"]
     ///    v3@{shape: rounded, label: "model"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`containers`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`containers`"]
     ///    v0@{shape: rounded, label: "container_model"}
-    /// class v0 directly-involved-column
-    /// end
-    /// subgraph v6 ["`physical_assets`"]
+    ///class v0 directly-involved-column
+    ///end
+    ///subgraph v6 ["`physical_assets`"]
     ///    v1@{shape: rounded, label: "model"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v7 ["`volumetric_containers`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v7 ["`volumetric_containers`"]
     ///    v2@{shape: rounded, label: "volumetric_container_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v0 --->|"`ancestral same as`"| v3
-    /// v0 -.->|"`inferred ancestral same as`"| v1
-    /// v1 --->|"`ancestral same as`"| v3
-    /// v2 --->|"`ancestral same as`"| v3
-    /// v2 -.->|"`inferred ancestral same as`"| v0
-    /// v2 -.->|"`inferred ancestral same as`"| v1
-    /// v5 --->|"`extends`"| v6
-    /// v6 --->|"`extends`"| v4
-    /// v7 --->|"`extends`"| v5
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v0 --->|"`ancestral same as`"| v3
+    ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v3
+    ///v2 --->|"`ancestral same as`"| v3
+    ///v2 -.->|"`inferred ancestral same as`"| v0
+    ///v2 -.->|"`inferred ancestral same as`"| v1
+    ///v5 --->|"`extends`"| v6
+    ///v6 --->|"`extends`"| v4
+    ///v7 --->|"`extends`"| v5
+    ///```
     fn volumetric_container_model<VCM>(
         mut self,
         volumetric_container_model: VCM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         VCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let volumetric_container_model =
-            <VCM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &volumetric_container_model,
-            );
+        let volumetric_container_model = <VCM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &volumetric_container_model,
+        );
         self.id = <Container as crate::codegen::structs_codegen::tables::insertables::ContainerSettable>::container_model(
                 self.id,
                 volumetric_container_model,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
@@ -262,7 +278,7 @@ impl<
                 volumetric_container_model,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
@@ -272,22 +288,28 @@ impl<
 }
 impl<
     Container: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ContainerAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetSettable
 for InsertableVolumetricContainerBuilder<Container>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.assets.id` column.
-    fn id<I>(
-        mut self,
-        id: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn id<I>(mut self, id: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -299,7 +321,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -307,10 +329,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.assets.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
@@ -321,7 +340,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -329,10 +348,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.assets.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
@@ -343,7 +359,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -373,10 +389,7 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn model<M>(
-        self,
-        model: M,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn model<M>(self, model: M) -> Result<Self, Self::Error>
     where
         M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -387,10 +400,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.assets.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -400,7 +410,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -408,10 +418,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.assets.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -424,7 +431,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -432,10 +439,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.assets.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -445,7 +449,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -453,10 +457,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.assets.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -469,7 +470,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -479,11 +480,18 @@ where
 impl<Container> crate::codegen::structs_codegen::tables::insertables::ContainerSettable
 for InsertableVolumetricContainerBuilder<Container>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::VolumetricContainerSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.containers.container_model` column.
     ///
@@ -516,10 +524,7 @@ where
     ///v3 --->|"`extends`"| v4
     ///v5 --->|"`extends`"| v3
     ///```
-    fn container_model<CM>(
-        self,
-        container_model: CM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn container_model<CM>(self, container_model: CM) -> Result<Self, Self::Error>
     where
         CM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -534,11 +539,18 @@ impl<
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable
 for InsertableVolumetricContainerBuilder<Container>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::VolumetricContainerSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.physical_assets.model` column.
     ///
@@ -579,10 +591,7 @@ where
     ///v6 --->|"`extends`"| v4
     ///v7 --->|"`extends`"| v5
     ///```
-    fn model<M>(
-        self,
-        model: M,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn model<M>(self, model: M) -> Result<Self, Self::Error>
     where
         M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -612,11 +621,10 @@ where
 impl<Container, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableVolumetricContainerBuilder<Container>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
-        Attribute = VolumetricContainerAttribute,
+        Error = web_common_traits::database::InsertError<VolumetricContainerAttribute>,
     >,
     Container: web_common_traits::database::TryInsertGeneric<
         C,
@@ -629,10 +637,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<VolumetricContainerAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

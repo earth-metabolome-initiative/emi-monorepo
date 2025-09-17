@@ -101,10 +101,6 @@ CREATE TABLE IF NOT EXISTS procedure_assets (
 	procedure_template_asset_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The ancestor asset model defined in the procedure template asset.
 	ancestor_model INTEGER NOT NULL REFERENCES asset_models(id),
-	-- User who created this procedure asset.
-	created_by INTEGER NOT NULL REFERENCES users(id),
-	-- Timestamp when this procedure asset was created.
-	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	-- The procedure template must match the procedure template of the procedure.
 	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
 	-- The procedure template asset must must be compatible with the procedure template of the procedure.
@@ -144,21 +140,17 @@ INSERT INTO procedure_assets (
 		asset_model,
 		asset,
 		procedure_template_asset_model,
-		ancestor_model,
-		created_by,
-		created_at
+		ancestor_model
 	)
 SELECT p.parent_procedure,
 	p.parent_procedure_template,
-	pam.asset_model,
+	NEW.asset_model,
 	NEW.asset,
 	ptam.id,
-	pam.ancestor_model,
-	NEW.created_by,
-	NEW.created_at
+	NEW.ancestor_model
 FROM procedures p
-	JOIN procedure_template_asset_models pam ON pam.procedure_template = NEW.procedure_template_asset_model
-	JOIN procedure_template_asset_models ptam ON ptam.based_on = pam.id
+	JOIN procedure_template_asset_models ptam ON ptam.based_on = NEW.procedure_template_asset_model
+	AND ptam.procedure_template = p.parent_procedure_template
 WHERE p.procedure = NEW.procedure
 	AND p.parent_procedure IS NOT NULL;
 RETURN NEW;

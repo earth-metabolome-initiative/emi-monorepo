@@ -6,7 +6,7 @@ use core_structures::{
 };
 use diesel::{OptionalExtension, PgConnection};
 use directus_codegen::Address as DirectusAddress;
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{BackendInsertableVariant, Insertable};
 
 /// Returns (potentially newly created) address for a Directus address.
 pub(crate) fn get_address(
@@ -22,7 +22,7 @@ pub(crate) fn get_address(
             PortalCity::new()
                 .name(directus_address.city.clone())?
                 .iso(country.iso)?
-                .insert(0, portal_conn)?
+                .backend_insert(portal_conn)?
         }
     };
 
@@ -51,6 +51,6 @@ pub(crate) fn get_address(
                     );
                 }
             })?
-            .insert(0, portal_conn)?)
+            .backend_insert(portal_conn)?)
     }
 }

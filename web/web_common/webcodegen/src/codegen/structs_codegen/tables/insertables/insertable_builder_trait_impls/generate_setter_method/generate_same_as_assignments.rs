@@ -37,7 +37,6 @@ impl Table {
     pub(super) fn generate_same_as_assignments(
         &self,
         current_column: &Column,
-        extension_network: &crate::TableExtensionNetwork,
         extension_table_traits: &mut HashMap<Table, HashSet<Table>>,
         conn: &mut PgConnection,
     ) -> Result<(bool, Vec<TokenStream>, Vec<Column>), WebCodeGenError> {
@@ -66,8 +65,8 @@ impl Table {
         //    column from an ancestor which does.
 
         for required_ancestor_column in &required_ancestor_columns {
-            let foreign_key = &extension_network
-                .extension_foreign_keys_path(self, required_ancestor_column, conn)
+            let foreign_key = &self
+                .extension_foreign_keys_path( required_ancestor_column, conn)?
                 .expect(&format!(
                     "There should exist a foreign key path from table {self} to column {required_ancestor_column}",
                 ))[0];
@@ -90,7 +89,7 @@ impl Table {
                     self.#foreign_key_ident,
                     #current_column_ident
                 ).map_err(|err| {
-                    err.into_field_name(|attribute| Self::Attributes::Extension(attribute.into()))
+                    err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(attribute.into()))
                 })?;
             });
         }
@@ -157,7 +156,7 @@ impl Table {
                                     return Err(
                                         web_common_traits::database::InsertError::BuilderError(
                                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                                                Self::Attributes::#local_column_camel_case_ident
+                                                <Self as common_traits::builder::Attributed>::Attribute::#local_column_camel_case_ident
                                             )
                                         )
                                     );
@@ -170,7 +169,7 @@ impl Table {
                                     #local_column_ident
                                 ).map_err(|e| {
                                     e.into_field_name(|attribute| {
-                                        Self::Attributes::#current_column_camel_case_ident(attribute)
+                                        <Self as common_traits::builder::Attributed>::Attribute::#current_column_camel_case_ident(attribute)
                                     })
                                 })?;
                             }
@@ -184,7 +183,7 @@ impl Table {
                                         return Err(
                                             web_common_traits::database::InsertError::BuilderError(
                                                 web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                                                    Self::Attributes::#local_column_camel_case_ident
+                                                    <Self as common_traits::builder::Attributed>::Attribute::#local_column_camel_case_ident
                                                 )
                                             )
                                         );
@@ -199,7 +198,7 @@ impl Table {
                                         #local_column_ident
                                     ).map_err(|e| {
                                         e.into_field_name(|attribute| {
-                                            Self::Attributes::#current_column_camel_case_ident(attribute)
+                                            <Self as common_traits::builder::Attributed>::Attribute::#current_column_camel_case_ident(attribute)
                                         })
                                     })?.into()
                                 } else {
@@ -252,7 +251,7 @@ impl Table {
                                 #current_column_ident
                             ).map_err(|e| {
                                 e.into_field_name(|attribute| {
-                                    Self::Attributes::#local_column_camel_case_ident(attribute)
+                                    <Self as common_traits::builder::Attributed>::Attribute::#local_column_camel_case_ident(attribute)
                                 })
                             })?;
                         }
@@ -265,7 +264,7 @@ impl Table {
                                     #current_column_ident
                                 ).map_err(|e| {
                                     e.into_field_name(|attribute| {
-                                        Self::Attributes::#local_column_camel_case_ident(attribute)
+                                        <Self as common_traits::builder::Attributed>::Attribute::#local_column_camel_case_ident(attribute)
                                     })
                                 })?.into();
                             }

@@ -35,6 +35,7 @@ impl core::fmt::Display for ColorAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -76,6 +77,12 @@ pub struct InsertableColorBuilder {
     pub(crate) hexadecimal_value: Option<String>,
     pub(crate) description: Option<String>,
 }
+impl diesel::associations::HasTable for InsertableColorBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::colors::colors::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::colors::colors::table
+    }
+}
 impl From<InsertableColorBuilder>
     for web_common_traits::database::IdOrBuilder<i16, InsertableColorBuilder>
 {
@@ -93,8 +100,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `Color` or
 /// descendant tables.
 pub trait ColorSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.colors.name` column.
     ///
     /// # Arguments
@@ -113,10 +120,7 @@ pub trait ColorSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
@@ -139,10 +143,7 @@ pub trait ColorSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn hexadecimal_value<HV>(
-        self,
-        hexadecimal_value: HV,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn hexadecimal_value<HV>(self, hexadecimal_value: HV) -> Result<Self, Self::Error>
     where
         HV: TryInto<String>,
         validation_errors::SingleFieldError: From<<HV as TryInto<String>>::Error>;
@@ -165,21 +166,22 @@ pub trait ColorSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn description<D>(
-        self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
 }
-impl ColorSettable for InsertableColorBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::ColorAttribute;
+impl ColorSettable for InsertableColorBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::ColorAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.colors.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -191,10 +193,7 @@ impl ColorSettable for InsertableColorBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.colors.hexadecimal_value` column.
-    fn hexadecimal_value<HV>(
-        mut self,
-        hexadecimal_value: HV,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn hexadecimal_value<HV>(mut self, hexadecimal_value: HV) -> Result<Self, Self::Error>
     where
         HV: TryInto<String>,
         validation_errors::SingleFieldError: From<<HV as TryInto<String>>::Error>,
@@ -207,10 +206,7 @@ impl ColorSettable for InsertableColorBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.colors.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -230,20 +226,19 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableColorBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableColorBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::colors::Color,
-            Attribute = ColorAttribute,
+            Error = web_common_traits::database::InsertError<ColorAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<ColorAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::colors::Color =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

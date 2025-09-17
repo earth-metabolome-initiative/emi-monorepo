@@ -6,7 +6,7 @@ pub enum CommercialProductExtensionAttribute {
 impl core::fmt::Display for CommercialProductExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::AssetModel(e) => write!(f, "{e}"),
+            Self::AssetModel(e) => write!(f, "commercial_products({e})"),
         }
     }
 }
@@ -59,6 +59,7 @@ impl core::fmt::Display for CommercialProductAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -127,6 +128,13 @@ pub struct InsertableCommercialProductBuilder<
     pub(crate) brand_id: Option<i32>,
     pub(crate) id: AssetModel,
 }
+impl<AssetModel> diesel::associations::HasTable for InsertableCommercialProductBuilder<AssetModel> {
+    type Table =
+        crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::commercial_products::commercial_products::table
+    }
+}
 impl From<InsertableCommercialProductBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialProductBuilder>
 {
@@ -148,8 +156,8 @@ where
 /// Trait defining setters for attributes of an instance of `CommercialProduct`
 /// or descendant tables.
 pub trait CommercialProductSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.commercial_products.deprecation_date`
     /// column.
     ///
@@ -170,10 +178,7 @@ pub trait CommercialProductSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn deprecation_date<DD>(
-        self,
-        deprecation_date: DD,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn deprecation_date<DD>(self, deprecation_date: DD) -> Result<Self, Self::Error>
     where
         DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
         validation_errors::SingleFieldError:
@@ -196,62 +201,68 @@ pub trait CommercialProductSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn brand<BI>(
-        self,
-        brand_id: BI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn brand<BI>(self, brand_id: BI) -> Result<Self, Self::Error>
     where
         BI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
-impl<AssetModel> CommercialProductSettable for InsertableCommercialProductBuilder<AssetModel> {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute;
-    /// Sets the value of the `public.commercial_products.deprecation_date`
-    /// column.
-    fn deprecation_date<DD>(
-        mut self,
-        deprecation_date: DD,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+impl<AssetModel> CommercialProductSettable
+for InsertableCommercialProductBuilder<AssetModel>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.commercial_products.deprecation_date` column.
+    fn deprecation_date<DD>(mut self, deprecation_date: DD) -> Result<Self, Self::Error>
     where
         DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
-        validation_errors::SingleFieldError:
-            From<<DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error>,
+        validation_errors::SingleFieldError: From<
+            <DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error,
+        >,
     {
-        let deprecation_date = deprecation_date.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(CommercialProductAttribute::DeprecationDate)
-        })?;
+        let deprecation_date = deprecation_date
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(CommercialProductAttribute::DeprecationDate)
+            })?;
         self.deprecation_date = deprecation_date;
         Ok(self)
     }
-    /// Sets the value of the `public.commercial_products.brand_id` column.
-    fn brand<BI>(
-        mut self,
-        brand_id: BI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.commercial_products.brand_id` column.
+    fn brand<BI>(mut self, brand_id: BI) -> Result<Self, Self::Error>
     where
         BI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let brand_id = <BI as web_common_traits::database::PrimaryKeyLike>::primary_key(&brand_id);
+        let brand_id = <BI as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &brand_id,
+        );
         self.brand_id = Some(brand_id);
         Ok(self)
     }
 }
 impl<
     AssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
-    for InsertableCommercialProductBuilder<AssetModel>
+for InsertableCommercialProductBuilder<AssetModel>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
-    /// Sets the value of the `public.asset_models.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.asset_models.name` column.
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -262,18 +273,15 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
     #[inline]
-    /// Sets the value of the `public.asset_models.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.asset_models.description` column.
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -284,18 +292,15 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
     #[inline]
-    /// Sets the value of the `public.asset_models.parent_model` column.
-    fn parent_model<PM>(
-        mut self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.asset_models.parent_model` column.
+    fn parent_model<PM>(mut self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -305,18 +310,15 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
     #[inline]
-    /// Sets the value of the `public.asset_models.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.asset_models.created_by` column.
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -326,22 +328,20 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
     #[inline]
-    /// Sets the value of the `public.asset_models.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.asset_models.created_at` column.
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+        validation_errors::SingleFieldError: From<
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.id,
@@ -349,18 +349,15 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
     #[inline]
-    /// Sets the value of the `public.asset_models.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.asset_models.updated_by` column.
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -370,22 +367,20 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
     #[inline]
-    /// Sets the value of the `public.asset_models.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.asset_models.updated_at` column.
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+        validation_errors::SingleFieldError: From<
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.id,
@@ -393,7 +388,7 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -423,11 +418,10 @@ where
 impl<AssetModel, C> web_common_traits::database::TryInsertGeneric<C>
     for InsertableCommercialProductBuilder<AssetModel>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
-            Attribute = CommercialProductAttribute,
+            Error = web_common_traits::database::InsertError<CommercialProductAttribute>,
         >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
@@ -435,9 +429,12 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<CommercialProductAttribute>,
+    > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

@@ -2,9 +2,6 @@
 
 /// A trait for types that can be updated in the database.
 pub trait Updatable<C> {
-    /// The expected user ID type.
-    type UserId;
-
     /// Returns whether the user can update the row.
     ///
     /// # Arguments
@@ -19,9 +16,5 @@ pub trait Updatable<C> {
     /// # Errors
     ///
     /// * If the database connection fails.
-    fn can_update(
-        &self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<bool, diesel::result::Error>;
+    fn can_update(&self, user_id: i32, conn: &mut C) -> Result<bool, diesel::result::Error>;
 }

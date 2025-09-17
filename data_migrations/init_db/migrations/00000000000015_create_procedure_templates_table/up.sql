@@ -75,10 +75,6 @@ CREATE TABLE IF NOT EXISTS procedure_template_asset_models (
 	based_on INTEGER REFERENCES procedure_template_asset_models(id),
 	-- The asset model this procedure template asset model is associated with
 	asset_model INTEGER NOT NULL REFERENCES asset_models(id) ON DELETE CASCADE,
-	-- The user who created this procedure template asset model
-	created_by INTEGER NOT NULL REFERENCES users(id),
-	-- The timestamp when this procedure template asset model was created
-	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	-- We enforce that, if based_on is specified, then the asset model must be the same as the one
 	-- of the procedure template asset model it is based on.
 	FOREIGN KEY (based_on, asset_model) REFERENCES procedure_template_asset_models(id, asset_model),
@@ -97,16 +93,12 @@ INSERT INTO procedure_template_asset_models (
 		name,
 		procedure_template,
 		based_on,
-		asset_model,
-		created_by,
-		created_at
+		asset_model
 	)
 SELECT pam.name,
 	NEW.parent,
 	pam.id,
-	pam.asset_model,
-	NEW.created_by,
-	NEW.created_at
+	pam.asset_model
 FROM procedure_template_asset_models pam
 WHERE pam.procedure_template = NEW.child;
 RETURN NEW;

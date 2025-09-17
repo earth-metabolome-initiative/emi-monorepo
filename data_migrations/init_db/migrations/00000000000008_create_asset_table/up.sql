@@ -69,3 +69,36 @@ CREATE TABLE IF NOT EXISTS asset_model_ancestors (
     ancestor_model INTEGER NOT NULL REFERENCES asset_models(id) ON DELETE CASCADE,
     PRIMARY KEY (descendant_model, ancestor_model)
 );
+-- When a new `asset_models` row is inserted, we also populate the `asset_model_ancestors` table
+-- with the tautological relationship (a row is an ancestor of itself) and all the ancestors of its parent model.
+CREATE OR REPLACE FUNCTION populate_asset_model_ancestors() RETURNS TRIGGER AS $$ BEGIN -- Insert the tautological relationship
+INSERT INTO asset_model_ancestors (descendant_model, ancestor_model)
+VALUES (NEW.id, NEW.id);
+-- Insert all ancestors of the parent model
+IF NEW.parent_model IS NOT NULL THEN
+INSERT INTO asset_model_ancestors (descendant_model, ancestor_model)
+SELECT NEW.id,
+    ancestor_model
+FROM asset_model_ancestors
+WHERE descendant_model = NEW.parent_model;
+END IF;
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER after_insert_asset_models
+AFTER
+INSERT ON asset_models FOR EACH ROW EXECUTE FUNCTION populate_asset_model_ancestors();
+-- When an `asset_models` row is deleted, we also delete all its descendants.
+CREATE OR REPLACE FUNCTION delete_descendant_asset_models() RETURNS TRIGGER AS $$ BEGIN
+DELETE FROM asset_models
+WHERE id IN (
+        SELECT descendant_model
+        FROM asset_model_ancestors
+        WHERE ancestor_model = OLD.id
+            AND descendant_model != OLD.id
+    );
+RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+CREATE TRIGGER after_delete_asset_models
+AFTER DELETE ON asset_models FOR EACH ROW EXECUTE FUNCTION delete_descendant_asset_models();

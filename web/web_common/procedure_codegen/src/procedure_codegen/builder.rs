@@ -148,7 +148,6 @@ impl<'a> Builder for ProcedureCodegenBuilder<'a> {
         Ok(ProcedureCodegen {
             generate_procedure_impls: self.generate_procedure_impls,
             generate_procedure_template_impls: self.generate_procedure_template_impls,
-            generate_procedure_initializer_impls: self.generate_procedure_initializer_impls,
             beautify: self.beautify,
             extension_network: self.extension_network.ok_or(BuilderError::IncompleteBuild(
                 ProcedureCodegenAttribute::ExtensionNetwork,

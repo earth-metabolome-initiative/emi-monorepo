@@ -9,8 +9,8 @@ pub enum CommercialCapLotExtensionAttribute {
 impl core::fmt::Display for CommercialCapLotExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::CommercialProductLot(e) => write!(f, "{e}"),
-            Self::CapModel(e) => write!(f, "{e}"),
+            Self::CommercialProductLot(e) => write!(f, "commercial_cap_lots({e})"),
+            Self::CapModel(e) => write!(f, "commercial_cap_lots({e})"),
         }
     }
 }
@@ -71,6 +71,7 @@ impl core::fmt::Display for CommercialCapLotAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -137,20 +138,29 @@ impl InsertableCommercialCapLot {
 ///    .insert(user.id, conn)?;
 /// ```
 pub struct InsertableCommercialCapLotBuilder<
-    CapModel
-        = crate::codegen::structs_codegen::tables::insertables::InsertableCapModelBuilder<
+    CommercialProductLot
+        = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotBuilder<
             crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
                 crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
             >,
         >,
-    CommercialProductLot
-        = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductLotBuilder<
+    CapModel
+        = crate::codegen::structs_codegen::tables::insertables::InsertableCapModelBuilder<
             Option<i32>,
         >,
 > {
     pub(crate) product_model: Option<i32>,
     pub(crate) commercial_cap_lots_id_fkey: CommercialProductLot,
     pub(crate) commercial_cap_lots_id_fkey1: CapModel,
+}
+impl<CommercialProductLot, CapModel> diesel::associations::HasTable
+    for InsertableCommercialCapLotBuilder<CommercialProductLot, CapModel>
+{
+    type Table =
+        crate::codegen::diesel_codegen::tables::commercial_cap_lots::commercial_cap_lots::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::commercial_cap_lots::commercial_cap_lots::table
+    }
 }
 impl From<InsertableCommercialCapLotBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialCapLotBuilder>
@@ -177,8 +187,8 @@ where
 /// Trait defining setters for attributes of an instance of `CommercialCapLot`
 /// or descendant tables.
 pub trait CommercialCapLotSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.commercial_cap_lots.product_model` column.
     ///
     /// # Arguments
@@ -197,23 +207,32 @@ pub trait CommercialCapLotSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn product_model<PM>(
-        self,
-        product_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn product_model<PM>(self, product_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl<
-    CapModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::CapModelAttribute,
-        >,
     CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+            >,
+        >
+        + crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+            >,
         >,
+    CapModel,
 > CommercialCapLotSettable
-for InsertableCommercialCapLotBuilder<CapModel, CommercialProductLot> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute;
+for InsertableCommercialCapLotBuilder<CommercialProductLot, CapModel>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     ///Sets the value of the `public.commercial_cap_lots.product_model` column.
     ///
     ///# Implementation notes
@@ -253,10 +272,7 @@ for InsertableCommercialCapLotBuilder<CapModel, CommercialProductLot> {
     ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
     ///```
-    fn product_model<PM>(
-        mut self,
-        product_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn product_model<PM>(mut self, product_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -268,16 +284,16 @@ for InsertableCommercialCapLotBuilder<CapModel, CommercialProductLot> {
                 product_model,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
-        self.commercial_cap_lots_id_fkey1 = <CapModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
-                self.commercial_cap_lots_id_fkey1,
+        self.commercial_cap_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
+                self.commercial_cap_lots_id_fkey,
                 product_model,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
@@ -286,35 +302,41 @@ for InsertableCommercialCapLotBuilder<CapModel, CommercialProductLot> {
     }
 }
 impl<
-    CapModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::CapModelAttribute,
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+            >,
         >,
-    CommercialProductLot,
+    CapModel,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
-for InsertableCommercialCapLotBuilder<CapModel, CommercialProductLot>
+for InsertableCommercialCapLotBuilder<CommercialProductLot, CapModel>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.commercial_cap_lots_id_fkey1 = <CapModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
-                self.commercial_cap_lots_id_fkey1,
+        self.commercial_cap_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
+                self.commercial_cap_lots_id_fkey,
                 name,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -322,21 +344,18 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.commercial_cap_lots_id_fkey1 = <CapModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
-                self.commercial_cap_lots_id_fkey1,
+        self.commercial_cap_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
+                self.commercial_cap_lots_id_fkey,
                 description,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -366,10 +385,7 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn parent_model<PM>(
-        self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -380,20 +396,17 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.commercial_cap_lots_id_fkey1 = <CapModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
-                self.commercial_cap_lots_id_fkey1,
+        self.commercial_cap_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
+                self.commercial_cap_lots_id_fkey,
                 created_by,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -401,23 +414,20 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_cap_lots_id_fkey1 = <CapModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
-                self.commercial_cap_lots_id_fkey1,
+        self.commercial_cap_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
+                self.commercial_cap_lots_id_fkey,
                 created_at,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -425,20 +435,17 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.commercial_cap_lots_id_fkey1 = <CapModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
-                self.commercial_cap_lots_id_fkey1,
+        self.commercial_cap_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
+                self.commercial_cap_lots_id_fkey,
                 updated_by,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -446,55 +453,65 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_cap_lots_id_fkey1 = <CapModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
-                self.commercial_cap_lots_id_fkey1,
+        self.commercial_cap_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
+                self.commercial_cap_lots_id_fkey,
                 updated_at,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
 }
-impl<CapModel, CommercialProductLot>
-    crate::codegen::structs_codegen::tables::insertables::CapModelSettable
-    for InsertableCommercialCapLotBuilder<CapModel, CommercialProductLot>
-{
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute;
-}
 impl<
+    CommercialProductLot,
     CapModel,
-    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
-        >,
-> crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable
-for InsertableCommercialCapLotBuilder<CapModel, CommercialProductLot>
+> crate::codegen::structs_codegen::tables::insertables::CapModelSettable
+for InsertableCommercialCapLotBuilder<CommercialProductLot, CapModel>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::CommercialCapLotSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute,
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+}
+impl<
+    CommercialProductLot: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+            >,
+        >,
+    CapModel,
+> crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable
+for InsertableCommercialCapLotBuilder<CommercialProductLot, CapModel>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute,
+    >,
+    Self: crate::codegen::structs_codegen::tables::insertables::CommercialCapLotSettable<
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute,
+        >,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.commercial_product_lots.lot` column.
-    fn lot<L>(
-        mut self,
-        lot: L,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn lot<L>(mut self, lot: L) -> Result<Self, Self::Error>
     where
         L: TryInto<String>,
         validation_errors::SingleFieldError: From<<L as TryInto<String>>::Error>,
@@ -505,7 +522,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -543,10 +560,7 @@ where
     ///v3 --->|"`extends`"| v4
     ///v4 --->|"`extends`"| v5
     ///```
-    fn product_model<PM>(
-        self,
-        product_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn product_model<PM>(self, product_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -554,16 +568,23 @@ where
     }
 }
 impl<
-    CapModel,
     CommercialProductLot,
+    CapModel,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
-for InsertableCommercialCapLotBuilder<CapModel, CommercialProductLot>
+for InsertableCommercialCapLotBuilder<CommercialProductLot, CapModel>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialCapLotSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialCapLotAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -604,10 +625,7 @@ where
     ///v6 --->|"`extends`"| v7
     ///v7 --->|"`extends`"| v4
     ///```
-    fn parent_model<PM>(
-        self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -618,7 +636,7 @@ where
                 )
                 .ok_or(
                     common_traits::prelude::BuilderError::IncompleteBuild(
-                        Self::Attributes::ProductModel,
+                        <Self as common_traits::builder::Attributed>::Attribute::ProductModel,
                     ),
                 )?,
         )
@@ -650,25 +668,25 @@ where
         self
     }
 }
-impl<CapModel, CommercialProductLot, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableCommercialCapLotBuilder<CapModel, CommercialProductLot>
+impl<CommercialProductLot, CapModel, C> web_common_traits::database::TryInsertGeneric<C>
+    for InsertableCommercialCapLotBuilder<CommercialProductLot, CapModel>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot,
-            Attribute = CommercialCapLotAttribute,
+            Error = web_common_traits::database::InsertError<CommercialCapLotAttribute>,
         >,
-    CapModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     CommercialProductLot: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    CapModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<CommercialCapLotAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

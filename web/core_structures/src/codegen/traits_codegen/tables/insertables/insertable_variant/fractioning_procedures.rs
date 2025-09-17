@@ -1,13 +1,96 @@
-impl<Procedure> web_common_traits::database::InsertableVariantMetadata
+impl<Procedure> web_common_traits::database::DispatchableInsertVariantMetadata
     for crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureBuilder<
         Procedure,
     >
 {
     type Row =
         crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute,
+    >;
+}
+impl<Procedure> web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureBuilder<
+        Procedure,
+    >
+{
     type InsertableVariant =
         crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedure;
-    type UserId = i32;
+}
+#[cfg(feature = "backend")]
+impl<Procedure> web_common_traits::database::BackendInsertableVariant
+    for crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureBuilder<
+        Procedure,
+    >
+where
+    Self: web_common_traits::database::DispatchableInsertableVariant<diesel::PgConnection>,
+{
+}
+impl<
+    C: diesel::connection::LoadConnection,
+    Procedure,
+> web_common_traits::database::DispatchableInsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureBuilder<
+    Procedure,
+>
+where
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedure as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
+    >,
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedure,
+        Row = crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute,
+        >,
+    >,
+    Procedure: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = ::rosetta_uuid::Uuid,
+    >,
+    Self: crate::codegen::structs_codegen::tables::insertables::FractioningProcedureSettable<
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute,
+        >,
+    >,
+    crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+        PrimaryKey = ::rosetta_uuid::Uuid,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+        C,
+    >,
+    Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::FractioningProcedureExtensionAttribute: From<
+        <Procedure as common_traits::builder::Attributed>::Attribute,
+    >,
+{
+    fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("fractioning_procedures");
+        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedure = self
+            .try_insert(user_id, conn)?;
+        Ok(
+            diesel::insert_into(Self::table())
+                .values(insertable_struct)
+                .get_result(conn)?,
+        )
+    }
 }
 impl<
     C: diesel::connection::LoadConnection,
@@ -32,7 +115,9 @@ where
         PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     Self: crate::codegen::structs_codegen::tables::insertables::FractioningProcedureSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute,
+        >,
     >,
     crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate: web_common_traits::database::Read<
         C,
@@ -50,38 +135,11 @@ where
         <Procedure as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    fn insert(
-        mut self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute,
-        >,
-    > {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use web_common_traits::database::MostConcreteTable;
-        self.set_most_concrete_table("fractioning_procedures");
-        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedure = self
-            .try_insert(user_id, conn)?;
-        Ok(
-            diesel::insert_into(Self::Row::table())
-                .values(insertable_struct)
-                .get_result(conn)?,
-        )
-    }
     fn try_insert(
         mut self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::InsertableVariant,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute,
-        >,
-    > {
+    ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {

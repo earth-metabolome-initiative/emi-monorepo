@@ -6,7 +6,9 @@ use core_structures::{
 };
 use diesel::{OptionalExtension, PgConnection};
 use directus_codegen::{DirectusUser, FieldDatum as DirectusFieldDatum};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{
+    BackendInsertableVariant, DispatchableInsertableVariant, Insertable,
+};
 
 /// This module provides a method to retrieve or insert a user in the database.
 pub fn get_user(
@@ -35,7 +37,7 @@ pub fn get_user(
         .last_name(directus_user.last_name.clone().expect("Directus user must have a last name"))?
         .created_at(imputed_created_at)?
         .updated_at(last_access)?
-        .insert(0, portal_conn)?;
+        .backend_insert(portal_conn)?;
 
     let _new_email = UserEmail::new()
         .created_by(new_user.id)?

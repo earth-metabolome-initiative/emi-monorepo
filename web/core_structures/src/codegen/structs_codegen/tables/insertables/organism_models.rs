@@ -8,7 +8,7 @@ pub enum OrganismModelExtensionAttribute {
 impl core::fmt::Display for OrganismModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::SampleSourceModel(e) => write!(f, "{e}"),
+            Self::SampleSourceModel(e) => write!(f, "organism_models({e})"),
         }
     }
 }
@@ -53,6 +53,7 @@ impl core::fmt::Display for OrganismModelAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -108,6 +109,14 @@ pub struct InsertableOrganismModelBuilder<
 > {
     pub(crate) id: SampleSourceModel,
 }
+impl<SampleSourceModel> diesel::associations::HasTable
+    for InsertableOrganismModelBuilder<SampleSourceModel>
+{
+    type Table = crate::codegen::diesel_codegen::tables::organism_models::organism_models::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::organism_models::organism_models::table
+    }
+}
 impl From<InsertableOrganismModelBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableOrganismModelBuilder>
 {
@@ -129,32 +138,44 @@ where
 /// Trait defining setters for attributes of an instance of `OrganismModel` or
 /// descendant tables.
 pub trait OrganismModelSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
 }
 impl<SampleSourceModel> OrganismModelSettable
-    for InsertableOrganismModelBuilder<SampleSourceModel>
+for InsertableOrganismModelBuilder<SampleSourceModel>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute,
+    >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
 }
 impl<
     SampleSourceModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableOrganismModelBuilder<SampleSourceModel>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -165,7 +186,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -173,10 +194,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -187,7 +205,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -217,10 +235,7 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn parent_model<PM>(
-        self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -231,10 +246,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -244,7 +256,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -252,10 +264,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -268,7 +277,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -276,10 +285,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -289,7 +295,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -297,10 +303,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -313,7 +316,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -322,17 +325,23 @@ where
 }
 impl<
     SampleSourceModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::SampleSourceModelAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
-for InsertableOrganismModelBuilder<SampleSourceModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute;
+for InsertableOrganismModelBuilder<SampleSourceModel>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
-    fn parent_model<PM>(
-        mut self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(mut self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -342,18 +351,25 @@ for InsertableOrganismModelBuilder<SampleSourceModel> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
 }
-impl<SampleSourceModel>
-    crate::codegen::structs_codegen::tables::insertables::SampleSourceModelSettable
-    for InsertableOrganismModelBuilder<SampleSourceModel>
+impl<
+    SampleSourceModel,
+> crate::codegen::structs_codegen::tables::insertables::SampleSourceModelSettable
+for InsertableOrganismModelBuilder<SampleSourceModel>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute,
+    >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganismModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
 }
 impl<SampleSourceModel> web_common_traits::database::MostConcreteTable
     for InsertableOrganismModelBuilder<SampleSourceModel>
@@ -378,11 +394,10 @@ where
 impl<SampleSourceModel, C> web_common_traits::database::TryInsertGeneric<C>
     for InsertableOrganismModelBuilder<SampleSourceModel>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::organism_models::OrganismModel,
-            Attribute = OrganismModelAttribute,
+            Error = web_common_traits::database::InsertError<OrganismModelAttribute>,
         >,
     SampleSourceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
@@ -390,9 +405,10 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<OrganismModelAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::organism_models::OrganismModel =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

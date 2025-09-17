@@ -1,6 +1,6 @@
 //! Submodule providing utilities to create and manage documents.
 use diesel::connection::LoadConnection;
-use web_common_traits::database::{InsertError, Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, InsertError, Insertable};
 
 use crate::{
     Photograph, codegen::structs_codegen::tables::insertables::AssetSettable,
@@ -14,8 +14,7 @@ pub fn create_photograph<C: LoadConnection>(
     conn: &mut C,
 ) -> Result<Photograph, InsertError<PhotographAttribute>>
 where
-    <Photograph as Insertable>::InsertableBuilder:
-        InsertableVariant<C, Attribute = PhotographAttribute, Row = Photograph, UserId = i32>,
+    <Photograph as Insertable>::InsertableBuilder: DispatchableInsertableVariant<C, Error = InsertError<PhotographAttribute>, Row = Photograph>,
 {
     let info = infer::get(photograph).expect("Failed to infer document type");
 

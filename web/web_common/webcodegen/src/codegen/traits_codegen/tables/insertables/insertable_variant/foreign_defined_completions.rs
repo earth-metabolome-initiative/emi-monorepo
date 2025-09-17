@@ -97,7 +97,7 @@ impl Codegen<'_> {
         if !foreign_defined_completions.is_empty() {
             let attributes = table.insertable_enum_ty()?;
             extra_requirements.push(quote! {
-                Self: #buildable_trait<Attributes=#attributes>
+                Self: #buildable_trait<Error= web_common_traits::database::InsertError<#attributes>>
             });
         }
 

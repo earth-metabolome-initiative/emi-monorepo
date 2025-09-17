@@ -1,8 +1,6 @@
 //! Submodule defining the `ProcedureTemplateGraph` structure and its associated
 //! methods.
 
-use std::rc::Rc;
-
 use core_structures::{
     AssetModel, NextProcedureTemplate, ParentProcedureTemplate, ProcedureTemplate,
     ProcedureTemplateAssetModel,

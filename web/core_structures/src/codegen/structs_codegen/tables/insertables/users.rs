@@ -39,6 +39,7 @@ impl core::fmt::Display for UserAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -84,6 +85,12 @@ pub struct InsertableUserBuilder {
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
+impl diesel::associations::HasTable for InsertableUserBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::users::users::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::users::users::table
+    }
+}
 impl From<InsertableUserBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableUserBuilder>
 {
@@ -114,8 +121,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `User` or descendant
 /// tables.
 pub trait UserSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.users.first_name` column.
     ///
     /// # Arguments
@@ -135,10 +142,7 @@ pub trait UserSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn first_name<FN>(
-        self,
-        first_name: FN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn first_name<FN>(self, first_name: FN) -> Result<Self, Self::Error>
     where
         FN: TryInto<String>,
         validation_errors::SingleFieldError: From<<FN as TryInto<String>>::Error>;
@@ -160,10 +164,7 @@ pub trait UserSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn last_name<LN>(
-        self,
-        last_name: LN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn last_name<LN>(self, last_name: LN) -> Result<Self, Self::Error>
     where
         LN: TryInto<String>,
         validation_errors::SingleFieldError: From<<LN as TryInto<String>>::Error>;
@@ -186,10 +187,7 @@ pub trait UserSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<CA>(
-        self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -213,22 +211,23 @@ pub trait UserSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_at<UA>(
-        self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl UserSettable for InsertableUserBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::UserAttribute;
+impl UserSettable for InsertableUserBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::UserAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.users.first_name` column.
-    fn first_name<FN>(
-        mut self,
-        first_name: FN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn first_name<FN>(mut self, first_name: FN) -> Result<Self, Self::Error>
     where
         FN: TryInto<String>,
         validation_errors::SingleFieldError: From<<FN as TryInto<String>>::Error>,
@@ -245,10 +244,7 @@ impl UserSettable for InsertableUserBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.users.last_name` column.
-    fn last_name<LN>(
-        mut self,
-        last_name: LN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn last_name<LN>(mut self, last_name: LN) -> Result<Self, Self::Error>
     where
         LN: TryInto<String>,
         validation_errors::SingleFieldError: From<<LN as TryInto<String>>::Error>,
@@ -265,10 +261,7 @@ impl UserSettable for InsertableUserBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.users.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -289,10 +282,7 @@ impl UserSettable for InsertableUserBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.users.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -321,20 +311,19 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableUserBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableUserBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::users::User,
-            Attribute = UserAttribute,
+            Error = web_common_traits::database::InsertError<UserAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<UserAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::users::User =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

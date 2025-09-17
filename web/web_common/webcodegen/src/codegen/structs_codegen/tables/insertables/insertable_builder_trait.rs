@@ -198,7 +198,7 @@ impl Table {
                     #column_snake_case_ident: #argument_type
                 ) -> Result<
                     Self,
-                    web_common_traits::database::InsertError<Self::Attributes>
+                    Self::Error
                 > #maybe_where_constraints;
             })
         }
@@ -211,8 +211,8 @@ impl Table {
         Ok(quote::quote! {
             #[doc = #trait_documentation]
             pub trait #trait_ident: Sized {
-                /// Attributes required to build the insertable.
-                type Attributes;
+                /// Error type returned when setting attributes.
+                type Error;
 
                 #(#methods)*
             }

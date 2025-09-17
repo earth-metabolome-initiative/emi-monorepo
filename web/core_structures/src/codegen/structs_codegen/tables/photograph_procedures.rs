@@ -34,7 +34,7 @@
 pub struct PhotographProcedure {
     pub procedure: ::rosetta_uuid::Uuid,
     pub procedure_template: i32,
-    pub photographed_asset: ::rosetta_uuid::Uuid,
+    pub photographed_asset: Option<::rosetta_uuid::Uuid>,
     pub procedure_template_photographed_asset_model: i32,
     pub procedure_photographed_asset: ::rosetta_uuid::Uuid,
     pub photographed_with: Option<::rosetta_uuid::Uuid>,
@@ -107,18 +107,23 @@ impl PhotographProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        Option<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>,
         diesel::result::Error,
     >
     where
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
             web_common_traits::database::Read<C>,
     {
+        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
+        let Some(photographed_asset) = self.photographed_asset else {
+            return Ok(None);
+        };
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(
-            self.photographed_asset,
+            photographed_asset,
             conn,
         )
+        .optional()
     }
     pub fn photographed_with<C: diesel::connection::LoadConnection>(
         &self,
@@ -226,11 +231,15 @@ impl PhotographProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
         diesel::result::Error,
     > {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(photographed_asset) = self.photographed_asset else {
+            return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
@@ -238,12 +247,13 @@ impl PhotographProcedure {
                     .eq(&self.procedure_photographed_asset)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.photographed_asset),
+                            .eq(photographed_asset),
                     ),
             )
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
+            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn photograph_procedures_procedure_photographed_asset_procedu_fkey(

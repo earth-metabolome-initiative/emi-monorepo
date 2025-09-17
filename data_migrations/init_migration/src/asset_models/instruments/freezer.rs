@@ -2,7 +2,7 @@
 
 use core_structures::{FreezerModel, User, tables::insertables::AssetModelSettable};
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 /// Returns the freezer.
 ///

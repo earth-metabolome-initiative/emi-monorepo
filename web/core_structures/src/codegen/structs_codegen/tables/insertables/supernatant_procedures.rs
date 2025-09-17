@@ -6,7 +6,7 @@ pub enum SupernatantProcedureExtensionAttribute {
 impl core::fmt::Display for SupernatantProcedureExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Procedure(e) => write!(f, "{e}"),
+            Self::Procedure(e) => write!(f, "supernatant_procedures({e})"),
         }
     }
 }
@@ -165,6 +165,7 @@ impl core::fmt::Display for SupernatantProcedureAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -862,6 +863,14 @@ pub struct InsertableSupernatantProcedureBuilder<
     >,
     pub(crate) procedure: Procedure,
 }
+impl<Procedure> diesel::associations::HasTable
+    for InsertableSupernatantProcedureBuilder<Procedure>
+{
+    type Table = crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures::table
+    }
+}
 impl From<InsertableSupernatantProcedureBuilder>
     for web_common_traits::database::IdOrBuilder<
         ::rosetta_uuid::Uuid,
@@ -912,8 +921,8 @@ where
 /// Trait defining setters for attributes of an instance of
 /// `SupernatantProcedure` or descendant tables.
 pub trait SupernatantProcedureSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.supernatant_procedures.procedure_template`
     /// column.
     ///
@@ -933,10 +942,7 @@ pub trait SupernatantProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template<PT>(
-        self,
-        procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure_template<PT>(self, procedure_template: PT) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.supernatant_procedures.stratified_source`
@@ -959,10 +965,7 @@ pub trait SupernatantProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn stratified_source<SS>(
-        self,
-        stratified_source: SS,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn stratified_source<SS>(self, stratified_source: SS) -> Result<Self, Self::Error>
     where
         SS: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
@@ -989,7 +992,7 @@ pub trait SupernatantProcedureSettable: Sized {
     fn procedure_template_stratified_source_model<PTSSM>(
         self,
         procedure_template_stratified_source_model: PTSSM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSSM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -1015,7 +1018,7 @@ pub trait SupernatantProcedureSettable: Sized {
     fn procedure_stratified_source<PSS>(
         self,
         procedure_stratified_source: PSS,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PSS: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1043,10 +1046,7 @@ pub trait SupernatantProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn supernatant_destination<SD>(
-        self,
-        supernatant_destination: SD,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn supernatant_destination<SD>(self, supernatant_destination: SD) -> Result<Self, Self::Error>
     where
         SD: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
@@ -1073,7 +1073,7 @@ pub trait SupernatantProcedureSettable: Sized {
     fn procedure_template_supernatant_destination_model<PTSDM>(
         self,
         procedure_template_supernatant_destination_model: PTSDM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSDM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -1101,7 +1101,7 @@ pub trait SupernatantProcedureSettable: Sized {
     fn procedure_supernatant_destination<PSD>(
         self,
         procedure_supernatant_destination: PSD,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PSD: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1129,10 +1129,7 @@ pub trait SupernatantProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn transferred_with<TW>(
-        self,
-        transferred_with: TW,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn transferred_with<TW>(self, transferred_with: TW) -> Result<Self, Self::Error>
     where
         TW: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
@@ -1154,10 +1151,7 @@ pub trait SupernatantProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn transferred_with_model<TWM>(
-        self,
-        transferred_with_model: TWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn transferred_with_model<TWM>(self, transferred_with_model: TWM) -> Result<Self, Self::Error>
     where
         TWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -1184,7 +1178,7 @@ pub trait SupernatantProcedureSettable: Sized {
     fn procedure_template_transferred_with_model<PTTWM>(
         self,
         procedure_template_transferred_with_model: PTTWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTTWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -1210,7 +1204,7 @@ pub trait SupernatantProcedureSettable: Sized {
     fn procedure_transferred_with<PTW>(
         self,
         procedure_transferred_with: PTW,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTW: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1237,10 +1231,7 @@ pub trait SupernatantProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn pipette_tip_model<PTM>(
-        self,
-        pipette_tip_model: PTM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn pipette_tip_model<PTM>(self, pipette_tip_model: PTM) -> Result<Self, Self::Error>
     where
         PTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -1267,7 +1258,7 @@ pub trait SupernatantProcedureSettable: Sized {
     fn procedure_template_pipette_tip_model<PTPTM>(
         self,
         procedure_template_pipette_tip_model: PTPTM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTPTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -1293,7 +1284,7 @@ pub trait SupernatantProcedureSettable: Sized {
     fn procedure_pipette_tip<PPT>(
         self,
         procedure_pipette_tip: PPT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PPT: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1304,123 +1295,133 @@ pub trait SupernatantProcedureSettable: Sized {
 }
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            >,
         >,
 > SupernatantProcedureSettable for InsertableSupernatantProcedureBuilder<Procedure>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute;
-    /// Sets the value of the `public.supernatant_procedures.procedure_template`
-    /// column.
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.supernatant_procedures.procedure_template` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v7 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v7 ["`procedure_assets`"]
     ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v6 undirectly-involved-column
-    /// end
-    /// subgraph v8 ["`procedures`"]
+    ///class v6 undirectly-involved-column
+    ///end
+    ///subgraph v8 ["`procedures`"]
     ///    v0@{shape: rounded, label: "procedure_template"}
-    /// class v0 directly-involved-column
-    /// end
-    /// subgraph v9 ["`supernatant_procedures`"]
+    ///class v0 directly-involved-column
+    ///end
+    ///subgraph v9 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_template"}
-    /// class v1 column-of-interest
+    ///class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_template_stratified_source_model"}
-    /// class v3 directly-involved-column
+    ///class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
-    /// class v4 directly-involved-column
+    ///class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "procedure_template_transferred_with_model"}
-    /// class v5 directly-involved-column
-    /// end
-    /// v1 --->|"`ancestral same as`"| v0
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v1 -.->|"`foreign defines`"| v3
-    /// v1 -.->|"`foreign defines`"| v4
-    /// v1 -.->|"`foreign defines`"| v5
-    /// v2 --->|"`associated same as`"| v6
-    /// v3 --->|"`associated same as`"| v6
-    /// v4 --->|"`associated same as`"| v6
-    /// v5 --->|"`associated same as`"| v6
-    /// v9 --->|"`extends`"| v8
-    /// v9 ---o|"`associated with`"| v7
-    /// ```
+    ///class v5 directly-involved-column
+    ///end
+    ///v1 --->|"`ancestral same as`"| v0
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v1 -.->|"`foreign defines`"| v3
+    ///v1 -.->|"`foreign defines`"| v4
+    ///v1 -.->|"`foreign defines`"| v5
+    ///v2 --->|"`associated same as`"| v6
+    ///v3 --->|"`associated same as`"| v6
+    ///v4 --->|"`associated same as`"| v6
+    ///v5 --->|"`associated same as`"| v6
+    ///v9 --->|"`extends`"| v8
+    ///v9 ---o|"`associated with`"| v7
+    ///```
     fn procedure_template<PT>(
         mut self,
         procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template =
-            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
+        let procedure_template = <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template,
+        );
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    /// Sets the value of the `public.supernatant_procedures.stratified_source`
-    /// column.
+    ///Sets the value of the `public.supernatant_procedures.stratified_source` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`supernatant_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_stratified_source"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stratified_source"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn stratified_source<SS>(
         mut self,
         stratified_source: SS,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
-        SS: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+        SS: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
     {
-        let stratified_source =
-            <SS as web_common_traits::database::PrimaryKeyLike>::primary_key(&stratified_source);
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_stratified_source) =
-            self.procedure_stratified_source
+        let stratified_source = <SS as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &stratified_source,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_stratified_source,
+        ) = self.procedure_stratified_source
         {
             self.procedure_stratified_source = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_stratified_source,
@@ -1428,7 +1429,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureStratifiedSource(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureStratifiedSource(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -1436,53 +1439,51 @@ impl<
         self.stratified_source = Some(stratified_source);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.supernatant_procedures.
-    /// procedure_template_stratified_source_model` column.
+    ///Sets the value of the `public.supernatant_procedures.procedure_template_stratified_source_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`supernatant_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_stratified_source"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_stratified_source_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn procedure_template_stratified_source_model<PTSSM>(
         mut self,
         procedure_template_stratified_source_model: PTSSM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSSM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_stratified_source_model =
-            <PTSSM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &procedure_template_stratified_source_model,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_stratified_source) =
-            self.procedure_stratified_source
+        let procedure_template_stratified_source_model = <PTSSM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_stratified_source_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_stratified_source,
+        ) = self.procedure_stratified_source
         {
             self.procedure_stratified_source = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_stratified_source,
@@ -1490,58 +1491,60 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureStratifiedSource(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureStratifiedSource(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
         }
-        self.procedure_template_stratified_source_model =
-            Some(procedure_template_stratified_source_model);
+        self.procedure_template_stratified_source_model = Some(
+            procedure_template_stratified_source_model,
+        );
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.supernatant_procedures.procedure_stratified_source` column.
+    ///Sets the value of the `public.supernatant_procedures.procedure_stratified_source` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v6 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v6 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
-    /// end
-    /// subgraph v7 ["`supernatant_procedures`"]
+    ///class v5 undirectly-involved-column
+    ///end
+    ///subgraph v7 ["`supernatant_procedures`"]
     ///    v2@{shape: rounded, label: "procedure_stratified_source"}
-    /// class v2 column-of-interest
+    ///class v2 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_stratified_source_model"}
-    /// class v3 directly-involved-column
+    ///class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "stratified_source"}
-    /// class v4 directly-involved-column
-    /// end
-    /// v2 --->|"`associated same as`"| v5
-    /// v2 --->|"`associated same as`"| v5
-    /// v2 --->|"`associated same as`"| v5
-    /// v2 -.->|"`foreign defines`"| v3
-    /// v2 -.->|"`foreign defines`"| v4
-    /// v3 --->|"`associated same as`"| v1
-    /// v4 --->|"`associated same as`"| v0
-    /// v7 ---o|"`associated with`"| v6
-    /// ```
+    ///class v4 directly-involved-column
+    ///end
+    ///v2 --->|"`associated same as`"| v5
+    ///v2 --->|"`associated same as`"| v5
+    ///v2 --->|"`associated same as`"| v5
+    ///v2 -.->|"`foreign defines`"| v3
+    ///v2 -.->|"`foreign defines`"| v4
+    ///v3 --->|"`associated same as`"| v1
+    ///v4 --->|"`associated same as`"| v0
+    ///v7 ---o|"`associated with`"| v6
+    ///```
     fn procedure_stratified_source<PSS>(
         mut self,
         procedure_stratified_source: PSS,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PSS: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1551,9 +1554,7 @@ impl<
         >,
     {
         let mut procedure_stratified_source = procedure_stratified_source.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_stratified_source
-        {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stratified_source {
             procedure_stratified_source = if let (
                 Some(procedure_template_stratified_source_model),
                 Some(procedure_template_asset_model),
@@ -1561,22 +1562,27 @@ impl<
                 self.procedure_template_stratified_source_model,
                 builder.procedure_template_asset_model,
             ) {
-                if procedure_template_stratified_source_model != procedure_template_asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateStratifiedSourceModel,
+                if procedure_template_stratified_source_model
+                    != procedure_template_asset_model
+                {
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateStratifiedSourceModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
+            } else if let Some(procedure_template_asset_model) = builder
+                .procedure_template_asset_model
             {
-                self.procedure_template_stratified_source_model =
-                    Some(procedure_template_asset_model);
+                self.procedure_template_stratified_source_model = Some(
+                    procedure_template_asset_model,
+                );
                 builder.into()
-            } else if let Some(procedure_template_stratified_source_model) =
-                self.procedure_template_stratified_source_model
+            } else if let Some(procedure_template_stratified_source_model) = self
+                .procedure_template_stratified_source_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
@@ -1584,7 +1590,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureStratifiedSource(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureStratifiedSource(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1592,18 +1600,19 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_stratified_source
-        {
-            procedure_stratified_source = if let (Some(stratified_source), Some(asset)) =
-                (self.stratified_source, builder.asset)
-            {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stratified_source {
+            procedure_stratified_source = if let (
+                Some(stratified_source),
+                Some(asset),
+            ) = (self.stratified_source, builder.asset) {
                 if stratified_source != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::StratifiedSource,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::StratifiedSource,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset) = builder.asset {
@@ -1616,7 +1625,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureStratifiedSource(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureStratifiedSource(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1627,50 +1638,50 @@ impl<
         self.procedure_stratified_source = procedure_stratified_source;
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.supernatant_procedures.supernatant_destination` column.
+    ///Sets the value of the `public.supernatant_procedures.supernatant_destination` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`supernatant_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_supernatant_destination"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "supernatant_destination"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn supernatant_destination<SD>(
         mut self,
         supernatant_destination: SD,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
-        SD: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+        SD: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
     {
-        let supernatant_destination =
-            <SD as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &supernatant_destination,
-            );
+        let supernatant_destination = <SD as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &supernatant_destination,
+        );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_supernatant_destination,
         ) = self.procedure_supernatant_destination
@@ -1681,7 +1692,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureSupernatantDestination(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureSupernatantDestination(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -1689,51 +1702,48 @@ impl<
         self.supernatant_destination = Some(supernatant_destination);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.supernatant_procedures.
-    /// procedure_template_supernatant_destination_model` column.
+    ///Sets the value of the `public.supernatant_procedures.procedure_template_supernatant_destination_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`supernatant_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_supernatant_destination"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn procedure_template_supernatant_destination_model<PTSDM>(
         mut self,
         procedure_template_supernatant_destination_model: PTSDM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSDM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_supernatant_destination_model =
-            <PTSDM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &procedure_template_supernatant_destination_model,
-            );
+        let procedure_template_supernatant_destination_model = <PTSDM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_supernatant_destination_model,
+        );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_supernatant_destination,
         ) = self.procedure_supernatant_destination
@@ -1744,59 +1754,60 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureSupernatantDestination(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureSupernatantDestination(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
         }
-        self.procedure_template_supernatant_destination_model =
-            Some(procedure_template_supernatant_destination_model);
+        self.procedure_template_supernatant_destination_model = Some(
+            procedure_template_supernatant_destination_model,
+        );
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.supernatant_procedures.procedure_supernatant_destination`
-    /// column.
+    ///Sets the value of the `public.supernatant_procedures.procedure_supernatant_destination` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v6 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v6 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
-    /// end
-    /// subgraph v7 ["`supernatant_procedures`"]
+    ///class v5 undirectly-involved-column
+    ///end
+    ///subgraph v7 ["`supernatant_procedures`"]
     ///    v2@{shape: rounded, label: "procedure_supernatant_destination"}
-    /// class v2 column-of-interest
+    ///class v2 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_supernatant_destination_model"}
-    /// class v3 directly-involved-column
+    ///class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "supernatant_destination"}
-    /// class v4 directly-involved-column
-    /// end
-    /// v2 --->|"`associated same as`"| v5
-    /// v2 --->|"`associated same as`"| v5
-    /// v2 --->|"`associated same as`"| v5
-    /// v2 -.->|"`foreign defines`"| v3
-    /// v2 -.->|"`foreign defines`"| v4
-    /// v3 --->|"`associated same as`"| v1
-    /// v4 --->|"`associated same as`"| v0
-    /// v7 ---o|"`associated with`"| v6
-    /// ```
+    ///class v4 directly-involved-column
+    ///end
+    ///v2 --->|"`associated same as`"| v5
+    ///v2 --->|"`associated same as`"| v5
+    ///v2 --->|"`associated same as`"| v5
+    ///v2 -.->|"`foreign defines`"| v3
+    ///v2 -.->|"`foreign defines`"| v4
+    ///v3 --->|"`associated same as`"| v1
+    ///v4 --->|"`associated same as`"| v0
+    ///v7 ---o|"`associated with`"| v6
+    ///```
     fn procedure_supernatant_destination<PSD>(
         mut self,
         procedure_supernatant_destination: PSD,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PSD: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1805,10 +1816,9 @@ impl<
             >,
         >,
     {
-        let mut procedure_supernatant_destination = procedure_supernatant_destination.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_supernatant_destination
-        {
+        let mut procedure_supernatant_destination = procedure_supernatant_destination
+            .into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_supernatant_destination {
             procedure_supernatant_destination = if let (
                 Some(procedure_template_supernatant_destination_model),
                 Some(procedure_template_asset_model),
@@ -1819,21 +1829,24 @@ impl<
                 if procedure_template_supernatant_destination_model
                     != procedure_template_asset_model
                 {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateSupernatantDestinationModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateSupernatantDestinationModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
+            } else if let Some(procedure_template_asset_model) = builder
+                .procedure_template_asset_model
             {
-                self.procedure_template_supernatant_destination_model =
-                    Some(procedure_template_asset_model);
+                self.procedure_template_supernatant_destination_model = Some(
+                    procedure_template_asset_model,
+                );
                 builder.into()
-            } else if let Some(procedure_template_supernatant_destination_model) =
-                self.procedure_template_supernatant_destination_model
+            } else if let Some(procedure_template_supernatant_destination_model) = self
+                .procedure_template_supernatant_destination_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
@@ -1841,7 +1854,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureSupernatantDestination(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureSupernatantDestination(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1849,20 +1864,19 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_supernatant_destination
-        {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_supernatant_destination {
             procedure_supernatant_destination = if let (
                 Some(supernatant_destination),
                 Some(asset),
-            ) = (self.supernatant_destination, builder.asset)
-            {
+            ) = (self.supernatant_destination, builder.asset) {
                 if supernatant_destination != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::SupernatantDestination,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::SupernatantDestination,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset) = builder.asset {
@@ -1875,7 +1889,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureSupernatantDestination(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureSupernatantDestination(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1886,51 +1902,51 @@ impl<
         self.procedure_supernatant_destination = procedure_supernatant_destination;
         Ok(self)
     }
-    /// Sets the value of the `public.supernatant_procedures.transferred_with`
-    /// column.
+    ///Sets the value of the `public.supernatant_procedures.transferred_with` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`supernatant_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_transferred_with"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "transferred_with"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
-    fn transferred_with<TW>(
-        mut self,
-        transferred_with: TW,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
+    fn transferred_with<TW>(mut self, transferred_with: TW) -> Result<Self, Self::Error>
     where
-        TW: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+        TW: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
     {
-        let transferred_with =
-            <TW as web_common_traits::database::PrimaryKeyLike>::primary_key(&transferred_with);
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_transferred_with) =
-            self.procedure_transferred_with
+        let transferred_with = <TW as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &transferred_with,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_transferred_with,
+        ) = self.procedure_transferred_with
         {
             self.procedure_transferred_with = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_transferred_with,
@@ -1938,7 +1954,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTransferredWith(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureTransferredWith(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -1946,53 +1964,52 @@ impl<
         self.transferred_with = Some(transferred_with);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.supernatant_procedures.transferred_with_model` column.
+    ///Sets the value of the `public.supernatant_procedures.transferred_with_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`supernatant_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_transferred_with"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "transferred_with_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn transferred_with_model<TWM>(
         mut self,
         transferred_with_model: TWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         TWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let transferred_with_model =
-            <TWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &transferred_with_model,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_transferred_with) =
-            self.procedure_transferred_with
+        let transferred_with_model = <TWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &transferred_with_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_transferred_with,
+        ) = self.procedure_transferred_with
         {
             self.procedure_transferred_with = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                     procedure_transferred_with,
@@ -2000,7 +2017,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTransferredWith(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureTransferredWith(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -2008,54 +2027,52 @@ impl<
         self.transferred_with_model = Some(transferred_with_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.supernatant_procedures.
-    /// procedure_template_transferred_with_model` column.
+    ///Sets the value of the `public.supernatant_procedures.procedure_template_transferred_with_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`supernatant_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_template_transferred_with_model"}
-    /// class v1 column-of-interest
+    ///class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_transferred_with"}
-    /// class v2 directly-involved-column
-    /// end
-    /// v1 --->|"`associated same as`"| v0
-    /// v2 --->|"`associated same as`"| v3
-    /// v2 --->|"`associated same as`"| v3
-    /// v2 --->|"`associated same as`"| v3
-    /// v2 --->|"`associated same as`"| v3
-    /// v2 -.->|"`foreign defines`"| v1
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 directly-involved-column
+    ///end
+    ///v1 --->|"`associated same as`"| v0
+    ///v2 --->|"`associated same as`"| v3
+    ///v2 --->|"`associated same as`"| v3
+    ///v2 --->|"`associated same as`"| v3
+    ///v2 --->|"`associated same as`"| v3
+    ///v2 -.->|"`foreign defines`"| v1
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn procedure_template_transferred_with_model<PTTWM>(
         mut self,
         procedure_template_transferred_with_model: PTTWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTTWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_transferred_with_model =
-            <PTTWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &procedure_template_transferred_with_model,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_transferred_with) =
-            self.procedure_transferred_with
+        let procedure_template_transferred_with_model = <PTTWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_transferred_with_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_transferred_with,
+        ) = self.procedure_transferred_with
         {
             self.procedure_transferred_with = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_transferred_with,
@@ -2063,66 +2080,68 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTransferredWith(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureTransferredWith(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
         }
-        self.procedure_template_transferred_with_model =
-            Some(procedure_template_transferred_with_model);
+        self.procedure_template_transferred_with_model = Some(
+            procedure_template_transferred_with_model,
+        );
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.supernatant_procedures.procedure_transferred_with` column.
+    ///Sets the value of the `public.supernatant_procedures.procedure_transferred_with` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v8 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v8 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "asset_model"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
-    /// end
-    /// subgraph v9 ["`supernatant_procedures`"]
+    ///class v7 undirectly-involved-column
+    ///end
+    ///subgraph v9 ["`supernatant_procedures`"]
     ///    v3@{shape: rounded, label: "procedure_template_transferred_with_model"}
-    /// class v3 directly-involved-column
+    ///class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_transferred_with"}
-    /// class v4 column-of-interest
+    ///class v4 column-of-interest
     ///    v5@{shape: rounded, label: "transferred_with"}
-    /// class v5 directly-involved-column
+    ///class v5 directly-involved-column
     ///    v6@{shape: rounded, label: "transferred_with_model"}
-    /// class v6 directly-involved-column
-    /// end
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v3 --->|"`associated same as`"| v2
-    /// v4 --->|"`associated same as`"| v7
-    /// v4 --->|"`associated same as`"| v7
-    /// v4 --->|"`associated same as`"| v7
-    /// v4 --->|"`associated same as`"| v7
-    /// v4 -.->|"`foreign defines`"| v3
-    /// v4 -.->|"`foreign defines`"| v5
-    /// v4 -.->|"`foreign defines`"| v6
-    /// v5 --->|"`associated same as`"| v0
-    /// v6 --->|"`associated same as`"| v1
-    /// v9 ---o|"`associated with`"| v8
-    /// ```
+    ///class v6 directly-involved-column
+    ///end
+    ///v0 -.->|"`foreign defines`"| v1
+    ///v3 --->|"`associated same as`"| v2
+    ///v4 --->|"`associated same as`"| v7
+    ///v4 --->|"`associated same as`"| v7
+    ///v4 --->|"`associated same as`"| v7
+    ///v4 --->|"`associated same as`"| v7
+    ///v4 -.->|"`foreign defines`"| v3
+    ///v4 -.->|"`foreign defines`"| v5
+    ///v4 -.->|"`foreign defines`"| v6
+    ///v5 --->|"`associated same as`"| v0
+    ///v6 --->|"`associated same as`"| v1
+    ///v9 ---o|"`associated with`"| v8
+    ///```
     fn procedure_transferred_with<PTW>(
         mut self,
         procedure_transferred_with: PTW,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTW: Into<
             web_common_traits::database::IdOrBuilder<
@@ -2132,9 +2151,7 @@ impl<
         >,
     {
         let mut procedure_transferred_with = procedure_transferred_with.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_transferred_with
-        {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_transferred_with {
             procedure_transferred_with = if let (
                 Some(procedure_template_transferred_with_model),
                 Some(procedure_template_asset_model),
@@ -2142,22 +2159,27 @@ impl<
                 self.procedure_template_transferred_with_model,
                 builder.procedure_template_asset_model,
             ) {
-                if procedure_template_transferred_with_model != procedure_template_asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateTransferredWithModel,
+                if procedure_template_transferred_with_model
+                    != procedure_template_asset_model
+                {
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateTransferredWithModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
+            } else if let Some(procedure_template_asset_model) = builder
+                .procedure_template_asset_model
             {
-                self.procedure_template_transferred_with_model =
-                    Some(procedure_template_asset_model);
+                self.procedure_template_transferred_with_model = Some(
+                    procedure_template_asset_model,
+                );
                 builder.into()
-            } else if let Some(procedure_template_transferred_with_model) =
-                self.procedure_template_transferred_with_model
+            } else if let Some(procedure_template_transferred_with_model) = self
+                .procedure_template_transferred_with_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
@@ -2165,7 +2187,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTransferredWith(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureTransferredWith(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -2173,18 +2197,19 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_transferred_with
-        {
-            procedure_transferred_with = if let (Some(transferred_with_model), Some(asset_model)) =
-                (self.transferred_with_model, builder.asset_model)
-            {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_transferred_with {
+            procedure_transferred_with = if let (
+                Some(transferred_with_model),
+                Some(asset_model),
+            ) = (self.transferred_with_model, builder.asset_model) {
                 if transferred_with_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::TransferredWithModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::TransferredWithModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -2197,7 +2222,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTransferredWith(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureTransferredWith(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -2205,18 +2232,19 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_transferred_with
-        {
-            procedure_transferred_with = if let (Some(transferred_with), Some(asset)) =
-                (self.transferred_with, builder.asset)
-            {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_transferred_with {
+            procedure_transferred_with = if let (Some(transferred_with), Some(asset)) = (
+                self.transferred_with,
+                builder.asset,
+            ) {
                 if transferred_with != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::TransferredWith,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::TransferredWith,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset) = builder.asset {
@@ -2229,7 +2257,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTransferredWith(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureTransferredWith(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -2240,53 +2270,54 @@ impl<
         self.procedure_transferred_with = procedure_transferred_with;
         Ok(self)
     }
-    /// Sets the value of the `public.supernatant_procedures.pipette_tip_model`
-    /// column.
+    ///Sets the value of the `public.supernatant_procedures.pipette_tip_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`supernatant_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "pipette_tip_model"}
-    /// class v1 column-of-interest
+    ///class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_pipette_tip"}
-    /// class v2 directly-involved-column
-    /// end
-    /// v1 --->|"`associated same as`"| v0
-    /// v1 --->|"`associated same as`"| v0
-    /// v2 --->|"`associated same as`"| v3
-    /// v2 --->|"`associated same as`"| v3
-    /// v2 --->|"`associated same as`"| v3
-    /// v2 --->|"`associated same as`"| v3
-    /// v2 -.->|"`foreign defines`"| v1
-    /// v2 -.->|"`foreign defines`"| v1
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 directly-involved-column
+    ///end
+    ///v1 --->|"`associated same as`"| v0
+    ///v1 --->|"`associated same as`"| v0
+    ///v2 --->|"`associated same as`"| v3
+    ///v2 --->|"`associated same as`"| v3
+    ///v2 --->|"`associated same as`"| v3
+    ///v2 --->|"`associated same as`"| v3
+    ///v2 -.->|"`foreign defines`"| v1
+    ///v2 -.->|"`foreign defines`"| v1
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn pipette_tip_model<PTM>(
         mut self,
         pipette_tip_model: PTM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let pipette_tip_model =
-            <PTM as web_common_traits::database::PrimaryKeyLike>::primary_key(&pipette_tip_model);
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_pipette_tip) =
-            self.procedure_pipette_tip
+        let pipette_tip_model = <PTM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &pipette_tip_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_pipette_tip,
+        ) = self.procedure_pipette_tip
         {
             self.procedure_pipette_tip = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                     procedure_pipette_tip,
@@ -2294,13 +2325,16 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedurePipetteTip(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedurePipetteTip(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_pipette_tip) =
-            self.procedure_pipette_tip
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_pipette_tip,
+        ) = self.procedure_pipette_tip
         {
             self.procedure_pipette_tip = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                     procedure_pipette_tip,
@@ -2308,7 +2342,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedurePipetteTip(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedurePipetteTip(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -2316,54 +2352,52 @@ impl<
         self.pipette_tip_model = Some(pipette_tip_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.supernatant_procedures.procedure_template_pipette_tip_model`
-    /// column.
+    ///Sets the value of the `public.supernatant_procedures.procedure_template_pipette_tip_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`supernatant_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`supernatant_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_pipette_tip"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn procedure_template_pipette_tip_model<PTPTM>(
         mut self,
         procedure_template_pipette_tip_model: PTPTM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTPTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_pipette_tip_model =
-            <PTPTM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &procedure_template_pipette_tip_model,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_pipette_tip) =
-            self.procedure_pipette_tip
+        let procedure_template_pipette_tip_model = <PTPTM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_pipette_tip_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_pipette_tip,
+        ) = self.procedure_pipette_tip
         {
             self.procedure_pipette_tip = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_pipette_tip,
@@ -2371,60 +2405,63 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedurePipetteTip(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedurePipetteTip(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
         }
-        self.procedure_template_pipette_tip_model = Some(procedure_template_pipette_tip_model);
+        self.procedure_template_pipette_tip_model = Some(
+            procedure_template_pipette_tip_model,
+        );
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.supernatant_procedures.procedure_pipette_tip` column.
+    ///Sets the value of the `public.supernatant_procedures.procedure_pipette_tip` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v6 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v6 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
-    /// end
-    /// subgraph v7 ["`supernatant_procedures`"]
+    ///class v5 undirectly-involved-column
+    ///end
+    ///subgraph v7 ["`supernatant_procedures`"]
     ///    v2@{shape: rounded, label: "pipette_tip_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_pipette_tip"}
-    /// class v3 column-of-interest
+    ///class v3 column-of-interest
     ///    v4@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v4 directly-involved-column
-    /// end
-    /// v2 --->|"`associated same as`"| v0
-    /// v2 --->|"`associated same as`"| v0
-    /// v3 --->|"`associated same as`"| v5
-    /// v3 --->|"`associated same as`"| v5
-    /// v3 --->|"`associated same as`"| v5
-    /// v3 --->|"`associated same as`"| v5
-    /// v3 -.->|"`foreign defines`"| v2
-    /// v3 -.->|"`foreign defines`"| v2
-    /// v3 -.->|"`foreign defines`"| v4
-    /// v4 --->|"`associated same as`"| v1
-    /// v7 ---o|"`associated with`"| v6
-    /// ```
+    ///class v4 directly-involved-column
+    ///end
+    ///v2 --->|"`associated same as`"| v0
+    ///v2 --->|"`associated same as`"| v0
+    ///v3 --->|"`associated same as`"| v5
+    ///v3 --->|"`associated same as`"| v5
+    ///v3 --->|"`associated same as`"| v5
+    ///v3 --->|"`associated same as`"| v5
+    ///v3 -.->|"`foreign defines`"| v2
+    ///v3 -.->|"`foreign defines`"| v2
+    ///v3 -.->|"`foreign defines`"| v4
+    ///v4 --->|"`associated same as`"| v1
+    ///v7 ---o|"`associated with`"| v6
+    ///```
     fn procedure_pipette_tip<PPT>(
         mut self,
         procedure_pipette_tip: PPT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PPT: Into<
             web_common_traits::database::IdOrBuilder<
@@ -2435,15 +2472,18 @@ impl<
     {
         let mut procedure_pipette_tip = procedure_pipette_tip.into();
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_pipette_tip {
-            procedure_pipette_tip = if let (Some(pipette_tip_model), Some(asset_model)) =
-                (self.pipette_tip_model, builder.asset_model)
-            {
+            procedure_pipette_tip = if let (
+                Some(pipette_tip_model),
+                Some(asset_model),
+            ) = (self.pipette_tip_model, builder.asset_model) {
                 if pipette_tip_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::PipetteTipModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::PipetteTipModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -2456,7 +2496,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedurePipetteTip(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedurePipetteTip(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -2465,15 +2507,18 @@ impl<
             };
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_pipette_tip {
-            procedure_pipette_tip = if let (Some(pipette_tip_model), Some(asset_model)) =
-                (self.pipette_tip_model, builder.asset_model)
-            {
+            procedure_pipette_tip = if let (
+                Some(pipette_tip_model),
+                Some(asset_model),
+            ) = (self.pipette_tip_model, builder.asset_model) {
                 if pipette_tip_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::PipetteTipModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::PipetteTipModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -2486,7 +2531,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedurePipetteTip(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedurePipetteTip(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -2498,24 +2545,30 @@ impl<
             procedure_pipette_tip = if let (
                 Some(procedure_template_pipette_tip_model),
                 Some(procedure_template_asset_model),
-            ) =
-                (self.procedure_template_pipette_tip_model, builder.procedure_template_asset_model)
-            {
-                if procedure_template_pipette_tip_model != procedure_template_asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplatePipetteTipModel,
+            ) = (
+                self.procedure_template_pipette_tip_model,
+                builder.procedure_template_asset_model,
+            ) {
+                if procedure_template_pipette_tip_model != procedure_template_asset_model
+                {
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplatePipetteTipModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
+            } else if let Some(procedure_template_asset_model) = builder
+                .procedure_template_asset_model
             {
-                self.procedure_template_pipette_tip_model = Some(procedure_template_asset_model);
+                self.procedure_template_pipette_tip_model = Some(
+                    procedure_template_asset_model,
+                );
                 builder.into()
-            } else if let Some(procedure_template_pipette_tip_model) =
-                self.procedure_template_pipette_tip_model
+            } else if let Some(procedure_template_pipette_tip_model) = self
+                .procedure_template_pipette_tip_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
@@ -2523,7 +2576,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedurePipetteTip(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedurePipetteTip(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -2537,22 +2592,28 @@ impl<
 }
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureSettable
 for InsertableSupernatantProcedureBuilder<Procedure>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
-    fn procedure<P>(
-        mut self,
-        procedure: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure<P>(mut self, procedure: P) -> Result<Self, Self::Error>
     where
         P: web_common_traits::database::PrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -2564,7 +2625,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2594,10 +2655,7 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn procedure_template<PT>(
-        self,
-        procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure_template<PT>(self, procedure_template: PT) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -2608,10 +2666,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.
-    fn parent_procedure<PP>(
-        mut self,
-        parent_procedure: PP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_procedure<PP>(mut self, parent_procedure: PP) -> Result<Self, Self::Error>
     where
         PP: web_common_traits::database::MaybePrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -2623,7 +2678,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2634,7 +2689,7 @@ where
     fn parent_procedure_template<PPT>(
         mut self,
         parent_procedure_template: PPT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -2644,7 +2699,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2655,7 +2710,7 @@ where
     fn predecessor_procedure<PP>(
         mut self,
         predecessor_procedure: PP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PP: web_common_traits::database::MaybePrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -2667,7 +2722,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2678,7 +2733,7 @@ where
     fn predecessor_procedure_template<PPT>(
         mut self,
         predecessor_procedure_template: PPT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -2688,7 +2743,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2696,10 +2751,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -2709,7 +2761,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2717,10 +2769,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -2733,7 +2782,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2741,10 +2790,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -2754,7 +2800,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2762,10 +2808,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -2778,7 +2821,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2808,11 +2851,10 @@ where
 impl<Procedure, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableSupernatantProcedureBuilder<Procedure>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
-        Attribute = SupernatantProcedureAttribute,
+        Error = web_common_traits::database::InsertError<SupernatantProcedureAttribute>,
     >,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -2828,10 +2870,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<SupernatantProcedureAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

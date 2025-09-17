@@ -1,19 +1,28 @@
 //! Submodule providing traits relative to procedure templates, procedures, and
 //! associated builders.
 
-use std::rc::Rc;
+use crate::database::{DispatchableInsertVariantMetadata, PrimaryKeyLike};
 
-use common_traits::{builder::IsCompleteBuilder, prelude::Builder};
+/// Trait defining a root procedure template.
+pub trait ProcedureTemplateRoot {
+    /// Associated procedure builder type.
+    type ProcedureBuilderDAG;
 
-use crate::{database::Read, prelude::InsertableVariant};
+    /// Returns the procedure builder DAG type associated with the current
+    /// procedure template.
+    fn procedure_builder_dag(&self) -> Self::ProcedureBuilderDAG;
+}
 
 /// Trait defining a procedure template.
-pub trait ProcedureTemplate<C> {
-    /// Associated procedure type.
-    type Procedure: Procedure<C>;
+pub trait ProcedureTemplateLike {
     /// Procedure template asset model type.
-    type ProcedureTemplateAssetModel: Read<C>;
+    type ProcedureTemplateAssetModel;
+    /// Associated procedure type.
+    type Procedure: ProcedureLike<Template = Self>;
+}
 
+/// Trait defining a procedure template.
+pub trait ProcedureTemplateQueries<C>: ProcedureTemplateLike {
     /// Returns all procedure template asset models associated with the current
     /// procedure template.
     fn procedure_template_asset_models(
@@ -22,121 +31,82 @@ pub trait ProcedureTemplate<C> {
     ) -> Result<Vec<Self::ProcedureTemplateAssetModel>, diesel::result::Error>;
 }
 
-impl<C, PT> ProcedureTemplate<C> for &PT
-where
-    PT: ProcedureTemplate<C>,
-{
-    type Procedure = PT::Procedure;
-    type ProcedureTemplateAssetModel = PT::ProcedureTemplateAssetModel;
-
-    fn procedure_template_asset_models(
-        &self,
-        conn: &mut C,
-    ) -> Result<Vec<Self::ProcedureTemplateAssetModel>, diesel::result::Error> {
-        (*self).procedure_template_asset_models(conn)
-    }
-}
-
-impl<C, PT> ProcedureTemplate<C> for Box<PT>
-where
-    PT: ProcedureTemplate<C>,
-{
-    type Procedure = PT::Procedure;
-    type ProcedureTemplateAssetModel = PT::ProcedureTemplateAssetModel;
-
-    fn procedure_template_asset_models(
-        &self,
-        conn: &mut C,
-    ) -> Result<Vec<Self::ProcedureTemplateAssetModel>, diesel::result::Error> {
-        (**self).procedure_template_asset_models(conn)
-    }
-}
-
-impl<C, PT> ProcedureTemplate<C> for Rc<PT>
-where
-    PT: ProcedureTemplate<C>,
-{
-    type Procedure = PT::Procedure;
-    type ProcedureTemplateAssetModel = PT::ProcedureTemplateAssetModel;
-
-    fn procedure_template_asset_models(
-        &self,
-        conn: &mut C,
-    ) -> Result<Vec<Self::ProcedureTemplateAssetModel>, diesel::result::Error> {
-        (**self).procedure_template_asset_models(conn)
-    }
-}
-
 /// Trait defining a procedure.
-pub trait Procedure<C> {
+pub trait ProcedureLike: PrimaryKeyLike {
     /// Associated procedure template type.
-    type Template: ProcedureTemplate<C, Procedure = Self>;
+    type Template: ProcedureTemplateLike<
+            Procedure = Self,
+            ProcedureTemplateAssetModel = Self::ProcedureTemplateAssetModel,
+        >;
+    /// Associated procedure template asset model type.
+    type ProcedureTemplateAssetModel: PrimaryKeyLike;
+    /// Associated procedure asset type.
+    type ProcedureAsset: PrimaryKeyLike;
+    /// Associated builder type.
+    type Builder: ProcedureBuilderLike<Procedure = Self>;
+
+    /// Returns the coupled procedure template asset model IDs alongside
+    /// with their corresponding procedure asset IDs.
+    fn procedure_template_asset_models_and_procedure_assets(
+        &self,
+    ) -> Vec<(
+        <Self::ProcedureTemplateAssetModel as PrimaryKeyLike>::PrimaryKey,
+        <Self::ProcedureAsset as PrimaryKeyLike>::PrimaryKey,
+    )>;
 }
 
-/// Enumeration of errors which may happen while working with a procedure
-/// template.
-pub enum ProcedureTemplateError<InsertErr> {
-    /// The procedure builder requested does not match the expected variant.
-    ProcedureBuilderMismatch {
-        /// The expected builder variant.
-        expected: String,
-        /// The found builder variant.
-        found: String,
-    },
-    /// An error occurred while inserting a procedure builder.
-    InsertError(InsertErr),
-    /// No further procedure builders are available.
-    NoMoreProcedureBuilders,
-    /// Diesel error.
-    DieselError(diesel::result::Error),
-}
+/// Trait defining a procedure template asset graph.
+pub trait ProcedureTemplateAssetGraph {
+    /// The type of the Procedure Template.
+    type ProcedureTemplateRoot: ProcedureTemplateRoot;
+    /// The type of the Procedure Template Asset Model.
+    type ProcedureTemplateAssetModel: PrimaryKeyLike;
+    /// The type of the Procedure Asset.
+    type ProcedureAsset: PrimaryKeyLike;
 
-impl<InsertErr> From<diesel::result::Error> for ProcedureTemplateError<InsertErr> {
-    fn from(err: diesel::result::Error) -> Self {
-        ProcedureTemplateError::DieselError(err)
-    }
-}
-
-/// Trait defining a builder of graphs of procedure templates.
-pub trait ProcedureTemplateBuilderGraphBuilder<'conn, C>: Builder {
-    /// Type of the root procedure template
-    type ProcedureTemplate;
-    /// User type of the user authoring the procedure template graph.
-    type UserId;
-
-    /// Whether to autocomplete procedures when building the graph.
-    fn autocomplete(self) -> Self;
-
-    /// Root procedure template from which to build the graph.
-    fn procedure_template(self, procedure_template: Self::ProcedureTemplate) -> Self;
-
-    /// Sets the user that is autoring the procedute template graph.
-    fn user(self, user: Self::UserId) -> Self;
-
-    /// The connection to the database to employ when building the graph.
-    fn conn(self, conn: &'conn mut C) -> Self;
-}
-
-/// Trait defining a procedure builder.
-pub trait ProcedureInitializer<C>: ProcedureTemplate<C> {
-    /// The procedure builder type.
-    type ProcedureBuilder: IsCompleteBuilder + InsertableVariant<C>;
-    /// Associated procedure template graph.
-    type Graph;
-
-    /// Returns an initialized builder for the procedure.
+    /// Returns the procedure asset ID corresponding to the given procedure
+    /// template asset model ID, if any.
     ///
     /// # Arguments
     ///
-    /// * `graph` - The graph with which to prefil the procedure builder.
-    /// * `conn` - A mutable reference to a database connection.
-    ///
-    /// # Error
-    ///
-    /// * If the connection to the database fails.
-    fn procedure_builder(
+    /// * `parents` - A slice of references to the parent procedure templates.
+    /// * `ptam_id` - The primary key of the procedure template asset model.
+    fn procedure_asset(
         &self,
-        graph: &Self::Graph,
-        conn: &mut C,
-    ) -> Result<Self::ProcedureBuilder, diesel::result::Error>;
+        parents: &[&Self::ProcedureTemplateRoot],
+        ptam_id: <Self::ProcedureTemplateAssetModel as PrimaryKeyLike>::PrimaryKey,
+    ) -> Option<<Self::ProcedureAsset as PrimaryKeyLike>::PrimaryKey>;
+}
+
+/// Trait defining a procedure builder.
+pub trait ProcedureBuilderLike:
+    Sized + DispatchableInsertVariantMetadata<Row = <Self as ProcedureBuilderLike>::Procedure>
+{
+    /// Associated procedure type.
+    type Procedure: ProcedureLike;
+
+    /// Completes the procedure builder into a procedure using the provided
+    /// procedure template.
+    ///
+    /// # Arguments
+    ///
+    /// * `parents` - A slice of references to the parent procedure templates.
+    /// * `template` - A reference to the procedure template to use for
+    ///   completion.
+    /// * `template_graph` - A reference to the procedure template asset graph.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error of type `Self::Error` if the completion fails.
+    fn complete_with<G, PT>(
+        self,
+        parents: &[&PT],
+        template: &<Self::Procedure as ProcedureLike>::Template,
+        template_graph: &G,
+    ) -> Result<Self, Self::Error> where
+        G: ProcedureTemplateAssetGraph<
+            ProcedureTemplateAssetModel = <Self::Procedure as ProcedureLike>::ProcedureTemplateAssetModel,
+            ProcedureAsset = <Self::Procedure as ProcedureLike>::ProcedureAsset,
+            ProcedureTemplateRoot=PT
+        >;
 }

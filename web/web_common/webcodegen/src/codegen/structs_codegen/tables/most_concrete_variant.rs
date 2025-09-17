@@ -10,6 +10,7 @@ use syn::Ident;
 
 mod most_concrete_variant_builder_enum_implementation;
 mod most_concrete_variant_enum_implementation;
+mod most_concrete_variant_insert_error_enum_implementation;
 
 use crate::{
     Codegen, Table,
@@ -59,6 +60,26 @@ impl Table {
         Ok(Some(format!("{}BuilderDAG", table.struct_name()?)))
     }
 
+    /// Returns the name for the variant insert error DAG.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    ///
+    /// # Errors
+    ///
+    /// * If the name of the variant DAG cannot be retrieved.
+    pub fn insert_error_dag_name(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<String>, WebCodeGenError> {
+        let Some(most_concrete_table_column) = self.most_concrete_table_column(true, conn)? else {
+            return Ok(None);
+        };
+        let table = most_concrete_table_column.table(conn)?;
+        Ok(Some(format!("{}InsertErrorDAG", table.struct_name()?)))
+    }
+
     /// Returns the [`Ident`](syn::Ident) for the variant DAG.
     ///
     /// # Arguments
@@ -89,6 +110,25 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<Option<Ident>, WebCodeGenError> {
         let Some(name) = self.builder_dag_name(conn)? else {
+            return Ok(None);
+        };
+        Ok(Some(Ident::new(&name, proc_macro2::Span::call_site())))
+    }
+
+    /// Returns the [`Ident`](syn::Ident) for the variant insert error DAG.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    ///
+    /// # Errors
+    ///
+    /// * If the name of the variant DAG cannot be retrieved.
+    pub fn insert_error_dag_ident(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<Ident>, WebCodeGenError> {
+        let Some(name) = self.insert_error_dag_name(conn)? else {
             return Ok(None);
         };
         Ok(Some(Ident::new(&name, proc_macro2::Span::call_site())))
@@ -134,6 +174,27 @@ impl Table {
             name
         ))?))
     }
+    /// Returns the [`Type`](syn::Type) for the variant insert error DAG.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    ///
+    /// # Errors
+    ///
+    /// * If the name of the variant DAG cannot be retrieved.
+    pub fn insert_error_dag_ty(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Option<syn::Type>, WebCodeGenError> {
+        let Some(name) = self.insert_error_dag_name(conn)? else {
+            return Ok(None);
+        };
+        Ok(Some(syn::parse_str(&format!(
+            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_MOST_CONCRETE_VARIANTS_PATH}::{}",
+            name
+        ))?))
+    }
 }
 
 impl Codegen<'_> {
@@ -169,6 +230,7 @@ impl Codegen<'_> {
 
             let dag_ident: Ident = table.dag_ident(conn)?.unwrap();
             let builder_dag_ident: Ident = table.builder_dag_ident(conn)?.unwrap();
+            let insert_error_dag_ident: Ident = table.insert_error_dag_ident(conn)?.unwrap();
             let enum_implementation = self.generate_most_concrete_variant_enum_implementation(
                 table,
                 &most_concrete_table_column,
@@ -181,6 +243,8 @@ impl Codegen<'_> {
                 &file_name,
                 self.beautify_code(&quote! {
                     mod builder;
+                    mod insert_error;
+                    pub use insert_error::#insert_error_dag_ident;
                     pub use builder::#builder_dag_ident;
 
                     #enum_implementation
@@ -200,10 +264,21 @@ impl Codegen<'_> {
                 }),
             )?;
 
+            let insert_error_enum_implementation =
+                self.generate_most_concrete_variant_insert_error_enum_implementation(table, conn)?;
+
+            let insert_error_file_name = table_directory.join("insert_error.rs");
+            std::fs::write(
+                &insert_error_file_name,
+                self.beautify_code(&quote! {
+                    #insert_error_enum_implementation
+                }),
+            )?;
+
             let table_identifier = table.snake_case_ident()?;
             insertables_main_module.extend(quote! {
                 mod #table_identifier;
-                pub use #table_identifier::{#dag_ident, #builder_dag_ident};
+                pub use #table_identifier::{#dag_ident, #builder_dag_ident, #insert_error_dag_ident};
             });
         }
 

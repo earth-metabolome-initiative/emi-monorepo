@@ -7,6 +7,7 @@ use web_common_traits::{
     crud::{CRUD, ExecuteCrudOperation},
     database::{Row, Tabular},
 };
+use diesel::OptionalExtension;
 use web_sys::console;
 use ws_messages::DBMessage;
 use yew_agent::worker::HandlerId;
@@ -146,7 +147,7 @@ impl DBWSWorker {
                 // for the modification of the table.
                 self.listen_notify.register_row_listener(subscriber_id, operation.primary_key());
 
-                match operation.clone().execute(conn) {
+                match operation.clone().execute(conn).optional() {
                     Ok(Some(row)) => {
                         scope.respond(subscriber_id, (row, operation_kind).into());
                     }

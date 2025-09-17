@@ -1,8 +1,58 @@
-impl web_common_traits::database::InsertableVariantMetadata
+impl web_common_traits::database::DispatchableInsertVariantMetadata
 for crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleBuilder {
     type Row = crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute,
+    >;
+}
+impl web_common_traits::database::InsertableVariantMetadata
+for crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleBuilder {
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRule;
-    type UserId = i32;
+}
+#[cfg(feature = "backend")]
+impl web_common_traits::database::BackendInsertableVariant
+for crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleBuilder
+where
+    Self: web_common_traits::database::DispatchableInsertableVariant<
+        diesel::PgConnection,
+    >,
+{}
+impl<
+    C: diesel::connection::LoadConnection,
+> web_common_traits::database::DispatchableInsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRuleBuilder
+where
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRule as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
+    >,
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRule,
+        Row = crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute,
+        >,
+    >,
+{
+    fn insert(self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRule = self
+            .try_insert(user_id, conn)?;
+        Ok(
+            diesel::insert_into(Self::table())
+                .values(insertable_struct)
+                .get_result(conn)?,
+        )
+    }
 }
 impl<
     C: diesel::connection::LoadConnection,
@@ -20,36 +70,11 @@ where
         crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
     >,
 {
-    fn insert(
-        self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute,
-        >,
-    > {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableContainerCompatibilityRule = self
-            .try_insert(user_id, conn)?;
-        Ok(
-            diesel::insert_into(Self::Row::table())
-                .values(insertable_struct)
-                .get_result(conn)?,
-        )
-    }
     fn try_insert(
         self,
         _user_id: i32,
         _conn: &mut C,
-    ) -> Result<
-        Self::InsertableVariant,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute,
-        >,
-    > {
+    ) -> Result<Self::InsertableVariant, Self::Error> {
         let container_model = self
             .container_model
             .ok_or(

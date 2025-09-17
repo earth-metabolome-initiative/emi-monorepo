@@ -37,6 +37,7 @@ impl core::fmt::Display for TaxonAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -93,6 +94,12 @@ pub struct InsertableTaxonBuilder {
     pub(crate) parent_id: Option<i32>,
     pub(crate) rank_id: Option<i16>,
 }
+impl diesel::associations::HasTable for InsertableTaxonBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::taxa::taxa::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::taxa::taxa::table
+    }
+}
 impl From<InsertableTaxonBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableTaxonBuilder>
 {
@@ -110,8 +117,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `Taxon` or
 /// descendant tables.
 pub trait TaxonSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.taxa.id` column.
     ///
     /// # Arguments
@@ -129,10 +136,7 @@ pub trait TaxonSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn id<I>(
-        self,
-        id: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn id<I>(self, id: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.taxa.name` column.
@@ -153,10 +157,7 @@ pub trait TaxonSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
@@ -177,10 +178,7 @@ pub trait TaxonSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn parent<PI>(
-        self,
-        parent_id: PI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent<PI>(self, parent_id: PI) -> Result<Self, Self::Error>
     where
         PI: TryInto<Option<i32>>,
         validation_errors::SingleFieldError: From<<PI as TryInto<Option<i32>>>::Error>;
@@ -201,20 +199,21 @@ pub trait TaxonSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn rank<RI>(
-        self,
-        rank_id: RI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn rank<RI>(self, rank_id: RI) -> Result<Self, Self::Error>
     where
         RI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
 }
-impl TaxonSettable for InsertableTaxonBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::TaxonAttribute;
+impl TaxonSettable for InsertableTaxonBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::TaxonAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.taxa.id` column.
-    fn id<I>(
-        mut self,
-        id: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn id<I>(mut self, id: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -223,10 +222,7 @@ impl TaxonSettable for InsertableTaxonBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.taxa.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -238,10 +234,7 @@ impl TaxonSettable for InsertableTaxonBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.taxa.parent_id` column.
-    fn parent<PI>(
-        mut self,
-        parent_id: PI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent<PI>(mut self, parent_id: PI) -> Result<Self, Self::Error>
     where
         PI: TryInto<Option<i32>>,
         validation_errors::SingleFieldError: From<<PI as TryInto<Option<i32>>>::Error>,
@@ -253,10 +246,7 @@ impl TaxonSettable for InsertableTaxonBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.taxa.rank_id` column.
-    fn rank<RI>(
-        mut self,
-        rank_id: RI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn rank<RI>(mut self, rank_id: RI) -> Result<Self, Self::Error>
     where
         RI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
     {
@@ -273,20 +263,19 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableTaxonBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableTaxonBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::taxa::Taxon,
-            Attribute = TaxonAttribute,
+            Error = web_common_traits::database::InsertError<TaxonAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<TaxonAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::taxa::Taxon =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

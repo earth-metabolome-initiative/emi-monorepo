@@ -2,7 +2,7 @@
 
 use core_structures::{User, tables::insertables::UserSettable};
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant, Read};
+use web_common_traits::database::{BackendInsertableVariant, Insertable, Read};
 
 /// Returns the root user, creating it if it does not exist.
 pub fn init_root_user(conn: &mut PgConnection) -> anyhow::Result<User> {
@@ -10,7 +10,8 @@ pub fn init_root_user(conn: &mut PgConnection) -> anyhow::Result<User> {
         return Ok(user);
     }
 
-    let user: User = User::new().last_name("Darwin")?.first_name("Charles")?.insert(0, conn)?;
+    let user: User =
+        User::new().last_name("Darwin")?.first_name("Charles")?.backend_insert(conn)?;
 
     Ok(user)
 }

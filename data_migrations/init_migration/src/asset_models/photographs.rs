@@ -5,7 +5,7 @@ use core_structures::{
     tables::insertables::{AssetModelSettable, DigitalAssetModelSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 /// Returns the photograph asset model.
 ///
@@ -17,10 +17,7 @@ use web_common_traits::database::{Insertable, InsertableVariant};
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn photograph(
-    user: &User,
-    conn: &mut PgConnection,
-) -> anyhow::Result<DigitalAssetModel> {
+pub fn photograph_model(user: &User, conn: &mut PgConnection) -> anyhow::Result<DigitalAssetModel> {
     const PHOTOGRAPHS: &str = "Photograph";
 
     if let Some(existing_photograph) = DigitalAssetModel::from_name(PHOTOGRAPHS, conn).optional()? {

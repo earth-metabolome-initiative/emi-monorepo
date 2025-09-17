@@ -12,5 +12,3 @@ use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templ
 diesel::allow_tables_to_appear_in_same_query!(procedure_assets, procedure_templates);
 use crate::codegen::diesel_codegen::tables::procedures::procedures;
 diesel::allow_tables_to_appear_in_same_query!(procedure_assets, procedures);
-use crate::codegen::diesel_codegen::tables::users::users;
-diesel::allow_tables_to_appear_in_same_query!(procedure_assets, users);

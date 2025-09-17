@@ -46,11 +46,18 @@ impl Codegen<'_> {
 
         // For each of the other columns, if they are not optional, we need to check if
         // they are complete
+        let most_concrete_column = table.most_concrete_table_column(false, conn)?;
         let insertable_columns = table.insertable_columns(conn, false)?;
         let number_of_insertable_columns = insertable_columns.len();
         for column in insertable_columns {
             // If the column is nullable, we do not need to check its completeness
             if column.is_nullable() {
+                continue;
+            }
+
+            // If the column is the `most_concrete_table` column, we do not need to
+            // check its completeness, as it is always set in the builder
+            if Some(&column) == most_concrete_column.as_ref() {
                 continue;
             }
 

@@ -8,7 +8,7 @@ use core_structures::{
     traits::AppendProcedureTemplate,
 };
 use diesel::OptionalExtension;
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 use crate::procedure_template_asset_models::{
     organism::organism_builder, phone::phone_builder, photograph::photograph_builder,

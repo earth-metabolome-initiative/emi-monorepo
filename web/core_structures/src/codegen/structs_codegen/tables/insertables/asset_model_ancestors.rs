@@ -29,6 +29,7 @@ impl core::fmt::Display for AssetModelAncestorAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -105,6 +106,13 @@ pub struct InsertableAssetModelAncestorBuilder {
     pub(crate) descendant_model: Option<i32>,
     pub(crate) ancestor_model: Option<i32>,
 }
+impl diesel::associations::HasTable for InsertableAssetModelAncestorBuilder {
+    type Table =
+        crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::asset_model_ancestors::asset_model_ancestors::table
+    }
+}
 impl common_traits::builder::IsCompleteBuilder
     for crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelAncestorBuilder
 {
@@ -115,8 +123,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `AssetModelAncestor`
 /// or descendant tables.
 pub trait AssetModelAncestorSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.asset_model_ancestors.descendant_model`
     /// column.
     ///
@@ -136,10 +144,7 @@ pub trait AssetModelAncestorSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn descendant_model<DM>(
-        self,
-        descendant_model: DM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn descendant_model<DM>(self, descendant_model: DM) -> Result<Self, Self::Error>
     where
         DM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.asset_model_ancestors.ancestor_model`
@@ -161,41 +166,38 @@ pub trait AssetModelAncestorSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn ancestor_model<AM>(
-        self,
-        ancestor_model: AM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn ancestor_model<AM>(self, ancestor_model: AM) -> Result<Self, Self::Error>
     where
         AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
-impl AssetModelAncestorSettable for InsertableAssetModelAncestorBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::AssetModelAncestorAttribute;
-    /// Sets the value of the `public.asset_model_ancestors.descendant_model`
-    /// column.
-    fn descendant_model<DM>(
-        mut self,
-        descendant_model: DM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+impl AssetModelAncestorSettable for InsertableAssetModelAncestorBuilder
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::AssetModelAncestorAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.asset_model_ancestors.descendant_model` column.
+    fn descendant_model<DM>(mut self, descendant_model: DM) -> Result<Self, Self::Error>
     where
         DM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let descendant_model =
-            <DM as web_common_traits::database::PrimaryKeyLike>::primary_key(&descendant_model);
+        let descendant_model = <DM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &descendant_model,
+        );
         self.descendant_model = Some(descendant_model);
         Ok(self)
     }
-    /// Sets the value of the `public.asset_model_ancestors.ancestor_model`
-    /// column.
-    fn ancestor_model<AM>(
-        mut self,
-        ancestor_model: AM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.asset_model_ancestors.ancestor_model` column.
+    fn ancestor_model<AM>(mut self, ancestor_model: AM) -> Result<Self, Self::Error>
     where
         AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let ancestor_model =
-            <AM as web_common_traits::database::PrimaryKeyLike>::primary_key(&ancestor_model);
+        let ancestor_model = <AM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &ancestor_model,
+        );
         self.ancestor_model = Some(ancestor_model);
         Ok(self)
     }
@@ -209,11 +211,10 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableAssetModelAncestorB
 impl<C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableAssetModelAncestorBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
-        Attribute = AssetModelAncestorAttribute,
+        Error = web_common_traits::database::InsertError<AssetModelAncestorAttribute>,
     >,
 {
     fn mint_primary_key(
@@ -222,10 +223,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<AssetModelAncestorAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

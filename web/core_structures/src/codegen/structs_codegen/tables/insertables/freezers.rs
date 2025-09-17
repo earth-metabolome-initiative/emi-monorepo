@@ -6,7 +6,7 @@ pub enum FreezerExtensionAttribute {
 impl core::fmt::Display for FreezerExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::PhysicalAsset(e) => write!(f, "{e}"),
+            Self::PhysicalAsset(e) => write!(f, "freezers({e})"),
         }
     }
 }
@@ -55,6 +55,7 @@ impl core::fmt::Display for FreezerAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -125,6 +126,12 @@ pub struct InsertableFreezerBuilder<
     pub(crate) model: Option<i32>,
     pub(crate) id: PhysicalAsset,
 }
+impl<PhysicalAsset> diesel::associations::HasTable for InsertableFreezerBuilder<PhysicalAsset> {
+    type Table = crate::codegen::diesel_codegen::tables::freezers::freezers::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::freezers::freezers::table
+    }
+}
 impl From<InsertableFreezerBuilder>
     for web_common_traits::database::IdOrBuilder<::rosetta_uuid::Uuid, InsertableFreezerBuilder>
 {
@@ -146,8 +153,8 @@ where
 /// Trait defining setters for attributes of an instance of `Freezer` or
 /// descendant tables.
 pub trait FreezerSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.freezers.model` column.
     ///
     /// # Arguments
@@ -165,66 +172,67 @@ pub trait FreezerSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn model<M>(
-        self,
-        model: M,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn model<M>(self, model: M) -> Result<Self, Self::Error>
     where
         M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
+            >,
         >,
-> FreezerSettable for InsertableFreezerBuilder<PhysicalAsset> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::FreezerAttribute;
-    ///Sets the value of the `public.freezers.model` column.
+> FreezerSettable for InsertableFreezerBuilder<PhysicalAsset>
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::FreezerAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    /// Sets the value of the `public.freezers.model` column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart BT
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v3 ["`assets`"]
+    /// ```mermaid
+    /// flowchart BT
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    /// subgraph v3 ["`assets`"]
     ///    v2@{shape: rounded, label: "model"}
-    ///class v2 undirectly-involved-column
-    ///end
-    ///subgraph v4 ["`freezers`"]
+    /// class v2 undirectly-involved-column
+    /// end
+    /// subgraph v4 ["`freezers`"]
     ///    v0@{shape: rounded, label: "model"}
-    ///class v0 column-of-interest
-    ///end
-    ///subgraph v5 ["`physical_assets`"]
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v5 ["`physical_assets`"]
     ///    v1@{shape: rounded, label: "model"}
-    ///class v1 directly-involved-column
-    ///end
-    ///v0 --->|"`ancestral same as`"| v2
-    ///v0 -.->|"`inferred ancestral same as`"| v1
-    ///v1 --->|"`ancestral same as`"| v2
-    ///v4 --->|"`extends`"| v5
-    ///v5 --->|"`extends`"| v3
-    ///```
-    fn model<M>(
-        mut self,
-        model: M,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    /// class v1 directly-involved-column
+    /// end
+    /// v0 --->|"`ancestral same as`"| v2
+    /// v0 -.->|"`inferred ancestral same as`"| v1
+    /// v1 --->|"`ancestral same as`"| v2
+    /// v4 --->|"`extends`"| v5
+    /// v5 --->|"`extends`"| v3
+    /// ```
+    fn model<M>(mut self, model: M) -> Result<Self, Self::Error>
     where
         M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let model = <M as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &model,
-        );
+        let model = <M as web_common_traits::database::PrimaryKeyLike>::primary_key(&model);
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
                 self.id,
                 model,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
@@ -234,26 +242,30 @@ impl<
 }
 impl<
     PhysicalAsset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetSettable
-for InsertableFreezerBuilder<PhysicalAsset>
+    for InsertableFreezerBuilder<PhysicalAsset>
 where
-    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::FreezerAttribute,
-    >,
-{
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::FreezerAttribute;
-    #[inline]
-    ///Sets the value of the `public.assets.id` column.
-    fn id<I>(
-        mut self,
-        id: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        I: web_common_traits::database::PrimaryKeyLike<
-            PrimaryKey = ::rosetta_uuid::Uuid,
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::FreezerAttribute,
         >,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::FreezerAttribute,
+            >,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    #[inline]
+    /// Sets the value of the `public.assets.id` column.
+    fn id<I>(mut self, id: I) -> Result<Self, Self::Error>
+    where
+        I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
     {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::id(
                 self.id,
@@ -261,18 +273,15 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.assets.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    /// Sets the value of the `public.assets.name` column.
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
@@ -283,18 +292,15 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.assets.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    /// Sets the value of the `public.assets.description` column.
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
@@ -305,54 +311,47 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.assets.model` column.
+    /// Sets the value of the `public.assets.model` column.
     ///
-    ///# Implementation notes
-    ///This method also set the values of other columns, due to
-    ///same-as relationships or inferred values.
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
     ///
-    ///## Mermaid illustration
+    /// ## Mermaid illustration
     ///
-    ///```mermaid
-    ///flowchart BT
-    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    ///subgraph v2 ["`assets`"]
+    /// ```mermaid
+    /// flowchart BT
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v2 ["`assets`"]
     ///    v0@{shape: rounded, label: "model"}
-    ///class v0 column-of-interest
-    ///end
-    ///subgraph v3 ["`physical_assets`"]
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v3 ["`physical_assets`"]
     ///    v1@{shape: rounded, label: "model"}
-    ///class v1 directly-involved-column
-    ///end
-    ///v1 --->|"`ancestral same as`"| v0
-    ///v3 --->|"`extends`"| v2
-    ///```
-    fn model<M>(
-        self,
-        model: M,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    /// class v1 directly-involved-column
+    /// end
+    /// v1 --->|"`ancestral same as`"| v0
+    /// v3 --->|"`extends`"| v2
+    /// ```
+    fn model<M>(self, model: M) -> Result<Self, Self::Error>
     where
         M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
         <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable>::model(
-            self,
-            model,
+            self, model,
         )
     }
     #[inline]
-    ///Sets the value of the `public.assets.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    /// Sets the value of the `public.assets.created_by` column.
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -362,23 +361,19 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.assets.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    /// Sets the value of the `public.assets.created_at` column.
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
-            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
-        >,
+        validation_errors::SingleFieldError:
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_at(
                 self.id,
@@ -386,18 +381,15 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.assets.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    /// Sets the value of the `public.assets.updated_by` column.
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -407,23 +399,19 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
         Ok(self)
     }
     #[inline]
-    ///Sets the value of the `public.assets.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    /// Sets the value of the `public.assets.updated_at` column.
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
-            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
-        >,
+        validation_errors::SingleFieldError:
+            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         self.id = <PhysicalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_at(
                 self.id,
@@ -431,7 +419,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -441,11 +429,18 @@ where
 impl<PhysicalAsset> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetSettable
     for InsertableFreezerBuilder<PhysicalAsset>
 where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::FreezerAttribute,
+        >,
     Self: crate::codegen::structs_codegen::tables::insertables::FreezerSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::FreezerAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::FreezerAttribute,
+            >,
         >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::FreezerAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     /// Sets the value of the `public.physical_assets.model` column.
     ///
@@ -478,10 +473,7 @@ where
     /// v4 --->|"`extends`"| v5
     /// v5 --->|"`extends`"| v3
     /// ```
-    fn model<M>(
-        self,
-        model: M,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn model<M>(self, model: M) -> Result<Self, Self::Error>
     where
         M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -511,11 +503,10 @@ where
 impl<PhysicalAsset, C> web_common_traits::database::TryInsertGeneric<C>
     for InsertableFreezerBuilder<PhysicalAsset>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::freezers::Freezer,
-            Attribute = FreezerAttribute,
+            Error = web_common_traits::database::InsertError<FreezerAttribute>,
         >,
     PhysicalAsset:
         web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
@@ -524,9 +515,9 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<FreezerAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::freezers::Freezer =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

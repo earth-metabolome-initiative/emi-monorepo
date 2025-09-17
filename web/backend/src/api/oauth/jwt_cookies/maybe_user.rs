@@ -13,6 +13,7 @@ use actix_web::{
 };
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use core_structures::{TemporaryUser, User};
+use diesel::OptionalExtension;
 use web_common_traits::database::Read;
 
 use super::JsonAccessToken;
@@ -126,6 +127,7 @@ impl FromRequest for MaybeUser {
 
             let user_wrapper: MaybeUser = if access_token.is_temporary() {
                 match TemporaryUser::read(access_token.user_id(), &mut conn)
+                    .optional()
                     .map_err(BackendError::from)?
                 {
                     None => {
@@ -134,7 +136,10 @@ impl FromRequest for MaybeUser {
                     Some(user) => user.into(),
                 }
             } else {
-                match User::read(access_token.user_id(), &mut conn).map_err(BackendError::from)? {
+                match User::read(access_token.user_id(), &mut conn)
+                    .optional()
+                    .map_err(BackendError::from)?
+                {
                     None => {
                         return Err(BackendError::Unauthorized.into());
                     }

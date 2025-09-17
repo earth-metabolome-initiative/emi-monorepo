@@ -6,8 +6,6 @@ pub enum ProcedureTemplateAssetModelAttribute {
     ProcedureTemplate,
     BasedOn,
     AssetModel,
-    CreatedBy,
-    CreatedAt,
 }
 impl core::str::FromStr for ProcedureTemplateAssetModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
@@ -17,14 +15,10 @@ impl core::str::FromStr for ProcedureTemplateAssetModelAttribute {
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "BasedOn" => Ok(Self::BasedOn),
             "AssetModel" => Ok(Self::AssetModel),
-            "CreatedBy" => Ok(Self::CreatedBy),
-            "CreatedAt" => Ok(Self::CreatedAt),
             "name" => Ok(Self::Name),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "based_on" => Ok(Self::BasedOn),
             "asset_model" => Ok(Self::AssetModel),
-            "created_by" => Ok(Self::CreatedBy),
-            "created_at" => Ok(Self::CreatedAt),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
@@ -43,11 +37,10 @@ impl core::fmt::Display for ProcedureTemplateAssetModelAttribute {
             }
             Self::BasedOn => write!(f, "procedure_template_asset_models.based_on"),
             Self::AssetModel => write!(f, "procedure_template_asset_models.asset_model"),
-            Self::CreatedBy => write!(f, "procedure_template_asset_models.created_by"),
-            Self::CreatedAt => write!(f, "procedure_template_asset_models.created_at"),
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -61,8 +54,6 @@ pub struct InsertableProcedureTemplateAssetModel {
     pub(crate) procedure_template: i32,
     pub(crate) based_on: Option<i32>,
     pub(crate) asset_model: i32,
-    pub(crate) created_by: i32,
-    pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl InsertableProcedureTemplateAssetModel {
     pub fn asset_model<C: diesel::connection::LoadConnection>(
@@ -138,16 +129,6 @@ impl InsertableProcedureTemplateAssetModel {
             )
             .optional()
     }
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
-    }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -166,7 +147,7 @@ impl InsertableProcedureTemplateAssetModel {
         )
     }
 }
-#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Builder for creating and inserting a new
 /// [`ProcedureTemplateAssetModel`](crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel).
@@ -185,11 +166,8 @@ impl InsertableProcedureTemplateAssetModel {
 ///
 /// let procedure_template_asset_model = ProcedureTemplateAssetModel::new()
 ///    // Set mandatory fields
-///    .created_by(created_by)?
 ///    .name(name)?
 ///    .procedure_template(procedure_template)?
-///    // Optionally set fields with default values
-///    .created_at(created_at)?
 ///    // Optionally set optional fields
 ///    .based_on(based_on)?
 ///    // Finally, insert the new record in the database
@@ -200,8 +178,12 @@ pub struct InsertableProcedureTemplateAssetModelBuilder {
     pub(crate) procedure_template: Option<i32>,
     pub(crate) based_on: Option<i32>,
     pub(crate) asset_model: Option<i32>,
-    pub(crate) created_by: Option<i32>,
-    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
+}
+impl diesel::associations::HasTable for InsertableProcedureTemplateAssetModelBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::table
+    }
 }
 impl From<InsertableProcedureTemplateAssetModelBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableProcedureTemplateAssetModelBuilder>
@@ -210,31 +192,18 @@ impl From<InsertableProcedureTemplateAssetModelBuilder>
         Self::Builder(builder)
     }
 }
-impl Default for InsertableProcedureTemplateAssetModelBuilder {
-    fn default() -> Self {
-        Self {
-            name: Default::default(),
-            procedure_template: Default::default(),
-            based_on: Default::default(),
-            asset_model: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
-    }
-}
 impl common_traits::builder::IsCompleteBuilder
 for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder {
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.procedure_template.is_some()
             && (self.asset_model.is_some() || self.based_on.is_some())
-            && self.created_by.is_some() && self.created_at.is_some()
     }
 }
 /// Trait defining setters for attributes of an instance of
 /// `ProcedureTemplateAssetModel` or descendant tables.
 pub trait ProcedureTemplateAssetModelSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.procedure_template_asset_models.name`
     /// column.
     ///
@@ -255,10 +224,7 @@ pub trait ProcedureTemplateAssetModelSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
@@ -281,10 +247,7 @@ pub trait ProcedureTemplateAssetModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template<PT>(
-        self,
-        procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure_template<PT>(self, procedure_template: PT) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.procedure_template_asset_models.based_on`
@@ -306,10 +269,7 @@ pub trait ProcedureTemplateAssetModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn based_on<BO>(
-        self,
-        based_on: BO,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn based_on<BO>(self, based_on: BO) -> Result<Self, Self::Error>
     where
         BO: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -331,83 +291,31 @@ pub trait ProcedureTemplateAssetModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn asset_model<AM>(
-        self,
-        asset_model: AM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn asset_model<AM>(self, asset_model: AM) -> Result<Self, Self::Error>
     where
         AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
-    /// Sets the value of the
-    /// `public.procedure_template_asset_models.created_by` column.
-    ///
-    /// # Arguments
-    /// * `created_by`: The value to set for the
-    ///   `public.procedure_template_asset_models.created_by` column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type `i32`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn created_by<CB>(
-        self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
-    /// Sets the value of the
-    /// `public.procedure_template_asset_models.created_at` column.
-    ///
-    /// # Arguments
-    /// * `created_at`: The value to set for the
-    ///   `public.procedure_template_asset_models.created_at` column.
-    ///
-    /// # Implementation details
-    /// This method accepts a reference to a generic value which can be
-    /// converted to the required type for the column. This allows passing
-    /// values of different types, as long as they can be converted to the
-    /// required type using the `TryFrom` trait. The method, additionally,
-    /// employs same-as and inferred same-as rules to ensure that the
-    /// schema-defined ancestral tables and associated table values associated
-    /// to the current column (if any) are also set appropriately.
-    ///
-    /// # Errors
-    /// * If the provided value cannot be converted to the required type
-    ///   `::rosetta_timestamp::TimestampUTC`.
-    /// * If the provided value does not pass schema-defined validation.
-    fn created_at<CA>(
-        self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl ProcedureTemplateAssetModelSettable for InsertableProcedureTemplateAssetModelBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute;
-    /// Sets the value of the `public.procedure_template_asset_models.name`
-    /// column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+impl ProcedureTemplateAssetModelSettable for InsertableProcedureTemplateAssetModelBuilder
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.procedure_template_asset_models.name` column.
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(ProcedureTemplateAssetModelAttribute::Name)
-        })?;
+        let name = name
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(ProcedureTemplateAssetModelAttribute::Name)
+            })?;
         pgrx_validation::must_be_paragraph(name.as_ref())
             .map_err(|e| {
                 e
@@ -418,95 +326,57 @@ impl ProcedureTemplateAssetModelSettable for InsertableProcedureTemplateAssetMod
         self.name = Some(name);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.procedure_template_asset_models.procedure_template` column.
+    ///Sets the value of the `public.procedure_template_asset_models.procedure_template` column.
     fn procedure_template<PT>(
         mut self,
         procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template =
-            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
+        let procedure_template = <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template,
+        );
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    /// Sets the value of the `public.procedure_template_asset_models.based_on`
-    /// column.
+    ///Sets the value of the `public.procedure_template_asset_models.based_on` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
-    /// v1@{shape: rounded, label: "based_on"}
-    /// class v1 column-of-interest
-    /// v1 -.->|"`foreign defines`"| v0
-    /// ```
-    fn based_on<BO>(
-        mut self,
-        based_on: BO,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///v0@{shape: rounded, label: "asset_model"}
+    ///class v0 directly-involved-column
+    ///v1@{shape: rounded, label: "based_on"}
+    ///class v1 column-of-interest
+    ///v1 -.->|"`foreign defines`"| v0
+    ///```
+    fn based_on<BO>(mut self, based_on: BO) -> Result<Self, Self::Error>
     where
         BO: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
-        let based_on =
-            <BO as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(&based_on);
+        let based_on = <BO as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+            &based_on,
+        );
         self.based_on = based_on;
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.procedure_template_asset_models.asset_model` column.
-    fn asset_model<AM>(
-        mut self,
-        asset_model: AM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.procedure_template_asset_models.asset_model` column.
+    fn asset_model<AM>(mut self, asset_model: AM) -> Result<Self, Self::Error>
     where
         AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let asset_model =
-            <AM as web_common_traits::database::PrimaryKeyLike>::primary_key(&asset_model);
+        let asset_model = <AM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &asset_model,
+        );
         self.asset_model = Some(asset_model);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.procedure_template_asset_models.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
-    {
-        let created_by =
-            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
-        self.created_by = Some(created_by);
-        Ok(self)
-    }
-    /// Sets the value of the
-    /// `public.procedure_template_asset_models.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
-    where
-        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
-    {
-        let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(ProcedureTemplateAssetModelAttribute::CreatedAt)
-        })?;
-        self.created_at = Some(created_at);
         Ok(self)
     }
 }
@@ -519,11 +389,12 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableProcedureTemplateAs
 impl<C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableProcedureTemplateAssetModelBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        Attribute = ProcedureTemplateAssetModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            ProcedureTemplateAssetModelAttribute,
+        >,
     >,
 {
     fn mint_primary_key(
@@ -532,10 +403,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<ProcedureTemplateAssetModelAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

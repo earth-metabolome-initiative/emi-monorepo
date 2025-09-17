@@ -29,6 +29,7 @@ impl core::fmt::Display for CountryAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -67,6 +68,12 @@ pub struct InsertableCountryBuilder {
     pub(crate) iso: Option<::iso_codes::CountryCode>,
     pub(crate) name: Option<String>,
 }
+impl diesel::associations::HasTable for InsertableCountryBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::countries::countries::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::countries::countries::table
+    }
+}
 impl From<InsertableCountryBuilder>
     for web_common_traits::database::IdOrBuilder<::iso_codes::CountryCode, InsertableCountryBuilder>
 {
@@ -84,8 +91,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `Country` or
 /// descendant tables.
 pub trait CountrySettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.countries.iso` column.
     ///
     /// # Arguments
@@ -104,10 +111,7 @@ pub trait CountrySettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::iso_codes::CountryCode`.
     /// * If the provided value does not pass schema-defined validation.
-    fn iso<I>(
-        self,
-        iso: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn iso<I>(self, iso: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::iso_codes::CountryCode>;
     /// Sets the value of the `public.countries.name` column.
@@ -128,21 +132,22 @@ pub trait CountrySettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
 }
-impl CountrySettable for InsertableCountryBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CountryAttribute;
+impl CountrySettable for InsertableCountryBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::CountryAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.countries.iso` column.
-    fn iso<I>(
-        mut self,
-        iso: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn iso<I>(mut self, iso: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::iso_codes::CountryCode>,
     {
@@ -151,10 +156,7 @@ impl CountrySettable for InsertableCountryBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.countries.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -174,20 +176,19 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableCountryBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableCountryBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::countries::Country,
-            Attribute = CountryAttribute,
+            Error = web_common_traits::database::InsertError<CountryAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<CountryAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::countries::Country =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

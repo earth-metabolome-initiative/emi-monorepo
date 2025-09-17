@@ -3,7 +3,7 @@
 
 use core_structures::{ProcedureTemplate, tables::insertables::ProcedureTemplateSettable};
 use diesel::OptionalExtension;
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 const WEATHER_RETRIEVAL_PROCEDURE: &str = "Weather Retrieval Procedure";
 
 /// Initializes the weather retrieval procedure template in the database.

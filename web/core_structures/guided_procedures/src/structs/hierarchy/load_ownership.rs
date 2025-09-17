@@ -3,40 +3,26 @@
 
 use std::rc::Rc;
 
-use algebra::impls::{CSR2D, GenericBiMatrix2D};
+use algebra::impls::CSR2D;
 use core_structures::{
-    AssetModel, NextProcedureTemplate, ParentProcedureTemplate, Procedure, ProcedureTemplate,
-    ProcedureTemplateAssetModel,
-    codegen::diesel_codegen::tables::{
-        next_procedure_templates::next_procedure_templates,
-        parent_procedure_templates::parent_procedure_templates,
-    },
-    diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models,
+    AssetModel, ProcedureTemplate, ProcedureTemplateAssetModel,
     tables::most_concrete_variants::ProcedureTemplateDAG,
 };
 use diesel::{
-    BelongingToDsl, RunQueryDsl,
-    associations::{BelongsTo, HasTable},
-    connection::LoadConnection,
-    dsl::Asc,
-    expression_methods::EqAll,
-    query_dsl::{
-        LoadQuery,
-        methods::{FilterDsl, OrderDsl},
-    },
+    BelongingToDsl, associations::BelongsTo, connection::LoadConnection, query_dsl::LoadQuery,
 };
 use graph::{
-    prelude::{BiEdgesBuilder, GenericBiGraph, GenericEdgesBuilder, MonopartiteGraph},
-    traits::{BipartiteGraphBuilder, EdgesBuilder},
+    prelude::{GenericBiGraph, GenericEdgesBuilder, MonopartiteGraph},
+    traits::EdgesBuilder,
 };
 use sorted_vec::prelude::SortedVec;
 use web_common_traits::{
     database::Read,
     prelude::{Builder, MostConcreteVariant},
-    procedures::ProcedureTemplate as ProcedureTemplateTrait,
+    procedures::ProcedureTemplateQueries,
 };
 
-use crate::structs::{Hierarchy, Ownership, TaskGraph};
+use crate::structs::{Hierarchy, Ownership};
 
 impl Hierarchy {
     /// Returns the ownership bipartite graph of the procedure templates in the

@@ -6,7 +6,7 @@ pub enum ReagentModelExtensionAttribute {
 impl core::fmt::Display for ReagentModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::AssetModel(e) => write!(f, "{e}"),
+            Self::AssetModel(e) => write!(f, "reagent_models({e})"),
         }
     }
 }
@@ -63,6 +63,7 @@ impl core::fmt::Display for ReagentModelAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -122,6 +123,12 @@ pub struct InsertableReagentModelBuilder<
     pub(crate) molecular_formula: Option<::molecular_formulas::MolecularFormula>,
     pub(crate) id: AssetModel,
 }
+impl<AssetModel> diesel::associations::HasTable for InsertableReagentModelBuilder<AssetModel> {
+    type Table = crate::codegen::diesel_codegen::tables::reagent_models::reagent_models::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::reagent_models::reagent_models::table
+    }
+}
 impl From<InsertableReagentModelBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableReagentModelBuilder>
 {
@@ -146,8 +153,8 @@ where
 /// Trait defining setters for attributes of an instance of `ReagentModel` or
 /// descendant tables.
 pub trait ReagentModelSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.reagent_models.purity` column.
     ///
     /// # Arguments
@@ -166,10 +173,7 @@ pub trait ReagentModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn purity<P>(
-        self,
-        purity: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn purity<P>(self, purity: P) -> Result<Self, Self::Error>
     where
         P: TryInto<f32>,
         validation_errors::SingleFieldError: From<<P as TryInto<f32>>::Error>;
@@ -192,10 +196,7 @@ pub trait ReagentModelSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::cas_codes::CAS`.
     /// * If the provided value does not pass schema-defined validation.
-    fn cas_code<CC>(
-        self,
-        cas_code: CC,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn cas_code<CC>(self, cas_code: CC) -> Result<Self, Self::Error>
     where
         CC: TryInto<::cas_codes::CAS>,
         validation_errors::SingleFieldError: From<<CC as TryInto<::cas_codes::CAS>>::Error>;
@@ -218,22 +219,23 @@ pub trait ReagentModelSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::molecular_formulas::MolecularFormula`.
     /// * If the provided value does not pass schema-defined validation.
-    fn molecular_formula<MF>(
-        self,
-        molecular_formula: MF,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn molecular_formula<MF>(self, molecular_formula: MF) -> Result<Self, Self::Error>
     where
         MF: TryInto<::molecular_formulas::MolecularFormula>,
         validation_errors::SingleFieldError:
             From<<MF as TryInto<::molecular_formulas::MolecularFormula>>::Error>;
 }
-impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute;
+impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetModel>
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.reagent_models.purity` column.
-    fn purity<P>(
-        mut self,
-        purity: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn purity<P>(mut self, purity: P) -> Result<Self, Self::Error>
     where
         P: TryInto<f32>,
         validation_errors::SingleFieldError: From<<P as TryInto<f32>>::Error>,
@@ -262,10 +264,7 @@ impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetMod
         Ok(self)
     }
     /// Sets the value of the `public.reagent_models.cas_code` column.
-    fn cas_code<CC>(
-        mut self,
-        cas_code: CC,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn cas_code<CC>(mut self, cas_code: CC) -> Result<Self, Self::Error>
     where
         CC: TryInto<::cas_codes::CAS>,
         validation_errors::SingleFieldError: From<<CC as TryInto<::cas_codes::CAS>>::Error>,
@@ -278,10 +277,7 @@ impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetMod
         Ok(self)
     }
     /// Sets the value of the `public.reagent_models.molecular_formula` column.
-    fn molecular_formula<MF>(
-        mut self,
-        molecular_formula: MF,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn molecular_formula<MF>(mut self, molecular_formula: MF) -> Result<Self, Self::Error>
     where
         MF: TryInto<::molecular_formulas::MolecularFormula>,
         validation_errors::SingleFieldError:
@@ -297,18 +293,23 @@ impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetMod
 }
 impl<
     AssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
     for InsertableReagentModelBuilder<AssetModel>
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute,
+        >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     /// Sets the value of the `public.asset_models.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -319,7 +320,7 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -327,10 +328,7 @@ impl<
     }
     #[inline]
     /// Sets the value of the `public.asset_models.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -341,7 +339,7 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -349,10 +347,7 @@ impl<
     }
     #[inline]
     /// Sets the value of the `public.asset_models.parent_model` column.
-    fn parent_model<PM>(
-        mut self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(mut self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -362,7 +357,7 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -370,10 +365,7 @@ impl<
     }
     #[inline]
     /// Sets the value of the `public.asset_models.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -383,7 +375,7 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -391,10 +383,7 @@ impl<
     }
     #[inline]
     /// Sets the value of the `public.asset_models.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -406,7 +395,7 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -414,10 +403,7 @@ impl<
     }
     #[inline]
     /// Sets the value of the `public.asset_models.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -427,7 +413,7 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -435,10 +421,7 @@ impl<
     }
     #[inline]
     /// Sets the value of the `public.asset_models.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -450,7 +433,7 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -480,11 +463,10 @@ where
 impl<AssetModel, C> web_common_traits::database::TryInsertGeneric<C>
     for InsertableReagentModelBuilder<AssetModel>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::reagent_models::ReagentModel,
-            Attribute = ReagentModelAttribute,
+            Error = web_common_traits::database::InsertError<ReagentModelAttribute>,
         >,
     AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
@@ -492,9 +474,10 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<ReagentModelAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::reagent_models::ReagentModel =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

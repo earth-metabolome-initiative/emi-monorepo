@@ -36,8 +36,5 @@ where
 {
     use diesel::Identifiable;
     let asset_model = AssetModel::read(*asset_model_like.id(), conn)?;
-    Ok(ProcedureTemplateAssetModel::new()
-        .name(&asset_model.name)?
-        .asset_model(asset_model)?
-        .created_by(user)?)
+    Ok(ProcedureTemplateAssetModel::new().name(&asset_model.name)?.asset_model(asset_model)?)
 }

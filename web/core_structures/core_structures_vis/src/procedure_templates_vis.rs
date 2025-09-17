@@ -5,9 +5,7 @@ use std::rc::Rc;
 
 use core_structures::{ProcedureTemplate, ProcedureTemplateAssetModel};
 use diesel::PgConnection;
-use guided_procedure_builder::{
-    HierarchyLike, OwnershipLike, PTGVisitor, PTGVisitorIterator, ProcedureTemplateGraph,
-};
+use guided_procedures::{HierarchyLike, OwnershipLike, PTGListener, ProcedureTemplateGraph};
 use mermaid::{
     prelude::{
         ArrowShape, ConfigurationBuilder, DiagramBuilder, Direction, Flowchart, FlowchartBuilder,
@@ -134,20 +132,18 @@ where
     hasher.finish()
 }
 
-impl PTGVisitor for ProcedureTemplateVisualization<'_> {
+impl<'graph> PTGListener<'graph> for &mut ProcedureTemplateVisualization<'graph> {
     type Error = crate::Error;
-    type FilteredSuccessors<'graph, I>
+    type FilteredSuccessors<I>
         = I
     where
         I: Iterator<Item = &'graph ProcedureTemplate>;
     type Output = ();
 
-    fn visit_foreign_procedure_template(
+    fn enter_foreign_procedure_template(
         &mut self,
         foreign_procedure_template: &ProcedureTemplate,
     ) -> Result<(), Self::Error> {
-        println!("Visiting foreign procedure template: {}", foreign_procedure_template.name);
-
         let procedure_name = procedure_template_icon(foreign_procedure_template)
             .map(|icon| format!("{} *{}*", icon, foreign_procedure_template.name))
             .unwrap_or_else(|| format!("*{}*", foreign_procedure_template.name));
@@ -184,12 +180,10 @@ impl PTGVisitor for ProcedureTemplateVisualization<'_> {
         Ok(())
     }
 
-    fn filter_successors<'graph, I>(
+    fn filter_successors<I>(
         &mut self,
-        _parents: &[&ProcedureTemplate],
-        _predecessors: &[&ProcedureTemplate],
         successors: I,
-    ) -> Result<Self::FilteredSuccessors<'graph, I>, Self::Error>
+    ) -> Result<Self::FilteredSuccessors<I>, Self::Error>
     where
         I: Iterator<Item = &'graph ProcedureTemplate>,
     {
@@ -197,18 +191,12 @@ impl PTGVisitor for ProcedureTemplateVisualization<'_> {
         Ok(successors)
     }
 
-    fn visit_procedure_template(
+    fn enter_procedure_template(
         &mut self,
         parents: &[&ProcedureTemplate],
         child: &ProcedureTemplate,
     ) -> Result<(), Self::Error> {
         let node_id = procedure_template_hash(parents, child);
-        println!(
-            "{}Visiting procedure template: {} ({node_id})",
-            "\t".repeat(parents.len()),
-            child.name
-        );
-
         let procedure_name = procedure_template_icon(child)
             .map(|icon| format!("{} *{}*", icon, child.name))
             .unwrap_or_else(|| format!("*{}*", child.name));
@@ -254,8 +242,6 @@ impl PTGVisitor for ProcedureTemplateVisualization<'_> {
         predecessors: &[&ProcedureTemplate],
         child: &ProcedureTemplate,
     ) -> Result<(), Self::Error> {
-        println!("{}Continuing procedure template: {}", "\t".repeat(parents.len()), child.name);
-
         if let Some(&predecessor) = predecessors.last() {
             let (root_leaf_node_parents, root_leaf_node) =
                 self.graph.root_leaf_node_of(parents, child);
@@ -310,7 +296,7 @@ impl PTGVisitor for ProcedureTemplateVisualization<'_> {
         Ok(())
     }
 
-    fn visit_leaf_ptam(
+    fn enter_leaf_ptam(
         &mut self,
         parents: &[&ProcedureTemplate],
         leaf: &ProcedureTemplate,
@@ -408,8 +394,7 @@ impl MermaidDB<PgConnection> for ProcedureTemplate {
     fn to_mermaid(&self, conn: &mut PgConnection) -> Result<Self::Diagram, Self::Error> {
         let graph = ProcedureTemplateGraph::new(self, conn)?;
         let mut visualization = ProcedureTemplateVisualization::new(&graph)?;
-        PTGVisitorIterator::new(&graph, &mut visualization)
-            .collect::<Result<(), crate::Error>>()?;
+        graph.visit_with(&mut visualization).collect::<Result<(), Self::Error>>()?;
         if visualization.required_procedures.is_subgraph() {
             visualization.builder.node(visualization.required_procedures)?;
         }

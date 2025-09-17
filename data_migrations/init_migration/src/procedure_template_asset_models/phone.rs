@@ -5,7 +5,7 @@ use core_structures::{User, tables::insertables::InsertableProcedureTemplateAsse
 use diesel::PgConnection;
 
 use crate::{
-    asset_models::instruments::phone::phone,
+    asset_models::instruments::phone::phone_model,
     procedure_template_asset_models::default_pmt::default_pmt,
 };
 
@@ -23,5 +23,5 @@ pub(crate) fn phone_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, phone(user, conn)?, conn)
+    default_pmt(user, phone_model(user, conn)?, conn)
 }

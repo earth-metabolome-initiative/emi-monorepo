@@ -1,9 +1,59 @@
-impl web_common_traits::database::InsertableVariantMetadata
+impl web_common_traits::database::DispatchableInsertVariantMetadata
     for crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder
 {
     type Row = crate::codegen::structs_codegen::tables::users::User;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::UserAttribute,
+    >;
+}
+impl web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder
+{
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUser;
-    type UserId = i32;
+}
+#[cfg(feature = "backend")]
+impl web_common_traits::database::BackendInsertableVariant
+    for crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder
+where
+    Self: web_common_traits::database::DispatchableInsertableVariant<diesel::PgConnection>,
+{
+}
+impl<
+    C: diesel::connection::LoadConnection,
+> web_common_traits::database::DispatchableInsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder
+where
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableUser as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::users::User,
+    >,
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUser,
+        Row = crate::codegen::structs_codegen::tables::users::User,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::UserAttribute,
+        >,
+    >,
+{
+    fn insert(self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use web_common_traits::database::InsertableVariant;
+        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableUser = self
+            .try_insert(user_id, conn)?;
+        Ok(
+            diesel::insert_into(Self::table())
+                .values(insertable_struct)
+                .get_result(conn)?,
+        )
+    }
 }
 impl<
     C: diesel::connection::LoadConnection,
@@ -21,36 +71,11 @@ where
         crate::codegen::structs_codegen::tables::users::User,
     >,
 {
-    fn insert(
-        self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::UserAttribute,
-        >,
-    > {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableUser = self
-            .try_insert(user_id, conn)?;
-        Ok(
-            diesel::insert_into(Self::Row::table())
-                .values(insertable_struct)
-                .get_result(conn)?,
-        )
-    }
     fn try_insert(
         self,
         _user_id: i32,
         _conn: &mut C,
-    ) -> Result<
-        Self::InsertableVariant,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::UserAttribute,
-        >,
-    > {
+    ) -> Result<Self::InsertableVariant, Self::Error> {
         let first_name = self
             .first_name
             .ok_or(

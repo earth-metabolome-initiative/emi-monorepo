@@ -1,10 +1,90 @@
-impl<ProcedureTemplate> web_common_traits::database::InsertableVariantMetadata
+impl<ProcedureTemplate> web_common_traits::database::DispatchableInsertVariantMetadata
 for crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateBuilder<
     ProcedureTemplate,
 > {
     type Row = crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute,
+    >;
+}
+impl<ProcedureTemplate> web_common_traits::database::InsertableVariantMetadata
+for crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateBuilder<
+    ProcedureTemplate,
+> {
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplate;
-    type UserId = i32;
+}
+#[cfg(feature = "backend")]
+impl<ProcedureTemplate> web_common_traits::database::BackendInsertableVariant
+for crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateBuilder<
+    ProcedureTemplate,
+>
+where
+    Self: web_common_traits::database::DispatchableInsertableVariant<
+        diesel::PgConnection,
+    >,
+{}
+impl<
+    C: diesel::connection::LoadConnection,
+    ProcedureTemplate,
+> web_common_traits::database::DispatchableInsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateBuilder<
+    ProcedureTemplate,
+>
+where
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplate as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+    >,
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplate,
+        Row = crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute,
+        >,
+    >,
+    ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
+    Self: crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateSettable<
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute,
+        >,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
+        C,
+        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
+        PrimaryKey = i32,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateExtensionAttribute: From<
+        <ProcedureTemplate as common_traits::builder::Attributed>::Attribute,
+    >,
+{
+    fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("pouring_procedure_templates");
+        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplate = self
+            .try_insert(user_id, conn)?;
+        Ok(
+            diesel::insert_into(Self::table())
+                .values(insertable_struct)
+                .get_result(conn)?,
+        )
+    }
 }
 impl<
     C: diesel::connection::LoadConnection,
@@ -29,7 +109,9 @@ where
         PrimaryKey = i32,
     >,
     Self: crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute,
+        >,
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
         C,
@@ -44,38 +126,11 @@ where
         <ProcedureTemplate as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    fn insert(
-        mut self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute,
-        >,
-    > {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use web_common_traits::database::MostConcreteTable;
-        self.set_most_concrete_table("pouring_procedure_templates");
-        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplate = self
-            .try_insert(user_id, conn)?;
-        Ok(
-            diesel::insert_into(Self::Row::table())
-                .values(insertable_struct)
-                .get_result(conn)?,
-        )
-    }
     fn try_insert(
         mut self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::InsertableVariant,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute,
-        >,
-    > {
+    ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let web_common_traits::database::IdOrBuilder::Id(

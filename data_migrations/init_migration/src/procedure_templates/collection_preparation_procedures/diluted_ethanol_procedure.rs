@@ -2,7 +2,7 @@
 
 use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateSettable};
 use diesel::OptionalExtension;
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 /// The name of the DBGI Collection preparation procedure template.
 pub const E70_ETHANOL: &str = "Ethanol 70 percent";

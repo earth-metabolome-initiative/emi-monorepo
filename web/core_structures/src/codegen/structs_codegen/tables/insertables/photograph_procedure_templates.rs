@@ -8,7 +8,9 @@ pub enum PhotographProcedureTemplateExtensionAttribute {
 impl core::fmt::Display for PhotographProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::ProcedureTemplate(e) => write!(f, "{e}"),
+            Self::ProcedureTemplate(e) => {
+                write!(f, "photograph_procedure_templates({e})")
+            }
         }
     }
 }
@@ -140,6 +142,7 @@ impl core::fmt::Display for PhotographProcedureTemplateAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -396,6 +399,14 @@ pub struct InsertablePhotographProcedureTemplateBuilder<
     >,
     pub(crate) procedure_template: ProcedureTemplate,
 }
+impl<ProcedureTemplate> diesel::associations::HasTable
+    for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate>
+{
+    type Table = crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::table
+    }
+}
 impl From<InsertablePhotographProcedureTemplateBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertablePhotographProcedureTemplateBuilder>
 {
@@ -427,8 +438,8 @@ where
 /// Trait defining setters for attributes of an instance of
 /// `PhotographProcedureTemplate` or descendant tables.
 pub trait PhotographProcedureTemplateSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the
     /// `public.photograph_procedure_templates.photographed_with_model` column.
     ///
@@ -452,7 +463,7 @@ pub trait PhotographProcedureTemplateSettable: Sized {
     fn photographed_with_model<PWM>(
         self,
         photographed_with_model: PWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -479,7 +490,7 @@ pub trait PhotographProcedureTemplateSettable: Sized {
     fn procedure_template_photographed_with_model<PTPWM>(
         self,
         procedure_template_photographed_with_model: PTPWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTPWM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -510,7 +521,7 @@ pub trait PhotographProcedureTemplateSettable: Sized {
     fn photographed_asset_model<PAM>(
         self,
         photographed_asset_model: PAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -537,7 +548,7 @@ pub trait PhotographProcedureTemplateSettable: Sized {
     fn procedure_template_photographed_asset_model<PTPAM>(
         self,
         procedure_template_photographed_asset_model: PTPAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTPAM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -564,10 +575,7 @@ pub trait PhotographProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn photograph_model<PM>(
-        self,
-        photograph_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn photograph_model<PM>(self, photograph_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -594,7 +602,7 @@ pub trait PhotographProcedureTemplateSettable: Sized {
     fn procedure_template_photograph_model<PTPM>(
         self,
         procedure_template_photograph_model: PTPM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTPM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -604,53 +612,56 @@ pub trait PhotographProcedureTemplateSettable: Sized {
         >;
 }
 impl<ProcedureTemplate> PhotographProcedureTemplateSettable
-    for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate>
+for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::PhotographProcedureTemplateAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::PhotographProcedureTemplateAttribute;
-    /// Sets the value of the
-    /// `public.photograph_procedure_templates.photographed_with_model` column.
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.photograph_procedure_templates.photographed_with_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`photograph_procedure_templates`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`photograph_procedure_templates`"]
     ///    v0@{shape: rounded, label: "photographed_with_model"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_photographed_with_model"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn photographed_with_model<PWM>(
         mut self,
         photographed_with_model: PWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let photographed_with_model =
-            <PWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &photographed_with_model,
-            );
+        let photographed_with_model = <PWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &photographed_with_model,
+        );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_photographed_with_model,
         ) = self.procedure_template_photographed_with_model
@@ -661,7 +672,7 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplatePhotographedWithModel(
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplatePhotographedWithModel(
                             attribute,
                         )
                     })
@@ -671,43 +682,41 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
         self.photographed_with_model = Some(photographed_with_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.photograph_procedure_templates.
-    /// procedure_template_photographed_with_model` column.
+    ///Sets the value of the `public.photograph_procedure_templates.procedure_template_photographed_with_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`photograph_procedure_templates`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`photograph_procedure_templates`"]
     ///    v0@{shape: rounded, label: "photographed_with_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_photographed_with_model"}
-    /// class v1 column-of-interest
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///class v1 column-of-interest
+    ///end
+    ///subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn procedure_template_photographed_with_model<PTPWM>(
         mut self,
         procedure_template_photographed_with_model: PTPWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTPWM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -716,23 +725,21 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
             >,
         >,
     {
-        let mut procedure_template_photographed_with_model =
-            procedure_template_photographed_with_model.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_template_photographed_with_model
-        {
+        let mut procedure_template_photographed_with_model = procedure_template_photographed_with_model
+            .into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_photographed_with_model {
             procedure_template_photographed_with_model = if let (
                 Some(photographed_with_model),
                 Some(asset_model),
-            ) =
-                (self.photographed_with_model, builder.asset_model)
-            {
+            ) = (self.photographed_with_model, builder.asset_model) {
                 if photographed_with_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::PhotographedWithModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::PhotographedWithModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -745,7 +752,7 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTemplatePhotographedWithModel(
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplatePhotographedWithModel(
                                 attribute,
                             )
                         })
@@ -755,53 +762,50 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
                 builder.into()
             };
         }
-        self.procedure_template_photographed_with_model =
-            procedure_template_photographed_with_model;
+        self.procedure_template_photographed_with_model = procedure_template_photographed_with_model;
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.photograph_procedure_templates.photographed_asset_model` column.
+    ///Sets the value of the `public.photograph_procedure_templates.photographed_asset_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`photograph_procedure_templates`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`photograph_procedure_templates`"]
     ///    v0@{shape: rounded, label: "photographed_asset_model"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_photographed_asset_model"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn photographed_asset_model<PAM>(
         mut self,
         photographed_asset_model: PAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let photographed_asset_model =
-            <PAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &photographed_asset_model,
-            );
+        let photographed_asset_model = <PAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &photographed_asset_model,
+        );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_photographed_asset_model,
         ) = self.procedure_template_photographed_asset_model
@@ -812,7 +816,7 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplatePhotographedAssetModel(
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplatePhotographedAssetModel(
                             attribute,
                         )
                     })
@@ -822,43 +826,41 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
         self.photographed_asset_model = Some(photographed_asset_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.photograph_procedure_templates.
-    /// procedure_template_photographed_asset_model` column.
+    ///Sets the value of the `public.photograph_procedure_templates.procedure_template_photographed_asset_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`photograph_procedure_templates`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`photograph_procedure_templates`"]
     ///    v0@{shape: rounded, label: "photographed_asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_photographed_asset_model"}
-    /// class v1 column-of-interest
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///class v1 column-of-interest
+    ///end
+    ///subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn procedure_template_photographed_asset_model<PTPAM>(
         mut self,
         procedure_template_photographed_asset_model: PTPAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTPAM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -867,36 +869,35 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
             >,
         >,
     {
-        let mut procedure_template_photographed_asset_model =
-            procedure_template_photographed_asset_model.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_template_photographed_asset_model
-        {
+        let mut procedure_template_photographed_asset_model = procedure_template_photographed_asset_model
+            .into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_photographed_asset_model {
             procedure_template_photographed_asset_model = if let (
                 Some(photographed_asset_model),
                 Some(asset_model),
-            ) =
-                (self.photographed_asset_model, builder.asset_model)
-            {
+            ) = (self.photographed_asset_model, builder.asset_model) {
                 if photographed_asset_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::PhotographedAssetModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::PhotographedAssetModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
                 self.photographed_asset_model = Some(asset_model);
                 builder.into()
-            } else if let Some(photographed_asset_model) = self.photographed_asset_model {
+            } else if let Some(photographed_asset_model) = self.photographed_asset_model
+            {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                         builder,
                         photographed_asset_model,
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTemplatePhotographedAssetModel(
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplatePhotographedAssetModel(
                                 attribute,
                             )
                         })
@@ -906,51 +907,47 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
                 builder.into()
             };
         }
-        self.procedure_template_photographed_asset_model =
-            procedure_template_photographed_asset_model;
+        self.procedure_template_photographed_asset_model = procedure_template_photographed_asset_model;
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.photograph_procedure_templates.photograph_model` column.
+    ///Sets the value of the `public.photograph_procedure_templates.photograph_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`photograph_procedure_templates`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`photograph_procedure_templates`"]
     ///    v0@{shape: rounded, label: "photograph_model"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_photograph_model"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
-    fn photograph_model<PM>(
-        mut self,
-        photograph_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
+    fn photograph_model<PM>(mut self, photograph_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let photograph_model =
-            <PM as web_common_traits::database::PrimaryKeyLike>::primary_key(&photograph_model);
+        let photograph_model = <PM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &photograph_model,
+        );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_photograph_model,
         ) = self.procedure_template_photograph_model
@@ -961,7 +958,9 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplatePhotographModel(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplatePhotographModel(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -969,43 +968,41 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
         self.photograph_model = Some(photograph_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.photograph_procedure_templates.
-    /// procedure_template_photograph_model` column.
+    ///Sets the value of the `public.photograph_procedure_templates.procedure_template_photograph_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`photograph_procedure_templates`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`photograph_procedure_templates`"]
     ///    v0@{shape: rounded, label: "photograph_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_photograph_model"}
-    /// class v1 column-of-interest
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///class v1 column-of-interest
+    ///end
+    ///subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn procedure_template_photograph_model<PTPM>(
         mut self,
         procedure_template_photograph_model: PTPM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTPM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1014,22 +1011,21 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
             >,
         >,
     {
-        let mut procedure_template_photograph_model = procedure_template_photograph_model.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_template_photograph_model
-        {
+        let mut procedure_template_photograph_model = procedure_template_photograph_model
+            .into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_photograph_model {
             procedure_template_photograph_model = if let (
                 Some(photograph_model),
                 Some(asset_model),
-            ) =
-                (self.photograph_model, builder.asset_model)
-            {
+            ) = (self.photograph_model, builder.asset_model) {
                 if photograph_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::PhotographModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::PhotographModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -1042,7 +1038,9 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTemplatePhotographModel(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplatePhotographModel(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1056,17 +1054,23 @@ impl<ProcedureTemplate> PhotographProcedureTemplateSettable
 }
 impl<
     ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
-for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::PhotographProcedureTemplateAttribute;
+for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::PhotographProcedureTemplateAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -1077,7 +1081,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1085,10 +1089,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -1099,7 +1100,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1107,10 +1108,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -1120,7 +1118,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1128,10 +1126,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -1144,7 +1139,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1152,10 +1147,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -1165,7 +1157,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1173,10 +1165,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -1189,7 +1178,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1197,10 +1186,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.deprecated` column.
-    fn deprecated<D>(
-        mut self,
-        deprecated: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn deprecated<D>(mut self, deprecated: D) -> Result<Self, Self::Error>
     where
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
@@ -1211,7 +1197,7 @@ for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1241,11 +1227,12 @@ where
 impl<ProcedureTemplate, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertablePhotographProcedureTemplateBuilder<ProcedureTemplate>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate,
-        Attribute = PhotographProcedureTemplateAttribute,
+        Error = web_common_traits::database::InsertError<
+            PhotographProcedureTemplateAttribute,
+        >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
         C,
@@ -1261,10 +1248,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<PhotographProcedureTemplateAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

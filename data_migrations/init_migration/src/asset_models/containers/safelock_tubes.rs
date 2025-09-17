@@ -7,7 +7,7 @@ use core_structures::{
     },
 };
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 pub(crate) fn safelock_tubes_2ml(
     user: &User,

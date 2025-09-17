@@ -2,7 +2,6 @@
 
 mod builder;
 mod procedure_impls;
-mod procedure_initializer_impls;
 mod procedure_template_impls;
 use std::{fs::OpenOptions, io::Write, path::Path};
 
@@ -31,8 +30,6 @@ pub struct ProcedureCodegen<'a> {
     generate_procedure_impls: bool,
     /// Whether to generate the procedure template impls.
     generate_procedure_template_impls: bool,
-    /// Whether to generate the procedure initializer impls.
-    generate_procedure_initializer_impls: bool,
     /// Whether to beautify the generated code.
     beautify: bool,
     /// The extension network codegen.
@@ -114,11 +111,6 @@ impl<'a> ProcedureCodegen<'a> {
                 mod #module_ident;
             });
             time_tracker.add_completed_task(task);
-        }
-        if self.generate_procedure_initializer_impls {
-            // We create the procedure initializer impls subdirectory.
-            todo!("Consider creating a separate subdirectory for procedure initializers?");
-            self.procedure_initializer_impls(traits_directory.as_path(), conn)?;
         }
 
         // We extend the traits module with the generated code by appending to the file.

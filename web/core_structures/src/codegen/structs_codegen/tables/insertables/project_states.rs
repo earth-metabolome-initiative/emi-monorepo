@@ -39,6 +39,7 @@ impl core::fmt::Display for ProjectStateAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -98,6 +99,12 @@ pub struct InsertableProjectStateBuilder {
     pub(crate) icon: Option<String>,
     pub(crate) color_id: Option<i16>,
 }
+impl diesel::associations::HasTable for InsertableProjectStateBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::project_states::project_states::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::project_states::project_states::table
+    }
+}
 impl From<InsertableProjectStateBuilder>
     for web_common_traits::database::IdOrBuilder<i16, InsertableProjectStateBuilder>
 {
@@ -118,8 +125,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `ProjectState` or
 /// descendant tables.
 pub trait ProjectStateSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.project_states.name` column.
     ///
     /// # Arguments
@@ -138,10 +145,7 @@ pub trait ProjectStateSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
@@ -164,10 +168,7 @@ pub trait ProjectStateSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn description<D>(
-        self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
@@ -189,10 +190,7 @@ pub trait ProjectStateSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn icon<I>(
-        self,
-        icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn icon<I>(self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
@@ -214,20 +212,21 @@ pub trait ProjectStateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn color<CI>(
-        self,
-        color_id: CI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn color<CI>(self, color_id: CI) -> Result<Self, Self::Error>
     where
         CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
 }
-impl ProjectStateSettable for InsertableProjectStateBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::ProjectStateAttribute;
+impl ProjectStateSettable for InsertableProjectStateBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::ProjectStateAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.project_states.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -239,10 +238,7 @@ impl ProjectStateSettable for InsertableProjectStateBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.project_states.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -255,10 +251,7 @@ impl ProjectStateSettable for InsertableProjectStateBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.project_states.icon` column.
-    fn icon<I>(
-        mut self,
-        icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn icon<I>(mut self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
@@ -270,10 +263,7 @@ impl ProjectStateSettable for InsertableProjectStateBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.project_states.color_id` column.
-    fn color<CI>(
-        mut self,
-        color_id: CI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn color<CI>(mut self, color_id: CI) -> Result<Self, Self::Error>
     where
         CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
     {
@@ -290,20 +280,20 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableProjectStateBuilder
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableProjectStateBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::project_states::ProjectState,
-            Attribute = ProjectStateAttribute,
+            Error = web_common_traits::database::InsertError<ProjectStateAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<ProjectStateAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::project_states::ProjectState =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

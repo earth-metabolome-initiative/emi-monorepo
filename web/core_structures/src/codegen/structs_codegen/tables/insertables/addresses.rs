@@ -43,6 +43,7 @@ impl core::fmt::Display for AddressAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -101,6 +102,12 @@ pub struct InsertableAddressBuilder {
     pub(crate) postal_code: Option<String>,
     pub(crate) geolocation: Option<postgis_diesel::types::Point>,
 }
+impl diesel::associations::HasTable for InsertableAddressBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::addresses::addresses::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::addresses::addresses::table
+    }
+}
 impl From<InsertableAddressBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableAddressBuilder>
 {
@@ -122,8 +129,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `Address` or
 /// descendant tables.
 pub trait AddressSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.addresses.city_id` column.
     ///
     /// # Arguments
@@ -141,10 +148,7 @@ pub trait AddressSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn city<CI>(
-        self,
-        city_id: CI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn city<CI>(self, city_id: CI) -> Result<Self, Self::Error>
     where
         CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.addresses.street_name` column.
@@ -166,10 +170,7 @@ pub trait AddressSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn street_name<SN>(
-        self,
-        street_name: SN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn street_name<SN>(self, street_name: SN) -> Result<Self, Self::Error>
     where
         SN: TryInto<String>,
         validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>;
@@ -192,10 +193,7 @@ pub trait AddressSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn house_number<HN>(
-        self,
-        house_number: HN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn house_number<HN>(self, house_number: HN) -> Result<Self, Self::Error>
     where
         HN: TryInto<String>,
         validation_errors::SingleFieldError: From<<HN as TryInto<String>>::Error>;
@@ -218,10 +216,7 @@ pub trait AddressSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn postal_code<PC>(
-        self,
-        postal_code: PC,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn postal_code<PC>(self, postal_code: PC) -> Result<Self, Self::Error>
     where
         PC: TryInto<String>,
         validation_errors::SingleFieldError: From<<PC as TryInto<String>>::Error>;
@@ -244,22 +239,23 @@ pub trait AddressSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `postgis_diesel::types::Point`.
     /// * If the provided value does not pass schema-defined validation.
-    fn geolocation<G>(
-        self,
-        geolocation: G,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn geolocation<G>(self, geolocation: G) -> Result<Self, Self::Error>
     where
         G: TryInto<postgis_diesel::types::Point>,
         validation_errors::SingleFieldError:
             From<<G as TryInto<postgis_diesel::types::Point>>::Error>;
 }
-impl AddressSettable for InsertableAddressBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::AddressAttribute;
+impl AddressSettable for InsertableAddressBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::AddressAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.addresses.city_id` column.
-    fn city<CI>(
-        mut self,
-        city_id: CI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn city<CI>(mut self, city_id: CI) -> Result<Self, Self::Error>
     where
         CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -268,10 +264,7 @@ impl AddressSettable for InsertableAddressBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.addresses.street_name` column.
-    fn street_name<SN>(
-        mut self,
-        street_name: SN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn street_name<SN>(mut self, street_name: SN) -> Result<Self, Self::Error>
     where
         SN: TryInto<String>,
         validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>,
@@ -284,10 +277,7 @@ impl AddressSettable for InsertableAddressBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.addresses.house_number` column.
-    fn house_number<HN>(
-        mut self,
-        house_number: HN,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn house_number<HN>(mut self, house_number: HN) -> Result<Self, Self::Error>
     where
         HN: TryInto<String>,
         validation_errors::SingleFieldError: From<<HN as TryInto<String>>::Error>,
@@ -300,10 +290,7 @@ impl AddressSettable for InsertableAddressBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.addresses.postal_code` column.
-    fn postal_code<PC>(
-        mut self,
-        postal_code: PC,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn postal_code<PC>(mut self, postal_code: PC) -> Result<Self, Self::Error>
     where
         PC: TryInto<String>,
         validation_errors::SingleFieldError: From<<PC as TryInto<String>>::Error>,
@@ -316,10 +303,7 @@ impl AddressSettable for InsertableAddressBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.addresses.geolocation` column.
-    fn geolocation<G>(
-        mut self,
-        geolocation: G,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn geolocation<G>(mut self, geolocation: G) -> Result<Self, Self::Error>
     where
         G: TryInto<postgis_diesel::types::Point>,
         validation_errors::SingleFieldError:
@@ -341,20 +325,19 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableAddressBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableAddressBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::addresses::Address,
-            Attribute = AddressAttribute,
+            Error = web_common_traits::database::InsertError<AddressAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<AddressAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::addresses::Address =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

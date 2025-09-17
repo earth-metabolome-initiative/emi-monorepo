@@ -47,6 +47,7 @@ impl core::fmt::Display for OrganizationAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -101,6 +102,12 @@ pub struct InsertableOrganizationBuilder {
     pub(crate) state_province: Option<String>,
     pub(crate) domain: Option<String>,
 }
+impl diesel::associations::HasTable for InsertableOrganizationBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::organizations::organizations::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::organizations::organizations::table
+    }
+}
 impl From<InsertableOrganizationBuilder>
     for web_common_traits::database::IdOrBuilder<i16, InsertableOrganizationBuilder>
 {
@@ -122,8 +129,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `Organization` or
 /// descendant tables.
 pub trait OrganizationSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.organizations.name` column.
     ///
     /// # Arguments
@@ -142,10 +149,7 @@ pub trait OrganizationSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
@@ -167,10 +171,7 @@ pub trait OrganizationSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn url<U>(
-        self,
-        url: U,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn url<U>(self, url: U) -> Result<Self, Self::Error>
     where
         U: TryInto<String>,
         validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>;
@@ -193,10 +194,7 @@ pub trait OrganizationSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn country<C>(
-        self,
-        country: C,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn country<C>(self, country: C) -> Result<Self, Self::Error>
     where
         C: TryInto<String>,
         validation_errors::SingleFieldError: From<<C as TryInto<String>>::Error>;
@@ -219,10 +217,7 @@ pub trait OrganizationSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::iso_codes::CountryCode`.
     /// * If the provided value does not pass schema-defined validation.
-    fn alpha_two_code<ATC>(
-        self,
-        alpha_two_code: ATC,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn alpha_two_code<ATC>(self, alpha_two_code: ATC) -> Result<Self, Self::Error>
     where
         ATC: TryInto<::iso_codes::CountryCode>,
         validation_errors::SingleFieldError:
@@ -246,10 +241,7 @@ pub trait OrganizationSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn state_province<SP>(
-        self,
-        state_province: SP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn state_province<SP>(self, state_province: SP) -> Result<Self, Self::Error>
     where
         SP: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<SP as TryInto<Option<String>>>::Error>;
@@ -272,21 +264,22 @@ pub trait OrganizationSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn domain<D>(
-        self,
-        domain: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn domain<D>(self, domain: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
 }
-impl OrganizationSettable for InsertableOrganizationBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::OrganizationAttribute;
+impl OrganizationSettable for InsertableOrganizationBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::OrganizationAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.organizations.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -298,10 +291,7 @@ impl OrganizationSettable for InsertableOrganizationBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.organizations.url` column.
-    fn url<U>(
-        mut self,
-        url: U,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn url<U>(mut self, url: U) -> Result<Self, Self::Error>
     where
         U: TryInto<String>,
         validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>,
@@ -313,10 +303,7 @@ impl OrganizationSettable for InsertableOrganizationBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.organizations.country` column.
-    fn country<C>(
-        mut self,
-        country: C,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn country<C>(mut self, country: C) -> Result<Self, Self::Error>
     where
         C: TryInto<String>,
         validation_errors::SingleFieldError: From<<C as TryInto<String>>::Error>,
@@ -329,10 +316,7 @@ impl OrganizationSettable for InsertableOrganizationBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.organizations.alpha_two_code` column.
-    fn alpha_two_code<ATC>(
-        mut self,
-        alpha_two_code: ATC,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn alpha_two_code<ATC>(mut self, alpha_two_code: ATC) -> Result<Self, Self::Error>
     where
         ATC: TryInto<::iso_codes::CountryCode>,
         validation_errors::SingleFieldError:
@@ -346,10 +330,7 @@ impl OrganizationSettable for InsertableOrganizationBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.organizations.state_province` column.
-    fn state_province<SP>(
-        mut self,
-        state_province: SP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn state_province<SP>(mut self, state_province: SP) -> Result<Self, Self::Error>
     where
         SP: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<SP as TryInto<Option<String>>>::Error>,
@@ -362,10 +343,7 @@ impl OrganizationSettable for InsertableOrganizationBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.organizations.domain` column.
-    fn domain<D>(
-        mut self,
-        domain: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn domain<D>(mut self, domain: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -386,20 +364,20 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableOrganizationBuilder
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableOrganizationBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::organizations::Organization,
-            Attribute = OrganizationAttribute,
+            Error = web_common_traits::database::InsertError<OrganizationAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<OrganizationAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::organizations::Organization =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

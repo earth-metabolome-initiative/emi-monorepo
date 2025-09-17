@@ -3,7 +3,7 @@
 //! Submodule defining the `AppendProcedureTemplate` trait.
 
 use web_common_traits::{
-    database::{InsertError, Insertable, InsertableVariant},
+    database::{DispatchableInsertableVariant, InsertError, Insertable},
     prelude::ExtensionTable,
 };
 

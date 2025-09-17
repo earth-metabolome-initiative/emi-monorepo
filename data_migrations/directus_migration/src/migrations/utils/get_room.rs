@@ -3,7 +3,7 @@
 use core_structures::{Room as PortalRoom, tables::insertables::RoomSettable};
 use diesel::{OptionalExtension, PgConnection};
 use directus_codegen::Room as DirectusRoom;
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 use super::{get_address, get_user};
 

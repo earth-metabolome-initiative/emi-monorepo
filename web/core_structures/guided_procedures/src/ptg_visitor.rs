@@ -1,12 +1,12 @@
-//! Submodule providing an iterator struct which uses a visitor pattern trait to
-//! traverse a `ProcedureTemplateGraph`.
+//! Submodule providing an iterator struct which uses a listener pattern trait
+//! to traverse a `ProcedureTemplateGraph`.
 
 use std::collections::VecDeque;
 
 use core_structures::{ProcedureTemplate, ProcedureTemplateAssetModel};
 
 use crate::{
-    PTGVisitor, ProcedureTemplateGraph,
+    PTGListener, ProcedureTemplateGraph,
     structs::{HierarchyLike, OwnershipLike, TaskGraph},
 };
 
@@ -18,12 +18,13 @@ enum CurrentNodeVisitState {
     Visited,
 }
 
+#[derive(Debug)]
 /// Visitor pattern trait for traversing a `ProcedureTemplateGraph`.
-pub struct PTGVisitorIterator<'graph, G, V> {
+pub struct PTGVisitor<'graph, G, L> {
     /// The graph to traverse.
     graph: &'graph G,
-    /// The visitor to apply at each node.
-    visitor: &'graph mut V,
+    /// The listener to apply at each node.
+    listener: L,
     /// Iterator over foreign procedure templates.
     foreign_procedures_iter: core::slice::Iter<'graph, ProcedureTemplate>,
     /// Procedure template asset models employed by the current node.
@@ -42,36 +43,62 @@ pub struct PTGVisitorIterator<'graph, G, V> {
     )>,
 }
 
-impl<'graph, G, V> PTGVisitorIterator<'graph, G, V>
+impl<'graph, G, L> PTGVisitor<'graph, G, L>
 where
     G: AsRef<ProcedureTemplateGraph>,
-    V: PTGVisitor,
 {
-    /// Creates a new `PTGVisitorIterator`.
-    pub fn new(graph: &'graph G, visitor: &'graph mut V) -> Self {
+    /// Creates a new `PTGVisitor`.
+    pub fn new(graph: &'graph G, listener: L) -> Self {
         Self {
             foreign_procedures_iter: graph.as_ref().foreign_procedure_templates(),
             parents: Vec::new(),
             current_node: Some(graph.as_ref().root_procedure_template()),
             graph,
-            visitor,
+            listener,
             current_node_state: CurrentNodeVisitState::Unvisited,
             ptam_iter: None,
             nodes_to_visit: Vec::new(),
         }
     }
+
+    /// Returns a reference to the underlying listener.
+    pub fn listener(&self) -> &L {
+        &self.listener
+    }
+
+    /// Returns a mutable reference to the underlying listener.
+    pub fn listener_mut(&mut self) -> &mut L {
+        &mut self.listener
+    }
 }
 
-impl<'graph, G, V> Iterator for PTGVisitorIterator<'graph, G, V>
+impl ProcedureTemplateGraph {
+    /// Returns an iterator which traverses the graph using the provided
+    /// listener.
+    ///
+    /// # Arguments
+    ///
+    /// * `listener` - The listener to apply at each node.
+    pub fn visit_with<'graph, L>(&'graph self, listener: L) -> PTGVisitor<'graph, Self, L>
+    where
+        L: PTGListener<'graph>,
+    {
+        PTGVisitor::new(self, listener)
+    }
+}
+
+impl<'graph, G, L> Iterator for PTGVisitor<'graph, G, L>
 where
     G: AsRef<ProcedureTemplateGraph>,
-    V: PTGVisitor,
+    L: PTGListener<'graph>,
 {
-    type Item = Result<V::Output, V::Error>;
+    type Item = Result<L::Output, L::Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if let Some(foreign_procedure_template) = self.foreign_procedures_iter.next() {
-            return Some(self.visitor.visit_foreign_procedure_template(foreign_procedure_template));
+            return Some(
+                self.listener.enter_foreign_procedure_template(foreign_procedure_template),
+            );
         }
 
         let current_node = self.current_node?;
@@ -80,7 +107,7 @@ where
             CurrentNodeVisitState::Unvisited => {
                 // We determine the visit outcome of visiting the current node.
                 let outcome =
-                    self.visitor.visit_procedure_template(self.parents.as_slice(), current_node);
+                    self.listener.enter_procedure_template(self.parents.as_slice(), current_node);
 
                 // When we are starting to visit a node, we setup its recursion.
                 if let Some(task_graph) = self.graph.as_ref().task_graph_of(current_node) {
@@ -123,7 +150,7 @@ where
                     if let Some(ptam) = ptam_iter.pop() {
                         // If there are still owned procedure template asset models to visit,
                         // we visit the next one.
-                        self.visitor.visit_leaf_ptam(self.parents.as_slice(), current_node, ptam)
+                        self.listener.enter_leaf_ptam(self.parents.as_slice(), current_node, ptam)
                     } else {
                         // Otherwise, we have finished visiting all owned procedure template asset
                         // models. We change the state of the current node
@@ -131,7 +158,8 @@ where
                         // the next node in the task graph, if any.
                         self.ptam_iter = None;
                         self.current_node_state = CurrentNodeVisitState::Visited;
-                        self.visitor.leave_procedure_template(self.parents.as_slice(), current_node)
+                        self.listener
+                            .leave_procedure_template(self.parents.as_slice(), current_node)
                     }
                 } else if let Some((task_graph, nodes)) = self.nodes_to_visit.last_mut() {
                     // If there is a task graph to visit, then we are visiting a non-leaf node,
@@ -157,7 +185,8 @@ where
                         // node to visited.
                         self.nodes_to_visit.pop();
                         self.current_node_state = CurrentNodeVisitState::Visited;
-                        self.visitor.leave_procedure_template(self.parents.as_slice(), current_node)
+                        self.listener
+                            .leave_procedure_template(self.parents.as_slice(), current_node)
                     }
                 } else {
                     unreachable!(
@@ -168,36 +197,36 @@ where
             CurrentNodeVisitState::Visited => {
                 // If we have finished visiting the node, we need to move to its parent.
                 // If there are no parents, then we have finished visiting the entire graph.
-                let mut outcome = None;
                 if let Some((task_graph, nodes)) = self.nodes_to_visit.last_mut() {
+                    // And we ask the listener to filter the successors of the current node, so
+                    // to only explore the ones that are relevant to the
+                    // current context.
+                    let successors = match self
+                        .listener
+                        .filter_successors(task_graph.successors(current_node))
+                    {
+                        Ok(successors) => successors,
+                        Err(e) => return Some(Err(e)),
+                    };
+
                     let (node, mut predecessors) = nodes.pop_front().unwrap();
                     assert_eq!(
                         node, current_node,
                         "The current node should be the one we are visiting."
                     );
 
-                    outcome = Some(self.visitor.continue_task(
+                    if let Err(err) = self.listener.continue_task(
                         self.parents.as_slice(),
                         predecessors.as_slice(),
                         current_node,
-                    ));
+                    ) {
+                        return Some(Err(err));
+                    }
 
                     predecessors.push(current_node);
 
-                    // And we ask the visitor to filter the successors of the current node, so
-                    // to only explore the ones that are relevant to the
-                    // current context.
-                    let successors = match self.visitor.filter_successors(
-                        self.parents.as_slice(),
-                        predecessors.as_slice(),
-                        task_graph.successors(current_node),
-                    ) {
-                        Ok(s) => s,
-                        Err(e) => return Some(Err(e)),
-                    };
-
                     // We push the successors to the nodes to visit stack, so that we can
-                    // explore them
+                    // explore them later.
                     for successor in successors {
                         nodes.push_back((successor, predecessors.clone()));
                     }
@@ -205,63 +234,8 @@ where
 
                 self.current_node_state = CurrentNodeVisitState::Visiting;
                 self.current_node = self.parents.pop();
-
-                if let Some(outcome) = outcome { outcome } else { self.next()? }
+                self.next()?
             }
         })
-    }
-}
-
-impl ProcedureTemplateGraph {
-    fn visit_recursive<'graph, V: PTGVisitor + 'graph>(
-        &'graph self,
-        visitor: &mut V,
-        parents: &mut Vec<&'graph ProcedureTemplate>,
-        current_node: &'graph ProcedureTemplate,
-    ) -> Result<(), V::Error> {
-        visitor.visit_procedure_template(parents.as_slice(), current_node)?;
-        if let Some(task_graph) = self.task_graph_of(current_node) {
-            parents.push(current_node);
-            let root_node = task_graph.root_node();
-            self.visit_recursive(visitor, parents, root_node)?;
-            let mut nodes_to_visit = vec![(Vec::new(), root_node)];
-            let mut nodes_to_visit_tmp = Vec::new();
-
-            while !nodes_to_visit.is_empty() {
-                for (mut predecessors, node) in nodes_to_visit.drain(..) {
-                    if task_graph.has_successors(node) {
-                        predecessors.push(node);
-                        let successors = visitor.filter_successors(
-                            parents.as_slice(),
-                            predecessors.as_slice(),
-                            task_graph.successors(node),
-                        )?;
-
-                        for successor in successors {
-                            self.visit_recursive(visitor, parents, successor)?;
-                            visitor.continue_task(
-                                parents.as_slice(),
-                                predecessors.as_slice(),
-                                successor,
-                            )?;
-                            nodes_to_visit_tmp.push((predecessors.clone(), successor));
-                        }
-                    }
-                }
-
-                core::mem::swap(&mut nodes_to_visit, &mut nodes_to_visit_tmp);
-                nodes_to_visit_tmp.clear();
-            }
-            parents.pop();
-        } else {
-            // Leaf node: visit all owned procedure template asset models.
-            for ptam in self.employed_by(current_node) {
-                visitor.visit_leaf_ptam(parents.as_slice(), current_node, ptam)?;
-            }
-        }
-
-        visitor.leave_procedure_template(parents.as_slice(), current_node)?;
-
-        Ok(())
     }
 }

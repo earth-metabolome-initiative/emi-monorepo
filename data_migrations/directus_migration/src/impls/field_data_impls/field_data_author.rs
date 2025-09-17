@@ -2,7 +2,7 @@
 
 use core_structures::{User, tables::insertables::UserSettable};
 use diesel::PgConnection;
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{BackendInsertableVariant, Insertable};
 
 use crate::structs::FieldDatumWrapper;
 
@@ -125,7 +125,8 @@ fn get_or_insert_user(
         return Ok(users.into_iter().next().unwrap());
     }
 
-    let user: User = User::new().last_name(last_name)?.first_name(first_name)?.insert(0, portal)?;
+    let user: User =
+        User::new().last_name(last_name)?.first_name(first_name)?.backend_insert(portal)?;
 
     Ok(user)
 }

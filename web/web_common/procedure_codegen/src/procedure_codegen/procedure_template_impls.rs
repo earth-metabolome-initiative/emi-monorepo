@@ -34,9 +34,12 @@ impl<'a> ProcedureCodegen<'a> {
         let procedure_template_ident = procedure_template_table.struct_ident()?;
         let procedure_table = Procedure::root(table_catalog, conn)?;
         let procedure_template_dag_ty = procedure_template_table.as_ref().dag_ty(conn)?.unwrap();
+        let procedure_builder_dag_ty = procedure_table.as_ref().builder_dag_ty(conn)?.unwrap();
         let procedure_dag_ty = procedure_table.as_ref().dag_ty(conn)?.unwrap();
 
-        for procedure_template in ProcedureTemplate::load_all(table_catalog, conn)? {
+        let procedure_templates = ProcedureTemplate::load_all(table_catalog, conn)?;
+
+        for procedure_template in &procedure_templates {
             let procedure_template_name = procedure_template.snake_case_name()?;
             let procedure_template_ident = procedure_template.snake_case_ident()?;
             let procedure_template_type = procedure_template.import_struct_path()?;
@@ -44,6 +47,8 @@ impl<'a> ProcedureCodegen<'a> {
                 root.join(procedure_template_name).with_extension("rs");
             let procedure = procedure_template.procedure(conn)?;
             let procedure_type = procedure.import_struct_path()?;
+            let is_root =
+                procedure_template.as_ref().has_most_concrete_table_column(false, conn)?;
             submodules.push(quote! {
                 mod #procedure_template_ident;
             });
@@ -52,10 +57,7 @@ impl<'a> ProcedureCodegen<'a> {
                 crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
                 C: diesel::connection::LoadConnection
             }];
-            let root_dispatch = if procedure_template
-                .as_ref()
-                .has_most_concrete_table_column(false, conn)?
-            {
+            let root_dispatch = if is_root {
                 where_constraint.push(quote! {
                     Self: web_common_traits::database::MostConcreteVariant<
                         C,
@@ -90,14 +92,51 @@ impl<'a> ProcedureCodegen<'a> {
                 }
             };
 
+            let maybe_procedure_template_root_impl = if let Some(most_concrete_column) =
+                procedure_template.as_ref().most_concrete_table_column(false, conn)?
+            {
+                let most_concrete_column_ident = most_concrete_column.snake_case_ident()?;
+                let cases = procedure_templates
+                    .iter()
+                    .map(|table| {
+                        let table_name = table.as_ref().table_name.as_str();
+                        let procedure = table.procedure(conn)?;
+                        let procedure_type = procedure.as_ref().import_struct_path()?;
+                        Ok(quote! {
+                            #table_name => #procedure_type::new().into()
+                        })
+                    })
+                    .collect::<Result<Vec<_>, crate::errors::Error>>()?;
+                Some(quote! {
+                    impl web_common_traits::prelude::ProcedureTemplateRoot for #procedure_template_type {
+                        type ProcedureBuilderDAG = #procedure_builder_dag_ty;
+
+                        fn procedure_builder_dag(&self) -> Self::ProcedureBuilderDAG {
+                            use web_common_traits::database::Insertable;
+                            match self.#most_concrete_column_ident.as_str() {
+                                #(#cases),*,
+                                most_concrete_column_ident => {
+                                    unreachable!("Unknown most concrete variant: {most_concrete_column_ident}")
+                                }
+                            }
+                        }
+                    }
+                })
+            } else {
+                None
+            };
+
             std::fs::write(
                 submodule,
                 self.beautify_code(&quote! {
-                    impl<C> web_common_traits::prelude::ProcedureTemplate<C> for #procedure_template_type
-                    where #(#where_constraint),* {
+                    #maybe_procedure_template_root_impl
+
+                    impl web_common_traits::prelude::ProcedureTemplateLike for #procedure_template_type {
                         type Procedure = #procedure_type;
                         type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
-
+                    }
+                    impl<C> web_common_traits::prelude::ProcedureTemplateQueries<C> for #procedure_template_type
+                    where #(#where_constraint),* {
                         fn procedure_template_asset_models(
                             &self,
                             conn: &mut C,
@@ -122,7 +161,12 @@ impl<'a> ProcedureCodegen<'a> {
             self.beautify_code(&quote! {
                 #(#submodules)*
 
-                impl<C> web_common_traits::prelude::ProcedureTemplate<C> for #procedure_template_dag_ty
+                impl web_common_traits::prelude::ProcedureTemplateLike for #procedure_template_dag_ty
+                {
+                    type Procedure = #procedure_dag_ty;
+                    type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
+                }
+                impl<C> web_common_traits::prelude::ProcedureTemplateQueries<C> for #procedure_template_dag_ty
                     where
                     C: diesel::connection::LoadConnection,
                     crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
@@ -133,9 +177,6 @@ impl<'a> ProcedureCodegen<'a> {
                         crate::ProcedureTemplateAssetModel,
                     >,
                 {
-                    type Procedure = #procedure_dag_ty;
-                    type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
-
                     fn procedure_template_asset_models(&self, conn: &mut C) -> Result<Vec<Self::ProcedureTemplateAssetModel>, diesel::result::Error> {
                         Ok(match self {
                             #(Self::#procedure_template_idents(value) => value.procedure_template_asset_models(conn)?,)*

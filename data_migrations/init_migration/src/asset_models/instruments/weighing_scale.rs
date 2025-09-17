@@ -3,7 +3,7 @@
 
 use core_structures::{User, WeighingDeviceModel, tables::insertables::AssetModelSettable};
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 /// Returns the weighing scale.
 ///
 /// # Implementation Details

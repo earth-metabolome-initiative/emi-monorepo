@@ -31,6 +31,7 @@ impl core::fmt::Display for CityAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -81,6 +82,12 @@ pub struct InsertableCityBuilder {
     pub(crate) name: Option<String>,
     pub(crate) iso: Option<::iso_codes::CountryCode>,
 }
+impl diesel::associations::HasTable for InsertableCityBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::cities::cities::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::cities::cities::table
+    }
+}
 impl From<InsertableCityBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableCityBuilder>
 {
@@ -98,8 +105,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `City` or descendant
 /// tables.
 pub trait CitySettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.cities.name` column.
     ///
     /// # Arguments
@@ -118,10 +125,7 @@ pub trait CitySettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
@@ -143,20 +147,21 @@ pub trait CitySettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::iso_codes::CountryCode`.
     /// * If the provided value does not pass schema-defined validation.
-    fn iso<I>(
-        self,
-        iso: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn iso<I>(self, iso: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::iso_codes::CountryCode>;
 }
-impl CitySettable for InsertableCityBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CityAttribute;
+impl CitySettable for InsertableCityBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::CityAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.cities.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -168,10 +173,7 @@ impl CitySettable for InsertableCityBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.cities.iso` column.
-    fn iso<I>(
-        mut self,
-        iso: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn iso<I>(mut self, iso: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::iso_codes::CountryCode>,
     {
@@ -188,20 +190,19 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableCityBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableCityBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::cities::City,
-            Attribute = CityAttribute,
+            Error = web_common_traits::database::InsertError<CityAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<CityAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::cities::City =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

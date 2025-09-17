@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS photograph_procedures (
 	-- The template of this procedure should be a photograph procedure template.
 	procedure_template INTEGER NOT NULL REFERENCES photograph_procedure_templates(procedure_template),
 	-- The asset being photographed, which must be a physical asset.
-	photographed_asset UUID NOT NULL REFERENCES physical_assets(id),
+	photographed_asset UUID REFERENCES physical_assets(id),
 	-- The procedure template asset model associated to the `photographed_asset`.
 	procedure_template_photographed_asset_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure asset associated to the `photographed_asset`.

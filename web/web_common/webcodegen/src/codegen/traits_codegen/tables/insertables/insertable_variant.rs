@@ -44,15 +44,10 @@ impl Codegen<'_> {
         table: &Table,
         conn: &mut PgConnection,
     ) -> Result<(TokenStream, Vec<TokenStream>), WebCodeGenError> {
-        let Some(user_table) = self.users_table else {
-            return Err(crate::errors::CodeGenerationError::UserTableNotProvided.into());
-        };
-        let user_id_type = user_table.primary_key_type(conn)?;
         let insertable_enum = table.insertable_enum_ty()?;
         let mut maybe_mut_self = false;
         let attributes_enum = table.insertable_enum_ty()?;
-        let table_extension_network = self.table_extension_network().unwrap();
-        let extension_tables = table_extension_network.extension_tables(table);
+        let extension_tables = table.extension_tables(conn)?;
         let mut additional_use_imports = Vec::new();
         let right_generics = extension_tables
             .iter()
@@ -67,8 +62,7 @@ impl Codegen<'_> {
         let mut attribute_availability_checks = Vec::new();
 
         let generics_recursive_operation = if !right_generics.is_empty() {
-            let extension_foreign_keys =
-                table_extension_network.extension_foreign_keys(table, conn)?;
+            let extension_foreign_keys = table.extension_foreign_keys(conn)?;
 
             let primary_keys = table.primary_key_columns(conn)?;
 
@@ -422,11 +416,11 @@ impl Codegen<'_> {
             quote! {
                 fn try_insert(
                     #maybe_mut_self self,
-                    #user_id_ident: #user_id_type,
+                    #user_id_ident: i32,
                     #conn_ident: &mut C
                 ) -> Result<
                     Self::InsertableVariant,
-                    web_common_traits::database::InsertError<#attributes_enum>
+                    Self::Error
                 >
                 {
                     #(#additional_use_imports)*
@@ -465,11 +459,6 @@ impl Codegen<'_> {
         std::fs::create_dir_all(root)?;
 
         let mut ifvb_main_module = TokenStream::new();
-        let Some(user_table) = self.users_table else {
-            return Err(crate::errors::CodeGenerationError::UserTableNotProvided.into());
-        };
-        let user_id_type = user_table.primary_key_type(conn)?;
-        let extension_network = self.table_extension_network().unwrap();
 
         for table in tables {
             // We create a file for each table
@@ -482,7 +471,7 @@ impl Codegen<'_> {
             // We build a check to see whether the user is authorized to update
             // the parent tables.
 
-            let mut parent_check = TokenStream::new();
+            let mut parent_checks = Vec::new();
             let mut additional_where_clause = Vec::new();
 
             for parent_key in table.parent_keys(conn)? {
@@ -495,7 +484,7 @@ impl Codegen<'_> {
 
                 let parent_table_path = parent_table.import_struct_path()?;
 
-                parent_check.extend(if parent_key.is_nullable(conn)? {
+                parent_checks.push(if parent_key.is_nullable(conn)? {
                     quote::quote! {
                         if let Some(parent) = insertable_struct.#parent_key_method(conn)? {
                             if !parent.can_update(user_id, conn)? {
@@ -516,13 +505,13 @@ impl Codegen<'_> {
                 });
 
                 additional_where_clause.push(quote::quote! {
-                    #parent_table_path: web_common_traits::database::Updatable<C, UserId = #user_id_type>
+                    #parent_table_path: web_common_traits::database::Updatable<C>
                 });
             }
 
             let mut additional_imports = Vec::new();
 
-            if !parent_check.is_empty() {
+            if !parent_checks.is_empty() {
                 additional_imports.push(quote::quote! {
                     use web_common_traits::database::Updatable;
                 });
@@ -539,8 +528,8 @@ impl Codegen<'_> {
             additional_where_clause.dedup_by_key(|x| x.to_string());
 
             let extension_tables = table.extension_tables(conn)?;
-            let generics = extension_network
-                .extension_tables(table)
+            let generics = table
+                .extension_tables(conn)?
                 .iter()
                 .map(|extension_table| extension_table.struct_ident())
                 .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
@@ -577,17 +566,68 @@ impl Codegen<'_> {
                     .collect::<Result<Vec<_>, WebCodeGenError>>()?,
             );
 
+            let maybe_backend_insert = if parent_checks.is_empty() {
+                Some(quote! {
+                    impl<#(#generics),*> web_common_traits::database::BackendInsertableVariant for #insertable_builder #maybe_generics
+                    where
+                        Self: web_common_traits::database::DispatchableInsertableVariant<diesel::PgConnection>,
+                    {}
+                })
+            } else {
+                None
+            };
+
             std::fs::write(&table_file, self.beautify_code(&quote::quote!{
 
+                impl #maybe_generics web_common_traits::database::DispatchableInsertVariantMetadata for #insertable_builder #maybe_generics
+                {
+                    type Row = #table_path;
+                    type Error = web_common_traits::database::InsertError<#attributes_enum>;
+                }
 
 				impl #maybe_generics web_common_traits::database::InsertableVariantMetadata for #insertable_builder #maybe_generics
                 {
-					type Row = #table_path;
                     type InsertableVariant = #insertable_struct;
-                    type UserId = #user_id_type;
                 }
 
-				impl<C: diesel::connection::LoadConnection, #(#generics),*> web_common_traits::database::InsertableVariant<C> for #insertable_builder #maybe_generics
+                #[cfg(feature = "backend")]
+				#maybe_backend_insert
+
+                impl<C: diesel::connection::LoadConnection, #(#generics),*> web_common_traits::database::DispatchableInsertableVariant<C> for #insertable_builder #maybe_generics
+                where
+                    diesel::query_builder::InsertStatement<
+                        <#table_path as diesel::associations::HasTable>::Table,
+                        <#insertable_struct as diesel::Insertable<<#table_path as diesel::associations::HasTable>::Table>>::Values,
+                    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, #table_path>,
+                    Self: web_common_traits::database::InsertableVariant<
+                        C,
+                        InsertableVariant = #insertable_struct,
+                        Row = #table_path,
+                        Error = web_common_traits::database::InsertError<#attributes_enum>,
+                    >,
+                    #(#additional_where_clause),*
+                {
+                    fn insert(
+                        #maybe_mut self,
+                        user_id: i32,
+                        conn: &mut C,
+                    ) -> Result<Self::Row, Self::Error> {
+                        use diesel::RunQueryDsl;
+                        use diesel::associations::HasTable;
+                        use web_common_traits::database::InsertableVariant;
+                        #(#additional_imports)*
+
+                        #maybe_complete_most_concrete_table
+                        let insertable_struct: #insertable_struct = self.try_insert(user_id, conn)?;
+
+                        #(#parent_checks)*
+
+                        Ok(diesel::insert_into(Self::table())
+                            .values(insertable_struct)
+                            .get_result(conn)?)
+                    }
+                }
+                impl<C: diesel::connection::LoadConnection, #(#generics),*> web_common_traits::database::InsertableVariant<C> for #insertable_builder #maybe_generics
                 where
                     diesel::query_builder::InsertStatement<
                         <#table_path as diesel::associations::HasTable>::Table,
@@ -595,24 +635,6 @@ impl Codegen<'_> {
                     >: for<'query> diesel::query_dsl::LoadQuery<'query, C, #table_path>,
                     #(#additional_where_clause),*
                 {
-                    fn insert(
-                        #maybe_mut self,
-                        user_id: Self::UserId,
-                        conn: &mut C,
-                    ) -> Result<Self::Row, web_common_traits::database::InsertError<#attributes_enum>> {
-                        use diesel::RunQueryDsl;
-                        use diesel::associations::HasTable;
-                        #(#additional_imports)*
-
-                        #maybe_complete_most_concrete_table
-                        let insertable_struct: #insertable_struct = self.try_insert(user_id, conn)?;
-
-                        #parent_check
-
-                        Ok(diesel::insert_into(Self::Row::table())
-                            .values(insertable_struct)
-                            .get_result(conn)?)
-                    }
 
                     #try_insert
 				}

@@ -59,6 +59,7 @@ impl core::fmt::Display for ProcedureTemplateAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -140,6 +141,13 @@ pub struct InsertableProcedureTemplateBuilder {
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) deprecated: Option<bool>,
 }
+impl diesel::associations::HasTable for InsertableProcedureTemplateBuilder {
+    type Table =
+        crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates::table
+    }
+}
 impl From<InsertableProcedureTemplateBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableProcedureTemplateBuilder>
 {
@@ -165,8 +173,7 @@ impl common_traits::builder::IsCompleteBuilder
     for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateBuilder
 {
     fn is_complete(&self) -> bool {
-        self.most_concrete_table.is_some()
-            && self.name.is_some()
+        self.name.is_some()
             && self.description.is_some()
             && self.created_by.is_some()
             && self.created_at.is_some()
@@ -178,8 +185,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `ProcedureTemplate`
 /// or descendant tables.
 pub trait ProcedureTemplateSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.procedure_templates.name` column.
     ///
     /// # Arguments
@@ -199,10 +206,7 @@ pub trait ProcedureTemplateSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
@@ -225,10 +229,7 @@ pub trait ProcedureTemplateSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn description<D>(
-        self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
@@ -250,10 +251,7 @@ pub trait ProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by<CB>(
-        self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.procedure_templates.created_at` column.
@@ -275,10 +273,7 @@ pub trait ProcedureTemplateSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<CA>(
-        self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -301,10 +296,7 @@ pub trait ProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_by<UB>(
-        self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.procedure_templates.updated_at` column.
@@ -326,10 +318,7 @@ pub trait ProcedureTemplateSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_at<UA>(
-        self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -352,30 +341,32 @@ pub trait ProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `bool`.
     /// * If the provided value does not pass schema-defined validation.
-    fn deprecated<D>(
-        self,
-        deprecated: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn deprecated<D>(self, deprecated: D) -> Result<Self, Self::Error>
     where
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>;
 }
-impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute;
-    /// Sets the value of the `public.procedure_templates.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.procedure_templates.name` column.
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(ProcedureTemplateAttribute::Name)
-        })?;
+        let name = name
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(ProcedureTemplateAttribute::Name)
+            })?;
         if let Some(description) = self.description.as_ref() {
             pgrx_validation::must_be_distinct(name.as_ref(), description)
                 .map_err(|e| {
@@ -396,19 +387,18 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
         self.name = Some(name);
         Ok(self)
     }
-    /// Sets the value of the `public.procedure_templates.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.procedure_templates.description` column.
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        let description = description.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(ProcedureTemplateAttribute::Description)
-        })?;
+        let description = description
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(ProcedureTemplateAttribute::Description)
+            })?;
         if let Some(name) = self.name.as_ref() {
             pgrx_validation::must_be_distinct(name, description.as_ref())
                 .map_err(|e| {
@@ -429,50 +419,48 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
         self.description = Some(description);
         Ok(self)
     }
-    /// Sets the value of the `public.procedure_templates.created_by` column.
+    ///Sets the value of the `public.procedure_templates.created_by` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// v0@{shape: rounded, label: "created_by"}
-    /// class v0 column-of-interest
-    /// v1@{shape: rounded, label: "updated_by"}
-    /// class v1 directly-involved-column
-    /// ```
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///v0@{shape: rounded, label: "created_by"}
+    ///class v0 column-of-interest
+    ///v1@{shape: rounded, label: "updated_by"}
+    ///class v1 directly-involved-column
+    ///```
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let created_by =
-            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
+        let created_by = <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &created_by,
+        );
         self = self.updated_by(created_by)?;
         self.created_by = Some(created_by);
         Ok(self)
     }
-    /// Sets the value of the `public.procedure_templates.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.procedure_templates.created_at` column.
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+        validation_errors::SingleFieldError: From<
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
     {
-        let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(ProcedureTemplateAttribute::CreatedAt)
-        })?;
+        let created_at = created_at
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(ProcedureTemplateAttribute::CreatedAt)
+            })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
@@ -486,33 +474,31 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
         self.created_at = Some(created_at);
         Ok(self)
     }
-    /// Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.procedure_templates.updated_by` column.
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let updated_by =
-            <UB as web_common_traits::database::PrimaryKeyLike>::primary_key(&updated_by);
+        let updated_by = <UB as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &updated_by,
+        );
         self.updated_by = Some(updated_by);
         Ok(self)
     }
-    /// Sets the value of the `public.procedure_templates.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.procedure_templates.updated_at` column.
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+        validation_errors::SingleFieldError: From<
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
     {
-        let updated_at = updated_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(ProcedureTemplateAttribute::UpdatedAt)
-        })?;
+        let updated_at = updated_at
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(ProcedureTemplateAttribute::UpdatedAt)
+            })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
                 .map_err(|e| {
@@ -526,19 +512,18 @@ impl ProcedureTemplateSettable for InsertableProcedureTemplateBuilder {
         self.updated_at = Some(updated_at);
         Ok(self)
     }
-    /// Sets the value of the `public.procedure_templates.deprecated` column.
-    fn deprecated<D>(
-        mut self,
-        deprecated: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.procedure_templates.deprecated` column.
+    fn deprecated<D>(mut self, deprecated: D) -> Result<Self, Self::Error>
     where
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
-        let deprecated = deprecated.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(ProcedureTemplateAttribute::Deprecated)
-        })?;
+        let deprecated = deprecated
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(ProcedureTemplateAttribute::Deprecated)
+            })?;
         self.deprecated = Some(deprecated);
         Ok(self)
     }
@@ -558,20 +543,22 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableProcedureTemplateBu
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableProcedureTemplateBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
-            Attribute = ProcedureTemplateAttribute,
+            Error = web_common_traits::database::InsertError<ProcedureTemplateAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<ProcedureTemplateAttribute>,
+    > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

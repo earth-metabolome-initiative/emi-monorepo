@@ -1,9 +1,72 @@
-impl<SampleSource> web_common_traits::database::InsertableVariantMetadata
+impl<SampleSource> web_common_traits::database::DispatchableInsertVariantMetadata
     for crate::codegen::structs_codegen::tables::insertables::InsertableSoilBuilder<SampleSource>
 {
     type Row = crate::codegen::structs_codegen::tables::soils::Soil;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::SoilAttribute,
+    >;
+}
+impl<SampleSource> web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSoilBuilder<SampleSource>
+{
     type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSoil;
-    type UserId = i32;
+}
+#[cfg(feature = "backend")]
+impl<SampleSource> web_common_traits::database::BackendInsertableVariant
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSoilBuilder<SampleSource>
+where
+    Self: web_common_traits::database::DispatchableInsertableVariant<diesel::PgConnection>,
+{
+}
+impl<
+    C: diesel::connection::LoadConnection,
+    SampleSource,
+> web_common_traits::database::DispatchableInsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableSoilBuilder<
+    SampleSource,
+>
+where
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::soils::Soil as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableSoil as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::soils::Soil as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::soils::Soil,
+    >,
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSoil,
+        Row = crate::codegen::structs_codegen::tables::soils::Soil,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::SoilAttribute,
+        >,
+    >,
+    SampleSource: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = ::rosetta_uuid::Uuid,
+    >,
+    Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::SoilExtensionAttribute: From<
+        <SampleSource as common_traits::builder::Attributed>::Attribute,
+    >,
+{
+    fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("soils");
+        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableSoil = self
+            .try_insert(user_id, conn)?;
+        Ok(
+            diesel::insert_into(Self::table())
+                .values(insertable_struct)
+                .get_result(conn)?,
+        )
+    }
 }
 impl<
     C: diesel::connection::LoadConnection,
@@ -32,38 +95,11 @@ where
         <SampleSource as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    fn insert(
-        mut self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::SoilAttribute,
-        >,
-    > {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use web_common_traits::database::MostConcreteTable;
-        self.set_most_concrete_table("soils");
-        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableSoil = self
-            .try_insert(user_id, conn)?;
-        Ok(
-            diesel::insert_into(Self::Row::table())
-                .values(insertable_struct)
-                .get_result(conn)?,
-        )
-    }
     fn try_insert(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::InsertableVariant,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::SoilAttribute,
-        >,
-    > {
+    ) -> Result<Self::InsertableVariant, Self::Error> {
         let model = self
             .model
             .ok_or(

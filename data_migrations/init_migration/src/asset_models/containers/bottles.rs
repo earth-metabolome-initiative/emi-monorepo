@@ -5,7 +5,7 @@ use core_structures::{
     tables::insertables::{AssetModelSettable, VolumetricContainerModelSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 /// Returns the 1L bottle container model, creating it if it does not exist.
 ///

@@ -1,14 +1,21 @@
-impl web_common_traits::database::InsertableVariantMetadata
+impl web_common_traits::database::DispatchableInsertVariantMetadata
     for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder
 {
     type Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+    >;
+}
+impl web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder
+{
     type InsertableVariant =
         crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAsset;
-    type UserId = i32;
 }
+#[cfg(feature = "backend")]
 impl<
     C: diesel::connection::LoadConnection,
-> web_common_traits::database::InsertableVariant<C>
+> web_common_traits::database::DispatchableInsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder
 where
     diesel::query_builder::InsertStatement<
@@ -21,22 +28,30 @@ where
         C,
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
     >,
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAsset,
+        Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+        >,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+        >,
     >,
     crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Updatable<
         C,
-        UserId = i32,
     >,
     crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Updatable<
         C,
-        UserId = i32,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
         C,
@@ -46,28 +61,18 @@ where
     >,
     crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
         C,
-        UserId = i32,
     >,
     crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Updatable<
         C,
-        UserId = i32,
     >,
 {
-    fn insert(
-        self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
-        >,
-    > {
+    fn insert(self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
+        use web_common_traits::database::InsertableVariant;
         use web_common_traits::database::Updatable;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAsset = self
             .try_insert(user_id, conn)?;
@@ -104,21 +109,65 @@ where
             );
         }
         Ok(
-            diesel::insert_into(Self::Row::table())
+            diesel::insert_into(Self::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
     }
+}
+impl<
+    C: diesel::connection::LoadConnection,
+> web_common_traits::database::InsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder
+where
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAsset as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+    >,
+    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable<
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
+        >,
+    >,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Updatable<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Updatable<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Updatable<
+        C,
+    >,
+{
     fn try_insert(
         mut self,
         _user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::InsertableVariant,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
-        >,
-    > {
+    ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::Read;
         if let Some(procedure) = self.procedure {
             let procedures = crate::codegen::structs_codegen::tables::procedures::Procedure::read(
@@ -197,20 +246,6 @@ where
                     crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::AncestorModel,
                 ),
             )?;
-        let created_by = self
-            .created_by
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::CreatedBy,
-                ),
-            )?;
-        let created_at = self
-            .created_at
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::CreatedAt,
-                ),
-            )?;
         Ok(Self::InsertableVariant {
             id,
             procedure,
@@ -219,8 +254,6 @@ where
             asset: self.asset,
             procedure_template_asset_model,
             ancestor_model,
-            created_by,
-            created_at,
         })
     }
 }

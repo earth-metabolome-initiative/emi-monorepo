@@ -29,6 +29,7 @@ impl core::fmt::Display for UserOrganizationAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -98,6 +99,13 @@ pub struct InsertableUserOrganizationBuilder {
     pub(crate) user_id: Option<i32>,
     pub(crate) organization_id: Option<i16>,
 }
+impl diesel::associations::HasTable for InsertableUserOrganizationBuilder {
+    type Table =
+        crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::user_organizations::user_organizations::table
+    }
+}
 impl common_traits::builder::IsCompleteBuilder
     for crate::codegen::structs_codegen::tables::insertables::InsertableUserOrganizationBuilder
 {
@@ -108,8 +116,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `UserOrganization`
 /// or descendant tables.
 pub trait UserOrganizationSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.user_organizations.user_id` column.
     ///
     /// # Arguments
@@ -128,10 +136,7 @@ pub trait UserOrganizationSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn user<UI>(
-        self,
-        user_id: UI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn user<UI>(self, user_id: UI) -> Result<Self, Self::Error>
     where
         UI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.user_organizations.organization_id`
@@ -153,39 +158,38 @@ pub trait UserOrganizationSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn organization<OI>(
-        self,
-        organization_id: OI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn organization<OI>(self, organization_id: OI) -> Result<Self, Self::Error>
     where
         OI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
 }
-impl UserOrganizationSettable for InsertableUserOrganizationBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::UserOrganizationAttribute;
-    /// Sets the value of the `public.user_organizations.user_id` column.
-    fn user<UI>(
-        mut self,
-        user_id: UI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+impl UserOrganizationSettable for InsertableUserOrganizationBuilder
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::UserOrganizationAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.user_organizations.user_id` column.
+    fn user<UI>(mut self, user_id: UI) -> Result<Self, Self::Error>
     where
         UI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let user_id = <UI as web_common_traits::database::PrimaryKeyLike>::primary_key(&user_id);
+        let user_id = <UI as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &user_id,
+        );
         self.user_id = Some(user_id);
         Ok(self)
     }
-    /// Sets the value of the `public.user_organizations.organization_id`
-    /// column.
-    fn organization<OI>(
-        mut self,
-        organization_id: OI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.user_organizations.organization_id` column.
+    fn organization<OI>(mut self, organization_id: OI) -> Result<Self, Self::Error>
     where
         OI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
     {
-        let organization_id =
-            <OI as web_common_traits::database::PrimaryKeyLike>::primary_key(&organization_id);
+        let organization_id = <OI as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &organization_id,
+        );
         self.organization_id = Some(organization_id);
         Ok(self)
     }
@@ -198,20 +202,20 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableUserOrganizationBui
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableUserOrganizationBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
-            Attribute = UserOrganizationAttribute,
+            Error = web_common_traits::database::InsertError<UserOrganizationAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<UserOrganizationAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::user_organizations::UserOrganization = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

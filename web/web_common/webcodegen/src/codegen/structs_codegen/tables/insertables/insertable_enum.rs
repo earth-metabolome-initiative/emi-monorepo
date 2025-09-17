@@ -6,7 +6,7 @@ use proc_macro2::TokenStream;
 use syn::Ident;
 
 use crate::{
-    Codegen, Column, Table,
+    Table,
     codegen::{
         CODEGEN_DIRECTORY, CODEGEN_INSERTABLES_PATH, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
     },
@@ -137,12 +137,14 @@ impl Table {
         let mut display_insertable_extension_enum_variants = Vec::new();
         let mut insertable_extension_enum_variants = Vec::new();
         let mut from_implementations = Vec::new();
+        let table_name = self.table_name.as_str();
+        let display_pattern = format!("{table_name}({{e}})");
 
         for extension_table in extension_tables.iter() {
             let struct_ident = extension_table.struct_ident()?;
             let extension_table_enum_ty = extension_table.insertable_enum_ty()?;
             display_insertable_extension_enum_variants.push(quote::quote! {
-                Self::#struct_ident(e) => write!(f, "{e}")
+                Self::#struct_ident(e) => write!(f, #display_pattern)
             });
             insertable_extension_enum_variants.push(quote::quote! {
                 #struct_ident(#extension_table_enum_ty)
@@ -423,145 +425,6 @@ impl Table {
                     }
                 }
             }
-        })
-    }
-}
-
-impl Codegen<'_> {
-    /// Returns the enum path lambda for the insertable attributes of the
-    /// provided [`Column`] for the current [`Table`].
-    ///
-    /// # Arguments
-    ///
-    /// * `table` - The table for which the lambda is generated.
-    /// * `column` - The column for which the lambda is generated.
-    /// * `conn` - A mutable reference to a `PgConnection`.
-    pub fn into_field_name_lambda(
-        &self,
-        table: &Table,
-        column: &Column,
-        conn: &mut PgConnection,
-    ) -> Result<TokenStream, WebCodeGenError> {
-        // If the column is from the current table, it is an error
-        // to call this method.
-
-        assert!(
-            !table.has_column(column),
-            "The column `{}.{}` is from the current table `{}`, cannot generate a lambda for it",
-            column.table_name,
-            column.column_name,
-            table.table_name
-        );
-
-        // We retrieve the path of foreign keys to the column.
-        let foreign_key_path = self
-            .table_extension_network()
-            .unwrap()
-            .extension_foreign_keys_path(table, column, conn)
-            .expect("The column must have a foreign key path");
-
-        // We only care about the first ancestor of the foreign key path.
-        let first_ancestor =
-            foreign_key_path.first().expect("The foreign key path must have at least one ancestor");
-
-        Ok(if first_ancestor.is_singleton(conn)? {
-            // If the first ancestor is a singleton foreign key, it means
-            // that the enum implements the `From` trait for the conversion
-            // from the enum associated with the foreign key to the current enum.
-            // Therefore, we can simply use `From::from` to convert the
-            // attribute to the current enum.
-            quote::quote! {
-                From::from
-            }
-        } else {
-            // Otherwise, we cannot rely on the `From` trait, and we need to
-            // generate a custom lambda that converts the attribute
-            // to the current enum.
-            if first_ancestor.is_extension(conn)? {
-                let foreign_table = first_ancestor.foreign_table(conn)?;
-                table.into_extension_field_name_lambda(&foreign_table)?
-            } else {
-                // If the first ancestor is not an extension, we can simply
-                // return the enum variant associated with the column.
-                let insertable_enum_type = table.insertable_enum_ty()?;
-                let local_columns = first_ancestor.columns(conn)?;
-                assert_eq!(
-                    local_columns.len(),
-                    1,
-                    "Foreign key `{}` on `{}.{}` must have exactly one column",
-                    first_ancestor.constraint_name,
-                    first_ancestor.table_name,
-                    first_ancestor.column_name
-                );
-                let local_column_camel_cased = local_columns[0].camel_case_ident()?;
-                quote::quote! {
-                    #insertable_enum_type::#local_column_camel_cased
-                }
-            }
-        })
-    }
-
-    /// Returns the enum for the insertable attributes of the current
-    /// [`Table`] for the provided [`Column`].
-    ///
-    /// # Arguments
-    ///
-    /// * `table` - The table for which the enum is generated.
-    /// * `column` - The column for which the lambda is generated.
-    /// * `passing_through` - An optional column that is the foreign key to the
-    ///   associated table which contains the column.
-    /// * `conn` - A mutable reference to a `PgConnection`.
-    pub fn column_enum_path(
-        &self,
-        table: &Table,
-        column: &Column,
-        passing_through: Option<&Column>,
-        conn: &mut PgConnection,
-    ) -> Result<TokenStream, WebCodeGenError> {
-        let insertable_enum = table.insertable_enum_ty()?;
-        let column_ident = column.camel_case_ident()?;
-
-        if table.has_column(column) {
-            assert!(
-                passing_through.is_none(),
-                "Passing through column must be None if the column is from the current table"
-            );
-            // If the provided column is from the current table, we can simply return the
-            // associated enum variant.
-            return Ok(quote::quote! {
-                #insertable_enum::#column_ident
-            });
-        }
-
-        if let Some(passing_through) = passing_through {
-            if table.has_column(passing_through) {
-                let passing_through_ident = passing_through.camel_case_ident()?;
-                let (_partial_builder_kind, _, foreign_key) = passing_through
-                    .requires_partial_builder(conn)?
-                    .expect("Passing through column must require a partial builder");
-                let foreign_table = foreign_key.foreign_table(conn)?;
-                assert_eq!(
-                    foreign_table,
-                    column.table(conn)?,
-                    "The passing through column must be from the same table as the column"
-                );
-                let recursion = self.column_enum_path(&foreign_table, column, None, conn)?;
-                return Ok(quote::quote! {
-                    #insertable_enum::#passing_through_ident(#recursion)
-                });
-            }
-        }
-
-        let path = self.table_extension_network().unwrap().extension_path(table, column).unwrap();
-        let insertable_extension_enum = table.attributes_extension_enum_ty()?;
-        let extension_table = path[0];
-        let extension_table_ident = extension_table.struct_ident()?;
-        let recursion = self.column_enum_path(extension_table, column, passing_through, conn)?;
-
-        Ok(quote::quote! {
-            #insertable_enum::Extension(
-                #insertable_extension_enum::#extension_table_ident(#recursion)
-            )
         })
     }
 }

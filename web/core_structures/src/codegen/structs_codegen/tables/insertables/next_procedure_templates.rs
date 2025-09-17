@@ -41,6 +41,7 @@ impl core::fmt::Display for NextProcedureTemplateAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -194,6 +195,12 @@ pub struct InsertableNextProcedureTemplateBuilder {
     pub(crate) created_by: Option<i32>,
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
+impl diesel::associations::HasTable for InsertableNextProcedureTemplateBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::next_procedure_templates::next_procedure_templates::table
+    }
+}
 impl Default for InsertableNextProcedureTemplateBuilder {
     fn default() -> Self {
         Self {
@@ -219,8 +226,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of
 /// `NextProcedureTemplate` or descendant tables.
 pub trait NextProcedureTemplateSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.next_procedure_templates.parent` column.
     ///
     /// # Arguments
@@ -239,10 +246,7 @@ pub trait NextProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn parent<P>(
-        self,
-        parent: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent<P>(self, parent: P) -> Result<Self, Self::Error>
     where
         P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.next_procedure_templates.predecessor`
@@ -264,10 +268,7 @@ pub trait NextProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn predecessor<P>(
-        self,
-        predecessor: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn predecessor<P>(self, predecessor: P) -> Result<Self, Self::Error>
     where
         P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.next_procedure_templates.successor`
@@ -289,10 +290,7 @@ pub trait NextProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn successor<S>(
-        self,
-        successor: S,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn successor<S>(self, successor: S) -> Result<Self, Self::Error>
     where
         S: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.next_procedure_templates.created_by`
@@ -314,10 +312,7 @@ pub trait NextProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by<CB>(
-        self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.next_procedure_templates.created_at`
@@ -340,41 +335,40 @@ pub trait NextProcedureTemplateSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<CA>(
-        self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl NextProcedureTemplateSettable for InsertableNextProcedureTemplateBuilder {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute;
-    /// Sets the value of the `public.next_procedure_templates.parent` column.
-    fn parent<P>(
-        mut self,
-        parent: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+impl NextProcedureTemplateSettable for InsertableNextProcedureTemplateBuilder
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::NextProcedureTemplateAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.next_procedure_templates.parent` column.
+    fn parent<P>(mut self, parent: P) -> Result<Self, Self::Error>
     where
         P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let parent = <P as web_common_traits::database::PrimaryKeyLike>::primary_key(&parent);
+        let parent = <P as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &parent,
+        );
         self.parent = Some(parent);
         Ok(self)
     }
-    /// Sets the value of the `public.next_procedure_templates.predecessor`
-    /// column.
-    fn predecessor<P>(
-        mut self,
-        predecessor: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.next_procedure_templates.predecessor` column.
+    fn predecessor<P>(mut self, predecessor: P) -> Result<Self, Self::Error>
     where
         P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let predecessor =
-            <P as web_common_traits::database::PrimaryKeyLike>::primary_key(&predecessor);
+        let predecessor = <P as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &predecessor,
+        );
         if let Some(successor) = self.successor {
             pgrx_validation::must_be_distinct_i32(predecessor, successor)
                 .map_err(|e| {
@@ -388,16 +382,14 @@ impl NextProcedureTemplateSettable for InsertableNextProcedureTemplateBuilder {
         self.predecessor = Some(predecessor);
         Ok(self)
     }
-    /// Sets the value of the `public.next_procedure_templates.successor`
-    /// column.
-    fn successor<S>(
-        mut self,
-        successor: S,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.next_procedure_templates.successor` column.
+    fn successor<S>(mut self, successor: S) -> Result<Self, Self::Error>
     where
         S: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let successor = <S as web_common_traits::database::PrimaryKeyLike>::primary_key(&successor);
+        let successor = <S as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &successor,
+        );
         if let Some(predecessor) = self.predecessor {
             pgrx_validation::must_be_distinct_i32(predecessor, successor)
                 .map_err(|e| {
@@ -411,35 +403,31 @@ impl NextProcedureTemplateSettable for InsertableNextProcedureTemplateBuilder {
         self.successor = Some(successor);
         Ok(self)
     }
-    /// Sets the value of the `public.next_procedure_templates.created_by`
-    /// column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.next_procedure_templates.created_by` column.
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let created_by =
-            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
+        let created_by = <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &created_by,
+        );
         self.created_by = Some(created_by);
         Ok(self)
     }
-    /// Sets the value of the `public.next_procedure_templates.created_at`
-    /// column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.next_procedure_templates.created_at` column.
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
-            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+        validation_errors::SingleFieldError: From<
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
     {
-        let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(NextProcedureTemplateAttribute::CreatedAt)
-        })?;
+        let created_at = created_at
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(NextProcedureTemplateAttribute::CreatedAt)
+            })?;
         self.created_at = Some(created_at);
         Ok(self)
     }
@@ -453,11 +441,10 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableNextProcedureTempla
 impl<C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableNextProcedureTemplateBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate,
-        Attribute = NextProcedureTemplateAttribute,
+        Error = web_common_traits::database::InsertError<NextProcedureTemplateAttribute>,
     >,
 {
     fn mint_primary_key(
@@ -466,10 +453,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<NextProcedureTemplateAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

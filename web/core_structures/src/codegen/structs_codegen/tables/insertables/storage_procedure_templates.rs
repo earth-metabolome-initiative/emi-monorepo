@@ -8,7 +8,7 @@ pub enum StorageProcedureTemplateExtensionAttribute {
 impl core::fmt::Display for StorageProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::ProcedureTemplate(e) => write!(f, "{e}"),
+            Self::ProcedureTemplate(e) => write!(f, "storage_procedure_templates({e})"),
         }
     }
 }
@@ -124,6 +124,7 @@ impl core::fmt::Display for StorageProcedureTemplateAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -335,6 +336,14 @@ pub struct InsertableStorageProcedureTemplateBuilder<
     >,
     pub(crate) procedure_template: ProcedureTemplate,
 }
+impl<ProcedureTemplate> diesel::associations::HasTable
+    for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate>
+{
+    type Table = crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::table
+    }
+}
 impl From<InsertableStorageProcedureTemplateBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableStorageProcedureTemplateBuilder>
 {
@@ -380,8 +389,8 @@ where
 /// Trait defining setters for attributes of an instance of
 /// `StorageProcedureTemplate` or descendant tables.
 pub trait StorageProcedureTemplateSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.storage_procedure_templates.kelvin`
     /// column.
     ///
@@ -401,10 +410,7 @@ pub trait StorageProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn kelvin<K>(
-        self,
-        kelvin: K,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn kelvin<K>(self, kelvin: K) -> Result<Self, Self::Error>
     where
         K: TryInto<f32>,
         validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>;
@@ -431,7 +437,7 @@ pub trait StorageProcedureTemplateSettable: Sized {
     fn kelvin_tolerance_percentage<KTP>(
         self,
         kelvin_tolerance_percentage: KTP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         KTP: TryInto<f32>,
         validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>;
@@ -454,10 +460,7 @@ pub trait StorageProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn stored_into_model<SIM>(
-        self,
-        stored_into_model: SIM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn stored_into_model<SIM>(self, stored_into_model: SIM) -> Result<Self, Self::Error>
     where
         SIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -484,7 +487,7 @@ pub trait StorageProcedureTemplateSettable: Sized {
     fn procedure_template_stored_into_model<PTSIM>(
         self,
         procedure_template_stored_into_model: PTSIM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSIM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -511,10 +514,7 @@ pub trait StorageProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn stored_asset_model<SAM>(
-        self,
-        stored_asset_model: SAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn stored_asset_model<SAM>(self, stored_asset_model: SAM) -> Result<Self, Self::Error>
     where
         SAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -541,7 +541,7 @@ pub trait StorageProcedureTemplateSettable: Sized {
     fn procedure_template_stored_asset_model<PTSAM>(
         self,
         procedure_template_stored_asset_model: PTSAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSAM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -551,24 +551,27 @@ pub trait StorageProcedureTemplateSettable: Sized {
         >;
 }
 impl<ProcedureTemplate> StorageProcedureTemplateSettable
-    for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate>
+for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute;
-    /// Sets the value of the `public.storage_procedure_templates.kelvin`
-    /// column.
-    fn kelvin<K>(
-        mut self,
-        kelvin: K,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.storage_procedure_templates.kelvin` column.
+    fn kelvin<K>(mut self, kelvin: K) -> Result<Self, Self::Error>
     where
         K: TryInto<f32>,
         validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
-        let kelvin = kelvin.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(StorageProcedureTemplateAttribute::Kelvin)
-        })?;
+        let kelvin = kelvin
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(StorageProcedureTemplateAttribute::Kelvin)
+            })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin)
             .map_err(|e| {
                 e
@@ -579,20 +582,22 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
         self.kelvin = Some(kelvin);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.storage_procedure_templates.kelvin_tolerance_percentage` column.
+    ///Sets the value of the `public.storage_procedure_templates.kelvin_tolerance_percentage` column.
     fn kelvin_tolerance_percentage<KTP>(
         mut self,
         kelvin_tolerance_percentage: KTP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         KTP: TryInto<f32>,
         validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>,
     {
-        let kelvin_tolerance_percentage =
-            kelvin_tolerance_percentage.try_into().map_err(|err| {
+        let kelvin_tolerance_percentage = kelvin_tolerance_percentage
+            .try_into()
+            .map_err(|err| {
                 validation_errors::SingleFieldError::from(err)
-                    .rename_field(StorageProcedureTemplateAttribute::KelvinTolerancePercentage)
+                    .rename_field(
+                        StorageProcedureTemplateAttribute::KelvinTolerancePercentage,
+                    )
             })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin_tolerance_percentage)
             .map_err(|e| {
@@ -616,47 +621,47 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
         self.kelvin_tolerance_percentage = Some(kelvin_tolerance_percentage);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.storage_procedure_templates.stored_into_model` column.
+    ///Sets the value of the `public.storage_procedure_templates.stored_into_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`storage_procedure_templates`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`storage_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_stored_into_model"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stored_into_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn stored_into_model<SIM>(
         mut self,
         stored_into_model: SIM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         SIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let stored_into_model =
-            <SIM as web_common_traits::database::PrimaryKeyLike>::primary_key(&stored_into_model);
+        let stored_into_model = <SIM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &stored_into_model,
+        );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_stored_into_model,
         ) = self.procedure_template_stored_into_model
@@ -667,7 +672,9 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplateStoredIntoModel(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateStoredIntoModel(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -675,43 +682,41 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
         self.stored_into_model = Some(stored_into_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.storage_procedure_templates.
-    /// procedure_template_stored_into_model` column.
+    ///Sets the value of the `public.storage_procedure_templates.procedure_template_stored_into_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`storage_procedure_templates`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`storage_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_stored_into_model"}
-    /// class v1 column-of-interest
+    ///class v1 column-of-interest
     ///    v2@{shape: rounded, label: "stored_into_model"}
-    /// class v2 directly-involved-column
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 directly-involved-column
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn procedure_template_stored_into_model<PTSIM>(
         mut self,
         procedure_template_stored_into_model: PTSIM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSIM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -720,22 +725,21 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
             >,
         >,
     {
-        let mut procedure_template_stored_into_model = procedure_template_stored_into_model.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_template_stored_into_model
-        {
+        let mut procedure_template_stored_into_model = procedure_template_stored_into_model
+            .into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_stored_into_model {
             procedure_template_stored_into_model = if let (
                 Some(stored_into_model),
                 Some(asset_model),
-            ) =
-                (self.stored_into_model, builder.asset_model)
-            {
+            ) = (self.stored_into_model, builder.asset_model) {
                 if stored_into_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::StoredIntoModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::StoredIntoModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -748,7 +752,9 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTemplateStoredIntoModel(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateStoredIntoModel(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -759,47 +765,47 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
         self.procedure_template_stored_into_model = procedure_template_stored_into_model;
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.storage_procedure_templates.stored_asset_model` column.
+    ///Sets the value of the `public.storage_procedure_templates.stored_asset_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`storage_procedure_templates`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`storage_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_stored_asset_model"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stored_asset_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn stored_asset_model<SAM>(
         mut self,
         stored_asset_model: SAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         SAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let stored_asset_model =
-            <SAM as web_common_traits::database::PrimaryKeyLike>::primary_key(&stored_asset_model);
+        let stored_asset_model = <SAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &stored_asset_model,
+        );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_stored_asset_model,
         ) = self.procedure_template_stored_asset_model
@@ -810,7 +816,9 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplateStoredAssetModel(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateStoredAssetModel(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -818,43 +826,41 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
         self.stored_asset_model = Some(stored_asset_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.storage_procedure_templates.
-    /// procedure_template_stored_asset_model` column.
+    ///Sets the value of the `public.storage_procedure_templates.procedure_template_stored_asset_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`storage_procedure_templates`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`storage_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_stored_asset_model"}
-    /// class v1 column-of-interest
+    ///class v1 column-of-interest
     ///    v2@{shape: rounded, label: "stored_asset_model"}
-    /// class v2 directly-involved-column
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 directly-involved-column
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn procedure_template_stored_asset_model<PTSAM>(
         mut self,
         procedure_template_stored_asset_model: PTSAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSAM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -863,23 +869,21 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
             >,
         >,
     {
-        let mut procedure_template_stored_asset_model =
-            procedure_template_stored_asset_model.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_template_stored_asset_model
-        {
+        let mut procedure_template_stored_asset_model = procedure_template_stored_asset_model
+            .into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_stored_asset_model {
             procedure_template_stored_asset_model = if let (
                 Some(stored_asset_model),
                 Some(asset_model),
-            ) =
-                (self.stored_asset_model, builder.asset_model)
-            {
+            ) = (self.stored_asset_model, builder.asset_model) {
                 if stored_asset_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::StoredAssetModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::StoredAssetModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -892,7 +896,7 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTemplateStoredAssetModel(
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateStoredAssetModel(
                                 attribute,
                             )
                         })
@@ -908,17 +912,23 @@ impl<ProcedureTemplate> StorageProcedureTemplateSettable
 }
 impl<
     ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
-for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute;
+for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -929,7 +939,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -937,10 +947,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -951,7 +958,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -959,10 +966,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -972,7 +976,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -980,10 +984,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -996,7 +997,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1004,10 +1005,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -1017,7 +1015,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1025,10 +1023,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -1041,7 +1036,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1049,10 +1044,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.deprecated` column.
-    fn deprecated<D>(
-        mut self,
-        deprecated: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn deprecated<D>(mut self, deprecated: D) -> Result<Self, Self::Error>
     where
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
@@ -1063,7 +1055,7 @@ for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1093,11 +1085,12 @@ where
 impl<ProcedureTemplate, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableStorageProcedureTemplateBuilder<ProcedureTemplate>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
-        Attribute = StorageProcedureTemplateAttribute,
+        Error = web_common_traits::database::InsertError<
+            StorageProcedureTemplateAttribute,
+        >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
         C,
@@ -1113,10 +1106,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<StorageProcedureTemplateAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

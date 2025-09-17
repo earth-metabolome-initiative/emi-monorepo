@@ -11,7 +11,6 @@ pub struct ProcedureAssetForeignKeys {
     pub asset_model: Option<
         crate::codegen::structs_codegen::tables::asset_models::AssetModel,
     >,
-    pub created_by: Option<crate::codegen::structs_codegen::tables::users::User>,
     pub procedure: Option<
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
@@ -53,9 +52,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::User(self.created_by),
-        ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::Procedure(self.procedure),
         ));
         connector
@@ -77,7 +73,6 @@ impl web_common_traits::prelude::HasForeignKeys
             && (foreign_keys.asset.is_some() || self.asset.is_some())
             && foreign_keys.procedure_assets_asset_model_ancestor_model_fkey.is_some()
             && foreign_keys.asset_model.is_some()
-            && foreign_keys.created_by.is_some()
             && foreign_keys.procedure.is_some()
             && foreign_keys.procedure_template_asset_model.is_some()
             && foreign_keys.procedure_template.is_some()
@@ -225,26 +220,6 @@ impl web_common_traits::prelude::HasForeignKeys
             ) => {
                 if self.procedure == procedures.procedure {
                     foreign_keys.procedure = None;
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Read
-                | web_common_traits::crud::CRUD::Create
-                | web_common_traits::crud::CRUD::Update,
-            ) => {
-                if self.created_by == users.id {
-                    foreign_keys.created_by = Some(users);
-                    updated = true;
-                }
-            }
-            (
-                crate::codegen::tables::row::Row::User(users),
-                web_common_traits::crud::CRUD::Delete,
-            ) => {
-                if self.created_by == users.id {
-                    foreign_keys.created_by = None;
                     updated = true;
                 }
             }

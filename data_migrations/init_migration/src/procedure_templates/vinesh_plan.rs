@@ -1,6 +1,6 @@
 //! Submodule defining the Vinesh plan procedure template.
 use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateSettable};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 /// The name of the Vinesh plan procedure template.
 pub const VINESH_PLAN: &str = "Vinesh Plan";

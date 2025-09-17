@@ -2,7 +2,7 @@
 
 use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateSettable};
 use diesel::OptionalExtension;
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 const LC_MAINTENANCE: &str = "LC Maintenance";
 
 pub(crate) fn init_lc_maintenance_procedure(

@@ -4,7 +4,7 @@ use core_structures::{
     tables::insertables::{AssetModelSettable, CommercialProductSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 use crate::brands::sarstedt;
 

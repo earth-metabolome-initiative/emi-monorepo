@@ -5,7 +5,7 @@ use core_structures::{
     tables::insertables::{AssetModelSettable, CommercialProductSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 use crate::{
     asset_models::containers::conical_centrifugal_tubes::conical_centrifugal_tube_50ml, fisherbrand,

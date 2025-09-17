@@ -21,9 +21,7 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
                     .ne(excluded(name))
                     .or(procedure_template.ne(excluded(procedure_template)))
                     .or(based_on.ne(excluded(based_on)))
-                    .or(asset_model.ne(excluded(asset_model)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at))),
+                    .or(asset_model.ne(excluded(asset_model))),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })
@@ -52,9 +50,7 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
                     .ne(excluded(name))
                     .or(procedure_template.ne(excluded(procedure_template)))
                     .or(based_on.ne(excluded(based_on)))
-                    .or(asset_model.ne(excluded(asset_model)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at))),
+                    .or(asset_model.ne(excluded(asset_model))),
             )
             .get_results(conn)
             .map(|mut result| { result.pop() })

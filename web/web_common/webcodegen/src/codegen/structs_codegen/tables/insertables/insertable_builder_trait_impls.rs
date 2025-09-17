@@ -9,9 +9,7 @@ mod generate_setter_method;
 mod mermaid_illustration;
 pub(crate) use mermaid_illustration::columns_to_mermaid_illustration;
 
-use crate::{
-    Column, PgExtension, Table, TableExtensionNetwork, TableLike, errors::WebCodeGenError,
-};
+use crate::{Column, PgExtension, Table, TableLike, errors::WebCodeGenError};
 
 impl Table {
     /// Returns the closest "same as" column in the current table or one of its
@@ -74,7 +72,6 @@ impl Table {
         &self,
         conn: &mut diesel::PgConnection,
         insertable_column: &crate::Column,
-        extension_network: &TableExtensionNetwork,
         check_constraints_extensions: &[&PgExtension],
         extension_table_traits: &mut HashMap<Table, HashSet<Table>>,
     ) -> Result<(bool, bool, bool, Vec<Column>, proc_macro2::TokenStream), WebCodeGenError> {
@@ -84,7 +81,6 @@ impl Table {
             return self
                 .generate_setter_method(
                     insertable_column,
-                    extension_network,
                     check_constraints_extensions,
                     extension_table_traits,
                     conn,
@@ -114,8 +110,8 @@ impl Table {
             };
 
             if &closest_same_as_column == insertable_column {
-                let foreign_key = &extension_network
-                    .extension_foreign_keys_path(self, insertable_column, conn)
+                let foreign_key = &self
+                    .extension_foreign_keys_path(insertable_column, conn)?
                     .expect(&format!(
                         "There should exist a foreign key path from table {self} to column {insertable_column}",
                     ))[0];
@@ -134,7 +130,7 @@ impl Table {
                     quote! {
                         self.#foreign_key_ident = <#foreign_table_ident as #setter_trait>::#setter_method(
                             self.#foreign_key_ident, #snake_case_ident
-                        ).map_err(|e| e.into_field_name(|attribute| Self::Attributes::Extension(attribute.into())))?;
+                        ).map_err(|e| e.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(attribute.into())))?;
                         Ok(self)
                     },
                 ))
@@ -163,7 +159,7 @@ impl Table {
                             <Self as #setter_trait>::#setter_method(
                                 self,
                                 #maybe_primary_key.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(
-                                    Self::Attributes::#camel_case_ident,
+                                    <Self as common_traits::builder::Attributed>::Attribute::#camel_case_ident,
                                 ))?
                             )
                         }
@@ -196,27 +192,28 @@ impl Table {
     /// # Errors
     ///
     /// * If the trait implementation cannot be generated.
-    fn generate_builder_trait_impl_for_ancestral_table(
+    pub(crate) fn generate_builder_method_impls_for_ancestral_table(
         &self,
-        extension_network: &TableExtensionNetwork,
         conn: &mut diesel::PgConnection,
         ancestral_table: &Table,
         check_constraints_extensions: &[&PgExtension],
-    ) -> Result<proc_macro2::TokenStream, WebCodeGenError> {
-        let trait_path = if self == ancestral_table {
-            let trait_ident = self.setter_trait_ident()?;
-            quote! { #trait_ident }
-        } else {
-            let trait_path = ancestral_table.setter_trait_ty()?;
-            quote! { #trait_path }
-        };
-        let builder_ident = self.insertable_builder_ident()?;
-        let extension_tables = extension_network.extension_tables(self);
+        dispatch_setter_method_body: impl Fn(
+            &mut diesel::PgConnection,
+            &crate::Column,
+            &[&PgExtension],
+            &mut HashMap<Table, HashSet<Table>>,
+        ) -> Result<
+            (bool, bool, bool, Vec<Column>, proc_macro2::TokenStream),
+            WebCodeGenError,
+        >,
+    ) -> Result<(HashMap<Table, HashSet<Table>>, Vec<proc_macro2::TokenStream>), WebCodeGenError>
+    {
+        let extension_tables = self.extension_tables(conn)?;
         let mut extension_table_traits: HashMap<Table, HashSet<Table>> =
             extension_tables.iter().map(|table| ((**table).clone(), HashSet::new())).collect();
         extension_table_traits.insert(self.clone(), HashSet::new());
 
-        let method_impls = ancestral_table
+        let methods = ancestral_table
             .insertable_columns(conn, false)?
             .iter()
             .map(|insertable_column| {
@@ -237,10 +234,9 @@ impl Table {
                     mutable_attribute,
                     relevant_columns,
                     method_body,
-                ) = self.dispatch_setter_method_body(
+                ) = dispatch_setter_method_body(
                     conn,
                     insertable_column,
-                    extension_network,
                     check_constraints_extensions,
                     &mut extension_table_traits,
                 )?;
@@ -283,7 +279,7 @@ impl Table {
                         #maybe_mut_attribute #column_snake_case_ident: #argument_type
                     ) -> Result<
                         Self,
-                        web_common_traits::database::InsertError<Self::Attributes>
+                        Self::Error
                     > #maybe_where_constraints
                         {
                             #method_body
@@ -291,6 +287,57 @@ impl Table {
                 })
             })
             .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+
+        Ok((extension_table_traits, methods))
+    }
+
+    /// Implements for the builder associated to the current table
+    /// the trait associated with the provided ancestral table.
+    ///
+    /// # Arguments
+    ///
+    /// * `extension_network`: The network of table extensions to which the
+    ///   current table belongs.
+    /// * `conn`: The PostgreSQL connection to use to retrieve information about
+    ///   the table.
+    /// * `ancestral_table`: The ancestral table for which the trait
+    ///   implementation must be generated.
+    ///
+    /// # Errors
+    ///
+    /// * If the trait implementation cannot be generated.
+    pub(crate) fn generate_builder_trait_impl_for_ancestral_table(
+        &self,
+        conn: &mut diesel::PgConnection,
+        ancestral_table: &Table,
+        check_constraints_extensions: &[&PgExtension],
+        dispatch_setter_method_body: impl Fn(
+            &mut diesel::PgConnection,
+            &crate::Column,
+            &[&PgExtension],
+            &mut HashMap<Table, HashSet<Table>>,
+        ) -> Result<
+            (bool, bool, bool, Vec<Column>, proc_macro2::TokenStream),
+            WebCodeGenError,
+        >,
+    ) -> Result<proc_macro2::TokenStream, WebCodeGenError> {
+        let trait_path = if self == ancestral_table {
+            let trait_ident = self.setter_trait_ident()?;
+            quote! { #trait_ident }
+        } else {
+            let trait_path = ancestral_table.setter_trait_ty()?;
+            quote! { #trait_path }
+        };
+        let builder_ident = self.insertable_builder_ident()?;
+        let extension_tables = self.extension_tables(conn)?;
+
+        let (extension_table_traits, method_impls) = self
+            .generate_builder_method_impls_for_ancestral_table(
+                conn,
+                ancestral_table,
+                check_constraints_extensions,
+                dispatch_setter_method_body,
+            )?;
 
         let attributes = self.insertable_enum_ty()?;
 
@@ -307,7 +354,7 @@ impl Table {
                     .map(|required_table| {
                         let trait_ident = required_table.setter_trait_ty()?;
                         Ok(quote! {
-                            #trait_ident<Attributes = #generic_attributes>
+                            #trait_ident<Error = web_common_traits::database::InsertError<#generic_attributes>>
                         })
                     })
                     .collect::<Result<Vec<_>, WebCodeGenError>>()?;
@@ -338,22 +385,21 @@ impl Table {
         };
 
         let self_trait_requirements = extension_table_traits.get(self).unwrap();
-        let maybe_where = if self_trait_requirements.is_empty() {
-            quote! {}
-        } else {
-            let where_clauses = self_trait_requirements
-                .iter()
-                .map(|required_table| {
-                    let trait_ident = required_table.setter_trait_ty()?;
-                    Ok(quote! { Self: #trait_ident<Attributes = #attributes> })
-                })
-                .collect::<Result<Vec<_>, WebCodeGenError>>()?;
-            quote! { where #(#where_clauses),* }
-        };
+        let where_clauses = self_trait_requirements
+            .iter()
+            .map(|required_table| {
+                let trait_ident = required_table.setter_trait_ty()?;
+                Ok(quote! { Self: #trait_ident<Error = web_common_traits::database::InsertError<#attributes>> })
+            })
+            .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
         Ok(quote! {
-            impl #maybe_left_generics #trait_path for #builder_ident #maybe_right_generics #maybe_where{
-                type Attributes = #attributes;
+            impl #maybe_left_generics #trait_path for #builder_ident #maybe_right_generics
+            where
+                Self: common_traits::builder::Attributed<Attribute = #attributes>,
+                #(#where_clauses),*
+            {
+                type Error = web_common_traits::database::InsertError<<Self as common_traits::builder::Attributed>::Attribute>;
 
                 #(#method_impls)*
             }
@@ -410,8 +456,6 @@ impl Table {
     ///
     /// # Arguments
     ///
-    /// * `extension_network`: The network of table extensions to which the
-    ///   current table belongs.
     /// * `conn`: The PostgreSQL connection to use to retrieve information about
     ///   the table.
     /// * `check_constraints_extensions`: The PostgreSQL extensions that may be
@@ -422,23 +466,36 @@ impl Table {
     /// * If the trait implementation cannot be generated.
     pub(super) fn generate_builder_trait_impl_for_ancestral_tables(
         &self,
-        extension_network: &TableExtensionNetwork,
         conn: &mut diesel::PgConnection,
         check_constraints_extensions: &[&PgExtension],
     ) -> Result<Vec<proc_macro2::TokenStream>, WebCodeGenError> {
         let mut impls = vec![self.generate_builder_trait_impl_for_ancestral_table(
-            extension_network,
             conn,
             self,
             check_constraints_extensions,
+            |conn, insertable_column, check_constraints_extensions, extension_table_traits| {
+                self.dispatch_setter_method_body(
+                    conn,
+                    insertable_column,
+                    check_constraints_extensions,
+                    extension_table_traits,
+                )
+            },
         )?];
 
         for ancestor in self.ancestral_extension_tables(conn)?.iter() {
             impls.push(self.generate_builder_trait_impl_for_ancestral_table(
-                extension_network,
                 conn,
                 &ancestor,
                 check_constraints_extensions,
+                |conn, insertable_column, check_constraints_extensions, extension_table_traits| {
+                    self.dispatch_setter_method_body(
+                        conn,
+                        insertable_column,
+                        check_constraints_extensions,
+                        extension_table_traits,
+                    )
+                },
             )?);
         }
 

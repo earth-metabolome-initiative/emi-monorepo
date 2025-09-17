@@ -4,7 +4,7 @@ use core_structures::{
     ProcedureTemplate, User, tables::insertables::ProcedureTemplateSettable,
     traits::AppendProcedureTemplate,
 };
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 use crate::procedure_templates::{
     init_data_enrichment_procedure, init_negative_ionization_lcms_procedure,

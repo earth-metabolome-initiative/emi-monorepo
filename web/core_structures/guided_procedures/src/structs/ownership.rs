@@ -240,6 +240,25 @@ pub trait OwnershipLike: AsRef<Ownership> {
         self.as_ref().asset_models.get(ptam_id).expect("Asset model id out of bounds")
     }
 
+    /// Returns the ptam associated with the provided identifier.
+    ///
+    /// # Arguments
+    ///
+    /// * `primary_key` - The identifier of the procedure template asset model
+    ///   to retrieve.
+    fn ptam_by_primary_key(
+        &self,
+        primary_key: <ProcedureTemplateAssetModel as web_common_traits::database::PrimaryKeyLike>::PrimaryKey,
+    ) -> Option<&ProcedureTemplateAssetModel> {
+        self.as_ref()
+            .graph
+            .right_nodes_vocabulary()
+            .binary_search_by(|ptam: &ProcedureTemplateAssetModel| ptam.id.cmp(&primary_key))
+            .ok()
+            .and_then(|index| self.as_ref().graph.right_nodes_vocabulary().get(index))
+            .map(|ptam| ptam.as_ref())
+    }
+
     /// Returns the certain based on aliases of the given procedure
     /// template asset model.
     ///

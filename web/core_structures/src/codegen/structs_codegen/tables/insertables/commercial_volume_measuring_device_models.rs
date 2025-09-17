@@ -11,8 +11,12 @@ pub enum CommercialVolumeMeasuringDeviceModelExtensionAttribute {
 impl core::fmt::Display for CommercialVolumeMeasuringDeviceModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::VolumeMeasuringDeviceModel(e) => write!(f, "{e}"),
-            Self::CommercialProduct(e) => write!(f, "{e}"),
+            Self::VolumeMeasuringDeviceModel(e) => {
+                write!(f, "commercial_volume_measuring_device_models({e})")
+            }
+            Self::CommercialProduct(e) => {
+                write!(f, "commercial_volume_measuring_device_models({e})")
+            }
         }
     }
 }
@@ -76,6 +80,7 @@ impl core::fmt::Display for CommercialVolumeMeasuringDeviceModelAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -146,20 +151,31 @@ impl InsertableCommercialVolumeMeasuringDeviceModel {
 ///    .insert(user.id, conn)?;
 /// ```
 pub struct InsertableCommercialVolumeMeasuringDeviceModelBuilder<
-    CommercialProduct
-        = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
-        >,
     VolumeMeasuringDeviceModel
         = crate::codegen::structs_codegen::tables::insertables::InsertableVolumeMeasuringDeviceModelBuilder<
             crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
-                Option<i32>,
+                crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
             >,
+        >,
+    CommercialProduct
+        = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
+            Option<i32>,
         >,
 > {
     pub(crate) volume_measuring_device_model: Option<i32>,
     pub(crate) commercial_volume_measuring_device_models_id_fkey: VolumeMeasuringDeviceModel,
     pub(crate) commercial_volume_measuring_device_models_id_fkey1: CommercialProduct,
+}
+impl<VolumeMeasuringDeviceModel, CommercialProduct> diesel::associations::HasTable
+    for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
+        VolumeMeasuringDeviceModel,
+        CommercialProduct,
+    >
+{
+    type Table = crate::codegen::diesel_codegen::tables::commercial_volume_measuring_device_models::commercial_volume_measuring_device_models::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::commercial_volume_measuring_device_models::commercial_volume_measuring_device_models::table
+    }
 }
 impl From<InsertableCommercialVolumeMeasuringDeviceModelBuilder>
     for web_common_traits::database::IdOrBuilder<
@@ -192,8 +208,8 @@ where
 /// Trait defining setters for attributes of an instance of
 /// `CommercialVolumeMeasuringDeviceModel` or descendant tables.
 pub trait CommercialVolumeMeasuringDeviceModelSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the
     /// `public.commercial_volume_measuring_device_models.
     /// volume_measuring_device_model` column.
@@ -218,21 +234,30 @@ pub trait CommercialVolumeMeasuringDeviceModelSettable: Sized {
     fn volume_measuring_device_model<VMDM>(
         self,
         volume_measuring_device_model: VMDM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         VMDM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl<
-    CommercialProduct,
     VolumeMeasuringDeviceModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceModelAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceModelAttribute,
+            >,
         >,
+    CommercialProduct,
 > CommercialVolumeMeasuringDeviceModelSettable
 for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
-    CommercialProduct,
     VolumeMeasuringDeviceModel,
-> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute;
+    CommercialProduct,
+>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     ///Sets the value of the `public.commercial_volume_measuring_device_models.volume_measuring_device_model` column.
     ///
     ///# Implementation notes
@@ -266,7 +291,7 @@ for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
     fn volume_measuring_device_model<VMDM>(
         mut self,
         volume_measuring_device_model: VMDM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         VMDM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -278,7 +303,7 @@ for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
                 volume_measuring_device_model,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
@@ -287,38 +312,44 @@ for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
     }
 }
 impl<
-    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    VolumeMeasuringDeviceModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceModelAttribute,
+            >,
         >,
-    VolumeMeasuringDeviceModel,
+    CommercialProduct,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
-    CommercialProduct,
     VolumeMeasuringDeviceModel,
+    CommercialProduct,
 >
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.commercial_volume_measuring_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
-                self.commercial_volume_measuring_device_models_id_fkey1,
+        self.commercial_volume_measuring_device_models_id_fkey = <VolumeMeasuringDeviceModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
+                self.commercial_volume_measuring_device_models_id_fkey,
                 name,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -326,21 +357,18 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.commercial_volume_measuring_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
-                self.commercial_volume_measuring_device_models_id_fkey1,
+        self.commercial_volume_measuring_device_models_id_fkey = <VolumeMeasuringDeviceModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
+                self.commercial_volume_measuring_device_models_id_fkey,
                 description,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -370,10 +398,7 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn parent_model<PM>(
-        self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -384,20 +409,17 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.commercial_volume_measuring_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
-                self.commercial_volume_measuring_device_models_id_fkey1,
+        self.commercial_volume_measuring_device_models_id_fkey = <VolumeMeasuringDeviceModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
+                self.commercial_volume_measuring_device_models_id_fkey,
                 created_by,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -405,23 +427,20 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_volume_measuring_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
-                self.commercial_volume_measuring_device_models_id_fkey1,
+        self.commercial_volume_measuring_device_models_id_fkey = <VolumeMeasuringDeviceModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
+                self.commercial_volume_measuring_device_models_id_fkey,
                 created_at,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -429,20 +448,17 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.commercial_volume_measuring_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
-                self.commercial_volume_measuring_device_models_id_fkey1,
+        self.commercial_volume_measuring_device_models_id_fkey = <VolumeMeasuringDeviceModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
+                self.commercial_volume_measuring_device_models_id_fkey,
                 updated_by,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -450,23 +466,20 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_volume_measuring_device_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
-                self.commercial_volume_measuring_device_models_id_fkey1,
+        self.commercial_volume_measuring_device_models_id_fkey = <VolumeMeasuringDeviceModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
+                self.commercial_volume_measuring_device_models_id_fkey,
                 updated_at,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -474,22 +487,28 @@ where
     }
 }
 impl<
-    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-        >,
     VolumeMeasuringDeviceModel,
+    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+            >,
+        >,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable
 for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
-    CommercialProduct,
     VolumeMeasuringDeviceModel,
-> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute;
+    CommercialProduct,
+>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.commercial_products.deprecation_date` column.
-    fn deprecation_date<DD>(
-        mut self,
-        deprecation_date: DD,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn deprecation_date<DD>(mut self, deprecation_date: DD) -> Result<Self, Self::Error>
     where
         DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
         validation_errors::SingleFieldError: From<
@@ -502,7 +521,7 @@ for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -510,10 +529,7 @@ for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
     }
     #[inline]
     ///Sets the value of the `public.commercial_products.brand_id` column.
-    fn brand<BI>(
-        mut self,
-        brand_id: BI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn brand<BI>(mut self, brand_id: BI) -> Result<Self, Self::Error>
     where
         BI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -523,7 +539,7 @@ for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -531,19 +547,26 @@ for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
     }
 }
 impl<
-    CommercialProduct,
     VolumeMeasuringDeviceModel,
+    CommercialProduct,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
-    CommercialProduct,
     VolumeMeasuringDeviceModel,
+    CommercialProduct,
 >
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -575,10 +598,7 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
-    fn parent_model<PM>(
-        self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -589,20 +609,28 @@ where
                 )
                 .ok_or(
                     common_traits::prelude::BuilderError::IncompleteBuild(
-                        Self::Attributes::VolumeMeasuringDeviceModel,
+                        <Self as common_traits::builder::Attributed>::Attribute::VolumeMeasuringDeviceModel,
                     ),
                 )?,
         )
     }
 }
-impl<CommercialProduct, VolumeMeasuringDeviceModel>
-    crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceModelSettable
-    for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
-        CommercialProduct,
-        VolumeMeasuringDeviceModel,
-    >
+impl<
+    VolumeMeasuringDeviceModel,
+    CommercialProduct,
+> crate::codegen::structs_codegen::tables::insertables::VolumeMeasuringDeviceModelSettable
+for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
+    VolumeMeasuringDeviceModel,
+    CommercialProduct,
+>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute,
+    >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialVolumeMeasuringDeviceModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
 }
 impl<VolumeMeasuringDeviceModel, CommercialProduct> web_common_traits::database::MostConcreteTable
     for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
@@ -637,26 +665,27 @@ where
     }
 }
 impl<
-    CommercialProduct,
     VolumeMeasuringDeviceModel,
+    CommercialProduct,
     C,
 > web_common_traits::database::TryInsertGeneric<C>
 for InsertableCommercialVolumeMeasuringDeviceModelBuilder<
-    CommercialProduct,
     VolumeMeasuringDeviceModel,
+    CommercialProduct,
 >
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel,
-        Attribute = CommercialVolumeMeasuringDeviceModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            CommercialVolumeMeasuringDeviceModelAttribute,
+        >,
     >,
-    CommercialProduct: web_common_traits::database::TryInsertGeneric<
+    VolumeMeasuringDeviceModel: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
-    VolumeMeasuringDeviceModel: web_common_traits::database::TryInsertGeneric<
+    CommercialProduct: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
@@ -667,10 +696,12 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<
+            CommercialVolumeMeasuringDeviceModelAttribute,
+        >,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

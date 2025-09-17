@@ -29,6 +29,7 @@ impl core::fmt::Display for TeamProjectAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -92,6 +93,12 @@ pub struct InsertableTeamProjectBuilder {
     pub(crate) team_id: Option<i32>,
     pub(crate) project_id: Option<i32>,
 }
+impl diesel::associations::HasTable for InsertableTeamProjectBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::team_projects::team_projects::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::team_projects::team_projects::table
+    }
+}
 impl common_traits::builder::IsCompleteBuilder
     for crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectBuilder
 {
@@ -102,8 +109,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `TeamProject` or
 /// descendant tables.
 pub trait TeamProjectSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.team_projects.team_id` column.
     ///
     /// # Arguments
@@ -122,10 +129,7 @@ pub trait TeamProjectSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn team<TI>(
-        self,
-        team_id: TI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn team<TI>(self, team_id: TI) -> Result<Self, Self::Error>
     where
         TI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.team_projects.project_id` column.
@@ -146,20 +150,21 @@ pub trait TeamProjectSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn project<PI>(
-        self,
-        project_id: PI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn project<PI>(self, project_id: PI) -> Result<Self, Self::Error>
     where
         PI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
-impl TeamProjectSettable for InsertableTeamProjectBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::TeamProjectAttribute;
+impl TeamProjectSettable for InsertableTeamProjectBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::TeamProjectAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.team_projects.team_id` column.
-    fn team<TI>(
-        mut self,
-        team_id: TI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn team<TI>(mut self, team_id: TI) -> Result<Self, Self::Error>
     where
         TI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -168,10 +173,7 @@ impl TeamProjectSettable for InsertableTeamProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.team_projects.project_id` column.
-    fn project<PI>(
-        mut self,
-        project_id: PI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn project<PI>(mut self, project_id: PI) -> Result<Self, Self::Error>
     where
         PI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -189,20 +191,20 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableTeamProjectBuilder 
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableTeamProjectBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::team_projects::TeamProject,
-            Attribute = TeamProjectAttribute,
+            Error = web_common_traits::database::InsertError<TeamProjectAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<TeamProjectAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::team_projects::TeamProject =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

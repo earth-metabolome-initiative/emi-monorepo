@@ -1,12 +1,76 @@
-impl<AssetModel> web_common_traits::database::InsertableVariantMetadata
+impl<AssetModel> web_common_traits::database::DispatchableInsertVariantMetadata
     for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder<
         AssetModel,
     >
 {
     type Row = crate::codegen::structs_codegen::tables::reagent_models::ReagentModel;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute,
+    >;
+}
+impl<AssetModel> web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder<
+        AssetModel,
+    >
+{
     type InsertableVariant =
         crate::codegen::structs_codegen::tables::insertables::InsertableReagentModel;
-    type UserId = i32;
+}
+#[cfg(feature = "backend")]
+impl<AssetModel> web_common_traits::database::BackendInsertableVariant
+    for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder<
+        AssetModel,
+    >
+where
+    Self: web_common_traits::database::DispatchableInsertableVariant<diesel::PgConnection>,
+{
+}
+impl<
+    C: diesel::connection::LoadConnection,
+    AssetModel,
+> web_common_traits::database::DispatchableInsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder<
+    AssetModel,
+>
+where
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::reagent_models::ReagentModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableReagentModel as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::reagent_models::ReagentModel as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::reagent_models::ReagentModel,
+    >,
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableReagentModel,
+        Row = crate::codegen::structs_codegen::tables::reagent_models::ReagentModel,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute,
+        >,
+    >,
+    AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::ReagentModelExtensionAttribute: From<
+        <AssetModel as common_traits::builder::Attributed>::Attribute,
+    >,
+{
+    fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("reagent_models");
+        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableReagentModel = self
+            .try_insert(user_id, conn)?;
+        Ok(
+            diesel::insert_into(Self::table())
+                .values(insertable_struct)
+                .get_result(conn)?,
+        )
+    }
 }
 impl<
     C: diesel::connection::LoadConnection,
@@ -32,38 +96,11 @@ where
         <AssetModel as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    fn insert(
-        mut self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute,
-        >,
-    > {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use web_common_traits::database::MostConcreteTable;
-        self.set_most_concrete_table("reagent_models");
-        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableReagentModel = self
-            .try_insert(user_id, conn)?;
-        Ok(
-            diesel::insert_into(Self::Row::table())
-                .values(insertable_struct)
-                .get_result(conn)?,
-        )
-    }
     fn try_insert(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::InsertableVariant,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute,
-        >,
-    > {
+    ) -> Result<Self::InsertableVariant, Self::Error> {
         let purity = self
             .purity
             .ok_or(

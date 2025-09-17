@@ -1,11 +1,14 @@
-impl<C> web_common_traits::prelude::ProcedureTemplate<C>
+impl web_common_traits::prelude::ProcedureTemplateLike
+for crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate {
+    type Procedure = crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure;
+    type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
+}
+impl<C> web_common_traits::prelude::ProcedureTemplateQueries<C>
 for crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate
 where
     crate::ProcedureTemplateAssetModel: web_common_traits::database::Read<C>,
     C: diesel::connection::LoadConnection,
 {
-    type Procedure = crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure;
-    type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
     fn procedure_template_asset_models(
         &self,
         conn: &mut C,

@@ -3,6 +3,7 @@ use actix_web::{HttpRequest, HttpResponse, web};
 use actix_web_codegen::get;
 use api_path::api::oauth::jwt_cookies::AccessToken;
 use core_structures::User;
+use diesel::OptionalExtension;
 use web_common_traits::database::Read;
 
 use crate::{
@@ -56,8 +57,9 @@ pub(crate) async fn refresh_access_token(
     let mut connection = pool.get()?;
 
     // If the user doesn't exist, we return an error, otherwise we return the user.
-    let user =
-        User::read(refresh_token.user_id(), &mut connection)?.ok_or(BackendError::Unauthorized)?;
+    let user = User::read(refresh_token.user_id(), &mut connection)
+        .optional()?
+        .ok_or(BackendError::Unauthorized)?;
 
     // If the user exists, we create a new access token and return it.
     let access_token = JsonAccessToken::new(refresh_token.user_id(), false)?;

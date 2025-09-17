@@ -2,7 +2,7 @@
 
 use core_structures::{Brand, User, tables::insertables::BrandSettable};
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 /// Initializes the Fisher Scientific brand in the database.
 ///

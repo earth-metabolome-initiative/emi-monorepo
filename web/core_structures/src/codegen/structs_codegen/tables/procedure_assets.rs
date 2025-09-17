@@ -11,12 +11,6 @@
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::users::User,
-        foreign_key = created_by
-    )
-)]
-#[diesel(
-    belongs_to(
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
         foreign_key = procedure_template
     )
@@ -33,8 +27,6 @@ pub struct ProcedureAsset {
     pub asset: Option<::rosetta_uuid::Uuid>,
     pub procedure_template_asset_model: i32,
     pub ancestor_model: i32,
-    pub created_by: i32,
-    pub created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl web_common_traits::prelude::TableName for ProcedureAsset {
     const TABLE_NAME: &'static str = "procedure_assets";
@@ -158,16 +150,6 @@ impl ProcedureAsset {
             self.asset_model,
             conn,
         )
-    }
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn procedure<C: diesel::connection::LoadConnection>(
         &self,

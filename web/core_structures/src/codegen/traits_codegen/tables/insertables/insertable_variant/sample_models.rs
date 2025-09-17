@@ -1,12 +1,79 @@
-impl<PhysicalAssetModel> web_common_traits::database::InsertableVariantMetadata
+impl<PhysicalAssetModel> web_common_traits::database::DispatchableInsertVariantMetadata
     for crate::codegen::structs_codegen::tables::insertables::InsertableSampleModelBuilder<
         PhysicalAssetModel,
     >
 {
     type Row = crate::codegen::structs_codegen::tables::sample_models::SampleModel;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute,
+    >;
+}
+impl<PhysicalAssetModel> web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSampleModelBuilder<
+        PhysicalAssetModel,
+    >
+{
     type InsertableVariant =
         crate::codegen::structs_codegen::tables::insertables::InsertableSampleModel;
-    type UserId = i32;
+}
+#[cfg(feature = "backend")]
+impl<PhysicalAssetModel> web_common_traits::database::BackendInsertableVariant
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSampleModelBuilder<
+        PhysicalAssetModel,
+    >
+where
+    Self: web_common_traits::database::DispatchableInsertableVariant<diesel::PgConnection>,
+{
+}
+impl<
+    C: diesel::connection::LoadConnection,
+    PhysicalAssetModel,
+> web_common_traits::database::DispatchableInsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableSampleModelBuilder<
+    PhysicalAssetModel,
+>
+where
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::sample_models::SampleModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableSampleModel as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::sample_models::SampleModel as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::sample_models::SampleModel,
+    >,
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSampleModel,
+        Row = crate::codegen::structs_codegen::tables::sample_models::SampleModel,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute,
+        >,
+    >,
+    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
+    Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::SampleModelExtensionAttribute: From<
+        <PhysicalAssetModel as common_traits::builder::Attributed>::Attribute,
+    >,
+{
+    fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("sample_models");
+        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableSampleModel = self
+            .try_insert(user_id, conn)?;
+        Ok(
+            diesel::insert_into(Self::table())
+                .values(insertable_struct)
+                .get_result(conn)?,
+        )
+    }
 }
 impl<
     C: diesel::connection::LoadConnection,
@@ -35,38 +102,11 @@ where
         <PhysicalAssetModel as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    fn insert(
-        mut self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute,
-        >,
-    > {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use web_common_traits::database::MostConcreteTable;
-        self.set_most_concrete_table("sample_models");
-        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableSampleModel = self
-            .try_insert(user_id, conn)?;
-        Ok(
-            diesel::insert_into(Self::Row::table())
-                .values(insertable_struct)
-                .get_result(conn)?,
-        )
-    }
     fn try_insert(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::InsertableVariant,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::SampleModelAttribute,
-        >,
-    > {
+    ) -> Result<Self::InsertableVariant, Self::Error> {
         let sample_source_model = self
             .sample_source_model
             .ok_or(

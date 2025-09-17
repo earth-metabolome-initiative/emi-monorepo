@@ -8,7 +8,7 @@ pub enum PackagingProcedureTemplateExtensionAttribute {
 impl core::fmt::Display for PackagingProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::ProcedureTemplate(e) => write!(f, "{e}"),
+            Self::ProcedureTemplate(e) => write!(f, "packaging_procedure_templates({e})"),
         }
     }
 }
@@ -112,6 +112,7 @@ impl core::fmt::Display for PackagingProcedureTemplateAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -316,6 +317,14 @@ pub struct InsertablePackagingProcedureTemplateBuilder<
     >,
     pub(crate) procedure_template: ProcedureTemplate,
 }
+impl<ProcedureTemplate> diesel::associations::HasTable
+    for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate>
+{
+    type Table = crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::table
+    }
+}
 impl From<InsertablePackagingProcedureTemplateBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertablePackagingProcedureTemplateBuilder>
 {
@@ -344,8 +353,8 @@ where
 /// Trait defining setters for attributes of an instance of
 /// `PackagingProcedureTemplate` or descendant tables.
 pub trait PackagingProcedureTemplateSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the
     /// `public.packaging_procedure_templates.packaged_with_model` column.
     ///
@@ -365,10 +374,7 @@ pub trait PackagingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn packaged_with_model<PWM>(
-        self,
-        packaged_with_model: PWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn packaged_with_model<PWM>(self, packaged_with_model: PWM) -> Result<Self, Self::Error>
     where
         PWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -395,7 +401,7 @@ pub trait PackagingProcedureTemplateSettable: Sized {
     fn procedure_template_packaged_with_model<PTPWM>(
         self,
         procedure_template_packaged_with_model: PTPWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTPWM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -422,10 +428,7 @@ pub trait PackagingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn sample_model<SM>(
-        self,
-        sample_model: SM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn sample_model<SM>(self, sample_model: SM) -> Result<Self, Self::Error>
     where
         SM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -452,7 +455,7 @@ pub trait PackagingProcedureTemplateSettable: Sized {
     fn procedure_template_sample_model<PTSM>(
         self,
         procedure_template_sample_model: PTSM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -462,51 +465,56 @@ pub trait PackagingProcedureTemplateSettable: Sized {
         >;
 }
 impl<ProcedureTemplate> PackagingProcedureTemplateSettable
-    for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate>
+for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::PackagingProcedureTemplateAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::PackagingProcedureTemplateAttribute;
-    /// Sets the value of the
-    /// `public.packaging_procedure_templates.packaged_with_model` column.
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.packaging_procedure_templates.packaged_with_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`packaging_procedure_templates`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`packaging_procedure_templates`"]
     ///    v0@{shape: rounded, label: "packaged_with_model"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_packaged_with_model"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn packaged_with_model<PWM>(
         mut self,
         packaged_with_model: PWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let packaged_with_model =
-            <PWM as web_common_traits::database::PrimaryKeyLike>::primary_key(&packaged_with_model);
+        let packaged_with_model = <PWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &packaged_with_model,
+        );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_packaged_with_model,
         ) = self.procedure_template_packaged_with_model
@@ -517,7 +525,9 @@ impl<ProcedureTemplate> PackagingProcedureTemplateSettable
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplatePackagedWithModel(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplatePackagedWithModel(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -525,43 +535,41 @@ impl<ProcedureTemplate> PackagingProcedureTemplateSettable
         self.packaged_with_model = Some(packaged_with_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.packaging_procedure_templates.
-    /// procedure_template_packaged_with_model` column.
+    ///Sets the value of the `public.packaging_procedure_templates.procedure_template_packaged_with_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`packaging_procedure_templates`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`packaging_procedure_templates`"]
     ///    v0@{shape: rounded, label: "packaged_with_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_packaged_with_model"}
-    /// class v1 column-of-interest
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///class v1 column-of-interest
+    ///end
+    ///subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn procedure_template_packaged_with_model<PTPWM>(
         mut self,
         procedure_template_packaged_with_model: PTPWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTPWM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -570,23 +578,21 @@ impl<ProcedureTemplate> PackagingProcedureTemplateSettable
             >,
         >,
     {
-        let mut procedure_template_packaged_with_model =
-            procedure_template_packaged_with_model.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_template_packaged_with_model
-        {
+        let mut procedure_template_packaged_with_model = procedure_template_packaged_with_model
+            .into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_packaged_with_model {
             procedure_template_packaged_with_model = if let (
                 Some(packaged_with_model),
                 Some(asset_model),
-            ) =
-                (self.packaged_with_model, builder.asset_model)
-            {
+            ) = (self.packaged_with_model, builder.asset_model) {
                 if packaged_with_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::PackagedWithModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::PackagedWithModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -599,7 +605,7 @@ impl<ProcedureTemplate> PackagingProcedureTemplateSettable
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTemplatePackagedWithModel(
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplatePackagedWithModel(
                                 attribute,
                             )
                         })
@@ -612,49 +618,47 @@ impl<ProcedureTemplate> PackagingProcedureTemplateSettable
         self.procedure_template_packaged_with_model = procedure_template_packaged_with_model;
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.packaging_procedure_templates.sample_model` column.
+    ///Sets the value of the `public.packaging_procedure_templates.sample_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`packaging_procedure_templates`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`packaging_procedure_templates`"]
     ///    v0@{shape: rounded, label: "procedure_template_sample_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "sample_model"}
-    /// class v1 column-of-interest
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///class v1 column-of-interest
+    ///end
+    ///subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
-    fn sample_model<SM>(
-        mut self,
-        sample_model: SM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 -.->|"`foreign defines`"| v1
+    ///v1 --->|"`associated same as`"| v2
+    ///v4 ---o|"`associated with`"| v5
+    ///```
+    fn sample_model<SM>(mut self, sample_model: SM) -> Result<Self, Self::Error>
     where
         SM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let sample_model =
-            <SM as web_common_traits::database::PrimaryKeyLike>::primary_key(&sample_model);
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_template_sample_model) =
-            self.procedure_template_sample_model
+        let sample_model = <SM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &sample_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_template_sample_model,
+        ) = self.procedure_template_sample_model
         {
             self.procedure_template_sample_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                     procedure_template_sample_model,
@@ -662,7 +666,9 @@ impl<ProcedureTemplate> PackagingProcedureTemplateSettable
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplateSampleModel(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateSampleModel(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -670,43 +676,41 @@ impl<ProcedureTemplate> PackagingProcedureTemplateSettable
         self.sample_model = Some(sample_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.packaging_procedure_templates.procedure_template_sample_model`
-    /// column.
+    ///Sets the value of the `public.packaging_procedure_templates.procedure_template_sample_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`packaging_procedure_templates`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`packaging_procedure_templates`"]
     ///    v0@{shape: rounded, label: "procedure_template_sample_model"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "sample_model"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_template_asset_models`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`procedure_template_asset_models`"]
     ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 -.->|"`foreign defines`"| v1
+    ///v1 --->|"`associated same as`"| v2
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn procedure_template_sample_model<PTSM>(
         mut self,
         procedure_template_sample_model: PTSM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -716,18 +720,19 @@ impl<ProcedureTemplate> PackagingProcedureTemplateSettable
         >,
     {
         let mut procedure_template_sample_model = procedure_template_sample_model.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_template_sample_model
-        {
-            procedure_template_sample_model = if let (Some(sample_model), Some(asset_model)) =
-                (self.sample_model, builder.asset_model)
-            {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_sample_model {
+            procedure_template_sample_model = if let (
+                Some(sample_model),
+                Some(asset_model),
+            ) = (self.sample_model, builder.asset_model) {
                 if sample_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::SampleModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::SampleModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -740,7 +745,9 @@ impl<ProcedureTemplate> PackagingProcedureTemplateSettable
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTemplateSampleModel(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateSampleModel(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -754,17 +761,23 @@ impl<ProcedureTemplate> PackagingProcedureTemplateSettable
 }
 impl<
     ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
-for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::PackagingProcedureTemplateAttribute;
+for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::PackagingProcedureTemplateAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -775,7 +788,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -783,10 +796,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -797,7 +807,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -805,10 +815,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -818,7 +825,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -826,10 +833,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -842,7 +846,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -850,10 +854,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -863,7 +864,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -871,10 +872,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -887,7 +885,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -895,10 +893,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.deprecated` column.
-    fn deprecated<D>(
-        mut self,
-        deprecated: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn deprecated<D>(mut self, deprecated: D) -> Result<Self, Self::Error>
     where
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
@@ -909,7 +904,7 @@ for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -939,11 +934,12 @@ where
 impl<ProcedureTemplate, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertablePackagingProcedureTemplateBuilder<ProcedureTemplate>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
-        Attribute = PackagingProcedureTemplateAttribute,
+        Error = web_common_traits::database::InsertError<
+            PackagingProcedureTemplateAttribute,
+        >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
         C,
@@ -959,10 +955,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<PackagingProcedureTemplateAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

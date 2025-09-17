@@ -2,7 +2,7 @@
 //! models [`StyleClass`] objects.
 
 use core_structures::ProcedureTemplateAssetModel;
-use guided_procedure_builder::{OwnershipLike, ProcedureTemplateGraph};
+use guided_procedures::{OwnershipLike, ProcedureTemplateGraph};
 use mermaid::{
     prelude::{Color, FlowchartBuilder, StyleClassBuilder, StyleProperty, Unit},
     traits::DiagramBuilder,

@@ -9,8 +9,8 @@ pub enum CommercialPipetteTipModelExtensionAttribute {
 impl core::fmt::Display for CommercialPipetteTipModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::PipetteTipModel(e) => write!(f, "{e}"),
-            Self::CommercialProduct(e) => write!(f, "{e}"),
+            Self::PipetteTipModel(e) => write!(f, "commercial_pipette_tip_models({e})"),
+            Self::CommercialProduct(e) => write!(f, "commercial_pipette_tip_models({e})"),
         }
     }
 }
@@ -72,6 +72,7 @@ impl core::fmt::Display for CommercialPipetteTipModelAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -141,20 +142,28 @@ impl InsertableCommercialPipetteTipModel {
 ///    .insert(user.id, conn)?;
 /// ```
 pub struct InsertableCommercialPipetteTipModelBuilder<
-    CommercialProduct
-        = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
-        >,
     PipetteTipModel
         = crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelBuilder<
             crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
-                Option<i32>,
+                crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
             >,
+        >,
+    CommercialProduct
+        = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialProductBuilder<
+            Option<i32>,
         >,
 > {
     pub(crate) pipette_tip_model: Option<i32>,
     pub(crate) commercial_pipette_tip_models_id_fkey: PipetteTipModel,
     pub(crate) commercial_pipette_tip_models_id_fkey1: CommercialProduct,
+}
+impl<PipetteTipModel, CommercialProduct> diesel::associations::HasTable
+    for InsertableCommercialPipetteTipModelBuilder<PipetteTipModel, CommercialProduct>
+{
+    type Table = crate::codegen::diesel_codegen::tables::commercial_pipette_tip_models::commercial_pipette_tip_models::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::commercial_pipette_tip_models::commercial_pipette_tip_models::table
+    }
 }
 impl From<InsertableCommercialPipetteTipModelBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialPipetteTipModelBuilder>
@@ -181,8 +190,8 @@ where
 /// Trait defining setters for attributes of an instance of
 /// `CommercialPipetteTipModel` or descendant tables.
 pub trait CommercialPipetteTipModelSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the
     /// `public.commercial_pipette_tip_models.pipette_tip_model` column.
     ///
@@ -202,21 +211,27 @@ pub trait CommercialPipetteTipModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn pipette_tip_model<PTM>(
-        self,
-        pipette_tip_model: PTM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn pipette_tip_model<PTM>(self, pipette_tip_model: PTM) -> Result<Self, Self::Error>
     where
         PTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl<
-    CommercialProduct,
     PipetteTipModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::PipetteTipModelAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::PipetteTipModelAttribute,
+            >,
         >,
+    CommercialProduct,
 > CommercialPipetteTipModelSettable
-for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute;
+for InsertableCommercialPipetteTipModelBuilder<PipetteTipModel, CommercialProduct>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     ///Sets the value of the `public.commercial_pipette_tip_models.pipette_tip_model` column.
     ///
     ///# Implementation notes
@@ -250,7 +265,7 @@ for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipMode
     fn pipette_tip_model<PTM>(
         mut self,
         pipette_tip_model: PTM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -262,7 +277,7 @@ for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipMode
                 pipette_tip_model,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
@@ -271,35 +286,41 @@ for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipMode
     }
 }
 impl<
-    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    PipetteTipModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::PipetteTipModelAttribute,
+            >,
         >,
-    PipetteTipModel,
+    CommercialProduct,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
-for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipModel>
+for InsertableCommercialPipetteTipModelBuilder<PipetteTipModel, CommercialProduct>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.commercial_pipette_tip_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
-                self.commercial_pipette_tip_models_id_fkey1,
+        self.commercial_pipette_tip_models_id_fkey = <PipetteTipModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
+                self.commercial_pipette_tip_models_id_fkey,
                 name,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -307,21 +328,18 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.commercial_pipette_tip_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
-                self.commercial_pipette_tip_models_id_fkey1,
+        self.commercial_pipette_tip_models_id_fkey = <PipetteTipModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
+                self.commercial_pipette_tip_models_id_fkey,
                 description,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -351,10 +369,7 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn parent_model<PM>(
-        self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -365,20 +380,17 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.commercial_pipette_tip_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
-                self.commercial_pipette_tip_models_id_fkey1,
+        self.commercial_pipette_tip_models_id_fkey = <PipetteTipModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
+                self.commercial_pipette_tip_models_id_fkey,
                 created_by,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -386,23 +398,20 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_pipette_tip_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
-                self.commercial_pipette_tip_models_id_fkey1,
+        self.commercial_pipette_tip_models_id_fkey = <PipetteTipModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
+                self.commercial_pipette_tip_models_id_fkey,
                 created_at,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -410,20 +419,17 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.commercial_pipette_tip_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
-                self.commercial_pipette_tip_models_id_fkey1,
+        self.commercial_pipette_tip_models_id_fkey = <PipetteTipModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
+                self.commercial_pipette_tip_models_id_fkey,
                 updated_by,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -431,23 +437,20 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
-        self.commercial_pipette_tip_models_id_fkey1 = <CommercialProduct as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
-                self.commercial_pipette_tip_models_id_fkey1,
+        self.commercial_pipette_tip_models_id_fkey = <PipetteTipModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
+                self.commercial_pipette_tip_models_id_fkey,
                 updated_at,
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -455,19 +458,25 @@ where
     }
 }
 impl<
-    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
-        >,
     PipetteTipModel,
+    CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+            >,
+        >,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable
-for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipModel> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute;
+for InsertableCommercialPipetteTipModelBuilder<PipetteTipModel, CommercialProduct>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.commercial_products.deprecation_date` column.
-    fn deprecation_date<DD>(
-        mut self,
-        deprecation_date: DD,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn deprecation_date<DD>(mut self, deprecation_date: DD) -> Result<Self, Self::Error>
     where
         DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
         validation_errors::SingleFieldError: From<
@@ -480,7 +489,7 @@ for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipMode
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -488,10 +497,7 @@ for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipMode
     }
     #[inline]
     ///Sets the value of the `public.commercial_products.brand_id` column.
-    fn brand<BI>(
-        mut self,
-        brand_id: BI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn brand<BI>(mut self, brand_id: BI) -> Result<Self, Self::Error>
     where
         BI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -501,7 +507,7 @@ for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipMode
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -509,16 +515,23 @@ for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipMode
     }
 }
 impl<
-    CommercialProduct,
     PipetteTipModel,
+    CommercialProduct,
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
-for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipModel>
+for InsertableCommercialPipetteTipModelBuilder<PipetteTipModel, CommercialProduct>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -550,10 +563,7 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
-    fn parent_model<PM>(
-        self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -564,18 +574,25 @@ where
                 )
                 .ok_or(
                     common_traits::prelude::BuilderError::IncompleteBuild(
-                        Self::Attributes::PipetteTipModel,
+                        <Self as common_traits::builder::Attributed>::Attribute::PipetteTipModel,
                     ),
                 )?,
         )
     }
 }
-impl<CommercialProduct, PipetteTipModel>
-    crate::codegen::structs_codegen::tables::insertables::PipetteTipModelSettable
-    for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipModel>
+impl<
+    PipetteTipModel,
+    CommercialProduct,
+> crate::codegen::structs_codegen::tables::insertables::PipetteTipModelSettable
+for InsertableCommercialPipetteTipModelBuilder<PipetteTipModel, CommercialProduct>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::CommercialPipetteTipModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
 }
 impl<PipetteTipModel, CommercialProduct> web_common_traits::database::MostConcreteTable
     for InsertableCommercialPipetteTipModelBuilder<PipetteTipModel, CommercialProduct>
@@ -604,23 +621,24 @@ where
     }
 }
 impl<
-    CommercialProduct,
     PipetteTipModel,
+    CommercialProduct,
     C,
 > web_common_traits::database::TryInsertGeneric<C>
-for InsertableCommercialPipetteTipModelBuilder<CommercialProduct, PipetteTipModel>
+for InsertableCommercialPipetteTipModelBuilder<PipetteTipModel, CommercialProduct>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
-        Attribute = CommercialPipetteTipModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            CommercialPipetteTipModelAttribute,
+        >,
     >,
+    PipetteTipModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
     >,
-    PipetteTipModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     fn mint_primary_key(
         self,
@@ -628,10 +646,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<CommercialPipetteTipModelAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

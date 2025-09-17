@@ -6,7 +6,7 @@ pub enum AliquotingProcedureExtensionAttribute {
 impl core::fmt::Display for AliquotingProcedureExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Procedure(e) => write!(f, "{e}"),
+            Self::Procedure(e) => write!(f, "aliquoting_procedures({e})"),
         }
     }
 }
@@ -151,6 +151,7 @@ impl core::fmt::Display for AliquotingProcedureAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -834,6 +835,13 @@ pub struct InsertableAliquotingProcedureBuilder<
     >,
     pub(crate) procedure: Procedure,
 }
+impl<Procedure> diesel::associations::HasTable for InsertableAliquotingProcedureBuilder<Procedure> {
+    type Table =
+        crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures::table
+    }
+}
 impl From<InsertableAliquotingProcedureBuilder>
     for web_common_traits::database::IdOrBuilder<
         ::rosetta_uuid::Uuid,
@@ -881,8 +889,8 @@ where
 /// Trait defining setters for attributes of an instance of
 /// `AliquotingProcedure` or descendant tables.
 pub trait AliquotingProcedureSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.aliquoting_procedures.procedure_template`
     /// column.
     ///
@@ -902,10 +910,7 @@ pub trait AliquotingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template<PT>(
-        self,
-        procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure_template<PT>(self, procedure_template: PT) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.aliquoting_procedures.aliquoted_with`
@@ -928,10 +933,7 @@ pub trait AliquotingProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn aliquoted_with<AW>(
-        self,
-        aliquoted_with: AW,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn aliquoted_with<AW>(self, aliquoted_with: AW) -> Result<Self, Self::Error>
     where
         AW: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
@@ -953,10 +955,7 @@ pub trait AliquotingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn aliquoted_with_model<AWM>(
-        self,
-        aliquoted_with_model: AWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn aliquoted_with_model<AWM>(self, aliquoted_with_model: AWM) -> Result<Self, Self::Error>
     where
         AWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -983,7 +982,7 @@ pub trait AliquotingProcedureSettable: Sized {
     fn procedure_template_aliquoted_with_model<PTAWM>(
         self,
         procedure_template_aliquoted_with_model: PTAWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTAWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -1009,7 +1008,7 @@ pub trait AliquotingProcedureSettable: Sized {
     fn procedure_aliquoted_with<PAW>(
         self,
         procedure_aliquoted_with: PAW,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PAW: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1036,10 +1035,7 @@ pub trait AliquotingProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn pipette_tip_model<PTM>(
-        self,
-        pipette_tip_model: PTM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn pipette_tip_model<PTM>(self, pipette_tip_model: PTM) -> Result<Self, Self::Error>
     where
         PTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -1066,7 +1062,7 @@ pub trait AliquotingProcedureSettable: Sized {
     fn procedure_template_pipette_tip_model<PTPTM>(
         self,
         procedure_template_pipette_tip_model: PTPTM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTPTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -1092,7 +1088,7 @@ pub trait AliquotingProcedureSettable: Sized {
     fn procedure_pipette_tip<PPT>(
         self,
         procedure_pipette_tip: PPT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PPT: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1120,10 +1116,7 @@ pub trait AliquotingProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn aliquoted_from<AF>(
-        self,
-        aliquoted_from: AF,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn aliquoted_from<AF>(self, aliquoted_from: AF) -> Result<Self, Self::Error>
     where
         AF: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
@@ -1150,7 +1143,7 @@ pub trait AliquotingProcedureSettable: Sized {
     fn procedure_template_aliquoted_from_model<PTAFM>(
         self,
         procedure_template_aliquoted_from_model: PTAFM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTAFM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -1176,7 +1169,7 @@ pub trait AliquotingProcedureSettable: Sized {
     fn procedure_aliquoted_from<PAF>(
         self,
         procedure_aliquoted_from: PAF,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PAF: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1204,10 +1197,7 @@ pub trait AliquotingProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn aliquoted_into<AI>(
-        self,
-        aliquoted_into: AI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn aliquoted_into<AI>(self, aliquoted_into: AI) -> Result<Self, Self::Error>
     where
         AI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
@@ -1234,7 +1224,7 @@ pub trait AliquotingProcedureSettable: Sized {
     fn procedure_template_aliquoted_into_model<PTAIM>(
         self,
         procedure_template_aliquoted_into_model: PTAIM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTAIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -1260,7 +1250,7 @@ pub trait AliquotingProcedureSettable: Sized {
     fn procedure_aliquoted_into<PAI>(
         self,
         procedure_aliquoted_into: PAI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PAI: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1271,126 +1261,131 @@ pub trait AliquotingProcedureSettable: Sized {
 }
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            >,
         >,
 > AliquotingProcedureSettable for InsertableAliquotingProcedureBuilder<Procedure>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute;
-    /// Sets the value of the `public.aliquoting_procedures.procedure_template`
-    /// column.
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.aliquoting_procedures.procedure_template` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v7 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v7 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "procedure_template"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_template_aliquoted_with_model"}
-    /// class v3 directly-involved-column
+    ///class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v4 directly-involved-column
-    /// end
-    /// subgraph v8 ["`procedure_assets`"]
+    ///class v4 directly-involved-column
+    ///end
+    ///subgraph v8 ["`procedure_assets`"]
     ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v6 undirectly-involved-column
-    /// end
-    /// subgraph v9 ["`procedures`"]
+    ///class v6 undirectly-involved-column
+    ///end
+    ///subgraph v9 ["`procedures`"]
     ///    v5@{shape: rounded, label: "procedure_template"}
-    /// class v5 directly-involved-column
-    /// end
-    /// v0 --->|"`ancestral same as`"| v5
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v0 -.->|"`foreign defines`"| v2
-    /// v0 -.->|"`foreign defines`"| v3
-    /// v0 -.->|"`foreign defines`"| v4
-    /// v1 --->|"`associated same as`"| v6
-    /// v2 --->|"`associated same as`"| v6
-    /// v3 --->|"`associated same as`"| v6
-    /// v4 --->|"`associated same as`"| v6
-    /// v7 --->|"`extends`"| v9
-    /// v7 ---o|"`associated with`"| v8
-    /// ```
+    ///class v5 directly-involved-column
+    ///end
+    ///v0 --->|"`ancestral same as`"| v5
+    ///v0 -.->|"`foreign defines`"| v1
+    ///v0 -.->|"`foreign defines`"| v2
+    ///v0 -.->|"`foreign defines`"| v3
+    ///v0 -.->|"`foreign defines`"| v4
+    ///v1 --->|"`associated same as`"| v6
+    ///v2 --->|"`associated same as`"| v6
+    ///v3 --->|"`associated same as`"| v6
+    ///v4 --->|"`associated same as`"| v6
+    ///v7 --->|"`extends`"| v9
+    ///v7 ---o|"`associated with`"| v8
+    ///```
     fn procedure_template<PT>(
         mut self,
         procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template =
-            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
+        let procedure_template = <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template,
+        );
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    /// Sets the value of the `public.aliquoting_procedures.aliquoted_with`
-    /// column.
+    ///Sets the value of the `public.aliquoting_procedures.aliquoted_with` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "aliquoted_with"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_aliquoted_with"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_assets`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
-    fn aliquoted_with<AW>(
-        mut self,
-        aliquoted_with: AW,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
+    fn aliquoted_with<AW>(mut self, aliquoted_with: AW) -> Result<Self, Self::Error>
     where
-        AW: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+        AW: web_common_traits::database::MaybePrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
     {
-        let aliquoted_with =
-            <AW as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
-                &aliquoted_with,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_with) =
-            self.procedure_aliquoted_with
+        let aliquoted_with = <AW as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+            &aliquoted_with,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_aliquoted_with,
+        ) = self.procedure_aliquoted_with
         {
             self.procedure_aliquoted_with = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_aliquoted_with,
@@ -1398,7 +1393,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureAliquotedWith(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedWith(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -1406,53 +1403,52 @@ impl<
         self.aliquoted_with = aliquoted_with;
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.aliquoting_procedures.aliquoted_with_model` column.
+    ///Sets the value of the `public.aliquoting_procedures.aliquoted_with_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "aliquoted_with_model"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_aliquoted_with"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_assets`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn aliquoted_with_model<AWM>(
         mut self,
         aliquoted_with_model: AWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         AWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let aliquoted_with_model =
-            <AWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &aliquoted_with_model,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_with) =
-            self.procedure_aliquoted_with
+        let aliquoted_with_model = <AWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &aliquoted_with_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_aliquoted_with,
+        ) = self.procedure_aliquoted_with
         {
             self.procedure_aliquoted_with = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                     procedure_aliquoted_with,
@@ -1460,7 +1456,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureAliquotedWith(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedWith(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -1468,54 +1466,52 @@ impl<
         self.aliquoted_with_model = Some(aliquoted_with_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.aliquoting_procedures.procedure_template_aliquoted_with_model`
-    /// column.
+    ///Sets the value of the `public.aliquoting_procedures.procedure_template_aliquoted_with_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "procedure_aliquoted_with"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_aliquoted_with_model"}
-    /// class v1 column-of-interest
-    /// end
-    /// subgraph v5 ["`procedure_assets`"]
+    ///class v1 column-of-interest
+    ///end
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 -.->|"`foreign defines`"| v1
+    ///v1 --->|"`associated same as`"| v2
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn procedure_template_aliquoted_with_model<PTAWM>(
         mut self,
         procedure_template_aliquoted_with_model: PTAWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTAWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_aliquoted_with_model =
-            <PTAWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &procedure_template_aliquoted_with_model,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_with) =
-            self.procedure_aliquoted_with
+        let procedure_template_aliquoted_with_model = <PTAWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_aliquoted_with_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_aliquoted_with,
+        ) = self.procedure_aliquoted_with
         {
             self.procedure_aliquoted_with = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_aliquoted_with,
@@ -1523,66 +1519,68 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureAliquotedWith(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedWith(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
         }
-        self.procedure_template_aliquoted_with_model =
-            Some(procedure_template_aliquoted_with_model);
+        self.procedure_template_aliquoted_with_model = Some(
+            procedure_template_aliquoted_with_model,
+        );
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.aliquoting_procedures.procedure_aliquoted_with` column.
+    ///Sets the value of the `public.aliquoting_procedures.procedure_aliquoted_with` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v8 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v8 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "aliquoted_with"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "aliquoted_with_model"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_aliquoted_with"}
-    /// class v2 column-of-interest
+    ///class v2 column-of-interest
     ///    v3@{shape: rounded, label: "procedure_template_aliquoted_with_model"}
-    /// class v3 directly-involved-column
-    /// end
-    /// subgraph v9 ["`procedure_assets`"]
+    ///class v3 directly-involved-column
+    ///end
+    ///subgraph v9 ["`procedure_assets`"]
     ///    v4@{shape: rounded, label: "asset"}
-    /// class v4 directly-involved-column
+    ///class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "asset_model"}
-    /// class v5 directly-involved-column
+    ///class v5 directly-involved-column
     ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v6 directly-involved-column
+    ///class v6 directly-involved-column
     ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v4
-    /// v1 --->|"`associated same as`"| v5
-    /// v2 --->|"`associated same as`"| v7
-    /// v2 --->|"`associated same as`"| v7
-    /// v2 --->|"`associated same as`"| v7
-    /// v2 --->|"`associated same as`"| v7
-    /// v2 -.->|"`foreign defines`"| v0
-    /// v2 -.->|"`foreign defines`"| v1
-    /// v2 -.->|"`foreign defines`"| v3
-    /// v3 --->|"`associated same as`"| v6
-    /// v4 -.->|"`foreign defines`"| v5
-    /// v8 ---o|"`associated with`"| v9
-    /// ```
+    ///class v7 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v4
+    ///v1 --->|"`associated same as`"| v5
+    ///v2 --->|"`associated same as`"| v7
+    ///v2 --->|"`associated same as`"| v7
+    ///v2 --->|"`associated same as`"| v7
+    ///v2 --->|"`associated same as`"| v7
+    ///v2 -.->|"`foreign defines`"| v0
+    ///v2 -.->|"`foreign defines`"| v1
+    ///v2 -.->|"`foreign defines`"| v3
+    ///v3 --->|"`associated same as`"| v6
+    ///v4 -.->|"`foreign defines`"| v5
+    ///v8 ---o|"`associated with`"| v9
+    ///```
     fn procedure_aliquoted_with<PAW>(
         mut self,
         procedure_aliquoted_with: PAW,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PAW: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1592,17 +1590,19 @@ impl<
         >,
     {
         let mut procedure_aliquoted_with = procedure_aliquoted_with.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_with
-        {
-            procedure_aliquoted_with = if let (Some(aliquoted_with), Some(asset)) =
-                (self.aliquoted_with, builder.asset)
-            {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_with {
+            procedure_aliquoted_with = if let (Some(aliquoted_with), Some(asset)) = (
+                self.aliquoted_with,
+                builder.asset,
+            ) {
                 if aliquoted_with != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::AliquotedWith,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::AliquotedWith,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset) = builder.asset {
@@ -1615,7 +1615,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureAliquotedWith(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedWith(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1623,17 +1625,19 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_with
-        {
-            procedure_aliquoted_with = if let (Some(aliquoted_with_model), Some(asset_model)) =
-                (self.aliquoted_with_model, builder.asset_model)
-            {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_with {
+            procedure_aliquoted_with = if let (
+                Some(aliquoted_with_model),
+                Some(asset_model),
+            ) = (self.aliquoted_with_model, builder.asset_model) {
                 if aliquoted_with_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::AliquotedWithModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::AliquotedWithModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -1646,7 +1650,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureAliquotedWith(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedWith(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1654,8 +1660,7 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_with
-        {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_with {
             procedure_aliquoted_with = if let (
                 Some(procedure_template_aliquoted_with_model),
                 Some(procedure_template_asset_model),
@@ -1663,21 +1668,27 @@ impl<
                 self.procedure_template_aliquoted_with_model,
                 builder.procedure_template_asset_model,
             ) {
-                if procedure_template_aliquoted_with_model != procedure_template_asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateAliquotedWithModel,
+                if procedure_template_aliquoted_with_model
+                    != procedure_template_asset_model
+                {
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateAliquotedWithModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
+            } else if let Some(procedure_template_asset_model) = builder
+                .procedure_template_asset_model
             {
-                self.procedure_template_aliquoted_with_model = Some(procedure_template_asset_model);
+                self.procedure_template_aliquoted_with_model = Some(
+                    procedure_template_asset_model,
+                );
                 builder.into()
-            } else if let Some(procedure_template_aliquoted_with_model) =
-                self.procedure_template_aliquoted_with_model
+            } else if let Some(procedure_template_aliquoted_with_model) = self
+                .procedure_template_aliquoted_with_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
@@ -1685,7 +1696,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureAliquotedWith(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedWith(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1696,50 +1709,51 @@ impl<
         self.procedure_aliquoted_with = procedure_aliquoted_with;
         Ok(self)
     }
-    /// Sets the value of the `public.aliquoting_procedures.pipette_tip_model`
-    /// column.
+    ///Sets the value of the `public.aliquoting_procedures.pipette_tip_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "pipette_tip_model"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_pipette_tip"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_assets`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn pipette_tip_model<PTM>(
         mut self,
         pipette_tip_model: PTM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let pipette_tip_model =
-            <PTM as web_common_traits::database::PrimaryKeyLike>::primary_key(&pipette_tip_model);
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_pipette_tip) =
-            self.procedure_pipette_tip
+        let pipette_tip_model = <PTM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &pipette_tip_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_pipette_tip,
+        ) = self.procedure_pipette_tip
         {
             self.procedure_pipette_tip = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                     procedure_pipette_tip,
@@ -1747,7 +1761,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedurePipetteTip(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedurePipetteTip(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -1755,53 +1771,51 @@ impl<
         self.pipette_tip_model = Some(pipette_tip_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.aliquoting_procedures.procedure_template_pipette_tip_model`
-    /// column.
+    ///Sets the value of the `public.aliquoting_procedures.procedure_template_pipette_tip_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "procedure_pipette_tip"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v1 column-of-interest
-    /// end
-    /// subgraph v5 ["`procedure_assets`"]
+    ///class v1 column-of-interest
+    ///end
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 -.->|"`foreign defines`"| v1
+    ///v1 --->|"`associated same as`"| v2
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn procedure_template_pipette_tip_model<PTPTM>(
         mut self,
         procedure_template_pipette_tip_model: PTPTM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTPTM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_pipette_tip_model =
-            <PTPTM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &procedure_template_pipette_tip_model,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_pipette_tip) =
-            self.procedure_pipette_tip
+        let procedure_template_pipette_tip_model = <PTPTM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_pipette_tip_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_pipette_tip,
+        ) = self.procedure_pipette_tip
         {
             self.procedure_pipette_tip = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_pipette_tip,
@@ -1809,57 +1823,60 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedurePipetteTip(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedurePipetteTip(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
         }
-        self.procedure_template_pipette_tip_model = Some(procedure_template_pipette_tip_model);
+        self.procedure_template_pipette_tip_model = Some(
+            procedure_template_pipette_tip_model,
+        );
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.aliquoting_procedures.procedure_pipette_tip` column.
+    ///Sets the value of the `public.aliquoting_procedures.procedure_pipette_tip` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v6 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v6 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "pipette_tip_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_pipette_tip"}
-    /// class v1 column-of-interest
+    ///class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_pipette_tip_model"}
-    /// class v2 directly-involved-column
-    /// end
-    /// subgraph v7 ["`procedure_assets`"]
+    ///class v2 directly-involved-column
+    ///end
+    ///subgraph v7 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "asset_model"}
-    /// class v3 directly-involved-column
+    ///class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v4 directly-involved-column
+    ///class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v5
-    /// v1 --->|"`associated same as`"| v5
-    /// v1 --->|"`associated same as`"| v5
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v4
-    /// v6 ---o|"`associated with`"| v7
-    /// ```
+    ///class v5 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v5
+    ///v1 --->|"`associated same as`"| v5
+    ///v1 --->|"`associated same as`"| v5
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v4
+    ///v6 ---o|"`associated with`"| v7
+    ///```
     fn procedure_pipette_tip<PPT>(
         mut self,
         procedure_pipette_tip: PPT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PPT: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1870,15 +1887,18 @@ impl<
     {
         let mut procedure_pipette_tip = procedure_pipette_tip.into();
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_pipette_tip {
-            procedure_pipette_tip = if let (Some(pipette_tip_model), Some(asset_model)) =
-                (self.pipette_tip_model, builder.asset_model)
-            {
+            procedure_pipette_tip = if let (
+                Some(pipette_tip_model),
+                Some(asset_model),
+            ) = (self.pipette_tip_model, builder.asset_model) {
                 if pipette_tip_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::PipetteTipModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::PipetteTipModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -1891,7 +1911,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedurePipetteTip(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedurePipetteTip(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1903,24 +1925,30 @@ impl<
             procedure_pipette_tip = if let (
                 Some(procedure_template_pipette_tip_model),
                 Some(procedure_template_asset_model),
-            ) =
-                (self.procedure_template_pipette_tip_model, builder.procedure_template_asset_model)
-            {
-                if procedure_template_pipette_tip_model != procedure_template_asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplatePipetteTipModel,
+            ) = (
+                self.procedure_template_pipette_tip_model,
+                builder.procedure_template_asset_model,
+            ) {
+                if procedure_template_pipette_tip_model != procedure_template_asset_model
+                {
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplatePipetteTipModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
+            } else if let Some(procedure_template_asset_model) = builder
+                .procedure_template_asset_model
             {
-                self.procedure_template_pipette_tip_model = Some(procedure_template_asset_model);
+                self.procedure_template_pipette_tip_model = Some(
+                    procedure_template_asset_model,
+                );
                 builder.into()
-            } else if let Some(procedure_template_pipette_tip_model) =
-                self.procedure_template_pipette_tip_model
+            } else if let Some(procedure_template_pipette_tip_model) = self
+                .procedure_template_pipette_tip_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
@@ -1928,7 +1956,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedurePipetteTip(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedurePipetteTip(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1939,50 +1969,50 @@ impl<
         self.procedure_pipette_tip = procedure_pipette_tip;
         Ok(self)
     }
-    /// Sets the value of the `public.aliquoting_procedures.aliquoted_from`
-    /// column.
+    ///Sets the value of the `public.aliquoting_procedures.aliquoted_from` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "aliquoted_from"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_aliquoted_from"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_assets`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
-    fn aliquoted_from<AF>(
-        mut self,
-        aliquoted_from: AF,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
+    fn aliquoted_from<AF>(mut self, aliquoted_from: AF) -> Result<Self, Self::Error>
     where
-        AF: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+        AF: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
     {
-        let aliquoted_from =
-            <AF as web_common_traits::database::PrimaryKeyLike>::primary_key(&aliquoted_from);
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_from) =
-            self.procedure_aliquoted_from
+        let aliquoted_from = <AF as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &aliquoted_from,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_aliquoted_from,
+        ) = self.procedure_aliquoted_from
         {
             self.procedure_aliquoted_from = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_aliquoted_from,
@@ -1990,7 +2020,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureAliquotedFrom(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedFrom(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -1998,53 +2030,51 @@ impl<
         self.aliquoted_from = Some(aliquoted_from);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.aliquoting_procedures.procedure_template_aliquoted_from_model`
-    /// column.
+    ///Sets the value of the `public.aliquoting_procedures.procedure_template_aliquoted_from_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "procedure_aliquoted_from"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
-    /// class v1 column-of-interest
-    /// end
-    /// subgraph v5 ["`procedure_assets`"]
+    ///class v1 column-of-interest
+    ///end
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 -.->|"`foreign defines`"| v1
+    ///v1 --->|"`associated same as`"| v2
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn procedure_template_aliquoted_from_model<PTAFM>(
         mut self,
         procedure_template_aliquoted_from_model: PTAFM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTAFM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_aliquoted_from_model =
-            <PTAFM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &procedure_template_aliquoted_from_model,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_from) =
-            self.procedure_aliquoted_from
+        let procedure_template_aliquoted_from_model = <PTAFM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_aliquoted_from_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_aliquoted_from,
+        ) = self.procedure_aliquoted_from
         {
             self.procedure_aliquoted_from = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_aliquoted_from,
@@ -2052,58 +2082,60 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureAliquotedFrom(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedFrom(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
         }
-        self.procedure_template_aliquoted_from_model =
-            Some(procedure_template_aliquoted_from_model);
+        self.procedure_template_aliquoted_from_model = Some(
+            procedure_template_aliquoted_from_model,
+        );
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.aliquoting_procedures.procedure_aliquoted_from` column.
+    ///Sets the value of the `public.aliquoting_procedures.procedure_aliquoted_from` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v6 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v6 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "aliquoted_from"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_aliquoted_from"}
-    /// class v1 column-of-interest
+    ///class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_aliquoted_from_model"}
-    /// class v2 directly-involved-column
-    /// end
-    /// subgraph v7 ["`procedure_assets`"]
+    ///class v2 directly-involved-column
+    ///end
+    ///subgraph v7 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "asset"}
-    /// class v3 directly-involved-column
+    ///class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v4 directly-involved-column
+    ///class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v5
-    /// v1 --->|"`associated same as`"| v5
-    /// v1 --->|"`associated same as`"| v5
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v4
-    /// v6 ---o|"`associated with`"| v7
-    /// ```
+    ///class v5 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v5
+    ///v1 --->|"`associated same as`"| v5
+    ///v1 --->|"`associated same as`"| v5
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v4
+    ///v6 ---o|"`associated with`"| v7
+    ///```
     fn procedure_aliquoted_from<PAF>(
         mut self,
         procedure_aliquoted_from: PAF,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PAF: Into<
             web_common_traits::database::IdOrBuilder<
@@ -2113,17 +2145,19 @@ impl<
         >,
     {
         let mut procedure_aliquoted_from = procedure_aliquoted_from.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_from
-        {
-            procedure_aliquoted_from = if let (Some(aliquoted_from), Some(asset)) =
-                (self.aliquoted_from, builder.asset)
-            {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_from {
+            procedure_aliquoted_from = if let (Some(aliquoted_from), Some(asset)) = (
+                self.aliquoted_from,
+                builder.asset,
+            ) {
                 if aliquoted_from != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::AliquotedFrom,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::AliquotedFrom,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset) = builder.asset {
@@ -2136,7 +2170,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureAliquotedFrom(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedFrom(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -2144,8 +2180,7 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_from
-        {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_from {
             procedure_aliquoted_from = if let (
                 Some(procedure_template_aliquoted_from_model),
                 Some(procedure_template_asset_model),
@@ -2153,21 +2188,27 @@ impl<
                 self.procedure_template_aliquoted_from_model,
                 builder.procedure_template_asset_model,
             ) {
-                if procedure_template_aliquoted_from_model != procedure_template_asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateAliquotedFromModel,
+                if procedure_template_aliquoted_from_model
+                    != procedure_template_asset_model
+                {
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateAliquotedFromModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
+            } else if let Some(procedure_template_asset_model) = builder
+                .procedure_template_asset_model
             {
-                self.procedure_template_aliquoted_from_model = Some(procedure_template_asset_model);
+                self.procedure_template_aliquoted_from_model = Some(
+                    procedure_template_asset_model,
+                );
                 builder.into()
-            } else if let Some(procedure_template_aliquoted_from_model) =
-                self.procedure_template_aliquoted_from_model
+            } else if let Some(procedure_template_aliquoted_from_model) = self
+                .procedure_template_aliquoted_from_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
@@ -2175,7 +2216,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureAliquotedFrom(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedFrom(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -2186,50 +2229,50 @@ impl<
         self.procedure_aliquoted_from = procedure_aliquoted_from;
         Ok(self)
     }
-    /// Sets the value of the `public.aliquoting_procedures.aliquoted_into`
-    /// column.
+    ///Sets the value of the `public.aliquoting_procedures.aliquoted_into` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "aliquoted_into"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_aliquoted_into"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_assets`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
-    fn aliquoted_into<AI>(
-        mut self,
-        aliquoted_into: AI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
+    fn aliquoted_into<AI>(mut self, aliquoted_into: AI) -> Result<Self, Self::Error>
     where
-        AI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+        AI: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
     {
-        let aliquoted_into =
-            <AI as web_common_traits::database::PrimaryKeyLike>::primary_key(&aliquoted_into);
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_into) =
-            self.procedure_aliquoted_into
+        let aliquoted_into = <AI as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &aliquoted_into,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_aliquoted_into,
+        ) = self.procedure_aliquoted_into
         {
             self.procedure_aliquoted_into = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_aliquoted_into,
@@ -2237,7 +2280,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureAliquotedInto(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedInto(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -2245,53 +2290,51 @@ impl<
         self.aliquoted_into = Some(aliquoted_into);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.aliquoting_procedures.procedure_template_aliquoted_into_model`
-    /// column.
+    ///Sets the value of the `public.aliquoting_procedures.procedure_template_aliquoted_into_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "procedure_aliquoted_into"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
-    /// class v1 column-of-interest
-    /// end
-    /// subgraph v5 ["`procedure_assets`"]
+    ///class v1 column-of-interest
+    ///end
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 -.->|"`foreign defines`"| v1
+    ///v1 --->|"`associated same as`"| v2
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn procedure_template_aliquoted_into_model<PTAIM>(
         mut self,
         procedure_template_aliquoted_into_model: PTAIM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTAIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_aliquoted_into_model =
-            <PTAIM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &procedure_template_aliquoted_into_model,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_aliquoted_into) =
-            self.procedure_aliquoted_into
+        let procedure_template_aliquoted_into_model = <PTAIM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_aliquoted_into_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_aliquoted_into,
+        ) = self.procedure_aliquoted_into
         {
             self.procedure_aliquoted_into = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_aliquoted_into,
@@ -2299,58 +2342,60 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureAliquotedInto(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedInto(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
         }
-        self.procedure_template_aliquoted_into_model =
-            Some(procedure_template_aliquoted_into_model);
+        self.procedure_template_aliquoted_into_model = Some(
+            procedure_template_aliquoted_into_model,
+        );
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.aliquoting_procedures.procedure_aliquoted_into` column.
+    ///Sets the value of the `public.aliquoting_procedures.procedure_aliquoted_into` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v6 ["`aliquoting_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v6 ["`aliquoting_procedures`"]
     ///    v0@{shape: rounded, label: "aliquoted_into"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_aliquoted_into"}
-    /// class v1 column-of-interest
+    ///class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_aliquoted_into_model"}
-    /// class v2 directly-involved-column
-    /// end
-    /// subgraph v7 ["`procedure_assets`"]
+    ///class v2 directly-involved-column
+    ///end
+    ///subgraph v7 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "asset"}
-    /// class v3 directly-involved-column
+    ///class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v4 directly-involved-column
+    ///class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v5
-    /// v1 --->|"`associated same as`"| v5
-    /// v1 --->|"`associated same as`"| v5
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v4
-    /// v6 ---o|"`associated with`"| v7
-    /// ```
+    ///class v5 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v5
+    ///v1 --->|"`associated same as`"| v5
+    ///v1 --->|"`associated same as`"| v5
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v4
+    ///v6 ---o|"`associated with`"| v7
+    ///```
     fn procedure_aliquoted_into<PAI>(
         mut self,
         procedure_aliquoted_into: PAI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PAI: Into<
             web_common_traits::database::IdOrBuilder<
@@ -2360,17 +2405,19 @@ impl<
         >,
     {
         let mut procedure_aliquoted_into = procedure_aliquoted_into.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_into
-        {
-            procedure_aliquoted_into = if let (Some(aliquoted_into), Some(asset)) =
-                (self.aliquoted_into, builder.asset)
-            {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_into {
+            procedure_aliquoted_into = if let (Some(aliquoted_into), Some(asset)) = (
+                self.aliquoted_into,
+                builder.asset,
+            ) {
                 if aliquoted_into != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::AliquotedInto,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::AliquotedInto,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset) = builder.asset {
@@ -2383,7 +2430,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureAliquotedInto(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedInto(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -2391,8 +2440,7 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_into
-        {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_aliquoted_into {
             procedure_aliquoted_into = if let (
                 Some(procedure_template_aliquoted_into_model),
                 Some(procedure_template_asset_model),
@@ -2400,21 +2448,27 @@ impl<
                 self.procedure_template_aliquoted_into_model,
                 builder.procedure_template_asset_model,
             ) {
-                if procedure_template_aliquoted_into_model != procedure_template_asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateAliquotedIntoModel,
+                if procedure_template_aliquoted_into_model
+                    != procedure_template_asset_model
+                {
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateAliquotedIntoModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
+            } else if let Some(procedure_template_asset_model) = builder
+                .procedure_template_asset_model
             {
-                self.procedure_template_aliquoted_into_model = Some(procedure_template_asset_model);
+                self.procedure_template_aliquoted_into_model = Some(
+                    procedure_template_asset_model,
+                );
                 builder.into()
-            } else if let Some(procedure_template_aliquoted_into_model) =
-                self.procedure_template_aliquoted_into_model
+            } else if let Some(procedure_template_aliquoted_into_model) = self
+                .procedure_template_aliquoted_into_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
@@ -2422,7 +2476,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureAliquotedInto(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureAliquotedInto(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -2436,22 +2492,28 @@ impl<
 }
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureSettable
 for InsertableAliquotingProcedureBuilder<Procedure>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
-    fn procedure<P>(
-        mut self,
-        procedure: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure<P>(mut self, procedure: P) -> Result<Self, Self::Error>
     where
         P: web_common_traits::database::PrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -2463,7 +2525,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2493,10 +2555,7 @@ where
     ///v0 --->|"`ancestral same as`"| v1
     ///v2 --->|"`extends`"| v3
     ///```
-    fn procedure_template<PT>(
-        self,
-        procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure_template<PT>(self, procedure_template: PT) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -2507,10 +2566,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.
-    fn parent_procedure<PP>(
-        mut self,
-        parent_procedure: PP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_procedure<PP>(mut self, parent_procedure: PP) -> Result<Self, Self::Error>
     where
         PP: web_common_traits::database::MaybePrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -2522,7 +2578,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2533,7 +2589,7 @@ where
     fn parent_procedure_template<PPT>(
         mut self,
         parent_procedure_template: PPT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -2543,7 +2599,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2554,7 +2610,7 @@ where
     fn predecessor_procedure<PP>(
         mut self,
         predecessor_procedure: PP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PP: web_common_traits::database::MaybePrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -2566,7 +2622,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2577,7 +2633,7 @@ where
     fn predecessor_procedure_template<PPT>(
         mut self,
         predecessor_procedure_template: PPT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -2587,7 +2643,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2595,10 +2651,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -2608,7 +2661,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2616,10 +2669,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -2632,7 +2682,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2640,10 +2690,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -2653,7 +2700,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2661,10 +2708,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -2677,7 +2721,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2707,11 +2751,10 @@ where
 impl<Procedure, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableAliquotingProcedureBuilder<Procedure>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
-        Attribute = AliquotingProcedureAttribute,
+        Error = web_common_traits::database::InsertError<AliquotingProcedureAttribute>,
     >,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
@@ -2727,10 +2770,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<AliquotingProcedureAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

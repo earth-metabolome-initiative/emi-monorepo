@@ -4,7 +4,7 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::{Column, PgExtension, Table, TableExtensionNetwork, errors::WebCodeGenError};
+use crate::{Column, PgExtension, Table, errors::WebCodeGenError};
 
 mod generate_method_check_constraints;
 mod generate_same_as_assignments;
@@ -33,7 +33,6 @@ impl Table {
     pub(super) fn generate_setter_method(
         &self,
         column: &Column,
-        extension_network: &TableExtensionNetwork,
         check_constraints_extensions: &[&PgExtension],
         extension_table_traits: &mut HashMap<Table, HashSet<Table>>,
         conn: &mut PgConnection,
@@ -74,13 +73,8 @@ impl Table {
             None
         };
 
-        let (mut requires_attribute_mutability, same_as_assignments, same_as_columns) = self
-            .generate_same_as_assignments(
-                column,
-                extension_network,
-                extension_table_traits,
-                conn,
-            )?;
+        let (mut requires_attribute_mutability, same_as_assignments, same_as_columns) =
+            self.generate_same_as_assignments(column, extension_table_traits, conn)?;
 
         involved_columns.extend(same_as_columns);
         involved_columns.sort_unstable();

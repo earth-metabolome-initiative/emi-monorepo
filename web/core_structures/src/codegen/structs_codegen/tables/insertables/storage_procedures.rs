@@ -6,7 +6,7 @@ pub enum StorageProcedureExtensionAttribute {
 impl core::fmt::Display for StorageProcedureExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Procedure(e) => write!(f, "{e}"),
+            Self::Procedure(e) => write!(f, "storage_procedures({e})"),
         }
     }
 }
@@ -103,6 +103,7 @@ impl core::fmt::Display for StorageProcedureAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -543,6 +544,13 @@ pub struct InsertableStorageProcedureBuilder<
     >,
     pub(crate) procedure: Procedure,
 }
+impl<Procedure> diesel::associations::HasTable for InsertableStorageProcedureBuilder<Procedure> {
+    type Table =
+        crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::table
+    }
+}
 impl From<InsertableStorageProcedureBuilder>
     for web_common_traits::database::IdOrBuilder<
         ::rosetta_uuid::Uuid,
@@ -582,8 +590,8 @@ where
 /// Trait defining setters for attributes of an instance of `StorageProcedure`
 /// or descendant tables.
 pub trait StorageProcedureSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.storage_procedures.procedure_template`
     /// column.
     ///
@@ -603,10 +611,7 @@ pub trait StorageProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template<PT>(
-        self,
-        procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure_template<PT>(self, procedure_template: PT) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.storage_procedures.stored_asset` column.
@@ -628,10 +633,7 @@ pub trait StorageProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn stored_asset<SA>(
-        self,
-        stored_asset: SA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn stored_asset<SA>(self, stored_asset: SA) -> Result<Self, Self::Error>
     where
         SA: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.storage_procedures.stored_asset_model`
@@ -653,10 +655,7 @@ pub trait StorageProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn stored_asset_model<SAM>(
-        self,
-        stored_asset_model: SAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn stored_asset_model<SAM>(self, stored_asset_model: SAM) -> Result<Self, Self::Error>
     where
         SAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -683,7 +682,7 @@ pub trait StorageProcedureSettable: Sized {
     fn procedure_template_stored_asset_model<PTSAM>(
         self,
         procedure_template_stored_asset_model: PTSAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.storage_procedures.procedure_stored_asset`
@@ -709,7 +708,7 @@ pub trait StorageProcedureSettable: Sized {
     fn procedure_stored_asset<PSA>(
         self,
         procedure_stored_asset: PSA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PSA: Into<
             web_common_traits::database::IdOrBuilder<
@@ -736,10 +735,7 @@ pub trait StorageProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn stored_into<SI>(
-        self,
-        stored_into: SI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn stored_into<SI>(self, stored_into: SI) -> Result<Self, Self::Error>
     where
         SI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.storage_procedures.stored_into_model`
@@ -761,10 +757,7 @@ pub trait StorageProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn stored_into_model<SIM>(
-        self,
-        stored_into_model: SIM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn stored_into_model<SIM>(self, stored_into_model: SIM) -> Result<Self, Self::Error>
     where
         SIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -790,7 +783,7 @@ pub trait StorageProcedureSettable: Sized {
     fn procedure_template_stored_into_model<PTSIM>(
         self,
         procedure_template_stored_into_model: PTSIM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.storage_procedures.procedure_stored_into`
@@ -816,7 +809,7 @@ pub trait StorageProcedureSettable: Sized {
     fn procedure_stored_into<PSI>(
         self,
         procedure_stored_into: PSI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PSI: Into<
             web_common_traits::database::IdOrBuilder<
@@ -827,115 +820,123 @@ pub trait StorageProcedureSettable: Sized {
 }
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            >,
         >,
 > StorageProcedureSettable for InsertableStorageProcedureBuilder<Procedure>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::StorageProcedureAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::StorageProcedureAttribute;
-    /// Sets the value of the `public.storage_procedures.procedure_template`
-    /// column.
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.storage_procedures.procedure_template` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v5 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v4 undirectly-involved-column
-    /// end
-    /// subgraph v6 ["`procedures`"]
+    ///class v4 undirectly-involved-column
+    ///end
+    ///subgraph v6 ["`procedures`"]
     ///    v0@{shape: rounded, label: "procedure_template"}
-    /// class v0 directly-involved-column
-    /// end
-    /// subgraph v7 ["`storage_procedures`"]
+    ///class v0 directly-involved-column
+    ///end
+    ///subgraph v7 ["`storage_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_template"}
-    /// class v1 column-of-interest
+    ///class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_stored_asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "procedure_template_stored_into_model"}
-    /// class v3 directly-involved-column
-    /// end
-    /// v1 --->|"`ancestral same as`"| v0
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v1 -.->|"`foreign defines`"| v3
-    /// v2 --->|"`associated same as`"| v4
-    /// v3 --->|"`associated same as`"| v4
-    /// v7 --->|"`extends`"| v6
-    /// v7 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 directly-involved-column
+    ///end
+    ///v1 --->|"`ancestral same as`"| v0
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v1 -.->|"`foreign defines`"| v3
+    ///v2 --->|"`associated same as`"| v4
+    ///v3 --->|"`associated same as`"| v4
+    ///v7 --->|"`extends`"| v6
+    ///v7 ---o|"`associated with`"| v5
+    ///```
     fn procedure_template<PT>(
         mut self,
         procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template =
-            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
+        let procedure_template = <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template,
+        );
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    /// Sets the value of the `public.storage_procedures.stored_asset` column.
+    ///Sets the value of the `public.storage_procedures.stored_asset` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`storage_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`storage_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_stored_asset"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stored_asset"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
-    fn stored_asset<SA>(
-        mut self,
-        stored_asset: SA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
+    fn stored_asset<SA>(mut self, stored_asset: SA) -> Result<Self, Self::Error>
     where
-        SA: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+        SA: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
     {
-        let stored_asset =
-            <SA as web_common_traits::database::PrimaryKeyLike>::primary_key(&stored_asset);
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_stored_asset) =
-            self.procedure_stored_asset
+        let stored_asset = <SA as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &stored_asset,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_stored_asset,
+        ) = self.procedure_stored_asset
         {
             self.procedure_stored_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_stored_asset,
@@ -943,7 +944,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureStoredAsset(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureStoredAsset(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -951,51 +954,52 @@ impl<
         self.stored_asset = Some(stored_asset);
         Ok(self)
     }
-    /// Sets the value of the `public.storage_procedures.stored_asset_model`
-    /// column.
+    ///Sets the value of the `public.storage_procedures.stored_asset_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`storage_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`storage_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_stored_asset"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stored_asset_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn stored_asset_model<SAM>(
         mut self,
         stored_asset_model: SAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         SAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let stored_asset_model =
-            <SAM as web_common_traits::database::PrimaryKeyLike>::primary_key(&stored_asset_model);
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_stored_asset) =
-            self.procedure_stored_asset
+        let stored_asset_model = <SAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &stored_asset_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_stored_asset,
+        ) = self.procedure_stored_asset
         {
             self.procedure_stored_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                     procedure_stored_asset,
@@ -1003,7 +1007,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureStoredAsset(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureStoredAsset(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -1011,54 +1017,52 @@ impl<
         self.stored_asset_model = Some(stored_asset_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.storage_procedures.procedure_template_stored_asset_model`
-    /// column.
+    ///Sets the value of the `public.storage_procedures.procedure_template_stored_asset_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`storage_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`storage_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_stored_asset"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_stored_asset_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn procedure_template_stored_asset_model<PTSAM>(
         mut self,
         procedure_template_stored_asset_model: PTSAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_stored_asset_model =
-            <PTSAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &procedure_template_stored_asset_model,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_stored_asset) =
-            self.procedure_stored_asset
+        let procedure_template_stored_asset_model = <PTSAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_stored_asset_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_stored_asset,
+        ) = self.procedure_stored_asset
         {
             self.procedure_stored_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_stored_asset,
@@ -1066,65 +1070,68 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureStoredAsset(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureStoredAsset(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
         }
-        self.procedure_template_stored_asset_model = Some(procedure_template_stored_asset_model);
+        self.procedure_template_stored_asset_model = Some(
+            procedure_template_stored_asset_model,
+        );
         Ok(self)
     }
-    /// Sets the value of the `public.storage_procedures.procedure_stored_asset`
-    /// column.
+    ///Sets the value of the `public.storage_procedures.procedure_stored_asset` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v8 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v8 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "asset_model"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
-    /// end
-    /// subgraph v9 ["`storage_procedures`"]
+    ///class v7 undirectly-involved-column
+    ///end
+    ///subgraph v9 ["`storage_procedures`"]
     ///    v3@{shape: rounded, label: "procedure_stored_asset"}
-    /// class v3 column-of-interest
+    ///class v3 column-of-interest
     ///    v4@{shape: rounded, label: "procedure_template_stored_asset_model"}
-    /// class v4 directly-involved-column
+    ///class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "stored_asset"}
-    /// class v5 directly-involved-column
+    ///class v5 directly-involved-column
     ///    v6@{shape: rounded, label: "stored_asset_model"}
-    /// class v6 directly-involved-column
-    /// end
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v3 --->|"`associated same as`"| v7
-    /// v3 --->|"`associated same as`"| v7
-    /// v3 --->|"`associated same as`"| v7
-    /// v3 --->|"`associated same as`"| v7
-    /// v3 -.->|"`foreign defines`"| v4
-    /// v3 -.->|"`foreign defines`"| v5
-    /// v3 -.->|"`foreign defines`"| v6
-    /// v4 --->|"`associated same as`"| v2
-    /// v5 --->|"`associated same as`"| v0
-    /// v6 --->|"`associated same as`"| v1
-    /// v9 ---o|"`associated with`"| v8
-    /// ```
+    ///class v6 directly-involved-column
+    ///end
+    ///v0 -.->|"`foreign defines`"| v1
+    ///v3 --->|"`associated same as`"| v7
+    ///v3 --->|"`associated same as`"| v7
+    ///v3 --->|"`associated same as`"| v7
+    ///v3 --->|"`associated same as`"| v7
+    ///v3 -.->|"`foreign defines`"| v4
+    ///v3 -.->|"`foreign defines`"| v5
+    ///v3 -.->|"`foreign defines`"| v6
+    ///v4 --->|"`associated same as`"| v2
+    ///v5 --->|"`associated same as`"| v0
+    ///v6 --->|"`associated same as`"| v1
+    ///v9 ---o|"`associated with`"| v8
+    ///```
     fn procedure_stored_asset<PSA>(
         mut self,
         procedure_stored_asset: PSA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PSA: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1138,24 +1145,31 @@ impl<
             procedure_stored_asset = if let (
                 Some(procedure_template_stored_asset_model),
                 Some(procedure_template_asset_model),
-            ) =
-                (self.procedure_template_stored_asset_model, builder.procedure_template_asset_model)
-            {
-                if procedure_template_stored_asset_model != procedure_template_asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateStoredAssetModel,
+            ) = (
+                self.procedure_template_stored_asset_model,
+                builder.procedure_template_asset_model,
+            ) {
+                if procedure_template_stored_asset_model
+                    != procedure_template_asset_model
+                {
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateStoredAssetModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
+            } else if let Some(procedure_template_asset_model) = builder
+                .procedure_template_asset_model
             {
-                self.procedure_template_stored_asset_model = Some(procedure_template_asset_model);
+                self.procedure_template_stored_asset_model = Some(
+                    procedure_template_asset_model,
+                );
                 builder.into()
-            } else if let Some(procedure_template_stored_asset_model) =
-                self.procedure_template_stored_asset_model
+            } else if let Some(procedure_template_stored_asset_model) = self
+                .procedure_template_stored_asset_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
@@ -1163,7 +1177,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureStoredAsset(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureStoredAsset(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1172,15 +1188,18 @@ impl<
             };
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_asset {
-            procedure_stored_asset = if let (Some(stored_asset), Some(asset)) =
-                (self.stored_asset, builder.asset)
-            {
+            procedure_stored_asset = if let (Some(stored_asset), Some(asset)) = (
+                self.stored_asset,
+                builder.asset,
+            ) {
                 if stored_asset != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::StoredAsset,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::StoredAsset,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset) = builder.asset {
@@ -1193,7 +1212,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureStoredAsset(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureStoredAsset(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1202,15 +1223,18 @@ impl<
             };
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_asset {
-            procedure_stored_asset = if let (Some(stored_asset_model), Some(asset_model)) =
-                (self.stored_asset_model, builder.asset_model)
-            {
+            procedure_stored_asset = if let (
+                Some(stored_asset_model),
+                Some(asset_model),
+            ) = (self.stored_asset_model, builder.asset_model) {
                 if stored_asset_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::StoredAssetModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::StoredAssetModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -1223,7 +1247,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureStoredAsset(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureStoredAsset(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1234,50 +1260,51 @@ impl<
         self.procedure_stored_asset = procedure_stored_asset;
         Ok(self)
     }
-    /// Sets the value of the `public.storage_procedures.stored_into` column.
+    ///Sets the value of the `public.storage_procedures.stored_into` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`storage_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`storage_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_stored_into"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stored_into"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
-    fn stored_into<SI>(
-        mut self,
-        stored_into: SI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
+    fn stored_into<SI>(mut self, stored_into: SI) -> Result<Self, Self::Error>
     where
-        SI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+        SI: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
     {
-        let stored_into =
-            <SI as web_common_traits::database::PrimaryKeyLike>::primary_key(&stored_into);
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_stored_into) =
-            self.procedure_stored_into
+        let stored_into = <SI as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &stored_into,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_stored_into,
+        ) = self.procedure_stored_into
         {
             self.procedure_stored_into = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_stored_into,
@@ -1285,7 +1312,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureStoredInto(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureStoredInto(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -1293,51 +1322,52 @@ impl<
         self.stored_into = Some(stored_into);
         Ok(self)
     }
-    /// Sets the value of the `public.storage_procedures.stored_into_model`
-    /// column.
+    ///Sets the value of the `public.storage_procedures.stored_into_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`storage_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`storage_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_stored_into"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "stored_into_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn stored_into_model<SIM>(
         mut self,
         stored_into_model: SIM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         SIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let stored_into_model =
-            <SIM as web_common_traits::database::PrimaryKeyLike>::primary_key(&stored_into_model);
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_stored_into) =
-            self.procedure_stored_into
+        let stored_into_model = <SIM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &stored_into_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_stored_into,
+        ) = self.procedure_stored_into
         {
             self.procedure_stored_into = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                     procedure_stored_into,
@@ -1345,7 +1375,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureStoredInto(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureStoredInto(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -1353,53 +1385,52 @@ impl<
         self.stored_into_model = Some(stored_into_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.storage_procedures.procedure_template_stored_into_model` column.
+    ///Sets the value of the `public.storage_procedures.procedure_template_stored_into_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`storage_procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`storage_procedures`"]
     ///    v1@{shape: rounded, label: "procedure_stored_into"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_stored_into_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn procedure_template_stored_into_model<PTSIM>(
         mut self,
         procedure_template_stored_into_model: PTSIM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTSIM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_stored_into_model =
-            <PTSIM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &procedure_template_stored_into_model,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_stored_into) =
-            self.procedure_stored_into
+        let procedure_template_stored_into_model = <PTSIM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_stored_into_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_stored_into,
+        ) = self.procedure_stored_into
         {
             self.procedure_stored_into = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_stored_into,
@@ -1407,65 +1438,68 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureStoredInto(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureStoredInto(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
         }
-        self.procedure_template_stored_into_model = Some(procedure_template_stored_into_model);
+        self.procedure_template_stored_into_model = Some(
+            procedure_template_stored_into_model,
+        );
         Ok(self)
     }
-    /// Sets the value of the `public.storage_procedures.procedure_stored_into`
-    /// column.
+    ///Sets the value of the `public.storage_procedures.procedure_stored_into` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v8 ["`procedure_assets`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v8 ["`procedure_assets`"]
     ///    v0@{shape: rounded, label: "asset"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "asset_model"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v7@{shape: rounded, label: "id"}
-    /// class v7 undirectly-involved-column
-    /// end
-    /// subgraph v9 ["`storage_procedures`"]
+    ///class v7 undirectly-involved-column
+    ///end
+    ///subgraph v9 ["`storage_procedures`"]
     ///    v3@{shape: rounded, label: "procedure_stored_into"}
-    /// class v3 column-of-interest
+    ///class v3 column-of-interest
     ///    v4@{shape: rounded, label: "procedure_template_stored_into_model"}
-    /// class v4 directly-involved-column
+    ///class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "stored_into"}
-    /// class v5 directly-involved-column
+    ///class v5 directly-involved-column
     ///    v6@{shape: rounded, label: "stored_into_model"}
-    /// class v6 directly-involved-column
-    /// end
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v3 --->|"`associated same as`"| v7
-    /// v3 --->|"`associated same as`"| v7
-    /// v3 --->|"`associated same as`"| v7
-    /// v3 --->|"`associated same as`"| v7
-    /// v3 -.->|"`foreign defines`"| v4
-    /// v3 -.->|"`foreign defines`"| v5
-    /// v3 -.->|"`foreign defines`"| v6
-    /// v4 --->|"`associated same as`"| v2
-    /// v5 --->|"`associated same as`"| v0
-    /// v6 --->|"`associated same as`"| v1
-    /// v9 ---o|"`associated with`"| v8
-    /// ```
+    ///class v6 directly-involved-column
+    ///end
+    ///v0 -.->|"`foreign defines`"| v1
+    ///v3 --->|"`associated same as`"| v7
+    ///v3 --->|"`associated same as`"| v7
+    ///v3 --->|"`associated same as`"| v7
+    ///v3 --->|"`associated same as`"| v7
+    ///v3 -.->|"`foreign defines`"| v4
+    ///v3 -.->|"`foreign defines`"| v5
+    ///v3 -.->|"`foreign defines`"| v6
+    ///v4 --->|"`associated same as`"| v2
+    ///v5 --->|"`associated same as`"| v0
+    ///v6 --->|"`associated same as`"| v1
+    ///v9 ---o|"`associated with`"| v8
+    ///```
     fn procedure_stored_into<PSI>(
         mut self,
         procedure_stored_into: PSI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PSI: Into<
             web_common_traits::database::IdOrBuilder<
@@ -1479,24 +1513,30 @@ impl<
             procedure_stored_into = if let (
                 Some(procedure_template_stored_into_model),
                 Some(procedure_template_asset_model),
-            ) =
-                (self.procedure_template_stored_into_model, builder.procedure_template_asset_model)
-            {
-                if procedure_template_stored_into_model != procedure_template_asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateStoredIntoModel,
+            ) = (
+                self.procedure_template_stored_into_model,
+                builder.procedure_template_asset_model,
+            ) {
+                if procedure_template_stored_into_model != procedure_template_asset_model
+                {
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateStoredIntoModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
+            } else if let Some(procedure_template_asset_model) = builder
+                .procedure_template_asset_model
             {
-                self.procedure_template_stored_into_model = Some(procedure_template_asset_model);
+                self.procedure_template_stored_into_model = Some(
+                    procedure_template_asset_model,
+                );
                 builder.into()
-            } else if let Some(procedure_template_stored_into_model) =
-                self.procedure_template_stored_into_model
+            } else if let Some(procedure_template_stored_into_model) = self
+                .procedure_template_stored_into_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
@@ -1504,7 +1544,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureStoredInto(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureStoredInto(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1513,15 +1555,18 @@ impl<
             };
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_into {
-            procedure_stored_into = if let (Some(stored_into), Some(asset)) =
-                (self.stored_into, builder.asset)
-            {
+            procedure_stored_into = if let (Some(stored_into), Some(asset)) = (
+                self.stored_into,
+                builder.asset,
+            ) {
                 if stored_into != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::StoredInto,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::StoredInto,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset) = builder.asset {
@@ -1534,7 +1579,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureStoredInto(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureStoredInto(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1543,15 +1590,18 @@ impl<
             };
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_into {
-            procedure_stored_into = if let (Some(stored_into_model), Some(asset_model)) =
-                (self.stored_into_model, builder.asset_model)
-            {
+            procedure_stored_into = if let (
+                Some(stored_into_model),
+                Some(asset_model),
+            ) = (self.stored_into_model, builder.asset_model) {
                 if stored_into_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::StoredIntoModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::StoredIntoModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -1564,7 +1614,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureStoredInto(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureStoredInto(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -1578,22 +1630,28 @@ impl<
 }
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureSettable
 for InsertableStorageProcedureBuilder<Procedure>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::StorageProcedureAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::StorageProcedureAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::StorageProcedureAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::StorageProcedureAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
-    fn procedure<P>(
-        mut self,
-        procedure: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure<P>(mut self, procedure: P) -> Result<Self, Self::Error>
     where
         P: web_common_traits::database::PrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -1605,7 +1663,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1635,10 +1693,7 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn procedure_template<PT>(
-        self,
-        procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure_template<PT>(self, procedure_template: PT) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -1646,10 +1701,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.
-    fn parent_procedure<PP>(
-        mut self,
-        parent_procedure: PP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_procedure<PP>(mut self, parent_procedure: PP) -> Result<Self, Self::Error>
     where
         PP: web_common_traits::database::MaybePrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -1661,7 +1713,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1672,7 +1724,7 @@ where
     fn parent_procedure_template<PPT>(
         mut self,
         parent_procedure_template: PPT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -1682,7 +1734,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1693,7 +1745,7 @@ where
     fn predecessor_procedure<PP>(
         mut self,
         predecessor_procedure: PP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PP: web_common_traits::database::MaybePrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -1705,7 +1757,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1716,7 +1768,7 @@ where
     fn predecessor_procedure_template<PPT>(
         mut self,
         predecessor_procedure_template: PPT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -1726,7 +1778,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1734,10 +1786,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -1747,7 +1796,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1755,10 +1804,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -1771,7 +1817,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1779,10 +1825,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -1792,7 +1835,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1800,10 +1843,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -1816,7 +1856,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1846,11 +1886,10 @@ where
 impl<Procedure, C> web_common_traits::database::TryInsertGeneric<C>
     for InsertableStorageProcedureBuilder<Procedure>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure,
-            Attribute = StorageProcedureAttribute,
+            Error = web_common_traits::database::InsertError<StorageProcedureAttribute>,
         >,
     Procedure: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder:
@@ -1860,9 +1899,10 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<StorageProcedureAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

@@ -1,5 +1,7 @@
 mod builder;
+mod insert_error;
 pub use builder::ProcedureBuilderDAG;
+pub use insert_error::ProcedureInsertErrorDAG;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Enum representing the most concrete variant of the `procedures` table DAG.
@@ -112,6 +114,16 @@ impl From<crate::codegen::structs_codegen::tables::aliquoting_procedures::Aliquo
         ProcedureDAG::AliquotingProcedure(value)
     }
 }
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::AliquotingProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure>
     for ProcedureDAG
 {
@@ -119,6 +131,16 @@ impl From<crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMil
         value: crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure,
     ) -> Self {
         ProcedureDAG::BallMillProcedure(value)
+    }
+}
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::BallMillProcedure(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure>
@@ -130,6 +152,16 @@ impl From<crate::codegen::structs_codegen::tables::capping_procedures::CappingPr
         ProcedureDAG::CappingProcedure(value)
     }
 }
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::CappingProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure>
     for ProcedureDAG
 {
@@ -137,6 +169,16 @@ impl From<crate::codegen::structs_codegen::tables::centrifuge_procedures::Centri
         value: crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure,
     ) -> Self {
         ProcedureDAG::CentrifugeProcedure(value)
+    }
+}
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::CentrifugeProcedure(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure>
@@ -148,6 +190,16 @@ impl From<crate::codegen::structs_codegen::tables::disposal_procedures::Disposal
         ProcedureDAG::DisposalProcedure(value)
     }
 }
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::DisposalProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure>
     for ProcedureDAG
 {
@@ -155,6 +207,18 @@ impl From<crate::codegen::structs_codegen::tables::fractioning_procedures::Fract
         value: crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
     ) -> Self {
         ProcedureDAG::FractioningProcedure(value)
+    }
+}
+impl From<ProcedureDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
+    >
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::FractioningProcedure(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure>
@@ -166,6 +230,18 @@ impl From<crate::codegen::structs_codegen::tables::freeze_drying_procedures::Fre
         ProcedureDAG::FreezeDryingProcedure(value)
     }
 }
+impl From<ProcedureDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure,
+    >
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::FreezeDryingProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure>
     for ProcedureDAG
 {
@@ -173,6 +249,16 @@ impl From<crate::codegen::structs_codegen::tables::freezing_procedures::Freezing
         value: crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure,
     ) -> Self {
         ProcedureDAG::FreezingProcedure(value)
+    }
+}
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::FreezingProcedure(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure>
@@ -184,6 +270,18 @@ impl From<crate::codegen::structs_codegen::tables::geolocation_procedures::Geolo
         ProcedureDAG::GeolocationProcedure(value)
     }
 }
+impl From<ProcedureDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
+    >
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::GeolocationProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure>
     for ProcedureDAG
 {
@@ -191,6 +289,16 @@ impl From<crate::codegen::structs_codegen::tables::harvesting_procedures::Harves
         value: crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure,
     ) -> Self {
         ProcedureDAG::HarvestingProcedure(value)
+    }
+}
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::HarvestingProcedure(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure>
@@ -202,6 +310,16 @@ impl From<crate::codegen::structs_codegen::tables::packaging_procedures::Packagi
         ProcedureDAG::PackagingProcedure(value)
     }
 }
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::PackagingProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure>
     for ProcedureDAG
 {
@@ -209,6 +327,16 @@ impl From<crate::codegen::structs_codegen::tables::photograph_procedures::Photog
         value: crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure,
     ) -> Self {
         ProcedureDAG::PhotographProcedure(value)
+    }
+}
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::PhotographProcedure(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure>
@@ -220,9 +348,27 @@ impl From<crate::codegen::structs_codegen::tables::pouring_procedures::PouringPr
         ProcedureDAG::PouringProcedure(value)
     }
 }
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::PouringProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::procedures::Procedure> for ProcedureDAG {
     fn from(value: crate::codegen::structs_codegen::tables::procedures::Procedure) -> Self {
         ProcedureDAG::Procedure(value)
+    }
+}
+impl From<ProcedureDAG> for Option<crate::codegen::structs_codegen::tables::procedures::Procedure> {
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::Procedure(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure>
@@ -234,6 +380,16 @@ impl From<crate::codegen::structs_codegen::tables::storage_procedures::StoragePr
         ProcedureDAG::StorageProcedure(value)
     }
 }
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::StorageProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure>
     for ProcedureDAG
 {
@@ -241,6 +397,18 @@ impl From<crate::codegen::structs_codegen::tables::supernatant_procedures::Super
         value: crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
     ) -> Self {
         ProcedureDAG::SupernatantProcedure(value)
+    }
+}
+impl From<ProcedureDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
+    >
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::SupernatantProcedure(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure>
@@ -252,10 +420,44 @@ impl From<crate::codegen::structs_codegen::tables::weighing_procedures::Weighing
         ProcedureDAG::WeighingProcedure(value)
     }
 }
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::WeighingProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl web_common_traits::database::MostConcreteVariantMetadata
     for crate::codegen::structs_codegen::tables::procedures::Procedure
 {
     type Variant = ProcedureDAG;
+}
+impl web_common_traits::database::PrimaryKeyLike for ProcedureDAG {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        match self {
+            Self::AliquotingProcedure(variant) => variant.primary_key(),
+            Self::BallMillProcedure(variant) => variant.primary_key(),
+            Self::CappingProcedure(variant) => variant.primary_key(),
+            Self::CentrifugeProcedure(variant) => variant.primary_key(),
+            Self::DisposalProcedure(variant) => variant.primary_key(),
+            Self::FractioningProcedure(variant) => variant.primary_key(),
+            Self::FreezeDryingProcedure(variant) => variant.primary_key(),
+            Self::FreezingProcedure(variant) => variant.primary_key(),
+            Self::GeolocationProcedure(variant) => variant.primary_key(),
+            Self::HarvestingProcedure(variant) => variant.primary_key(),
+            Self::PackagingProcedure(variant) => variant.primary_key(),
+            Self::PhotographProcedure(variant) => variant.primary_key(),
+            Self::PouringProcedure(variant) => variant.primary_key(),
+            Self::Procedure(variant) => variant.primary_key(),
+            Self::StorageProcedure(variant) => variant.primary_key(),
+            Self::SupernatantProcedure(variant) => variant.primary_key(),
+            Self::WeighingProcedure(variant) => variant.primary_key(),
+        }
+    }
 }
 impl<C> web_common_traits::database::MostConcreteVariant<C>
     for crate::codegen::structs_codegen::tables::procedures::Procedure
@@ -285,6 +487,8 @@ where
     crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure:
         web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::procedures::Procedure:
         web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure:
         web_common_traits::database::Read<C>,

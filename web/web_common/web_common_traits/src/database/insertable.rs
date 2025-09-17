@@ -2,10 +2,7 @@
 //! rows.
 use std::{convert::Infallible, str::FromStr};
 
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::BuilderError,
-};
+use common_traits::{builder::IsCompleteBuilder, prelude::BuilderError};
 use generic_backend_request_errors::GenericBackendRequestError;
 
 #[derive(
@@ -136,25 +133,28 @@ impl<T> MostConcreteTable for Option<T> {
 }
 
 /// A trait for types that provide metadata for insertable variants.
-pub trait InsertableVariantMetadata: Attributed {
+pub trait DispatchableInsertVariantMetadata {
     /// The associated row type which can be inserted into the database.
-    type Row: Insertable<InsertableVariant = <Self as InsertableVariantMetadata>::InsertableVariant>
-        + diesel::associations::HasTable;
+    type Row;
+    /// The error which may occur during the insert operation.
+    type Error;
+}
+
+/// A trait for types that provide metadata for insertable variants.
+pub trait InsertableVariantMetadata: DispatchableInsertVariantMetadata {
     /// The associated insertable variant type which can be constructed in the
     /// frontend or backend to execute the insert operation.
-    type InsertableVariant: diesel::Insertable<<Self::Row as diesel::associations::HasTable>::Table>;
-    /// The expected user ID type.
-    type UserId;
+    type InsertableVariant;
 }
 
 /// A trait for types that can be constructed in the frontend or backend to
 /// execute the insert operation.
-pub trait InsertableVariant<C>: InsertableVariantMetadata {
+pub trait DispatchableInsertableVariant<C>: DispatchableInsertVariantMetadata {
     /// Inserts the row into the database.
     ///
     /// # Arguments
     ///
-    /// * `user_id` - The user ID.
+    /// * `user_id` - The user performing the insert operation.
     /// * `conn` - The connection to the database.
     ///
     /// # Returns
@@ -165,29 +165,50 @@ pub trait InsertableVariant<C>: InsertableVariantMetadata {
     ///
     /// * If the row cannot be inserted.
     /// * If the user is not authorized to insert the row.
-    fn insert(
-        self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<Self::Row, InsertError<Self::Attribute>>;
+    fn insert(self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error>;
+}
 
+/// A trait for types that can be constructed in the frontend or backend to
+/// execute the insert operation.
+pub trait InsertableVariant<C>: InsertableVariantMetadata {
     /// Attempts to convert the builder into an insertable object, executing
     /// the necessary database operations if required.
     ///
     /// # Arguments
     ///
-    /// * `user_id` - The ID of the user performing the insert operation.
+    /// * `user_id` - The user performing the insert operation.
     /// * `conn` - A mutable reference to the database connection.
     ///
     /// # Errors
     ///
     /// * `InsertError` - If the insert operation fails, it returns an error
     ///   containing the attributes of the insertable object.
-    fn try_insert(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::InsertableVariant, InsertError<Self::Attribute>>;
+    fn try_insert(self, user_id: i32, conn: &mut C)
+    -> Result<Self::InsertableVariant, Self::Error>;
+}
+
+#[cfg(feature = "backend")]
+/// A trait for types that can be constructed in the backend to
+/// execute the insert operation.
+pub trait BackendInsertableVariant:
+    Sized + DispatchableInsertableVariant<diesel::PgConnection>
+{
+    /// Inserts the row into the database.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The connection to the database.
+    ///
+    /// # Returns
+    ///
+    /// The inserted row, if the operation was successful.
+    ///
+    /// # Errors
+    ///
+    /// * If the row cannot be inserted.
+    fn backend_insert(self, conn: &mut diesel::PgConnection) -> Result<Self::Row, Self::Error> {
+        self.insert(-1, conn)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]

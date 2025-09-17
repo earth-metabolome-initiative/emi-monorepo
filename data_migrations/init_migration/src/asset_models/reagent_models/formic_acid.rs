@@ -4,7 +4,7 @@ use core_structures::{
     tables::insertables::{AssetModelSettable, ReagentModelSettable},
 };
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 /// Returns the formic acid reagent.
 ///
 /// # Implementation Details

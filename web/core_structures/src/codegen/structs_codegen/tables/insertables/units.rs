@@ -39,6 +39,7 @@ impl core::fmt::Display for UnitAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -95,6 +96,12 @@ pub struct InsertableUnitBuilder {
     pub(crate) icon: Option<String>,
     pub(crate) color_id: Option<i16>,
 }
+impl diesel::associations::HasTable for InsertableUnitBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::units::units::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::units::units::table
+    }
+}
 impl From<InsertableUnitBuilder>
     for web_common_traits::database::IdOrBuilder<i16, InsertableUnitBuilder>
 {
@@ -112,8 +119,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `Unit` or descendant
 /// tables.
 pub trait UnitSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.units.name` column.
     ///
     /// # Arguments
@@ -132,10 +139,7 @@ pub trait UnitSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
@@ -157,10 +161,7 @@ pub trait UnitSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn unit<U>(
-        self,
-        unit: U,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn unit<U>(self, unit: U) -> Result<Self, Self::Error>
     where
         U: TryInto<String>,
         validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>;
@@ -182,10 +183,7 @@ pub trait UnitSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn icon<I>(
-        self,
-        icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn icon<I>(self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
@@ -206,20 +204,21 @@ pub trait UnitSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn color<CI>(
-        self,
-        color_id: CI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn color<CI>(self, color_id: CI) -> Result<Self, Self::Error>
     where
         CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
 }
-impl UnitSettable for InsertableUnitBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::UnitAttribute;
+impl UnitSettable for InsertableUnitBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::UnitAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.units.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -231,10 +230,7 @@ impl UnitSettable for InsertableUnitBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.units.unit` column.
-    fn unit<U>(
-        mut self,
-        unit: U,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn unit<U>(mut self, unit: U) -> Result<Self, Self::Error>
     where
         U: TryInto<String>,
         validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>,
@@ -246,10 +242,7 @@ impl UnitSettable for InsertableUnitBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.units.icon` column.
-    fn icon<I>(
-        mut self,
-        icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn icon<I>(mut self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
@@ -261,10 +254,7 @@ impl UnitSettable for InsertableUnitBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.units.color_id` column.
-    fn color<CI>(
-        mut self,
-        color_id: CI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn color<CI>(mut self, color_id: CI) -> Result<Self, Self::Error>
     where
         CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
     {
@@ -281,20 +271,19 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableUnitBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableUnitBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::units::Unit,
-            Attribute = UnitAttribute,
+            Error = web_common_traits::database::InsertError<UnitAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<UnitAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::units::Unit =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

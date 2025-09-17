@@ -24,9 +24,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                     .or(asset_model.ne(excluded(asset_model)))
                     .or(asset.ne(excluded(asset)))
                     .or(procedure_template_asset_model.ne(excluded(procedure_template_asset_model)))
-                    .or(ancestor_model.ne(excluded(ancestor_model)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at))),
+                    .or(ancestor_model.ne(excluded(ancestor_model))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())
@@ -58,9 +56,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                     .or(asset_model.ne(excluded(asset_model)))
                     .or(asset.ne(excluded(asset)))
                     .or(procedure_template_asset_model.ne(excluded(procedure_template_asset_model)))
-                    .or(ancestor_model.ne(excluded(ancestor_model)))
-                    .or(created_by.ne(excluded(created_by)))
-                    .or(created_at.ne(excluded(created_at))),
+                    .or(ancestor_model.ne(excluded(ancestor_model))),
             )
             .get_results(conn)
             .map(|mut result| result.pop())

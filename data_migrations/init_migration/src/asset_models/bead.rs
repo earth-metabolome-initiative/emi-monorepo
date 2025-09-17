@@ -5,7 +5,7 @@ use core_structures::{
     tables::insertables::{AssetModelSettable, BeadModelAttribute, BeadModelSettable},
 };
 use diesel::PgConnection;
-use web_common_traits::database::{InsertError, Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, InsertError, Insertable};
 
 /// Returns the bead model for 3mm metal beads, creating it if it does not
 /// exist.

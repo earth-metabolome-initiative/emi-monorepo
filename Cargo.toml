@@ -34,7 +34,7 @@ members = [
   "web/core_structures",
   "web/core_structures/core_structures_builder",
   "web/core_structures/core_structures_vis",
-  "web/core_structures/guided_procedure_builder",
+  "web/core_structures/guided_procedures",
   "web/frontend",
   "web/web_common/backend_request_errors",
   "web/web_common/cas_codes",
@@ -190,7 +190,7 @@ procedure_codegen = { path = "web/web_common/procedure_codegen" }
 mermaid = { path = "utils/mermaid" }
 colorsys = "0.7.0"
 prettyplease = "0.2"
-guided_procedure_builder = { path = "web/core_structures/guided_procedure_builder" }
+guided_procedures = { path = "web/core_structures/guided_procedures" }
 directus_codegen = { path = "data_migrations/directus_migration/directus_codegen" }
 
 [workspace.lints.rust]

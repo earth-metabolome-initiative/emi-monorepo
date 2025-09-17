@@ -5,7 +5,7 @@ use core_structures::{User, tables::insertables::InsertableProcedureTemplateAsse
 use diesel::PgConnection;
 
 use crate::{
-    asset_models::photographs::photograph,
+    asset_models::photographs::photograph_model,
     procedure_template_asset_models::default_pmt::default_pmt,
 };
 
@@ -23,5 +23,5 @@ pub(crate) fn photograph_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, photograph(user, conn)?, conn)
+    default_pmt(user, photograph_model(user, conn)?, conn)
 }

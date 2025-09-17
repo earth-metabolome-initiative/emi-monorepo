@@ -39,6 +39,7 @@ impl core::fmt::Display for RoleAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -95,6 +96,12 @@ pub struct InsertableRoleBuilder {
     pub(crate) icon: Option<String>,
     pub(crate) color_id: Option<i16>,
 }
+impl diesel::associations::HasTable for InsertableRoleBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::roles::roles::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::roles::roles::table
+    }
+}
 impl From<InsertableRoleBuilder>
     for web_common_traits::database::IdOrBuilder<i16, InsertableRoleBuilder>
 {
@@ -115,8 +122,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `Role` or descendant
 /// tables.
 pub trait RoleSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.roles.name` column.
     ///
     /// # Arguments
@@ -135,10 +142,7 @@ pub trait RoleSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
@@ -161,10 +165,7 @@ pub trait RoleSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn description<D>(
-        self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
@@ -186,10 +187,7 @@ pub trait RoleSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn icon<I>(
-        self,
-        icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn icon<I>(self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
@@ -210,20 +208,21 @@ pub trait RoleSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn color<CI>(
-        self,
-        color_id: CI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn color<CI>(self, color_id: CI) -> Result<Self, Self::Error>
     where
         CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
 }
-impl RoleSettable for InsertableRoleBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::RoleAttribute;
+impl RoleSettable for InsertableRoleBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::RoleAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.roles.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -235,10 +234,7 @@ impl RoleSettable for InsertableRoleBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.roles.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -250,10 +246,7 @@ impl RoleSettable for InsertableRoleBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.roles.icon` column.
-    fn icon<I>(
-        mut self,
-        icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn icon<I>(mut self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
@@ -265,10 +258,7 @@ impl RoleSettable for InsertableRoleBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.roles.color_id` column.
-    fn color<CI>(
-        mut self,
-        color_id: CI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn color<CI>(mut self, color_id: CI) -> Result<Self, Self::Error>
     where
         CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
     {
@@ -285,20 +275,19 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableRoleBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableRoleBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::roles::Role,
-            Attribute = RoleAttribute,
+            Error = web_common_traits::database::InsertError<RoleAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<RoleAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::roles::Role =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

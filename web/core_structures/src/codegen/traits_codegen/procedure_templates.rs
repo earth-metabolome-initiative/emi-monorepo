@@ -15,7 +15,13 @@ mod procedure_templates;
 mod storage_procedure_templates;
 mod supernatant_procedure_templates;
 mod weighing_procedure_templates;
-impl<C> web_common_traits::prelude::ProcedureTemplate<C>
+impl web_common_traits::prelude::ProcedureTemplateLike
+    for crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG
+{
+    type Procedure = crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureDAG;
+    type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
+}
+impl<C> web_common_traits::prelude::ProcedureTemplateQueries<C>
 for crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG
 where
     C: diesel::connection::LoadConnection,
@@ -27,8 +33,6 @@ where
         &'a crate::ProcedureTemplate,
     >>::Output: diesel::query_dsl::LoadQuery<'a, C, crate::ProcedureTemplateAssetModel>,
 {
-    type Procedure = crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureDAG;
-    type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
     fn procedure_template_asset_models(
         &self,
         conn: &mut C,

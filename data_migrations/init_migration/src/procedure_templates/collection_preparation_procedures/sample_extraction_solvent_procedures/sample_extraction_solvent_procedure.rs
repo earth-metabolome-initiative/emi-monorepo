@@ -5,7 +5,7 @@ use core_structures::{
     tables::insertables::{ProcedureTemplateAssetModelSettable, ProcedureTemplateSettable},
 };
 use diesel::OptionalExtension;
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 use crate::asset_models::containers::bottles::bottle_1l;
 
@@ -43,7 +43,6 @@ pub(crate) fn sample_extraction_solvent_procedure(
         .procedure_template(&procedure_template)?
         .asset_model(bottle_1l(user, conn)?)?
         .name(SAMPLE_EXTRACTION_SOLVENT)?
-        .created_by(user)?
         .insert(user.id, conn)?;
 
     Ok((procedure_template, ptam))

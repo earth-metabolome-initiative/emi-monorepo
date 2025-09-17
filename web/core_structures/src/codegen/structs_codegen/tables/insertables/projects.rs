@@ -81,6 +81,7 @@ impl core::fmt::Display for ProjectAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -229,6 +230,12 @@ pub struct InsertableProjectBuilder {
     pub(crate) expected_end_date: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) end_date: Option<::rosetta_timestamp::TimestampUTC>,
 }
+impl diesel::associations::HasTable for InsertableProjectBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::projects::projects::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::projects::projects::table
+    }
+}
 impl From<InsertableProjectBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableProjectBuilder>
 {
@@ -278,8 +285,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `Project` or
 /// descendant tables.
 pub trait ProjectSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.projects.id` column.
     ///
     /// # Arguments
@@ -297,10 +304,7 @@ pub trait ProjectSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn id<I>(
-        self,
-        id: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn id<I>(self, id: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.projects.name` column.
@@ -321,10 +325,7 @@ pub trait ProjectSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
@@ -347,10 +348,7 @@ pub trait ProjectSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn description<D>(
-        self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
@@ -372,10 +370,7 @@ pub trait ProjectSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn state<SI>(
-        self,
-        state_id: SI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn state<SI>(self, state_id: SI) -> Result<Self, Self::Error>
     where
         SI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
     /// Sets the value of the `public.projects.icon` column.
@@ -396,10 +391,7 @@ pub trait ProjectSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn icon<I>(
-        self,
-        icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn icon<I>(self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
@@ -421,10 +413,7 @@ pub trait ProjectSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn color<CI>(
-        self,
-        color_id: CI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn color<CI>(self, color_id: CI) -> Result<Self, Self::Error>
     where
         CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
     /// Sets the value of the `public.projects.parent_project_id` column.
@@ -445,10 +434,7 @@ pub trait ProjectSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn parent_project<PPI>(
-        self,
-        parent_project_id: PPI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_project<PPI>(self, parent_project_id: PPI) -> Result<Self, Self::Error>
     where
         PPI: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.projects.budget` column.
@@ -468,10 +454,7 @@ pub trait ProjectSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f64`.
     /// * If the provided value does not pass schema-defined validation.
-    fn budget<B>(
-        self,
-        budget: B,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn budget<B>(self, budget: B) -> Result<Self, Self::Error>
     where
         B: TryInto<Option<f64>>,
         validation_errors::SingleFieldError: From<<B as TryInto<Option<f64>>>::Error>;
@@ -493,10 +476,7 @@ pub trait ProjectSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `f64`.
     /// * If the provided value does not pass schema-defined validation.
-    fn expenses<E>(
-        self,
-        expenses: E,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn expenses<E>(self, expenses: E) -> Result<Self, Self::Error>
     where
         E: TryInto<Option<f64>>,
         validation_errors::SingleFieldError: From<<E as TryInto<Option<f64>>>::Error>;
@@ -518,10 +498,7 @@ pub trait ProjectSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by<CB>(
-        self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.projects.created_at` column.
@@ -543,10 +520,7 @@ pub trait ProjectSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<CA>(
-        self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -569,10 +543,7 @@ pub trait ProjectSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_by<UB>(
-        self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.projects.updated_at` column.
@@ -594,10 +565,7 @@ pub trait ProjectSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_at<UA>(
-        self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -621,10 +589,7 @@ pub trait ProjectSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn expected_end_date<EED>(
-        self,
-        expected_end_date: EED,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn expected_end_date<EED>(self, expected_end_date: EED) -> Result<Self, Self::Error>
     where
         EED: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -648,22 +613,23 @@ pub trait ProjectSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn end_date<ED>(
-        self,
-        end_date: ED,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn end_date<ED>(self, end_date: ED) -> Result<Self, Self::Error>
     where
         ED: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<ED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl ProjectSettable for InsertableProjectBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::ProjectAttribute;
+impl ProjectSettable for InsertableProjectBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::ProjectAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.projects.id` column.
-    fn id<I>(
-        mut self,
-        id: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn id<I>(mut self, id: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -682,10 +648,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -712,10 +675,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -743,10 +703,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.state_id` column.
-    fn state<SI>(
-        mut self,
-        state_id: SI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn state<SI>(mut self, state_id: SI) -> Result<Self, Self::Error>
     where
         SI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
     {
@@ -755,10 +712,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.icon` column.
-    fn icon<I>(
-        mut self,
-        icon: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn icon<I>(mut self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
         validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
@@ -775,10 +729,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.color_id` column.
-    fn color<CI>(
-        mut self,
-        color_id: CI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn color<CI>(mut self, color_id: CI) -> Result<Self, Self::Error>
     where
         CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
     {
@@ -787,10 +738,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.parent_project_id` column.
-    fn parent_project<PPI>(
-        mut self,
-        parent_project_id: PPI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_project<PPI>(mut self, parent_project_id: PPI) -> Result<Self, Self::Error>
     where
         PPI: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -812,10 +760,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.budget` column.
-    fn budget<B>(
-        mut self,
-        budget: B,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn budget<B>(mut self, budget: B) -> Result<Self, Self::Error>
     where
         B: TryInto<Option<f64>>,
         validation_errors::SingleFieldError: From<<B as TryInto<Option<f64>>>::Error>,
@@ -827,10 +772,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.expenses` column.
-    fn expenses<E>(
-        mut self,
-        expenses: E,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn expenses<E>(mut self, expenses: E) -> Result<Self, Self::Error>
     where
         E: TryInto<Option<f64>>,
         validation_errors::SingleFieldError: From<<E as TryInto<Option<f64>>>::Error>,
@@ -858,10 +800,7 @@ impl ProjectSettable for InsertableProjectBuilder {
     /// v1@{shape: rounded, label: "updated_by"}
     /// class v1 directly-involved-column
     /// ```
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -872,10 +811,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -898,10 +834,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -911,10 +844,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -937,10 +867,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.expected_end_date` column.
-    fn expected_end_date<EED>(
-        mut self,
-        expected_end_date: EED,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn expected_end_date<EED>(mut self, expected_end_date: EED) -> Result<Self, Self::Error>
     where
         EED: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -954,10 +881,7 @@ impl ProjectSettable for InsertableProjectBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.projects.end_date` column.
-    fn end_date<ED>(
-        mut self,
-        end_date: ED,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn end_date<ED>(mut self, end_date: ED) -> Result<Self, Self::Error>
     where
         ED: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -978,20 +902,19 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableProjectBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableProjectBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::projects::Project,
-            Attribute = ProjectAttribute,
+            Error = web_common_traits::database::InsertError<ProjectAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<ProjectAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::projects::Project =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

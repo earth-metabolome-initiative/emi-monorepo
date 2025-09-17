@@ -3,7 +3,7 @@
 //! Submodule defining the `ParentProcedureTemplate` trait.
 
 use web_common_traits::{
-    database::{InsertError, Insertable, InsertableVariant},
+    database::{DispatchableInsertableVariant, InsertError, Insertable},
     prelude::ExtensionTable,
 };
 
@@ -45,7 +45,6 @@ where
             .name(name)?
             .procedure_template(*self.id())?
             .asset_model(*asset_model.id())?
-            .created_by(user.id)?
             .insert(user.id, conn)
     }
 }

@@ -9,8 +9,8 @@ pub enum CommercialBeadModelExtensionAttribute {
 impl core::fmt::Display for CommercialBeadModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::BeadModel(e) => write!(f, "{e}"),
-            Self::CommercialProduct(e) => write!(f, "{e}"),
+            Self::BeadModel(e) => write!(f, "commercial_bead_models({e})"),
+            Self::CommercialProduct(e) => write!(f, "commercial_bead_models({e})"),
         }
     }
 }
@@ -71,6 +71,7 @@ impl core::fmt::Display for CommercialBeadModelAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -154,6 +155,14 @@ pub struct InsertableCommercialBeadModelBuilder<
     pub(crate) commercial_bead_models_id_fkey: BeadModel,
     pub(crate) commercial_bead_models_id_fkey1: CommercialProduct,
 }
+impl<BeadModel, CommercialProduct> diesel::associations::HasTable
+    for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
+{
+    type Table = crate::codegen::diesel_codegen::tables::commercial_bead_models::commercial_bead_models::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::commercial_bead_models::commercial_bead_models::table
+    }
+}
 impl From<InsertableCommercialBeadModelBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableCommercialBeadModelBuilder>
 {
@@ -179,8 +188,8 @@ where
 /// Trait defining setters for attributes of an instance of
 /// `CommercialBeadModel` or descendant tables.
 pub trait CommercialBeadModelSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.commercial_bead_models.bead_model` column.
     ///
     /// # Arguments
@@ -199,68 +208,70 @@ pub trait CommercialBeadModelSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn bead_model<BM>(
-        self,
-        bead_model: BM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn bead_model<BM>(self, bead_model: BM) -> Result<Self, Self::Error>
     where
         BM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
 }
 impl<
     BeadModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
+            >,
         >,
     CommercialProduct,
 > CommercialBeadModelSettable
-    for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
+for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute;
-    /// Sets the value of the `public.commercial_bead_models.bead_model` column.
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.commercial_bead_models.bead_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v3 ["`asset_models`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v3 ["`asset_models`"]
     ///    v2@{shape: rounded, label: "parent_model"}
-    /// class v2 undirectly-involved-column
-    /// end
-    /// subgraph v4 ["`commercial_bead_models`"]
+    ///class v2 undirectly-involved-column
+    ///end
+    ///subgraph v4 ["`commercial_bead_models`"]
     ///    v0@{shape: rounded, label: "bead_model"}
-    /// class v0 column-of-interest
-    /// end
-    /// subgraph v5 ["`physical_asset_models`"]
+    ///class v0 column-of-interest
+    ///end
+    ///subgraph v5 ["`physical_asset_models`"]
     ///    v1@{shape: rounded, label: "parent_model"}
-    /// class v1 directly-involved-column
-    /// end
-    /// v0 --->|"`ancestral same as`"| v2
-    /// v0 -.->|"`inferred ancestral same as`"| v1
-    /// v1 --->|"`ancestral same as`"| v2
-    /// v5 --->|"`extends`"| v3
-    /// ```
-    fn bead_model<BM>(
-        mut self,
-        bead_model: BM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///class v1 directly-involved-column
+    ///end
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v0 -.->|"`inferred ancestral same as`"| v1
+    ///v1 --->|"`ancestral same as`"| v2
+    ///v5 --->|"`extends`"| v3
+    ///```
+    fn bead_model<BM>(mut self, bead_model: BM) -> Result<Self, Self::Error>
     where
         BM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let bead_model =
-            <BM as web_common_traits::database::PrimaryKeyLike>::primary_key(&bead_model);
+        let bead_model = <BM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &bead_model,
+        );
         self.commercial_bead_models_id_fkey = <BeadModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.commercial_bead_models_id_fkey,
                 bead_model,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
@@ -270,23 +281,29 @@ impl<
 }
 impl<
     BeadModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
+            >,
         >,
     CommercialProduct,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
 for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.asset_models.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -297,7 +314,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -305,10 +322,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -319,7 +333,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -349,10 +363,7 @@ where
     ///v1 --->|"`ancestral same as`"| v0
     ///v3 --->|"`extends`"| v2
     ///```
-    fn parent_model<PM>(
-        self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -363,10 +374,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -376,7 +384,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -384,10 +392,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -400,7 +405,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -408,10 +413,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -421,7 +423,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -429,10 +431,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.asset_models.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -445,7 +444,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -454,20 +453,27 @@ where
 }
 impl<
     BeadModel: crate::codegen::structs_codegen::tables::insertables::BeadModelSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
+            >,
         >,
     CommercialProduct,
 > crate::codegen::structs_codegen::tables::insertables::BeadModelSettable
-    for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
+for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
-    /// Sets the value of the `public.bead_models.diameter_millimeters` column.
+    ///Sets the value of the `public.bead_models.diameter_millimeters` column.
     fn diameter_millimeters<DM>(
         mut self,
         diameter_millimeters: DM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         DM: TryInto<f32>,
         validation_errors::SingleFieldError: From<<DM as TryInto<f32>>::Error>,
@@ -478,7 +484,7 @@ impl<
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -488,17 +494,23 @@ impl<
 impl<
     BeadModel,
     CommercialProduct: crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::CommercialProductSettable
-for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute;
+for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.commercial_products.deprecation_date` column.
-    fn deprecation_date<DD>(
-        mut self,
-        deprecation_date: DD,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn deprecation_date<DD>(mut self, deprecation_date: DD) -> Result<Self, Self::Error>
     where
         DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
         validation_errors::SingleFieldError: From<
@@ -511,7 +523,7 @@ for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -519,10 +531,7 @@ for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct> {
     }
     #[inline]
     ///Sets the value of the `public.commercial_products.brand_id` column.
-    fn brand<BI>(
-        mut self,
-        brand_id: BI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn brand<BI>(mut self, brand_id: BI) -> Result<Self, Self::Error>
     where
         BI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -532,7 +541,7 @@ for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -545,11 +554,18 @@ impl<
 > crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
 for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::CommercialBeadModelAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.physical_asset_models.parent_model` column.
     ///
@@ -581,10 +597,7 @@ where
     ///v1 --->|"`ancestral same as`"| v2
     ///v5 --->|"`extends`"| v3
     ///```
-    fn parent_model<PM>(
-        self,
-        parent_model: PM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -595,7 +608,7 @@ where
                 )
                 .ok_or(
                     common_traits::prelude::BuilderError::IncompleteBuild(
-                        Self::Attributes::BeadModel,
+                        <Self as common_traits::builder::Attributed>::Attribute::BeadModel,
                     ),
                 )?,
         )
@@ -630,11 +643,10 @@ where
 impl<BeadModel, CommercialProduct, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel,
-        Attribute = CommercialBeadModelAttribute,
+        Error = web_common_traits::database::InsertError<CommercialBeadModelAttribute>,
     >,
     BeadModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
@@ -648,10 +660,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<CommercialBeadModelAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

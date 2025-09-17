@@ -12,7 +12,7 @@ use init_migration::asset_models::{
     soils::{soil_model, soil_sample_model},
 };
 use web_common_traits::{
-    database::{InsertableVariant, PrimaryKeyLike, Read},
+    database::{DispatchableInsertableVariant, PrimaryKeyLike, Read},
     prelude::Insertable,
 };
 

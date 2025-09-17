@@ -8,7 +8,7 @@ pub enum WeighingProcedureTemplateExtensionAttribute {
 impl core::fmt::Display for WeighingProcedureTemplateExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::ProcedureTemplate(e) => write!(f, "{e}"),
+            Self::ProcedureTemplate(e) => write!(f, "weighing_procedure_templates({e})"),
         }
     }
 }
@@ -114,6 +114,7 @@ impl core::fmt::Display for WeighingProcedureTemplateAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -302,6 +303,14 @@ pub struct InsertableWeighingProcedureTemplateBuilder<
     >,
     pub(crate) procedure_template: ProcedureTemplate,
 }
+impl<ProcedureTemplate> diesel::associations::HasTable
+    for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate>
+{
+    type Table = crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates::table
+    }
+}
 impl From<InsertableWeighingProcedureTemplateBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableWeighingProcedureTemplateBuilder>
 {
@@ -330,8 +339,8 @@ where
 /// Trait defining setters for attributes of an instance of
 /// `WeighingProcedureTemplate` or descendant tables.
 pub trait WeighingProcedureTemplateSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the
     /// `public.weighing_procedure_templates.weighed_container_model` column.
     ///
@@ -354,7 +363,7 @@ pub trait WeighingProcedureTemplateSettable: Sized {
     fn weighed_container_model<WCM>(
         self,
         weighed_container_model: WCM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         WCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -381,7 +390,7 @@ pub trait WeighingProcedureTemplateSettable: Sized {
     fn procedure_template_weighed_container_model<PTWCM>(
         self,
         procedure_template_weighed_container_model: PTWCM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTWCM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -408,10 +417,7 @@ pub trait WeighingProcedureTemplateSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn weighed_with_model<WWM>(
-        self,
-        weighed_with_model: WWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn weighed_with_model<WWM>(self, weighed_with_model: WWM) -> Result<Self, Self::Error>
     where
         WWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -438,7 +444,7 @@ pub trait WeighingProcedureTemplateSettable: Sized {
     fn procedure_template_weighed_with_model<PTWWM>(
         self,
         procedure_template_weighed_with_model: PTWWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTWWM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -448,53 +454,56 @@ pub trait WeighingProcedureTemplateSettable: Sized {
         >;
 }
 impl<ProcedureTemplate> WeighingProcedureTemplateSettable
-    for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate>
+for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateAttribute;
-    /// Sets the value of the
-    /// `public.weighing_procedure_templates.weighed_container_model` column.
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.weighing_procedure_templates.weighed_container_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`weighing_procedure_templates`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`weighing_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_weighed_container_model"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "weighed_container_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn weighed_container_model<WCM>(
         mut self,
         weighed_container_model: WCM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         WCM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let weighed_container_model =
-            <WCM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &weighed_container_model,
-            );
+        let weighed_container_model = <WCM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &weighed_container_model,
+        );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_weighed_container_model,
         ) = self.procedure_template_weighed_container_model
@@ -505,7 +514,7 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplateWeighedContainerModel(
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateWeighedContainerModel(
                             attribute,
                         )
                     })
@@ -515,43 +524,41 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
         self.weighed_container_model = Some(weighed_container_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.weighing_procedure_templates.
-    /// procedure_template_weighed_container_model` column.
+    ///Sets the value of the `public.weighing_procedure_templates.procedure_template_weighed_container_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`weighing_procedure_templates`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`weighing_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_weighed_container_model"}
-    /// class v1 column-of-interest
+    ///class v1 column-of-interest
     ///    v2@{shape: rounded, label: "weighed_container_model"}
-    /// class v2 directly-involved-column
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 directly-involved-column
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn procedure_template_weighed_container_model<PTWCM>(
         mut self,
         procedure_template_weighed_container_model: PTWCM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTWCM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -560,23 +567,21 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
             >,
         >,
     {
-        let mut procedure_template_weighed_container_model =
-            procedure_template_weighed_container_model.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_template_weighed_container_model
-        {
+        let mut procedure_template_weighed_container_model = procedure_template_weighed_container_model
+            .into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_weighed_container_model {
             procedure_template_weighed_container_model = if let (
                 Some(weighed_container_model),
                 Some(asset_model),
-            ) =
-                (self.weighed_container_model, builder.asset_model)
-            {
+            ) = (self.weighed_container_model, builder.asset_model) {
                 if weighed_container_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::WeighedContainerModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::WeighedContainerModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -589,7 +594,7 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTemplateWeighedContainerModel(
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateWeighedContainerModel(
                                 attribute,
                             )
                         })
@@ -599,51 +604,50 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
                 builder.into()
             };
         }
-        self.procedure_template_weighed_container_model =
-            procedure_template_weighed_container_model;
+        self.procedure_template_weighed_container_model = procedure_template_weighed_container_model;
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.weighing_procedure_templates.weighed_with_model` column.
+    ///Sets the value of the `public.weighing_procedure_templates.weighed_with_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`weighing_procedure_templates`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`weighing_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_weighed_with_model"}
-    /// class v1 directly-involved-column
+    ///class v1 directly-involved-column
     ///    v2@{shape: rounded, label: "weighed_with_model"}
-    /// class v2 column-of-interest
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 column-of-interest
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn weighed_with_model<WWM>(
         mut self,
         weighed_with_model: WWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         WWM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let weighed_with_model =
-            <WWM as web_common_traits::database::PrimaryKeyLike>::primary_key(&weighed_with_model);
+        let weighed_with_model = <WWM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &weighed_with_model,
+        );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_template_weighed_with_model,
         ) = self.procedure_template_weighed_with_model
@@ -654,7 +658,9 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureTemplateWeighedWithModel(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateWeighedWithModel(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -662,43 +668,41 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
         self.weighed_with_model = Some(weighed_with_model);
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.weighing_procedure_templates.
-    /// procedure_template_weighed_with_model` column.
+    ///Sets the value of the `public.weighing_procedure_templates.procedure_template_weighed_with_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`procedure_template_asset_models`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`procedure_template_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v5 ["`weighing_procedure_templates`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v5 ["`weighing_procedure_templates`"]
     ///    v1@{shape: rounded, label: "procedure_template_weighed_with_model"}
-    /// class v1 column-of-interest
+    ///class v1 column-of-interest
     ///    v2@{shape: rounded, label: "weighed_with_model"}
-    /// class v2 directly-involved-column
-    /// end
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v0
-    /// v5 ---o|"`associated with`"| v4
-    /// ```
+    ///class v2 directly-involved-column
+    ///end
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v0
+    ///v5 ---o|"`associated with`"| v4
+    ///```
     fn procedure_template_weighed_with_model<PTWWM>(
         mut self,
         procedure_template_weighed_with_model: PTWWM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTWWM: Into<
             web_common_traits::database::IdOrBuilder<
@@ -707,23 +711,21 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
             >,
         >,
     {
-        let mut procedure_template_weighed_with_model =
-            procedure_template_weighed_with_model.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) =
-            procedure_template_weighed_with_model
-        {
+        let mut procedure_template_weighed_with_model = procedure_template_weighed_with_model
+            .into();
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_weighed_with_model {
             procedure_template_weighed_with_model = if let (
                 Some(weighed_with_model),
                 Some(asset_model),
-            ) =
-                (self.weighed_with_model, builder.asset_model)
-            {
+            ) = (self.weighed_with_model, builder.asset_model) {
                 if weighed_with_model != asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::WeighedWithModel,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::WeighedWithModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset_model) = builder.asset_model {
@@ -736,7 +738,7 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureTemplateWeighedWithModel(
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateWeighedWithModel(
                                 attribute,
                             )
                         })
@@ -752,17 +754,23 @@ impl<ProcedureTemplate> WeighingProcedureTemplateSettable
 }
 impl<
     ProcedureTemplate: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable
-for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateAttribute;
+for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::WeighingProcedureTemplateAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.procedure_templates.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -773,7 +781,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -781,10 +789,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -795,7 +800,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -803,10 +808,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -816,7 +818,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -824,10 +826,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -840,7 +839,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -848,10 +847,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -861,7 +857,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -869,10 +865,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -885,7 +878,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -893,10 +886,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
     }
     #[inline]
     ///Sets the value of the `public.procedure_templates.deprecated` column.
-    fn deprecated<D>(
-        mut self,
-        deprecated: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn deprecated<D>(mut self, deprecated: D) -> Result<Self, Self::Error>
     where
         D: TryInto<bool>,
         validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
@@ -907,7 +897,7 @@ for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate> {
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -937,11 +927,12 @@ where
 impl<ProcedureTemplate, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableWeighingProcedureTemplateBuilder<ProcedureTemplate>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
-        Attribute = WeighingProcedureTemplateAttribute,
+        Error = web_common_traits::database::InsertError<
+            WeighingProcedureTemplateAttribute,
+        >,
     >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
         C,
@@ -957,10 +948,10 @@ where
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attribute>,
+        web_common_traits::database::InsertError<WeighingProcedureTemplateAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

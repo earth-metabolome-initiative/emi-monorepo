@@ -20,9 +20,11 @@ pub use connection::AnyConnection;
 pub use deletable::{Deletable, DeleteError, DeleteFromVec};
 pub use extension::ExtensionTable;
 pub use foreign::{ForeignKeys, HasForeignKeys};
+#[cfg(feature = "backend")]
+pub use insertable::BackendInsertableVariant;
 pub use insertable::{
-    IdOrBuilder, InsertError, Insertable, InsertableVariant, InsertableVariantMetadata,
-    MostConcreteTable, SetPrimaryKey,
+    DispatchableInsertVariantMetadata, DispatchableInsertableVariant, IdOrBuilder, InsertError,
+    Insertable, InsertableVariant, InsertableVariantMetadata, MostConcreteTable, SetPrimaryKey,
 };
 pub use most_concrete_variant::{MostConcreteVariant, MostConcreteVariantMetadata};
 pub use primary_key_like::{MaybePrimaryKeyLike, PrimaryKeyLike};

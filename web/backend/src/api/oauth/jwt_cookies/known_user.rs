@@ -1,8 +1,12 @@
 //! Submodule handling the case where one of the provided emails for the given
 //! provider is already registered in the system.
 
-use core_structures::{EmailProvider, LoginProvider, User, UserEmail};
-use web_common_traits::database::{Insertable, Read, UncheckedInsertableVariant};
+use core_structures::{
+    EmailProvider, LoginProvider, User, UserEmail,
+    tables::insertables::{EmailProviderSettable, UserEmailSettable},
+};
+use diesel::OptionalExtension;
+use web_common_traits::database::{BackendInsertableVariant, Insertable, Read};
 
 use crate::BackendError;
 
@@ -31,13 +35,13 @@ pub(super) fn handle_known_user(
     let mut unregistered_emails = Vec::new();
 
     for email in emails {
-        if let Some(user_email) = UserEmail::from_email(email, conn)? {
+        if let Some(user_email) = UserEmail::from_email(email, conn).optional()? {
             let user = user_email.created_by(conn)?;
             if !users.contains(&user) {
                 users.push(user);
             }
 
-            if EmailProvider::read((user_email.id, provider.id), conn)?.is_none() {
+            if EmailProvider::read((user_email.id, provider.id), conn).optional()?.is_none() {
                 email_not_registered_with_provider.push(user_email);
             }
         } else {
@@ -58,9 +62,9 @@ pub(super) fn handle_known_user(
     // We insert the emails that are not registered with the provider.
     for user_email in email_not_registered_with_provider {
         let _ = EmailProvider::new()
-            .email_id(user_email.id)?
-            .login_provider_id(provider.id)?
-            .unchecked_insert(conn)?;
+            .email(user_email)?
+            .login_provider(provider)?
+            .backend_insert(conn)?;
     }
 
     // If there is only one user, and there is one or more emails which are not
@@ -71,11 +75,11 @@ pub(super) fn handle_known_user(
             .created_by(user.id)?
             .email(*unregistered_email)?
             .primary_email(false)?
-            .unchecked_insert(conn)?;
+            .backend_insert(conn)?;
         let _ = EmailProvider::new()
-            .email_id(newly_inserted_email.id)?
-            .login_provider_id(provider.id)?
-            .unchecked_insert(conn)?;
+            .email(newly_inserted_email)?
+            .login_provider(provider)?
+            .backend_insert(conn)?;
     }
 
     Ok(Some(user))

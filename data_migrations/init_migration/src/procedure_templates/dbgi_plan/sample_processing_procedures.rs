@@ -15,7 +15,7 @@ use core_structures::{
     },
     traits::AppendProcedureTemplate,
 };
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 use crate::{
     asset_models::{
@@ -47,17 +47,14 @@ pub(super) fn init_dbgi_sample_processing_procedures(
 
     let long_term_storage_vial_builder = ProcedureTemplateAssetModel::new()
         .name("Long Term Storage Vial")?
-        .created_by(user)?
         .asset_model(vial_1_5ml(user, conn)?)?;
 
     let long_term_storage_vial_box_builder = ProcedureTemplateAssetModel::new()
         .name("Long Term Storage Vial Box")?
-        .created_by(user)?
         .asset_model(vial_rack_1_5ml(user, conn)?)?;
 
     let storage_freezer = ProcedureTemplateAssetModel::new()
         .name("Sample Storage Freezer")?
-        .created_by(user)?
         .asset_model(freezer(user, conn)?)?;
 
     let freezing_procedure = FreezingProcedureTemplate::new()

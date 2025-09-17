@@ -16,17 +16,10 @@ impl Codegen<'_> {
         table: &Table,
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
-        let maybe_generics = self
-            .table_extension_network()
-            .unwrap()
-            .generics_for_table_builder_definition(table, conn)?;
+        let maybe_generics = table.generics_for_table_builder_definition(conn)?;
         let insertable_columns = table.insertable_columns(conn, true)?;
         let builder_ident = table.insertable_builder_ident()?;
-        let maybe_impl_generics = self
-            .table_extension_network()
-            .unwrap()
-            .generics_for_table_builder_implementation(table)?;
-        let extension_network = self.table_extension_network().expect("Extension network exists");
+        let maybe_impl_generics = table.generics_for_table_builder_implementation(conn)?;
 
         let has_sql_default_types = insertable_columns.iter().any(Column::has_default);
         let mut derives = vec![
@@ -141,11 +134,11 @@ impl Codegen<'_> {
             self.from_builder_to_id_or_builder_impl(table, conn)?;
         let builder_trait_definition = table.generate_builder_trait(conn)?;
         let builder_trait_impls = table.generate_builder_trait_impl_for_ancestral_tables(
-            extension_network,
             conn,
             self.check_constraints_extensions.as_slice(),
         )?;
         let documentation: Vec<String> = self.generate_builder_documentation(table, conn)?;
+        let diesel_table_path = table.import_diesel_path()?;
 
         Ok(quote! {
             #[derive(#(#derives),*)]
@@ -153,6 +146,14 @@ impl Codegen<'_> {
             #(#[doc = #documentation])*
             pub struct #builder_ident #maybe_generics {
                 #(#insertable_builder_attributes),*
+            }
+
+            impl #maybe_impl_generics diesel::associations::HasTable for #builder_ident #maybe_impl_generics{
+                type Table = #diesel_table_path::table;
+
+                fn table() -> Self::Table {
+                    #diesel_table_path::table
+                }
             }
 
             #from_builder_to_id_or_builder_impl

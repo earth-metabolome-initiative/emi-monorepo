@@ -17,12 +17,6 @@
 )]
 #[diesel(
     belongs_to(
-        crate::codegen::structs_codegen::tables::users::User,
-        foreign_key = created_by
-    )
-)]
-#[diesel(
-    belongs_to(
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
         foreign_key = procedure_template
     )
@@ -37,8 +31,6 @@ pub struct ProcedureTemplateAssetModel {
     pub procedure_template: i32,
     pub based_on: Option<i32>,
     pub asset_model: i32,
-    pub created_by: i32,
-    pub created_at: ::rosetta_timestamp::TimestampUTC,
 }
 impl web_common_traits::prelude::TableName for ProcedureTemplateAssetModel {
     const TABLE_NAME: &'static str = "procedure_template_asset_models";
@@ -169,16 +161,6 @@ impl ProcedureTemplateAssetModel {
                 conn,
             )
             .optional()
-    }
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
-    where
-        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
-    {
-        use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
         &self,

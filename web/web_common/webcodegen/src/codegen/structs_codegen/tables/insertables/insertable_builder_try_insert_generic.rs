@@ -1,7 +1,7 @@
 //! Submodule providing the generation of the `try_insert` method for the
 //! insertable builder struct.
 
-use std::collections::HashSet;
+use std::{collections::HashSet, sync::Arc};
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
@@ -33,21 +33,19 @@ impl Codegen<'_> {
         let builder_ident = table.insertable_builder_ident()?;
         let row_path = table.import_struct_path()?;
         let attributes_enum = table.attributes_enum_ident()?;
-        let table_extension_network = self.table_extension_network().unwrap();
-        let extension_tables = table_extension_network.extension_tables(table);
+        let extension_tables = table.extension_tables(conn)?;
         let primary_key_type = table.primary_key_type(conn)?;
         let mut where_constraints = vec![quote! {
-            Self: web_common_traits::database::InsertableVariant<
+            Self: web_common_traits::database::DispatchableInsertableVariant<
                 C,
-                UserId=#user_id_type,
                 Row=#row_path,
-                Attribute=#attributes_enum
+                Error= web_common_traits::database::InsertError<#attributes_enum>
             >
         }];
-        let mut try_insert_generic_where_constraint: HashSet<Table> = HashSet::new();
+        let mut try_insert_generic_where_constraint: HashSet<Arc<Table>> = HashSet::new();
         let mut table_generics = Vec::new();
 
-        for extension_table in &extension_tables {
+        for extension_table in extension_tables.iter() {
             let generic_ident = extension_table.struct_ident()?;
             table_generics.push(quote! {#generic_ident});
             where_constraints.push(quote! {
@@ -73,7 +71,7 @@ impl Codegen<'_> {
                     where_constraints.push(quote! {
                         #foreign_builder_type: web_common_traits::database::TryInsertGeneric<C>
                     });
-                    try_insert_generic_where_constraint.insert(foreign_table.as_ref().clone());
+                    try_insert_generic_where_constraint.insert(foreign_table);
                 }
             }
         }
@@ -99,10 +97,10 @@ impl Codegen<'_> {
                     self,
                     user_id: #user_id_type,
                     conn: &mut C,
-                ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>>
+                ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<#attributes_enum>>
                 {
                     use diesel::Identifiable;
-                    use web_common_traits::database::InsertableVariant;
+                    use web_common_traits::database::DispatchableInsertableVariant;
                     let insertable: #row_path = self.insert(user_id, conn)?;
                     Ok(insertable.id())
                 }

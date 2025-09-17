@@ -31,6 +31,7 @@ impl core::fmt::Display for RankAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -69,6 +70,12 @@ pub struct InsertableRankBuilder {
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
 }
+impl diesel::associations::HasTable for InsertableRankBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::ranks::ranks::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::ranks::ranks::table
+    }
+}
 impl From<InsertableRankBuilder>
     for web_common_traits::database::IdOrBuilder<i16, InsertableRankBuilder>
 {
@@ -86,8 +93,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `Rank` or descendant
 /// tables.
 pub trait RankSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.ranks.name` column.
     ///
     /// # Arguments
@@ -106,10 +113,7 @@ pub trait RankSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
@@ -132,21 +136,22 @@ pub trait RankSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn description<D>(
-        self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
 }
-impl RankSettable for InsertableRankBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::RankAttribute;
+impl RankSettable for InsertableRankBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::RankAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.ranks.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
@@ -158,10 +163,7 @@ impl RankSettable for InsertableRankBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.ranks.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
@@ -181,20 +183,19 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableRankBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableRankBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::ranks::Rank,
-            Attribute = RankAttribute,
+            Error = web_common_traits::database::InsertError<RankAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<RankAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::ranks::Rank =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

@@ -1,5 +1,7 @@
 mod builder;
+mod insert_error;
 pub use builder::AssetModelBuilderDAG;
+pub use insert_error::AssetModelInsertErrorDAG;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Enum representing the most concrete variant of the `asset_models` table DAG.
@@ -333,6 +335,16 @@ impl From<crate::codegen::structs_codegen::tables::asset_models::AssetModel> for
         AssetModelDAG::AssetModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::asset_models::AssetModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::AssetModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel>
     for AssetModelDAG
 {
@@ -342,9 +354,31 @@ impl From<crate::codegen::structs_codegen::tables::ball_mill_machine_models::Bal
         AssetModelDAG::BallMillMachineModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+    >
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::BallMillMachineModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::bead_models::BeadModel> for AssetModelDAG {
     fn from(value: crate::codegen::structs_codegen::tables::bead_models::BeadModel) -> Self {
         AssetModelDAG::BeadModel(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::bead_models::BeadModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::BeadModel(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::camera_models::CameraModel> for AssetModelDAG {
@@ -352,9 +386,27 @@ impl From<crate::codegen::structs_codegen::tables::camera_models::CameraModel> f
         AssetModelDAG::CameraModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::camera_models::CameraModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CameraModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::cap_models::CapModel> for AssetModelDAG {
     fn from(value: crate::codegen::structs_codegen::tables::cap_models::CapModel) -> Self {
         AssetModelDAG::CapModel(value)
+    }
+}
+impl From<AssetModelDAG> for Option<crate::codegen::structs_codegen::tables::cap_models::CapModel> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CapModel(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel>
@@ -366,6 +418,16 @@ impl From<crate::codegen::structs_codegen::tables::centrifuge_models::Centrifuge
         AssetModelDAG::CentrifugeModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CentrifugeModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<
     crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
 > for AssetModelDAG {
@@ -373,6 +435,17 @@ impl From<
         value: crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
     ) -> Self {
         AssetModelDAG::CommercialBallMillMachineLot(value)
+    }
+}
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialBallMillMachineLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<
@@ -384,6 +457,17 @@ impl From<
         AssetModelDAG::CommercialBallMillMachineModel(value)
     }
 }
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialBallMillMachineModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot>
     for AssetModelDAG
 {
@@ -391,6 +475,16 @@ impl From<crate::codegen::structs_codegen::tables::commercial_bead_lots::Commerc
         value: crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot,
     ) -> Self {
         AssetModelDAG::CommercialBeadLot(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialBeadLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel>
@@ -402,6 +496,16 @@ impl From<crate::codegen::structs_codegen::tables::commercial_bead_models::Comme
         AssetModelDAG::CommercialBeadModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialBeadModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::commercial_camera_lots::CommercialCameraLot>
     for AssetModelDAG
 {
@@ -409,6 +513,16 @@ impl From<crate::codegen::structs_codegen::tables::commercial_camera_lots::Comme
         value: crate::codegen::structs_codegen::tables::commercial_camera_lots::CommercialCameraLot,
     ) -> Self {
         AssetModelDAG::CommercialCameraLot(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::commercial_camera_lots::CommercialCameraLot>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialCameraLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel>
@@ -420,6 +534,18 @@ impl From<crate::codegen::structs_codegen::tables::commercial_camera_models::Com
         AssetModelDAG::CommercialCameraModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel,
+    >
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialCameraModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot>
     for AssetModelDAG
 {
@@ -427,6 +553,16 @@ impl From<crate::codegen::structs_codegen::tables::commercial_cap_lots::Commerci
         value: crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot,
     ) -> Self {
         AssetModelDAG::CommercialCapLot(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialCapLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel>
@@ -438,6 +574,16 @@ impl From<crate::codegen::structs_codegen::tables::commercial_cap_models::Commer
         AssetModelDAG::CommercialCapModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialCapModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<
     crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
 > for AssetModelDAG {
@@ -445,6 +591,17 @@ impl From<
         value: crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
     ) -> Self {
         AssetModelDAG::CommercialCentrifugeLot(value)
+    }
+}
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialCentrifugeLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<
@@ -456,6 +613,17 @@ impl From<
         AssetModelDAG::CommercialCentrifugeModel(value)
     }
 }
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialCentrifugeModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<
     crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
 > for AssetModelDAG {
@@ -463,6 +631,17 @@ impl From<
         value: crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
     ) -> Self {
         AssetModelDAG::CommercialFreezeDryerLot(value)
+    }
+}
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialFreezeDryerLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<
@@ -474,6 +653,17 @@ impl From<
         AssetModelDAG::CommercialFreezeDryerModel(value)
     }
 }
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_freeze_dryer_models::CommercialFreezeDryerModel,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialFreezeDryerModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot>
     for AssetModelDAG
 {
@@ -481,6 +671,18 @@ impl From<crate::codegen::structs_codegen::tables::commercial_freezer_lots::Comm
         value: crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
     ) -> Self {
         AssetModelDAG::CommercialFreezerLot(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
+    >
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialFreezerLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl
@@ -493,6 +695,18 @@ impl
         AssetModelDAG::CommercialFreezerModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
+    >
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialFreezerModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl
     From<crate::codegen::structs_codegen::tables::commercial_packaging_lots::CommercialPackagingLot>
     for AssetModelDAG
@@ -501,6 +715,18 @@ impl
         value: crate::codegen::structs_codegen::tables::commercial_packaging_lots::CommercialPackagingLot,
     ) -> Self {
         AssetModelDAG::CommercialPackagingLot(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::commercial_packaging_lots::CommercialPackagingLot,
+    >
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialPackagingLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<
@@ -512,6 +738,17 @@ impl From<
         AssetModelDAG::CommercialPackagingModel(value)
     }
 }
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialPackagingModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot>
     for AssetModelDAG
 {
@@ -519,6 +756,18 @@ impl From<crate::codegen::structs_codegen::tables::commercial_pipette_lots::Comm
         value: crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot,
     ) -> Self {
         AssetModelDAG::CommercialPipetteLot(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot,
+    >
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialPipetteLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl
@@ -531,6 +780,18 @@ impl
         AssetModelDAG::CommercialPipetteModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::commercial_pipette_models::CommercialPipetteModel,
+    >
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialPipetteModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<
     crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot,
 > for AssetModelDAG {
@@ -538,6 +799,17 @@ impl From<
         value: crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot,
     ) -> Self {
         AssetModelDAG::CommercialPipetteTipLot(value)
+    }
+}
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialPipetteTipLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<
@@ -549,6 +821,17 @@ impl From<
         AssetModelDAG::CommercialPipetteTipModel(value)
     }
 }
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialPipetteTipModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<
     crate::codegen::structs_codegen::tables::commercial_positioning_device_lots::CommercialPositioningDeviceLot,
 > for AssetModelDAG {
@@ -556,6 +839,17 @@ impl From<
         value: crate::codegen::structs_codegen::tables::commercial_positioning_device_lots::CommercialPositioningDeviceLot,
     ) -> Self {
         AssetModelDAG::CommercialPositioningDeviceLot(value)
+    }
+}
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_positioning_device_lots::CommercialPositioningDeviceLot,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialPositioningDeviceLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<
@@ -567,6 +861,17 @@ impl From<
         AssetModelDAG::CommercialPositioningDeviceModel(value)
     }
 }
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialPositioningDeviceModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot>
     for AssetModelDAG
 {
@@ -574,6 +879,18 @@ impl From<crate::codegen::structs_codegen::tables::commercial_product_lots::Comm
         value: crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
     ) -> Self {
         AssetModelDAG::CommercialProductLot(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+    >
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialProductLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>
@@ -585,6 +902,16 @@ impl From<crate::codegen::structs_codegen::tables::commercial_products::Commerci
         AssetModelDAG::CommercialProduct(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialProduct(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<
     crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
 > for AssetModelDAG {
@@ -592,6 +919,17 @@ impl From<
         value: crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
     ) -> Self {
         AssetModelDAG::CommercialVolumeMeasuringDeviceLot(value)
+    }
+}
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialVolumeMeasuringDeviceLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<
@@ -603,6 +941,17 @@ impl From<
         AssetModelDAG::CommercialVolumeMeasuringDeviceModel(value)
     }
 }
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialVolumeMeasuringDeviceModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<
     crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot,
 > for AssetModelDAG {
@@ -610,6 +959,17 @@ impl From<
         value: crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot,
     ) -> Self {
         AssetModelDAG::CommercialWeighingDeviceLot(value)
+    }
+}
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialWeighingDeviceLot(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<
@@ -621,6 +981,17 @@ impl From<
         AssetModelDAG::CommercialWeighingDeviceModel(value)
     }
 }
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::CommercialWeighingDeviceModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::container_models::ContainerModel>
     for AssetModelDAG
 {
@@ -628,6 +999,16 @@ impl From<crate::codegen::structs_codegen::tables::container_models::ContainerMo
         value: crate::codegen::structs_codegen::tables::container_models::ContainerModel,
     ) -> Self {
         AssetModelDAG::ContainerModel(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::container_models::ContainerModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::ContainerModel(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel>
@@ -639,6 +1020,16 @@ impl From<crate::codegen::structs_codegen::tables::digital_asset_models::Digital
         AssetModelDAG::DigitalAssetModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::DigitalAssetModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel>
     for AssetModelDAG
 {
@@ -648,9 +1039,29 @@ impl From<crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDr
         AssetModelDAG::FreezeDryerModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::FreezeDryerModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel> for AssetModelDAG {
     fn from(value: crate::codegen::structs_codegen::tables::freezer_models::FreezerModel) -> Self {
         AssetModelDAG::FreezerModel(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::FreezerModel(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::organism_models::OrganismModel>
@@ -662,6 +1073,16 @@ impl From<crate::codegen::structs_codegen::tables::organism_models::OrganismMode
         AssetModelDAG::OrganismModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::organism_models::OrganismModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::OrganismModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel>
     for AssetModelDAG
 {
@@ -671,9 +1092,29 @@ impl From<crate::codegen::structs_codegen::tables::packaging_models::PackagingMo
         AssetModelDAG::PackagingModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::PackagingModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::phone_models::PhoneModel> for AssetModelDAG {
     fn from(value: crate::codegen::structs_codegen::tables::phone_models::PhoneModel) -> Self {
         AssetModelDAG::PhoneModel(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::phone_models::PhoneModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::PhoneModel(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel>
@@ -685,9 +1126,29 @@ impl From<crate::codegen::structs_codegen::tables::physical_asset_models::Physic
         AssetModelDAG::PhysicalAssetModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::PhysicalAssetModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel> for AssetModelDAG {
     fn from(value: crate::codegen::structs_codegen::tables::pipette_models::PipetteModel) -> Self {
         AssetModelDAG::PipetteModel(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::PipetteModel(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel>
@@ -697,6 +1158,16 @@ impl From<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTi
         value: crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
     ) -> Self {
         AssetModelDAG::PipetteTipModel(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::PipetteTipModel(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl
@@ -709,14 +1180,46 @@ impl
         AssetModelDAG::PositioningDeviceModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
+    >
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::PositioningDeviceModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::reagent_models::ReagentModel> for AssetModelDAG {
     fn from(value: crate::codegen::structs_codegen::tables::reagent_models::ReagentModel) -> Self {
         AssetModelDAG::ReagentModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::reagent_models::ReagentModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::ReagentModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::sample_models::SampleModel> for AssetModelDAG {
     fn from(value: crate::codegen::structs_codegen::tables::sample_models::SampleModel) -> Self {
         AssetModelDAG::SampleModel(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::sample_models::SampleModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::SampleModel(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel>
@@ -728,9 +1231,29 @@ impl From<crate::codegen::structs_codegen::tables::sample_source_models::SampleS
         AssetModelDAG::SampleSourceModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::SampleSourceModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::soil_models::SoilModel> for AssetModelDAG {
     fn from(value: crate::codegen::structs_codegen::tables::soil_models::SoilModel) -> Self {
         AssetModelDAG::SoilModel(value)
+    }
+}
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::soil_models::SoilModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::SoilModel(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<
@@ -742,6 +1265,17 @@ impl From<
         AssetModelDAG::VolumeMeasuringDeviceModel(value)
     }
 }
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::VolumeMeasuringDeviceModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<
     crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
 > for AssetModelDAG {
@@ -749,6 +1283,17 @@ impl From<
         value: crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
     ) -> Self {
         AssetModelDAG::VolumetricContainerModel(value)
+    }
+}
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::VolumetricContainerModel(v) => Some(v),
+            _ => None,
+        }
     }
 }
 impl From<crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel>
@@ -760,14 +1305,86 @@ impl From<crate::codegen::structs_codegen::tables::weighing_device_models::Weigh
         AssetModelDAG::WeighingDeviceModel(value)
     }
 }
+impl From<AssetModelDAG>
+    for Option<crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel>
+{
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::WeighingDeviceModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl web_common_traits::database::MostConcreteVariantMetadata
     for crate::codegen::structs_codegen::tables::asset_models::AssetModel
 {
     type Variant = AssetModelDAG;
 }
+impl web_common_traits::database::PrimaryKeyLike for AssetModelDAG {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        match self {
+            Self::AssetModel(variant) => variant.primary_key(),
+            Self::BallMillMachineModel(variant) => variant.primary_key(),
+            Self::BeadModel(variant) => variant.primary_key(),
+            Self::CameraModel(variant) => variant.primary_key(),
+            Self::CapModel(variant) => variant.primary_key(),
+            Self::CentrifugeModel(variant) => variant.primary_key(),
+            Self::CommercialBallMillMachineLot(variant) => variant.primary_key(),
+            Self::CommercialBallMillMachineModel(variant) => variant.primary_key(),
+            Self::CommercialBeadLot(variant) => variant.primary_key(),
+            Self::CommercialBeadModel(variant) => variant.primary_key(),
+            Self::CommercialCameraLot(variant) => variant.primary_key(),
+            Self::CommercialCameraModel(variant) => variant.primary_key(),
+            Self::CommercialCapLot(variant) => variant.primary_key(),
+            Self::CommercialCapModel(variant) => variant.primary_key(),
+            Self::CommercialCentrifugeLot(variant) => variant.primary_key(),
+            Self::CommercialCentrifugeModel(variant) => variant.primary_key(),
+            Self::CommercialFreezeDryerLot(variant) => variant.primary_key(),
+            Self::CommercialFreezeDryerModel(variant) => variant.primary_key(),
+            Self::CommercialFreezerLot(variant) => variant.primary_key(),
+            Self::CommercialFreezerModel(variant) => variant.primary_key(),
+            Self::CommercialPackagingLot(variant) => variant.primary_key(),
+            Self::CommercialPackagingModel(variant) => variant.primary_key(),
+            Self::CommercialPipetteLot(variant) => variant.primary_key(),
+            Self::CommercialPipetteModel(variant) => variant.primary_key(),
+            Self::CommercialPipetteTipLot(variant) => variant.primary_key(),
+            Self::CommercialPipetteTipModel(variant) => variant.primary_key(),
+            Self::CommercialPositioningDeviceLot(variant) => variant.primary_key(),
+            Self::CommercialPositioningDeviceModel(variant) => variant.primary_key(),
+            Self::CommercialProductLot(variant) => variant.primary_key(),
+            Self::CommercialProduct(variant) => variant.primary_key(),
+            Self::CommercialVolumeMeasuringDeviceLot(variant) => variant.primary_key(),
+            Self::CommercialVolumeMeasuringDeviceModel(variant) => variant.primary_key(),
+            Self::CommercialWeighingDeviceLot(variant) => variant.primary_key(),
+            Self::CommercialWeighingDeviceModel(variant) => variant.primary_key(),
+            Self::ContainerModel(variant) => variant.primary_key(),
+            Self::DigitalAssetModel(variant) => variant.primary_key(),
+            Self::FreezeDryerModel(variant) => variant.primary_key(),
+            Self::FreezerModel(variant) => variant.primary_key(),
+            Self::OrganismModel(variant) => variant.primary_key(),
+            Self::PackagingModel(variant) => variant.primary_key(),
+            Self::PhoneModel(variant) => variant.primary_key(),
+            Self::PhysicalAssetModel(variant) => variant.primary_key(),
+            Self::PipetteModel(variant) => variant.primary_key(),
+            Self::PipetteTipModel(variant) => variant.primary_key(),
+            Self::PositioningDeviceModel(variant) => variant.primary_key(),
+            Self::ReagentModel(variant) => variant.primary_key(),
+            Self::SampleModel(variant) => variant.primary_key(),
+            Self::SampleSourceModel(variant) => variant.primary_key(),
+            Self::SoilModel(variant) => variant.primary_key(),
+            Self::VolumeMeasuringDeviceModel(variant) => variant.primary_key(),
+            Self::VolumetricContainerModel(variant) => variant.primary_key(),
+            Self::WeighingDeviceModel(variant) => variant.primary_key(),
+        }
+    }
+}
 impl<C> web_common_traits::database::MostConcreteVariant<C>
 for crate::codegen::structs_codegen::tables::asset_models::AssetModel
 where
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel: web_common_traits::database::Read<
         C,
     >,

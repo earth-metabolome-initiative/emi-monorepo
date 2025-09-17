@@ -41,12 +41,14 @@ impl Codegen<'_> {
         descendants.sort_unstable();
 
         let mut from_variant_impls = Vec::new();
+        let mut variants = Vec::new();
+        let mut types = Vec::new();
         let mut variants_with_documentation = Vec::new();
         let mut most_concrete_variants = Vec::new();
-        let mut where_requirements = Vec::new();
         let mut involved_primary_keys = Vec::new();
         let primary_key_columns = table.primary_key_columns(conn)?;
         let primary_key_column = &primary_key_columns[0];
+        let primary_key_type = table.primary_key_type(conn)?;
         for descendant in descendants {
             let variant_ident = descendant.struct_ident()?;
             let variant_path = descendant.import_struct_path()?;
@@ -63,19 +65,27 @@ impl Codegen<'_> {
                         #dag_ident::#variant_ident(value)
                     }
                 }
+
+                impl From<#dag_ident> for Option<#variant_path> {
+                    fn from(value: #dag_ident) -> Self {
+                        match value {
+                            #dag_ident::#variant_ident(v) => Some(v),
+                            _ => None,
+                        }
+                    }
+                }
             });
             most_concrete_variants.push(if descendant == table {
                 quote! {
                     #table_name => self.clone().into(),
                 }
             } else {
-                where_requirements.push(quote! {
-                    #variant_path: web_common_traits::database::Read<C>
-                });
                 quote! {
                     #table_name => <#variant_path as web_common_traits::database::Read<C>>::read(*self.id(), conn)?.into(),
                 }
             });
+            types.push(variant_path);
+            variants.push(variant_ident);
         }
         let mermaid = columns_to_mermaid_illustration(
             false,
@@ -107,8 +117,19 @@ impl Codegen<'_> {
                 type Variant = #dag_ident;
             }
 
+            impl web_common_traits::database::PrimaryKeyLike for #dag_ident {
+                type PrimaryKey = #primary_key_type;
+
+                fn primary_key(&self) -> Self::PrimaryKey {
+                    match self {
+                        #( Self::#variants(variant) => variant.primary_key(), )*
+                    }
+                }
+            }
+
             impl<C> web_common_traits::database::MostConcreteVariant<C> for #struct_path
-                where #(#where_requirements),*
+                where
+                    #(#types: web_common_traits::database::Read<C>),*
             {
                 fn most_concrete_variant(&self, conn: &mut C) -> Result<Self::Variant, diesel::result::Error> {
                     use diesel::Identifiable;

@@ -3,7 +3,7 @@
 
 use core_structures::{PhoneModel, User, tables::insertables::AssetModelSettable};
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 /// Returns the smartphone device.
 ///
@@ -20,7 +20,7 @@ use web_common_traits::database::{Insertable, InsertableVariant};
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn phone(user: &User, conn: &mut PgConnection) -> anyhow::Result<PhoneModel> {
+pub fn phone_model(user: &User, conn: &mut PgConnection) -> anyhow::Result<PhoneModel> {
     let name = "Phone";
 
     if let Some(existing) = PhoneModel::from_name(name, conn).optional()? {

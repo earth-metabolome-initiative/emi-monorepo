@@ -57,6 +57,7 @@ impl core::fmt::Display for AssetAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -153,6 +154,12 @@ pub struct InsertableAssetBuilder {
     pub(crate) updated_by: Option<i32>,
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
 }
+impl diesel::associations::HasTable for InsertableAssetBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::assets::assets::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::assets::assets::table
+    }
+}
 impl From<InsertableAssetBuilder>
     for web_common_traits::database::IdOrBuilder<::rosetta_uuid::Uuid, InsertableAssetBuilder>
 {
@@ -180,7 +187,6 @@ impl common_traits::builder::IsCompleteBuilder
 {
     fn is_complete(&self) -> bool {
         self.id.is_some()
-            && self.most_concrete_table.is_some()
             && self.model.is_some()
             && self.created_by.is_some()
             && self.created_at.is_some()
@@ -191,8 +197,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `Asset` or
 /// descendant tables.
 pub trait AssetSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.assets.id` column.
     ///
     /// # Arguments
@@ -211,10 +217,7 @@ pub trait AssetSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn id<I>(
-        self,
-        id: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn id<I>(self, id: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the `public.assets.name` column.
@@ -235,10 +238,7 @@ pub trait AssetSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn name<N>(
-        self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>;
@@ -261,10 +261,7 @@ pub trait AssetSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn description<D>(
-        self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>;
@@ -285,10 +282,7 @@ pub trait AssetSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn model<M>(
-        self,
-        model: M,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn model<M>(self, model: M) -> Result<Self, Self::Error>
     where
         M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.assets.created_by` column.
@@ -309,10 +303,7 @@ pub trait AssetSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by<CB>(
-        self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.assets.created_at` column.
@@ -334,10 +325,7 @@ pub trait AssetSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<CA>(
-        self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -360,10 +348,7 @@ pub trait AssetSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_by<UB>(
-        self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.assets.updated_at` column.
@@ -385,22 +370,23 @@ pub trait AssetSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn updated_at<UA>(
-        self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
-impl AssetSettable for InsertableAssetBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::AssetAttribute;
+impl AssetSettable for InsertableAssetBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::AssetAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.assets.id` column.
-    fn id<I>(
-        mut self,
-        id: I,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn id<I>(mut self, id: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
     {
@@ -409,10 +395,7 @@ impl AssetSettable for InsertableAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.assets.name` column.
-    fn name<N>(
-        mut self,
-        name: N,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
@@ -441,10 +424,7 @@ impl AssetSettable for InsertableAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.assets.description` column.
-    fn description<D>(
-        mut self,
-        description: D,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<Option<String>>,
         validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
@@ -475,10 +455,7 @@ impl AssetSettable for InsertableAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.assets.model` column.
-    fn model<M>(
-        mut self,
-        model: M,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn model<M>(mut self, model: M) -> Result<Self, Self::Error>
     where
         M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -503,10 +480,7 @@ impl AssetSettable for InsertableAssetBuilder {
     /// v1@{shape: rounded, label: "updated_by"}
     /// class v1 directly-involved-column
     /// ```
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -517,10 +491,7 @@ impl AssetSettable for InsertableAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.assets.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -541,10 +512,7 @@ impl AssetSettable for InsertableAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.assets.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -554,10 +522,7 @@ impl AssetSettable for InsertableAssetBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.assets.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -594,20 +559,19 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableAssetBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableAssetBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::assets::Asset,
-            Attribute = AssetAttribute,
+            Error = web_common_traits::database::InsertError<AssetAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<AssetAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::assets::Asset =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

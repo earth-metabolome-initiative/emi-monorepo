@@ -343,4 +343,41 @@ impl Procedure {
         }
         Ok(procedures)
     }
+
+    /// Returns the pairs of coupled procedure assets and procedure template
+    /// asset models for the current procedure.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the database query fails, returns a `diesel::result::Error`.
+    pub(crate) fn coupled_pa_and_ptams(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<(Column, Column)>, crate::errors::Error> {
+        let procedure_assets = self.procedure_assets(conn)?;
+        let procedure_template_asset_models = self.procedure_template_asset_models(conn)?;
+
+        let mut coupled = Vec::new();
+
+        for (procedure_asset_column, _) in procedure_assets {
+            let expected_name = format!(
+                "{}_model",
+                procedure_asset_column.column_name.as_str().replacen(
+                    "procedure_",
+                    "procedure_template_",
+                    1,
+                )
+            );
+            let (procedure_template_asset_model, _) = procedure_template_asset_models.iter().find(|(ptam_column, _)| {
+                ptam_column.column_name == expected_name
+            }).expect(&format!("Procedure asset column {procedure_asset_column} should have a matching procedure template asset model column called \"{expected_name}\""));
+            coupled.push((procedure_asset_column, procedure_template_asset_model.clone()));
+        }
+
+        Ok(coupled)
+    }
 }

@@ -16,6 +16,8 @@ pub mod session_operation;
 pub mod prelude {
     pub use common_traits::prelude::*;
 
+    #[cfg(feature = "backend")]
+    pub use crate::database::BackendInsertableVariant;
     pub use crate::{
         attributes::*,
         database::{

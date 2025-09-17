@@ -49,11 +49,13 @@ impl web_common_traits::prelude::HasForeignKeys
                 self.photograph,
             ),
         ));
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(
-                self.photographed_asset,
-            ),
-        ));
+        if let Some(photographed_asset) = self.photographed_asset {
+            connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(
+                    photographed_asset,
+                ),
+            ));
+        }
         if let Some(photographed_with) = self.photographed_with {
             connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::Camera(
@@ -114,7 +116,7 @@ impl web_common_traits::prelude::HasForeignKeys
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.photograph.is_some()
-            && foreign_keys.photographed_asset.is_some()
+            && (foreign_keys.photographed_asset.is_some() || self.photographed_asset.is_some())
             && (foreign_keys.photographed_with.is_some() || self.photographed_with.is_some())
             && foreign_keys.procedure.is_some()
             && foreign_keys.procedure_photograph.is_some()
@@ -209,7 +211,10 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.photographed_asset == physical_assets.id {
+                if self
+                    .photographed_asset
+                    .is_some_and(|photographed_asset| photographed_asset == physical_assets.id)
+                {
                     foreign_keys.photographed_asset = Some(physical_assets);
                     updated = true;
                 }
@@ -218,7 +223,10 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::PhysicalAsset(physical_assets),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.photographed_asset == physical_assets.id {
+                if self
+                    .photographed_asset
+                    .is_some_and(|photographed_asset| photographed_asset == physical_assets.id)
+                {
                     foreign_keys.photographed_asset = None;
                     updated = true;
                 }

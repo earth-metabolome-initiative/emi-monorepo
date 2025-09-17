@@ -83,7 +83,6 @@ impl Codegen<'_> {
         //     return
         // Err(crate::errors::CodeGenerationError::TeamProjectsTableNotProvided.into());
         // };
-        let user_id_type = user.primary_key_type(conn)?;
 
         for table in tables {
             if !table.allows_updatable(conn)? && table != user {
@@ -147,7 +146,7 @@ impl Codegen<'_> {
 
                 if parent_table.as_ref() != table {
                     where_constraints.push(quote::quote! {
-                        #parent_table_path: web_common_traits::database::Updatable<C, UserId = #user_id_type>
+                        #parent_table_path: web_common_traits::database::Updatable<C>
                     });
                 }
 
@@ -230,11 +229,9 @@ impl Codegen<'_> {
                 &table_file,
                 self.beautify_code(&quote::quote! {
                     impl<C: diesel::connection::LoadConnection> web_common_traits::database::Updatable<C> for #table_path #maybe_where_clause{
-                        type UserId = #user_id_type;
-
                         fn can_update(
                             &self,
-                            user_id: Self::UserId,
+                            user_id: i32,
                             #conn_ident: &mut C,
                         ) -> Result<bool, diesel::result::Error> {
                             #created_by_check

@@ -1,4 +1,5 @@
-impl<CommercialProductLot, FreezerModel> web_common_traits::database::InsertableVariantMetadata
+impl<CommercialProductLot, FreezerModel>
+    web_common_traits::database::DispatchableInsertVariantMetadata
     for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotBuilder<
         CommercialProductLot,
         FreezerModel,
@@ -6,9 +7,84 @@ impl<CommercialProductLot, FreezerModel> web_common_traits::database::Insertable
 {
     type Row =
         crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotAttribute,
+    >;
+}
+impl<CommercialProductLot, FreezerModel> web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotBuilder<
+        CommercialProductLot,
+        FreezerModel,
+    >
+{
     type InsertableVariant =
         crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLot;
-    type UserId = i32;
+}
+#[cfg(feature = "backend")]
+impl<CommercialProductLot, FreezerModel> web_common_traits::database::BackendInsertableVariant
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotBuilder<
+        CommercialProductLot,
+        FreezerModel,
+    >
+where
+    Self: web_common_traits::database::DispatchableInsertableVariant<diesel::PgConnection>,
+{
+}
+impl<
+    C: diesel::connection::LoadConnection,
+    CommercialProductLot,
+    FreezerModel,
+> web_common_traits::database::DispatchableInsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLotBuilder<
+    CommercialProductLot,
+    FreezerModel,
+>
+where
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLot as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
+    >,
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLot,
+        Row = crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotAttribute,
+        >,
+    >,
+    CommercialProductLot: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
+    FreezerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotExtensionAttribute: From<
+        <CommercialProductLot as common_traits::builder::Attributed>::Attribute,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotExtensionAttribute: From<
+        <FreezerModel as common_traits::builder::Attributed>::Attribute,
+    >,
+{
+    fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
+        use diesel::RunQueryDsl;
+        use diesel::associations::HasTable;
+        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("commercial_freezer_lots");
+        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLot = self
+            .try_insert(user_id, conn)?;
+        Ok(
+            diesel::insert_into(Self::table())
+                .values(insertable_struct)
+                .get_result(conn)?,
+        )
+    }
 }
 impl<
     C: diesel::connection::LoadConnection,
@@ -43,38 +119,11 @@ where
         <FreezerModel as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    fn insert(
-        mut self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<
-        Self::Row,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotAttribute,
-        >,
-    > {
-        use diesel::RunQueryDsl;
-        use diesel::associations::HasTable;
-        use web_common_traits::database::MostConcreteTable;
-        self.set_most_concrete_table("commercial_freezer_lots");
-        let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFreezerLot = self
-            .try_insert(user_id, conn)?;
-        Ok(
-            diesel::insert_into(Self::Row::table())
-                .values(insertable_struct)
-                .get_result(conn)?,
-        )
-    }
     fn try_insert(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::InsertableVariant,
-        web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::CommercialFreezerLotAttribute,
-        >,
-    > {
+    ) -> Result<Self::InsertableVariant, Self::Error> {
         let product_model = self
             .product_model
             .ok_or(

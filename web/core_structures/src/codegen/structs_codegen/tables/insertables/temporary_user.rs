@@ -31,6 +31,7 @@ impl core::fmt::Display for TemporaryUserAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -90,6 +91,12 @@ pub struct InsertableTemporaryUserBuilder {
     pub(crate) email: Option<String>,
     pub(crate) login_provider_id: Option<i16>,
 }
+impl diesel::associations::HasTable for InsertableTemporaryUserBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::temporary_user::temporary_user::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::temporary_user::temporary_user::table
+    }
+}
 impl From<InsertableTemporaryUserBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableTemporaryUserBuilder>
 {
@@ -107,8 +114,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `TemporaryUser` or
 /// descendant tables.
 pub trait TemporaryUserSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.temporary_user.email` column.
     ///
     /// # Arguments
@@ -128,10 +135,7 @@ pub trait TemporaryUserSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn email<E>(
-        self,
-        email: E,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn email<E>(self, email: E) -> Result<Self, Self::Error>
     where
         E: TryInto<String>,
         validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>;
@@ -153,46 +157,49 @@ pub trait TemporaryUserSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i16`.
     /// * If the provided value does not pass schema-defined validation.
-    fn login_provider<LPI>(
-        self,
-        login_provider_id: LPI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn login_provider<LPI>(self, login_provider_id: LPI) -> Result<Self, Self::Error>
     where
         LPI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
 }
-impl TemporaryUserSettable for InsertableTemporaryUserBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::TemporaryUserAttribute;
-    /// Sets the value of the `public.temporary_user.email` column.
-    fn email<E>(
-        mut self,
-        email: E,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+impl TemporaryUserSettable for InsertableTemporaryUserBuilder
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::TemporaryUserAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.temporary_user.email` column.
+    fn email<E>(mut self, email: E) -> Result<Self, Self::Error>
     where
         E: TryInto<String>,
         validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>,
     {
-        let email = email.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
-                .rename_field(TemporaryUserAttribute::Email)
-        })?;
-        pgrx_validation::must_be_email(email.as_ref()).map_err(|e| {
-            e.rename_field(
-                crate::codegen::structs_codegen::tables::insertables::TemporaryUserAttribute::Email,
-            )
-        })?;
+        let email = email
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(TemporaryUserAttribute::Email)
+            })?;
+        pgrx_validation::must_be_email(email.as_ref())
+            .map_err(|e| {
+                e
+                    .rename_field(
+                        crate::codegen::structs_codegen::tables::insertables::TemporaryUserAttribute::Email,
+                    )
+            })?;
         self.email = Some(email);
         Ok(self)
     }
-    /// Sets the value of the `public.temporary_user.login_provider_id` column.
-    fn login_provider<LPI>(
-        mut self,
-        login_provider_id: LPI,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///Sets the value of the `public.temporary_user.login_provider_id` column.
+    fn login_provider<LPI>(mut self, login_provider_id: LPI) -> Result<Self, Self::Error>
     where
         LPI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
     {
-        let login_provider_id =
-            <LPI as web_common_traits::database::PrimaryKeyLike>::primary_key(&login_provider_id);
+        let login_provider_id = <LPI as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &login_provider_id,
+        );
         self.login_provider_id = Some(login_provider_id);
         Ok(self)
     }
@@ -205,20 +212,20 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableTemporaryUserBuilde
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableTemporaryUserBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser,
-            Attribute = TemporaryUserAttribute,
+            Error = web_common_traits::database::InsertError<TemporaryUserAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<TemporaryUserAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

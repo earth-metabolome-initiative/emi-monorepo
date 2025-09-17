@@ -6,7 +6,7 @@ pub enum DisposalProcedureExtensionAttribute {
 impl core::fmt::Display for DisposalProcedureExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Procedure(e) => write!(f, "{e}"),
+            Self::Procedure(e) => write!(f, "disposal_procedures({e})"),
         }
     }
 }
@@ -79,6 +79,7 @@ impl core::fmt::Display for DisposalProcedureAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -297,6 +298,13 @@ pub struct InsertableDisposalProcedureBuilder<
     >,
     pub(crate) procedure: Procedure,
 }
+impl<Procedure> diesel::associations::HasTable for InsertableDisposalProcedureBuilder<Procedure> {
+    type Table =
+        crate::codegen::diesel_codegen::tables::disposal_procedures::disposal_procedures::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::disposal_procedures::disposal_procedures::table
+    }
+}
 impl From<InsertableDisposalProcedureBuilder>
     for web_common_traits::database::IdOrBuilder<
         ::rosetta_uuid::Uuid,
@@ -328,8 +336,8 @@ where
 /// Trait defining setters for attributes of an instance of `DisposalProcedure`
 /// or descendant tables.
 pub trait DisposalProcedureSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.disposal_procedures.procedure_template`
     /// column.
     ///
@@ -349,10 +357,7 @@ pub trait DisposalProcedureSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn procedure_template<PT>(
-        self,
-        procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure_template<PT>(self, procedure_template: PT) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.disposal_procedures.disposed_asset`
@@ -375,10 +380,7 @@ pub trait DisposalProcedureSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_uuid::Uuid`.
     /// * If the provided value does not pass schema-defined validation.
-    fn disposed_asset<DA>(
-        self,
-        disposed_asset: DA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn disposed_asset<DA>(self, disposed_asset: DA) -> Result<Self, Self::Error>
     where
         DA: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
@@ -405,7 +407,7 @@ pub trait DisposalProcedureSettable: Sized {
     fn procedure_template_disposed_asset_model<PTDAM>(
         self,
         procedure_template_disposed_asset_model: PTDAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTDAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the
@@ -431,7 +433,7 @@ pub trait DisposalProcedureSettable: Sized {
     fn procedure_disposed_asset<PDA>(
         self,
         procedure_disposed_asset: PDA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PDA: Into<
             web_common_traits::database::IdOrBuilder<
@@ -442,113 +444,118 @@ pub trait DisposalProcedureSettable: Sized {
 }
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            >,
         >,
 > DisposalProcedureSettable for InsertableDisposalProcedureBuilder<Procedure>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute,
+    >,
 {
-    type Attributes =
-        crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute;
-    /// Sets the value of the `public.disposal_procedures.procedure_template`
-    /// column.
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.disposal_procedures.procedure_template` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`disposal_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`disposal_procedures`"]
     ///    v0@{shape: rounded, label: "procedure_template"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_assets`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// subgraph v6 ["`procedures`"]
+    ///class v3 undirectly-involved-column
+    ///end
+    ///subgraph v6 ["`procedures`"]
     ///    v2@{shape: rounded, label: "procedure_template"}
-    /// class v2 directly-involved-column
-    /// end
-    /// v0 --->|"`ancestral same as`"| v2
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v3
-    /// v4 --->|"`extends`"| v6
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v2 directly-involved-column
+    ///end
+    ///v0 --->|"`ancestral same as`"| v2
+    ///v0 -.->|"`foreign defines`"| v1
+    ///v1 --->|"`associated same as`"| v3
+    ///v4 --->|"`extends`"| v6
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn procedure_template<PT>(
         mut self,
         procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template =
-            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
+        let procedure_template = <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template,
+        );
         self.procedure = <Procedure as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                 self.procedure,
                 procedure_template,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| Self::Attributes::Extension(
+                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
         self.procedure_template = Some(procedure_template);
         Ok(self)
     }
-    /// Sets the value of the `public.disposal_procedures.disposed_asset`
-    /// column.
+    ///Sets the value of the `public.disposal_procedures.disposed_asset` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`disposal_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`disposal_procedures`"]
     ///    v0@{shape: rounded, label: "disposed_asset"}
-    /// class v0 column-of-interest
+    ///class v0 column-of-interest
     ///    v1@{shape: rounded, label: "procedure_disposed_asset"}
-    /// class v1 directly-involved-column
-    /// end
-    /// subgraph v5 ["`procedure_assets`"]
+    ///class v1 directly-involved-column
+    ///end
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "asset"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v2
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v3
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
-    fn disposed_asset<DA>(
-        mut self,
-        disposed_asset: DA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v2
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v3
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v4 ---o|"`associated with`"| v5
+    ///```
+    fn disposed_asset<DA>(mut self, disposed_asset: DA) -> Result<Self, Self::Error>
     where
-        DA: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
+        DA: web_common_traits::database::MaybePrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
     {
-        let disposed_asset =
-            <DA as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
-                &disposed_asset,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_disposed_asset) =
-            self.procedure_disposed_asset
+        let disposed_asset = <DA as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
+            &disposed_asset,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_disposed_asset,
+        ) = self.procedure_disposed_asset
         {
             self.procedure_disposed_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset(
                     procedure_disposed_asset,
@@ -556,7 +563,9 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureDisposedAsset(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureDisposedAsset(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
@@ -564,53 +573,51 @@ impl<
         self.disposed_asset = disposed_asset;
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.disposal_procedures.procedure_template_disposed_asset_model`
-    /// column.
+    ///Sets the value of the `public.disposal_procedures.procedure_template_disposed_asset_model` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v4 ["`disposal_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v4 ["`disposal_procedures`"]
     ///    v0@{shape: rounded, label: "procedure_disposed_asset"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_disposed_asset_model"}
-    /// class v1 column-of-interest
-    /// end
-    /// subgraph v5 ["`procedure_assets`"]
+    ///class v1 column-of-interest
+    ///end
+    ///subgraph v5 ["`procedure_assets`"]
     ///    v2@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v2 directly-involved-column
+    ///class v2 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
-    /// class v3 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 --->|"`associated same as`"| v3
-    /// v0 -.->|"`foreign defines`"| v1
-    /// v1 --->|"`associated same as`"| v2
-    /// v4 ---o|"`associated with`"| v5
-    /// ```
+    ///class v3 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 --->|"`associated same as`"| v3
+    ///v0 -.->|"`foreign defines`"| v1
+    ///v1 --->|"`associated same as`"| v2
+    ///v4 ---o|"`associated with`"| v5
+    ///```
     fn procedure_template_disposed_asset_model<PTDAM>(
         mut self,
         procedure_template_disposed_asset_model: PTDAM,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PTDAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_disposed_asset_model =
-            <PTDAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-                &procedure_template_disposed_asset_model,
-            );
-        if let web_common_traits::database::IdOrBuilder::Builder(procedure_disposed_asset) =
-            self.procedure_disposed_asset
+        let procedure_template_disposed_asset_model = <PTDAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_disposed_asset_model,
+        );
+        if let web_common_traits::database::IdOrBuilder::Builder(
+            procedure_disposed_asset,
+        ) = self.procedure_disposed_asset
         {
             self.procedure_disposed_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_disposed_asset,
@@ -618,58 +625,60 @@ impl<
                 )
                 .map_err(|e| {
                     e.into_field_name(|attribute| {
-                        Self::Attributes::ProcedureDisposedAsset(attribute)
+                        <Self as common_traits::builder::Attributed>::Attribute::ProcedureDisposedAsset(
+                            attribute,
+                        )
                     })
                 })?
                 .into();
         }
-        self.procedure_template_disposed_asset_model =
-            Some(procedure_template_disposed_asset_model);
+        self.procedure_template_disposed_asset_model = Some(
+            procedure_template_disposed_asset_model,
+        );
         Ok(self)
     }
-    /// Sets the value of the
-    /// `public.disposal_procedures.procedure_disposed_asset` column.
+    ///Sets the value of the `public.disposal_procedures.procedure_disposed_asset` column.
     ///
-    /// # Implementation notes
-    /// This method also set the values of other columns, due to
-    /// same-as relationships or inferred values.
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
     ///
-    /// ## Mermaid illustration
+    ///## Mermaid illustration
     ///
-    /// ```mermaid
-    /// flowchart BT
-    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
-    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
-    /// classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    /// subgraph v6 ["`disposal_procedures`"]
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
+    ///subgraph v6 ["`disposal_procedures`"]
     ///    v0@{shape: rounded, label: "disposed_asset"}
-    /// class v0 directly-involved-column
+    ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_disposed_asset"}
-    /// class v1 column-of-interest
+    ///class v1 column-of-interest
     ///    v2@{shape: rounded, label: "procedure_template_disposed_asset_model"}
-    /// class v2 directly-involved-column
-    /// end
-    /// subgraph v7 ["`procedure_assets`"]
+    ///class v2 directly-involved-column
+    ///end
+    ///subgraph v7 ["`procedure_assets`"]
     ///    v3@{shape: rounded, label: "asset"}
-    /// class v3 directly-involved-column
+    ///class v3 directly-involved-column
     ///    v4@{shape: rounded, label: "procedure_template_asset_model"}
-    /// class v4 directly-involved-column
+    ///class v4 directly-involved-column
     ///    v5@{shape: rounded, label: "id"}
-    /// class v5 undirectly-involved-column
-    /// end
-    /// v0 --->|"`associated same as`"| v3
-    /// v1 --->|"`associated same as`"| v5
-    /// v1 --->|"`associated same as`"| v5
-    /// v1 --->|"`associated same as`"| v5
-    /// v1 -.->|"`foreign defines`"| v0
-    /// v1 -.->|"`foreign defines`"| v2
-    /// v2 --->|"`associated same as`"| v4
-    /// v6 ---o|"`associated with`"| v7
-    /// ```
+    ///class v5 undirectly-involved-column
+    ///end
+    ///v0 --->|"`associated same as`"| v3
+    ///v1 --->|"`associated same as`"| v5
+    ///v1 --->|"`associated same as`"| v5
+    ///v1 --->|"`associated same as`"| v5
+    ///v1 -.->|"`foreign defines`"| v0
+    ///v1 -.->|"`foreign defines`"| v2
+    ///v2 --->|"`associated same as`"| v4
+    ///v6 ---o|"`associated with`"| v7
+    ///```
     fn procedure_disposed_asset<PDA>(
         mut self,
         procedure_disposed_asset: PDA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PDA: Into<
             web_common_traits::database::IdOrBuilder<
@@ -679,17 +688,19 @@ impl<
         >,
     {
         let mut procedure_disposed_asset = procedure_disposed_asset.into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_disposed_asset
-        {
-            procedure_disposed_asset = if let (Some(disposed_asset), Some(asset)) =
-                (self.disposed_asset, builder.asset)
-            {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_disposed_asset {
+            procedure_disposed_asset = if let (Some(disposed_asset), Some(asset)) = (
+                self.disposed_asset,
+                builder.asset,
+            ) {
                 if disposed_asset != asset {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::DisposedAsset,
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::DisposedAsset,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
             } else if let Some(asset) = builder.asset {
@@ -702,7 +713,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureDisposedAsset(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureDisposedAsset(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -710,8 +723,7 @@ impl<
                 builder.into()
             };
         }
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_disposed_asset
-        {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_disposed_asset {
             procedure_disposed_asset = if let (
                 Some(procedure_template_disposed_asset_model),
                 Some(procedure_template_asset_model),
@@ -719,21 +731,27 @@ impl<
                 self.procedure_template_disposed_asset_model,
                 builder.procedure_template_asset_model,
             ) {
-                if procedure_template_disposed_asset_model != procedure_template_asset_model {
-                    return Err(web_common_traits::database::InsertError::BuilderError(
-                        web_common_traits::prelude::BuilderError::UnexpectedAttribute(
-                            Self::Attributes::ProcedureTemplateDisposedAssetModel,
+                if procedure_template_disposed_asset_model
+                    != procedure_template_asset_model
+                {
+                    return Err(
+                        web_common_traits::database::InsertError::BuilderError(
+                            web_common_traits::prelude::BuilderError::UnexpectedAttribute(
+                                <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateDisposedAssetModel,
+                            ),
                         ),
-                    ));
+                    );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) =
-                builder.procedure_template_asset_model
+            } else if let Some(procedure_template_asset_model) = builder
+                .procedure_template_asset_model
             {
-                self.procedure_template_disposed_asset_model = Some(procedure_template_asset_model);
+                self.procedure_template_disposed_asset_model = Some(
+                    procedure_template_asset_model,
+                );
                 builder.into()
-            } else if let Some(procedure_template_disposed_asset_model) =
-                self.procedure_template_disposed_asset_model
+            } else if let Some(procedure_template_disposed_asset_model) = self
+                .procedure_template_disposed_asset_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
@@ -741,7 +759,9 @@ impl<
                     )
                     .map_err(|e| {
                         e.into_field_name(|attribute| {
-                            Self::Attributes::ProcedureDisposedAsset(attribute)
+                            <Self as common_traits::builder::Attributed>::Attribute::ProcedureDisposedAsset(
+                                attribute,
+                            )
                         })
                     })?
                     .into()
@@ -755,22 +775,28 @@ impl<
 }
 impl<
     Procedure: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-            Attributes = crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+            >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::ProcedureSettable
 for InsertableDisposalProcedureBuilder<Procedure>
 where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute,
+    >,
     Self: crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute,
+        >,
     >,
 {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     #[inline]
     ///Sets the value of the `public.procedures.procedure` column.
-    fn procedure<P>(
-        mut self,
-        procedure: P,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure<P>(mut self, procedure: P) -> Result<Self, Self::Error>
     where
         P: web_common_traits::database::PrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -782,7 +808,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -812,10 +838,7 @@ where
     ///v0 --->|"`ancestral same as`"| v1
     ///v2 --->|"`extends`"| v3
     ///```
-    fn procedure_template<PT>(
-        self,
-        procedure_template: PT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn procedure_template<PT>(self, procedure_template: PT) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -823,10 +846,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.
-    fn parent_procedure<PP>(
-        mut self,
-        parent_procedure: PP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn parent_procedure<PP>(mut self, parent_procedure: PP) -> Result<Self, Self::Error>
     where
         PP: web_common_traits::database::MaybePrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -838,7 +858,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -849,7 +869,7 @@ where
     fn parent_procedure_template<PPT>(
         mut self,
         parent_procedure_template: PPT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -859,7 +879,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -870,7 +890,7 @@ where
     fn predecessor_procedure<PP>(
         mut self,
         predecessor_procedure: PP,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PP: web_common_traits::database::MaybePrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
@@ -882,7 +902,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -893,7 +913,7 @@ where
     fn predecessor_procedure_template<PPT>(
         mut self,
         predecessor_procedure_template: PPT,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    ) -> Result<Self, Self::Error>
     where
         PPT: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -903,7 +923,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -911,10 +931,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -924,7 +941,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -932,10 +949,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -948,7 +962,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -956,10 +970,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_by` column.
-    fn updated_by<UB>(
-        mut self,
-        updated_by: UB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -969,7 +980,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -977,10 +988,7 @@ where
     }
     #[inline]
     ///Sets the value of the `public.procedures.updated_at` column.
-    fn updated_at<UA>(
-        mut self,
-        updated_at: UA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError: From<
@@ -993,7 +1001,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| Self::Attributes::Extension(
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1023,11 +1031,10 @@ where
 impl<Procedure, C> web_common_traits::database::TryInsertGeneric<C>
     for InsertableDisposalProcedureBuilder<Procedure>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure,
-            Attribute = DisposalProcedureAttribute,
+            Error = web_common_traits::database::InsertError<DisposalProcedureAttribute>,
         >,
     Procedure: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder:
@@ -1037,9 +1044,12 @@ where
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<DisposalProcedureAttribute>,
+    > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

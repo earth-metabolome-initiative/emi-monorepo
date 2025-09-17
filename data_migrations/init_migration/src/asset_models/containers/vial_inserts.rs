@@ -7,7 +7,7 @@ use core_structures::{
     },
 };
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 use crate::brands::vici_schweiz;
 

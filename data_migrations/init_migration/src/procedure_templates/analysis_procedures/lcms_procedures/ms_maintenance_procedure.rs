@@ -2,7 +2,7 @@
 
 use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateSettable};
 use diesel::OptionalExtension;
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 pub(crate) fn init_ms_maintenance_procedure(
     user: &User,

@@ -39,6 +39,7 @@ impl core::fmt::Display for UserEmailAttribute {
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -96,6 +97,12 @@ pub struct InsertableUserEmailBuilder {
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) primary_email: Option<bool>,
 }
+impl diesel::associations::HasTable for InsertableUserEmailBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::user_emails::user_emails::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::user_emails::user_emails::table
+    }
+}
 impl From<InsertableUserEmailBuilder>
     for web_common_traits::database::IdOrBuilder<i32, InsertableUserEmailBuilder>
 {
@@ -126,8 +133,8 @@ impl common_traits::builder::IsCompleteBuilder
 /// Trait defining setters for attributes of an instance of `UserEmail` or
 /// descendant tables.
 pub trait UserEmailSettable: Sized {
-    /// Attributes required to build the insertable.
-    type Attributes;
+    /// Error type returned when setting attributes.
+    type Error;
     /// Sets the value of the `public.user_emails.email` column.
     ///
     /// # Arguments
@@ -146,10 +153,7 @@ pub trait UserEmailSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `String`.
     /// * If the provided value does not pass schema-defined validation.
-    fn email<E>(
-        self,
-        email: E,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn email<E>(self, email: E) -> Result<Self, Self::Error>
     where
         E: TryInto<String>,
         validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>;
@@ -171,10 +175,7 @@ pub trait UserEmailSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `i32`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_by<CB>(
-        self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
     /// Sets the value of the `public.user_emails.created_at` column.
@@ -196,10 +197,7 @@ pub trait UserEmailSettable: Sized {
     /// * If the provided value cannot be converted to the required type
     ///   `::rosetta_timestamp::TimestampUTC`.
     /// * If the provided value does not pass schema-defined validation.
-    fn created_at<CA>(
-        self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -222,21 +220,22 @@ pub trait UserEmailSettable: Sized {
     /// # Errors
     /// * If the provided value cannot be converted to the required type `bool`.
     /// * If the provided value does not pass schema-defined validation.
-    fn primary_email<PE>(
-        self,
-        primary_email: PE,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn primary_email<PE>(self, primary_email: PE) -> Result<Self, Self::Error>
     where
         PE: TryInto<bool>,
         validation_errors::SingleFieldError: From<<PE as TryInto<bool>>::Error>;
 }
-impl UserEmailSettable for InsertableUserEmailBuilder {
-    type Attributes = crate::codegen::structs_codegen::tables::insertables::UserEmailAttribute;
+impl UserEmailSettable for InsertableUserEmailBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::UserEmailAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
     /// Sets the value of the `public.user_emails.email` column.
-    fn email<E>(
-        mut self,
-        email: E,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn email<E>(mut self, email: E) -> Result<Self, Self::Error>
     where
         E: TryInto<String>,
         validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>,
@@ -253,10 +252,7 @@ impl UserEmailSettable for InsertableUserEmailBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.user_emails.created_by` column.
-    fn created_by<CB>(
-        mut self,
-        created_by: CB,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
@@ -266,10 +262,7 @@ impl UserEmailSettable for InsertableUserEmailBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.user_emails.created_at` column.
-    fn created_at<CA>(
-        mut self,
-        created_at: CA,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
         validation_errors::SingleFieldError:
@@ -283,10 +276,7 @@ impl UserEmailSettable for InsertableUserEmailBuilder {
         Ok(self)
     }
     /// Sets the value of the `public.user_emails.primary_email` column.
-    fn primary_email<PE>(
-        mut self,
-        primary_email: PE,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>>
+    fn primary_email<PE>(mut self, primary_email: PE) -> Result<Self, Self::Error>
     where
         PE: TryInto<bool>,
         validation_errors::SingleFieldError: From<<PE as TryInto<bool>>::Error>,
@@ -307,20 +297,20 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableUserEmailBuilder {
 }
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableUserEmailBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::user_emails::UserEmail,
-            Attribute = UserEmailAttribute,
+            Error = web_common_traits::database::InsertError<UserEmailAttribute>,
         >,
 {
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<UserEmailAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::user_emails::UserEmail =
             self.insert(user_id, conn)?;
         Ok(insertable.id())
