@@ -1,23 +1,20 @@
 //! Submodule providing utilities to create and manage documents.
 use diesel::connection::LoadConnection;
-use web_common_traits::database::{InsertError, Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, InsertError, Insertable};
 
-use crate::{Document, tables::insertables::InsertableDocumentAttributes};
+use crate::{
+    Photograph, codegen::structs_codegen::tables::insertables::AssetSettable,
+    tables::insertables::PhotographAttribute,
+};
 
 /// Returns the newly created photograph.
 pub fn create_photograph<C: LoadConnection>(
     photograph: &[u8],
     user: &crate::User,
     conn: &mut C,
-) -> Result<Document, InsertError<InsertableDocumentAttributes>>
+) -> Result<Photograph, InsertError<PhotographAttribute>>
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
-    diesel::query_builder::InsertStatement<
-        <Document as diesel::associations::HasTable>::Table,
-        <<Document as Insertable>::InsertableVariant as diesel::Insertable<
-            <Document as diesel::associations::HasTable>::Table,
-        >>::Values,
-    >: for<'query> diesel::query_dsl::LoadQuery<'query, C, Document>,
+    <Photograph as Insertable>::InsertableBuilder: DispatchableInsertableVariant<C, Error = InsertError<PhotographAttribute>, Row = Photograph>,
 {
     let info = infer::get(photograph).expect("Failed to infer document type");
 
@@ -25,12 +22,10 @@ where
 
     // We begin a transaction where we insert the document and write it to the
     // database
-    let document: Document = conn
-        .transaction::<Document, InsertError<InsertableDocumentAttributes>, _>(|conn| {
-            let document: Document = crate::Document::new()
-                .mime_type(info.mime_type())?
-                .created_by(user.id)?
-                .insert(user.id, conn)?;
+    let document: Photograph = conn
+        .transaction::<Photograph, InsertError<PhotographAttribute>, _>(|conn| {
+            let document: Photograph =
+                crate::Photograph::new().created_by(user.id)?.insert(user.id, conn)?;
 
             // TODO: actually write the document to the file system
             // Using `document.id` as the file name

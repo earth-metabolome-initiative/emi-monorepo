@@ -15,25 +15,48 @@ pub use syntaxes::Syntax;
 use time_requirements::prelude::{Task, TimeTracker};
 
 use crate::{
-    Column, ColumnSameAsNetwork, PgExtension, PgType, Table, TableExtensionNetwork,
+    PgExtension, PgType, Table, TableExtensionNetwork,
     errors::{CodeGenerationError, WebCodeGenError},
 };
 
+/// Constant defining the codegen directory name.
 pub const CODEGEN_DIRECTORY: &str = "codegen";
+/// Constant defining the diesel codegen module name.
 pub const CODEGEN_DIESEL_MODULE: &str = "diesel_codegen";
+/// Constant defining the structs codegen module name.
 pub const CODEGEN_STRUCTS_MODULE: &str = "structs_codegen";
+/// Constant defining the traits codegen module name.
 pub const CODEGEN_TRAITS_MODULE: &str = "traits_codegen";
+/// Constant defining the submodule for the tables schema.
 pub const CODEGEN_TABLES_PATH: &str = "tables";
+/// Constant defining the submodule for the SQL types.
 pub const CODEGEN_TYPES_PATH: &str = "types";
+/// Constant defining the submodule for the diesel joinable macro.
 pub const CODEGEN_JOINABLE_PATH: &str = "joinable";
+/// Constant defining the submodule for the Upsertable trait implementations.
 pub const CODEGEN_UPSERTABLES_PATH: &str = "upsertables";
+/// Constant defining the submodule for the Insertable-related trait
+/// implementation.
 pub const CODEGEN_INSERTABLES_PATH: &str = "insertables";
+/// Constant defining the submodule for the MostConcreteVariant-related trait
+/// implementation.
+pub const CODEGEN_MOST_CONCRETE_VARIANTS_PATH: &str = "most_concrete_variants";
+/// Constant defining the submodule for the Insertable trait implementations.
 pub const CODEGEN_INSERTABLE_PATH: &str = "insertable";
+/// Constant defining the submodule for the foreign-keys-related trait
+/// implementations.
 pub const CODEGEN_FOREIGN_KEYS_PATH: &str = "foreign_keys";
+/// Constant defining the submodule for the Foreign trait implementations.
 pub const CODEGEN_FOREIGN_PATH: &str = "foreign";
+/// Constant defining the submodule for the Tabular trait implementations.
 pub const CODEGEN_TABULAR_PATH: &str = "tabular";
+/// Constant defining the submodule for the InsertableVariant trait
+/// implementations.
 pub const CODEGEN_INSERTABLE_VARIANT_PATH: &str = "insertable_variant";
+/// Constant defining the submodule for the Updatable-related trait
+/// implementations.
 pub const CODEGEN_UPDATABLES_PATH: &str = "updatables";
+/// Constant defining the submodule for the Updatable trait implementations.
 pub const CODEGEN_UPDATABLE_PATH: &str = "updatable";
 
 #[derive(Debug, Default)]
@@ -88,6 +111,10 @@ pub struct Codegen<'a> {
     /// implementations.
     pub(super) enable_insertable_trait: bool,
     /// Whether to enable the
+    /// [`MostConcreteVariant`](web_common_traits::database::MostConcreteVariant) traits
+    /// implementations.
+    pub(super) enable_most_concrete_variant_trait: bool,
+    /// Whether to enable the
     /// [`Updatable`](web_common_traits::database::Updatable) traits
     /// implementations.
     pub(super) enable_updatable_trait: bool,
@@ -101,18 +128,11 @@ pub struct Codegen<'a> {
     pub(super) enable_read_trait: bool,
     /// Whether to derive traits relative to the `yew` framework.
     pub(super) enable_yew: bool,
-    /// Graph representing the same-as relationships between columns.
-    column_same_as_network: Option<ColumnSameAsNetwork>,
     /// Graph representing the "extend" relationships between tables.
     table_extension_network: Option<TableExtensionNetwork>,
 }
 
 impl<'a> Codegen<'a> {
-    /// Returns a reference to the column same-as network.
-    pub fn column_same_as_network(&self) -> Option<&ColumnSameAsNetwork> {
-        self.column_same_as_network.as_ref()
-    }
-
     /// Returns a reference to the table extension network.
     pub fn table_extension_network(&self) -> Option<&TableExtensionNetwork> {
         self.table_extension_network.as_ref()
@@ -125,6 +145,7 @@ impl<'a> Codegen<'a> {
             || self.enable_attribute_trait
             || self.enable_foreign_trait
             || self.enable_insertable_trait
+            || self.enable_most_concrete_variant_trait
             || self.enable_updatable_trait
             || self.enable_upsertable_trait
             || self.enable_read_trait
@@ -354,6 +375,22 @@ impl<'a> Codegen<'a> {
 
     #[must_use]
     /// Whether to enable the generation of the
+    /// [`MostConcreteVariant`](web_common_traits::database::MostConcreteVariant) traits.
+    ///
+    /// # Note
+    ///
+    /// Since the [`MostConcreteVariant`](web_common_traits::database::MostConcreteVariant) traits
+    /// require the tables structs, enabling the generation of the
+    /// [`MostConcreteVariant`](web_common_traits::database::MostConcreteVariant) traits
+    /// automatically enables the generation of the tables structs.
+    pub fn enable_most_concrete_variant_trait(mut self) -> Self {
+        self = self.enable_table_structs();
+        self.enable_most_concrete_variant_trait = true;
+        self
+    }
+
+    #[must_use]
+    /// Whether to enable the generation of the
     /// [`Updatable`](web_common_traits::database::Updatable) traits.
     ///
     /// # Note
@@ -398,20 +435,20 @@ impl<'a> Codegen<'a> {
     }
 
     /// Dispatches beautification for the provided `TokenStream`, if requested.
-    pub(crate) fn beautify_code(&self, code: &TokenStream) -> Result<String, WebCodeGenError> {
+    pub(crate) fn beautify_code(&self, code: &TokenStream) -> String {
         if !self.beautify {
-            return Ok(code.to_string());
+            return code.to_string();
         }
 
         let code_string = code.to_string();
 
         // Parse the generated code string into a syn::Item
-        let syntax_tree: File = syn::parse_str(&code_string)?;
+        let syntax_tree: File = syn::parse_str(&code_string).unwrap();
 
         // Use prettyplease to format the syntax tree
         let formatted_code = unparse(&syntax_tree);
 
-        Ok(formatted_code)
+        formatted_code
     }
 
     /// Returns the output directory.
@@ -443,7 +480,10 @@ impl<'a> Codegen<'a> {
         for table in tables {
             let mut custom_types = Vec::new();
 
-            for column in table.columns(conn)?.into_iter().filter(Column::has_custom_type) {
+            for column in table.columns(conn)?.iter() {
+                if !column.has_custom_type() {
+                    continue;
+                }
                 let column_type = PgType::from_name(column.data_type_str(conn)?, conn)?;
                 if column_type.is_enum() || column_type.is_composite() {
                     custom_types.push(column_type);
@@ -472,7 +512,6 @@ impl<'a> Codegen<'a> {
     ///
     /// * `conn` - A mutable reference to a `PgConnection`.
     /// * `table_catalog` - The name of the table catalog.
-    /// * `table_schema` - The name of the table schema.
     ///
     /// # Errors
     ///
@@ -488,23 +527,20 @@ impl<'a> Codegen<'a> {
         &mut self,
         conn: &mut PgConnection,
         table_catalog: &str,
-        table_schema: Option<&str>,
     ) -> Result<TimeTracker, WebCodeGenError> {
         let mut time_tracker = TimeTracker::new("Code generation");
 
         let task = Task::new("Retrieving tables");
-        let mut tables = Table::load_all(conn, table_catalog, table_schema)?
-            .into_iter()
+
+        let mut tables = Table::load_all(conn, table_catalog, "public")?
+            .iter()
             .filter(|table| !(table.is_temporary() || table.is_view()))
             .filter(|table| !self.tables_deny_list.contains(&table))
+            .cloned()
             .collect::<Vec<Table>>();
 
         tables.sort_unstable();
 
-        time_tracker.add_completed_task(task);
-
-        let task = Task::new("Creating column same-as network");
-        self.column_same_as_network = Some(ColumnSameAsNetwork::from_tables(conn, &tables)?);
         time_tracker.add_completed_task(task);
 
         let task = Task::new("Creating table extension network");
@@ -548,7 +584,7 @@ impl<'a> Codegen<'a> {
             pub use #structs_codegen_ident::*;
 
             mod #traits_codegen_ident;
-        })?;
+        });
 
         std::fs::write(&codegen_module, codegen_module_impl)?;
 

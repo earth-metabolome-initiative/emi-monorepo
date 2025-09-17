@@ -9,7 +9,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use strum::IntoEnumIterator;
 
-use crate::{Codegen, Table, codegen::Syntax, errors::WebCodeGenError};
+use crate::{Codegen, Table, codegen::Syntax, errors::WebCodeGenError, traits::TableLike};
 
 impl Codegen<'_> {
     #[allow(clippy::too_many_lines)]
@@ -47,7 +47,7 @@ impl Codegen<'_> {
 
             let primary_key_columns: Vec<TokenStream> = table
                 .primary_key_columns(conn)?
-                .into_iter()
+                .iter()
                 .map(|primary_key| {
                     let snake_case_column_ident = primary_key.snake_case_ident()?;
                     Ok(quote! {
@@ -144,7 +144,7 @@ impl Codegen<'_> {
 							})
 					}
                 }
-            }}).collect::<TokenStream>())?)?;
+            }}).collect::<TokenStream>()))?;
 
             table_upsertable_main_module.extend(quote::quote! {
                 mod #snake_case_ident;
@@ -152,7 +152,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&table_upsertable_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&table_upsertable_main_module))?;
 
         Ok(())
     }

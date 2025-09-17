@@ -1,72 +1,131 @@
 mod addresses;
-mod aliquoting_procedure_models;
+mod aliquoting_procedure_templates;
 mod aliquoting_procedures;
+mod asset_compatibility_rules;
+mod asset_model_ancestors;
+mod asset_models;
+mod assets;
 mod ball_mill_machine_models;
-mod ball_mill_procedure_models;
-mod binary_question_procedure_models;
+mod ball_mill_machines;
+mod ball_mill_procedure_templates;
+mod ball_mill_procedures;
+mod bead_models;
 mod bounded_read_dispatch;
 mod brands;
 mod camera_models;
-mod capping_procedure_models;
+mod cameras;
+mod cap_models;
+mod capping_procedure_templates;
+mod capping_procedures;
 mod centrifuge_models;
-mod centrifuge_procedure_models;
+mod centrifuge_procedure_templates;
+mod centrifuge_procedures;
+mod centrifuges;
 mod cities;
 mod colors;
+mod commercial_ball_mill_machine_lots;
+mod commercial_ball_mill_machine_models;
+mod commercial_bead_lots;
+mod commercial_bead_models;
+mod commercial_camera_lots;
+mod commercial_camera_models;
+mod commercial_cap_lots;
+mod commercial_cap_models;
+mod commercial_centrifuge_lots;
+mod commercial_centrifuge_models;
+mod commercial_freeze_dryer_lots;
+mod commercial_freeze_dryer_models;
+mod commercial_freezer_lots;
+mod commercial_freezer_models;
+mod commercial_packaging_lots;
+mod commercial_packaging_models;
+mod commercial_pipette_lots;
+mod commercial_pipette_models;
+mod commercial_pipette_tip_lots;
+mod commercial_pipette_tip_models;
+mod commercial_positioning_device_lots;
+mod commercial_positioning_device_models;
 mod commercial_product_lots;
 mod commercial_products;
-mod commercial_reagents;
-mod compatibility_rules;
+mod commercial_volume_measuring_device_lots;
+mod commercial_volume_measuring_device_models;
+mod commercial_weighing_device_lots;
+mod commercial_weighing_device_models;
+mod container_compatibility_rules;
 mod container_models;
 mod containers;
 mod countries;
-mod disposal_procedure_models;
-mod documents;
+mod digital_asset_models;
+mod digital_assets;
+mod disposal_procedure_templates;
+mod disposal_procedures;
 mod email_providers;
-mod fractioning_procedure_models;
-mod freeze_drier_models;
-mod freeze_drying_procedure_models;
+mod fractioning_procedure_templates;
+mod fractioning_procedures;
+mod freeze_dryer_models;
+mod freeze_dryers;
+mod freeze_drying_procedure_templates;
+mod freeze_drying_procedures;
 mod freezer_models;
-mod freezing_procedure_models;
-mod geolocation_procedure_models;
+mod freezers;
+mod freezing_procedure_templates;
+mod freezing_procedures;
+mod geolocation_procedure_templates;
+mod geolocation_procedures;
+mod harvesting_procedure_templates;
+mod harvesting_procedures;
 mod instrument_states;
 mod into_iter;
 mod len;
 mod login_providers;
 mod materials;
-mod mixing_procedure_models;
-mod next_procedure_models;
+mod next_procedure_templates;
 mod observation_subjects;
+mod organism_models;
 mod organism_taxa;
 mod organisms;
 mod organizations;
-mod packaging_procedure_models;
-mod parent_procedure_models;
+mod packaging_models;
+mod packaging_procedure_templates;
+mod packaging_procedures;
+mod parent_procedure_templates;
 mod permanence_categories;
 mod phone_models;
-mod photograph_procedure_models;
+mod photograph_procedure_templates;
+mod photograph_procedures;
+mod photographs;
+mod physical_asset_models;
+mod physical_assets;
 mod pipette_models;
 mod pipette_tip_models;
-mod placing_procedure_models;
+mod pipettes;
 mod positioning_device_models;
-mod pouring_procedure_models;
-mod procedure_model_trackables;
-mod procedure_models;
-mod procedure_trackables;
+mod positioning_devices;
+mod pouring_procedure_templates;
+mod pouring_procedures;
+mod procedure_assets;
+mod procedure_template_asset_models;
+mod procedure_templates;
 mod procedures;
-mod processables;
 mod project_states;
 mod projects;
 mod ranks;
-mod reagents;
+mod reagent_models;
 mod roles;
 mod rooms;
+mod sample_models;
+mod sample_source_models;
+mod sample_sources;
 mod sample_states;
-mod shared_procedure_model_trackables;
+mod samples;
+mod soil_models;
+mod soils;
 mod spatial_ref_sys;
 mod spectra;
 mod spectra_collections;
-mod storage_procedure_models;
-mod supernatant_procedure_models;
+mod storage_procedure_templates;
+mod storage_procedures;
+mod supernatant_procedure_templates;
 mod supernatant_procedures;
 mod tabular;
 mod taxa;
@@ -75,25 +134,25 @@ mod team_projects;
 mod team_states;
 mod teams;
 mod temporary_user;
-mod trackable_ancestors;
-mod trackable_locations;
-mod trackables;
 mod units;
 mod user_emails;
 mod user_organizations;
 mod users;
+mod volume_measuring_device_models;
+mod volume_measuring_devices;
 mod volumetric_container_models;
-mod volumetric_processables;
+mod volumetric_containers;
 mod weighing_device_models;
-mod weighing_procedure_models;
+mod weighing_devices;
+mod weighing_procedure_templates;
 mod weighing_procedures;
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Rows {
     Address(Vec<crate::codegen::structs_codegen::tables::addresses::Address>),
-    AliquotingProcedureModel(
+    AliquotingProcedureTemplate(
         Vec<
-            crate::codegen::structs_codegen::tables::aliquoting_procedure_models::AliquotingProcedureModel,
+            crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate,
         >,
     ),
     AliquotingProcedure(
@@ -101,40 +160,179 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
         >,
     ),
+    AssetCompatibilityRule(
+        Vec<
+            crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
+        >,
+    ),
+    AssetModelAncestor(
+        Vec<
+            crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
+        >,
+    ),
+    AssetModel(Vec<crate::codegen::structs_codegen::tables::asset_models::AssetModel>),
+    Asset(Vec<crate::codegen::structs_codegen::tables::assets::Asset>),
     BallMillMachineModel(
         Vec<
             crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
         >,
     ),
-    BallMillProcedureModel(
+    BallMillMachine(
+        Vec<crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine>,
+    ),
+    BallMillProcedureTemplate(
         Vec<
-            crate::codegen::structs_codegen::tables::ball_mill_procedure_models::BallMillProcedureModel,
+            crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
         >,
     ),
-    BinaryQuestionProcedureModel(
+    BallMillProcedure(
         Vec<
-            crate::codegen::structs_codegen::tables::binary_question_procedure_models::BinaryQuestionProcedureModel,
+            crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure,
         >,
     ),
+    BeadModel(Vec<crate::codegen::structs_codegen::tables::bead_models::BeadModel>),
     Brand(Vec<crate::codegen::structs_codegen::tables::brands::Brand>),
     CameraModel(
         Vec<crate::codegen::structs_codegen::tables::camera_models::CameraModel>,
     ),
-    CappingProcedureModel(
+    Camera(Vec<crate::codegen::structs_codegen::tables::cameras::Camera>),
+    CapModel(Vec<crate::codegen::structs_codegen::tables::cap_models::CapModel>),
+    CappingProcedureTemplate(
         Vec<
-            crate::codegen::structs_codegen::tables::capping_procedure_models::CappingProcedureModel,
+            crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+        >,
+    ),
+    CappingProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure,
         >,
     ),
     CentrifugeModel(
         Vec<crate::codegen::structs_codegen::tables::centrifuge_models::CentrifugeModel>,
     ),
-    CentrifugeProcedureModel(
+    CentrifugeProcedureTemplate(
         Vec<
-            crate::codegen::structs_codegen::tables::centrifuge_procedure_models::CentrifugeProcedureModel,
+            crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
         >,
     ),
+    CentrifugeProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure,
+        >,
+    ),
+    Centrifuge(Vec<crate::codegen::structs_codegen::tables::centrifuges::Centrifuge>),
     City(Vec<crate::codegen::structs_codegen::tables::cities::City>),
     Color(Vec<crate::codegen::structs_codegen::tables::colors::Color>),
+    CommercialBallMillMachineLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+        >,
+    ),
+    CommercialBallMillMachineModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_models::CommercialBallMillMachineModel,
+        >,
+    ),
+    CommercialBeadLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot,
+        >,
+    ),
+    CommercialBeadModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel,
+        >,
+    ),
+    CommercialCameraLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_camera_lots::CommercialCameraLot,
+        >,
+    ),
+    CommercialCameraModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_camera_models::CommercialCameraModel,
+        >,
+    ),
+    CommercialCapLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot,
+        >,
+    ),
+    CommercialCapModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_cap_models::CommercialCapModel,
+        >,
+    ),
+    CommercialCentrifugeLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_centrifuge_lots::CommercialCentrifugeLot,
+        >,
+    ),
+    CommercialCentrifugeModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_centrifuge_models::CommercialCentrifugeModel,
+        >,
+    ),
+    CommercialFreezeDryerLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+        >,
+    ),
+    CommercialFreezeDryerModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_freeze_dryer_models::CommercialFreezeDryerModel,
+        >,
+    ),
+    CommercialFreezerLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_freezer_lots::CommercialFreezerLot,
+        >,
+    ),
+    CommercialFreezerModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
+        >,
+    ),
+    CommercialPackagingLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_packaging_lots::CommercialPackagingLot,
+        >,
+    ),
+    CommercialPackagingModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_packaging_models::CommercialPackagingModel,
+        >,
+    ),
+    CommercialPipetteLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_pipette_lots::CommercialPipetteLot,
+        >,
+    ),
+    CommercialPipetteModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_pipette_models::CommercialPipetteModel,
+        >,
+    ),
+    CommercialPipetteTipLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot,
+        >,
+    ),
+    CommercialPipetteTipModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_pipette_tip_models::CommercialPipetteTipModel,
+        >,
+    ),
+    CommercialPositioningDeviceLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_positioning_device_lots::CommercialPositioningDeviceLot,
+        >,
+    ),
+    CommercialPositioningDeviceModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel,
+        >,
+    ),
     CommercialProductLot(
         Vec<
             crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
@@ -145,14 +343,29 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
         >,
     ),
-    CommercialReagent(
+    CommercialVolumeMeasuringDeviceLot(
         Vec<
-            crate::codegen::structs_codegen::tables::commercial_reagents::CommercialReagent,
+            crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
         >,
     ),
-    CompatibilityRule(
+    CommercialVolumeMeasuringDeviceModel(
         Vec<
-            crate::codegen::structs_codegen::tables::compatibility_rules::CompatibilityRule,
+            crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_models::CommercialVolumeMeasuringDeviceModel,
+        >,
+    ),
+    CommercialWeighingDeviceLot(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_weighing_device_lots::CommercialWeighingDeviceLot,
+        >,
+    ),
+    CommercialWeighingDeviceModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::commercial_weighing_device_models::CommercialWeighingDeviceModel,
+        >,
+    ),
+    ContainerCompatibilityRule(
+        Vec<
+            crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule,
         >,
     ),
     ContainerModel(
@@ -160,41 +373,87 @@ pub enum Rows {
     ),
     Container(Vec<crate::codegen::structs_codegen::tables::containers::Container>),
     Country(Vec<crate::codegen::structs_codegen::tables::countries::Country>),
-    DisposalProcedureModel(
+    DigitalAssetModel(
         Vec<
-            crate::codegen::structs_codegen::tables::disposal_procedure_models::DisposalProcedureModel,
+            crate::codegen::structs_codegen::tables::digital_asset_models::DigitalAssetModel,
         >,
     ),
-    Document(Vec<crate::codegen::structs_codegen::tables::documents::Document>),
+    DigitalAsset(
+        Vec<crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset>,
+    ),
+    DisposalProcedureTemplate(
+        Vec<
+            crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
+        >,
+    ),
+    DisposalProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure,
+        >,
+    ),
     EmailProvider(
         Vec<crate::codegen::structs_codegen::tables::email_providers::EmailProvider>,
     ),
-    FractioningProcedureModel(
+    FractioningProcedureTemplate(
         Vec<
-            crate::codegen::structs_codegen::tables::fractioning_procedure_models::FractioningProcedureModel,
+            crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
         >,
     ),
-    FreezeDrierModel(
+    FractioningProcedure(
         Vec<
-            crate::codegen::structs_codegen::tables::freeze_drier_models::FreezeDrierModel,
+            crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
         >,
     ),
-    FreezeDryingProcedureModel(
+    FreezeDryerModel(
         Vec<
-            crate::codegen::structs_codegen::tables::freeze_drying_procedure_models::FreezeDryingProcedureModel,
+            crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel,
+        >,
+    ),
+    FreezeDryer(
+        Vec<crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer>,
+    ),
+    FreezeDryingProcedureTemplate(
+        Vec<
+            crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate,
+        >,
+    ),
+    FreezeDryingProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure,
         >,
     ),
     FreezerModel(
         Vec<crate::codegen::structs_codegen::tables::freezer_models::FreezerModel>,
     ),
-    FreezingProcedureModel(
+    Freezer(Vec<crate::codegen::structs_codegen::tables::freezers::Freezer>),
+    FreezingProcedureTemplate(
         Vec<
-            crate::codegen::structs_codegen::tables::freezing_procedure_models::FreezingProcedureModel,
+            crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate,
         >,
     ),
-    GeolocationProcedureModel(
+    FreezingProcedure(
         Vec<
-            crate::codegen::structs_codegen::tables::geolocation_procedure_models::GeolocationProcedureModel,
+            crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure,
+        >,
+    ),
+    GeolocationProcedureTemplate(
+        Vec<
+            crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate,
+        >,
+    ),
+    GeolocationProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
+        >,
+    ),
+    HarvestingProcedureTemplate(
+        Vec<
+            crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate,
+        >,
+    ),
+    HarvestingProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure,
         >,
     ),
     InstrumentState(
@@ -204,20 +463,18 @@ pub enum Rows {
         Vec<crate::codegen::structs_codegen::tables::login_providers::LoginProvider>,
     ),
     Material(Vec<crate::codegen::structs_codegen::tables::materials::Material>),
-    MixingProcedureModel(
+    NextProcedureTemplate(
         Vec<
-            crate::codegen::structs_codegen::tables::mixing_procedure_models::MixingProcedureModel,
-        >,
-    ),
-    NextProcedureModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::next_procedure_models::NextProcedureModel,
+            crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate,
         >,
     ),
     ObservationSubject(
         Vec<
             crate::codegen::structs_codegen::tables::observation_subjects::ObservationSubject,
         >,
+    ),
+    OrganismModel(
+        Vec<crate::codegen::structs_codegen::tables::organism_models::OrganismModel>,
     ),
     OrganismTaxon(
         Vec<crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon>,
@@ -226,14 +483,22 @@ pub enum Rows {
     Organization(
         Vec<crate::codegen::structs_codegen::tables::organizations::Organization>,
     ),
-    PackagingProcedureModel(
+    PackagingModel(
+        Vec<crate::codegen::structs_codegen::tables::packaging_models::PackagingModel>,
+    ),
+    PackagingProcedureTemplate(
         Vec<
-            crate::codegen::structs_codegen::tables::packaging_procedure_models::PackagingProcedureModel,
+            crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
         >,
     ),
-    ParentProcedureModel(
+    PackagingProcedure(
         Vec<
-            crate::codegen::structs_codegen::tables::parent_procedure_models::ParentProcedureModel,
+            crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure,
+        >,
+    ),
+    ParentProcedureTemplate(
+        Vec<
+            crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
         >,
     ),
     PermanenceCategory(
@@ -242,10 +507,24 @@ pub enum Rows {
         >,
     ),
     PhoneModel(Vec<crate::codegen::structs_codegen::tables::phone_models::PhoneModel>),
-    PhotographProcedureModel(
+    PhotographProcedureTemplate(
         Vec<
-            crate::codegen::structs_codegen::tables::photograph_procedure_models::PhotographProcedureModel,
+            crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate,
         >,
+    ),
+    PhotographProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure,
+        >,
+    ),
+    Photograph(Vec<crate::codegen::structs_codegen::tables::photographs::Photograph>),
+    PhysicalAssetModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+        >,
+    ),
+    PhysicalAsset(
+        Vec<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>,
     ),
     PipetteModel(
         Vec<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel>,
@@ -253,52 +532,68 @@ pub enum Rows {
     PipetteTipModel(
         Vec<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel>,
     ),
-    PlacingProcedureModel(
-        Vec<
-            crate::codegen::structs_codegen::tables::placing_procedure_models::PlacingProcedureModel,
-        >,
-    ),
+    Pipette(Vec<crate::codegen::structs_codegen::tables::pipettes::Pipette>),
     PositioningDeviceModel(
         Vec<
             crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
         >,
     ),
-    PouringProcedureModel(
+    PositioningDevice(
         Vec<
-            crate::codegen::structs_codegen::tables::pouring_procedure_models::PouringProcedureModel,
+            crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice,
         >,
     ),
-    ProcedureModelTrackable(
+    PouringProcedureTemplate(
         Vec<
-            crate::codegen::structs_codegen::tables::procedure_model_trackables::ProcedureModelTrackable,
+            crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
         >,
     ),
-    ProcedureModel(
-        Vec<crate::codegen::structs_codegen::tables::procedure_models::ProcedureModel>,
-    ),
-    ProcedureTrackable(
+    PouringProcedure(
         Vec<
-            crate::codegen::structs_codegen::tables::procedure_trackables::ProcedureTrackable,
+            crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
+        >,
+    ),
+    ProcedureAsset(
+        Vec<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+    ),
+    ProcedureTemplateAssetModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+        >,
+    ),
+    ProcedureTemplate(
+        Vec<
+            crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate,
         >,
     ),
     Procedure(Vec<crate::codegen::structs_codegen::tables::procedures::Procedure>),
-    Processable(Vec<crate::codegen::structs_codegen::tables::processables::Processable>),
     ProjectState(
         Vec<crate::codegen::structs_codegen::tables::project_states::ProjectState>,
     ),
     Project(Vec<crate::codegen::structs_codegen::tables::projects::Project>),
     Rank(Vec<crate::codegen::structs_codegen::tables::ranks::Rank>),
-    Reagent(Vec<crate::codegen::structs_codegen::tables::reagents::Reagent>),
+    ReagentModel(
+        Vec<crate::codegen::structs_codegen::tables::reagent_models::ReagentModel>,
+    ),
     Role(Vec<crate::codegen::structs_codegen::tables::roles::Role>),
     Room(Vec<crate::codegen::structs_codegen::tables::rooms::Room>),
+    SampleModel(
+        Vec<crate::codegen::structs_codegen::tables::sample_models::SampleModel>,
+    ),
+    SampleSourceModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::sample_source_models::SampleSourceModel,
+        >,
+    ),
+    SampleSource(
+        Vec<crate::codegen::structs_codegen::tables::sample_sources::SampleSource>,
+    ),
     SampleState(
         Vec<crate::codegen::structs_codegen::tables::sample_states::SampleState>,
     ),
-    SharedProcedureModelTrackable(
-        Vec<
-            crate::codegen::structs_codegen::tables::shared_procedure_model_trackables::SharedProcedureModelTrackable,
-        >,
-    ),
+    Sample(Vec<crate::codegen::structs_codegen::tables::samples::Sample>),
+    SoilModel(Vec<crate::codegen::structs_codegen::tables::soil_models::SoilModel>),
+    Soil(Vec<crate::codegen::structs_codegen::tables::soils::Soil>),
     SpatialRefSy(
         Vec<crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy>,
     ),
@@ -308,14 +603,19 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
         >,
     ),
-    StorageProcedureModel(
+    StorageProcedureTemplate(
         Vec<
-            crate::codegen::structs_codegen::tables::storage_procedure_models::StorageProcedureModel,
+            crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
         >,
     ),
-    SupernatantProcedureModel(
+    StorageProcedure(
         Vec<
-            crate::codegen::structs_codegen::tables::supernatant_procedure_models::SupernatantProcedureModel,
+            crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure,
+        >,
+    ),
+    SupernatantProcedureTemplate(
+        Vec<
+            crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
         >,
     ),
     SupernatantProcedure(
@@ -333,17 +633,6 @@ pub enum Rows {
     TemporaryUser(
         Vec<crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser>,
     ),
-    TrackableAncestor(
-        Vec<
-            crate::codegen::structs_codegen::tables::trackable_ancestors::TrackableAncestor,
-        >,
-    ),
-    TrackableLocation(
-        Vec<
-            crate::codegen::structs_codegen::tables::trackable_locations::TrackableLocation,
-        >,
-    ),
-    Trackable(Vec<crate::codegen::structs_codegen::tables::trackables::Trackable>),
     Unit(Vec<crate::codegen::structs_codegen::tables::units::Unit>),
     UserEmail(Vec<crate::codegen::structs_codegen::tables::user_emails::UserEmail>),
     UserOrganization(
@@ -352,14 +641,24 @@ pub enum Rows {
         >,
     ),
     User(Vec<crate::codegen::structs_codegen::tables::users::User>),
+    VolumeMeasuringDeviceModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
+        >,
+    ),
+    VolumeMeasuringDevice(
+        Vec<
+            crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
+        >,
+    ),
     VolumetricContainerModel(
         Vec<
             crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
         >,
     ),
-    VolumetricProcessable(
+    VolumetricContainer(
         Vec<
-            crate::codegen::structs_codegen::tables::volumetric_processables::VolumetricProcessable,
+            crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
         >,
     ),
     WeighingDeviceModel(
@@ -367,9 +666,12 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::weighing_device_models::WeighingDeviceModel,
         >,
     ),
-    WeighingProcedureModel(
+    WeighingDevice(
+        Vec<crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice>,
+    ),
+    WeighingProcedureTemplate(
         Vec<
-            crate::codegen::structs_codegen::tables::weighing_procedure_models::WeighingProcedureModel,
+            crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
         >,
     ),
     WeighingProcedure(
@@ -394,8 +696,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::AliquotingProcedureModel(aliquoting_procedure_models) => {
-                aliquoting_procedure_models
+            Rows::AliquotingProcedureTemplate(aliquoting_procedure_templates) => {
+                aliquoting_procedure_templates
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -408,6 +710,34 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::AssetCompatibilityRule(asset_compatibility_rules) => {
+                asset_compatibility_rules
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::AssetModelAncestor(asset_model_ancestors) => {
+                asset_model_ancestors
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::AssetModel(asset_models) => {
+                asset_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::Asset(assets) => {
+                assets
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::BallMillMachineModel(ball_mill_machine_models) => {
                 ball_mill_machine_models
                     .iter()
@@ -415,15 +745,29 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::BallMillProcedureModel(ball_mill_procedure_models) => {
-                ball_mill_procedure_models
+            Rows::BallMillMachine(ball_mill_machines) => {
+                ball_mill_machines
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::BinaryQuestionProcedureModel(binary_question_procedure_models) => {
-                binary_question_procedure_models
+            Rows::BallMillProcedureTemplate(ball_mill_procedure_templates) => {
+                ball_mill_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::BallMillProcedure(ball_mill_procedures) => {
+                ball_mill_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::BeadModel(bead_models) => {
+                bead_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -443,8 +787,29 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::CappingProcedureModel(capping_procedure_models) => {
-                capping_procedure_models
+            Rows::Camera(cameras) => {
+                cameras
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CapModel(cap_models) => {
+                cap_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CappingProcedureTemplate(capping_procedure_templates) => {
+                capping_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CappingProcedure(capping_procedures) => {
+                capping_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -457,8 +822,22 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::CentrifugeProcedureModel(centrifuge_procedure_models) => {
-                centrifuge_procedure_models
+            Rows::CentrifugeProcedureTemplate(centrifuge_procedure_templates) => {
+                centrifuge_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CentrifugeProcedure(centrifuge_procedures) => {
+                centrifuge_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::Centrifuge(centrifuges) => {
+                centrifuges
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -478,6 +857,160 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::CommercialBallMillMachineLot(commercial_ball_mill_machine_lots) => {
+                commercial_ball_mill_machine_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialBallMillMachineModel(commercial_ball_mill_machine_models) => {
+                commercial_ball_mill_machine_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialBeadLot(commercial_bead_lots) => {
+                commercial_bead_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialBeadModel(commercial_bead_models) => {
+                commercial_bead_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialCameraLot(commercial_camera_lots) => {
+                commercial_camera_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialCameraModel(commercial_camera_models) => {
+                commercial_camera_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialCapLot(commercial_cap_lots) => {
+                commercial_cap_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialCapModel(commercial_cap_models) => {
+                commercial_cap_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialCentrifugeLot(commercial_centrifuge_lots) => {
+                commercial_centrifuge_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialCentrifugeModel(commercial_centrifuge_models) => {
+                commercial_centrifuge_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialFreezeDryerLot(commercial_freeze_dryer_lots) => {
+                commercial_freeze_dryer_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialFreezeDryerModel(commercial_freeze_dryer_models) => {
+                commercial_freeze_dryer_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialFreezerLot(commercial_freezer_lots) => {
+                commercial_freezer_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialFreezerModel(commercial_freezer_models) => {
+                commercial_freezer_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialPackagingLot(commercial_packaging_lots) => {
+                commercial_packaging_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialPackagingModel(commercial_packaging_models) => {
+                commercial_packaging_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialPipetteLot(commercial_pipette_lots) => {
+                commercial_pipette_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialPipetteModel(commercial_pipette_models) => {
+                commercial_pipette_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialPipetteTipLot(commercial_pipette_tip_lots) => {
+                commercial_pipette_tip_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialPipetteTipModel(commercial_pipette_tip_models) => {
+                commercial_pipette_tip_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialPositioningDeviceLot(commercial_positioning_device_lots) => {
+                commercial_positioning_device_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialPositioningDeviceModel(commercial_positioning_device_models) => {
+                commercial_positioning_device_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::CommercialProductLot(commercial_product_lots) => {
                 commercial_product_lots
                     .iter()
@@ -492,15 +1025,38 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::CommercialReagent(commercial_reagents) => {
-                commercial_reagents
+            Rows::CommercialVolumeMeasuringDeviceLot(commercial_volume_measuring_device_lots) => {
+                commercial_volume_measuring_device_lots
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::CompatibilityRule(compatibility_rules) => {
-                compatibility_rules
+            Rows::CommercialVolumeMeasuringDeviceModel(
+                commercial_volume_measuring_device_models,
+            ) => {
+                commercial_volume_measuring_device_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialWeighingDeviceLot(commercial_weighing_device_lots) => {
+                commercial_weighing_device_lots
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CommercialWeighingDeviceModel(commercial_weighing_device_models) => {
+                commercial_weighing_device_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::ContainerCompatibilityRule(container_compatibility_rules) => {
+                container_compatibility_rules
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -527,15 +1083,29 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::DisposalProcedureModel(disposal_procedure_models) => {
-                disposal_procedure_models
+            Rows::DigitalAssetModel(digital_asset_models) => {
+                digital_asset_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::Document(documents) => {
-                documents
+            Rows::DigitalAsset(digital_assets) => {
+                digital_assets
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::DisposalProcedureTemplate(disposal_procedure_templates) => {
+                disposal_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::DisposalProcedure(disposal_procedures) => {
+                disposal_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -548,22 +1118,43 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::FractioningProcedureModel(fractioning_procedure_models) => {
-                fractioning_procedure_models
+            Rows::FractioningProcedureTemplate(fractioning_procedure_templates) => {
+                fractioning_procedure_templates
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::FreezeDrierModel(freeze_drier_models) => {
-                freeze_drier_models
+            Rows::FractioningProcedure(fractioning_procedures) => {
+                fractioning_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
-                freeze_drying_procedure_models
+            Rows::FreezeDryerModel(freeze_dryer_models) => {
+                freeze_dryer_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::FreezeDryer(freeze_dryers) => {
+                freeze_dryers
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::FreezeDryingProcedureTemplate(freeze_drying_procedure_templates) => {
+                freeze_drying_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::FreezeDryingProcedure(freeze_drying_procedures) => {
+                freeze_drying_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -576,15 +1167,50 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::FreezingProcedureModel(freezing_procedure_models) => {
-                freezing_procedure_models
+            Rows::Freezer(freezers) => {
+                freezers
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::GeolocationProcedureModel(geolocation_procedure_models) => {
-                geolocation_procedure_models
+            Rows::FreezingProcedureTemplate(freezing_procedure_templates) => {
+                freezing_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::FreezingProcedure(freezing_procedures) => {
+                freezing_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::GeolocationProcedureTemplate(geolocation_procedure_templates) => {
+                geolocation_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::GeolocationProcedure(geolocation_procedures) => {
+                geolocation_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::HarvestingProcedureTemplate(harvesting_procedure_templates) => {
+                harvesting_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::HarvestingProcedure(harvesting_procedures) => {
+                harvesting_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -611,15 +1237,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::MixingProcedureModel(mixing_procedure_models) => {
-                mixing_procedure_models
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::NextProcedureModel(next_procedure_models) => {
-                next_procedure_models
+            Rows::NextProcedureTemplate(next_procedure_templates) => {
+                next_procedure_templates
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -627,6 +1246,13 @@ impl Rows {
             }
             Rows::ObservationSubject(observation_subjects) => {
                 observation_subjects
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::OrganismModel(organism_models) => {
+                organism_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -653,15 +1279,29 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::PackagingProcedureModel(packaging_procedure_models) => {
-                packaging_procedure_models
+            Rows::PackagingModel(packaging_models) => {
+                packaging_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ParentProcedureModel(parent_procedure_models) => {
-                parent_procedure_models
+            Rows::PackagingProcedureTemplate(packaging_procedure_templates) => {
+                packaging_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::PackagingProcedure(packaging_procedures) => {
+                packaging_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::ParentProcedureTemplate(parent_procedure_templates) => {
+                parent_procedure_templates
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -681,8 +1321,36 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::PhotographProcedureModel(photograph_procedure_models) => {
-                photograph_procedure_models
+            Rows::PhotographProcedureTemplate(photograph_procedure_templates) => {
+                photograph_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::PhotographProcedure(photograph_procedures) => {
+                photograph_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::Photograph(photographs) => {
+                photographs
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::PhysicalAssetModel(physical_asset_models) => {
+                physical_asset_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::PhysicalAsset(physical_assets) => {
+                physical_assets
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -702,8 +1370,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::PlacingProcedureModel(placing_procedure_models) => {
-                placing_procedure_models
+            Rows::Pipette(pipettes) => {
+                pipettes
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -716,29 +1384,43 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::PouringProcedureModel(pouring_procedure_models) => {
-                pouring_procedure_models
+            Rows::PositioningDevice(positioning_devices) => {
+                positioning_devices
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ProcedureModelTrackable(procedure_model_trackables) => {
-                procedure_model_trackables
+            Rows::PouringProcedureTemplate(pouring_procedure_templates) => {
+                pouring_procedure_templates
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ProcedureModel(procedure_models) => {
-                procedure_models
+            Rows::PouringProcedure(pouring_procedures) => {
+                pouring_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ProcedureTrackable(procedure_trackables) => {
-                procedure_trackables
+            Rows::ProcedureAsset(procedure_assets) => {
+                procedure_assets
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::ProcedureTemplateAssetModel(procedure_template_asset_models) => {
+                procedure_template_asset_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::ProcedureTemplate(procedure_templates) => {
+                procedure_templates
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -746,13 +1428,6 @@ impl Rows {
             }
             Rows::Procedure(procedures) => {
                 procedures
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Processable(processables) => {
-                processables
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -779,8 +1454,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::Reagent(reagents) => {
-                reagents
+            Rows::ReagentModel(reagent_models) => {
+                reagent_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -800,6 +1475,27 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::SampleModel(sample_models) => {
+                sample_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::SampleSourceModel(sample_source_models) => {
+                sample_source_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::SampleSource(sample_sources) => {
+                sample_sources
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::SampleState(sample_states) => {
                 sample_states
                     .iter()
@@ -807,8 +1503,22 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::SharedProcedureModelTrackable(shared_procedure_model_trackables) => {
-                shared_procedure_model_trackables
+            Rows::Sample(samples) => {
+                samples
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::SoilModel(soil_models) => {
+                soil_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::Soil(soils) => {
+                soils
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -835,15 +1545,22 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::StorageProcedureModel(storage_procedure_models) => {
-                storage_procedure_models
+            Rows::StorageProcedureTemplate(storage_procedure_templates) => {
+                storage_procedure_templates
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::SupernatantProcedureModel(supernatant_procedure_models) => {
-                supernatant_procedure_models
+            Rows::StorageProcedure(storage_procedures) => {
+                storage_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::SupernatantProcedureTemplate(supernatant_procedure_templates) => {
+                supernatant_procedure_templates
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -897,27 +1614,6 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::TrackableAncestor(trackable_ancestors) => {
-                trackable_ancestors
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::TrackableLocation(trackable_locations) => {
-                trackable_locations
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::Trackable(trackables) => {
-                trackables
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
             Rows::Unit(units) => {
                 units
                     .iter()
@@ -946,6 +1642,20 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::VolumeMeasuringDeviceModel(volume_measuring_device_models) => {
+                volume_measuring_device_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::VolumeMeasuringDevice(volume_measuring_devices) => {
+                volume_measuring_devices
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::VolumetricContainerModel(volumetric_container_models) => {
                 volumetric_container_models
                     .iter()
@@ -953,8 +1663,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::VolumetricProcessable(volumetric_processables) => {
-                volumetric_processables
+            Rows::VolumetricContainer(volumetric_containers) => {
+                volumetric_containers
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -967,8 +1677,15 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::WeighingProcedureModel(weighing_procedure_models) => {
-                weighing_procedure_models
+            Rows::WeighingDevice(weighing_devices) => {
+                weighing_devices
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::WeighingProcedureTemplate(weighing_procedure_templates) => {
+                weighing_procedure_templates
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -989,118 +1706,235 @@ impl web_common_traits::prelude::Rows for Rows {
     fn primary_keys(&self) -> Vec<Self::PrimaryKey> {
         match self {
             Rows::Address(addresses) => addresses.primary_keys(),
-            Rows::AliquotingProcedureModel(aliquoting_procedure_models) => {
-                aliquoting_procedure_models.primary_keys()
+            Rows::AliquotingProcedureTemplate(aliquoting_procedure_templates) => {
+                aliquoting_procedure_templates.primary_keys()
             }
             Rows::AliquotingProcedure(aliquoting_procedures) => {
                 aliquoting_procedures.primary_keys()
             }
+            Rows::AssetCompatibilityRule(asset_compatibility_rules) => {
+                asset_compatibility_rules.primary_keys()
+            }
+            Rows::AssetModelAncestor(asset_model_ancestors) => asset_model_ancestors.primary_keys(),
+            Rows::AssetModel(asset_models) => asset_models.primary_keys(),
+            Rows::Asset(assets) => assets.primary_keys(),
             Rows::BallMillMachineModel(ball_mill_machine_models) => {
                 ball_mill_machine_models.primary_keys()
             }
-            Rows::BallMillProcedureModel(ball_mill_procedure_models) => {
-                ball_mill_procedure_models.primary_keys()
+            Rows::BallMillMachine(ball_mill_machines) => ball_mill_machines.primary_keys(),
+            Rows::BallMillProcedureTemplate(ball_mill_procedure_templates) => {
+                ball_mill_procedure_templates.primary_keys()
             }
-            Rows::BinaryQuestionProcedureModel(binary_question_procedure_models) => {
-                binary_question_procedure_models.primary_keys()
-            }
+            Rows::BallMillProcedure(ball_mill_procedures) => ball_mill_procedures.primary_keys(),
+            Rows::BeadModel(bead_models) => bead_models.primary_keys(),
             Rows::Brand(brands) => brands.primary_keys(),
             Rows::CameraModel(camera_models) => camera_models.primary_keys(),
-            Rows::CappingProcedureModel(capping_procedure_models) => {
-                capping_procedure_models.primary_keys()
+            Rows::Camera(cameras) => cameras.primary_keys(),
+            Rows::CapModel(cap_models) => cap_models.primary_keys(),
+            Rows::CappingProcedureTemplate(capping_procedure_templates) => {
+                capping_procedure_templates.primary_keys()
             }
+            Rows::CappingProcedure(capping_procedures) => capping_procedures.primary_keys(),
             Rows::CentrifugeModel(centrifuge_models) => centrifuge_models.primary_keys(),
-            Rows::CentrifugeProcedureModel(centrifuge_procedure_models) => {
-                centrifuge_procedure_models.primary_keys()
+            Rows::CentrifugeProcedureTemplate(centrifuge_procedure_templates) => {
+                centrifuge_procedure_templates.primary_keys()
             }
+            Rows::CentrifugeProcedure(centrifuge_procedures) => {
+                centrifuge_procedures.primary_keys()
+            }
+            Rows::Centrifuge(centrifuges) => centrifuges.primary_keys(),
             Rows::City(cities) => cities.primary_keys(),
             Rows::Color(colors) => colors.primary_keys(),
+            Rows::CommercialBallMillMachineLot(commercial_ball_mill_machine_lots) => {
+                commercial_ball_mill_machine_lots.primary_keys()
+            }
+            Rows::CommercialBallMillMachineModel(commercial_ball_mill_machine_models) => {
+                commercial_ball_mill_machine_models.primary_keys()
+            }
+            Rows::CommercialBeadLot(commercial_bead_lots) => commercial_bead_lots.primary_keys(),
+            Rows::CommercialBeadModel(commercial_bead_models) => {
+                commercial_bead_models.primary_keys()
+            }
+            Rows::CommercialCameraLot(commercial_camera_lots) => {
+                commercial_camera_lots.primary_keys()
+            }
+            Rows::CommercialCameraModel(commercial_camera_models) => {
+                commercial_camera_models.primary_keys()
+            }
+            Rows::CommercialCapLot(commercial_cap_lots) => commercial_cap_lots.primary_keys(),
+            Rows::CommercialCapModel(commercial_cap_models) => commercial_cap_models.primary_keys(),
+            Rows::CommercialCentrifugeLot(commercial_centrifuge_lots) => {
+                commercial_centrifuge_lots.primary_keys()
+            }
+            Rows::CommercialCentrifugeModel(commercial_centrifuge_models) => {
+                commercial_centrifuge_models.primary_keys()
+            }
+            Rows::CommercialFreezeDryerLot(commercial_freeze_dryer_lots) => {
+                commercial_freeze_dryer_lots.primary_keys()
+            }
+            Rows::CommercialFreezeDryerModel(commercial_freeze_dryer_models) => {
+                commercial_freeze_dryer_models.primary_keys()
+            }
+            Rows::CommercialFreezerLot(commercial_freezer_lots) => {
+                commercial_freezer_lots.primary_keys()
+            }
+            Rows::CommercialFreezerModel(commercial_freezer_models) => {
+                commercial_freezer_models.primary_keys()
+            }
+            Rows::CommercialPackagingLot(commercial_packaging_lots) => {
+                commercial_packaging_lots.primary_keys()
+            }
+            Rows::CommercialPackagingModel(commercial_packaging_models) => {
+                commercial_packaging_models.primary_keys()
+            }
+            Rows::CommercialPipetteLot(commercial_pipette_lots) => {
+                commercial_pipette_lots.primary_keys()
+            }
+            Rows::CommercialPipetteModel(commercial_pipette_models) => {
+                commercial_pipette_models.primary_keys()
+            }
+            Rows::CommercialPipetteTipLot(commercial_pipette_tip_lots) => {
+                commercial_pipette_tip_lots.primary_keys()
+            }
+            Rows::CommercialPipetteTipModel(commercial_pipette_tip_models) => {
+                commercial_pipette_tip_models.primary_keys()
+            }
+            Rows::CommercialPositioningDeviceLot(commercial_positioning_device_lots) => {
+                commercial_positioning_device_lots.primary_keys()
+            }
+            Rows::CommercialPositioningDeviceModel(commercial_positioning_device_models) => {
+                commercial_positioning_device_models.primary_keys()
+            }
             Rows::CommercialProductLot(commercial_product_lots) => {
                 commercial_product_lots.primary_keys()
             }
             Rows::CommercialProduct(commercial_products) => commercial_products.primary_keys(),
-            Rows::CommercialReagent(commercial_reagents) => commercial_reagents.primary_keys(),
-            Rows::CompatibilityRule(compatibility_rules) => compatibility_rules.primary_keys(),
+            Rows::CommercialVolumeMeasuringDeviceLot(commercial_volume_measuring_device_lots) => {
+                commercial_volume_measuring_device_lots.primary_keys()
+            }
+            Rows::CommercialVolumeMeasuringDeviceModel(
+                commercial_volume_measuring_device_models,
+            ) => commercial_volume_measuring_device_models.primary_keys(),
+            Rows::CommercialWeighingDeviceLot(commercial_weighing_device_lots) => {
+                commercial_weighing_device_lots.primary_keys()
+            }
+            Rows::CommercialWeighingDeviceModel(commercial_weighing_device_models) => {
+                commercial_weighing_device_models.primary_keys()
+            }
+            Rows::ContainerCompatibilityRule(container_compatibility_rules) => {
+                container_compatibility_rules.primary_keys()
+            }
             Rows::ContainerModel(container_models) => container_models.primary_keys(),
             Rows::Container(containers) => containers.primary_keys(),
             Rows::Country(countries) => countries.primary_keys(),
-            Rows::DisposalProcedureModel(disposal_procedure_models) => {
-                disposal_procedure_models.primary_keys()
+            Rows::DigitalAssetModel(digital_asset_models) => digital_asset_models.primary_keys(),
+            Rows::DigitalAsset(digital_assets) => digital_assets.primary_keys(),
+            Rows::DisposalProcedureTemplate(disposal_procedure_templates) => {
+                disposal_procedure_templates.primary_keys()
             }
-            Rows::Document(documents) => documents.primary_keys(),
+            Rows::DisposalProcedure(disposal_procedures) => disposal_procedures.primary_keys(),
             Rows::EmailProvider(email_providers) => email_providers.primary_keys(),
-            Rows::FractioningProcedureModel(fractioning_procedure_models) => {
-                fractioning_procedure_models.primary_keys()
+            Rows::FractioningProcedureTemplate(fractioning_procedure_templates) => {
+                fractioning_procedure_templates.primary_keys()
             }
-            Rows::FreezeDrierModel(freeze_drier_models) => freeze_drier_models.primary_keys(),
-            Rows::FreezeDryingProcedureModel(freeze_drying_procedure_models) => {
-                freeze_drying_procedure_models.primary_keys()
+            Rows::FractioningProcedure(fractioning_procedures) => {
+                fractioning_procedures.primary_keys()
+            }
+            Rows::FreezeDryerModel(freeze_dryer_models) => freeze_dryer_models.primary_keys(),
+            Rows::FreezeDryer(freeze_dryers) => freeze_dryers.primary_keys(),
+            Rows::FreezeDryingProcedureTemplate(freeze_drying_procedure_templates) => {
+                freeze_drying_procedure_templates.primary_keys()
+            }
+            Rows::FreezeDryingProcedure(freeze_drying_procedures) => {
+                freeze_drying_procedures.primary_keys()
             }
             Rows::FreezerModel(freezer_models) => freezer_models.primary_keys(),
-            Rows::FreezingProcedureModel(freezing_procedure_models) => {
-                freezing_procedure_models.primary_keys()
+            Rows::Freezer(freezers) => freezers.primary_keys(),
+            Rows::FreezingProcedureTemplate(freezing_procedure_templates) => {
+                freezing_procedure_templates.primary_keys()
             }
-            Rows::GeolocationProcedureModel(geolocation_procedure_models) => {
-                geolocation_procedure_models.primary_keys()
+            Rows::FreezingProcedure(freezing_procedures) => freezing_procedures.primary_keys(),
+            Rows::GeolocationProcedureTemplate(geolocation_procedure_templates) => {
+                geolocation_procedure_templates.primary_keys()
+            }
+            Rows::GeolocationProcedure(geolocation_procedures) => {
+                geolocation_procedures.primary_keys()
+            }
+            Rows::HarvestingProcedureTemplate(harvesting_procedure_templates) => {
+                harvesting_procedure_templates.primary_keys()
+            }
+            Rows::HarvestingProcedure(harvesting_procedures) => {
+                harvesting_procedures.primary_keys()
             }
             Rows::InstrumentState(instrument_states) => instrument_states.primary_keys(),
             Rows::LoginProvider(login_providers) => login_providers.primary_keys(),
             Rows::Material(materials) => materials.primary_keys(),
-            Rows::MixingProcedureModel(mixing_procedure_models) => {
-                mixing_procedure_models.primary_keys()
+            Rows::NextProcedureTemplate(next_procedure_templates) => {
+                next_procedure_templates.primary_keys()
             }
-            Rows::NextProcedureModel(next_procedure_models) => next_procedure_models.primary_keys(),
             Rows::ObservationSubject(observation_subjects) => observation_subjects.primary_keys(),
+            Rows::OrganismModel(organism_models) => organism_models.primary_keys(),
             Rows::OrganismTaxon(organism_taxa) => organism_taxa.primary_keys(),
             Rows::Organism(organisms) => organisms.primary_keys(),
             Rows::Organization(organizations) => organizations.primary_keys(),
-            Rows::PackagingProcedureModel(packaging_procedure_models) => {
-                packaging_procedure_models.primary_keys()
+            Rows::PackagingModel(packaging_models) => packaging_models.primary_keys(),
+            Rows::PackagingProcedureTemplate(packaging_procedure_templates) => {
+                packaging_procedure_templates.primary_keys()
             }
-            Rows::ParentProcedureModel(parent_procedure_models) => {
-                parent_procedure_models.primary_keys()
+            Rows::PackagingProcedure(packaging_procedures) => packaging_procedures.primary_keys(),
+            Rows::ParentProcedureTemplate(parent_procedure_templates) => {
+                parent_procedure_templates.primary_keys()
             }
             Rows::PermanenceCategory(permanence_categories) => permanence_categories.primary_keys(),
             Rows::PhoneModel(phone_models) => phone_models.primary_keys(),
-            Rows::PhotographProcedureModel(photograph_procedure_models) => {
-                photograph_procedure_models.primary_keys()
+            Rows::PhotographProcedureTemplate(photograph_procedure_templates) => {
+                photograph_procedure_templates.primary_keys()
             }
+            Rows::PhotographProcedure(photograph_procedures) => {
+                photograph_procedures.primary_keys()
+            }
+            Rows::Photograph(photographs) => photographs.primary_keys(),
+            Rows::PhysicalAssetModel(physical_asset_models) => physical_asset_models.primary_keys(),
+            Rows::PhysicalAsset(physical_assets) => physical_assets.primary_keys(),
             Rows::PipetteModel(pipette_models) => pipette_models.primary_keys(),
             Rows::PipetteTipModel(pipette_tip_models) => pipette_tip_models.primary_keys(),
-            Rows::PlacingProcedureModel(placing_procedure_models) => {
-                placing_procedure_models.primary_keys()
-            }
+            Rows::Pipette(pipettes) => pipettes.primary_keys(),
             Rows::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.primary_keys()
             }
-            Rows::PouringProcedureModel(pouring_procedure_models) => {
-                pouring_procedure_models.primary_keys()
+            Rows::PositioningDevice(positioning_devices) => positioning_devices.primary_keys(),
+            Rows::PouringProcedureTemplate(pouring_procedure_templates) => {
+                pouring_procedure_templates.primary_keys()
             }
-            Rows::ProcedureModelTrackable(procedure_model_trackables) => {
-                procedure_model_trackables.primary_keys()
+            Rows::PouringProcedure(pouring_procedures) => pouring_procedures.primary_keys(),
+            Rows::ProcedureAsset(procedure_assets) => procedure_assets.primary_keys(),
+            Rows::ProcedureTemplateAssetModel(procedure_template_asset_models) => {
+                procedure_template_asset_models.primary_keys()
             }
-            Rows::ProcedureModel(procedure_models) => procedure_models.primary_keys(),
-            Rows::ProcedureTrackable(procedure_trackables) => procedure_trackables.primary_keys(),
+            Rows::ProcedureTemplate(procedure_templates) => procedure_templates.primary_keys(),
             Rows::Procedure(procedures) => procedures.primary_keys(),
-            Rows::Processable(processables) => processables.primary_keys(),
             Rows::ProjectState(project_states) => project_states.primary_keys(),
             Rows::Project(projects) => projects.primary_keys(),
             Rows::Rank(ranks) => ranks.primary_keys(),
-            Rows::Reagent(reagents) => reagents.primary_keys(),
+            Rows::ReagentModel(reagent_models) => reagent_models.primary_keys(),
             Rows::Role(roles) => roles.primary_keys(),
             Rows::Room(rooms) => rooms.primary_keys(),
+            Rows::SampleModel(sample_models) => sample_models.primary_keys(),
+            Rows::SampleSourceModel(sample_source_models) => sample_source_models.primary_keys(),
+            Rows::SampleSource(sample_sources) => sample_sources.primary_keys(),
             Rows::SampleState(sample_states) => sample_states.primary_keys(),
-            Rows::SharedProcedureModelTrackable(shared_procedure_model_trackables) => {
-                shared_procedure_model_trackables.primary_keys()
-            }
+            Rows::Sample(samples) => samples.primary_keys(),
+            Rows::SoilModel(soil_models) => soil_models.primary_keys(),
+            Rows::Soil(soils) => soils.primary_keys(),
             Rows::SpatialRefSy(spatial_ref_sys) => spatial_ref_sys.primary_keys(),
             Rows::Spectrum(spectra) => spectra.primary_keys(),
             Rows::SpectraCollection(spectra_collections) => spectra_collections.primary_keys(),
-            Rows::StorageProcedureModel(storage_procedure_models) => {
-                storage_procedure_models.primary_keys()
+            Rows::StorageProcedureTemplate(storage_procedure_templates) => {
+                storage_procedure_templates.primary_keys()
             }
-            Rows::SupernatantProcedureModel(supernatant_procedure_models) => {
-                supernatant_procedure_models.primary_keys()
+            Rows::StorageProcedure(storage_procedures) => storage_procedures.primary_keys(),
+            Rows::SupernatantProcedureTemplate(supernatant_procedure_templates) => {
+                supernatant_procedure_templates.primary_keys()
             }
             Rows::SupernatantProcedure(supernatant_procedures) => {
                 supernatant_procedures.primary_keys()
@@ -1111,24 +1945,28 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::TeamState(team_states) => team_states.primary_keys(),
             Rows::Team(teams) => teams.primary_keys(),
             Rows::TemporaryUser(temporary_user) => temporary_user.primary_keys(),
-            Rows::TrackableAncestor(trackable_ancestors) => trackable_ancestors.primary_keys(),
-            Rows::TrackableLocation(trackable_locations) => trackable_locations.primary_keys(),
-            Rows::Trackable(trackables) => trackables.primary_keys(),
             Rows::Unit(units) => units.primary_keys(),
             Rows::UserEmail(user_emails) => user_emails.primary_keys(),
             Rows::UserOrganization(user_organizations) => user_organizations.primary_keys(),
             Rows::User(users) => users.primary_keys(),
+            Rows::VolumeMeasuringDeviceModel(volume_measuring_device_models) => {
+                volume_measuring_device_models.primary_keys()
+            }
+            Rows::VolumeMeasuringDevice(volume_measuring_devices) => {
+                volume_measuring_devices.primary_keys()
+            }
             Rows::VolumetricContainerModel(volumetric_container_models) => {
                 volumetric_container_models.primary_keys()
             }
-            Rows::VolumetricProcessable(volumetric_processables) => {
-                volumetric_processables.primary_keys()
+            Rows::VolumetricContainer(volumetric_containers) => {
+                volumetric_containers.primary_keys()
             }
             Rows::WeighingDeviceModel(weighing_device_models) => {
                 weighing_device_models.primary_keys()
             }
-            Rows::WeighingProcedureModel(weighing_procedure_models) => {
-                weighing_procedure_models.primary_keys()
+            Rows::WeighingDevice(weighing_devices) => weighing_devices.primary_keys(),
+            Rows::WeighingProcedureTemplate(weighing_procedure_templates) => {
+                weighing_procedure_templates.primary_keys()
             }
             Rows::WeighingProcedure(weighing_procedures) => weighing_procedures.primary_keys(),
         }

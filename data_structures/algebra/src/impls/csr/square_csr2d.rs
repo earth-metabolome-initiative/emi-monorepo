@@ -9,7 +9,7 @@ mod arbitrary_impl;
 
 use crate::prelude::*;
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 /// A compressed sparse row matrix.
 pub struct SquareCSR2D<M: Matrix2D> {
     /// The underlying matrix.

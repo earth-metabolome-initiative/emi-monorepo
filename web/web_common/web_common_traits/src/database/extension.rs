@@ -1,19 +1,47 @@
 //! Submodule defining the `ExtensionTable` trait for struct tables.
 
-use diesel::Identifiable;
+use std::rc::Rc;
+
+use crate::database::PrimaryKeyLike;
 
 /// Trait marker defining that a table is an extension of another table.
 pub trait ExtensionTable<T>
 where
-    for<'a> &'a T: Identifiable,
-    for<'a> &'a Self: Identifiable<Id = <&'a T as Identifiable>::Id>,
+    T: PrimaryKeyLike,
+    Self: PrimaryKeyLike<PrimaryKey = <T as PrimaryKeyLike>::PrimaryKey>,
 {
+}
+
+impl<T, A> From<T> for Box<dyn ExtensionTable<A>>
+where
+    A: PrimaryKeyLike,
+    T: ExtensionTable<A> + 'static,
+{
+    fn from(value: T) -> Self {
+        Box::new(value)
+    }
 }
 
 impl<T, C> ExtensionTable<T> for &C
 where
     Self: ExtensionTable<T>,
-    for<'a> &'a T: Identifiable,
-    for<'a> &'a Self: Identifiable<Id = <&'a T as Identifiable>::Id>,
+    T: PrimaryKeyLike,
+    Self: PrimaryKeyLike<PrimaryKey = <T as PrimaryKeyLike>::PrimaryKey>,
+{
+}
+
+impl<T, C> ExtensionTable<T> for Box<C>
+where
+    Self: ExtensionTable<T>,
+    T: PrimaryKeyLike,
+    Self: PrimaryKeyLike<PrimaryKey = <T as PrimaryKeyLike>::PrimaryKey>,
+{
+}
+
+impl<T, C> ExtensionTable<T> for Rc<C>
+where
+    Self: ExtensionTable<T>,
+    T: PrimaryKeyLike,
+    Self: PrimaryKeyLike<PrimaryKey = <T as PrimaryKeyLike>::PrimaryKey>,
 {
 }

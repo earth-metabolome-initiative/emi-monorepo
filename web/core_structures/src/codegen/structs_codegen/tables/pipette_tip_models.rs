@@ -7,57 +7,80 @@
     table_name = crate::codegen::diesel_codegen::tables::pipette_tip_models::pipette_tip_models
 )]
 pub struct PipetteTipModel {
-    pub id: ::rosetta_uuid::Uuid,
+    pub id: i32,
 }
 impl web_common_traits::prelude::TableName for PipetteTipModel {
     const TABLE_NAME: &'static str = "pipette_tip_models";
 }
+impl<'a> From<&'a PipetteTipModel>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertablePipetteTipModelBuilder,
+    >
+{
+    fn from(value: &'a PipetteTipModel) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        crate::codegen::structs_codegen::tables::asset_models::AssetModel,
     > for PipetteTipModel
 where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    > for PipetteTipModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
+    > for PipetteTipModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
 {
 }
 impl diesel::Identifiable for PipetteTipModel {
-    type Id = ::rosetta_uuid::Uuid;
+    type Id = i32;
     fn id(self) -> Self::Id {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for PipetteTipModel {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl PipetteTipModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
-                self.id,
-            ),
-            conn,
-        )
+    #[cfg(feature = "postgres")]
+    pub fn from_parent_model(
+        parent_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            physical_asset_models::physical_asset_models, pipette_tip_models::pipette_tip_models,
+        };
+        Self::table()
+            .inner_join(
+                physical_asset_models::table
+                    .on(pipette_tip_models::id.eq(physical_asset_models::id)),
+            )
+            .filter(physical_asset_models::parent_model.eq(parent_model))
+            .order_by(pipette_tip_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(
@@ -70,11 +93,11 @@ impl PipetteTipModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            pipette_tip_models::pipette_tip_models, trackables::trackables,
+            asset_models::asset_models, pipette_tip_models::pipette_tip_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(pipette_tip_models::id.eq(trackables::id)))
-            .filter(trackables::name.eq(name))
+            .inner_join(asset_models::table.on(pipette_tip_models::id.eq(asset_models::id)))
+            .filter(asset_models::name.eq(name))
             .order_by(pipette_tip_models::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
@@ -90,58 +113,18 @@ impl PipetteTipModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            pipette_tip_models::pipette_tip_models, trackables::trackables,
+            asset_models::asset_models, pipette_tip_models::pipette_tip_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(pipette_tip_models::id.eq(trackables::id)))
-            .filter(trackables::description.eq(description))
-            .order_by(pipette_tip_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_photograph_id(
-        photograph_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pipette_tip_models::pipette_tip_models, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(pipette_tip_models::id.eq(trackables::id)))
-            .filter(trackables::photograph_id.eq(photograph_id))
-            .order_by(pipette_tip_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_parent_id(
-        parent_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pipette_tip_models::pipette_tip_models, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(pipette_tip_models::id.eq(trackables::id)))
-            .filter(trackables::parent_id.eq(parent_id))
+            .inner_join(asset_models::table.on(pipette_tip_models::id.eq(asset_models::id)))
+            .filter(asset_models::description.eq(description))
             .order_by(pipette_tip_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(
-        created_by: &i32,
+        created_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -150,38 +133,18 @@ impl PipetteTipModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            pipette_tip_models::pipette_tip_models, trackables::trackables,
+            asset_models::asset_models, pipette_tip_models::pipette_tip_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(pipette_tip_models::id.eq(trackables::id)))
-            .filter(trackables::created_by.eq(created_by))
-            .order_by(pipette_tip_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pipette_tip_models::pipette_tip_models, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(pipette_tip_models::id.eq(trackables::id)))
-            .filter(trackables::created_at.eq(created_at))
+            .inner_join(asset_models::table.on(pipette_tip_models::id.eq(asset_models::id)))
+            .filter(asset_models::created_by.eq(created_by))
             .order_by(pipette_tip_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_by(
-        updated_by: &i32,
+        updated_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -190,31 +153,11 @@ impl PipetteTipModel {
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            pipette_tip_models::pipette_tip_models, trackables::trackables,
+            asset_models::asset_models, pipette_tip_models::pipette_tip_models,
         };
         Self::table()
-            .inner_join(trackables::table.on(pipette_tip_models::id.eq(trackables::id)))
-            .filter(trackables::updated_by.eq(updated_by))
-            .order_by(pipette_tip_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            pipette_tip_models::pipette_tip_models, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(pipette_tip_models::id.eq(trackables::id)))
-            .filter(trackables::updated_at.eq(updated_at))
+            .inner_join(asset_models::table.on(pipette_tip_models::id.eq(asset_models::id)))
+            .filter(asset_models::updated_by.eq(updated_by))
             .order_by(pipette_tip_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

@@ -15,7 +15,7 @@ async fn test_codegen_types_macro() {
         .set_output_directory("tests/codegen_types_macro".as_ref())
         .enable_sql_types()
         .beautify()
-        .generate(&mut conn, &database_name, None);
+        .generate(&mut conn, &database_name);
 
     docker.stop().await.unwrap();
     outcome.unwrap();

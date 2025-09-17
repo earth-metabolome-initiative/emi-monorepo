@@ -9,7 +9,11 @@ pub use builder::{FlowchartConfigurationAttribute, FlowchartConfigurationBuilder
 
 use crate::{
     diagrams::flowchart::curve_styles::CurveStyle,
-    shared::generic_configuration::GenericConfiguration, traits::Configuration,
+    shared::{
+        Direction, Renderer,
+        generic_configuration::{GenericConfiguration, Look, Theme},
+    },
+    traits::Configuration,
 };
 
 #[derive(Default, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -28,13 +32,18 @@ pub struct FlowchartConfiguration {
 
 impl Display for FlowchartConfiguration {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.generic.title().is_none() && self.renderer() == Renderer::default() {
+            return Ok(());
+        }
         writeln!(f, "---")?;
+        writeln!(f, "config:")?;
+        writeln!(f, "  theme: {}", self.theme())?;
+        writeln!(f, "  look: {}", self.look())?;
+        writeln!(f, "  flowchart:")?;
+        writeln!(f, "    defaultRenderer: \"{}\"", self.renderer())?;
         if let Some(title) = &self.generic.title() {
             writeln!(f, "title: {title}")?;
         }
-        writeln!(f, "config:")?;
-        writeln!(f, "  flowchart:")?;
-        writeln!(f, "    defaultRenderer: \"{}\"", self.renderer())?;
         writeln!(f, "---")?;
 
         Ok(())
@@ -48,11 +57,19 @@ impl Configuration for FlowchartConfiguration {
         self.generic.title()
     }
 
-    fn direction(&self) -> &crate::shared::generic_configuration::Direction {
+    fn direction(&self) -> Direction {
         self.generic.direction()
     }
 
-    fn renderer(&self) -> &crate::shared::generic_configuration::Renderer {
+    fn renderer(&self) -> Renderer {
         self.generic.renderer()
+    }
+
+    fn theme(&self) -> Theme {
+        self.generic.theme()
+    }
+
+    fn look(&self) -> Look {
+        self.generic.look()
     }
 }

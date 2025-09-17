@@ -24,7 +24,7 @@ impl<R: Row> AsRef<CRUD> for CrudPrimaryKeyOperation<R> {
 }
 
 impl<R: Row> CrudOperation for CrudPrimaryKeyOperation<R> {
-    type Payload = Option<R>;
+    type Payload = R;
 }
 
 impl<R: Row> Tabular for CrudPrimaryKeyOperation<R> {

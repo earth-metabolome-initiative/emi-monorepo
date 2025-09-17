@@ -1,18 +1,66 @@
 #[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::AsChangeset,
+    diesel::Queryable,
+    diesel::Identifiable,
+    diesel::Associations,
+)]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel,
+        foreign_key = model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::organisms::organisms)]
 pub struct Organism {
     pub id: ::rosetta_uuid::Uuid,
+    pub model: i32,
 }
 impl web_common_traits::prelude::TableName for Organism {
     const TABLE_NAME: &'static str = "organisms";
 }
+impl<'a> From<&'a Organism>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableOrganismBuilder,
+    >
+{
+    fn from(value: &'a Organism) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        crate::codegen::structs_codegen::tables::assets::Asset,
+    > for Organism
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    > for Organism
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::sample_sources::SampleSource,
+    > for Organism
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::organisms::Organism,
     > for Organism
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
@@ -24,58 +72,85 @@ impl diesel::Identifiable for Organism {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for Organism {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl Organism {
-    pub fn id<C: diesel::connection::LoadConnection>(
+    pub fn model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
-        >,
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
-                self.id,
-            ),
-            conn,
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::organism_models::OrganismModel::read(
+            self.model, conn,
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
+    pub fn from_model(
+        model: i32,
         conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
+    ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
             ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
             associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            organisms::organisms, trackables::trackables,
+            organisms::organisms, sample_sources::sample_sources,
         };
         Self::table()
-            .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
-            .filter(trackables::name.eq(name))
+            .inner_join(sample_sources::table.on(organisms::id.eq(sample_sources::id)))
+            .filter(sample_sources::model.eq(model))
+            .order_by(organisms::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name_and_model(
+        name: &str,
+        model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{assets::assets, organisms::organisms};
+        Self::table()
+            .inner_join(assets::table.on(organisms::id.eq(assets::id)))
+            .filter(assets::name.eq(name).and(assets::model.eq(model)))
             .order_by(organisms::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{assets::assets, organisms::organisms};
+        Self::table()
+            .inner_join(assets::table.on(organisms::id.eq(assets::id)))
+            .filter(assets::name.eq(name))
+            .order_by(organisms::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_description(
@@ -87,59 +162,17 @@ impl Organism {
             associations::HasTable,
         };
 
-        use crate::codegen::diesel_codegen::tables::{
-            organisms::organisms, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::{assets::assets, organisms::organisms};
         Self::table()
-            .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
-            .filter(trackables::description.eq(description))
-            .order_by(organisms::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_photograph_id(
-        photograph_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            organisms::organisms, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
-            .filter(trackables::photograph_id.eq(photograph_id))
-            .order_by(organisms::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_parent_id(
-        parent_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            organisms::organisms, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
-            .filter(trackables::parent_id.eq(parent_id))
+            .inner_join(assets::table.on(organisms::id.eq(assets::id)))
+            .filter(assets::description.eq(description))
             .order_by(organisms::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(
-        created_by: &i32,
+        created_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -147,39 +180,17 @@ impl Organism {
             associations::HasTable,
         };
 
-        use crate::codegen::diesel_codegen::tables::{
-            organisms::organisms, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::{assets::assets, organisms::organisms};
         Self::table()
-            .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
-            .filter(trackables::created_by.eq(created_by))
-            .order_by(organisms::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            organisms::organisms, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
-            .filter(trackables::created_at.eq(created_at))
+            .inner_join(assets::table.on(organisms::id.eq(assets::id)))
+            .filter(assets::created_by.eq(created_by))
             .order_by(organisms::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_by(
-        updated_by: &i32,
+        updated_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -187,32 +198,10 @@ impl Organism {
             associations::HasTable,
         };
 
-        use crate::codegen::diesel_codegen::tables::{
-            organisms::organisms, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::{assets::assets, organisms::organisms};
         Self::table()
-            .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
-            .filter(trackables::updated_by.eq(updated_by))
-            .order_by(organisms::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            organisms::organisms, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(organisms::id.eq(trackables::id)))
-            .filter(trackables::updated_at.eq(updated_at))
+            .inner_join(assets::table.on(organisms::id.eq(assets::id)))
+            .filter(assets::updated_by.eq(updated_by))
             .order_by(organisms::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

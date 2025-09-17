@@ -2,6 +2,7 @@
 //! symbol.
 
 use core::fmt::Debug;
+use std::rc::Rc;
 
 use algebra::prelude::Symbol;
 
@@ -70,6 +71,64 @@ impl<V: Vocabulary + ?Sized> Vocabulary for &V {
     }
 }
 
+impl<V: Vocabulary + ?Sized> Vocabulary for Box<V> {
+    type SourceSymbol = V::SourceSymbol;
+    type DestinationSymbol = V::DestinationSymbol;
+    type Sources<'a>
+        = V::Sources<'a>
+    where
+        Self: 'a;
+    type Destinations<'a>
+        = V::Destinations<'a>
+    where
+        Self: 'a;
+
+    fn convert(&self, source: &Self::SourceSymbol) -> Option<Self::DestinationSymbol> {
+        (**self).convert(source)
+    }
+
+    fn len(&self) -> usize {
+        (**self).len()
+    }
+
+    fn sources(&self) -> Self::Sources<'_> {
+        (**self).sources()
+    }
+
+    fn destinations(&self) -> Self::Destinations<'_> {
+        (**self).destinations()
+    }
+}
+
+impl<V: Vocabulary + ?Sized> Vocabulary for Rc<V> {
+    type SourceSymbol = V::SourceSymbol;
+    type DestinationSymbol = V::DestinationSymbol;
+    type Sources<'a>
+        = V::Sources<'a>
+    where
+        Self: 'a;
+    type Destinations<'a>
+        = V::Destinations<'a>
+    where
+        Self: 'a;
+
+    fn convert(&self, source: &Self::SourceSymbol) -> Option<Self::DestinationSymbol> {
+        (**self).convert(source)
+    }
+
+    fn len(&self) -> usize {
+        (**self).len()
+    }
+
+    fn sources(&self) -> Self::Sources<'_> {
+        (**self).sources()
+    }
+
+    fn destinations(&self) -> Self::Destinations<'_> {
+        (**self).destinations()
+    }
+}
+
 /// Trait defining a conversion between a source symbol and a destination symbol
 /// reference.
 pub trait VocabularyRef: Vocabulary {
@@ -110,6 +169,18 @@ pub trait BidirectionalVocabulary: Vocabulary {
 impl<V: BidirectionalVocabulary + ?Sized> BidirectionalVocabulary for &V {
     fn invert(&self, destination: &Self::DestinationSymbol) -> Option<Self::SourceSymbol> {
         (*self).invert(destination)
+    }
+}
+
+impl<V: BidirectionalVocabulary + ?Sized> BidirectionalVocabulary for Box<V> {
+    fn invert(&self, destination: &Self::DestinationSymbol) -> Option<Self::SourceSymbol> {
+        (**self).invert(destination)
+    }
+}
+
+impl<V: BidirectionalVocabulary + ?Sized> BidirectionalVocabulary for Rc<V> {
+    fn invert(&self, destination: &Self::DestinationSymbol) -> Option<Self::SourceSymbol> {
+        (**self).invert(destination)
     }
 }
 

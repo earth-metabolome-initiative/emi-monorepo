@@ -54,12 +54,12 @@ where
         for<'a> &'a T: diesel::Identifiable<Id = <&'a Self as diesel::Identifiable>::Id>,
     {
         use diesel::{Identifiable, RunQueryDsl};
-        let Some(parent_id) = other.parent_id() else {
+        let Some(parent) = other.parent() else {
             // If the other does not have a parent ID, it cannot be an descendant.
             return Ok(false);
         };
         let ancestor_id = self.id();
-        if ancestor_id == parent_id {
+        if ancestor_id == parent {
             // If the ancestor is the same as the parent, it is trivially an ancestor.
             return Ok(true);
         }
@@ -70,24 +70,24 @@ where
         let query = format!(
             "
 			WITH RECURSIVE ancestors({primary_key}) AS (
-				SELECT {parent_id} FROM {table}
+				SELECT {parent} FROM {table}
 				WHERE {primary_key} = $1
 				UNION ALL
-				SELECT {table}.{parent_id} FROM {table}
+				SELECT {table}.{parent} FROM {table}
 				JOIN ancestors ON {table}.{primary_key} = ancestors.{primary_key}
-				WHERE {table}.{parent_id} IS NOT NULL
+				WHERE {table}.{parent} IS NOT NULL
 			)
 			SELECT EXISTS (
 				SELECT 1 FROM ancestors WHERE {primary_key} = $2
 			) as exists
 			",
             primary_key = Self::ID,
-            parent_id = Self::PARENT_ID,
+            parent = Self::PARENT_ID,
             table = Self::TABLE_NAME
         );
 
         let result: AncestorExists = diesel::sql_query(query)
-            .bind::<Self::SqlType, _>(parent_id)
+            .bind::<Self::SqlType, _>(parent)
             .bind::<Self::SqlType, _>(ancestor_id)
             .get_result(conn)?;
 
@@ -101,5 +101,5 @@ where
     for<'a> &'a Self: diesel::Identifiable,
 {
     /// Returns the ID of the parent of this descendant, if it exists.
-    fn parent_id(&self) -> Option<<&Self as diesel::Identifiable>::Id>;
+    fn parent(&self) -> Option<<&Self as diesel::Identifiable>::Id>;
 }

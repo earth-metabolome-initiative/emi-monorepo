@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::colors::Color,
+        foreign_key = color_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::units::units)]
 pub struct Unit {
@@ -20,9 +27,32 @@ pub struct Unit {
 impl web_common_traits::prelude::TableName for Unit {
     const TABLE_NAME: &'static str = "units";
 }
+impl<'a> From<&'a Unit>
+    for web_common_traits::database::IdOrBuilder<
+        i16,
+        crate::codegen::structs_codegen::tables::insertables::InsertableUnitBuilder,
+    >
+{
+    fn from(value: &'a Unit) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
+impl
+    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::units::Unit>
+    for Unit
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for Unit {
     type Id = i16;
     fn id(self) -> Self::Id {
+        self.id
+    }
+}
+impl web_common_traits::database::PrimaryKeyLike for Unit {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
         self.id
     }
 }
@@ -30,34 +60,13 @@ impl Unit {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::colors::Color,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::colors::Color: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::colors::Color,
-        >,
+        crate::codegen::structs_codegen::tables::colors::Color:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::colors::Color::table(),
-                self.color_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::colors::Color::read(self.color_id, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(
@@ -88,19 +97,6 @@ impl Unit {
 
         use crate::codegen::diesel_codegen::tables::units::units;
         Self::table().filter(units::icon.eq(icon)).order_by(units::id.asc()).load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_color_id(
-        color_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::units::units;
-        Self::table()
-            .filter(units::color_id.eq(color_id))
-            .order_by(units::id.asc())
-            .load::<Self>(conn)
     }
 }
 impl AsRef<Unit> for Unit {

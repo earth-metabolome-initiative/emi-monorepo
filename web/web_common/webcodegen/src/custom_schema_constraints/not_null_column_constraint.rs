@@ -21,17 +21,15 @@ impl NotNullColumnConstraint {
 }
 
 impl CustomColumnConstraint for NotNullColumnConstraint {
+    type Error = crate::errors::WebCodeGenError;
+
     fn check_constraint(
         &self,
         _conn: &mut PgConnection,
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
         if self.column_name == column.column_name && column.is_nullable() {
-            return Err(ConstraintError::UnexpectedNullableColumn(
-                column.table_name.clone(),
-                self.column_name.clone(),
-            )
-            .into());
+            return Err(ConstraintError::UnexpectedNullableColumn(Box::new(column.clone())).into());
         }
         Ok(())
     }

@@ -11,6 +11,7 @@ pub use builder::FlowchartBuilder;
 pub use configuration::{
     FlowchartConfiguration, FlowchartConfigurationAttribute, FlowchartConfigurationBuilder,
 };
+pub use curve_styles::CurveStyle;
 pub use flowchart_edge::{FlowchartEdge, FlowchartEdgeAttribute, FlowchartEdgeBuilder};
 pub use flowchart_node::{
     FlowchartNode, FlowchartNodeAttribute, FlowchartNodeBuilder, FlowchartNodeShape,
@@ -18,7 +19,7 @@ pub use flowchart_node::{
 
 use crate::{
     shared::generic_diagram::GenericDiagram,
-    traits::{Configuration, Diagram},
+    traits::{Configuration, Diagram, Node, edge::Edge},
 };
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -42,17 +43,14 @@ impl Diagram for Flowchart {
         self.generic.edges()
     }
 
-    fn get_node_by_label<S>(&self, label: S) -> Option<std::rc::Rc<Self::Node>>
-    where
-        S: AsRef<str>,
-    {
-        self.generic.get_node_by_label(label)
+    fn get_node_by_id(&self, id: u64) -> Option<std::rc::Rc<Self::Node>> {
+        self.generic.get_node_by_id(id)
     }
 
-    fn get_style_class_by_name<S>(&self, name: S) -> Option<std::rc::Rc<crate::shared::StyleClass>>
-    where
-        S: AsRef<str>,
-    {
+    fn get_style_class_by_name(
+        &self,
+        name: &str,
+    ) -> Option<std::rc::Rc<crate::shared::StyleClass>> {
         self.generic.get_style_class_by_name(name)
     }
 
@@ -70,6 +68,12 @@ impl Display for Flowchart {
         write!(f, "{}", self.configuration())?;
         writeln!(f, "flowchart {}", self.configuration().direction())?;
         for style_class in self.style_classes() {
+            if !self.nodes().any(|n| n.classes().any(|sc| sc == style_class))
+                && !self.edges().any(|e| e.classes().any(|sc| sc == style_class))
+            {
+                continue;
+            }
+
             write!(f, "{style_class}")?;
         }
 

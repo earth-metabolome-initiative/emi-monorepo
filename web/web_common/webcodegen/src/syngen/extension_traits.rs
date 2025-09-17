@@ -1,10 +1,10 @@
-//! Submodule implementing the `ExtensionTraits` trait for `ProcedureModel`.
+//! Submodule implementing the `ExtensionTraits` trait for `ProcedureTemplate`.
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::errors::WebCodeGenError;
+use crate::{errors::WebCodeGenError, traits::TableLike};
 
 impl crate::Table {
     /// Creates the extension trait implementations for the table, if it is
@@ -35,11 +35,10 @@ impl crate::Table {
             })
             .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
-        if self.is_extended(conn)? {
-            extension_traits.push(quote! {
-                impl web_common_traits::prelude::ExtensionTable<Self> for #table_ident where for<'a> &'a Self: diesel::Identifiable<Id=&'a #primary_key_type> {}
-            });
-        }
+        let extended_table_path = self.import_struct_path()?;
+        extension_traits.push(quote! {
+            impl web_common_traits::prelude::ExtensionTable<#extended_table_path> for #table_ident where for<'a> &'a Self: diesel::Identifiable<Id=&'a #primary_key_type> {}
+        });
 
         Ok(extension_traits)
     }

@@ -108,6 +108,15 @@ impl PgAttribute {
         self.pg_type(conn)?.supports_eq(conn)
     }
 
+    /// Returns whether the associated rust type supports `PartialOrd`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the provided database connection fails.
+    pub fn supports_partial_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        self.pg_type(conn)?.supports_partial_ord(conn)
+    }
+
     /// Returns whether the associated rust type supports `Ord`.
     ///
     /// # Errors

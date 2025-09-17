@@ -1,0 +1,21 @@
+[package]
+name = "guided_procedures"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+core_structures.workspace = true
+algebra.workspace = true
+graph.workspace = true
+diesel.workspace = true
+web_common_traits.workspace = true
+sorted_vec.workspace = true
+common_traits.workspace = true
+rosetta_uuid.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = ["backend"]
+backend = ["core_structures/backend"]

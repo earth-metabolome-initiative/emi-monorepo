@@ -5,6 +5,7 @@ use numeric_common_traits::prelude::IntoUsize;
 
 use crate::prelude::*;
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// [`GenericBiMatrix2D`] data structure, which provides a wrapper to a matrix
 /// and its transposed version.
 pub struct GenericBiMatrix2D<M, T> {
@@ -264,5 +265,27 @@ where
     #[inline]
     fn transposed(&self) -> &T {
         &self.transposed
+    }
+}
+
+impl<M, T> SquareMatrix for GenericBiMatrix2D<M, T>
+where
+    T: SquareMatrix,
+    M: SquareMatrix<Index = T::Index> + TransposableMatrix2D<T>,
+{
+    type Index = M::Index;
+
+    fn order(&self) -> Self::Index {
+        self.matrix.order()
+    }
+}
+
+impl<M, T> SparseSquareMatrix for GenericBiMatrix2D<M, T>
+where
+    T: SparseSquareMatrix,
+    M: SparseSquareMatrix<Index = T::Index> + TransposableMatrix2D<T>,
+{
+    fn number_of_defined_diagonal_values(&self) -> Self::Index {
+        self.matrix.number_of_defined_diagonal_values()
     }
 }

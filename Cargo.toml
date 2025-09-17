@@ -3,59 +3,60 @@ resolver = "2"
 
 members = [
   "bindings/sirius_bindings",
-  "web/backend",
-  "web/frontend",
-  "web/web_common/web_common_traits",
-  "web/web_common/webcodegen",
-  "web/web_common/csqlv",
-  "web/web_common/snake_case_sanitizer",
-  "web/web_common/pgrx_validation",
-  "web/web_common/pgrx_validation_derive",
-  "web/web_common/validation_errors",
-  "web/web_common/backend_request_errors",
-  "web/web_common/generic_backend_request_errors",
-  "web/web_common/pg2sqlite",
-  "data_retrieval/taxonomy_fetcher",
+  "data_migrations/directus_migration",
+  "data_migrations/directus_migration/directus_codegen",
+  "data_migrations/directus_migration/directus_migration_builder",
+  "data_migrations/init_db",
+  "data_migrations/init_migration",
   "data_retrieval/downloader",
+  "data_retrieval/taxonomy_fetcher",
+  "data_structures/algebra",
+  "data_structures/graph",
+  "data_structures/mass_spectrometry",
+  "data_structures/multi_ranged",
+  "data_structures/rosetta_uuid",
+  "data_structures/sorted_vec",
+  "utils/common_traits",
+  "utils/diesel_migrations_utils",
+  "utils/diesel_pgrx",
+  "utils/diesel_pgrx/example_extension",
+  "utils/diesel_pgrx_derive",
+  "utils/functional_properties",
+  "utils/image_validation",
+  "utils/inflector",
+  "utils/iter_utils",
+  "utils/macro_utils",
+  "utils/mermaid",
+  "utils/numeric_common_traits",
+  "utils/rosetta_timestamp",
+  "utils/time_requirements",
+  "web/backend",
   "web/core_structures",
   "web/core_structures/core_structures_builder",
   "web/core_structures/core_structures_vis",
-  "utils/diesel_migrations_utils",
-  "utils/common_traits",
-  "utils/inflector",
-  "utils/time_requirements",
-  "data_structures/graph",
-  "data_structures/algebra",
-  "data_migrations/directus_migration/directus_migration_builder",
-  "data_migrations/directus_migration",
-  "data_structures/mass_spectrometry",
-  "utils/functional_properties",
-  "data_structures/rosetta_uuid",
-  "data_structures/sorted_vec",
-  "utils/functional_properties",
-  "utils/image_validation",
-  "utils/mermaid",
-  "web/web_common/media_types",
-  "web/web_common/media_types/media_types_builder",
-  "web/web_common/ws_messages",
-  "utils/rosetta_timestamp",
-  "utils/iter_utils",
-  "data_migrations/init_migration",
-  "web/web_common/sqlite_migration_generator",
-  "utils/macro_utils",
-  "web/web_common/iso_codes",
-  "web/web_common/rosetta_url",
-  "data_migrations/init_db",
-  "web/web_common/reference_docker",
+  "web/core_structures/guided_procedures",
+  "web/frontend",
+  "web/web_common/backend_request_errors",
   "web/web_common/cas_codes",
-  "utils/diesel_pgrx_derive",
-  "utils/diesel_pgrx",
+  "web/web_common/csqlv",
   "web/web_common/elements",
   "web/web_common/elements/elements_builder",
-  "utils/diesel_pgrx/example_extension",
+  "web/web_common/generic_backend_request_errors",
+  "web/web_common/iso_codes",
+  "web/web_common/media_types",
+  "web/web_common/media_types/media_types_builder",
   "web/web_common/molecular_formulas",
-  "utils/numeric_common_traits",
-  "data_structures/multi_ranged",
+  "web/web_common/pg2sqlite",
+  "web/web_common/pgrx_validation",
+  "web/web_common/pgrx_validation_derive",
+  "web/web_common/procedure_codegen",
+  "web/web_common/reference_docker",
+  "web/web_common/rosetta_url",
+  "web/web_common/sqlite_migration_generator",
+  "web/web_common/validation_errors",
+  "web/web_common/webcodegen",
+  "web/web_common/web_common_traits",
+  "web/web_common/ws_messages",
 ]
 
 [workspace.dependencies]
@@ -74,7 +75,7 @@ proc-macro2 = "1.0"
 num_cpus = "1.17.0"
 url = "2.5.4"
 r2d2 = { version = ">= 0.8.2, < 0.9.0" }
-indicatif = "0.17.11"
+indicatif = "0.18.0"
 reqwest = { version = "0.12.12", features = ["stream", "json"] }
 tokio = { version = "1.43.0", features = ["full"] }
 flate2 = "1.0.35"
@@ -84,21 +85,21 @@ csv = "1.3.1"
 bytes = "1.10.0"
 rayon = "1.10.0"
 bincode = { version = "2", features = ["serde"] }
-sqlparser = { git = "https://github.com/apache/datafusion-sqlparser-rs.git", branch = "main" }
+sqlparser = "0.58.0"
 arbitrary = { version = "1", features = ["derive"] }
-diesel = { git = "https://github.com/diesel-rs/diesel", rev = "2cf1642d69a699ddefaa15fabc2d58e37670a735", features = [
+diesel = { version = "2.3.1", features = [
   "extras",
   "sqlite",
   "returning_clauses_for_sqlite_3_35",
   "postgres",
   "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
 ] }
-diesel_full_text_search = "2.2"
+# diesel_full_text_search = "2.2"
 diesel_pgrx = { path = "utils/diesel_pgrx" }
 diesel_pgrx_derive = { path = "utils/diesel_pgrx_derive" }
 example_extension = { path = "utils/diesel_pgrx/example_extension" }
 redis = { version = "0.32.1", features = ["tokio-comp"] }
-postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel.git", default-features = false, branch = "custom-diesel" }
+postgis_diesel = { version = "3.0.1", default-features = false }
 chrono = { version = "0.4.39", features = ["serde"] }
 serde = { version = "1.0", features = ["derive", "rc"] }
 serde_json = "1.0"
@@ -120,14 +121,14 @@ rsa = { version = "0.9.8" }
 rand = { version = "0.9.1" }
 gloo = "0.11.0"
 gloo-timers = "0.3.0"
-criterion = { version = "0.6", features = ["html_reports"] }
+criterion = { version = "0.7", features = ["html_reports"] }
 rosetta_uuid = { path = "data_structures/rosetta_uuid" }
 rosetta_timestamp = { path = "utils/rosetta_timestamp" }
 taxonomy_fetcher = { path = "data_retrieval/taxonomy_fetcher" }
 csqlv = { path = "web/web_common/csqlv", default-features = false }
 iso_codes = { path = "web/web_common/iso_codes" }
 elements = { path = "web/web_common/elements" }
-testcontainers = { version = "0.24.0" }
+testcontainers = { version = "0.25.0" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen" }
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
@@ -145,7 +146,7 @@ futures = "0.3.31"
 futures-util = "0.3.31"
 wasm-bindgen-futures = "0.4.50"
 wasm-bindgen = "0.2.100"
-trybuild = "1"
+trybuild = "1.0.111"
 const_format = "0.2.34"
 log = "0.4"
 rustfft = "6.2.0"
@@ -153,7 +154,7 @@ lender = "0.3.2"
 sql_minifier = "0.1.5"
 blake3 = "1.8.2"
 num-traits = "0.2.19"
-phf = { version = "0.12.1", features = ["macros"] }
+phf = { version = "0.13.1", features = ["macros"] }
 api_path = { path = "web/web_common/api_path" }
 time_requirements = { path = "utils/time_requirements" }
 numeric_common_traits = { path = "utils/numeric_common_traits" }
@@ -172,7 +173,7 @@ macro_utils = { path = "utils/macro_utils" }
 lazy_static = { version = "1.5.0" }
 validator = { version = "0.20", features = ["derive"] }
 web-sys = { version = "0.3.77" }
-cached = "0.55"
+cached = { version = "0.56", features = ["disk_store"] }
 dotenvy = "0.15.7"
 serde_cbor = "0.11.2"
 sophia_api = "0.9.0"
@@ -185,8 +186,12 @@ media_types = { path = "web/web_common/media_types" }
 molecular_formulas = { path = "web/web_common/molecular_formulas" }
 cas_codes = { path = "web/web_common/cas_codes" }
 multi_ranged = { path = "data_structures/multi_ranged" }
+procedure_codegen = { path = "web/web_common/procedure_codegen" }
 mermaid = { path = "utils/mermaid" }
 colorsys = "0.7.0"
+prettyplease = "0.2"
+guided_procedures = { path = "web/core_structures/guided_procedures" }
+directus_codegen = { path = "data_migrations/directus_migration/directus_codegen" }
 
 [workspace.lints.rust]
 missing_docs = "forbid"
@@ -206,7 +211,11 @@ clone_on_copy = "forbid"
 pedantic = { level = "deny", priority = -1 }
 
 [profile.bench]
-debug = true # Include debug info.
+debug = false # Include debug info.
+
+[profile.test]
+incremental = true
+debug = true
 
 [profile.release]
-debug = true # Don't include debug info.
+debug = true

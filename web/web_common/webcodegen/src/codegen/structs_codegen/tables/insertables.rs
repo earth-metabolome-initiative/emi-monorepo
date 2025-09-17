@@ -1,7 +1,7 @@
 //! Submodule defining the structs supporting the [`Insertable`] and
 //! [`Insertable`]-adjacent traits.
 
-use std::{collections::HashSet, path::Path};
+use std::path::Path;
 
 use diesel::PgConnection;
 use proc_macro2::TokenStream;
@@ -9,18 +9,21 @@ use quote::quote;
 use syn::Ident;
 
 use crate::{
-    CheckConstraint, Codegen, Column, Table,
+    Codegen, Column, Table,
     codegen::{
         CODEGEN_DIRECTORY, CODEGEN_INSERTABLES_PATH, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
     },
     errors::WebCodeGenError,
+    traits::TableLike,
 };
 
 mod insertable_builder_definition;
 mod insertable_builder_set_primary_key;
+mod insertable_builder_trait;
+mod insertable_builder_trait_impls;
+pub(crate) use insertable_builder_trait_impls::columns_to_mermaid_illustration;
 mod insertable_builder_try_insert_generic;
 mod insertable_enum;
-mod insertable_setter_method;
 mod insertable_variant;
 
 impl Table {
@@ -80,16 +83,75 @@ impl Table {
     ) -> Result<Vec<Column>, WebCodeGenError> {
         let mut insertable_columns = Vec::new();
 
-        for column in self.columns(conn)? {
+        for column in self.columns(conn)?.as_ref() {
             if column.is_always_automatically_generated()
                 || !include_extension_columns
                     && column.is_part_of_extension_primary_key(conn)?.is_some()
             {
                 continue;
             }
-            insertable_columns.push(column);
+            insertable_columns.push(column.clone());
         }
 
+        Ok(insertable_columns)
+    }
+
+    /// Returns the list of ancestral insertable columns for the table.
+    ///
+    /// # Implementation details
+    ///
+    /// This method returns the list of insertable columns for the table,
+    /// including the insertable columns of its ancestral extensions. It
+    /// then proceeds to remove any duplicate columns which may arise due to
+    /// overlapping extensions in a DAG, and removes any columns that are
+    /// within ancestral same-as relationships. It also removes columns which
+    /// are defined in either associated same-as relationships or foreign
+    /// defined relationships, allowing the user to focus on the columns that
+    /// are directly relevant to the table itself.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    ///
+    /// # Errors
+    ///
+    /// * If the database connection fails.
+    pub(crate) fn ancestral_insertable_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Column>, WebCodeGenError> {
+        let mut insertable_columns = self.insertable_columns(conn, false)?;
+
+        // We filter the `most_concrete_table` column, if present.
+        if let Some(most_concrete_table_column) = self.most_concrete_table_column(false, conn)? {
+            insertable_columns.retain(|c| c != &most_concrete_table_column);
+        }
+
+        let mut ancestral_insertable_columns = Vec::new();
+        for extension in self.extension_tables(conn)?.iter() {
+            let extension_insertable_columns = extension.ancestral_insertable_columns(conn)?;
+            ancestral_insertable_columns.extend(extension_insertable_columns);
+        }
+        // We deduplicate the columns to avoid duplicates due to overlapping extensions
+        // in a DAG.
+        ancestral_insertable_columns.sort_unstable();
+        ancestral_insertable_columns.dedup();
+
+        // Next, we filter out the columns which are part of ancestral same-as
+        // relationships.
+        for insertable_column in &insertable_columns {
+            ancestral_insertable_columns.retain(|other| {
+                !insertable_column.is_ancestrally_same_as(other, conn).unwrap_or(false)
+            });
+        }
+
+        // Next, we remove columns which are defined in either associated same-as
+        // relationships (i.e. by partial builders) or foreign defined relationships.
+        insertable_columns
+            .retain(|column| !column.is_foreignely_defined(true, conn).unwrap_or(false));
+
+        insertable_columns.extend(ancestral_insertable_columns);
+        insertable_columns.sort_unstable();
         Ok(insertable_columns)
     }
 }
@@ -120,79 +182,17 @@ impl Codegen<'_> {
         let mut insertables_main_module = TokenStream::new();
 
         for table in tables {
-            let insertable_enum = table.insertable_enum_ident()?;
+            let insertable_enum = table.attributes_enum_ident()?;
             let maybe_insertable_extension_enum = if table.extension_tables(conn)?.is_empty() {
                 None
             } else {
-                Some(table.insertable_extension_enum_ident()?)
+                Some(table.attributes_extension_enum_ident()?)
             };
             let insertable_variant_ident = table.insertable_variant_ident()?;
             let insertable_builder_ident = table.insertable_builder_ident()?;
+            let buildable_trait_ident = table.setter_trait_ident()?;
             let enum_implementation = table.insertable_enum_definition(conn)?;
             let insertable_variant_definition = table.insertable_variant_definition(conn)?;
-
-            // We re-export all of the setter methods associated with the extended
-            // table, if any.
-            let mut covered = HashSet::new();
-            let ancestor_columns_map = self.table_extension_network().unwrap().ancestors_columns(
-                table,
-                &mut covered,
-                conn,
-            )?;
-            let mut ancestor_columns: Vec<&Column> =
-                ancestor_columns_map.values().flatten().collect::<Vec<&Column>>();
-            ancestor_columns.sort_unstable();
-            let mut insertable_builder_methods = ancestor_columns
-                .into_iter()
-                .map(|column| self.generate_setter_method(table, &[column], conn))
-                .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
-            let mut covered = HashSet::new();
-            let ancestor_check_constraints_map = self
-                .table_extension_network()
-                .unwrap()
-                .ancestors_check_constraints(table, &mut covered, conn)?;
-            let mut ancestor_check_constraints: Vec<&CheckConstraint> =
-                ancestor_check_constraints_map
-                    .values()
-                    .flatten()
-                    .collect::<Vec<&CheckConstraint>>();
-            ancestor_check_constraints.sort_unstable();
-            let mut ancestor_check_constraint_columns = ancestor_check_constraints
-                .iter()
-                .filter_map(|check_constraint| {
-                    let Ok(columns) = check_constraint.columns(conn) else {
-                        return None;
-                    };
-
-                    // Check constraints which include columns which are automatically
-                    // generated are not considered, as they cannot be set by the user.
-                    if columns.iter().any(|column| column.is_always_automatically_generated()) {
-                        return None;
-                    }
-
-                    // We only take into account check constraints involving more than one column,
-                    // as the single column ones are already handled by the other methods.
-
-                    // Furthermore, as check constraints only apply to non-nullable columns,
-                    // we convert the columns to non-nullable columns.
-                    let non_nullable_columns: Vec<Column> =
-                        columns.into_iter().map(|column| column.to_non_nullable()).collect();
-
-                    if non_nullable_columns.len() > 1 { Some(non_nullable_columns) } else { None }
-                })
-                .collect::<Vec<Vec<Column>>>();
-
-            ancestor_check_constraint_columns.sort_unstable();
-            ancestor_check_constraint_columns.dedup();
-
-            insertable_builder_methods.extend(
-                ancestor_check_constraint_columns
-                    .iter()
-                    .map(|columns| self.generate_setter_method(table, columns.as_slice(), conn))
-                    .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?,
-            );
-
-            insertable_builder_methods.sort_unstable_by_key(|method| method.to_string());
 
             // When the table associated with the struct we are generating is not an
             // extension, we can implement the `TryFrom` trait to convert the insertable
@@ -213,21 +213,19 @@ impl Codegen<'_> {
                     #builder_definition
                     #maybe_set_primary_key_impl
 
-                    #(#insertable_builder_methods)*
-
                     #try_insert_generic_impl
-                })?,
+                }),
             )?;
 
             let table_identifier = table.snake_case_ident()?;
             insertables_main_module.extend(quote! {
                 mod #table_identifier;
-                pub use #table_identifier::{#insertable_variant_ident, #insertable_builder_ident, #insertable_enum, #maybe_insertable_extension_enum};
+                pub use #table_identifier::{#insertable_variant_ident, #insertable_builder_ident, #buildable_trait_ident, #insertable_enum, #maybe_insertable_extension_enum};
             });
         }
 
         let insertables_file = root.with_extension("rs");
-        std::fs::write(&insertables_file, self.beautify_code(&insertables_main_module)?)?;
+        std::fs::write(&insertables_file, self.beautify_code(&insertables_main_module))?;
 
         Ok(())
     }

@@ -7,7 +7,18 @@ use super::{PgExtension, PgProc, PgType};
 
 /// Represents the `pg_operator` system catalog table in `PostgreSQL`.
 /// This table stores information about operators.
-#[derive(Queryable, QueryableByName, Selectable, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(
+    Queryable,
+    QueryableByName,
+    Selectable,
+    Clone,
+    Debug,
+    PartialEq,
+    Eq,
+    Hash,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 #[diesel(table_name = crate::schema::pg_operator)]
 pub struct PgOperator {
     /// The OID of the operator.

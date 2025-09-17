@@ -6,20 +6,53 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        foreign_key = container_model
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::containers::containers)]
 pub struct Container {
     pub id: ::rosetta_uuid::Uuid,
-    pub container_model_id: ::rosetta_uuid::Uuid,
+    pub container_model: i32,
 }
 impl web_common_traits::prelude::TableName for Container {
     const TABLE_NAME: &'static str = "containers";
 }
+impl<'a> From<&'a Container>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        crate::codegen::structs_codegen::tables::insertables::InsertableContainerBuilder,
+    >
+{
+    fn from(value: &'a Container) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        crate::codegen::structs_codegen::tables::assets::Asset,
+    > for Container
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    > for Container
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::containers::Container,
     > for Container
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
@@ -31,39 +64,13 @@ impl diesel::Identifiable for Container {
         self.id
     }
 }
-impl Container {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
-                self.id,
-            ),
-            conn,
-        )
+impl web_common_traits::database::PrimaryKeyLike for Container {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
     }
+}
+impl Container {
     pub fn container_model<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
@@ -72,62 +79,71 @@ impl Container {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-        >,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::container_models::ContainerModel::table(),
-                self.container_model_id,
-            ),
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel::read(
+            self.container_model,
             conn,
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn from_container_model_id(
-        container_model_id: &::rosetta_uuid::Uuid,
+    pub fn from_model(
+        model: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::containers::containers;
-        Self::table()
-            .filter(containers::container_model_id.eq(container_model_id))
-            .order_by(containers::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_name(
-        name: &str,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
         use diesel::{
             ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
             associations::HasTable,
         };
 
         use crate::codegen::diesel_codegen::tables::{
-            containers::containers, trackables::trackables,
+            containers::containers, physical_assets::physical_assets,
         };
         Self::table()
-            .inner_join(trackables::table.on(containers::id.eq(trackables::id)))
-            .filter(trackables::name.eq(name))
+            .inner_join(physical_assets::table.on(containers::id.eq(physical_assets::id)))
+            .filter(physical_assets::model.eq(model))
+            .order_by(containers::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name_and_model(
+        name: &str,
+        model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Self, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl,
+            SelectableHelper, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{assets::assets, containers::containers};
+        Self::table()
+            .inner_join(assets::table.on(containers::id.eq(assets::id)))
+            .filter(assets::name.eq(name).and(assets::model.eq(model)))
             .order_by(containers::id.asc())
             .select(Self::as_select())
             .first::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
+    pub fn from_name(
+        name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{assets::assets, containers::containers};
+        Self::table()
+            .inner_join(assets::table.on(containers::id.eq(assets::id)))
+            .filter(assets::name.eq(name))
+            .order_by(containers::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_description(
@@ -139,59 +155,17 @@ impl Container {
             associations::HasTable,
         };
 
-        use crate::codegen::diesel_codegen::tables::{
-            containers::containers, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::{assets::assets, containers::containers};
         Self::table()
-            .inner_join(trackables::table.on(containers::id.eq(trackables::id)))
-            .filter(trackables::description.eq(description))
-            .order_by(containers::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_photograph_id(
-        photograph_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            containers::containers, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(containers::id.eq(trackables::id)))
-            .filter(trackables::photograph_id.eq(photograph_id))
-            .order_by(containers::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_parent_id(
-        parent_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            containers::containers, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(containers::id.eq(trackables::id)))
-            .filter(trackables::parent_id.eq(parent_id))
+            .inner_join(assets::table.on(containers::id.eq(assets::id)))
+            .filter(assets::description.eq(description))
             .order_by(containers::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_created_by(
-        created_by: &i32,
+        created_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -199,39 +173,17 @@ impl Container {
             associations::HasTable,
         };
 
-        use crate::codegen::diesel_codegen::tables::{
-            containers::containers, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::{assets::assets, containers::containers};
         Self::table()
-            .inner_join(trackables::table.on(containers::id.eq(trackables::id)))
-            .filter(trackables::created_by.eq(created_by))
-            .order_by(containers::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            containers::containers, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(containers::id.eq(trackables::id)))
-            .filter(trackables::created_at.eq(created_at))
+            .inner_join(assets::table.on(containers::id.eq(assets::id)))
+            .filter(assets::created_by.eq(created_by))
             .order_by(containers::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_updated_by(
-        updated_by: &i32,
+        updated_by: i32,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{
@@ -239,32 +191,10 @@ impl Container {
             associations::HasTable,
         };
 
-        use crate::codegen::diesel_codegen::tables::{
-            containers::containers, trackables::trackables,
-        };
+        use crate::codegen::diesel_codegen::tables::{assets::assets, containers::containers};
         Self::table()
-            .inner_join(trackables::table.on(containers::id.eq(trackables::id)))
-            .filter(trackables::updated_by.eq(updated_by))
-            .order_by(containers::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            containers::containers, trackables::trackables,
-        };
-        Self::table()
-            .inner_join(trackables::table.on(containers::id.eq(trackables::id)))
-            .filter(trackables::updated_at.eq(updated_at))
+            .inner_join(assets::table.on(containers::id.eq(assets::id)))
+            .filter(assets::updated_by.eq(updated_by))
             .order_by(containers::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

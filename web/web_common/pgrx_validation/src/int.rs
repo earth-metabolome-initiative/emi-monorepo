@@ -47,6 +47,25 @@ pub fn must_be_strictly_positive_i32(
 }
 
 #[validation]
+/// Control that the i32 is positive [0, ...].
+///
+/// # Arguments
+///
+/// * `value` a i32
+///
+/// # Errors
+///
+/// * `validation_errors::SingleFieldError::UnexpectedNegativeValue(())` if the
+///   value is negative.
+pub fn must_be_positive_i32(value: i32) -> Result<(), validation_errors::SingleFieldError> {
+    if value >= 0 {
+        Ok(())
+    } else {
+        Err(validation_errors::SingleFieldError::UnexpectedNegativeValue(()))
+    }
+}
+
+#[validation]
 /// Validates that two provided integers are distinct.
 ///
 /// # Arguments
@@ -87,6 +106,25 @@ pub fn must_be_strictly_positive_i16(
         Ok(())
     } else {
         Err(validation_errors::SingleFieldError::UnexpectedNegativeOrZeroValue(()))
+    }
+}
+
+#[validation]
+/// Control that the i16 is positive [0, ...].
+///
+/// # Arguments
+///
+/// * `value` a i16
+///
+/// # Errors
+///
+/// * `validation_errors::SingleFieldError::UnexpectedNegativeValue(())` if the
+///   value is negative.
+pub fn must_be_positive_i16(value: i16) -> Result<(), validation_errors::SingleFieldError> {
+    if value >= 0 {
+        Ok(())
+    } else {
+        Err(validation_errors::SingleFieldError::UnexpectedNegativeValue(()))
     }
 }
 

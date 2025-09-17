@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::countries::Country,
+        foreign_key = iso
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(table_name = crate::codegen::diesel_codegen::tables::cities::cities)]
 pub struct City {
@@ -18,9 +25,33 @@ pub struct City {
 impl web_common_traits::prelude::TableName for City {
     const TABLE_NAME: &'static str = "cities";
 }
+impl<'a> From<&'a City>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableCityBuilder,
+    >
+{
+    fn from(value: &'a City) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::cities::City,
+    > for City
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl diesel::Identifiable for City {
     type Id = i32;
     fn id(self) -> Self::Id {
+        self.id
+    }
+}
+impl web_common_traits::database::PrimaryKeyLike for City {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
         self.id
     }
 }
@@ -28,34 +59,13 @@ impl City {
     pub fn iso<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::countries::Country,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::countries::Country, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::countries::Country: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::countries::Country as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::countries::Country as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::countries::Country as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::countries::Country as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::countries::Country as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::countries::Country as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::countries::Country,
-        >,
+        crate::codegen::structs_codegen::tables::countries::Country:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::countries::Country::table(),
-                self.iso,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::countries::Country::read(self.iso, conn)
     }
     #[cfg(feature = "postgres")]
     pub fn from_name(
@@ -66,16 +76,6 @@ impl City {
 
         use crate::codegen::diesel_codegen::tables::cities::cities;
         Self::table().filter(cities::name.eq(name)).order_by(cities::id.asc()).load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_iso(
-        iso: &::iso_codes::CountryCode,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::cities::cities;
-        Self::table().filter(cities::iso.eq(iso)).order_by(cities::id.asc()).load::<Self>(conn)
     }
 }
 impl AsRef<City> for City {

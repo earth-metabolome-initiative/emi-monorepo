@@ -49,6 +49,10 @@ impl Edge for FlowchartEdge {
         self.edge.destination()
     }
 
+    fn classes(&self) -> impl Iterator<Item = &StyleClass> {
+        self.style_classes.iter().map(AsRef::as_ref)
+    }
+
     fn line_style(&self) -> LineStyle {
         self.edge.line_style()
     }
@@ -70,11 +74,19 @@ impl Display for FlowchartEdge {
             LineStyle::Dashed => format!("-{}-", ".".repeat(self.length as usize)),
         };
 
+        let edge_prefix = if self.curve_style != CurveStyle::default()
+            || !self.style_classes.is_empty()
+            || !self.style_properties.is_empty()
+        {
+            format!("{EDGE_LETTER}{}@", self.id)
+        } else {
+            String::default()
+        };
+
         writeln!(
             f,
-            "{NODE_LETTER}{} {EDGE_LETTER}{}@{left_arrow}{segment}{right_arrow}{} {NODE_LETTER}{}",
+            "{NODE_LETTER}{} {edge_prefix}{left_arrow}{segment}{right_arrow}{} {NODE_LETTER}{}",
             self.source().id(),
-            self.id,
             self.label().map_or_else(String::new, |label| format!("|\"`{label}`\"|")),
             self.destination().id(),
             left_arrow = self.left_arrow_shape().as_ref().map_or_else(|| "", |shape| shape.left()),
@@ -87,7 +99,7 @@ impl Display for FlowchartEdge {
         }
 
         for class in &self.style_classes {
-            writeln!(f, "class {EDGE_LETTER}{} {class}", self.id)?;
+            writeln!(f, "class {EDGE_LETTER}{} {}", self.id, class.name())?;
         }
 
         if !self.style_properties.is_empty() {

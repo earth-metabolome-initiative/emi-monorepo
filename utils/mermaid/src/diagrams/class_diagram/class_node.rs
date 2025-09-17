@@ -40,7 +40,7 @@ impl Node for ClassNode {
         self.node.label()
     }
 
-    fn id(&self) -> usize {
+    fn id(&self) -> u64 {
         self.node.id()
     }
 

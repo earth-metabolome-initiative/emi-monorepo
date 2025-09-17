@@ -1,17 +1,52 @@
 //! Submodule defining a trait for what a `Builder` should be able to do.
 
+use std::fmt::{Debug, Display};
+
+/// Trait defining what a `CompleteBuilder` should be able to do.
+pub trait IsCompleteBuilder {
+    /// Returns whether the builder is complete, meaning all required attributes
+    /// have been set.
+    fn is_complete(&self) -> bool;
+}
+
+impl<T> IsCompleteBuilder for Option<T> {
+    fn is_complete(&self) -> bool {
+        self.is_some()
+    }
+}
+
+/// Trait defining an associated enumeration of attributes.
+pub trait Attributed {
+    /// The enumeration of the attributes that can be set.
+    type Attribute: core::fmt::Debug + Display + 'static;
+}
+
+#[derive(Default, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+/// A struct representing an empty tuple, used for builders without attributes.
+pub struct EmptyTuple;
+
+impl Debug for EmptyTuple {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "()")
+    }
+}
+
+impl Display for EmptyTuple {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "()")
+    }
+}
+
+impl<T> Attributed for Option<T> {
+    type Attribute = EmptyTuple;
+}
+
 /// Trait defining what a `Builder` should be able to do.
-pub trait Builder: Default {
+pub trait Builder: Default + IsCompleteBuilder + Attributed {
     /// The type of the object being built.
     type Object;
     /// The type of errors that can occur during building.
     type Error: core::error::Error + From<BuilderError<Self::Attribute>>;
-    /// The enumeration of the attributes that can be set.
-    type Attribute: core::fmt::Debug + core::fmt::Display + 'static;
-
-    /// Returns whether the builder is complete, meaning all required attributes
-    /// have been set.
-    fn is_complete(&self) -> bool;
 
     /// Builds the object.
     ///

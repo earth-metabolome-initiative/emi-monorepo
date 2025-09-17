@@ -11,7 +11,10 @@ webcodegen.workspace = true
 serde_json.workspace = true
 reference_docker.workspace = true
 init_db.workspace = true
+common_traits.workspace = true
+procedure_codegen.workspace = true
 diesel = { workspace = true, features = ["postgres"] }
+anyhow.workspace = true
 
 [lints]
 workspace = true

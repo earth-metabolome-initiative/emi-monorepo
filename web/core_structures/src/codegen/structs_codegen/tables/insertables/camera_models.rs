@@ -1,31 +1,38 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCameraModelExtensionAttributes {
-    Trackable(crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes),
+pub enum CameraModelExtensionAttribute {
+    PhysicalAssetModel(
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    ),
 }
-impl core::fmt::Display for InsertableCameraModelExtensionAttributes {
+impl core::fmt::Display for CameraModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Trackable(e) => write!(f, "{e}"),
+            Self::PhysicalAssetModel(e) => write!(f, "camera_models({e})"),
         }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
+    for CameraModelExtensionAttribute
+{
+    fn from(
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    ) -> Self {
+        Self::PhysicalAssetModel(attribute)
+    }
+}
+impl From<common_traits::builder::EmptyTuple> for CameraModelExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableCameraModelAttributes {
-    Extension(InsertableCameraModelExtensionAttributes),
+pub enum CameraModelAttribute {
+    Extension(CameraModelExtensionAttribute),
     Id,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes>
-    for InsertableCameraModelAttributes
-{
-    fn from(
-        trackables: crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
-    ) -> Self {
-        Self::Extension(InsertableCameraModelExtensionAttributes::Trackable(trackables))
-    }
-}
-impl core::str::FromStr for InsertableCameraModelAttributes {
+impl core::str::FromStr for CameraModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -33,14 +40,20 @@ impl core::str::FromStr for InsertableCameraModelAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableCameraModelAttributes {
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<T1>
+{
+    type Attribute = CameraModelAttribute;
+}
+impl core::fmt::Display for CameraModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
+            Self::Id => write!(f, "camera_models.id"),
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -50,339 +63,335 @@ impl core::fmt::Display for InsertableCameraModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableCameraModel {
-    pub(crate) id: ::rosetta_uuid::Uuid,
+    pub(crate) id: i32,
 }
-impl InsertableCameraModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
+impl InsertableCameraModel {}
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new
+/// [`CameraModel`](crate::codegen::structs_codegen::tables::camera_models::CameraModel).
+///
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::CameraModel;
+/// use core_structures::tables::insertables::AssetModelSettable;
+/// use core_structures::tables::insertables::PhysicalAssetModelSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let camera_model = CameraModel::new()
+///    // Set mandatory fields
+///    .created_by(created_by)?
+///    .description(description)?
+///    .name(name)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
+///    .updated_by(updated_by)?
+///    // Optionally set fields with default values
+///    .created_at(created_at)?
+///    .updated_at(updated_at)?
+///    // Optionally set optional fields
+///    .parent_model(parent_model)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
+pub struct InsertableCameraModelBuilder<
+    PhysicalAssetModel
+        = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
         >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
-                self.id,
-            ),
-            conn,
-        )
+> {
+    pub(crate) id: PhysicalAssetModel,
+}
+impl<PhysicalAssetModel> diesel::associations::HasTable
+    for InsertableCameraModelBuilder<PhysicalAssetModel>
+{
+    type Table = crate::codegen::diesel_codegen::tables::camera_models::camera_models::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::camera_models::camera_models::table
     }
 }
-#[derive(Clone, Debug, Default)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InsertableCameraModelBuilder<
-    Trackable = crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-> {
-    pub(crate) id: Trackable,
-}
-impl<Trackable> web_common_traits::database::ExtendableBuilder
-for InsertableCameraModelBuilder<Trackable>
-where
-    Trackable: web_common_traits::database::ExtendableBuilder<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes,
-    >,
+impl From<InsertableCameraModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableCameraModelBuilder>
 {
-    type Attributes = InsertableCameraModelAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = self
-            .id
-            .extend_builder(other.id)
-            .map_err(|err| {
-                err.into_field_name(|attribute| InsertableCameraModelAttributes::Extension(
-                    InsertableCameraModelExtensionAttributes::Trackable(attribute),
-                ))
+    fn from(builder: InsertableCameraModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
+impl<PhysicalAssetModel> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
+        PhysicalAssetModel,
+    >
+where
+    PhysicalAssetModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete()
+    }
+}
+/// Trait defining setters for attributes of an instance of `CameraModel` or
+/// descendant tables.
+pub trait CameraModelSettable: Sized {
+    /// Error type returned when setting attributes.
+    type Error;
+}
+impl<PhysicalAssetModel> CameraModelSettable for InsertableCameraModelBuilder<PhysicalAssetModel>
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+}
+impl<
+    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+            >,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
+    for InsertableCameraModelBuilder<PhysicalAssetModel>
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
+        >,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
+            >,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    #[inline]
+    /// Sets the value of the `public.asset_models.name` column.
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
+    where
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+    {
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
+                self.id,
+                name,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    /// Sets the value of the `public.asset_models.description` column.
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
+    where
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+    {
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
+                self.id,
+                description,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    /// Sets the value of the `public.asset_models.parent_model` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart BT
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v2 ["`asset_models`"]
+    ///    v0@{shape: rounded, label: "parent_model"}
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v3 ["`physical_asset_models`"]
+    ///    v1@{shape: rounded, label: "parent_model"}
+    /// class v1 directly-involved-column
+    /// end
+    /// v1 --->|"`ancestral same as`"| v0
+    /// v3 --->|"`extends`"| v2
+    /// ```
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
+    where
+        PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
+            self,
+            parent_model,
+        )
+    }
+    #[inline]
+    /// Sets the value of the `public.asset_models.created_by` column.
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
+                self.id,
+                created_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    /// Sets the value of the `public.asset_models.created_at` column.
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
+    where
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+    {
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
+                self.id,
+                created_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    /// Sets the value of the `public.asset_models.updated_by` column.
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
+                self.id,
+                updated_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    /// Sets the value of the `public.asset_models.updated_at` column.
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
+    where
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+    {
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
+                self.id,
+                updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
             })?;
         Ok(self)
     }
 }
-impl<Trackable> web_common_traits::prelude::SetPrimaryKey
-    for InsertableCameraModelBuilder<Trackable>
+impl<
+    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+            >,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
+    for InsertableCameraModelBuilder<PhysicalAssetModel>
 where
-    Trackable: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
+        >,
 {
-    type PrimaryKey = ::rosetta_uuid::Uuid;
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    #[inline]
+    /// Sets the value of the `public.physical_asset_models.parent_model`
+    /// column.
+    fn parent_model<PM>(mut self, parent_model: PM) -> Result<Self, Self::Error>
+    where
+        PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
+                self.id,
+                parent_model,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+}
+impl<PhysicalAssetModel> web_common_traits::database::MostConcreteTable
+    for InsertableCameraModelBuilder<PhysicalAssetModel>
+where
+    PhysicalAssetModel: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.id.set_most_concrete_table(table_name);
+    }
+}
+impl<PhysicalAssetModel> web_common_traits::prelude::SetPrimaryKey
+    for InsertableCameraModelBuilder<PhysicalAssetModel>
+where
+    PhysicalAssetModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
+{
+    type PrimaryKey = i32;
     fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
         self.id = self.id.set_primary_key(primary_key);
         self
     }
 }
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.created_at` column from table
-    /// `camera_models`.
-    pub fn created_at<CreatedAt>(
-        mut self,
-        created_at: CreatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.created_at(created_at).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.created_at`, `trackables.updated_at`
-    /// columns from table `camera_models`.
-    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
-        mut self,
-        created_at: CreatedAt,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .created_at_and_updated_at(created_at, updated_at)
-            .map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.created_by` column from table
-    /// `camera_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
-    {
-        self.id = self.id.created_by(created_by).map_err(|e| e.into_field_name(From::from))?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.description` column from table
-    /// `camera_models`.
-    pub fn description<Description>(
-        mut self,
-        description: Description,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
-    where
-        Description: TryInto<Option<String>>,
-        <Description as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.description(description).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.id` column from table `camera_models`.
-    pub fn id<Id>(
-        mut self,
-        id: Id,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
-    where
-        Id: TryInto<::rosetta_uuid::Uuid>,
-        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.id(id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.name` column from table
-    /// `camera_models`.
-    pub fn name<Name>(
-        mut self,
-        name: Name,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
-    where
-        Name: TryInto<Option<String>>,
-        <Name as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.name(name).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.name`, `trackables.description`
-    /// columns from table `camera_models`.
-    pub fn name_and_description<Name, Description>(
-        mut self,
-        name: Name,
-        description: Description,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
-    where
-        Name: TryInto<String>,
-        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-        Description: TryInto<String>,
-        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self
-            .id
-            .name_and_description(name, description)
-            .map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.parent_id` column from table
-    /// `camera_models`.
-    pub fn parent(
-        mut self,
-        parent_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
-    {
-        self.id = self.id.parent(parent_id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.parent_id`, `trackables.id` columns
-    /// from table `camera_models`.
-    pub fn parent_and_id<Id>(
-        mut self,
-        parent_id: ::rosetta_uuid::Uuid,
-        id: Id,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
-    where
-        Id: TryInto<::rosetta_uuid::Uuid>,
-        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        self.id =
-            self.id.parent_and_id(parent_id, id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.photograph_id` column from table
-    /// `camera_models`.
-    pub fn photograph(
-        mut self,
-        photograph_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
-    {
-        self.id = self.id.photograph(photograph_id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.updated_at` column from table
-    /// `camera_models`.
-    pub fn updated_at<UpdatedAt>(
-        mut self,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
-    where
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        self.id = self.id.updated_at(updated_at).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableCameraModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-    >
-{
-    /// Sets the value of the `trackables.updated_by` column from table
-    /// `camera_models`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableCameraModelAttributes>>
-    {
-        self.id = self.id.updated_by(updated_by).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl<Trackable, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableCameraModelBuilder<Trackable>
+impl<PhysicalAssetModel, C> web_common_traits::database::TryInsertGeneric<C>
+    for InsertableCameraModelBuilder<PhysicalAssetModel>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::camera_models::CameraModel,
-            Error = web_common_traits::database::InsertError<InsertableCameraModelAttributes>,
+            Error = web_common_traits::database::InsertError<CameraModelAttribute>,
         >,
-    Trackable: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
+    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableCameraModelAttributes;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<CameraModelAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::camera_models::CameraModel =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

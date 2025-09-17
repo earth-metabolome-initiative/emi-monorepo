@@ -14,12 +14,17 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use crate::codegen::diesel_codegen::tables::procedures::procedures::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure)
             .do_update()
             .set(self)
             .filter(
-                procedure_model_id
-                    .ne(excluded(procedure_model_id))
+                procedure_template
+                    .ne(excluded(procedure_template))
+                    .or(parent_procedure.ne(excluded(parent_procedure)))
+                    .or(parent_procedure_template.ne(excluded(parent_procedure_template)))
+                    .or(predecessor_procedure.ne(excluded(predecessor_procedure)))
+                    .or(predecessor_procedure_template.ne(excluded(predecessor_procedure_template)))
+                    .or(most_concrete_table.ne(excluded(most_concrete_table)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))
@@ -45,12 +50,17 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use crate::codegen::diesel_codegen::tables::procedures::procedures::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(id)
+            .on_conflict(procedure)
             .do_update()
             .set(self)
             .filter(
-                procedure_model_id
-                    .ne(excluded(procedure_model_id))
+                procedure_template
+                    .ne(excluded(procedure_template))
+                    .or(parent_procedure.ne(excluded(parent_procedure)))
+                    .or(parent_procedure_template.ne(excluded(parent_procedure_template)))
+                    .or(predecessor_procedure.ne(excluded(predecessor_procedure)))
+                    .or(predecessor_procedure_template.ne(excluded(predecessor_procedure_template)))
+                    .or(most_concrete_table.ne(excluded(most_concrete_table)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
                     .or(updated_by.ne(excluded(updated_by)))

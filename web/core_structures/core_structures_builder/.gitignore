@@ -4,3 +4,4 @@ perf.data
 perf.data.old
 flamegraph.svg
 most_expensive_queries.json
+cache

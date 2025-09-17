@@ -1,8 +1,8 @@
 //! Submodule defining the init migrations for the brands.
 
-use core_structures::{Brand, User};
+use core_structures::{Brand, User, tables::insertables::BrandSettable};
 use diesel::{OptionalExtension, PgConnection};
-use web_common_traits::database::{Insertable, InsertableVariant};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
 /// Initializes the Fisher Scientific brand in the database.
 ///
@@ -19,7 +19,7 @@ pub(crate) fn fisher_scientific(user: &User, conn: &mut PgConnection) -> anyhow:
     if let Some(brand) = Brand::from_name("Fisher Scientific", conn).optional()? {
         return Ok(brand);
     }
-    Ok(Brand::new().name("Fisher Scientific")?.created_by(user.id)?.insert(user.id, conn)?)
+    Ok(Brand::new().name("Fisher Scientific")?.created_by(user)?.insert(user.id, conn)?)
 }
 
 /// Initializes the Acros Organics brand in the database.
@@ -38,7 +38,7 @@ pub(crate) fn acros_organics(user: &User, conn: &mut PgConnection) -> anyhow::Re
     if let Some(brand) = Brand::from_name(brand_name, conn).optional()? {
         return Ok(brand);
     }
-    Ok(Brand::new().name(brand_name)?.created_by(user.id)?.insert(user.id, conn)?)
+    Ok(Brand::new().name(brand_name)?.created_by(user)?.insert(user.id, conn)?)
 }
 
 /// Initializes the greiner BIO-ONE brand in the database.
@@ -58,7 +58,7 @@ pub(crate) fn greiner_bio_one(user: &User, conn: &mut PgConnection) -> anyhow::R
         return Ok(brand);
     }
 
-    Ok(Brand::new().name(brand_name)?.created_by(user.id)?.insert(user.id, conn)?)
+    Ok(Brand::new().name(brand_name)?.created_by(user)?.insert(user.id, conn)?)
 }
 
 /// Initializes MACHINERY-NAGEL `GmbH` & Co. KG brand in the database.
@@ -78,7 +78,7 @@ pub(crate) fn macherey_nagel(user: &User, conn: &mut PgConnection) -> anyhow::Re
         return Ok(brand);
     }
 
-    Ok(Brand::new().name(brand_name)?.created_by(user.id)?.insert(user.id, conn)?)
+    Ok(Brand::new().name(brand_name)?.created_by(user)?.insert(user.id, conn)?)
 }
 
 /// Initializes VICI Schweiz AG brand in the database.
@@ -98,7 +98,7 @@ pub(crate) fn vici_schweiz(user: &User, conn: &mut PgConnection) -> anyhow::Resu
         return Ok(brand);
     }
 
-    Ok(Brand::new().name(brand_name)?.created_by(user.id)?.insert(user.id, conn)?)
+    Ok(Brand::new().name(brand_name)?.created_by(user)?.insert(user.id, conn)?)
 }
 
 /// Initializes Advion Interchim scientific brand in the database.
@@ -118,7 +118,7 @@ pub(crate) fn advion_interchim(user: &User, conn: &mut PgConnection) -> anyhow::
         return Ok(brand);
     }
 
-    Ok(Brand::new().name(brand_name)?.created_by(user.id)?.insert(user.id, conn)?)
+    Ok(Brand::new().name(brand_name)?.created_by(user)?.insert(user.id, conn)?)
 }
 
 /// Initializes eppendorf brand in the database.
@@ -138,7 +138,7 @@ pub(crate) fn eppendorf(user: &User, conn: &mut PgConnection) -> anyhow::Result<
         return Ok(brand);
     }
 
-    Ok(Brand::new().name(brand_name)?.created_by(user.id)?.insert(user.id, conn)?)
+    Ok(Brand::new().name(brand_name)?.created_by(user)?.insert(user.id, conn)?)
 }
 
 /// Initializes GILSON brand in the database.
@@ -158,7 +158,7 @@ pub(crate) fn gilson(user: &User, conn: &mut PgConnection) -> anyhow::Result<Bra
         return Ok(brand);
     }
 
-    Ok(Brand::new().name(brand_name)?.created_by(user.id)?.insert(user.id, conn)?)
+    Ok(Brand::new().name(brand_name)?.created_by(user)?.insert(user.id, conn)?)
 }
 
 /// Initializes SARSTEDT AG & Co. KG brand in the database.
@@ -178,7 +178,7 @@ pub(crate) fn sarstedt(user: &User, conn: &mut PgConnection) -> anyhow::Result<B
         return Ok(brand);
     }
 
-    Ok(Brand::new().name(brand_name)?.created_by(user.id)?.insert(user.id, conn)?)
+    Ok(Brand::new().name(brand_name)?.created_by(user)?.insert(user.id, conn)?)
 }
 
 /// Initializes AXYGEN brand in the database.
@@ -198,7 +198,7 @@ pub(crate) fn axygen(user: &User, conn: &mut PgConnection) -> anyhow::Result<Bra
         return Ok(brand);
     }
 
-    Ok(Brand::new().name(brand_name)?.created_by(user.id)?.insert(user.id, conn)?)
+    Ok(Brand::new().name(brand_name)?.created_by(user)?.insert(user.id, conn)?)
 }
 
 /// Initializes Retsch MILLING & SIEVING brand in the database.
@@ -218,7 +218,7 @@ pub(crate) fn retsch(user: &User, conn: &mut PgConnection) -> anyhow::Result<Bra
         return Ok(brand);
     }
 
-    Ok(Brand::new().name(brand_name)?.created_by(user.id)?.insert(user.id, conn)?)
+    Ok(Brand::new().name(brand_name)?.created_by(user)?.insert(user.id, conn)?)
 }
 
 /// Initializes Fisherbrand brand in the database.
@@ -238,5 +238,5 @@ pub(crate) fn fisherbrand(user: &User, conn: &mut PgConnection) -> anyhow::Resul
         return Ok(brand);
     }
 
-    Ok(Brand::new().name(brand_name)?.created_by(user.id)?.insert(user.id, conn)?)
+    Ok(Brand::new().name(brand_name)?.created_by(user)?.insert(user.id, conn)?)
 }

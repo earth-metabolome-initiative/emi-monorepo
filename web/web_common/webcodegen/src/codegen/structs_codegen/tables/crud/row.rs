@@ -9,6 +9,7 @@ use syn::Ident;
 use crate::{
     Codegen, Table,
     codegen::{CODEGEN_DIRECTORY, CODEGEN_TABLES_PATH},
+    traits::TableLike,
 };
 
 impl Codegen<'_> {
@@ -163,7 +164,7 @@ impl Codegen<'_> {
                             }
                         }
                     }
-                })?,
+                }),
             )?;
         }
 
@@ -211,7 +212,7 @@ impl Codegen<'_> {
                 });
                 Ok(quote::quote! {
                     #table_primary_keys_path::#struct_ident(primary_key) => {
-                        #struct_path::read(primary_key, conn)?.map(super::Row::from)
+                        #struct_path::read(primary_key, conn)?.into()
                     }
                 })
             })
@@ -228,7 +229,7 @@ impl Codegen<'_> {
                     fn read(
                         primary_key: Self::PrimaryKey,
                         conn: &mut C,
-                    ) -> Result<Option<Self>, diesel::result::Error> {
+                    ) -> Result<Self, diesel::result::Error> {
                         use web_common_traits::database::Read;
                         Ok(match primary_key {
                             #(
@@ -247,7 +248,7 @@ impl Codegen<'_> {
                 &trait_file,
                 self.beautify_code(&quote! {
                     #trait_impl
-                })?,
+                }),
             )?;
             modules.push(quote::quote! {
                 mod #trait_module_ident;
@@ -279,7 +280,7 @@ impl Codegen<'_> {
                         }
                     }
                 }
-            })?,
+            }),
         )?;
 
         Ok(())

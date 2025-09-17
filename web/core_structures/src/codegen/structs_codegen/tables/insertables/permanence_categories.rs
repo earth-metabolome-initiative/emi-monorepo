@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertablePermanenceCategoryAttributes {
+pub enum PermanenceCategoryAttribute {
     Name,
     Description,
     Icon,
     ColorId,
     Id,
 }
-impl core::str::FromStr for InsertablePermanenceCategoryAttributes {
+impl core::str::FromStr for PermanenceCategoryAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -23,17 +23,23 @@ impl core::str::FromStr for InsertablePermanenceCategoryAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertablePermanenceCategoryAttributes {
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryBuilder
+{
+    type Attribute = PermanenceCategoryAttribute;
+}
+impl core::fmt::Display for PermanenceCategoryAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Name => write!(f, "name"),
-            Self::Description => write!(f, "description"),
-            Self::Icon => write!(f, "icon"),
-            Self::ColorId => write!(f, "color_id"),
-            Self::Id => write!(f, "id"),
+            Self::Name => write!(f, "permanence_categories.name"),
+            Self::Description => write!(f, "permanence_categories.description"),
+            Self::Icon => write!(f, "permanence_categories.icon"),
+            Self::ColorId => write!(f, "permanence_categories.color_id"),
+            Self::Id => write!(f, "permanence_categories.id"),
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -52,62 +58,230 @@ impl InsertablePermanenceCategory {
     pub fn color<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::colors::Color,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::colors::Color, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::colors::Color: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::colors::Color as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::colors::Color as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::colors::Color,
-        >,
+        crate::codegen::structs_codegen::tables::colors::Color:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::colors::Color::table(),
-                self.color_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::colors::Color::read(self.color_id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new
+/// [`PermanenceCategory`](crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory).
+///
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::PermanenceCategory;
+/// use core_structures::tables::insertables::PermanenceCategorySettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let permanence_category = PermanenceCategory::new()
+///    // Set mandatory fields
+///    .color(color_id)?
+///    .description(description)?
+///    .icon(icon)?
+///    .name(name)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertablePermanenceCategoryBuilder {
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
     pub(crate) icon: Option<String>,
     pub(crate) color_id: Option<i16>,
 }
-impl web_common_traits::database::ExtendableBuilder for InsertablePermanenceCategoryBuilder {
-    type Attributes = InsertablePermanenceCategoryAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(name) = other.name {
-            self = self.name(name)?;
-        }
-        if let Some(description) = other.description {
-            self = self.description(description)?;
-        }
-        if let Some(icon) = other.icon {
-            self = self.icon(icon)?;
-        }
-        if let Some(color_id) = other.color_id {
-            self = self.color(color_id)?;
-        }
+impl diesel::associations::HasTable for InsertablePermanenceCategoryBuilder {
+    type Table =
+        crate::codegen::diesel_codegen::tables::permanence_categories::permanence_categories::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::permanence_categories::permanence_categories::table
+    }
+}
+impl From<InsertablePermanenceCategoryBuilder>
+    for web_common_traits::database::IdOrBuilder<i16, InsertablePermanenceCategoryBuilder>
+{
+    fn from(builder: InsertablePermanenceCategoryBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.name.is_some()
+            && self.description.is_some()
+            && self.icon.is_some()
+            && self.color_id.is_some()
+    }
+}
+/// Trait defining setters for attributes of an instance of `PermanenceCategory`
+/// or descendant tables.
+pub trait PermanenceCategorySettable: Sized {
+    /// Error type returned when setting attributes.
+    type Error;
+    /// Sets the value of the `public.permanence_categories.name` column.
+    ///
+    /// # Arguments
+    /// * `name`: The value to set for the `public.permanence_categories.name`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
+    where
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+    /// Sets the value of the `public.permanence_categories.description` column.
+    ///
+    /// # Arguments
+    /// * `description`: The value to set for the
+    ///   `public.permanence_categories.description` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn description<D>(self, description: D) -> Result<Self, Self::Error>
+    where
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
+    /// Sets the value of the `public.permanence_categories.icon` column.
+    ///
+    /// # Arguments
+    /// * `icon`: The value to set for the `public.permanence_categories.icon`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn icon<I>(self, icon: I) -> Result<Self, Self::Error>
+    where
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
+    /// Sets the value of the `public.permanence_categories.color_id` column.
+    ///
+    /// # Arguments
+    /// * `color_id`: The value to set for the
+    ///   `public.permanence_categories.color_id` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i16`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn color<CI>(self, color_id: CI) -> Result<Self, Self::Error>
+    where
+        CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>;
+}
+impl PermanenceCategorySettable for InsertablePermanenceCategoryBuilder
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::PermanenceCategoryAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.permanence_categories.name` column.
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
+    where
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+    {
+        let name = name
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(PermanenceCategoryAttribute::Name)
+            })?;
+        self.name = Some(name);
+        Ok(self)
+    }
+    ///Sets the value of the `public.permanence_categories.description` column.
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
+    where
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+    {
+        let description = description
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(PermanenceCategoryAttribute::Description)
+            })?;
+        self.description = Some(description);
+        Ok(self)
+    }
+    ///Sets the value of the `public.permanence_categories.icon` column.
+    fn icon<I>(mut self, icon: I) -> Result<Self, Self::Error>
+    where
+        I: TryInto<String>,
+        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
+    {
+        let icon = icon
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(PermanenceCategoryAttribute::Icon)
+            })?;
+        self.icon = Some(icon);
+        Ok(self)
+    }
+    ///Sets the value of the `public.permanence_categories.color_id` column.
+    fn color<CI>(mut self, color_id: CI) -> Result<Self, Self::Error>
+    where
+        CI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i16>,
+    {
+        let color_id = <CI as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &color_id,
+        );
+        self.color_id = Some(color_id);
         Ok(self)
     }
 }
@@ -117,111 +291,25 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertablePermanenceCategoryB
         self
     }
 }
-impl crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryBuilder {
-    /// Sets the value of the `permanence_categories.color_id` column from table
-    /// `permanence_categories`.
-    pub fn color(
-        mut self,
-        color_id: i16,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertablePermanenceCategoryAttributes>,
-    > {
-        self.color_id = Some(color_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryBuilder {
-    /// Sets the value of the `permanence_categories.description` column from
-    /// table `permanence_categories`.
-    pub fn description<Description>(
-        mut self,
-        description: Description,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertablePermanenceCategoryAttributes>,
-    >
-    where
-        Description: TryInto<String>,
-        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let description =
-            description.try_into().map_err(|err: <Description as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertablePermanenceCategoryAttributes::Description)
-            })?;
-        self.description = Some(description);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryBuilder {
-    /// Sets the value of the `permanence_categories.icon` column from table
-    /// `permanence_categories`.
-    pub fn icon<Icon>(
-        mut self,
-        icon: Icon,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertablePermanenceCategoryAttributes>,
-    >
-    where
-        Icon: TryInto<String>,
-        <Icon as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let icon = icon.try_into().map_err(|err: <Icon as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertablePermanenceCategoryAttributes::Icon)
-        })?;
-        self.icon = Some(icon);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertablePermanenceCategoryBuilder {
-    /// Sets the value of the `permanence_categories.name` column from table
-    /// `permanence_categories`.
-    pub fn name<Name>(
-        mut self,
-        name: Name,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertablePermanenceCategoryAttributes>,
-    >
-    where
-        Name: TryInto<String>,
-        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertablePermanenceCategoryAttributes::Name)
-        })?;
-        self.name = Some(name);
-        Ok(self)
-    }
-}
 impl<C> web_common_traits::database::TryInsertGeneric<C>
 for InsertablePermanenceCategoryBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
-        Error = web_common_traits::database::InsertError<
-            InsertablePermanenceCategoryAttributes,
-        >,
+        Error = web_common_traits::database::InsertError<PermanenceCategoryAttribute>,
     >,
 {
-    type Attributes = InsertablePermanenceCategoryAttributes;
-    fn is_complete(&self) -> bool {
-        self.name.is_some() && self.description.is_some() && self.icon.is_some()
-            && self.color_id.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attributes>,
+        web_common_traits::database::InsertError<PermanenceCategoryAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

@@ -24,9 +24,33 @@ pub struct Organization {
 impl web_common_traits::prelude::TableName for Organization {
     const TABLE_NAME: &'static str = "organizations";
 }
+impl<'a> From<&'a Organization>
+    for web_common_traits::database::IdOrBuilder<
+        i16,
+        crate::codegen::structs_codegen::tables::insertables::InsertableOrganizationBuilder,
+    >
+{
+    fn from(value: &'a Organization) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::organizations::Organization,
+    > for Organization
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for Organization {
     type Id = i16;
     fn id(self) -> Self::Id {
+        self.id
+    }
+}
+impl web_common_traits::database::PrimaryKeyLike for Organization {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
         self.id
     }
 }
@@ -83,11 +107,37 @@ impl Organization {
             .order_by(organizations::id.asc())
             .load::<Self>(conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_alpha_two_code(
-        alpha_two_code: &::iso_codes::CountryCode,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
+    pub fn from_alpha_two_code<C>(
+        alpha_two_code: ::iso_codes::CountryCode,
+        conn: &mut C,
+    ) -> Result<Vec<Self>, diesel::result::Error>
+    where
+        C: diesel::connection::LoadConnection,
+        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::organizations::organizations::alpha_two_code as diesel::expression_methods::EqAll<
+                ::iso_codes::CountryCode,
+            >>::Output,
+        >,
+        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::organizations::organizations::alpha_two_code as diesel::expression_methods::EqAll<
+                ::iso_codes::CountryCode,
+            >>::Output,
+        >>::Output: diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::organizations::organizations::id,
+            >,
+        >,
+        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
+            <crate::codegen::diesel_codegen::tables::organizations::organizations::alpha_two_code as diesel::expression_methods::EqAll<
+                ::iso_codes::CountryCode,
+            >>::Output,
+        >>::Output as diesel::query_dsl::methods::OrderDsl<
+            diesel::helper_types::Asc<
+                crate::codegen::diesel_codegen::tables::organizations::organizations::id,
+            >,
+        >>::Output: diesel::RunQueryDsl<C>
+            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
+    {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
         use crate::codegen::diesel_codegen::tables::organizations::organizations;

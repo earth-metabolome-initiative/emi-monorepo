@@ -11,15 +11,15 @@ use crate::{
 pub struct LowercaseColumnConstraint;
 
 impl CustomColumnConstraint for LowercaseColumnConstraint {
+    type Error = crate::errors::WebCodeGenError;
+
     fn check_constraint(
         &self,
         _conn: &mut PgConnection,
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
         if column.column_name.chars().any(char::is_uppercase) {
-            return Err(
-                ConstraintError::UnexpectedUppercaseColumn(column.column_name.clone()).into()
-            );
+            return Err(ConstraintError::UnexpectedUppercaseColumn(Box::new(column.clone())).into());
         }
         Ok(())
     }

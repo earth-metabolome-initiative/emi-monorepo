@@ -19,7 +19,7 @@ AS 'MODULE_PATHNAME', 'must_be_distinct_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/int.rs:49
+-- web/web_common/pgrx_validation/src/int.rs:68
 -- pgrx_validation::int::must_be_distinct_i16
 CREATE  FUNCTION "must_be_distinct_i16"(
 	"left" smallint, /* i16 */
@@ -100,6 +100,28 @@ AS 'MODULE_PATHNAME', 'must_be_paragraph_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/int.rs:112
+-- pgrx_validation::int::must_be_positive_i16
+CREATE  FUNCTION "must_be_positive_i16"(
+	"value" smallint /* i16 */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_be_positive_i16_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
+-- web/web_common/pgrx_validation/src/int.rs:49
+-- pgrx_validation::int::must_be_positive_i32
+CREATE  FUNCTION "must_be_positive_i32"(
+	"value" INT /* i32 */
+) RETURNS bool /* bool */
+STRICT
+LANGUAGE c /* Rust */
+AS 'MODULE_PATHNAME', 'must_be_positive_i32_wrapper';
+/* </end connected objects> */
+
+/* <begin connected objects> */
 -- web/web_common/pgrx_validation/src/float.rs:70
 -- pgrx_validation::float::must_be_smaller_than_f32
 CREATE  FUNCTION "must_be_smaller_than_f32"(
@@ -170,7 +192,7 @@ AS 'MODULE_PATHNAME', 'must_be_strictly_positive_f64_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/int.rs:72
+-- web/web_common/pgrx_validation/src/int.rs:91
 -- pgrx_validation::int::must_be_strictly_positive_i16
 CREATE  FUNCTION "must_be_strictly_positive_i16"(
 	"value" smallint /* i16 */

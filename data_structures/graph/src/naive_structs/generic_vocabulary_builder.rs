@@ -1,7 +1,10 @@
 //! A generic vocabulary builder that can be used to build a vocabulary for any
 //! type of graph.
 
-use common_traits::prelude::Builder;
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::Builder,
+};
 
 use crate::traits::{GrowableVocabulary, Vocabulary, VocabularyBuilder, VocabularyBuilderOptions};
 
@@ -63,6 +66,34 @@ where
     }
 }
 
+impl<Symbols, V> IsCompleteBuilder for GenericVocabularyBuilder<Symbols, V>
+where
+    Self: VocabularyBuilder<Symbols = Symbols>,
+    Symbols: IntoIterator<
+        Item = (
+            <<Self as VocabularyBuilder>::Vocabulary as Vocabulary>::SourceSymbol,
+            <<Self as VocabularyBuilder>::Vocabulary as Vocabulary>::DestinationSymbol,
+        ),
+    >,
+{
+    fn is_complete(&self) -> bool {
+        self.symbols.is_some()
+    }
+}
+
+impl<Symbols, V> Attributed for GenericVocabularyBuilder<Symbols, V>
+where
+    Self: VocabularyBuilder<Symbols = Symbols>,
+    Symbols: IntoIterator<
+        Item = (
+            <<Self as VocabularyBuilder>::Vocabulary as Vocabulary>::SourceSymbol,
+            <<Self as VocabularyBuilder>::Vocabulary as Vocabulary>::DestinationSymbol,
+        ),
+    >,
+{
+    type Attribute = VocabularyBuilderOptions;
+}
+
 impl<Symbols, V> Builder for GenericVocabularyBuilder<Symbols, V>
 where
     Self: VocabularyBuilder<Symbols = Symbols>,
@@ -77,11 +108,7 @@ where
     type Error = crate::errors::builder::vocabulary::VocabularyBuilderError<
         <Self as VocabularyBuilder>::Vocabulary,
     >;
-    type Attribute = VocabularyBuilderOptions;
 
-    fn is_complete(&self) -> bool {
-        self.symbols.is_some()
-    }
     fn build(self) -> Result<Self::Object, Self::Error> {
         let expected_number_of_symbols = self.get_expected_number_of_symbols();
         let mut vocabulary = if let Some(number_of_symbols) = expected_number_of_symbols {

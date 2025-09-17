@@ -1,3 +1,3 @@
 diesel::table! {
-    phone_models(id) { id -> ::rosetta_uuid::diesel_impls::Uuid }
+    phone_models(id) { id -> diesel::sql_types::Integer }
 }

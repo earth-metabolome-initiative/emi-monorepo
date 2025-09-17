@@ -10,6 +10,7 @@ use syn::Ident;
 use crate::{
     Codegen, Table,
     codegen::{CODEGEN_DIRECTORY, CODEGEN_TABLES_PATH},
+    traits::TableLike,
 };
 
 impl Codegen<'_> {
@@ -154,7 +155,7 @@ impl Codegen<'_> {
                             }
                         }
                     }
-                })?,
+                }),
             )?;
         }
 
@@ -294,7 +295,7 @@ impl Codegen<'_> {
                 &trait_file,
                 self.beautify_code(&quote! {
                     #trait_impl
-                })?,
+                }),
             )?;
             modules.push(quote::quote! {
                 mod #trait_module_ident;
@@ -326,7 +327,7 @@ impl Codegen<'_> {
                         }
                     }
                 }
-            })?,
+            }),
         )?;
 
         Ok(())

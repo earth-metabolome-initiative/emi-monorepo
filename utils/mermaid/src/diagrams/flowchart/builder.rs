@@ -1,5 +1,7 @@
 //! Submodule providing a builder for flowchart diagrams in Mermaid syntax.
 
+use common_traits::builder::Attributed;
+
 use crate::{
     prelude::{
         Flowchart, FlowchartConfiguration, FlowchartConfigurationBuilder, FlowchartEdge,
@@ -33,9 +35,9 @@ impl DiagramBuilder for FlowchartBuilder {
     type Node = FlowchartNode;
     type NodeBuilder = FlowchartNodeBuilder;
     type Error = crate::errors::Error<
-        <Self::NodeBuilder as common_traits::prelude::Builder>::Attribute,
-        <Self::EdgeBuilder as common_traits::prelude::Builder>::Attribute,
-        <Self::ConfigurationBuilder as common_traits::prelude::Builder>::Attribute,
+        <Self::NodeBuilder as Attributed>::Attribute,
+        <Self::EdgeBuilder as Attributed>::Attribute,
+        <Self::ConfigurationBuilder as Attributed>::Attribute,
     >;
 
     fn configuration(
@@ -54,15 +56,16 @@ impl DiagramBuilder for FlowchartBuilder {
         self.generic.edge(edge)
     }
 
-    fn get_node_by_label<S>(&self, label: S) -> Option<std::rc::Rc<Self::Node>>
-    where
-        S: AsRef<str>,
-    {
-        self.generic.get_node_by_label(label)
+    fn get_node_by_id(&self, id: u64) -> Option<std::rc::Rc<Self::Node>> {
+        self.generic.get_node_by_id(id)
     }
 
     fn node(&mut self, node: Self::NodeBuilder) -> Result<std::rc::Rc<Self::Node>, Self::Error> {
         self.generic.node(node)
+    }
+
+    fn nodes(&self) -> impl Iterator<Item = &std::rc::Rc<Self::Node>> + '_ {
+        self.generic.nodes()
     }
 
     fn number_of_edges(&self) -> usize {
@@ -80,10 +83,7 @@ impl DiagramBuilder for FlowchartBuilder {
         self.generic.style_class(style_class)
     }
 
-    fn get_style_class_by_name<S>(&self, name: S) -> Option<std::rc::Rc<StyleClass>>
-    where
-        S: AsRef<str>,
-    {
+    fn get_style_class_by_name(&self, name: &str) -> Option<std::rc::Rc<StyleClass>> {
         self.generic.get_style_class_by_name(name)
     }
 }

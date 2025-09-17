@@ -2,7 +2,10 @@
 
 use std::fmt::Display;
 
-use common_traits::prelude::{Builder, BuilderError};
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::{Builder, BuilderError},
+};
 
 use crate::shared::{
     StyleClass,
@@ -35,14 +38,19 @@ impl Display for StyleClassAttribute {
     }
 }
 
-impl Builder for StyleClassBuilder {
-    type Attribute = StyleClassAttribute;
-    type Error = StyleClassError;
-    type Object = StyleClass;
-
+impl IsCompleteBuilder for StyleClassBuilder {
     fn is_complete(&self) -> bool {
         self.name.is_some() && !self.properties.is_empty()
     }
+}
+
+impl Attributed for StyleClassBuilder {
+    type Attribute = StyleClassAttribute;
+}
+
+impl Builder for StyleClassBuilder {
+    type Error = StyleClassError;
+    type Object = StyleClass;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         if self.properties.is_empty() {

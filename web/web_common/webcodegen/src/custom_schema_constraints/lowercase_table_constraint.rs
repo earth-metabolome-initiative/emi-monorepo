@@ -11,13 +11,15 @@ use crate::{
 pub struct LowercaseTableConstraint;
 
 impl CustomTableConstraint for LowercaseTableConstraint {
+    type Error = crate::errors::WebCodeGenError;
+
     fn check_constraint(
         &self,
         _conn: &mut PgConnection,
         table: &Table,
     ) -> Result<(), WebCodeGenError> {
         if table.table_name.chars().any(char::is_uppercase) {
-            return Err(ConstraintError::UnexpectedUppercaseTable(table.table_name.clone()).into());
+            return Err(ConstraintError::UnexpectedUppercaseTable(Box::new(table.clone())).into());
         }
         Ok(())
     }

@@ -19,9 +19,33 @@ pub struct Color {
 impl web_common_traits::prelude::TableName for Color {
     const TABLE_NAME: &'static str = "colors";
 }
+impl<'a> From<&'a Color>
+    for web_common_traits::database::IdOrBuilder<
+        i16,
+        crate::codegen::structs_codegen::tables::insertables::InsertableColorBuilder,
+    >
+{
+    fn from(value: &'a Color) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::colors::Color,
+    > for Color
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for Color {
     type Id = i16;
     fn id(self) -> Self::Id {
+        self.id
+    }
+}
+impl web_common_traits::database::PrimaryKeyLike for Color {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
         self.id
     }
 }

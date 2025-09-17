@@ -29,7 +29,7 @@ impl Node for ERNode {
         self.node.label()
     }
 
-    fn id(&self) -> usize {
+    fn id(&self) -> u64 {
         self.node.id()
     }
 

@@ -4,6 +4,7 @@ use proc_macro2::TokenStream;
 use strum_macros::EnumIter;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, EnumIter)]
+/// The supported syntaxes.
 pub enum Syntax {
     /// The `PostgreSQL` syntax,
     PostgreSQL,

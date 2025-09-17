@@ -6,8 +6,15 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
+        foreign_key = login_provider_id
+    )
+)]
 #[diesel(primary_key(id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::temporary_user::temporary_user
@@ -20,9 +27,33 @@ pub struct TemporaryUser {
 impl web_common_traits::prelude::TableName for TemporaryUser {
     const TABLE_NAME: &'static str = "temporary_user";
 }
+impl<'a> From<&'a TemporaryUser>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableTemporaryUserBuilder,
+    >
+{
+    fn from(value: &'a TemporaryUser) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser,
+    > for TemporaryUser
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl diesel::Identifiable for TemporaryUser {
     type Id = i32;
     fn id(self) -> Self::Id {
+        self.id
+    }
+}
+impl web_common_traits::database::PrimaryKeyLike for TemporaryUser {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
         self.id
     }
 }
@@ -35,34 +66,19 @@ impl TemporaryUser {
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::login_providers::LoginProvider: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::login_providers::LoginProvider as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
-        >,
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::login_providers::LoginProvider::table(),
-                self.login_provider_id,
-            ),
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider::read(
+            self.login_provider_id,
             conn,
         )
     }
     #[cfg(feature = "postgres")]
     pub fn from_email_and_login_provider_id(
         email: &str,
-        login_provider_id: &i16,
+        login_provider_id: i16,
         conn: &mut diesel::PgConnection,
     ) -> Result<Self, diesel::result::Error> {
         use diesel::{
@@ -89,19 +105,6 @@ impl TemporaryUser {
         use crate::codegen::diesel_codegen::tables::temporary_user::temporary_user;
         Self::table()
             .filter(temporary_user::email.eq(email))
-            .order_by(temporary_user::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_login_provider_id(
-        login_provider_id: &i16,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::temporary_user::temporary_user;
-        Self::table()
-            .filter(temporary_user::login_provider_id.eq(login_provider_id))
             .order_by(temporary_user::id.asc())
             .load::<Self>(conn)
     }

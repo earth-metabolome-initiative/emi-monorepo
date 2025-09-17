@@ -6,7 +6,13 @@ use std::fmt::Display;
 
 pub use builder::{ClassDiagramConfigurationAttribute, ClassDiagramConfigurationBuilder};
 
-use crate::{shared::generic_configuration::GenericConfiguration, traits::Configuration};
+use crate::{
+    shared::{
+        Direction, Renderer,
+        generic_configuration::{GenericConfiguration, Look, Theme},
+    },
+    traits::Configuration,
+};
 
 #[derive(Default, Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -40,11 +46,19 @@ impl Configuration for ClassDiagramConfiguration {
         self.generic.title()
     }
 
-    fn direction(&self) -> &crate::shared::generic_configuration::Direction {
+    fn direction(&self) -> Direction {
         self.generic.direction()
     }
 
-    fn renderer(&self) -> &crate::shared::generic_configuration::Renderer {
+    fn renderer(&self) -> Renderer {
         self.generic.renderer()
+    }
+
+    fn theme(&self) -> Theme {
+        self.generic.theme()
+    }
+
+    fn look(&self) -> Look {
+        self.generic.look()
     }
 }

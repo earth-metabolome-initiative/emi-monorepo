@@ -2,7 +2,10 @@
 
 use std::{fmt::Display, rc::Rc};
 
-use common_traits::prelude::{Builder, BuilderError};
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::{Builder, BuilderError},
+};
 
 use crate::{
     diagrams::flowchart::{
@@ -140,14 +143,19 @@ impl Display for FlowchartEdgeAttribute {
     }
 }
 
-impl Builder for FlowchartEdgeBuilder {
-    type Error = EdgeError<Self::Attribute>;
-    type Attribute = FlowchartEdgeAttribute;
-    type Object = FlowchartEdge;
-
+impl IsCompleteBuilder for FlowchartEdgeBuilder {
     fn is_complete(&self) -> bool {
         self.edge_builder.is_complete() && self.length > 0 && self.id.is_some()
     }
+}
+
+impl Attributed for FlowchartEdgeBuilder {
+    type Attribute = FlowchartEdgeAttribute;
+}
+
+impl Builder for FlowchartEdgeBuilder {
+    type Error = EdgeError<Self::Attribute>;
+    type Object = FlowchartEdge;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         if self.length == 0 {

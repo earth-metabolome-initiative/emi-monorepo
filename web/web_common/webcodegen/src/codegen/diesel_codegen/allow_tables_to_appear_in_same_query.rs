@@ -6,7 +6,7 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
 use super::Codegen;
-use crate::Table;
+use crate::{Table, traits::TableLike};
 
 impl Codegen<'_> {
     /// Generate implementations of the `allow_tables_to_appear_in_same_query`
@@ -47,11 +47,12 @@ impl Codegen<'_> {
             let table_name = table.snake_case_ident()?;
             for foreign_table in table
                 .foreign_tables(conn)?
-                .into_iter()
-                .chain(table.ancestral_extension_tables(conn)?)
+                .iter()
+                .map(|table| table.as_ref())
+                .chain(table.ancestral_extension_tables(conn)?.iter())
             {
                 // if the foreign table is the same as table we continue
-                if &foreign_table == table {
+                if foreign_table == table {
                     continue;
                 }
 
@@ -62,7 +63,7 @@ impl Codegen<'_> {
                     continue;
                 }
 
-                let Some(foreign_table_ref) = tables.iter().find(|&t| *t == foreign_table) else {
+                let Some(foreign_table_ref) = tables.iter().find(|&t| t == foreign_table) else {
                     continue;
                 };
                 table_hashset.insert((table, foreign_table_ref));
@@ -109,7 +110,7 @@ impl Codegen<'_> {
                 self.beautify_code(&quote::quote! {
                     use #table_path;
                     #submodule_token_stream
-                })?,
+                }),
             )?;
 
             // main token stream
@@ -119,7 +120,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&allow_table_query_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&allow_table_query_module))?;
         Ok(())
     }
 }

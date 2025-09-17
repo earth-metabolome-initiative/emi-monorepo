@@ -8,7 +8,10 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::codegen::{Codegen, Table};
+use crate::{
+    codegen::{Codegen, Table},
+    traits::TableLike,
+};
 
 impl Codegen<'_> {
     /// Generates the [`Tabular`](web_common_traits::prelude::Tabular) traits
@@ -40,7 +43,7 @@ impl Codegen<'_> {
 
             let primary_key: Vec<TokenStream> = table
                 .primary_key_columns(conn)?
-                .into_iter()
+                .iter()
                 .map(|column| {
                     let column_snake_ident = column.snake_case_ident()?;
                     Ok(quote! {
@@ -82,7 +85,7 @@ impl Codegen<'_> {
                             #table_primary_keys_enum_path::#struct_ident(#primary_key)
                         }
                     }
-                })?,
+                }),
             )?;
 
             table_tabular_main_module.extend(quote::quote! {
@@ -91,7 +94,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&table_tabular_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&table_tabular_main_module))?;
 
         Ok(())
     }

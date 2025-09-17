@@ -17,12 +17,12 @@ const DATABASE_URL: &str = const_format::formatcp!(
 /// Executable to generate the code for the Directus database.
 pub async fn main() {
     // Get the output directory
-    let out_dir = Path::new("../src");
+    let out_dir = Path::new("../directus_codegen/src");
 
     let mut conn = PgConnection::establish(DATABASE_URL).unwrap();
 
     // We write to the target directory the generated structs
-    let curation_data = Table::load(&mut conn, "Curation_Data", None, DATABASE_NAME).unwrap();
+    let curation_data = Table::load(&mut conn, "Curation_Data", "public", DATABASE_NAME).unwrap();
 
     // Generate the code associated with the database
     Codegen::default()
@@ -30,6 +30,6 @@ pub async fn main() {
         .set_output_directory(out_dir.as_ref())
         .enable_foreign_trait()
         .beautify()
-        .generate(&mut conn, DATABASE_NAME, None)
+        .generate(&mut conn, DATABASE_NAME)
         .unwrap();
 }

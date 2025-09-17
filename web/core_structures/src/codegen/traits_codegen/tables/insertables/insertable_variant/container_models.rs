@@ -1,12 +1,38 @@
+impl<PhysicalAssetModel> web_common_traits::database::DispatchableInsertVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
+        PhysicalAssetModel,
+    >
+{
+    type Row = crate::codegen::structs_codegen::tables::container_models::ContainerModel;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
+    >;
+}
+impl<PhysicalAssetModel> web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
+        PhysicalAssetModel,
+    >
+{
+    type InsertableVariant =
+        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel;
+}
+#[cfg(feature = "backend")]
+impl<PhysicalAssetModel> web_common_traits::database::BackendInsertableVariant
+    for crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
+        PhysicalAssetModel,
+    >
+where
+    Self: web_common_traits::database::DispatchableInsertableVariant<diesel::PgConnection>,
+{
+}
 impl<
     C: diesel::connection::LoadConnection,
-    Trackable,
-> web_common_traits::database::InsertableVariant<C>
+    PhysicalAssetModel,
+> web_common_traits::database::DispatchableInsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-    Trackable,
+    PhysicalAssetModel,
 >
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel as diesel::Insertable<
@@ -17,33 +43,65 @@ where
         C,
         crate::codegen::structs_codegen::tables::container_models::ContainerModel,
     >,
-    C: diesel::connection::LoadConnection,
-    Trackable: web_common_traits::database::TryInsertGeneric<
+    Self: web_common_traits::database::InsertableVariant<
         C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
+        InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel,
+        Row = crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
+        >,
+    >,
+    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
+    Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::ContainerModelExtensionAttribute: From<
+        <PhysicalAssetModel as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::container_models::ContainerModel;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes,
-    >;
-    type UserId = i32;
-    fn insert(
-        self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
+        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("container_models");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel = self
             .try_insert(user_id, conn)?;
         Ok(
-            diesel::insert_into(Self::Row::table())
+            diesel::insert_into(Self::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
     }
+}
+impl<
+    C: diesel::connection::LoadConnection,
+    PhysicalAssetModel,
+> web_common_traits::database::InsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
+    PhysicalAssetModel,
+>
+where
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableContainerModel as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
+    >,
+    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
+    Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::ContainerModelExtensionAttribute: From<
+        <PhysicalAssetModel as common_traits::builder::Attributed>::Attribute,
+    >,
+{
     fn try_insert(
         self,
         user_id: i32,
@@ -53,11 +111,11 @@ where
             .id
             .mint_primary_key(user_id, conn)
             .map_err(|err| {
-                err.into_field_name(|_| crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes::Extension(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelExtensionAttributes::Trackable(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableTrackableAttributes::Id,
-                    ),
-                ))
+                err.into_field_name(|attribute| {
+                    crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute::Extension(
+                        From::from(attribute),
+                    )
+                })
             })?;
         Ok(Self::InsertableVariant { id })
     }

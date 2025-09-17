@@ -12,7 +12,7 @@ async fn test_key_column_usage() {
         setup_database_with_default_migrations("test_key_column_usage").await.unwrap();
 
     let composite_user_profiles =
-        match Table::load(&mut conn, "composite_user_profiles", Some("public"), &database_name) {
+        match Table::load(&mut conn, "composite_user_profiles", "public", &database_name) {
             Ok(table) => table,
             Err(err) => {
                 docker.stop().await.unwrap();
@@ -20,16 +20,16 @@ async fn test_key_column_usage() {
             }
         };
 
-    let composite_users =
-        match Table::load(&mut conn, "composite_users", Some("public"), &database_name) {
-            Ok(table) => table,
-            Err(err) => {
-                docker.stop().await.unwrap();
-                panic!("Error loading composite_users: {err}");
-            }
-        };
+    let composite_users = match Table::load(&mut conn, "composite_users", "public", &database_name)
+    {
+        Ok(table) => table,
+        Err(err) => {
+            docker.stop().await.unwrap();
+            panic!("Error loading composite_users: {err}");
+        }
+    };
 
-    let users = match Table::load(&mut conn, "users", Some("public"), &database_name) {
+    let users = match Table::load(&mut conn, "users", "public", &database_name) {
         Ok(table) => table,
         Err(err) => {
             docker.stop().await.unwrap();
@@ -76,13 +76,7 @@ async fn test_key_column_usage() {
     assert_eq!(columns[1], expected_second_column, "Second column mismatch: {columns:?}");
 
     let foreign_table = match first_usage.foreign_table(&mut conn) {
-        Ok(Some(table)) => table,
-        Ok(None) => {
-            docker.stop().await.unwrap();
-            panic!(
-                "Expected foreign table to be Some, found None for key column usage: {first_usage:?}"
-            );
-        }
+        Ok(table) => table,
         Err(err) => {
             docker.stop().await.unwrap();
             panic!("Error getting foreign table for key column usage: {err}");
@@ -181,13 +175,9 @@ async fn test_key_column_usage() {
 
     // We check that for both foreign key constraints in `composite_users`, the
     // foreign table is `users`
-    for fk in &composite_users_foreign_keys {
+    for fk in composite_users_foreign_keys.iter() {
         let foreign_table = match fk.foreign_table(&mut conn) {
-            Ok(Some(table)) => table,
-            Ok(None) => {
-                docker.stop().await.unwrap();
-                panic!("Expected foreign table to be Some, found None for foreign key: {fk:?}");
-            }
+            Ok(table) => table,
             Err(err) => {
                 docker.stop().await.unwrap();
                 panic!("Error getting foreign table for foreign key: {err}");

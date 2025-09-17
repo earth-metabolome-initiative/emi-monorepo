@@ -35,7 +35,7 @@ impl Codegen<'_> {
             let type_name = r#type.snake_case_name()?;
             let type_ident = r#type.snake_case_identifier()?;
             let type_file = root.join(format!("{type_name}.rs"));
-            std::fs::write(&type_file, self.beautify_code(&r#type.to_struct_or_enum(conn)?)?)?;
+            std::fs::write(&type_file, self.beautify_code(&r#type.to_struct_or_enum(conn)?))?;
 
             types_main_module.extend(quote::quote! {
                 pub mod #type_ident;
@@ -43,7 +43,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&types_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&types_main_module))?;
 
         Ok(())
     }

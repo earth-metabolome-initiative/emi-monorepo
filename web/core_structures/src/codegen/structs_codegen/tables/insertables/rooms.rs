@@ -1,6 +1,6 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableRoomAttributes {
+pub enum RoomAttribute {
     Id,
     Name,
     Description,
@@ -12,7 +12,7 @@ pub enum InsertableRoomAttributes {
     UpdatedBy,
     UpdatedAt,
 }
-impl core::str::FromStr for InsertableRoomAttributes {
+impl core::str::FromStr for RoomAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -38,22 +38,28 @@ impl core::str::FromStr for InsertableRoomAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableRoomAttributes {
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder
+{
+    type Attribute = RoomAttribute;
+}
+impl core::fmt::Display for RoomAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::Name => write!(f, "name"),
-            Self::Description => write!(f, "description"),
-            Self::Qrcode => write!(f, "qrcode"),
-            Self::AddressesId => write!(f, "addresses_id"),
-            Self::Geolocation => write!(f, "geolocation"),
-            Self::CreatedBy => write!(f, "created_by"),
-            Self::CreatedAt => write!(f, "created_at"),
-            Self::UpdatedBy => write!(f, "updated_by"),
-            Self::UpdatedAt => write!(f, "updated_at"),
+            Self::Id => write!(f, "rooms.id"),
+            Self::Name => write!(f, "rooms.name"),
+            Self::Description => write!(f, "rooms.description"),
+            Self::Qrcode => write!(f, "rooms.qrcode"),
+            Self::AddressesId => write!(f, "rooms.addresses_id"),
+            Self::Geolocation => write!(f, "rooms.geolocation"),
+            Self::CreatedBy => write!(f, "rooms.created_by"),
+            Self::CreatedAt => write!(f, "rooms.created_at"),
+            Self::UpdatedBy => write!(f, "rooms.updated_by"),
+            Self::UpdatedAt => write!(f, "rooms.updated_at"),
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -75,102 +81,67 @@ impl InsertableRoom {
     pub fn addresses<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::addresses::Address,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::addresses::Address, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::addresses::Address: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::addresses::Address as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::addresses::Address as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::addresses::Address as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::addresses::Address as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::addresses::Address as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::addresses::Address as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::addresses::Address,
-        >,
+        crate::codegen::structs_codegen::tables::addresses::Address:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::addresses::Address::table(),
-                self.addresses_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::addresses::Address::read(self.addresses_id, conn)
     }
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.created_by,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn updated_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.updated_by,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.updated_by, conn)
     }
 }
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, PartialOrd)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new
+/// [`Room`](crate::codegen::structs_codegen::tables::rooms::Room).
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::Room;
+/// use core_structures::tables::insertables::RoomSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let room = Room::new()
+///    // Set mandatory fields
+///    .addresses(addresses_id)?
+///    .created_by(created_by)?
+///    .description(description)?
+///    .geolocation(geolocation)?
+///    .name(name)?
+///    .qrcode(qrcode)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
+///    .updated_by(updated_by)?
+///    // Optionally set fields with default values
+///    .created_at(created_at)?
+///    .updated_at(updated_at)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableRoomBuilder {
     pub(crate) name: Option<String>,
     pub(crate) description: Option<String>,
@@ -181,6 +152,19 @@ pub struct InsertableRoomBuilder {
     pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
     pub(crate) updated_by: Option<i32>,
     pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+}
+impl diesel::associations::HasTable for InsertableRoomBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::rooms::rooms::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::rooms::rooms::table
+    }
+}
+impl From<InsertableRoomBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableRoomBuilder>
+{
+    fn from(builder: InsertableRoomBuilder) -> Self {
+        Self::Builder(builder)
+    }
 }
 impl Default for InsertableRoomBuilder {
     fn default() -> Self {
@@ -197,282 +181,9 @@ impl Default for InsertableRoomBuilder {
         }
     }
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableRoomBuilder {
-    type Attributes = InsertableRoomAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        match (other.created_at, other.updated_at) {
-            (Some(created_at), Some(updated_at)) => {
-                self = self.created_at_and_updated_at(created_at, updated_at)?;
-            }
-            (None, Some(updated_at)) => {
-                self = self.updated_at(updated_at)?;
-            }
-            (Some(created_at), None) => {
-                self = self.created_at(created_at)?;
-            }
-            (None, None) => {}
-        }
-        if let Some(name) = other.name {
-            self = self.name(name)?;
-        }
-        if let Some(description) = other.description {
-            self = self.description(description)?;
-        }
-        if let Some(qrcode) = other.qrcode {
-            self = self.qrcode(qrcode)?;
-        }
-        if let Some(addresses_id) = other.addresses_id {
-            self = self.addresses(addresses_id)?;
-        }
-        if let Some(geolocation) = other.geolocation {
-            self = self.geolocation(geolocation)?;
-        }
-        if let Some(created_by) = other.created_by {
-            self = self.created_by(created_by)?;
-        }
-        if let Some(updated_by) = other.updated_by {
-            self = self.updated_by(updated_by)?;
-        }
-        Ok(self)
-    }
-}
-impl web_common_traits::prelude::SetPrimaryKey for InsertableRoomBuilder {
-    type PrimaryKey = i32;
-    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
-        self
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.addresses_id` column from table `rooms`.
-    pub fn addresses(
-        mut self,
-        addresses_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>> {
-        self.addresses_id = Some(addresses_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.created_at` column from table `rooms`.
-    pub fn created_at<CreatedAt>(
-        mut self,
-        created_at: CreatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableRoomAttributes::CreatedAt)
-            },
-        )?;
-        if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::UpdatedAt,
-                        )
-                })?;
-        }
-        self.created_at = Some(created_at);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.created_at`, `rooms.updated_at` columns
-    /// from table `rooms`.
-    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
-        mut self,
-        created_at: CreatedAt,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableRoomAttributes::CreatedAt)
-            },
-        )?;
-        let updated_at = updated_at.try_into().map_err(
-            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableRoomAttributes::UpdatedAt)
-            },
-        )?;
-        pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-            .map_err(|e| {
-                e
-                    .rename_fields(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::CreatedAt,
-                        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::UpdatedAt,
-                    )
-            })?;
-        self.created_at = Some(created_at);
-        self.updated_at = Some(updated_at);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.created_by` column from table `rooms`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>> {
-        self.created_by = Some(created_by);
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.description` column from table `rooms`.
-    pub fn description<Description>(
-        mut self,
-        description: Description,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
-    where
-        Description: TryInto<String>,
-        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let description =
-            description.try_into().map_err(|err: <Description as TryInto<String>>::Error| {
-                Into::into(err).rename_field(InsertableRoomAttributes::Description)
-            })?;
-        pgrx_validation::must_be_paragraph(description.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Description,
-                    )
-            })?;
-        self.description = Some(description);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.geolocation` column from table `rooms`.
-    pub fn geolocation<Geolocation>(
-        mut self,
-        geolocation: Geolocation,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
-    where
-        Geolocation: TryInto<postgis_diesel::types::Point>,
-        <Geolocation as TryInto<postgis_diesel::types::Point>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let geolocation = geolocation.try_into().map_err(
-            |err: <Geolocation as TryInto<postgis_diesel::types::Point>>::Error| {
-                Into::into(err).rename_field(InsertableRoomAttributes::Geolocation)
-            },
-        )?;
-        self.geolocation = Some(geolocation);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.name` column from table `rooms`.
-    pub fn name<Name>(
-        mut self,
-        name: Name,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
-    where
-        Name: TryInto<String>,
-        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let name = name.try_into().map_err(|err: <Name as TryInto<String>>::Error| {
-            Into::into(err).rename_field(InsertableRoomAttributes::Name)
-        })?;
-        pgrx_validation::must_be_paragraph(name.as_ref())
-            .map_err(|e| {
-                e
-                    .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::Name,
-                    )
-            })?;
-        self.name = Some(name);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.qrcode` column from table `rooms`.
-    pub fn qrcode<Qrcode>(
-        mut self,
-        qrcode: Qrcode,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
-    where
-        Qrcode: TryInto<::rosetta_uuid::Uuid>,
-        <Qrcode as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let qrcode = qrcode.try_into().map_err(
-            |err: <Qrcode as TryInto<::rosetta_uuid::Uuid>>::Error| {
-                Into::into(err).rename_field(InsertableRoomAttributes::Qrcode)
-            },
-        )?;
-        self.qrcode = Some(qrcode);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.updated_at` column from table `rooms`.
-    pub fn updated_at<UpdatedAt>(
-        mut self,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>>
-    where
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let updated_at = updated_at.try_into().map_err(
-            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableRoomAttributes::UpdatedAt)
-            },
-        )?;
-        if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableRoomAttributes::UpdatedAt,
-                        )
-                })?;
-        }
-        self.updated_at = Some(updated_at);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder {
-    /// Sets the value of the `rooms.updated_by` column from table `rooms`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableRoomAttributes>> {
-        self.updated_by = Some(updated_by);
-        Ok(self)
-    }
-}
-impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableRoomBuilder
-where
-    Self: web_common_traits::database::InsertableVariant<
-            C,
-            UserId = i32,
-            Row = crate::codegen::structs_codegen::tables::rooms::Room,
-            Error = web_common_traits::database::InsertError<InsertableRoomAttributes>,
-        >,
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableRoomBuilder
 {
-    type Attributes = InsertableRoomAttributes;
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.description.is_some()
@@ -484,13 +195,394 @@ where
             && self.updated_by.is_some()
             && self.updated_at.is_some()
     }
+}
+/// Trait defining setters for attributes of an instance of `Room` or descendant
+/// tables.
+pub trait RoomSettable: Sized {
+    /// Error type returned when setting attributes.
+    type Error;
+    /// Sets the value of the `public.rooms.name` column.
+    ///
+    /// # Arguments
+    /// * `name`: The value to set for the `public.rooms.name` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn name<N>(self, name: N) -> Result<Self, Self::Error>
+    where
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+    /// Sets the value of the `public.rooms.description` column.
+    ///
+    /// # Arguments
+    /// * `description`: The value to set for the `public.rooms.description`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn description<D>(self, description: D) -> Result<Self, Self::Error>
+    where
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
+    /// Sets the value of the `public.rooms.qrcode` column.
+    ///
+    /// # Arguments
+    /// * `qrcode`: The value to set for the `public.rooms.qrcode` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_uuid::Uuid`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn qrcode<Q>(self, qrcode: Q) -> Result<Self, Self::Error>
+    where
+        Q: TryInto<::rosetta_uuid::Uuid>,
+        validation_errors::SingleFieldError: From<<Q as TryInto<::rosetta_uuid::Uuid>>::Error>;
+    /// Sets the value of the `public.rooms.addresses_id` column.
+    ///
+    /// # Arguments
+    /// * `addresses_id`: The value to set for the `public.rooms.addresses_id`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn addresses<AI>(self, addresses_id: AI) -> Result<Self, Self::Error>
+    where
+        AI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
+    /// Sets the value of the `public.rooms.geolocation` column.
+    ///
+    /// # Arguments
+    /// * `geolocation`: The value to set for the `public.rooms.geolocation`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `postgis_diesel::types::Point`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn geolocation<G>(self, geolocation: G) -> Result<Self, Self::Error>
+    where
+        G: TryInto<postgis_diesel::types::Point>,
+        validation_errors::SingleFieldError:
+            From<<G as TryInto<postgis_diesel::types::Point>>::Error>;
+    /// Sets the value of the `public.rooms.created_by` column.
+    ///
+    /// # Arguments
+    /// * `created_by`: The value to set for the `public.rooms.created_by`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn created_by<CB>(self, created_by: CB) -> Result<Self, Self::Error>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
+    /// Sets the value of the `public.rooms.created_at` column.
+    ///
+    /// # Arguments
+    /// * `created_at`: The value to set for the `public.rooms.created_at`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_timestamp::TimestampUTC`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
+    where
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+    /// Sets the value of the `public.rooms.updated_by` column.
+    ///
+    /// # Arguments
+    /// * `updated_by`: The value to set for the `public.rooms.updated_by`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn updated_by<UB>(self, updated_by: UB) -> Result<Self, Self::Error>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
+    /// Sets the value of the `public.rooms.updated_at` column.
+    ///
+    /// # Arguments
+    /// * `updated_at`: The value to set for the `public.rooms.updated_at`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `::rosetta_timestamp::TimestampUTC`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn updated_at<UA>(self, updated_at: UA) -> Result<Self, Self::Error>
+    where
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
+}
+impl RoomSettable for InsertableRoomBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::RoomAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    /// Sets the value of the `public.rooms.name` column.
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
+    where
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+    {
+        let name = name.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(RoomAttribute::Name)
+        })?;
+        pgrx_validation::must_be_paragraph(name.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::RoomAttribute::Name,
+            )
+        })?;
+        self.name = Some(name);
+        Ok(self)
+    }
+    /// Sets the value of the `public.rooms.description` column.
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
+    where
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+    {
+        let description = description.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(RoomAttribute::Description)
+        })?;
+        pgrx_validation::must_be_paragraph(description.as_ref()).map_err(|e| {
+            e.rename_field(
+                crate::codegen::structs_codegen::tables::insertables::RoomAttribute::Description,
+            )
+        })?;
+        self.description = Some(description);
+        Ok(self)
+    }
+    /// Sets the value of the `public.rooms.qrcode` column.
+    fn qrcode<Q>(mut self, qrcode: Q) -> Result<Self, Self::Error>
+    where
+        Q: TryInto<::rosetta_uuid::Uuid>,
+        validation_errors::SingleFieldError: From<<Q as TryInto<::rosetta_uuid::Uuid>>::Error>,
+    {
+        let qrcode = qrcode.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(RoomAttribute::Qrcode)
+        })?;
+        self.qrcode = Some(qrcode);
+        Ok(self)
+    }
+    /// Sets the value of the `public.rooms.addresses_id` column.
+    fn addresses<AI>(mut self, addresses_id: AI) -> Result<Self, Self::Error>
+    where
+        AI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let addresses_id =
+            <AI as web_common_traits::database::PrimaryKeyLike>::primary_key(&addresses_id);
+        self.addresses_id = Some(addresses_id);
+        Ok(self)
+    }
+    /// Sets the value of the `public.rooms.geolocation` column.
+    fn geolocation<G>(mut self, geolocation: G) -> Result<Self, Self::Error>
+    where
+        G: TryInto<postgis_diesel::types::Point>,
+        validation_errors::SingleFieldError:
+            From<<G as TryInto<postgis_diesel::types::Point>>::Error>,
+    {
+        let geolocation = geolocation.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(RoomAttribute::Geolocation)
+        })?;
+        self.geolocation = Some(geolocation);
+        Ok(self)
+    }
+    /// Sets the value of the `public.rooms.created_by` column.
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart BT
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// v0@{shape: rounded, label: "created_by"}
+    /// class v0 column-of-interest
+    /// v1@{shape: rounded, label: "updated_by"}
+    /// class v1 directly-involved-column
+    /// ```
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let created_by =
+            <CB as web_common_traits::database::PrimaryKeyLike>::primary_key(&created_by);
+        self = self.updated_by(created_by)?;
+        self.created_by = Some(created_by);
+        Ok(self)
+    }
+    /// Sets the value of the `public.rooms.created_at` column.
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
+    where
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+    {
+        let created_at = created_at.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(RoomAttribute::CreatedAt)
+        })?;
+        if let Some(updated_at) = self.updated_at {
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    crate::codegen::structs_codegen::tables::insertables::RoomAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::RoomAttribute::UpdatedAt,
+                )
+            })?;
+        }
+        self.created_at = Some(created_at);
+        Ok(self)
+    }
+    /// Sets the value of the `public.rooms.updated_by` column.
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let updated_by =
+            <UB as web_common_traits::database::PrimaryKeyLike>::primary_key(&updated_by);
+        self.updated_by = Some(updated_by);
+        Ok(self)
+    }
+    /// Sets the value of the `public.rooms.updated_at` column.
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
+    where
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError:
+            From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
+    {
+        let updated_at = updated_at.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err).rename_field(RoomAttribute::UpdatedAt)
+        })?;
+        if let Some(created_at) = self.created_at {
+            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
+                e.rename_fields(
+                    crate::codegen::structs_codegen::tables::insertables::RoomAttribute::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::RoomAttribute::UpdatedAt,
+                )
+            })?;
+        }
+        self.updated_at = Some(updated_at);
+        Ok(self)
+    }
+}
+impl web_common_traits::prelude::SetPrimaryKey for InsertableRoomBuilder {
+    type PrimaryKey = i32;
+    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+        self
+    }
+}
+impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableRoomBuilder
+where
+    Self: web_common_traits::database::DispatchableInsertableVariant<
+            C,
+            Row = crate::codegen::structs_codegen::tables::rooms::Room,
+            Error = web_common_traits::database::InsertError<RoomAttribute>,
+        >,
+{
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<RoomAttribute>> {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::rooms::Room =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

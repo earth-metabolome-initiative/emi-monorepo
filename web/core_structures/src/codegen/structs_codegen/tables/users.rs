@@ -20,13 +20,52 @@ pub struct User {
 impl web_common_traits::prelude::TableName for User {
     const TABLE_NAME: &'static str = "users";
 }
+impl<'a> From<&'a User>
+    for web_common_traits::database::IdOrBuilder<
+        i32,
+        crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder,
+    >
+{
+    fn from(value: &'a User) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
+impl
+    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::users::User>
+    for User
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
 impl diesel::Identifiable for User {
     type Id = i32;
     fn id(self) -> Self::Id {
         self.id
     }
 }
+impl web_common_traits::database::PrimaryKeyLike for User {
+    type PrimaryKey = i32;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        self.id
+    }
+}
 impl User {
+    #[cfg(feature = "postgres")]
+    pub fn from_first_name_and_last_name(
+        first_name: &str,
+        last_name: &str,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::users::users;
+        Self::table()
+            .filter(users::first_name.eq(first_name).and(users::last_name.eq(last_name)))
+            .order_by(users::id.asc())
+            .load::<Self>(conn)
+    }
     #[cfg(feature = "postgres")]
     pub fn from_first_name(
         first_name: &str,
@@ -50,32 +89,6 @@ impl User {
         use crate::codegen::diesel_codegen::tables::users::users;
         Self::table()
             .filter(users::last_name.eq(last_name))
-            .order_by(users::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::users::users;
-        Self::table()
-            .filter(users::created_at.eq(created_at))
-            .order_by(users::id.asc())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_updated_at(
-        updated_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::users::users;
-        Self::table()
-            .filter(users::updated_at.eq(updated_at))
             .order_by(users::id.asc())
             .load::<Self>(conn)
     }

@@ -6,10 +6,15 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 
 use super::Codegen;
-use crate::Table;
+use crate::{
+    Table,
+    codegen::{CODEGEN_INSERTABLES_PATH, CODEGEN_MOST_CONCRETE_VARIANTS_PATH},
+    traits::TableLike,
+};
 
 mod crud;
 mod insertables;
+mod most_concrete_variant;
 
 impl Codegen<'_> {
     /// Generate implementations of the structs representing rows of the tables
@@ -34,7 +39,8 @@ impl Codegen<'_> {
             let table_identifier = table.snake_case_ident()?;
             let table_file = root.join(format!("{}.rs", table.snake_case_name()?));
             let table_struct = table.struct_ident()?;
-            let table_content = table.to_syn(self.enable_yew, conn)?;
+            let table_content =
+                table.to_syn(self.enable_yew, self.enable_insertable_trait, conn)?;
             let foreign_key_methods = if self.enable_foreign_trait {
                 table.foreign_key_methods(conn)?
             } else {
@@ -56,7 +62,7 @@ impl Codegen<'_> {
                             self
                         }
                     }
-                })?,
+                }),
             )?;
 
             table_main_module.extend(quote::quote! {
@@ -66,9 +72,24 @@ impl Codegen<'_> {
         }
 
         if self.enable_insertable_trait {
-            self.generate_insertable_structs(root.join("insertables").as_path(), tables, conn)?;
+            self.generate_insertable_structs(
+                root.join(CODEGEN_INSERTABLES_PATH).as_path(),
+                tables,
+                conn,
+            )?;
             table_main_module.extend(quote::quote! {
                 pub mod insertables;
+            });
+        }
+
+        if self.enable_most_concrete_variant_trait {
+            self.generate_most_concrete_variant_structs(
+                root.join(CODEGEN_MOST_CONCRETE_VARIANTS_PATH).as_path(),
+                tables,
+                conn,
+            )?;
+            table_main_module.extend(quote::quote! {
+                pub mod most_concrete_variants;
             });
         }
 
@@ -96,7 +117,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&table_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&table_main_module))?;
 
         Ok(())
     }

@@ -8,6 +8,7 @@ use syn::Ident;
 use crate::{
     Codegen, Table,
     codegen::{CODEGEN_DIRECTORY, CODEGEN_TABLES_PATH},
+    traits::TableLike,
 };
 
 impl Codegen<'_> {
@@ -58,7 +59,7 @@ impl Codegen<'_> {
                         }
                     }
                 }
-            })?,
+            }),
         )?;
 
         Ok(())

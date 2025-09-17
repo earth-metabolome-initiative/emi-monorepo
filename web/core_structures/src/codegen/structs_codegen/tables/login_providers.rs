@@ -24,9 +24,33 @@ pub struct LoginProvider {
 impl web_common_traits::prelude::TableName for LoginProvider {
     const TABLE_NAME: &'static str = "login_providers";
 }
+impl<'a> From<&'a LoginProvider>
+    for web_common_traits::database::IdOrBuilder<
+        i16,
+        crate::codegen::structs_codegen::tables::insertables::InsertableLoginProviderBuilder,
+    >
+{
+    fn from(value: &'a LoginProvider) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::login_providers::LoginProvider,
+    > for LoginProvider
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for LoginProvider {
     type Id = i16;
     fn id(self) -> Self::Id {
+        self.id
+    }
+}
+impl web_common_traits::database::PrimaryKeyLike for LoginProvider {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
         self.id
     }
 }

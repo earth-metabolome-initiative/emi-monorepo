@@ -20,6 +20,8 @@ impl<'column> HasSpecificTypeConstraint<'column> {
 }
 
 impl CustomColumnConstraint for HasSpecificTypeConstraint<'_> {
+    type Error = crate::errors::WebCodeGenError;
+
     fn check_constraint(
         &self,
         conn: &mut PgConnection,

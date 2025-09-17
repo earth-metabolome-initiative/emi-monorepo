@@ -1,7 +1,25 @@
 #[derive(Debug, Clone, PartialEq, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(diesel::Selectable, diesel::Insertable, diesel::Queryable, diesel::Identifiable)]
+#[derive(
+    diesel::Selectable,
+    diesel::Insertable,
+    diesel::Queryable,
+    diesel::Identifiable,
+    diesel::Associations,
+)]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::projects::Project,
+        foreign_key = project_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::teams::Team,
+        foreign_key = team_id
+    )
+)]
 #[diesel(primary_key(team_id, project_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::team_projects::team_projects
@@ -13,102 +31,57 @@ pub struct TeamProject {
 impl web_common_traits::prelude::TableName for TeamProject {
     const TABLE_NAME: &'static str = "team_projects";
 }
+impl<'a> From<&'a TeamProject>
+    for web_common_traits::database::IdOrBuilder<
+        (i32, i32),
+        crate::codegen::structs_codegen::tables::insertables::InsertableTeamProjectBuilder,
+    >
+{
+    fn from(value: &'a TeamProject) -> Self {
+        web_common_traits::database::IdOrBuilder::Id((value.team_id, value.project_id))
+    }
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::team_projects::TeamProject,
+    > for TeamProject
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (i32, i32)>,
+{
+}
 impl diesel::Identifiable for TeamProject {
     type Id = (i32, i32);
     fn id(self) -> Self::Id {
         (self.team_id, self.project_id)
     }
 }
-impl TeamProject {
-    pub fn team<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::teams::Team,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::teams::Team: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::teams::Team,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::teams::Team::table(),
-                self.team_id,
-            ),
-            conn,
-        )
+impl web_common_traits::database::PrimaryKeyLike for TeamProject {
+    type PrimaryKey = (i32, i32);
+    fn primary_key(&self) -> Self::PrimaryKey {
+        (self.team_id, self.project_id)
     }
+}
+impl TeamProject {
     pub fn project<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::projects::Project,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::projects::Project, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::projects::Project: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::projects::Project as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::projects::Project as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::projects::Project,
-        >,
+        crate::codegen::structs_codegen::tables::projects::Project:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::projects::Project::table(),
-                self.project_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::projects::Project::read(self.project_id, conn)
     }
-    #[cfg(feature = "postgres")]
-    pub fn from_team_id(
-        team_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::team_projects::team_projects;
-        Self::table()
-            .filter(team_projects::team_id.eq(team_id))
-            .order_by((team_projects::team_id.asc(), team_projects::project_id.asc()))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_project_id(
-        project_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::team_projects::team_projects;
-        Self::table()
-            .filter(team_projects::project_id.eq(project_id))
-            .order_by((team_projects::team_id.asc(), team_projects::project_id.asc()))
-            .load::<Self>(conn)
+    pub fn team<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::teams::Team, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::teams::Team::read(self.team_id, conn)
     }
 }
 impl AsRef<TeamProject> for TeamProject {

@@ -1,7 +1,8 @@
 #[derive(Debug, Clone, PartialEq, Default, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct CommercialProductLotForeignKeys {
-    pub id: Option<crate::codegen::structs_codegen::tables::trackables::Trackable>,
+    pub id:
+        Option<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel>,
     pub product_model:
         Option<crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct>,
 }
@@ -15,11 +16,13 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::Trackable(self.id),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
+                self.id,
+            ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::CommercialProduct(
-                self.product_model_id,
+                self.product_model,
             ),
         ));
     }
@@ -40,7 +43,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.product_model_id == commercial_products.id {
+                if self.product_model == commercial_products.id {
                     foreign_keys.product_model = Some(commercial_products);
                     updated = true;
                 }
@@ -49,27 +52,27 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::CommercialProduct(commercial_products),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.product_model_id == commercial_products.id {
+                if self.product_model == commercial_products.id {
                     foreign_keys.product_model = None;
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Trackable(trackables),
+                crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.id == trackables.id {
-                    foreign_keys.id = Some(trackables);
+                if self.id == physical_asset_models.id {
+                    foreign_keys.id = Some(physical_asset_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::Trackable(trackables),
+                crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.id == trackables.id {
+                if self.id == physical_asset_models.id {
                     foreign_keys.id = None;
                     updated = true;
                 }

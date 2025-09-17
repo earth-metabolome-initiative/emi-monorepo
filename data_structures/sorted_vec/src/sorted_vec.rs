@@ -8,7 +8,7 @@ use common_traits::transmute::TransmuteFrom;
 
 use crate::error::Error;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct defining a sorted vector and its primary methods.
 pub struct SortedVec<V> {
     vec: Vec<V>,
@@ -123,6 +123,14 @@ impl<V> SortedVec<V> {
         V: Ord,
     {
         self.vec.binary_search(value)
+    }
+
+    /// Binary searches this slice with a comparator function.
+    pub fn binary_search_by<F>(&self, f: F) -> Result<usize, usize>
+    where
+        F: FnMut(&V) -> core::cmp::Ordering,
+    {
+        self.vec.binary_search_by(f)
     }
 }
 

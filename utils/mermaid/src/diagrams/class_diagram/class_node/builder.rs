@@ -2,7 +2,10 @@
 
 use std::{fmt::Display, rc::Rc};
 
-use common_traits::prelude::Builder;
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::Builder,
+};
 
 use crate::{
     diagrams::class_diagram::class_node::{ClassAttribute, ClassMethod, ClassNode},
@@ -90,14 +93,19 @@ impl ClassNodeBuilder {
     }
 }
 
-impl Builder for ClassNodeBuilder {
-    type Attribute = ClassNodeAttribute;
-    type Object = ClassNode;
-    type Error = NodeError<Self::Attribute>;
-
+impl IsCompleteBuilder for ClassNodeBuilder {
     fn is_complete(&self) -> bool {
         self.builder.is_complete()
     }
+}
+
+impl Attributed for ClassNodeBuilder {
+    type Attribute = ClassNodeAttribute;
+}
+
+impl Builder for ClassNodeBuilder {
+    type Object = ClassNode;
+    type Error = NodeError<Self::Attribute>;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(ClassNode {
@@ -113,14 +121,22 @@ impl Builder for ClassNodeBuilder {
 impl NodeBuilder for ClassNodeBuilder {
     type Node = ClassNode;
 
-    fn id(mut self, id: usize) -> Self {
+    fn id(mut self, id: u64) -> Self {
         self.builder = self.builder.id(id);
         self
+    }
+
+    fn get_id(&self) -> Option<u64> {
+        self.builder.get_id()
     }
 
     fn label<S: ToString>(mut self, label: S) -> Result<Self, Self::Error> {
         self.builder = self.builder.label(label)?;
         Ok(self)
+    }
+
+    fn get_label(&self) -> Option<&String> {
+        self.builder.get_label()
     }
 
     fn style_class(mut self, style_class: Rc<StyleClass>) -> Result<Self, StyleClassError> {
@@ -134,5 +150,9 @@ impl NodeBuilder for ClassNodeBuilder {
     ) -> Result<Self, StyleClassError> {
         self.builder = self.builder.style_property(property)?;
         Ok(self)
+    }
+
+    fn style_properties(&self) -> impl Iterator<Item = &crate::prelude::StyleProperty> {
+        self.builder.style_properties()
     }
 }

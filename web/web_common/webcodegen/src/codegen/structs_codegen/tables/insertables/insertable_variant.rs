@@ -11,6 +11,7 @@ use crate::{
         CODEGEN_DIRECTORY, CODEGEN_INSERTABLES_PATH, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
     },
     errors::WebCodeGenError,
+    traits::TableLike,
 };
 
 impl Table {
@@ -66,6 +67,7 @@ impl Table {
         let insertable_variant_methods = self.foreign_key_methods(conn)?;
 
         Ok(quote::quote! {
+            #[derive(Debug)]
             #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
             #[cfg_attr(any(feature = "postgres", feature = "sqlite"), diesel(table_name = #table_diesel_ident))]
             #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

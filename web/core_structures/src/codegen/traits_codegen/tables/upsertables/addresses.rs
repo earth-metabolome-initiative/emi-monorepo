@@ -21,7 +21,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
                 city_id
                     .ne(excluded(city_id))
                     .or(street_name.ne(excluded(street_name)))
-                    .or(street_number.ne(excluded(street_number)))
+                    .or(house_number.ne(excluded(house_number)))
                     .or(postal_code.ne(excluded(postal_code)))
                     .or(geolocation.ne(excluded(geolocation))),
             )
@@ -52,7 +52,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
                 city_id
                     .ne(excluded(city_id))
                     .or(street_name.ne(excluded(street_name)))
-                    .or(street_number.ne(excluded(street_number)))
+                    .or(house_number.ne(excluded(house_number)))
                     .or(postal_code.ne(excluded(postal_code)))
                     .or(geolocation.ne(excluded(geolocation))),
             )

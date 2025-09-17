@@ -1,4 +1,4 @@
 diesel::table! {
-    spectra(id) { id -> diesel::sql_types::Integer, spectra_collection_id ->
-    diesel::sql_types::Integer }
+    spectra(id) { id -> ::rosetta_uuid::diesel_impls::Uuid, spectra_collection_id ->
+    ::rosetta_uuid::diesel_impls::Uuid }
 }

@@ -1,6 +1,6 @@
 //! Login providers migration
 
-use core_structures::{LoginProvider, User};
+use core_structures::{LoginProvider, tables::insertables::LoginProviderSettable};
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::prelude::*;
 
@@ -17,10 +17,7 @@ use web_common_traits::prelude::*;
 ///
 /// * If the login provider cannot be created or inserted into the database, an
 ///   error is returned.
-fn init_github_login_provider(
-    user: &User,
-    conn: &mut PgConnection,
-) -> anyhow::Result<LoginProvider> {
+fn init_github_login_provider(conn: &mut PgConnection) -> anyhow::Result<LoginProvider> {
     if let Some(provider) = LoginProvider::from_name("GitHub", conn).optional()? {
         return Ok(provider);
     }
@@ -32,21 +29,20 @@ fn init_github_login_provider(
         .client(std::env::var("GITHUB_CLIENT_ID").expect("GITHUB_CLIENT_ID"))?
         .redirect_uri(std::env::var("GITHUB_REDIRECT_URI").expect("GITHUB_REDIRECT_URI"))?
         .scope("read:user,user:email")?
-        .insert(user.id, conn)?)
+        .backend_insert(conn)?)
 }
 
 /// Initialize login providers in the database.
 ///
 /// # Arguments
 ///
-/// * `user` - A reference to the user who is initializing the login providers.
 /// * `conn` - A mutable reference to an hronous `PostgreSQL` connection.
 ///
 /// # Errors
 ///
 /// * If the login provider cannot be created or inserted into the database, an
 ///   error is returned.
-pub(crate) fn init_login_providers(user: &User, conn: &mut PgConnection) -> anyhow::Result<()> {
-    let _github = init_github_login_provider(user, conn)?;
+pub(crate) fn init_login_providers(conn: &mut PgConnection) -> anyhow::Result<()> {
+    let _github = init_github_login_provider(conn)?;
     Ok(())
 }

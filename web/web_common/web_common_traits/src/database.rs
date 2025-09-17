@@ -6,6 +6,8 @@ mod deletable;
 mod extension;
 mod foreign;
 mod insertable;
+mod most_concrete_variant;
+mod primary_key_like;
 mod read;
 mod table_name;
 mod tabular;
@@ -18,9 +20,14 @@ pub use connection::AnyConnection;
 pub use deletable::{Deletable, DeleteError, DeleteFromVec};
 pub use extension::ExtensionTable;
 pub use foreign::{ForeignKeys, HasForeignKeys};
+#[cfg(feature = "backend")]
+pub use insertable::BackendInsertableVariant;
 pub use insertable::{
-    ExtendableBuilder, InsertError, Insertable, InsertableVariant, SetPrimaryKey,
+    DispatchableInsertVariantMetadata, DispatchableInsertableVariant, IdOrBuilder, InsertError,
+    Insertable, InsertableVariant, InsertableVariantMetadata, MostConcreteTable, SetPrimaryKey,
 };
+pub use most_concrete_variant::{MostConcreteVariant, MostConcreteVariantMetadata};
+pub use primary_key_like::{MaybePrimaryKeyLike, PrimaryKeyLike};
 pub use read::{BoundedRead, BoundedReadDispatch, Read, ReadDispatch};
 pub use table_name::TableName;
 pub use tabular::{Row, Rows, StaticTabular, Tabular};

@@ -5,11 +5,11 @@
 
 use algebra::prelude::{SizedRowsSparseMatrix2D, SparseBiMatrix2D, SparseMatrix2D};
 
-use super::{Edges, MonoplexGraph, TransposedEdges, TransposedGraph};
+use super::{Edges, MonoplexGraph, TransposedEdges};
 
 /// Trait defining a transposed monoplex graph.
 pub trait TransposedMonoplexGraph:
-    TransposedGraph + MonoplexGraph<Edges = <Self as TransposedMonoplexGraph>::TransposedEdges>
+    MonoplexGraph<Edges = <Self as TransposedMonoplexGraph>::TransposedEdges>
 {
     /// The types of the edges.
     type TransposedEdges: TransposedEdges;
@@ -39,6 +39,18 @@ pub trait TransposedMonoplexGraph:
         source_node_id: <Self::TransposedEdges as Edges>::SourceNodeId,
     ) -> bool {
         self.edges().has_predecessor(destination_node_id, source_node_id)
+    }
+
+    /// Returns whether the given destination node has any predecessor.
+    ///
+    /// # Arguments
+    ///
+    /// * `destination_node_id` - The identifier of the destination node.
+    fn has_predecessors(
+        &self,
+        destination_node_id: <Self::TransposedEdges as Edges>::DestinationNodeId,
+    ) -> bool {
+        self.edges().has_predecessors(destination_node_id)
     }
 
     /// Returns the inbound degree of the node with the given identifier.
@@ -71,7 +83,7 @@ pub trait TransposedMonoplexGraph:
 
 impl<G> TransposedMonoplexGraph for G
 where
-    G: TransposedGraph + MonoplexGraph,
+    G: MonoplexGraph,
     G::Edges: TransposedEdges,
 {
     type TransposedEdges = G::Edges;

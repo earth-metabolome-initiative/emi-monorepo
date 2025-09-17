@@ -42,7 +42,7 @@ impl Codegen<'_> {
             &table_module,
             self.beautify_code(&quote! {
                 mod #updatable_module;
-            })?,
+            }),
         )?;
 
         Ok(())

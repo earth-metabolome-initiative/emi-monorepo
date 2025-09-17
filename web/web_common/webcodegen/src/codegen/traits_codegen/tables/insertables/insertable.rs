@@ -6,7 +6,7 @@ use std::path::Path;
 
 use proc_macro2::TokenStream;
 
-use crate::{Codegen, Table};
+use crate::{Codegen, Table, traits::TableLike};
 
 impl Codegen<'_> {
     /// Generates the [`Insertable`](web_common_traits::database::Insertable)
@@ -46,7 +46,7 @@ impl Codegen<'_> {
                         type InsertableBuilder = #insertable_builder;
                         type InsertableVariant = #insertable_variant;
                     }
-                })?,
+                }),
             )?;
 
             insertable_main_module.extend(quote::quote! {
@@ -55,7 +55,7 @@ impl Codegen<'_> {
         }
 
         let table_module = root.with_extension("rs");
-        std::fs::write(&table_module, self.beautify_code(&insertable_main_module)?)?;
+        std::fs::write(&table_module, self.beautify_code(&insertable_main_module))?;
 
         Ok(())
     }

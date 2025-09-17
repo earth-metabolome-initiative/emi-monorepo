@@ -45,7 +45,7 @@ async fn main() -> std::io::Result<()> {
         if !init_db::database_exists(&database_name, &mut connection)
             .expect("Error checking if database exists")
         {
-            init_db::init_database(&database_name, &mut connection)
+            init_db::init_database(&database_name, true, &mut connection)
                 .await
                 .expect("Error creating database");
             init_migration::init_migration(&mut connection).expect("Error running init migration");

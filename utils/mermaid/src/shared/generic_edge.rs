@@ -1,13 +1,16 @@
 //! Submodule providing a generic node struct which may be reused across
 //! different diagrams.
 
-use std::{fmt::Display, rc::Rc};
+use std::{fmt::Display, iter::empty, rc::Rc};
 
-use common_traits::prelude::{Builder, BuilderError};
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::{Builder, BuilderError},
+};
 
 use crate::{
     errors::EdgeError,
-    shared::{ArrowShape, LineStyle},
+    shared::{ArrowShape, LineStyle, StyleClass},
     traits::{Edge, EdgeBuilder, Node},
 };
 
@@ -47,6 +50,10 @@ impl<N: Node> Edge for GenericEdge<N> {
 
     fn line_style(&self) -> LineStyle {
         self.line_style
+    }
+
+    fn classes(&self) -> impl Iterator<Item = &StyleClass> {
+        empty()
     }
 
     fn left_arrow_shape(&self) -> Option<ArrowShape> {
@@ -120,14 +127,19 @@ impl Display for GenericEdgeAttribute {
     }
 }
 
-impl<N> Builder for GenericEdgeBuilder<N> {
-    type Attribute = GenericEdgeAttribute;
-    type Error = EdgeError<Self::Attribute>;
-    type Object = GenericEdge<N>;
-
+impl<N> IsCompleteBuilder for GenericEdgeBuilder<N> {
     fn is_complete(&self) -> bool {
         self.source.is_some() && self.destination.is_some()
     }
+}
+
+impl<N> Attributed for GenericEdgeBuilder<N> {
+    type Attribute = GenericEdgeAttribute;
+}
+
+impl<N> Builder for GenericEdgeBuilder<N> {
+    type Error = EdgeError<Self::Attribute>;
+    type Object = GenericEdge<N>;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(GenericEdge {

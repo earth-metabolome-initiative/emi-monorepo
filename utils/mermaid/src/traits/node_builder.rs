@@ -36,6 +36,9 @@ pub trait NodeBuilder: Builder<Object = Self::Node> {
     /// * If the style property has already been set for the node.
     fn style_property(self, property: StyleProperty) -> Result<Self, StyleClassError>;
 
+    /// Iterates across the style properties of the node being built.
+    fn style_properties(&self) -> impl Iterator<Item = &StyleProperty>;
+
     /// Sets the label for the node being built.
     ///
     /// # Arguments
@@ -47,7 +50,13 @@ pub trait NodeBuilder: Builder<Object = Self::Node> {
     /// * If the label is empty.
     fn label<S: ToString>(self, label: S) -> Result<Self, Self::Error>;
 
+    /// Returns a reference to the label of the node being built, if set.
+    fn get_label(&self) -> Option<&String>;
+
     #[must_use]
     /// Sets the ID for the node being built.
-    fn id(self, id: usize) -> Self;
+    fn id(self, id: u64) -> Self;
+
+    /// Returns the ID of the node being built, if set.
+    fn get_id(&self) -> Option<u64>;
 }

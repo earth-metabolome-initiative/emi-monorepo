@@ -21,17 +21,18 @@ impl IsForeignKeyConstraint {
 }
 
 impl CustomColumnConstraint for IsForeignKeyConstraint {
+    type Error = crate::errors::WebCodeGenError;
+
     fn check_constraint(
         &self,
         conn: &mut PgConnection,
         column: &Column,
     ) -> Result<(), WebCodeGenError> {
         if column.column_name == self.column_name
-            && column.foreign_keys(conn)?.into_iter().any(|foreign_key| {
+            && column.foreign_keys(conn)?.iter().any(|foreign_key| {
                 foreign_key
                     .foreign_table(conn)
                     .ok()
-                    .flatten()
                     .is_some_and(|table| table.table_name == self.table_name)
             })
         {

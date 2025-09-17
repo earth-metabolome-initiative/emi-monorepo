@@ -4,10 +4,17 @@
 mod renderers;
 use std::fmt::Display;
 
-use common_traits::prelude::Builder;
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::Builder,
+};
 pub use renderers::Renderer;
 mod direction;
 pub use direction::Direction;
+mod theme;
+pub use theme::Theme;
+mod look;
+pub use look::Look;
 
 use crate::{
     errors::ConfigError,
@@ -24,6 +31,10 @@ pub struct GenericConfiguration {
     renderer: Renderer,
     /// The direction of the flowchart.
     direction: Direction,
+    /// The theme to use for the diagram.
+    theme: Theme,
+    /// The look to use for the diagram.
+    look: Look,
 }
 
 impl Configuration for GenericConfiguration {
@@ -33,23 +44,33 @@ impl Configuration for GenericConfiguration {
         self.title.as_deref()
     }
 
-    fn renderer(&self) -> &Renderer {
-        &self.renderer
+    fn renderer(&self) -> Renderer {
+        self.renderer
     }
 
-    fn direction(&self) -> &Direction {
-        &self.direction
+    fn direction(&self) -> Direction {
+        self.direction
+    }
+
+    fn theme(&self) -> Theme {
+        self.theme
+    }
+
+    fn look(&self) -> Look {
+        self.look
     }
 }
 
 impl Display for GenericConfiguration {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "---")?;
+        writeln!(f, "config:")?;
+        writeln!(f, "  layout: {}", self.renderer)?;
+        writeln!(f, "  theme: {}", self.theme)?;
+        writeln!(f, "  look: {}", self.look)?;
         if let Some(title) = &self.title {
             writeln!(f, "title: {title}")?;
         }
-        writeln!(f, "config:")?;
-        writeln!(f, "  layout: {}", self.renderer)?;
         writeln!(f, "---")?;
 
         Ok(())
@@ -66,6 +87,10 @@ pub struct GenericConfigurationBuilder {
     renderer: Renderer,
     /// The direction of the flowchart.
     direction: Direction,
+    /// The theme to use for the diagram.
+    theme: Theme,
+    /// The look to use for the diagram.
+    look: Look,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -77,32 +102,45 @@ pub enum GenericConfigurationAttribute {
     Renderer,
     /// Direction of the flowchart.
     Direction,
+    /// Theme of the diagram.
+    Theme,
+    /// Look of the diagram.
+    Look,
 }
 
 impl Display for GenericConfigurationAttribute {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            GenericConfigurationAttribute::Title => write!(f, "title"),
-            GenericConfigurationAttribute::Renderer => write!(f, "renderer"),
-            GenericConfigurationAttribute::Direction => write!(f, "direction"),
+            Self::Title => write!(f, "title"),
+            Self::Renderer => write!(f, "renderer"),
+            Self::Direction => write!(f, "direction"),
+            Self::Theme => write!(f, "theme"),
+            Self::Look => write!(f, "look"),
         }
     }
+}
+
+impl IsCompleteBuilder for GenericConfigurationBuilder {
+    fn is_complete(&self) -> bool {
+        true
+    }
+}
+
+impl Attributed for GenericConfigurationBuilder {
+    type Attribute = GenericConfigurationAttribute;
 }
 
 impl Builder for GenericConfigurationBuilder {
     type Error = ConfigError<GenericConfigurationAttribute>;
     type Object = GenericConfiguration;
-    type Attribute = GenericConfigurationAttribute;
-
-    fn is_complete(&self) -> bool {
-        true
-    }
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(GenericConfiguration {
             title: self.title,
             renderer: self.renderer,
             direction: self.direction,
+            theme: self.theme,
+            look: self.look,
         })
     }
 }

@@ -18,9 +18,32 @@ pub struct Rank {
 impl web_common_traits::prelude::TableName for Rank {
     const TABLE_NAME: &'static str = "ranks";
 }
+impl<'a> From<&'a Rank>
+    for web_common_traits::database::IdOrBuilder<
+        i16,
+        crate::codegen::structs_codegen::tables::insertables::InsertableRankBuilder,
+    >
+{
+    fn from(value: &'a Rank) -> Self {
+        web_common_traits::database::IdOrBuilder::Id(value.id)
+    }
+}
+impl
+    web_common_traits::prelude::ExtensionTable<crate::codegen::structs_codegen::tables::ranks::Rank>
+    for Rank
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i16>,
+{
+}
 impl diesel::Identifiable for Rank {
     type Id = i16;
     fn id(self) -> Self::Id {
+        self.id
+    }
+}
+impl web_common_traits::database::PrimaryKeyLike for Rank {
+    type PrimaryKey = i16;
+    fn primary_key(&self) -> Self::PrimaryKey {
         self.id
     }
 }

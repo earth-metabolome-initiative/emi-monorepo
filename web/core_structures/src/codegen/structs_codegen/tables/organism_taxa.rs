@@ -6,8 +6,27 @@
     diesel::AsChangeset,
     diesel::Queryable,
     diesel::Identifiable,
+    diesel::Associations,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::users::User,
+        foreign_key = created_by
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::organisms::Organism,
+        foreign_key = organism_id
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::taxa::Taxon,
+        foreign_key = taxon_id
+    )
+)]
 #[diesel(primary_key(organism_id, taxon_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa
@@ -21,9 +40,33 @@ pub struct OrganismTaxon {
 impl web_common_traits::prelude::TableName for OrganismTaxon {
     const TABLE_NAME: &'static str = "organism_taxa";
 }
+impl<'a> From<&'a OrganismTaxon>
+    for web_common_traits::database::IdOrBuilder<
+        (::rosetta_uuid::Uuid, i32),
+        crate::codegen::structs_codegen::tables::insertables::InsertableOrganismTaxonBuilder,
+    >
+{
+    fn from(value: &'a OrganismTaxon) -> Self {
+        web_common_traits::database::IdOrBuilder::Id((value.organism_id, value.taxon_id))
+    }
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon,
+    > for OrganismTaxon
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a (::rosetta_uuid::Uuid, i32)>,
+{
+}
 impl diesel::Identifiable for OrganismTaxon {
     type Id = (::rosetta_uuid::Uuid, i32);
     fn id(self) -> Self::Id {
+        (self.organism_id, self.taxon_id)
+    }
+}
+impl web_common_traits::database::PrimaryKeyLike for OrganismTaxon {
+    type PrimaryKey = (::rosetta_uuid::Uuid, i32);
+    fn primary_key(&self) -> Self::PrimaryKey {
         (self.organism_id, self.taxon_id)
     }
 }
@@ -31,150 +74,33 @@ impl OrganismTaxon {
     pub fn created_by<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.created_by,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.created_by, conn)
     }
     pub fn organism<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::organisms::Organism,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::organisms::Organism, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::organisms::Organism: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::organisms::Organism as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::organisms::Organism as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::organisms::Organism as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::organisms::Organism as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::organisms::Organism as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::organisms::Organism as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::organisms::Organism,
-        >,
+        crate::codegen::structs_codegen::tables::organisms::Organism:
+            web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::organisms::Organism::table(),
-                self.organism_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::organisms::Organism::read(self.organism_id, conn)
     }
     pub fn taxon<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::taxa::Taxon,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::taxa::Taxon, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::taxa::Taxon: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::taxa::Taxon as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::taxa::Taxon as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::taxa::Taxon as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::taxa::Taxon as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::taxa::Taxon as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::taxa::Taxon as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::taxa::Taxon,
-        >,
+        crate::codegen::structs_codegen::tables::taxa::Taxon: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::taxa::Taxon::table(),
-                self.taxon_id,
-            ),
-            conn,
-        )
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_by(
-        created_by: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
-        Self::table()
-            .filter(organism_taxa::created_by.eq(created_by))
-            .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_created_at(
-        created_at: &::rosetta_timestamp::TimestampUTC,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
-        Self::table()
-            .filter(organism_taxa::created_at.eq(created_at))
-            .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_organism_id(
-        organism_id: &::rosetta_uuid::Uuid,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
-        Self::table()
-            .filter(organism_taxa::organism_id.eq(organism_id))
-            .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_taxon_id(
-        taxon_id: &i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::organism_taxa::organism_taxa;
-        Self::table()
-            .filter(organism_taxa::taxon_id.eq(taxon_id))
-            .order_by((organism_taxa::organism_id.asc(), organism_taxa::taxon_id.asc()))
-            .load::<Self>(conn)
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::taxa::Taxon::read(self.taxon_id, conn)
     }
 }
 impl AsRef<OrganismTaxon> for OrganismTaxon {

@@ -9,7 +9,9 @@ use crate::errors::WebCodeGenError;
 /// The `geography_columns` table provides metadata about all geography columns
 /// stored in the database, including their spatial reference system (SRID)
 /// and geography type.
-#[derive(Queryable, QueryableByName, Selectable, Debug, Clone)]
+#[derive(
+    Queryable, QueryableByName, Selectable, Debug, Clone, serde::Serialize, serde::Deserialize,
+)]
 #[diesel(table_name = crate::schema::geography_columns)]
 pub struct GeographyColumn {
     /// Database/catalog name (often the database name).

@@ -1,7 +1,10 @@
 //! Submodule for inserting the missing instrument models which
 //! are present in the Directus database but not in the Portal database.
 
-use core_structures::{Brand as PortalBrand, CommercialProduct as PortalCommercialProduct};
+use core_structures::{
+    Brand as PortalBrand, CommercialProduct as PortalCommercialProduct,
+    tables::insertables::AssetModelSettable,
+};
 use diesel::PgConnection;
 use web_common_traits::database::{BoundedRead, Insertable, InsertableVariant};
 
@@ -21,7 +24,7 @@ use crate::codegen::InstrumentModel as DirectusInstrumentModel;
 pub(crate) fn insert_missing_instrument_models(
     directus_conn: &mut PgConnection,
     portal_conn: &mut PgConnection,
-) -> Result<(), crate::error::Error> {
+) -> anyhow::Result<()> {
     let directus_instrument_models =
         DirectusInstrumentModel::bounded_read(0, u16::MAX, directus_conn)?;
     for directus_instrument_model in directus_instrument_models {

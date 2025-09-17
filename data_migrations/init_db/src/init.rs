@@ -1,6 +1,7 @@
 use std::path::Path;
 
 use diesel::Connection;
+use time_requirements::prelude::{Task, TimeTracker};
 
 use crate::{
     consistency_constraints::execute_consistency_constraint_checks,
@@ -13,6 +14,7 @@ use crate::{
 /// # Arguments
 ///
 /// * `database_name` - The name of the database.
+/// * `skip_consistency_checks` - Whether to skip the consistency checks.
 /// * `conn` - A mutable reference to the database connection.
 ///
 /// # Errors
@@ -21,20 +23,33 @@ use crate::{
 /// * If the migrations cannot be applied.
 pub async fn init_database(
     database_name: &str,
+    skip_consistency_checks: bool,
     conn: &mut diesel::PgConnection,
-) -> Result<(), crate::errors::Error> {
+) -> Result<TimeTracker, crate::errors::Error> {
+    let mut init_db_time_tracker = TimeTracker::new("Init DB");
     let cargo_directory = env!("CARGO_MANIFEST_DIR");
     let migrations_directory = Path::new(cargo_directory).join("migrations");
     let extension_migrations_directory = Path::new(cargo_directory).join("extension_migrations");
     let csv_directory = Path::new(cargo_directory).join("csvs");
     let container_directory = Path::new("/app/data_migrations/init_db/csvs");
+    let task = Task::new("Retrieve CSVs");
     retrieve_csvs(&csv_directory).await?;
-    conn.transaction(|portal_conn| {
-        init_csvs(&csv_directory, container_directory, portal_conn)?;
-        init_migrations(&migrations_directory, &extension_migrations_directory, portal_conn)?;
-        execute_consistency_constraint_checks(database_name, portal_conn)?;
-        Ok::<(), crate::errors::Error>(())
+    init_db_time_tracker.add_completed_task(task);
+    let transaction_time_tracker = conn.transaction(|conn| {
+        let mut transaction_time_tracker = TimeTracker::new("Init DB Transaction");
+        let task = Task::new("Initialize CSVs");
+        init_csvs(&csv_directory, container_directory, conn)?;
+        transaction_time_tracker.add_completed_task(task);
+        let task = Task::new("Initialize Migrations");
+        init_migrations(&migrations_directory, &extension_migrations_directory, conn)?;
+        transaction_time_tracker.add_completed_task(task);
+        if !skip_consistency_checks {
+            transaction_time_tracker
+                .extend(execute_consistency_constraint_checks(database_name, conn)?);
+        }
+        Ok::<_, crate::errors::Error>(transaction_time_tracker)
     })?;
+    init_db_time_tracker.extend(transaction_time_tracker);
 
-    Ok(())
+    Ok(init_db_time_tracker)
 }

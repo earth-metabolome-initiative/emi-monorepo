@@ -47,7 +47,7 @@ impl Node for FlowchartNode {
         self.node.label()
     }
 
-    fn id(&self) -> usize {
+    fn id(&self) -> u64 {
         self.node.id()
     }
 
@@ -60,7 +60,12 @@ impl Node for FlowchartNode {
     }
 
     fn is_compatible_arrow_shape(shape: crate::shared::ArrowShape) -> bool {
-        matches!(shape, crate::shared::ArrowShape::Normal | crate::shared::ArrowShape::Sharp)
+        matches!(
+            shape,
+            crate::shared::ArrowShape::Normal
+                | crate::shared::ArrowShape::Circle
+                | crate::shared::ArrowShape::X
+        )
     }
 }
 

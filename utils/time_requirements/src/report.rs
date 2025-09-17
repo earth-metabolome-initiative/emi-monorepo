@@ -81,7 +81,7 @@ impl Report {
             format!(
                 "The slowest task was `{}` which took {} ({:.2}% of all time).",
                 task.name(),
-                HumanTime::from(task.time()).to_text_en(Accuracy::Rough, Tense::Present),
+                HumanTime::from(task.time()).to_text_en(Accuracy::Precise, Tense::Present),
                 task.time().num_seconds() as f64 / total_time.num_seconds() as f64 * 100.0,
             )
         })
@@ -233,7 +233,7 @@ impl Report {
         let rows = self.time_tracker.tasks().map(|task| {
             TableRow {
                 name: task.name(),
-                time: HumanTime::from(task.time()).to_text_en(Accuracy::Rough, Tense::Present),
+                time: HumanTime::from(task.time()).to_text_en(Accuracy::Precise, Tense::Present),
                 percentage: format!(
                     "{:.2}%",
                     task.time().num_seconds() as f64 / total_time * 100.0

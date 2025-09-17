@@ -1,19 +1,19 @@
+#![recursion_limit = "64"]
 #![doc = include_str!("../README.md")]
 use diesel::{Connection, PgConnection};
 
+pub mod asset_models;
 mod brands;
-mod error;
 mod login_providers;
-mod procedure_model_trackables;
-mod procedure_models;
-mod trackables;
+mod procedure_template_asset_models;
+mod procedure_templates;
 mod users;
 
+use asset_models::init_compatibility_rules;
 pub(crate) use brands::{fisherbrand, greiner_bio_one};
 use login_providers::init_login_providers;
-pub use procedure_models::init_dbgi_plan;
-use trackables::init_compatibility_rules;
-use users::init_root_user;
+pub use procedure_templates::init_dbgi_plan;
+pub use users::init_root_user;
 
 /// Executes the init migration.
 ///
@@ -27,9 +27,8 @@ use users::init_root_user;
 pub fn init_migration(conn: &mut PgConnection) -> anyhow::Result<()> {
     conn.transaction(|conn| {
         let darwin = init_root_user(conn)?;
-        init_login_providers(&darwin, conn)?;
+        init_login_providers(conn)?;
         init_compatibility_rules(&darwin, conn)?;
-        init_procedure_models(&darwin, conn)?;
         Ok(())
     })
 }

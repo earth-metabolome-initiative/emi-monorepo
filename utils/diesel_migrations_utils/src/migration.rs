@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use sqlparser::ast::Statement;
 
-use crate::errors::Error;
+use crate::{errors::Error, prelude::MigrationKind};
 
 #[derive(Debug, PartialEq, Eq, Clone, Hash)]
 /// Struct representing a migration.
@@ -27,6 +27,62 @@ impl Ord for Migration {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.number.cmp(&other.number)
     }
+}
+
+/// Detects trailing commas in SQL statements.
+/// # Arguments
+///
+/// * `sql` - The SQL statements to check.
+/// * `migration_number` - The number of the migration.
+/// * `migration_kind` - The kind of the migration (up or down).
+///
+/// # Errors
+///
+/// * `Error::InvalidSql` - If a trailing comma is detected.
+fn detect_trailing_commas(
+    sql: &str,
+    migration_number: u64,
+    migration_kind: MigrationKind,
+) -> Result<(), Error> {
+    let mut last_character_was_comma = false;
+    let mut last_character_was_dash = false;
+    for (line_number, line) in sql.lines().enumerate() {
+        for (column_number, character) in line.chars().enumerate() {
+            if character.is_whitespace() {
+                continue;
+            }
+            if character == '-' {
+                if last_character_was_dash {
+                    // We are in a comment, we skip the rest of the line.
+                    break;
+                }
+                last_character_was_dash = true;
+                continue;
+            }
+            if last_character_was_comma {
+                if character.is_alphanumeric() {
+                    last_character_was_comma = false;
+                    continue;
+                }
+
+                return Err(Error::InvalidSql(
+                    migration_number,
+                    migration_kind,
+                    format!(
+                        "Trailing comma before character '{}' at line {}, column {}.",
+                        character,
+                        line_number + 1,
+                        column_number + 1
+                    ),
+                ));
+            }
+
+            if character == ',' {
+                last_character_was_comma = true;
+            }
+        }
+    }
+    Ok(())
 }
 
 impl<'a> TryFrom<&'a Path> for Migration {
@@ -70,6 +126,10 @@ impl<'a> TryFrom<&'a Path> for Migration {
                 path.to_path_buf(),
             )
         })?;
+
+        // We check whether we can identify a trailing comma in the SQL statements.
+        detect_trailing_commas(&up, number, MigrationKind::Up)?;
+
         if let Err(up_error) = sqlparser::parser::Parser::parse_sql(
             &sqlparser::dialect::PostgreSqlDialect {},
             up.as_str(),
@@ -87,6 +147,10 @@ impl<'a> TryFrom<&'a Path> for Migration {
                 path.to_path_buf(),
             )
         })?;
+
+        // We check whether we can identify a trailing comma in the SQL statements.
+        detect_trailing_commas(&down, number, MigrationKind::Down)?;
+
         if let Err(down_error) = sqlparser::parser::Parser::parse_sql(
             &sqlparser::dialect::PostgreSqlDialect {},
             down.as_str(),

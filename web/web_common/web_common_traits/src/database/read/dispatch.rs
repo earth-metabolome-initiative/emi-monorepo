@@ -15,10 +15,7 @@ pub trait ReadDispatch<C>: Sized {
     /// # Errors
     ///
     /// * Returns an error if loading the row fails.
-    fn read(
-        primary_key: Self::PrimaryKey,
-        conn: &mut C,
-    ) -> Result<Option<Self>, diesel::result::Error>;
+    fn read(primary_key: Self::PrimaryKey, conn: &mut C) -> Result<Self, diesel::result::Error>;
 }
 
 /// Variant of the `BoundedRead` trait meant to be implemented by enumeration of

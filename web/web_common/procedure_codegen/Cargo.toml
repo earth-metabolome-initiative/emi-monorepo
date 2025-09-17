@@ -1,0 +1,18 @@
+[package]
+name = "procedure_codegen"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+webcodegen.workspace = true
+diesel.workspace = true
+common_traits.workspace = true
+time_requirements.workspace = true
+syn.workspace = true
+quote.workspace = true
+proc-macro2.workspace = true
+prettyplease.workspace = true
+sqlparser.workspace = true
+
+[lints]
+workspace = true

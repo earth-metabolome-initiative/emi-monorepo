@@ -6,7 +6,7 @@ pub(crate) mod generic_diagram;
 pub mod javascript_function_signature;
 pub mod javascript_types;
 pub mod style_class;
-pub use style_class::{Color, StyleClass, StyleClassBuilder, StyleClassError, StyleProperty};
+pub use style_class::{Color, StyleClass, StyleClassBuilder, StyleClassError, StyleProperty, Unit};
 pub mod arrow_shape;
 pub mod click_event;
 pub mod line_style;

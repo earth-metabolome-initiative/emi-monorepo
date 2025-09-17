@@ -46,6 +46,10 @@ impl Edge for ClassEdge {
         self.edge.line_style()
     }
 
+    fn classes(&self) -> impl Iterator<Item = &crate::shared::StyleClass> {
+        std::iter::empty()
+    }
+
     fn left_arrow_shape(&self) -> Option<ArrowShape> {
         self.edge.left_arrow_shape()
     }

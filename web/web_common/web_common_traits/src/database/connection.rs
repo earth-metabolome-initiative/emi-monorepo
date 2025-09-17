@@ -1,7 +1,5 @@
 //! Submodule providing an `AnyConnection` enum for multi-database support.
 
-use diesel::QueryResult;
-
 #[derive(diesel::MultiConnection)]
 /// An enum representing a connection to either a `PostgreSQL` or `SQLite`
 /// database.

@@ -1,11 +1,12 @@
 //! Submodule for the transposed graph traits.
 
 use algebra::prelude::*;
+use num_traits::ConstZero;
 
 use super::Edges;
 
 /// Trait defining the properties of a transposed graph.
-pub trait TransposedEdges: super::Edges<Matrix = <Self as TransposedEdges>::BiMatrix> {
+pub trait TransposedEdges: Edges<Matrix = <Self as TransposedEdges>::BiMatrix> {
     /// The type of matrix required to store the transposed edges.
     type BiMatrix: SizedSparseBiMatrix2D<RowIndex = Self::SourceNodeId, ColumnIndex = Self::DestinationNodeId>;
 
@@ -36,6 +37,15 @@ pub trait TransposedEdges: super::Edges<Matrix = <Self as TransposedEdges>::BiMa
         self.matrix().transposed().has_entry(destination_node_id, source_node_id)
     }
 
+    /// Returns whether the given destination has any predecessor.
+    ///
+    /// # Arguments
+    ///
+    /// * `destination_node_id` - The identifier of the destination node.
+    fn has_predecessors(&self, destination_node_id: Self::DestinationNodeId) -> bool {
+        self.in_degree(destination_node_id) > Self::SourceNodeId::ZERO
+    }
+
     /// Returns the inbound degree of the node with the given identifier.
     ///
     /// # Arguments
@@ -58,8 +68,3 @@ where
 {
     type BiMatrix = E::Matrix;
 }
-
-/// Trait defining the properties of a graph.
-pub trait TransposedGraph: super::Graph {}
-
-impl<G: super::Graph> TransposedGraph for G {}

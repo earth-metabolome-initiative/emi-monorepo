@@ -54,7 +54,7 @@ impl Codegen<'_> {
             self.beautify_code(&quote! {
                 mod #insertable_module;
                 mod #insertable_variant_module;
-            })?,
+            }),
         )?;
 
         Ok(())

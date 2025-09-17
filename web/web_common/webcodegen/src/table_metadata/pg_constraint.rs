@@ -1,12 +1,14 @@
 //! Submodule providing a struct [`PgConstraint`] representing the
 //! `pg_constraint` table.
 
+use cached::{DiskCache, proc_macro::io_cached};
 use diesel::{
     ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, Queryable, QueryableByName, RunQueryDsl,
     Selectable, SelectableHelper,
 };
 
 use super::{PgOperator, PgProc};
+use crate::errors::WebCodeGenError;
 
 /// Represents the `pg_constraint` system catalog table in `PostgreSQL`.
 /// This table stores information about constraints on tables and columns.
@@ -79,6 +81,66 @@ pub struct PgConstraint {
     pub conexclop: Option<Vec<u32>>,
 }
 
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("pg_constraints.functions")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
+    key = "u32",
+    convert = r#"{ pg_constraint.oid }"#
+)]
+fn functions(
+    pg_constraint: &PgConstraint,
+    conn: &mut PgConnection,
+) -> Result<Vec<PgProc>, WebCodeGenError> {
+    use crate::schema::{pg_constraint, pg_depend, pg_proc};
+    Ok(pg_constraint::table
+        // Join to pg_depend where the constraint's OID is recorded as the dependent.
+        .inner_join(pg_depend::table.on(pg_constraint::oid.eq(pg_depend::objid)))
+        // Then join to pg_proc using the referenced function OID.
+        .inner_join(pg_proc::table.on(pg_depend::refobjid.eq(pg_proc::oid)))
+        // Filter for this specific constraint.
+        .filter(pg_constraint::oid.eq(pg_constraint.oid))
+        // Select all columns from pg_proc.
+        .select(PgProc::as_select())
+        .load::<PgProc>(conn)?)
+}
+
+#[io_cached(
+    map_error = r##"|e| WebCodeGenError::from(e)"##,
+    disk = true,
+    sync_to_disk_on_cache_change = true,
+    create = r##" {
+        DiskCache::new("pg_constraints.operators")
+            .set_disk_directory("cache")
+            .build()
+            .expect("error building disk cache")
+    } "##,
+    key = "u32",
+    convert = r#"{ pg_constraint.oid }"#
+)]
+fn operators(
+    pg_constraint: &PgConstraint,
+    conn: &mut PgConnection,
+) -> Result<Vec<PgOperator>, WebCodeGenError> {
+    use crate::schema::{pg_constraint, pg_depend, pg_operator};
+    Ok(pg_constraint::table
+        // Join to pg_depend where the constraint's OID is recorded as the dependent.
+        .inner_join(pg_depend::table.on(pg_constraint::oid.eq(pg_depend::objid)))
+        // Then join to pg_operator using the referenced operator OID.
+        .inner_join(pg_operator::table.on(pg_depend::refobjid.eq(pg_operator::oid)))
+        // Filter for this specific constraint.
+        .filter(pg_constraint::oid.eq(pg_constraint.oid))
+        // Select all columns from pg_operator.
+        .select(PgOperator::as_select())
+        .load::<PgOperator>(conn)?)
+}
+
 impl PgConstraint {
     /// Returns the vector of [`PgProc`] functions that are used in the
     /// constraint.
@@ -90,18 +152,8 @@ impl PgConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, diesel::result::Error> {
-        use crate::schema::{pg_constraint, pg_depend, pg_proc};
-        pg_constraint::table
-            // Join to pg_depend where the constraint's OID is recorded as the dependent.
-            .inner_join(pg_depend::table.on(pg_constraint::oid.eq(pg_depend::objid)))
-            // Then join to pg_proc using the referenced function OID.
-            .inner_join(pg_proc::table.on(pg_depend::refobjid.eq(pg_proc::oid)))
-            // Filter for this specific constraint.
-            .filter(pg_constraint::oid.eq(self.oid))
-            // Select all columns from pg_proc.
-            .select(PgProc::as_select())
-            .load::<PgProc>(conn)
+    pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, WebCodeGenError> {
+        functions(self, conn)
     }
 
     /// Returns the vector of [`PgOperator`] functions that are used in the
@@ -114,20 +166,7 @@ impl PgConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn operators(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<PgOperator>, diesel::result::Error> {
-        use crate::schema::{pg_constraint, pg_depend, pg_operator};
-        pg_constraint::table
-            // Join to pg_depend where the constraint's OID is recorded as the dependent.
-            .inner_join(pg_depend::table.on(pg_constraint::oid.eq(pg_depend::objid)))
-            // Then join to pg_operator using the referenced operator OID.
-            .inner_join(pg_operator::table.on(pg_depend::refobjid.eq(pg_operator::oid)))
-            // Filter for this specific constraint.
-            .filter(pg_constraint::oid.eq(self.oid))
-            // Select all columns from pg_operator.
-            .select(PgOperator::as_select())
-            .load::<PgOperator>(conn)
+    pub fn operators(&self, conn: &mut PgConnection) -> Result<Vec<PgOperator>, WebCodeGenError> {
+        operators(self, conn)
     }
 }

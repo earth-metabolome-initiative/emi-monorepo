@@ -11,7 +11,16 @@ use crate::{PgExtension, errors::WebCodeGenError};
 
 /// Represents the `pg_proc` system catalog table in `PostgreSQL`.
 /// This table stores information about functions and procedures.
-#[derive(Queryable, QueryableByName, Selectable, Debug, Clone, PartialEq)]
+#[derive(
+    Queryable,
+    QueryableByName,
+    Selectable,
+    Debug,
+    Clone,
+    PartialEq,
+    serde::Serialize,
+    serde::Deserialize,
+)]
 #[diesel(table_name = crate::schema::pg_proc)]
 #[allow(clippy::struct_excessive_bools)]
 pub struct PgProc {

@@ -1,0 +1,44 @@
+//! Test to check whether the database can indeed be initialized in the
+//! reference docker and populated with the `init_migration`.
+
+use directus_migration::{directus_connection, directus_migration};
+use init_db::init_database;
+use init_migration::{init_migration, init_root_user};
+use reference_docker::reference_docker_with_connection;
+
+const DATABASE_NAME: &str = "test_directus_migration.db";
+const DATABASE_PORT: u16 = 12132;
+
+#[tokio::test]
+async fn test_directus_migration() {
+    dotenvy::from_path("../../web/.env_develop").unwrap();
+
+    let mut directus_conn =
+        directus_connection().expect("Failed to connect to the Directus database");
+
+    // Get the output directory
+    let (docker, mut portal_conn) = reference_docker_with_connection(DATABASE_NAME, DATABASE_PORT)
+        .await
+        .expect("Failed to connect to the database");
+
+    // We initialize the database into the docker container
+    if let Err(err) = init_database(DATABASE_NAME, true, &mut portal_conn).await {
+        docker.stop().await.expect("Failed to stop the docker container");
+        panic!("Failed to initialize the database: {err}");
+    }
+
+    // We run the init migration to populate the necessary tables
+    if let Err(err) = init_migration(&mut portal_conn) {
+        docker.stop().await.expect("Failed to stop the docker container");
+        panic!("Failed to execute the init migration of the DB: {err}");
+    }
+
+    let user = init_root_user(&mut portal_conn).expect("Failed to initialize the root user");
+    // We try to populate the DB with the init initialization
+    if let Err(err) = directus_migration(&user, &mut directus_conn, &mut portal_conn) {
+        docker.stop().await.expect("Failed to stop the docker container");
+        panic!("Failed to execute the Directus migration: {err}");
+    }
+
+    docker.stop().await.expect("Failed to stop the docker container");
+}

@@ -1,0 +1,629 @@
+mod builder;
+mod insert_error;
+pub use builder::AssetBuilderDAG;
+pub use insert_error::AssetInsertErrorDAG;
+#[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Enum representing the most concrete variant of the `assets` table DAG.
+///
+/// # Mermaid illustration of the DAG:
+/// ```mermaid
+/// flowchart BT
+/// v0@{shape: rect, label: "assets"}
+/// v1@{shape: rect, label: "ball_mill_machines"}
+/// v2@{shape: rect, label: "cameras"}
+/// v3@{shape: rect, label: "centrifuges"}
+/// v4@{shape: rect, label: "containers"}
+/// v5@{shape: rect, label: "digital_assets"}
+/// v6@{shape: rect, label: "freeze_dryers"}
+/// v7@{shape: rect, label: "freezers"}
+/// v8@{shape: rect, label: "organisms"}
+/// v9@{shape: rect, label: "photographs"}
+/// v10@{shape: rect, label: "physical_assets"}
+/// v11@{shape: rect, label: "pipettes"}
+/// v12@{shape: rect, label: "positioning_devices"}
+/// v13@{shape: rect, label: "sample_sources"}
+/// v14@{shape: rect, label: "samples"}
+/// v15@{shape: rect, label: "soils"}
+/// v16@{shape: rect, label: "spectra"}
+/// v17@{shape: rect, label: "spectra_collections"}
+/// v18@{shape: rect, label: "volume_measuring_devices"}
+/// v19@{shape: rect, label: "volumetric_containers"}
+/// v20@{shape: rect, label: "weighing_devices"}
+/// v1 --->|"`extends`"| v10
+/// v2 --->|"`extends`"| v10
+/// v3 --->|"`extends`"| v10
+/// v4 --->|"`extends`"| v10
+/// v5 --->|"`extends`"| v0
+/// v6 --->|"`extends`"| v10
+/// v7 --->|"`extends`"| v10
+/// v8 --->|"`extends`"| v13
+/// v9 --->|"`extends`"| v5
+/// v10 --->|"`extends`"| v0
+/// v11 --->|"`extends`"| v10
+/// v12 --->|"`extends`"| v10
+/// v13 --->|"`extends`"| v10
+/// v14 --->|"`extends`"| v10
+/// v15 --->|"`extends`"| v13
+/// v16 --->|"`extends`"| v5
+/// v17 --->|"`extends`"| v5
+/// v18 --->|"`extends`"| v10
+/// v19 --->|"`extends`"| v4
+/// v20 --->|"`extends`"| v10
+/// ```
+pub enum AssetDAG {
+    /// Variant representing the `assets` table.
+    Asset(crate::codegen::structs_codegen::tables::assets::Asset),
+    /// Variant representing the `ball_mill_machines` table.
+    BallMillMachine(crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine),
+    /// Variant representing the `cameras` table.
+    Camera(crate::codegen::structs_codegen::tables::cameras::Camera),
+    /// Variant representing the `centrifuges` table.
+    Centrifuge(crate::codegen::structs_codegen::tables::centrifuges::Centrifuge),
+    /// Variant representing the `containers` table.
+    Container(crate::codegen::structs_codegen::tables::containers::Container),
+    /// Variant representing the `digital_assets` table.
+    DigitalAsset(crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset),
+    /// Variant representing the `freeze_dryers` table.
+    FreezeDryer(crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer),
+    /// Variant representing the `freezers` table.
+    Freezer(crate::codegen::structs_codegen::tables::freezers::Freezer),
+    /// Variant representing the `organisms` table.
+    Organism(crate::codegen::structs_codegen::tables::organisms::Organism),
+    /// Variant representing the `photographs` table.
+    Photograph(crate::codegen::structs_codegen::tables::photographs::Photograph),
+    /// Variant representing the `physical_assets` table.
+    PhysicalAsset(crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset),
+    /// Variant representing the `pipettes` table.
+    Pipette(crate::codegen::structs_codegen::tables::pipettes::Pipette),
+    /// Variant representing the `positioning_devices` table.
+    PositioningDevice(
+        crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice,
+    ),
+    /// Variant representing the `sample_sources` table.
+    SampleSource(crate::codegen::structs_codegen::tables::sample_sources::SampleSource),
+    /// Variant representing the `samples` table.
+    Sample(crate::codegen::structs_codegen::tables::samples::Sample),
+    /// Variant representing the `soils` table.
+    Soil(crate::codegen::structs_codegen::tables::soils::Soil),
+    /// Variant representing the `spectra` table.
+    Spectrum(crate::codegen::structs_codegen::tables::spectra::Spectrum),
+    /// Variant representing the `spectra_collections` table.
+    SpectraCollection(
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
+    ),
+    /// Variant representing the `volume_measuring_devices` table.
+    VolumeMeasuringDevice(
+        crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
+    ),
+    /// Variant representing the `volumetric_containers` table.
+    VolumetricContainer(
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+    ),
+    /// Variant representing the `weighing_devices` table.
+    WeighingDevice(crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice),
+}
+impl From<crate::codegen::structs_codegen::tables::assets::Asset> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::assets::Asset) -> Self {
+        AssetDAG::Asset(value)
+    }
+}
+impl From<AssetDAG> for Option<crate::codegen::structs_codegen::tables::assets::Asset> {
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::Asset(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine>
+    for AssetDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine,
+    ) -> Self {
+        AssetDAG::BallMillMachine(value)
+    }
+}
+impl From<AssetDAG>
+    for Option<crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine>
+{
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::BallMillMachine(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::cameras::Camera> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::cameras::Camera) -> Self {
+        AssetDAG::Camera(value)
+    }
+}
+impl From<AssetDAG> for Option<crate::codegen::structs_codegen::tables::cameras::Camera> {
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::Camera(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::centrifuges::Centrifuge> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::centrifuges::Centrifuge) -> Self {
+        AssetDAG::Centrifuge(value)
+    }
+}
+impl From<AssetDAG> for Option<crate::codegen::structs_codegen::tables::centrifuges::Centrifuge> {
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::Centrifuge(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::containers::Container> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::containers::Container) -> Self {
+        AssetDAG::Container(value)
+    }
+}
+impl From<AssetDAG> for Option<crate::codegen::structs_codegen::tables::containers::Container> {
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::Container(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset) -> Self {
+        AssetDAG::DigitalAsset(value)
+    }
+}
+impl From<AssetDAG>
+    for Option<crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset>
+{
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::DigitalAsset(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer) -> Self {
+        AssetDAG::FreezeDryer(value)
+    }
+}
+impl From<AssetDAG>
+    for Option<crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer>
+{
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::FreezeDryer(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::freezers::Freezer> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::freezers::Freezer) -> Self {
+        AssetDAG::Freezer(value)
+    }
+}
+impl From<AssetDAG> for Option<crate::codegen::structs_codegen::tables::freezers::Freezer> {
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::Freezer(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::organisms::Organism> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::organisms::Organism) -> Self {
+        AssetDAG::Organism(value)
+    }
+}
+impl From<AssetDAG> for Option<crate::codegen::structs_codegen::tables::organisms::Organism> {
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::Organism(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::photographs::Photograph> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::photographs::Photograph) -> Self {
+        AssetDAG::Photograph(value)
+    }
+}
+impl From<AssetDAG> for Option<crate::codegen::structs_codegen::tables::photographs::Photograph> {
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::Photograph(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset> for AssetDAG {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+    ) -> Self {
+        AssetDAG::PhysicalAsset(value)
+    }
+}
+impl From<AssetDAG>
+    for Option<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>
+{
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::PhysicalAsset(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::pipettes::Pipette> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::pipettes::Pipette) -> Self {
+        AssetDAG::Pipette(value)
+    }
+}
+impl From<AssetDAG> for Option<crate::codegen::structs_codegen::tables::pipettes::Pipette> {
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::Pipette(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice>
+    for AssetDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice,
+    ) -> Self {
+        AssetDAG::PositioningDevice(value)
+    }
+}
+impl From<AssetDAG>
+    for Option<crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice>
+{
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::PositioningDevice(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::sample_sources::SampleSource> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::sample_sources::SampleSource) -> Self {
+        AssetDAG::SampleSource(value)
+    }
+}
+impl From<AssetDAG>
+    for Option<crate::codegen::structs_codegen::tables::sample_sources::SampleSource>
+{
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::SampleSource(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::samples::Sample> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::samples::Sample) -> Self {
+        AssetDAG::Sample(value)
+    }
+}
+impl From<AssetDAG> for Option<crate::codegen::structs_codegen::tables::samples::Sample> {
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::Sample(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::soils::Soil> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::soils::Soil) -> Self {
+        AssetDAG::Soil(value)
+    }
+}
+impl From<AssetDAG> for Option<crate::codegen::structs_codegen::tables::soils::Soil> {
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::Soil(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::spectra::Spectrum> for AssetDAG {
+    fn from(value: crate::codegen::structs_codegen::tables::spectra::Spectrum) -> Self {
+        AssetDAG::Spectrum(value)
+    }
+}
+impl From<AssetDAG> for Option<crate::codegen::structs_codegen::tables::spectra::Spectrum> {
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::Spectrum(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection>
+    for AssetDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
+    ) -> Self {
+        AssetDAG::SpectraCollection(value)
+    }
+}
+impl From<AssetDAG>
+    for Option<crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection>
+{
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::SpectraCollection(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice>
+    for AssetDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
+    ) -> Self {
+        AssetDAG::VolumeMeasuringDevice(value)
+    }
+}
+impl From<AssetDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
+    >
+{
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::VolumeMeasuringDevice(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer>
+    for AssetDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+    ) -> Self {
+        AssetDAG::VolumetricContainer(value)
+    }
+}
+impl From<AssetDAG>
+    for Option<crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer>
+{
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::VolumetricContainer(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice> for AssetDAG {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice,
+    ) -> Self {
+        AssetDAG::WeighingDevice(value)
+    }
+}
+impl From<AssetDAG>
+    for Option<crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice>
+{
+    fn from(value: AssetDAG) -> Self {
+        match value {
+            AssetDAG::WeighingDevice(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl web_common_traits::database::MostConcreteVariantMetadata
+    for crate::codegen::structs_codegen::tables::assets::Asset
+{
+    type Variant = AssetDAG;
+}
+impl web_common_traits::database::PrimaryKeyLike for AssetDAG {
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn primary_key(&self) -> Self::PrimaryKey {
+        match self {
+            Self::Asset(variant) => variant.primary_key(),
+            Self::BallMillMachine(variant) => variant.primary_key(),
+            Self::Camera(variant) => variant.primary_key(),
+            Self::Centrifuge(variant) => variant.primary_key(),
+            Self::Container(variant) => variant.primary_key(),
+            Self::DigitalAsset(variant) => variant.primary_key(),
+            Self::FreezeDryer(variant) => variant.primary_key(),
+            Self::Freezer(variant) => variant.primary_key(),
+            Self::Organism(variant) => variant.primary_key(),
+            Self::Photograph(variant) => variant.primary_key(),
+            Self::PhysicalAsset(variant) => variant.primary_key(),
+            Self::Pipette(variant) => variant.primary_key(),
+            Self::PositioningDevice(variant) => variant.primary_key(),
+            Self::SampleSource(variant) => variant.primary_key(),
+            Self::Sample(variant) => variant.primary_key(),
+            Self::Soil(variant) => variant.primary_key(),
+            Self::Spectrum(variant) => variant.primary_key(),
+            Self::SpectraCollection(variant) => variant.primary_key(),
+            Self::VolumeMeasuringDevice(variant) => variant.primary_key(),
+            Self::VolumetricContainer(variant) => variant.primary_key(),
+            Self::WeighingDevice(variant) => variant.primary_key(),
+        }
+    }
+}
+impl<C> web_common_traits::database::MostConcreteVariant<C>
+    for crate::codegen::structs_codegen::tables::assets::Asset
+where
+    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::cameras::Camera: web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::centrifuges::Centrifuge:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::containers::Container:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::freezers::Freezer:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::organisms::Organism:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::photographs::Photograph:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::pipettes::Pipette:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::sample_sources::SampleSource:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::samples::Sample: web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::soils::Soil: web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::spectra::Spectrum:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice:
+        web_common_traits::database::Read<C>,
+{
+    fn most_concrete_variant(&self, conn: &mut C) -> Result<Self::Variant, diesel::result::Error> {
+        use diesel::Identifiable;
+        Ok(
+            match self.most_concrete_table.as_str() {
+                "assets" => self.clone().into(),
+                "ball_mill_machines" => {
+                    <crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "cameras" => {
+                    <crate::codegen::structs_codegen::tables::cameras::Camera as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "centrifuges" => {
+                    <crate::codegen::structs_codegen::tables::centrifuges::Centrifuge as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "containers" => {
+                    <crate::codegen::structs_codegen::tables::containers::Container as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "digital_assets" => {
+                    <crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "freeze_dryers" => {
+                    <crate::codegen::structs_codegen::tables::freeze_dryers::FreezeDryer as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "freezers" => {
+                    <crate::codegen::structs_codegen::tables::freezers::Freezer as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "organisms" => {
+                    <crate::codegen::structs_codegen::tables::organisms::Organism as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "photographs" => {
+                    <crate::codegen::structs_codegen::tables::photographs::Photograph as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "physical_assets" => {
+                    <crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "pipettes" => {
+                    <crate::codegen::structs_codegen::tables::pipettes::Pipette as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "positioning_devices" => {
+                    <crate::codegen::structs_codegen::tables::positioning_devices::PositioningDevice as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "sample_sources" => {
+                    <crate::codegen::structs_codegen::tables::sample_sources::SampleSource as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "samples" => {
+                    <crate::codegen::structs_codegen::tables::samples::Sample as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "soils" => {
+                    <crate::codegen::structs_codegen::tables::soils::Soil as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "spectra" => {
+                    <crate::codegen::structs_codegen::tables::spectra::Spectrum as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "spectra_collections" => {
+                    <crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "volume_measuring_devices" => {
+                    <crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "volumetric_containers" => {
+                    <crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "weighing_devices" => {
+                    <crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                _ => unreachable!("Database and codegen are out of sync."),
+            },
+        )
+    }
+}

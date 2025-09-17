@@ -1,25 +1,27 @@
 //! Build the core structures.
 use std::path::Path;
 
+use common_traits::builder::Builder;
 use diesel::PgConnection;
 use init_db::init_database;
+use procedure_codegen::ProcedureCodegen;
 use reference_docker::reference_docker_with_connection;
 use time_requirements::prelude::*;
-use webcodegen::{Codegen, ColumnSameAsNetwork, PgExtension, Table, errors::WebCodeGenError};
+use webcodegen::{Codegen, PgExtension, Table, errors::WebCodeGenError};
 
 pub(crate) const DATABASE_NAME: &str = "development.db";
 pub(crate) const DATABASE_PORT: u16 = 17032;
 
-fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, WebCodeGenError> {
+fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, anyhow::Error> {
     // Generate the code associated with the database
     let out_dir = Path::new("../src");
-    let users = Table::load(conn, "users", None, DATABASE_NAME)?;
-    let projects = Table::load(conn, "projects", None, DATABASE_NAME)?;
-    let teams = Table::load(conn, "teams", None, DATABASE_NAME)?;
-    let team_members = Table::load(conn, "team_members", None, DATABASE_NAME)?;
-    let team_projects = Table::load(conn, "team_projects", None, DATABASE_NAME)?;
+    let users = Table::load(conn, "users", "public", DATABASE_NAME)?;
+    let projects = Table::load(conn, "projects", "public", DATABASE_NAME)?;
+    let teams = Table::load(conn, "teams", "public", DATABASE_NAME)?;
+    let team_members = Table::load(conn, "team_members", "public", DATABASE_NAME)?;
+    let team_projects = Table::load(conn, "team_projects", "public", DATABASE_NAME)?;
     let Some(pgrx_validation) = PgExtension::load("pgrx_validation", "public", conn)? else {
-        return Err(WebCodeGenError::MissingExtension("pgrx_validation".to_owned()));
+        return Err(WebCodeGenError::MissingExtension("pgrx_validation".to_owned()).into());
     };
 
     // First, we delete the old `/src/codegen` directory
@@ -29,7 +31,10 @@ fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, WebCode
             .expect("Failed to remove the old codegen directory");
     }
 
-    Codegen::default()
+    let mut time_tracker = TimeTracker::new("Code Generation");
+
+    let mut codegen = Codegen::default()
+        .beautify()
         .users(&users)
         .projects(&projects)
         .teams(&teams)
@@ -39,46 +44,52 @@ fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, WebCode
         .set_output_directory(out_dir.as_ref())
         .enable_deletable_trait()
         .enable_insertable_trait()
+        .enable_most_concrete_variant_trait()
         .enable_foreign_trait()
         .enable_updatable_trait()
         .enable_upsertable_trait()
         .enable_crud_operations()
-        .enable_yew()
+        .enable_yew();
+    time_tracker.extend(codegen.generate(conn, DATABASE_NAME)?);
+
+    let table_extension_network = codegen.table_extension_network().unwrap();
+    let procedures_tracker = ProcedureCodegen::builder()
+        .output_directory(out_dir.as_ref())
+        .generate_procedure_impls()
+        .generate_procedure_template_impls()
+        .extension_network(&table_extension_network)
         .beautify()
-        .generate(conn, DATABASE_NAME, None)
+        .build()?
+        .generate(conn, DATABASE_NAME)?;
+
+    time_tracker.extend(procedures_tracker);
+
+    Ok(time_tracker)
 }
 
 #[tokio::main]
 #[allow(clippy::too_many_lines)]
 /// Main function to build the core structures.
 pub async fn main() {
+    // We ensure that the migrations directory has all expected properties.
+    let mut time_tracker = TimeTracker::new("Building Core Structures");
+
+    let task = Task::new("Setting up Docker and Database Connection");
     // Get the output directory
     let (docker, mut conn) = reference_docker_with_connection(DATABASE_NAME, DATABASE_PORT)
         .await
         .expect("Failed to connect to the database");
-
-    // We ensure that the migrations directory has all expected properties.
-    let mut time_tracker = TimeTracker::new("Building Core Structures");
+    time_tracker.add_completed_task(task);
 
     // We initialize the database into the docker container
-    if let Err(err) = init_database(DATABASE_NAME, &mut conn).await {
-        docker.stop().await.expect("Failed to stop the docker container");
-        eprintln!("Failed to initialize the database: {err:?}");
-        return;
-    }
-
-    // We save the time tracker
-    time_tracker.save(Path::new("./time_tracker")).unwrap();
-
-    let same_as_graph = ColumnSameAsNetwork::new(&mut conn, DATABASE_NAME, None)
-        .expect("Failed to build the column same-as network");
-
-    let same_as_dot = same_as_graph
-        .to_dot(&mut conn)
-        .expect("Failed to convert the column same-as network to dot format");
-    let same_as_path = Path::new("column_same_as_network.dot");
-    std::fs::write(same_as_path, same_as_dot)
-        .expect("Failed to write the column same-as network dot file");
+    match init_database(DATABASE_NAME, false, &mut conn).await {
+        Ok(tracker) => time_tracker.extend(tracker),
+        Err(err) => {
+            docker.stop().await.expect("Failed to stop the docker container");
+            eprintln!("Failed to initialize the database: {err}");
+            return;
+        }
+    };
 
     match build_core_structures(&mut conn) {
         Ok(tracker) => {
@@ -102,9 +113,7 @@ pub async fn main() {
     }
 
     // We print the report
-    let mut report = Report::new(time_tracker);
-    report.add_directory(Path::new("./time_tracker")).unwrap();
-    report
+    Report::new(time_tracker)
         .write(Path::new("time_requirements_report.md"), Path::new("time_requirements_report.png"))
         .unwrap();
 }

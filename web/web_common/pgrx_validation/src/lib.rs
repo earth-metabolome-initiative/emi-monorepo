@@ -18,8 +18,8 @@ pub use float::{
 };
 pub use font_awesome_icons::must_be_font_awesome_class;
 pub use int::{
-    must_be_distinct_i16, must_be_distinct_i32, must_be_strictly_positive_i16,
-    must_be_strictly_positive_i32,
+    must_be_distinct_i16, must_be_distinct_i32, must_be_positive_i16, must_be_positive_i32,
+    must_be_strictly_positive_i16, must_be_strictly_positive_i32,
 };
 pub use str::{
     must_be_distinct, must_be_email, must_be_paragraph, must_not_be_empty, must_not_be_padded,

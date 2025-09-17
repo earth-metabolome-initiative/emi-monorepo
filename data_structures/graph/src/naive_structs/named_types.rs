@@ -1,7 +1,9 @@
 //! Submodule defining commonly used named types for the generic graph data
 //! structures.
 
-use algebra::impls::{CSR2D, SquareCSR2D, SymmetricCSR2D, UpperTriangularCSR2D, ValuedCSR2D};
+use algebra::impls::{
+    CSR2D, GenericBiMatrix2D, SquareCSR2D, SymmetricCSR2D, UpperTriangularCSR2D, ValuedCSR2D,
+};
 use sorted_vec::prelude::SortedVec;
 
 use super::{
@@ -11,9 +13,26 @@ use super::{
 /// Type alias for a generic directed graph.
 pub type DiGraph<NodeSymbol> =
     GenericGraph<SortedVec<NodeSymbol>, SquareCSR2D<CSR2D<usize, usize, usize>>>;
+/// Type alias for a generic directed bipartite graph with bidirectional edges.
+pub type DiBiGraph<NodeSymbol> = GenericGraph<
+    SortedVec<NodeSymbol>,
+    GenericBiMatrix2D<
+        SquareCSR2D<CSR2D<usize, usize, usize>>,
+        SquareCSR2D<CSR2D<usize, usize, usize>>,
+    >,
+>;
 /// Type alias for a generic directed edges list builder.
 pub type DiEdgesBuilder<EdgeIterator> =
     GenericEdgesBuilder<EdgeIterator, SquareCSR2D<CSR2D<usize, usize, usize>>>;
+/// Type alias for a generic directed bipartite edges list builder with
+/// bidirectional edges.
+pub type DiBiEdgesBuilder<EdgeIterator> = GenericEdgesBuilder<
+    EdgeIterator,
+    GenericBiMatrix2D<
+        SquareCSR2D<CSR2D<usize, usize, usize>>,
+        SquareCSR2D<CSR2D<usize, usize, usize>>,
+    >,
+>;
 
 /// Type alias for a generic directed bipartite graph.
 pub type BiGraph<LeftNodeSymbol, RightNodeSymbol> = GenericBiGraph<

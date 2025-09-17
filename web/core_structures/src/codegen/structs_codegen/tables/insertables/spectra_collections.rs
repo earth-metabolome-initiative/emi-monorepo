@@ -1,49 +1,57 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableSpectraCollectionAttributes {
-    Id,
-    Notes,
-    TrackableId,
-    CreatedBy,
-    CreatedAt,
-    UpdatedBy,
-    UpdatedAt,
+pub enum SpectraCollectionExtensionAttribute {
+    DigitalAsset(crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute),
 }
-impl core::str::FromStr for InsertableSpectraCollectionAttributes {
+impl core::fmt::Display for SpectraCollectionExtensionAttribute {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            Self::DigitalAsset(e) => write!(f, "spectra_collections({e})"),
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute>
+    for SpectraCollectionExtensionAttribute
+{
+    fn from(
+        attribute: crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
+    ) -> Self {
+        Self::DigitalAsset(attribute)
+    }
+}
+impl From<common_traits::builder::EmptyTuple> for SpectraCollectionExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
+    }
+}
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum SpectraCollectionAttribute {
+    Extension(SpectraCollectionExtensionAttribute),
+    Id,
+}
+impl core::str::FromStr for SpectraCollectionAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "Id" => Ok(Self::Id),
-            "Notes" => Ok(Self::Notes),
-            "TrackableId" => Ok(Self::TrackableId),
-            "CreatedBy" => Ok(Self::CreatedBy),
-            "CreatedAt" => Ok(Self::CreatedAt),
-            "UpdatedBy" => Ok(Self::UpdatedBy),
-            "UpdatedAt" => Ok(Self::UpdatedAt),
-            "id" => Ok(Self::Id),
-            "notes" => Ok(Self::Notes),
-            "trackable_id" => Ok(Self::TrackableId),
-            "created_by" => Ok(Self::CreatedBy),
-            "created_at" => Ok(Self::CreatedAt),
-            "updated_by" => Ok(Self::UpdatedBy),
-            "updated_at" => Ok(Self::UpdatedAt),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }
     }
 }
-impl core::fmt::Display for InsertableSpectraCollectionAttributes {
+impl<T1> common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder<T1>
+{
+    type Attribute = SpectraCollectionAttribute;
+}
+impl core::fmt::Display for SpectraCollectionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "id"),
-            Self::Notes => write!(f, "notes"),
-            Self::TrackableId => write!(f, "trackable_id"),
-            Self::CreatedBy => write!(f, "created_by"),
-            Self::CreatedAt => write!(f, "created_at"),
-            Self::UpdatedBy => write!(f, "updated_by"),
-            Self::UpdatedAt => write!(f, "updated_at"),
+            Self::Extension(e) => write!(f, "{e}"),
+            Self::Id => write!(f, "spectra_collections.id"),
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -53,379 +61,365 @@ impl core::fmt::Display for InsertableSpectraCollectionAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableSpectraCollection {
-    pub(crate) id: i32,
-    pub(crate) notes: Option<String>,
-    pub(crate) trackable_id: ::rosetta_uuid::Uuid,
-    pub(crate) created_by: i32,
-    pub(crate) created_at: ::rosetta_timestamp::TimestampUTC,
-    pub(crate) updated_by: i32,
-    pub(crate) updated_at: ::rosetta_timestamp::TimestampUTC,
+    pub(crate) id: ::rosetta_uuid::Uuid,
 }
-impl InsertableSpectraCollection {
-    pub fn trackable<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::trackables::Trackable,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::trackables::Trackable::table(),
-                self.trackable_id,
-            ),
-            conn,
-        )
-    }
-    pub fn created_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.created_by,
-            ),
-            conn,
-        )
-    }
-    pub fn updated_by<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.updated_by,
-            ),
-            conn,
-        )
-    }
-}
-#[derive(Clone, Debug)]
+impl InsertableSpectraCollection {}
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct InsertableSpectraCollectionBuilder {
-    pub(crate) id: Option<i32>,
-    pub(crate) notes: Option<String>,
-    pub(crate) trackable_id: Option<::rosetta_uuid::Uuid>,
-    pub(crate) created_by: Option<i32>,
-    pub(crate) created_at: Option<::rosetta_timestamp::TimestampUTC>,
-    pub(crate) updated_by: Option<i32>,
-    pub(crate) updated_at: Option<::rosetta_timestamp::TimestampUTC>,
+/// Builder for creating and inserting a new
+/// [`SpectraCollection`](crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection).
+///
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::SpectraCollection;
+/// use core_structures::tables::insertables::AssetSettable;
+/// use core_structures::tables::insertables::DigitalAssetSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let spectra_collection = SpectraCollection::new()
+///    // Set mandatory fields
+///    .created_by(created_by)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
+///    .updated_by(updated_by)?
+///    .model(model)?
+///    // Optionally set fields with default values
+///    .created_at(created_at)?
+///    .id(id)?
+///    .updated_at(updated_at)?
+///    // Optionally set optional fields
+///    .description(description)?
+///    .name(name)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
+pub struct InsertableSpectraCollectionBuilder<
+    DigitalAsset
+        = crate::codegen::structs_codegen::tables::insertables::InsertableDigitalAssetBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableAssetBuilder,
+        >,
+> {
+    pub(crate) id: DigitalAsset,
 }
-impl Default for InsertableSpectraCollectionBuilder {
-    fn default() -> Self {
-        Self {
-            id: Default::default(),
-            notes: Default::default(),
-            trackable_id: Default::default(),
-            created_by: Default::default(),
-            created_at: Some(rosetta_timestamp::TimestampUTC::default()),
-            updated_by: Default::default(),
-            updated_at: Some(rosetta_timestamp::TimestampUTC::default()),
-        }
+impl<DigitalAsset> diesel::associations::HasTable
+    for InsertableSpectraCollectionBuilder<DigitalAsset>
+{
+    type Table =
+        crate::codegen::diesel_codegen::tables::spectra_collections::spectra_collections::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::spectra_collections::spectra_collections::table
     }
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableSpectraCollectionBuilder {
-    type Attributes = InsertableSpectraCollectionAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        match (other.created_at, other.updated_at) {
-            (Some(created_at), Some(updated_at)) => {
-                self = self.created_at_and_updated_at(created_at, updated_at)?;
-            }
-            (None, Some(updated_at)) => {
-                self = self.updated_at(updated_at)?;
-            }
-            (Some(created_at), None) => {
-                self = self.created_at(created_at)?;
-            }
-            (None, None) => {}
-        }
-        if let Some(id) = other.id {
-            self = self.id(id)?;
-        }
-        if let Some(notes) = other.notes {
-            self = self.notes(Some(notes))?;
-        }
-        if let Some(trackable_id) = other.trackable_id {
-            self = self.trackable(trackable_id)?;
-        }
-        if let Some(created_by) = other.created_by {
-            self = self.created_by(created_by)?;
-        }
-        if let Some(updated_by) = other.updated_by {
-            self = self.updated_by(updated_by)?;
-        }
+impl From<InsertableSpectraCollectionBuilder>
+    for web_common_traits::database::IdOrBuilder<
+        ::rosetta_uuid::Uuid,
+        InsertableSpectraCollectionBuilder,
+    >
+{
+    fn from(builder: InsertableSpectraCollectionBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
+impl<DigitalAsset> common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder<
+        DigitalAsset,
+    >
+where
+    DigitalAsset: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete()
+    }
+}
+/// Trait defining setters for attributes of an instance of `SpectraCollection`
+/// or descendant tables.
+pub trait SpectraCollectionSettable: Sized {
+    /// Error type returned when setting attributes.
+    type Error;
+}
+impl<DigitalAsset> SpectraCollectionSettable
+for InsertableSpectraCollectionBuilder<DigitalAsset>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::SpectraCollectionAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+}
+impl<
+    DigitalAsset: crate::codegen::structs_codegen::tables::insertables::AssetSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
+            >,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::AssetSettable
+for InsertableSpectraCollectionBuilder<DigitalAsset>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::SpectraCollectionAttribute,
+    >,
+    Self: crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable<
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::SpectraCollectionAttribute,
+        >,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    #[inline]
+    ///Sets the value of the `public.assets.id` column.
+    fn id<I>(mut self, id: I) -> Result<Self, Self::Error>
+    where
+        I: web_common_traits::database::PrimaryKeyLike<
+            PrimaryKey = ::rosetta_uuid::Uuid,
+        >,
+    {
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::id(
+                self.id,
+                id,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.name` column.
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
+    where
+        N: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
+    {
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::name(
+                self.id,
+                name,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.description` column.
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
+    where
+        D: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
+    {
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::description(
+                self.id,
+                description,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.model` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///subgraph v2 ["`assets`"]
+    ///    v0@{shape: rounded, label: "model"}
+    ///class v0 column-of-interest
+    ///end
+    ///subgraph v3 ["`digital_assets`"]
+    ///    v1@{shape: rounded, label: "model"}
+    ///class v1 directly-involved-column
+    ///end
+    ///v1 --->|"`ancestral same as`"| v0
+    ///v3 --->|"`extends`"| v2
+    ///```
+    fn model<M>(self, model: M) -> Result<Self, Self::Error>
+    where
+        M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        <Self as crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable>::model(
+            self,
+            model,
+        )
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.created_by` column.
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
+    where
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_by(
+                self.id,
+                created_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.created_at` column.
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
+    where
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
+    {
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_at(
+                self.id,
+                created_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.updated_by` column.
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
+    where
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_by(
+                self.id,
+                updated_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+    #[inline]
+    ///Sets the value of the `public.assets.updated_at` column.
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
+    where
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
+    {
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_at(
+                self.id,
+                updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
 }
-impl web_common_traits::prelude::SetPrimaryKey for InsertableSpectraCollectionBuilder {
-    type PrimaryKey = i32;
-    fn set_primary_key(self, _primary_key: Self::PrimaryKey) -> Self {
+impl<
+    DigitalAsset: crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
+            >,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable
+for InsertableSpectraCollectionBuilder<DigitalAsset>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::SpectraCollectionAttribute,
+    >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    #[inline]
+    ///Sets the value of the `public.digital_assets.model` column.
+    fn model<M>(mut self, model: M) -> Result<Self, Self::Error>
+    where
+        M: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::DigitalAssetSettable>::model(
+                self.id,
+                model,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+}
+impl<DigitalAsset> web_common_traits::database::MostConcreteTable
+    for InsertableSpectraCollectionBuilder<DigitalAsset>
+where
+    DigitalAsset: web_common_traits::database::MostConcreteTable,
+{
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.id.set_most_concrete_table(table_name);
+    }
+}
+impl<DigitalAsset> web_common_traits::prelude::SetPrimaryKey
+    for InsertableSpectraCollectionBuilder<DigitalAsset>
+where
+    DigitalAsset: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
+{
+    type PrimaryKey = ::rosetta_uuid::Uuid;
+    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
+        self.id = self.id.set_primary_key(primary_key);
         self
     }
 }
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
-    /// Sets the value of the `spectra_collections.created_at` column from table
-    /// `spectra_collections`.
-    pub fn created_at<CreatedAt>(
-        mut self,
-        created_at: CreatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableSpectraCollectionAttributes::CreatedAt)
-            },
-        )?;
-        if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::UpdatedAt,
-                        )
-                })?;
-        }
-        self.created_at = Some(created_at);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
-    /// Sets the value of the `spectra_collections.created_at`,
-    /// `spectra_collections.updated_at` columns from table
-    /// `spectra_collections`.
-    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
-        mut self,
-        created_at: CreatedAt,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
-    where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let created_at = created_at.try_into().map_err(
-            |err: <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableSpectraCollectionAttributes::CreatedAt)
-            },
-        )?;
-        let updated_at = updated_at.try_into().map_err(
-            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableSpectraCollectionAttributes::UpdatedAt)
-            },
-        )?;
-        pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-            .map_err(|e| {
-                e
-                    .rename_fields(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::CreatedAt,
-                        crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::UpdatedAt,
-                    )
-            })?;
-        self.created_at = Some(created_at);
-        self.updated_at = Some(updated_at);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
-    /// Sets the value of the `spectra_collections.created_by` column from table
-    /// `spectra_collections`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
-    {
-        self.created_by = Some(created_by);
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
-    /// Sets the value of the `spectra_collections.id` column from table
-    /// `spectra_collections`.
-    pub fn id<Id>(
-        mut self,
-        id: Id,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
-    where
-        Id: TryInto<i32>,
-        <Id as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let id = id.try_into().map_err(|err: <Id as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableSpectraCollectionAttributes::Id)
-        })?;
-        self.id = Some(id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
-    /// Sets the value of the `spectra_collections.notes` column from table
-    /// `spectra_collections`.
-    pub fn notes<Notes>(
-        mut self,
-        notes: Notes,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
-    where
-        Notes: TryInto<Option<String>>,
-        <Notes as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let notes =
-            notes.try_into().map_err(|err: <Notes as TryInto<Option<String>>>::Error| {
-                Into::into(err).rename_field(InsertableSpectraCollectionAttributes::Notes)
-            })?;
-        self.notes = notes;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
-    /// Sets the value of the `spectra_collections.trackable_id` column from
-    /// table `spectra_collections`.
-    pub fn trackable(
-        mut self,
-        trackable_id: ::rosetta_uuid::Uuid,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
-    {
-        self.trackable_id = Some(trackable_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
-    /// Sets the value of the `spectra_collections.updated_at` column from table
-    /// `spectra_collections`.
-    pub fn updated_at<UpdatedAt>(
-        mut self,
-        updated_at: UpdatedAt,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
-    where
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-    {
-        let updated_at = updated_at.try_into().map_err(
-            |err: <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error| {
-                Into::into(err).rename_field(InsertableSpectraCollectionAttributes::UpdatedAt)
-            },
-        )?;
-        if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
-                .map_err(|e| {
-                    e
-                        .rename_fields(
-                            crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::CreatedAt,
-                            crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::UpdatedAt,
-                        )
-                })?;
-        }
-        self.updated_at = Some(updated_at);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder {
-    /// Sets the value of the `spectra_collections.updated_by` column from table
-    /// `spectra_collections`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>>
-    {
-        self.updated_by = Some(updated_by);
-        Ok(self)
-    }
-}
-impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableSpectraCollectionBuilder
+impl<DigitalAsset, C> web_common_traits::database::TryInsertGeneric<C>
+    for InsertableSpectraCollectionBuilder<DigitalAsset>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
-            Error = web_common_traits::database::InsertError<InsertableSpectraCollectionAttributes>,
+            Error = web_common_traits::database::InsertError<SpectraCollectionAttribute>,
         >,
+    DigitalAsset:
+        web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
 {
-    type Attributes = InsertableSpectraCollectionAttributes;
-    fn is_complete(&self) -> bool {
-        self.id.is_some()
-            && self.trackable_id.is_some()
-            && self.created_by.is_some()
-            && self.created_at.is_some()
-            && self.updated_by.is_some()
-            && self.updated_at.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<
+        Self::PrimaryKey,
+        web_common_traits::database::InsertError<SpectraCollectionAttribute>,
+    > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

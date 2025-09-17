@@ -1,6 +1,6 @@
 //! Submodule defining the errors used across the `taxonomy_fetcher` crate.
 
-use std::io::Error as IoError;
+use std::{fmt::Display, io::Error as IoError};
 
 use csv::Error as CsvError;
 use downloader::DownloaderError;
@@ -16,6 +16,16 @@ pub enum TaxonomyError<TaxonId: TaxonIdentifier> {
     CsvError(CsvError),
     /// Whether an IO error has occurred.
     IoError(IoError),
+}
+
+impl<TaxonId: TaxonIdentifier> Display for TaxonomyError<TaxonId> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::TaxonNotFound(id) => write!(f, "Taxon not found: {id}"),
+            Self::CsvError(err) => write!(f, "CSV error: {err}"),
+            Self::IoError(err) => write!(f, "IO error: {err}"),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -35,6 +45,20 @@ pub enum TaxonomyBuilderError<TE: TaxonEntry> {
     IoError(IoError),
     /// Whether errors have occurred while building a taxon.
     TaxonEntryBuilderError(TaxonEntryBuilderError<TE>),
+}
+
+impl<TE: TaxonEntry> Display for TaxonomyBuilderError<TE> {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Self::NoRoot => write!(f, "No root found"),
+            Self::MultipleRoots => write!(f, "Multiple roots found"),
+            Self::MissingVersion => write!(f, "Missing version"),
+            Self::DownloaderError(err) => write!(f, "Downloader error: {err}"),
+            Self::CsvError(err) => write!(f, "CSV error: {err}"),
+            Self::IoError(err) => write!(f, "IO error: {err}"),
+            Self::TaxonEntryBuilderError(err) => write!(f, "Taxon entry builder error: {err}"),
+        }
+    }
 }
 
 impl<TE: TaxonEntry> TaxonomyBuilderError<TE> {

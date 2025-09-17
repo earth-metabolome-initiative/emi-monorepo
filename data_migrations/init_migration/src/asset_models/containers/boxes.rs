@@ -1,0 +1,100 @@
+//! Submodule defining standard boxes.
+
+use core_structures::{
+    CommercialProduct, ContainerModel, User,
+    tables::insertables::{AssetModelSettable, CommercialProductSettable},
+};
+use diesel::{OptionalExtension, PgConnection};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
+
+use crate::fisherbrand;
+
+/// Returns the polystyrene box.
+///
+/// # Implementation Details
+///
+/// This function either instantiate a new polystyrene box from the
+/// database or inserts it if it does not exist before returning it.
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the conical tube is being created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+pub(crate) fn polystyrene_box(
+    user: &core_structures::User,
+    conn: &mut diesel::PgConnection,
+) -> anyhow::Result<core_structures::ContainerModel> {
+    let name = "Polystyrene Box";
+
+    if let Some(existing_box) = core_structures::ContainerModel::from_name(name, conn).optional()? {
+        return Ok(existing_box);
+    }
+
+    Ok(ContainerModel::new()
+        .name(name)?
+        .description("Polystyrene box, a container typically used for liquid nitrogen")?
+        .created_by(user)?
+        .insert(user.id, conn)?)
+}
+
+/// Returns the vial box.
+///
+/// # Implementation Details
+///
+/// This function either instantiate a new vial box from the
+/// database or inserts it if it does not exist before returning it.
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the conical tube is being created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+pub(crate) fn vial_rack_1_5ml(
+    user: &core_structures::User,
+    conn: &mut diesel::PgConnection,
+) -> anyhow::Result<core_structures::ContainerModel> {
+    let name = "Vial Rack 1.5ml (9x9)";
+
+    if let Some(existing_box) = core_structures::ContainerModel::from_name(name, conn).optional()? {
+        return Ok(existing_box);
+    }
+
+    Ok(ContainerModel::new()
+        .name(name)?
+        .description("Vial box, a container typically used for storing vials")?
+        .created_by(user)?
+        .insert(user.id, conn)?)
+}
+
+/// Returns and possibly creates a Fisherbrand Kryobox Vial Box product.
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the product is being created.
+/// * `conn` - The database connection.
+pub(crate) fn init_fisherbrand_kryobox_vial_rack(
+    user: &User,
+    conn: &mut PgConnection,
+) -> anyhow::Result<CommercialProduct> {
+    let name = "Fisherbrand Kryobox Vial Rack 1.5ml (9x9)";
+    if let Some(existing) = CommercialProduct::from_name(name, conn).optional()? {
+        return Ok(existing);
+    }
+
+    let vial_box_trackable = vial_rack_1_5ml(user, conn)?;
+    let fisherbrand = fisherbrand(user, conn)?;
+    Ok(CommercialProduct::new()
+        .name(name)?
+        .description("Fisherbrand Kryobox Vial Rack, used to store vials.")?
+        .created_by(user)?
+        .brand(fisherbrand)?
+        .parent_model(vial_box_trackable)?
+        .insert(user.id, conn)?)
+}

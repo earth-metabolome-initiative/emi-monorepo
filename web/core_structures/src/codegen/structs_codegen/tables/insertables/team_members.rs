@@ -1,10 +1,10 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableTeamMemberAttributes {
+pub enum TeamMemberAttribute {
     TeamId,
     MemberId,
 }
-impl core::str::FromStr for InsertableTeamMemberAttributes {
+impl core::str::FromStr for TeamMemberAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -16,14 +16,20 @@ impl core::str::FromStr for InsertableTeamMemberAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableTeamMemberAttributes {
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberBuilder
+{
+    type Attribute = TeamMemberAttribute;
+}
+impl core::fmt::Display for TeamMemberAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::TeamId => write!(f, "team_id"),
-            Self::MemberId => write!(f, "member_id"),
+            Self::TeamId => write!(f, "team_members.team_id"),
+            Self::MemberId => write!(f, "team_members.member_id"),
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -37,89 +43,142 @@ pub struct InsertableTeamMember {
     pub(crate) member_id: i32,
 }
 impl InsertableTeamMember {
-    pub fn team<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::teams::Team,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::teams::Team: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::teams::Team as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::teams::Team as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::teams::Team,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::teams::Team::table(),
-                self.team_id,
-            ),
-            conn,
-        )
-    }
     pub fn member<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::users::User,
-        diesel::result::Error,
-    >
+    ) -> Result<crate::codegen::structs_codegen::tables::users::User, diesel::result::Error>
     where
-        crate::codegen::structs_codegen::tables::users::User: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::users::User as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::users::User,
-        >,
+        crate::codegen::structs_codegen::tables::users::User: web_common_traits::database::Read<C>,
     {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::users::User::table(),
-                self.member_id,
-            ),
-            conn,
-        )
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::users::User::read(self.member_id, conn)
+    }
+    pub fn team<C: diesel::connection::LoadConnection>(
+        &self,
+        conn: &mut C,
+    ) -> Result<crate::codegen::structs_codegen::tables::teams::Team, diesel::result::Error>
+    where
+        crate::codegen::structs_codegen::tables::teams::Team: web_common_traits::database::Read<C>,
+    {
+        use web_common_traits::database::Read;
+        crate::codegen::structs_codegen::tables::teams::Team::read(self.team_id, conn)
     }
 }
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new
+/// [`TeamMember`](crate::codegen::structs_codegen::tables::team_members::TeamMember).
+///
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::TeamMember;
+/// use core_structures::tables::insertables::TeamMemberSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let team_member = TeamMember::new()
+///    // Set mandatory fields
+///    .member(member_id)?
+///    .team(team_id)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableTeamMemberBuilder {
     pub(crate) team_id: Option<i32>,
     pub(crate) member_id: Option<i32>,
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableTeamMemberBuilder {
-    type Attributes = InsertableTeamMemberAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(team_id) = other.team_id {
-            self = self.team(team_id)?;
-        }
-        if let Some(member_id) = other.member_id {
-            self = self.member(member_id)?;
-        }
+impl diesel::associations::HasTable for InsertableTeamMemberBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::team_members::team_members::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::team_members::team_members::table
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.team_id.is_some() && self.member_id.is_some()
+    }
+}
+/// Trait defining setters for attributes of an instance of `TeamMember` or
+/// descendant tables.
+pub trait TeamMemberSettable: Sized {
+    /// Error type returned when setting attributes.
+    type Error;
+    /// Sets the value of the `public.team_members.team_id` column.
+    ///
+    /// # Arguments
+    /// * `team_id`: The value to set for the `public.team_members.team_id`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn team<TI>(self, team_id: TI) -> Result<Self, Self::Error>
+    where
+        TI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
+    /// Sets the value of the `public.team_members.member_id` column.
+    ///
+    /// # Arguments
+    /// * `member_id`: The value to set for the `public.team_members.member_id`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn member<MI>(self, member_id: MI) -> Result<Self, Self::Error>
+    where
+        MI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
+}
+impl TeamMemberSettable for InsertableTeamMemberBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::TeamMemberAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    /// Sets the value of the `public.team_members.team_id` column.
+    fn team<TI>(mut self, team_id: TI) -> Result<Self, Self::Error>
+    where
+        TI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let team_id = <TI as web_common_traits::database::PrimaryKeyLike>::primary_key(&team_id);
+        self.team_id = Some(team_id);
+        Ok(self)
+    }
+    /// Sets the value of the `public.team_members.member_id` column.
+    fn member<MI>(mut self, member_id: MI) -> Result<Self, Self::Error>
+    where
+        MI: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let member_id =
+            <MI as web_common_traits::database::PrimaryKeyLike>::primary_key(&member_id);
+        self.member_id = Some(member_id);
         Ok(self)
     }
 }
@@ -129,50 +188,22 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableTeamMemberBuilder {
         self
     }
 }
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberBuilder {
-    /// Sets the value of the `team_members.member_id` column from table
-    /// `team_members`.
-    pub fn member(
-        mut self,
-        member_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamMemberAttributes>>
-    {
-        self.member_id = Some(member_id);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableTeamMemberBuilder {
-    /// Sets the value of the `team_members.team_id` column from table
-    /// `team_members`.
-    pub fn team(
-        mut self,
-        team_id: i32,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableTeamMemberAttributes>>
-    {
-        self.team_id = Some(team_id);
-        Ok(self)
-    }
-}
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableTeamMemberBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::team_members::TeamMember,
-            Error = web_common_traits::database::InsertError<InsertableTeamMemberAttributes>,
+            Error = web_common_traits::database::InsertError<TeamMemberAttribute>,
         >,
 {
-    type Attributes = InsertableTeamMemberAttributes;
-    fn is_complete(&self) -> bool {
-        self.team_id.is_some() && self.member_id.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<TeamMemberAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::team_members::TeamMember =
             self.insert(user_id, conn)?;
         Ok(insertable.id())

@@ -1,36 +1,37 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableVolumetricContainerModelExtensionAttributes {
-    ContainerModel(
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes,
-    ),
+pub enum VolumetricContainerModelExtensionAttribute {
+    ContainerModel(crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute),
 }
-impl core::fmt::Display for InsertableVolumetricContainerModelExtensionAttributes {
+impl core::fmt::Display for VolumetricContainerModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::ContainerModel(e) => write!(f, "{e}"),
+            Self::ContainerModel(e) => write!(f, "volumetric_container_models({e})"),
         }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute>
+    for VolumetricContainerModelExtensionAttribute
+{
+    fn from(
+        attribute: crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
+    ) -> Self {
+        Self::ContainerModel(attribute)
+    }
+}
+impl From<common_traits::builder::EmptyTuple> for VolumetricContainerModelExtensionAttribute {
+    fn from(_attribute: common_traits::builder::EmptyTuple) -> Self {
+        unreachable!("Some code generation error occurred to reach this point.")
     }
 }
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableVolumetricContainerModelAttributes {
-    Extension(InsertableVolumetricContainerModelExtensionAttributes),
+pub enum VolumetricContainerModelAttribute {
+    Extension(VolumetricContainerModelExtensionAttribute),
     Id,
     Liters,
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes>
-    for InsertableVolumetricContainerModelAttributes
-{
-    fn from(
-        container_models: crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes,
-    ) -> Self {
-        Self::Extension(InsertableVolumetricContainerModelExtensionAttributes::ContainerModel(
-            container_models,
-        ))
-    }
-}
-impl core::str::FromStr for InsertableVolumetricContainerModelAttributes {
+impl core::str::FromStr for VolumetricContainerModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -40,15 +41,22 @@ impl core::str::FromStr for InsertableVolumetricContainerModelAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableVolumetricContainerModelAttributes {
+impl<T1> common_traits::builder::Attributed
+for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
+    T1,
+> {
+    type Attribute = VolumetricContainerModelAttribute;
+}
+impl core::fmt::Display for VolumetricContainerModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             Self::Extension(e) => write!(f, "{e}"),
-            Self::Id => write!(f, "id"),
-            Self::Liters => write!(f, "liters"),
+            Self::Id => write!(f, "volumetric_container_models.id"),
+            Self::Liters => write!(f, "volumetric_container_models.liters"),
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -58,446 +66,405 @@ impl core::fmt::Display for InsertableVolumetricContainerModelAttributes {
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct InsertableVolumetricContainerModel {
-    pub(crate) id: ::rosetta_uuid::Uuid,
+    pub(crate) id: i32,
     pub(crate) liters: f32,
 }
-impl InsertableVolumetricContainerModel {
-    pub fn id<C: diesel::connection::LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-        diesel::result::Error,
-    >
-    where
-        crate::codegen::structs_codegen::tables::container_models::ContainerModel: diesel::Identifiable,
-        <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
-        >,
-        <<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
-        >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-        <<<crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-            <crate::codegen::structs_codegen::tables::container_models::ContainerModel as diesel::Identifiable>::Id,
-        >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-            'a,
-            C,
-            crate::codegen::structs_codegen::tables::container_models::ContainerModel,
-        >,
-    {
-        use diesel::{QueryDsl, RunQueryDsl, associations::HasTable};
-        RunQueryDsl::first(
-            QueryDsl::find(
-                crate::codegen::structs_codegen::tables::container_models::ContainerModel::table(),
-                self.id,
-            ),
-            conn,
-        )
-    }
-}
-#[derive(Clone, Debug, Default)]
+impl InsertableVolumetricContainerModel {}
+#[derive(Clone, Debug, PartialEq, PartialOrd, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new
+/// [`VolumetricContainerModel`](crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel).
+///
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::VolumetricContainerModel;
+/// use core_structures::tables::insertables::AssetModelSettable;
+/// use core_structures::tables::insertables::PhysicalAssetModelSettable;
+/// use core_structures::tables::insertables::VolumetricContainerModelSettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let volumetric_container_model = VolumetricContainerModel::new()
+///    // Set mandatory fields
+///    .created_by(created_by)?
+///    .description(description)?
+///    .name(name)?
+///    // Note: `updated_by` is automatically set by the `created by` column.
+///    .updated_by(updated_by)?
+///    .liters(liters)?
+///    // Optionally set fields with default values
+///    .created_at(created_at)?
+///    .updated_at(updated_at)?
+///    // Optionally set optional fields
+///    .parent_model(parent_model)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableVolumetricContainerModelBuilder<
     ContainerModel
         = crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+            crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
+                crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
+            >,
         >,
 > {
     pub(crate) liters: Option<f32>,
     pub(crate) id: ContainerModel,
 }
-impl<ContainerModel> web_common_traits::database::ExtendableBuilder
+impl<ContainerModel> diesel::associations::HasTable
+    for InsertableVolumetricContainerModelBuilder<ContainerModel>
+{
+    type Table = crate::codegen::diesel_codegen::tables::volumetric_container_models::volumetric_container_models::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::volumetric_container_models::volumetric_container_models::table
+    }
+}
+impl From<InsertableVolumetricContainerModelBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableVolumetricContainerModelBuilder>
+{
+    fn from(builder: InsertableVolumetricContainerModelBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
+impl<ContainerModel> common_traits::builder::IsCompleteBuilder
+for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
+    ContainerModel,
+>
+where
+    ContainerModel: common_traits::builder::IsCompleteBuilder,
+{
+    fn is_complete(&self) -> bool {
+        self.id.is_complete() && self.liters.is_some()
+    }
+}
+/// Trait defining setters for attributes of an instance of
+/// `VolumetricContainerModel` or descendant tables.
+pub trait VolumetricContainerModelSettable: Sized {
+    /// Error type returned when setting attributes.
+    type Error;
+    /// Sets the value of the `public.volumetric_container_models.liters`
+    /// column.
+    ///
+    /// # Arguments
+    /// * `liters`: The value to set for the
+    ///   `public.volumetric_container_models.liters` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `f32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn liters<L>(self, liters: L) -> Result<Self, Self::Error>
+    where
+        L: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<L as TryInto<f32>>::Error>;
+}
+impl<ContainerModel> VolumetricContainerModelSettable
 for InsertableVolumetricContainerModelBuilder<ContainerModel>
 where
-    ContainerModel: web_common_traits::database::ExtendableBuilder<
-        Attributes = crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelAttributes,
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute,
     >,
 {
-    type Attributes = InsertableVolumetricContainerModelAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        self.id = self
-            .id
-            .extend_builder(other.id)
-            .map_err(|err| {
-                err.into_field_name(|attribute| InsertableVolumetricContainerModelAttributes::Extension(
-                    InsertableVolumetricContainerModelExtensionAttributes::ContainerModel(
-                        attribute,
-                    ),
-                ))
-            })?;
-        if let Some(liters) = other.liters {
-            self = self.liters(liters)?;
-        }
-        Ok(self)
-    }
-}
-impl<ContainerModel> web_common_traits::prelude::SetPrimaryKey
-    for InsertableVolumetricContainerModelBuilder<ContainerModel>
-where
-    ContainerModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>,
-{
-    type PrimaryKey = ::rosetta_uuid::Uuid;
-    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
-        self.id = self.id.set_primary_key(primary_key);
-        self
-    }
-}
-impl<ContainerModel>
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        ContainerModel,
-    >
-{
-    /// Sets the value of the `volumetric_container_models.liters` column from
-    /// table `volumetric_container_models`.
-    pub fn liters<Liters>(
-        mut self,
-        liters: Liters,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    >
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    ///Sets the value of the `public.volumetric_container_models.liters` column.
+    fn liters<L>(mut self, liters: L) -> Result<Self, Self::Error>
     where
-        Liters: TryInto<f32>,
-        <Liters as TryInto<f32>>::Error: Into<validation_errors::SingleFieldError>,
+        L: TryInto<f32>,
+        validation_errors::SingleFieldError: From<<L as TryInto<f32>>::Error>,
     {
-        let liters = liters.try_into().map_err(|err: <Liters as TryInto<f32>>::Error| {
-            Into::into(err).rename_field(InsertableVolumetricContainerModelAttributes::Liters)
-        })?;
+        let liters = liters
+            .try_into()
+            .map_err(|err| {
+                validation_errors::SingleFieldError::from(err)
+                    .rename_field(VolumetricContainerModelAttribute::Liters)
+            })?;
         pgrx_validation::must_be_strictly_positive_f32(liters)
             .map_err(|e| {
                 e
                     .rename_field(
-                        crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelAttributes::Liters,
+                        crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute::Liters,
                     )
             })?;
         self.liters = Some(liters);
         Ok(self)
     }
 }
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+impl<
+    ContainerModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
+            >,
         >,
-    >
+> crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
+for InsertableVolumetricContainerModelBuilder<ContainerModel>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute,
+    >,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute,
+        >,
+    >,
 {
-    /// Sets the value of the `trackables.created_at` column from table
-    /// `volumetric_container_models`.
-    pub fn created_at<CreatedAt>(
-        mut self,
-        created_at: CreatedAt,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    >
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    #[inline]
+    ///Sets the value of the `public.asset_models.name` column.
+    fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
+        N: TryInto<String>,
+        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.id = self.id.created_at(created_at).map_err(|e| e.into_field_name(From::from))?;
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
+                self.id,
+                name,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
-    /// Sets the value of the `trackables.created_at`, `trackables.updated_at`
-    /// columns from table `volumetric_container_models`.
-    pub fn created_at_and_updated_at<CreatedAt, UpdatedAt>(
-        mut self,
-        created_at: CreatedAt,
-        updated_at: UpdatedAt,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    >
+    #[inline]
+    ///Sets the value of the `public.asset_models.description` column.
+    fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
-        CreatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <CreatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
+        D: TryInto<String>,
+        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.id = self
-            .id
-            .created_at_and_updated_at(created_at, updated_at)
-            .map_err(|e| e.into_field_name(From::from))?;
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
+                self.id,
+                description,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
-    /// Sets the value of the `trackables.created_by` column from table
-    /// `volumetric_container_models`.
-    pub fn created_by(
-        mut self,
-        created_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    > {
-        self.id = self.id.created_by(created_by).map_err(|e| e.into_field_name(From::from))?;
-        self = self.updated_by(created_by)?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
-    /// Sets the value of the `trackables.description` column from table
-    /// `volumetric_container_models`.
-    pub fn description<Description>(
-        mut self,
-        description: Description,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    >
+    #[inline]
+    ///Sets the value of the `public.asset_models.parent_model` column.
+    ///
+    ///# Implementation notes
+    ///This method also set the values of other columns, due to
+    ///same-as relationships or inferred values.
+    ///
+    ///## Mermaid illustration
+    ///
+    ///```mermaid
+    ///flowchart BT
+    ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    ///subgraph v2 ["`asset_models`"]
+    ///    v0@{shape: rounded, label: "parent_model"}
+    ///class v0 column-of-interest
+    ///end
+    ///subgraph v3 ["`physical_asset_models`"]
+    ///    v1@{shape: rounded, label: "parent_model"}
+    ///class v1 directly-involved-column
+    ///end
+    ///v1 --->|"`ancestral same as`"| v0
+    ///v3 --->|"`extends`"| v2
+    ///```
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
-        Description: TryInto<Option<String>>,
-        <Description as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.id = self.id.description(description).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
+            self,
+            parent_model,
+        )
     }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
-    /// Sets the value of the `trackables.id` column from table
-    /// `volumetric_container_models`.
-    pub fn id<Id>(
-        mut self,
-        id: Id,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    >
+    #[inline]
+    ///Sets the value of the `public.asset_models.created_by` column.
+    fn created_by<CB>(mut self, created_by: CB) -> Result<Self, Self::Error>
     where
-        Id: TryInto<::rosetta_uuid::Uuid>,
-        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+        CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.id = self.id.id(id).map_err(|e| e.into_field_name(From::from))?;
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
+                self.id,
+                created_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
-    /// Sets the value of the `trackables.name` column from table
-    /// `volumetric_container_models`.
-    pub fn name<Name>(
-        mut self,
-        name: Name,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    >
+    #[inline]
+    ///Sets the value of the `public.asset_models.created_at` column.
+    fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
-        Name: TryInto<Option<String>>,
-        <Name as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
+        CA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
     {
-        self.id = self.id.name(name).map_err(|e| e.into_field_name(From::from))?;
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
+                self.id,
+                created_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
-    /// Sets the value of the `trackables.name`, `trackables.description`
-    /// columns from table `volumetric_container_models`.
-    pub fn name_and_description<Name, Description>(
-        mut self,
-        name: Name,
-        description: Description,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    >
+    #[inline]
+    ///Sets the value of the `public.asset_models.updated_by` column.
+    fn updated_by<UB>(mut self, updated_by: UB) -> Result<Self, Self::Error>
     where
-        Name: TryInto<String>,
-        <Name as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
-        Description: TryInto<String>,
-        <Description as TryInto<String>>::Error: Into<validation_errors::SingleFieldError>,
+        UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.id = self
-            .id
-            .name_and_description(name, description)
-            .map_err(|e| e.into_field_name(From::from))?;
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
+                self.id,
+                updated_by,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
-    /// Sets the value of the `trackables.parent_id` column from table
-    /// `volumetric_container_models`.
-    pub fn parent(
-        mut self,
-        parent_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    > {
-        self.id = self.id.parent(parent_id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
-}
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
-{
-    /// Sets the value of the `trackables.parent_id`, `trackables.id` columns
-    /// from table `volumetric_container_models`.
-    pub fn parent_and_id<Id>(
-        mut self,
-        parent_id: ::rosetta_uuid::Uuid,
-        id: Id,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    >
+    #[inline]
+    ///Sets the value of the `public.asset_models.updated_at` column.
+    fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
-        Id: TryInto<::rosetta_uuid::Uuid>,
-        <Id as TryInto<::rosetta_uuid::Uuid>>::Error: Into<validation_errors::SingleFieldError>,
+        UA: TryInto<::rosetta_timestamp::TimestampUTC>,
+        validation_errors::SingleFieldError: From<
+            <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
+        >,
     {
-        self.id =
-            self.id.parent_and_id(parent_id, id).map_err(|e| e.into_field_name(From::from))?;
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
+                self.id,
+                updated_at,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
 }
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
+impl<
+    ContainerModel,
+> crate::codegen::structs_codegen::tables::insertables::ContainerModelSettable
+for InsertableVolumetricContainerModelBuilder<ContainerModel>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute,
+    >,
 {
-    /// Sets the value of the `trackables.photograph_id` column from table
-    /// `volumetric_container_models`.
-    pub fn photograph(
-        mut self,
-        photograph_id: Option<::rosetta_uuid::Uuid>,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    > {
-        self.id = self.id.photograph(photograph_id).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
-    }
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
 }
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
+impl<
+    ContainerModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
+            >,
         >,
-    >
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
+for InsertableVolumetricContainerModelBuilder<ContainerModel>
+where
+    Self: common_traits::builder::Attributed<
+        Attribute = crate::codegen::structs_codegen::tables::insertables::VolumetricContainerModelAttribute,
+    >,
 {
-    /// Sets the value of the `trackables.updated_at` column from table
-    /// `volumetric_container_models`.
-    pub fn updated_at<UpdatedAt>(
-        mut self,
-        updated_at: UpdatedAt,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    >
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    #[inline]
+    ///Sets the value of the `public.physical_asset_models.parent_model` column.
+    fn parent_model<PM>(mut self, parent_model: PM) -> Result<Self, Self::Error>
     where
-        UpdatedAt: TryInto<::rosetta_timestamp::TimestampUTC>,
-        <UpdatedAt as TryInto<::rosetta_timestamp::TimestampUTC>>::Error:
-            Into<validation_errors::SingleFieldError>,
+        PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.id = self.id.updated_at(updated_at).map_err(|e| e.into_field_name(From::from))?;
+        self.id = <ContainerModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
+                self.id,
+                parent_model,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
         Ok(self)
     }
 }
-impl
-    crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricContainerModelBuilder<
-        crate::codegen::structs_codegen::tables::insertables::InsertableContainerModelBuilder<
-            crate::codegen::structs_codegen::tables::insertables::InsertableTrackableBuilder,
-        >,
-    >
+impl<ContainerModel> web_common_traits::database::MostConcreteTable
+    for InsertableVolumetricContainerModelBuilder<ContainerModel>
+where
+    ContainerModel: web_common_traits::database::MostConcreteTable,
 {
-    /// Sets the value of the `trackables.updated_by` column from table
-    /// `volumetric_container_models`.
-    pub fn updated_by(
-        mut self,
-        updated_by: i32,
-    ) -> Result<
-        Self,
-        web_common_traits::database::InsertError<InsertableVolumetricContainerModelAttributes>,
-    > {
-        self.id = self.id.updated_by(updated_by).map_err(|e| e.into_field_name(From::from))?;
-        Ok(self)
+    fn set_most_concrete_table(&mut self, table_name: &str) {
+        self.id.set_most_concrete_table(table_name);
+    }
+}
+impl<ContainerModel> web_common_traits::prelude::SetPrimaryKey
+    for InsertableVolumetricContainerModelBuilder<ContainerModel>
+where
+    ContainerModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
+{
+    type PrimaryKey = i32;
+    fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
+        self.id = self.id.set_primary_key(primary_key);
+        self
     }
 }
 impl<ContainerModel, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableVolumetricContainerModelBuilder<ContainerModel>
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
         C,
-        UserId = i32,
         Row = crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
         Error = web_common_traits::database::InsertError<
-            InsertableVolumetricContainerModelAttributes,
+            VolumetricContainerModelAttribute,
         >,
     >,
-    ContainerModel: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
+    ContainerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
-    type Attributes = InsertableVolumetricContainerModelAttributes;
-    fn is_complete(&self) -> bool {
-        self.id.is_complete() && self.liters.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<
         Self::PrimaryKey,
-        web_common_traits::database::InsertError<Self::Attributes>,
+        web_common_traits::database::InsertError<VolumetricContainerModelAttribute>,
     > {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel = self
             .insert(user_id, conn)?;
         Ok(insertable.id())

@@ -3,7 +3,10 @@
 
 use std::fmt::Display;
 
-use common_traits::prelude::Builder;
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::Builder,
+};
 
 use crate::{
     diagrams::class_diagram::{
@@ -69,14 +72,19 @@ impl Display for ClassEdgeAttribute {
     }
 }
 
-impl Builder for ClassEdgeBuilder {
-    type Error = EdgeError<Self::Attribute>;
-    type Attribute = ClassEdgeAttribute;
-    type Object = ClassEdge;
-
+impl IsCompleteBuilder for ClassEdgeBuilder {
     fn is_complete(&self) -> bool {
         self.edge_builder.is_complete()
     }
+}
+
+impl Attributed for ClassEdgeBuilder {
+    type Attribute = ClassEdgeAttribute;
+}
+
+impl Builder for ClassEdgeBuilder {
+    type Error = EdgeError<Self::Attribute>;
+    type Object = ClassEdge;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(ClassEdge {

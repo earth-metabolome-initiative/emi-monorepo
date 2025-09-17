@@ -3,7 +3,10 @@
 
 use std::{fmt::Display, rc::Rc};
 
-use common_traits::prelude::{Builder, BuilderError};
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::{Builder, BuilderError},
+};
 
 use crate::{
     diagrams::flowchart::flowchart_node::{ClickEvent, FlowchartNode, shape::FlowchartNodeShape},
@@ -85,6 +88,19 @@ impl FlowchartNodeBuilder {
         self.direction = Some(direction);
         self
     }
+
+    #[must_use]
+    /// Returns the direction of the subgraph, if set.
+    pub fn get_direction(&self) -> Option<Direction> {
+        self.direction
+    }
+
+    #[must_use]
+    /// Resets the direction of the subgraph for the flowchart node.
+    pub fn reset_direction(mut self) -> Self {
+        self.direction = None;
+        self
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -124,19 +140,26 @@ impl Display for FlowchartNodeAttribute {
     }
 }
 
-impl Builder for FlowchartNodeBuilder {
-    type Attribute = FlowchartNodeAttribute;
-    type Object = FlowchartNode;
-    type Error = NodeError<Self::Attribute>;
-
+impl IsCompleteBuilder for FlowchartNodeBuilder {
     fn is_complete(&self) -> bool {
         self.builder.is_complete()
     }
+}
 
-    fn build(self) -> Result<Self::Object, Self::Error> {
+impl Attributed for FlowchartNodeBuilder {
+    type Attribute = FlowchartNodeAttribute;
+}
+
+impl Builder for FlowchartNodeBuilder {
+    type Object = FlowchartNode;
+    type Error = NodeError<Self::Attribute>;
+
+    fn build(mut self) -> Result<Self::Object, Self::Error> {
         if self.direction.is_some() && self.subnodes.is_empty() {
             return Err(BuilderError::IncompleteBuild(FlowchartNodeAttribute::Subnodes).into());
         }
+
+        self.subnodes.sort_unstable();
 
         Ok(FlowchartNode {
             node: self.builder.build()?,
@@ -151,14 +174,22 @@ impl Builder for FlowchartNodeBuilder {
 impl NodeBuilder for FlowchartNodeBuilder {
     type Node = FlowchartNode;
 
-    fn id(mut self, id: usize) -> Self {
+    fn id(mut self, id: u64) -> Self {
         self.builder = self.builder.id(id);
         self
+    }
+
+    fn get_id(&self) -> Option<u64> {
+        self.builder.get_id()
     }
 
     fn label<S: ToString>(mut self, label: S) -> Result<Self, Self::Error> {
         self.builder = self.builder.label(label)?;
         Ok(self)
+    }
+
+    fn get_label(&self) -> Option<&String> {
+        self.builder.get_label()
     }
 
     fn style_class(mut self, style_class: Rc<StyleClass>) -> Result<Self, StyleClassError> {
@@ -172,5 +203,9 @@ impl NodeBuilder for FlowchartNodeBuilder {
     ) -> Result<Self, StyleClassError> {
         self.builder = self.builder.style_property(property)?;
         Ok(self)
+    }
+
+    fn style_properties(&self) -> impl Iterator<Item = &crate::prelude::StyleProperty> {
+        self.builder.style_properties()
     }
 }

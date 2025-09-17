@@ -22,7 +22,7 @@ use diesel::PgConnection;
 pub fn insert_directus_collection_procedures(
     _directus_conn: &mut PgConnection,
     _portal_conn: &mut PgConnection,
-) -> Result<(), crate::error::Error> {
+) -> anyhow::Result<()> {
     let _gloves_product_brand = "weitaglove";
     let _gloves_product_models = "NITRIL STRONG BLUE";
     let _falcon_product_brand = "greiner BIO-ONE";

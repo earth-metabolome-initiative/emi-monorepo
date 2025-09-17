@@ -8,7 +8,7 @@ use crate::{
 };
 
 /// Trait representing an edge in a Mermaid diagram.
-pub trait Edge {
+pub trait Edge: Ord {
     /// Type of the builder used to construct this edge.
     type Builder: EdgeBuilder<Edge = Self>;
     /// Type of the node this edge connects to.
@@ -25,6 +25,9 @@ pub trait Edge {
 
     /// Returns the line style of the edge.
     fn line_style(&self) -> LineStyle;
+
+    /// Returns an iterator over the style classes associated with the edge.
+    fn classes(&self) -> impl Iterator<Item = &crate::shared::StyleClass>;
 
     /// Returns the left arrow shape of the edge, if any.
     fn left_arrow_shape(&self) -> Option<ArrowShape>;

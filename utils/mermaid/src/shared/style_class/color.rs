@@ -14,6 +14,12 @@ pub struct Color {
     blue: u8,
 }
 
+impl From<(u8, u8, u8)> for Color {
+    fn from(rgb: (u8, u8, u8)) -> Self {
+        Color { red: rgb.0, green: rgb.1, blue: rgb.2 }
+    }
+}
+
 impl From<Rgb> for Color {
     fn from(rgb: Rgb) -> Self {
         Color { red: rgb.red() as u8, green: rgb.green() as u8, blue: rgb.blue() as u8 }
@@ -44,7 +50,19 @@ impl Color {
     #[must_use]
     /// Returns a new pastel red color.
     pub fn pastel_red() -> Self {
-        Color { red: 255, green: 116, blue: 108 }
+        Color { red: 240, green: 116, blue: 108 }
+    }
+
+    #[must_use]
+    /// Returns a new pastel blue color.
+    pub fn pastel_blue() -> Self {
+        Color { red: 108, green: 116, blue: 240 }
+    }
+
+    #[must_use]
+    /// Returns a new pastel cyan color.
+    pub fn pastel_cyan() -> Self {
+        Color { red: 167, green: 239, blue: 240 }
     }
 
     #[must_use]

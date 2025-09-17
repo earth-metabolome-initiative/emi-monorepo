@@ -1,4 +1,4 @@
-use diesel::{PgConnection, Queryable, QueryableByName, RunQueryDsl};
+use diesel::{Queryable, QueryableByName};
 
 /// Represents a row in the `constraint_table_usage` table in the `PostgreSQL`
 /// database.
@@ -21,25 +21,4 @@ pub struct ConstraintTableUsage {
     pub table_schema: String,
     /// The name of the table.
     pub table_name: String,
-}
-
-impl ConstraintTableUsage {
-    /// Loads all rows from the `constraint_table_usage` table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A connection to the `PostgreSQL` database.
-    ///
-    /// # Returns
-    ///
-    /// A `Result` containing a vector of `ConstraintTableUsage` on success,
-    /// or a `diesel::result::Error` on failure.
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while loading the rows from the database.
-    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<Self>, diesel::result::Error> {
-        use crate::schema::constraint_table_usage;
-        constraint_table_usage::table.load::<ConstraintTableUsage>(conn)
-    }
 }

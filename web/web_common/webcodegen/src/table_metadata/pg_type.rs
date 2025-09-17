@@ -8,16 +8,17 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Ident, Type, parse_str};
 
-use super::{PgAttribute, PgEnum, PgExtension, PgSetting, table::RESERVED_RUST_WORDS};
+use super::{PgAttribute, PgEnum, PgExtension, PgSetting};
 use crate::{
     codegen::{
         CODEGEN_DIESEL_MODULE, CODEGEN_DIRECTORY, CODEGEN_STRUCTS_MODULE, CODEGEN_TYPES_PATH,
     },
     errors::WebCodeGenError,
+    utils::RESERVED_RUST_WORDS,
 };
 
 /// Constant listing types supporting `Copy`.
-pub(crate) const COPY_TYPES: [&str; 9] = [
+pub(crate) const COPY_TYPES: [&str; 10] = [
     "i16",
     "i32",
     "i64",
@@ -27,10 +28,11 @@ pub(crate) const COPY_TYPES: [&str; 9] = [
     "::rosetta_uuid::Uuid",
     "::rosetta_timestamp::TimestampUTC",
     "::iso_codes::CountryCode",
+    "::cas_codes::CAS",
 ];
 
 /// Constant listing types supporting `Eq`.
-pub(crate) const EQ_TYPES: [&str; 10] = [
+pub(crate) const EQ_TYPES: [&str; 12] = [
     "i16",
     "i32",
     "i64",
@@ -40,11 +42,16 @@ pub(crate) const EQ_TYPES: [&str; 10] = [
     "::rosetta_uuid::Uuid",
     "::rosetta_timestamp::TimestampUTC",
     "::iso_codes::CountryCode",
+    "::cas_codes::CAS",
     "::media_types::MediaType",
+    "::molecular_formulas::MolecularFormula",
 ];
 
+/// Constant listing types supporting `PartialOrd`.
+pub(crate) const PARTIAL_ORD_TYPES: [&str; 2] = ["f32", "f64"];
+
 /// Constant listing types supporting `Ord`.
-pub(crate) const ORD_TYPES: [&str; 10] = [
+pub(crate) const ORD_TYPES: [&str; 12] = [
     "i16",
     "i32",
     "i64",
@@ -54,11 +61,13 @@ pub(crate) const ORD_TYPES: [&str; 10] = [
     "::rosetta_uuid::Uuid",
     "::rosetta_timestamp::TimestampUTC",
     "::iso_codes::CountryCode",
+    "::cas_codes::CAS",
     "::media_types::MediaType",
+    "::molecular_formulas::MolecularFormula",
 ];
 
 /// Constant listing types supporting `Hash`.
-pub(crate) const HASH_TYPES: [&str; 10] = [
+pub(crate) const HASH_TYPES: [&str; 12] = [
     "i16",
     "i32",
     "i64",
@@ -69,6 +78,8 @@ pub(crate) const HASH_TYPES: [&str; 10] = [
     "::rosetta_timestamp::TimestampUTC",
     "::iso_codes::CountryCode",
     "::media_types::MediaType",
+    "::cas_codes::CAS",
+    "::molecular_formulas::MolecularFormula",
 ];
 
 /// Represents a `PostgreSQL` type.
@@ -666,6 +677,32 @@ impl PgType {
             Ok(supports_eq)
         } else {
             Ok(EQ_TYPES.contains(&rust_type_str(&self.typname, conn)?))
+        }
+    }
+
+    /// Returns whether the associated rust type supports `PartialOrd`.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The Postgres connection.
+    ///
+    /// # Returns
+    ///
+    /// A Result containing a boolean indicating whether the associated rust
+    /// type supports `PartialOrd`, or an error if the type is not supported.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the provided database connection fails.
+    pub fn supports_partial_ord(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+        if self.is_user_defined(conn)? || self.is_composite() {
+            let mut supports_partial_ord = true;
+            for attribute in self.attributes(conn)? {
+                supports_partial_ord &= attribute.supports_partial_ord(conn)?;
+            }
+            Ok(supports_partial_ord)
+        } else {
+            Ok(PARTIAL_ORD_TYPES.contains(&rust_type_str(&self.typname, conn)?))
         }
     }
 

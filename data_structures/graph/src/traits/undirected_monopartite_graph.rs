@@ -9,7 +9,8 @@ use algebra::prelude::{
     SizedRowsSparseMatrix2D, SizedSparseBiMatrix2D, SparseMatrix2D, SparseSymmetricMatrix2D,
 };
 
-use super::{MonopartiteEdges, MonoplexMonopartiteGraph, TransposedEdges, TransposedGraph};
+use super::{MonopartiteEdges, MonoplexMonopartiteGraph, TransposedEdges};
+use crate::traits::TransposedMonoplexGraph;
 
 /// Trait defining the properties of a directed graph.
 pub trait UndirectedMonopartiteEdges:
@@ -61,7 +62,9 @@ where
 /// Trait defining the properties of monopartite undirected graphs.
 pub trait UndirectedMonopartiteMonoplexGraph: MonoplexMonopartiteGraph<
     MonoplexMonopartiteEdges = <Self as UndirectedMonopartiteMonoplexGraph>::UndirectedMonopartiteEdges,
-> + TransposedGraph {
+> + TransposedMonoplexGraph<
+    TransposedEdges = <Self as UndirectedMonopartiteMonoplexGraph>::UndirectedMonopartiteEdges,
+> {
     /// The undirected edges of the graph.
     type UndirectedMonopartiteEdges: UndirectedMonopartiteEdges;
 
@@ -86,7 +89,8 @@ pub trait UndirectedMonopartiteMonoplexGraph: MonoplexMonopartiteGraph<
 
 impl<G> UndirectedMonopartiteMonoplexGraph for G
 where
-    G: MonoplexMonopartiteGraph + TransposedGraph,
+    G: MonoplexMonopartiteGraph
+        + TransposedMonoplexGraph<TransposedEdges = G::MonoplexMonopartiteEdges>,
     G::MonoplexMonopartiteEdges: UndirectedMonopartiteEdges,
 {
     type UndirectedMonopartiteEdges = G::MonoplexMonopartiteEdges;

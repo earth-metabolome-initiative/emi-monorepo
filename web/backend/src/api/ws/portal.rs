@@ -7,6 +7,7 @@ use std::{
 
 use actix_web::web;
 use actix_ws::AggregatedMessage;
+use diesel::OptionalExtension;
 use futures_util::{
     StreamExt as _,
     future::{Either, select},
@@ -94,7 +95,7 @@ pub(super) async fn portal_ws(
                                 }
                                 let crud = *ops.as_ref();
 
-                                match ops.execute(&mut conn) {
+                                match ops.execute(&mut conn).optional() {
                                     Ok(None) => {}
                                     Ok(Some(row)) => {
                                         session

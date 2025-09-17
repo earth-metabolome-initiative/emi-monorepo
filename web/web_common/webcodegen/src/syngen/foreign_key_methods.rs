@@ -6,7 +6,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::Ident;
 
-use crate::{Column, Table, errors::WebCodeGenError};
+use crate::{Column, Table, errors::WebCodeGenError, traits::TableLike};
 
 impl Table {
     /// Returns the Syn `TokenStream` for the foreign key methods.
@@ -25,14 +25,12 @@ impl Table {
     ) -> Result<TokenStream, WebCodeGenError> {
         let mut foreign_key_methods = TokenStream::new();
 
-        for foreign_key_constraint in self.foreign_keys(conn)? {
-            if foreign_key_constraint.is_same_as_constraint(conn)?.is_some() {
+        for foreign_key_constraint in self.foreign_keys(conn)?.as_ref() {
+            if foreign_key_constraint.includes_local_primary_key(conn)? {
                 continue;
             }
 
-            let Some(foreign_key_table) = foreign_key_constraint.foreign_table(conn)? else {
-                return Ok(TokenStream::new());
-            };
+            let foreign_key_table = foreign_key_constraint.foreign_table(conn)?;
 
             let columns = foreign_key_constraint.columns(conn)?;
 
@@ -40,8 +38,11 @@ impl Table {
 
             let foreign_key_struct_path = foreign_key_table.import_struct_path()?;
 
+            let mut additional_requirements = Vec::new();
+
             let (return_statement, optional) = if columns.iter().any(Column::is_nullable) {
-                (syn::parse_quote! { Option<#foreign_key_struct_path> }, quote! { .map(Some) })
+                additional_requirements.push(quote! { use diesel::OptionalExtension; });
+                (syn::parse_quote! { Option<#foreign_key_struct_path> }, quote! { .optional() })
             } else {
                 (foreign_key_struct_path.clone(), TokenStream::new())
             };
@@ -50,12 +51,15 @@ impl Table {
             // is None. If so, we return None as well.
             let mut column_values_retrieval = TokenStream::new();
 
-            for column in &columns {
+            for column in columns.as_ref() {
                 let current_column_ident: Ident = column.snake_case_ident()?;
+
+                let maybe_clone =
+                    if !column.supports_copy(conn)? { Some(quote! { .clone() }) } else { None };
 
                 if column.is_nullable() {
                     column_values_retrieval.extend(quote! {
-                        let Some(#current_column_ident) = self.#current_column_ident else {
+                        let Some(#current_column_ident) = self.#current_column_ident #maybe_clone else {
                             return Ok(None);
                         };
                     });
@@ -74,7 +78,11 @@ impl Table {
                         if c.is_nullable() {
                             Ok(quote! { #column_ident })
                         } else {
-                            Ok(quote! { self.#column_ident })
+                            if c.supports_copy(conn)? {
+                                Ok(quote! { self.#column_ident })
+                            } else {
+                                Ok(quote! { self.#column_ident.clone() })
+                            }
                         }
                     })
                     .collect::<Result<Vec<_>, WebCodeGenError>>()?;
@@ -90,16 +98,12 @@ impl Table {
                         &self, conn: &mut C
                     ) -> Result<#return_statement, diesel::result::Error>
                         where
-                            #foreign_key_struct_path: diesel::Identifiable,
-                            <#foreign_key_struct_path as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<<#foreign_key_struct_path as diesel::Identifiable>::Id>,
-                            <<#foreign_key_struct_path as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<<#foreign_key_struct_path as diesel::Identifiable>::Id>>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-                            <<<#foreign_key_struct_path as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<<#foreign_key_struct_path as diesel::Identifiable>::Id>>::Output as diesel::query_dsl::methods::LimitDsl>::Output:
-                                for<'a> diesel::query_dsl::LoadQuery<'a, C, #foreign_key_struct_path>,
+                            #foreign_key_struct_path: web_common_traits::database::Read<C>
                     {
-                        use diesel::associations::HasTable;
-                        use diesel::{RunQueryDsl, QueryDsl};
+                        use web_common_traits::database::Read;
+                        #(#additional_requirements)*
                         #column_values_retrieval
-                        RunQueryDsl::first(QueryDsl::find(#foreign_key_struct_path::table(), #formatted_primary_key), conn)#optional
+                        #foreign_key_struct_path::read(#formatted_primary_key, conn)#optional
                     }
                 });
             } else {
@@ -112,6 +116,7 @@ impl Table {
                         use diesel::RunQueryDsl;
                         use diesel::associations::HasTable;
                         use diesel::{QueryDsl, ExpressionMethods};
+                        #(#additional_requirements)*
                         #bool_expression_methods
                         #column_values_retrieval
                         #foreign_key_struct_path::table()

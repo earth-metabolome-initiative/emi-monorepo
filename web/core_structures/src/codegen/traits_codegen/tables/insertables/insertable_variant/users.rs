@@ -1,9 +1,28 @@
+impl web_common_traits::database::DispatchableInsertVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder
+{
+    type Row = crate::codegen::structs_codegen::tables::users::User;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::UserAttribute,
+    >;
+}
+impl web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder
+{
+    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUser;
+}
+#[cfg(feature = "backend")]
+impl web_common_traits::database::BackendInsertableVariant
+    for crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder
+where
+    Self: web_common_traits::database::DispatchableInsertableVariant<diesel::PgConnection>,
+{
+}
 impl<
     C: diesel::connection::LoadConnection,
-> web_common_traits::database::InsertableVariant<C>
+> web_common_traits::database::DispatchableInsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableUser as diesel::Insertable<
@@ -14,29 +33,44 @@ where
         C,
         crate::codegen::structs_codegen::tables::users::User,
     >,
-    C: diesel::connection::LoadConnection,
+    Self: web_common_traits::database::InsertableVariant<
+        C,
+        InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUser,
+        Row = crate::codegen::structs_codegen::tables::users::User,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::UserAttribute,
+        >,
+    >,
 {
-    type Row = crate::codegen::structs_codegen::tables::users::User;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableUser;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes,
-    >;
-    type UserId = i32;
-    fn insert(
-        self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    fn insert(self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
+        use web_common_traits::database::InsertableVariant;
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableUser = self
             .try_insert(user_id, conn)?;
         Ok(
-            diesel::insert_into(Self::Row::table())
+            diesel::insert_into(Self::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
     }
+}
+impl<
+    C: diesel::connection::LoadConnection,
+> web_common_traits::database::InsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableUserBuilder
+where
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableUser as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::users::User as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::users::User,
+    >,
+{
     fn try_insert(
         self,
         _user_id: i32,
@@ -46,28 +80,28 @@ where
             .first_name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes::FirstName,
+                    crate::codegen::structs_codegen::tables::insertables::UserAttribute::FirstName,
                 ),
             )?;
         let last_name = self
             .last_name
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes::LastName,
+                    crate::codegen::structs_codegen::tables::insertables::UserAttribute::LastName,
                 ),
             )?;
         let created_at = self
             .created_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes::CreatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::UserAttribute::CreatedAt,
                 ),
             )?;
         let updated_at = self
             .updated_at
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableUserAttributes::UpdatedAt,
+                    crate::codegen::structs_codegen::tables::insertables::UserAttribute::UpdatedAt,
                 ),
             )?;
         Ok(Self::InsertableVariant {

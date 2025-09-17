@@ -3,7 +3,10 @@
 
 use std::{fmt::Display, rc::Rc};
 
-use common_traits::prelude::{Builder, BuilderError};
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::{Builder, BuilderError},
+};
 
 use crate::{
     errors::NodeError,
@@ -16,7 +19,7 @@ use crate::{
 /// Struct representing a generic node in Mermaid diagrams.
 pub(crate) struct GenericNode {
     /// Unique identifier for the node.
-    id: usize,
+    id: u64,
     /// Label for the node.
     label: String,
     /// Classes associated with the node, used for styling.
@@ -28,7 +31,7 @@ pub(crate) struct GenericNode {
 impl Node for GenericNode {
     type Builder = GenericNodeBuilder;
 
-    fn id(&self) -> usize {
+    fn id(&self) -> u64 {
         self.id
     }
 
@@ -54,7 +57,7 @@ impl Node for GenericNode {
 /// Builder for creating a `GenericNode`.
 pub(crate) struct GenericNodeBuilder {
     /// Unique identifier for the node.
-    id: Option<usize>,
+    id: Option<u64>,
     /// Label for the node.
     label: Option<String>,
     /// Classes associated with the node, used for styling.
@@ -88,14 +91,19 @@ impl Display for GenericNodeAttribute {
     }
 }
 
-impl Builder for GenericNodeBuilder {
-    type Attribute = GenericNodeAttribute;
-    type Error = NodeError<Self::Attribute>;
-    type Object = GenericNode;
-
+impl IsCompleteBuilder for GenericNodeBuilder {
     fn is_complete(&self) -> bool {
         self.id.is_some() && self.label.is_some()
     }
+}
+
+impl Attributed for GenericNodeBuilder {
+    type Attribute = GenericNodeAttribute;
+}
+
+impl Builder for GenericNodeBuilder {
+    type Error = NodeError<Self::Attribute>;
+    type Object = GenericNode;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         let id = self.id.ok_or(BuilderError::IncompleteBuild(GenericNodeAttribute::Id))?;
@@ -108,9 +116,13 @@ impl Builder for GenericNodeBuilder {
 impl NodeBuilder for GenericNodeBuilder {
     type Node = GenericNode;
 
-    fn id(mut self, id: usize) -> Self {
+    fn id(mut self, id: u64) -> Self {
         self.id = Some(id);
         self
+    }
+
+    fn get_id(&self) -> Option<u64> {
+        self.id
     }
 
     fn label<S: ToString>(mut self, label: S) -> Result<Self, Self::Error> {
@@ -121,6 +133,10 @@ impl NodeBuilder for GenericNodeBuilder {
 
         self.label = Some(label);
         Ok(self)
+    }
+
+    fn get_label(&self) -> Option<&String> {
+        self.label.as_ref()
     }
 
     fn style_class(mut self, style_class: Rc<StyleClass>) -> Result<Self, StyleClassError> {
@@ -139,5 +155,9 @@ impl NodeBuilder for GenericNodeBuilder {
 
         self.style.push(property);
         Ok(self)
+    }
+
+    fn style_properties(&self) -> impl Iterator<Item = &StyleProperty> {
+        self.style.iter()
     }
 }

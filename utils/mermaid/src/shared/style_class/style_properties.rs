@@ -74,7 +74,7 @@ impl Display for StyleProperty {
             }
             StyleProperty::StrokeDashoffset(offset) => write!(f, "stroke-dashoffset: {offset}",),
             StyleProperty::Opacity(value) => write!(f, "opacity: {:.2}", f32::from(*value) / 100.0),
-            StyleProperty::BorderRadius(radius) => write!(f, "border-radius: {radius}"),
+            StyleProperty::BorderRadius(radius) => write!(f, "rx: {radius}, ry: {radius}"),
         }
     }
 }

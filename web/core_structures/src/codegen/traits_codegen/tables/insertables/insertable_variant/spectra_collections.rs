@@ -1,9 +1,38 @@
+impl<DigitalAsset> web_common_traits::database::DispatchableInsertVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder<
+        DigitalAsset,
+    >
+{
+    type Row = crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection;
+    type Error = web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::SpectraCollectionAttribute,
+    >;
+}
+impl<DigitalAsset> web_common_traits::database::InsertableVariantMetadata
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder<
+        DigitalAsset,
+    >
+{
+    type InsertableVariant =
+        crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollection;
+}
+#[cfg(feature = "backend")]
+impl<DigitalAsset> web_common_traits::database::BackendInsertableVariant
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder<
+        DigitalAsset,
+    >
+where
+    Self: web_common_traits::database::DispatchableInsertableVariant<diesel::PgConnection>,
+{
+}
 impl<
     C: diesel::connection::LoadConnection,
-> web_common_traits::database::InsertableVariant<C>
-for crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder
+    DigitalAsset,
+> web_common_traits::database::DispatchableInsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder<
+    DigitalAsset,
+>
 where
-    <C as diesel::Connection>::Backend: diesel::backend::DieselReserveSpecialization,
     diesel::query_builder::InsertStatement<
         <crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollection as diesel::Insertable<
@@ -14,106 +43,80 @@ where
         C,
         crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
     >,
-    C: diesel::connection::LoadConnection,
-    crate::codegen::structs_codegen::tables::trackables::Trackable: diesel::Identifiable
-        + web_common_traits::database::Updatable<C, UserId = i32>,
-    <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-    >,
-    <<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-    >>::Output: diesel::query_dsl::methods::LimitDsl + diesel::RunQueryDsl<C>,
-    <<<crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FindDsl<
-        <crate::codegen::structs_codegen::tables::trackables::Trackable as diesel::Identifiable>::Id,
-    >>::Output as diesel::query_dsl::methods::LimitDsl>::Output: for<'a> diesel::query_dsl::LoadQuery<
-        'a,
+    Self: web_common_traits::database::InsertableVariant<
         C,
-        crate::codegen::structs_codegen::tables::trackables::Trackable,
+        InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollection,
+        Row = crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
+        Error = web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::SpectraCollectionAttribute,
+        >,
+    >,
+    DigitalAsset: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = ::rosetta_uuid::Uuid,
+    >,
+    Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::SpectraCollectionExtensionAttribute: From<
+        <DigitalAsset as common_traits::builder::Attributed>::Attribute,
     >,
 {
-    type Row = crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection;
-    type InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollection;
-    type Error = web_common_traits::database::InsertError<
-        crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes,
-    >;
-    type UserId = i32;
-    fn insert(
-        self,
-        user_id: Self::UserId,
-        conn: &mut C,
-    ) -> Result<Self::Row, Self::Error> {
+    fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
         use diesel::associations::HasTable;
-        use web_common_traits::database::Updatable;
+        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::MostConcreteTable;
+        self.set_most_concrete_table("spectra_collections");
         let insertable_struct: crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollection = self
             .try_insert(user_id, conn)?;
-        if !insertable_struct.trackable(conn)?.can_update(user_id, conn)? {
-            return Err(
-                generic_backend_request_errors::GenericBackendRequestError::Unauthorized
-                    .into(),
-            );
-        }
         Ok(
-            diesel::insert_into(Self::Row::table())
+            diesel::insert_into(Self::table())
                 .values(insertable_struct)
                 .get_result(conn)?,
         )
     }
+}
+impl<
+    C: diesel::connection::LoadConnection,
+    DigitalAsset,
+> web_common_traits::database::InsertableVariant<C>
+for crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionBuilder<
+    DigitalAsset,
+>
+where
+    diesel::query_builder::InsertStatement<
+        <crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollection as diesel::Insertable<
+            <crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection as diesel::associations::HasTable>::Table,
+        >>::Values,
+    >: for<'query> diesel::query_dsl::LoadQuery<
+        'query,
+        C,
+        crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
+    >,
+    DigitalAsset: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = ::rosetta_uuid::Uuid,
+    >,
+    Self: web_common_traits::database::MostConcreteTable,
+    crate::codegen::structs_codegen::tables::insertables::SpectraCollectionExtensionAttribute: From<
+        <DigitalAsset as common_traits::builder::Attributed>::Attribute,
+    >,
+{
     fn try_insert(
         self,
-        _user_id: i32,
-        _conn: &mut C,
+        user_id: i32,
+        conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
         let id = self
             .id
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::Id,
-                ),
-            )?;
-        let trackable_id = self
-            .trackable_id
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::TrackableId,
-                ),
-            )?;
-        let created_by = self
-            .created_by
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::CreatedBy,
-                ),
-            )?;
-        let created_at = self
-            .created_at
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::CreatedAt,
-                ),
-            )?;
-        let updated_by = self
-            .updated_by
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::UpdatedBy,
-                ),
-            )?;
-        let updated_at = self
-            .updated_at
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::InsertableSpectraCollectionAttributes::UpdatedAt,
-                ),
-            )?;
-        Ok(Self::InsertableVariant {
-            id,
-            notes: self.notes,
-            trackable_id,
-            created_by,
-            created_at,
-            updated_by,
-            updated_at,
-        })
+            .mint_primary_key(user_id, conn)
+            .map_err(|err| {
+                err.into_field_name(|attribute| {
+                    crate::codegen::structs_codegen::tables::insertables::SpectraCollectionAttribute::Extension(
+                        From::from(attribute),
+                    )
+                })
+            })?;
+        Ok(Self::InsertableVariant { id })
     }
 }

@@ -1,13 +1,13 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum InsertableSpatialRefSyAttributes {
+pub enum SpatialRefSyAttribute {
     Srid,
     AuthName,
     AuthSrid,
     Srtext,
     Proj4text,
 }
-impl core::str::FromStr for InsertableSpatialRefSyAttributes {
+impl core::str::FromStr for SpatialRefSyAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
@@ -25,17 +25,23 @@ impl core::str::FromStr for InsertableSpatialRefSyAttributes {
         }
     }
 }
-impl core::fmt::Display for InsertableSpatialRefSyAttributes {
+impl common_traits::builder::Attributed
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder
+{
+    type Attribute = SpatialRefSyAttribute;
+}
+impl core::fmt::Display for SpatialRefSyAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Srid => write!(f, "srid"),
-            Self::AuthName => write!(f, "auth_name"),
-            Self::AuthSrid => write!(f, "auth_srid"),
-            Self::Srtext => write!(f, "srtext"),
-            Self::Proj4text => write!(f, "proj4text"),
+            Self::Srid => write!(f, "spatial_ref_sys.srid"),
+            Self::AuthName => write!(f, "spatial_ref_sys.auth_name"),
+            Self::AuthSrid => write!(f, "spatial_ref_sys.auth_srid"),
+            Self::Srtext => write!(f, "spatial_ref_sys.srtext"),
+            Self::Proj4text => write!(f, "spatial_ref_sys.proj4text"),
         }
     }
 }
+#[derive(Debug)]
 #[cfg_attr(any(feature = "postgres", feature = "sqlite"), derive(diesel::Insertable))]
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
@@ -52,8 +58,34 @@ pub struct InsertableSpatialRefSy {
     pub(crate) proj4text: Option<String>,
 }
 impl InsertableSpatialRefSy {}
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Builder for creating and inserting a new
+/// [`SpatialRefSy`](crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy).
+///
+///
+/// # Implementation details
+/// While this builder implements several methods, a reasonably complete
+/// **basic** usage example (*which may not apply to your own specific use case,
+/// please adapt accordingly*) is as follows:
+///
+/// ```rust,ignore
+/// use core_structures::SpatialRefSy;
+/// use core_structures::tables::insertables::SpatialRefSySettable;
+/// use web_common_traits::database::Insertable;
+/// use web_common_traits::database::InsertableVariant;
+///
+/// let spatial_ref_sy = SpatialRefSy::new()
+///    // Set mandatory fields
+///    .srid(srid)?
+///    // Optionally set optional fields
+///    .auth_name(auth_name)?
+///    .auth_srid(auth_srid)?
+///    .proj4text(proj4text)?
+///    .srtext(srtext)?
+///    // Finally, insert the new record in the database
+///    .insert(user.id, conn)?;
+/// ```
 pub struct InsertableSpatialRefSyBuilder {
     pub(crate) srid: Option<i32>,
     pub(crate) auth_name: Option<String>,
@@ -61,27 +93,211 @@ pub struct InsertableSpatialRefSyBuilder {
     pub(crate) srtext: Option<String>,
     pub(crate) proj4text: Option<String>,
 }
-impl web_common_traits::database::ExtendableBuilder for InsertableSpatialRefSyBuilder {
-    type Attributes = InsertableSpatialRefSyAttributes;
-    fn extend_builder(
-        mut self,
-        other: Self,
-    ) -> Result<Self, web_common_traits::database::InsertError<Self::Attributes>> {
-        if let Some(srid) = other.srid {
-            self = self.srid(srid)?;
-        }
-        if let Some(auth_name) = other.auth_name {
-            self = self.auth_name(Some(auth_name))?;
-        }
-        if let Some(auth_srid) = other.auth_srid {
-            self = self.auth_srid(Some(auth_srid))?;
-        }
-        if let Some(srtext) = other.srtext {
-            self = self.srtext(Some(srtext))?;
-        }
-        if let Some(proj4text) = other.proj4text {
-            self = self.proj4text(Some(proj4text))?;
-        }
+impl diesel::associations::HasTable for InsertableSpatialRefSyBuilder {
+    type Table = crate::codegen::diesel_codegen::tables::spatial_ref_sys::spatial_ref_sys::table;
+    fn table() -> Self::Table {
+        crate::codegen::diesel_codegen::tables::spatial_ref_sys::spatial_ref_sys::table
+    }
+}
+impl From<InsertableSpatialRefSyBuilder>
+    for web_common_traits::database::IdOrBuilder<i32, InsertableSpatialRefSyBuilder>
+{
+    fn from(builder: InsertableSpatialRefSyBuilder) -> Self {
+        Self::Builder(builder)
+    }
+}
+impl common_traits::builder::IsCompleteBuilder
+    for crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder
+{
+    fn is_complete(&self) -> bool {
+        self.srid.is_some()
+    }
+}
+/// Trait defining setters for attributes of an instance of `SpatialRefSy` or
+/// descendant tables.
+pub trait SpatialRefSySettable: Sized {
+    /// Error type returned when setting attributes.
+    type Error;
+    /// Sets the value of the `public.spatial_ref_sys.srid` column.
+    ///
+    /// # Arguments
+    /// * `srid`: The value to set for the `public.spatial_ref_sys.srid` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn srid<S>(self, srid: S) -> Result<Self, Self::Error>
+    where
+        S: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
+    /// Sets the value of the `public.spatial_ref_sys.auth_name` column.
+    ///
+    /// # Arguments
+    /// * `auth_name`: The value to set for the
+    ///   `public.spatial_ref_sys.auth_name` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn auth_name<AN>(self, auth_name: AN) -> Result<Self, Self::Error>
+    where
+        AN: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<AN as TryInto<Option<String>>>::Error>;
+    /// Sets the value of the `public.spatial_ref_sys.auth_srid` column.
+    ///
+    /// # Arguments
+    /// * `auth_srid`: The value to set for the
+    ///   `public.spatial_ref_sys.auth_srid` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type `i32`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn auth_srid<AS>(self, auth_srid: AS) -> Result<Self, Self::Error>
+    where
+        AS: TryInto<Option<i32>>,
+        validation_errors::SingleFieldError: From<<AS as TryInto<Option<i32>>>::Error>;
+    /// Sets the value of the `public.spatial_ref_sys.srtext` column.
+    ///
+    /// # Arguments
+    /// * `srtext`: The value to set for the `public.spatial_ref_sys.srtext`
+    ///   column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn srtext<S>(self, srtext: S) -> Result<Self, Self::Error>
+    where
+        S: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<S as TryInto<Option<String>>>::Error>;
+    /// Sets the value of the `public.spatial_ref_sys.proj4text` column.
+    ///
+    /// # Arguments
+    /// * `proj4text`: The value to set for the
+    ///   `public.spatial_ref_sys.proj4text` column.
+    ///
+    /// # Implementation details
+    /// This method accepts a reference to a generic value which can be
+    /// converted to the required type for the column. This allows passing
+    /// values of different types, as long as they can be converted to the
+    /// required type using the `TryFrom` trait. The method, additionally,
+    /// employs same-as and inferred same-as rules to ensure that the
+    /// schema-defined ancestral tables and associated table values associated
+    /// to the current column (if any) are also set appropriately.
+    ///
+    /// # Errors
+    /// * If the provided value cannot be converted to the required type
+    ///   `String`.
+    /// * If the provided value does not pass schema-defined validation.
+    fn proj4text<P>(self, proj4text: P) -> Result<Self, Self::Error>
+    where
+        P: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<P as TryInto<Option<String>>>::Error>;
+}
+impl SpatialRefSySettable for InsertableSpatialRefSyBuilder
+where
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::SpatialRefSyAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    /// Sets the value of the `public.spatial_ref_sys.srid` column.
+    fn srid<S>(mut self, srid: S) -> Result<Self, Self::Error>
+    where
+        S: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
+    {
+        let srid = <S as web_common_traits::database::PrimaryKeyLike>::primary_key(&srid);
+        self.srid = Some(srid);
+        Ok(self)
+    }
+    /// Sets the value of the `public.spatial_ref_sys.auth_name` column.
+    fn auth_name<AN>(mut self, auth_name: AN) -> Result<Self, Self::Error>
+    where
+        AN: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<AN as TryInto<Option<String>>>::Error>,
+    {
+        let auth_name = auth_name.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(SpatialRefSyAttribute::AuthName)
+        })?;
+        self.auth_name = auth_name;
+        Ok(self)
+    }
+    /// Sets the value of the `public.spatial_ref_sys.auth_srid` column.
+    fn auth_srid<AS>(mut self, auth_srid: AS) -> Result<Self, Self::Error>
+    where
+        AS: TryInto<Option<i32>>,
+        validation_errors::SingleFieldError: From<<AS as TryInto<Option<i32>>>::Error>,
+    {
+        let auth_srid = auth_srid.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(SpatialRefSyAttribute::AuthSrid)
+        })?;
+        self.auth_srid = auth_srid;
+        Ok(self)
+    }
+    /// Sets the value of the `public.spatial_ref_sys.srtext` column.
+    fn srtext<S>(mut self, srtext: S) -> Result<Self, Self::Error>
+    where
+        S: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<S as TryInto<Option<String>>>::Error>,
+    {
+        let srtext = srtext.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(SpatialRefSyAttribute::Srtext)
+        })?;
+        self.srtext = srtext;
+        Ok(self)
+    }
+    /// Sets the value of the `public.spatial_ref_sys.proj4text` column.
+    fn proj4text<P>(mut self, proj4text: P) -> Result<Self, Self::Error>
+    where
+        P: TryInto<Option<String>>,
+        validation_errors::SingleFieldError: From<<P as TryInto<Option<String>>>::Error>,
+    {
+        let proj4text = proj4text.try_into().map_err(|err| {
+            validation_errors::SingleFieldError::from(err)
+                .rename_field(SpatialRefSyAttribute::Proj4text)
+        })?;
+        self.proj4text = proj4text;
         Ok(self)
     }
 }
@@ -91,121 +307,22 @@ impl web_common_traits::prelude::SetPrimaryKey for InsertableSpatialRefSyBuilder
         self
     }
 }
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
-    /// Sets the value of the `spatial_ref_sys.auth_name` column from table
-    /// `spatial_ref_sys`.
-    pub fn auth_name<AuthName>(
-        mut self,
-        auth_name: AuthName,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
-    where
-        AuthName: TryInto<Option<String>>,
-        <AuthName as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let auth_name =
-            auth_name.try_into().map_err(|err: <AuthName as TryInto<Option<String>>>::Error| {
-                Into::into(err).rename_field(InsertableSpatialRefSyAttributes::AuthName)
-            })?;
-        self.auth_name = auth_name;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
-    /// Sets the value of the `spatial_ref_sys.auth_srid` column from table
-    /// `spatial_ref_sys`.
-    pub fn auth_srid<AuthSrid>(
-        mut self,
-        auth_srid: AuthSrid,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
-    where
-        AuthSrid: TryInto<Option<i32>>,
-        <AuthSrid as TryInto<Option<i32>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let auth_srid =
-            auth_srid.try_into().map_err(|err: <AuthSrid as TryInto<Option<i32>>>::Error| {
-                Into::into(err).rename_field(InsertableSpatialRefSyAttributes::AuthSrid)
-            })?;
-        self.auth_srid = auth_srid;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
-    /// Sets the value of the `spatial_ref_sys.proj4text` column from table
-    /// `spatial_ref_sys`.
-    pub fn proj4text<Proj4text>(
-        mut self,
-        proj4text: Proj4text,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
-    where
-        Proj4text: TryInto<Option<String>>,
-        <Proj4text as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let proj4text = proj4text.try_into().map_err(
-            |err: <Proj4text as TryInto<Option<String>>>::Error| {
-                Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Proj4text)
-            },
-        )?;
-        self.proj4text = proj4text;
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
-    /// Sets the value of the `spatial_ref_sys.srid` column from table
-    /// `spatial_ref_sys`.
-    pub fn srid<Srid>(
-        mut self,
-        srid: Srid,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
-    where
-        Srid: TryInto<i32>,
-        <Srid as TryInto<i32>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let srid = srid.try_into().map_err(|err: <Srid as TryInto<i32>>::Error| {
-            Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Srid)
-        })?;
-        self.srid = Some(srid);
-        Ok(self)
-    }
-}
-impl crate::codegen::structs_codegen::tables::insertables::InsertableSpatialRefSyBuilder {
-    /// Sets the value of the `spatial_ref_sys.srtext` column from table
-    /// `spatial_ref_sys`.
-    pub fn srtext<Srtext>(
-        mut self,
-        srtext: Srtext,
-    ) -> Result<Self, web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>>
-    where
-        Srtext: TryInto<Option<String>>,
-        <Srtext as TryInto<Option<String>>>::Error: Into<validation_errors::SingleFieldError>,
-    {
-        let srtext =
-            srtext.try_into().map_err(|err: <Srtext as TryInto<Option<String>>>::Error| {
-                Into::into(err).rename_field(InsertableSpatialRefSyAttributes::Srtext)
-            })?;
-        self.srtext = srtext;
-        Ok(self)
-    }
-}
 impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableSpatialRefSyBuilder
 where
-    Self: web_common_traits::database::InsertableVariant<
+    Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            UserId = i32,
             Row = crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy,
-            Error = web_common_traits::database::InsertError<InsertableSpatialRefSyAttributes>,
+            Error = web_common_traits::database::InsertError<SpatialRefSyAttribute>,
         >,
 {
-    type Attributes = InsertableSpatialRefSyAttributes;
-    fn is_complete(&self) -> bool {
-        self.srid.is_some()
-    }
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<Self::Attributes>> {
+    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<SpatialRefSyAttribute>>
+    {
         use diesel::Identifiable;
-        use web_common_traits::database::InsertableVariant;
+        use web_common_traits::database::DispatchableInsertableVariant;
         let insertable: crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy =
             self.insert(user_id, conn)?;
         Ok(insertable.id())
