@@ -17,5 +17,6 @@ num-traits.workspace = true
 workspace = true
 
 [features]
+default = ["serde", "arbitrary"]
 serde = ["dep:serde", "common_traits/serde"]
 arbitrary = ["dep:arbitrary"]

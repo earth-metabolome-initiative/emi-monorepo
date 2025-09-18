@@ -31,3 +31,9 @@ name = "sink_nodes"
 path = "fuzz_targets/sink_nodes.rs"
 test = false
 doc = false
+
+[[bin]]
+name = "simple_path"
+path = "fuzz_targets/simple_path.rs"
+test = false
+doc = false

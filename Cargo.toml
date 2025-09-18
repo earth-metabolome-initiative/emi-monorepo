@@ -215,7 +215,6 @@ pedantic = { level = "deny", priority = -1 }
 debug = false # Include debug info.
 
 [profile.test]
-incremental = true
 debug = true
 
 [profile.release]

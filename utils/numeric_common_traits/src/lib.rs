@@ -5,7 +5,6 @@ pub mod finite;
 pub mod integer;
 pub mod into_usize;
 pub mod number;
-pub mod ops;
 pub mod positive_integer;
 pub mod pow;
 pub mod sqrt;
@@ -19,7 +18,6 @@ pub mod prelude {
         integer::Integer,
         into_usize::IntoUsize,
         number::{Number, PositiveNumber},
-        ops::SaturatingSub,
         positive_integer::PositiveInteger,
         pow::Pow,
         sqrt::Sqrt,
