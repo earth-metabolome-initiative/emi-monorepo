@@ -54,7 +54,10 @@ impl<'graph> GuidedProcedurePseudocode<'graph> {
                     format!(
                         "    .and_then::<{procedure_type}, {error_type}>(|mut builder, conn| {{"
                     ),
-                    format!("        todo!(\"Implement the logic for \\\"{}\\\"\");", procedure.name),
+                    format!(
+                        "        todo!(\"Implement the logic for \\\"{}\\\"\");",
+                        procedure.name
+                    ),
                     "        Ok(builder)".to_owned(),
                     "    })?\n".to_owned(),
                 ]

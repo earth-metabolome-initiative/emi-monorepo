@@ -45,7 +45,8 @@ impl Worker for DBWSWorker {
             sqlite_wasm_rs::sahpool_vfs::install(
                 &sqlite_wasm_rs::sahpool_vfs::OpfsSAHPoolCfg::default(),
                 true,
-            ).await
+            )
+            .await
         });
         scope.send_message(WSInternalMessage::Connect);
         Self { websocket: None, conn: None, listen_notify: ListenNotify::default() }

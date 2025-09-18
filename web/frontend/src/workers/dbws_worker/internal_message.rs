@@ -28,8 +28,13 @@ pub enum InternalMessage {
     RetryC2DB((ComponentMessage, HandlerId)),
 }
 
-impl From<Result<sqlite_wasm_rs::sahpool_vfs::OpfsSAHPoolUtil, sqlite_wasm_rs::sahpool_vfs::OpfsSAHError>>
-    for InternalMessage
+impl
+    From<
+        Result<
+            sqlite_wasm_rs::sahpool_vfs::OpfsSAHPoolUtil,
+            sqlite_wasm_rs::sahpool_vfs::OpfsSAHError,
+        >,
+    > for InternalMessage
 {
     fn from(
         value: Result<
