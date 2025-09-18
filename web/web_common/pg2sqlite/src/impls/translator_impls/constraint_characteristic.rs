@@ -14,7 +14,7 @@ impl Translator for ConstraintCharacteristics {
     fn translate(
         &self,
         _schema: &mut Self::Schema,
-        options: &Self::Options,
+        _options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         unimplemented!("The constraint characteristic {:?} is not supported", self)
     }

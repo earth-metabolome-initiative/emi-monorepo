@@ -87,6 +87,13 @@ impl Translator for CreateTrigger {
             ));
         }
 
+        if let Some(characteristics) = &characteristics {
+            return Err(crate::errors::Error::UnknownPostgresFeature(
+                format!("Triggers with characteristics are not supported: `{}`", characteristics)
+                    .into(),
+            ));
+        }
+
         Ok((
             maybe_drop_trigger,
             CreateTrigger {
@@ -110,10 +117,7 @@ impl Translator for CreateTrigger {
                     .transpose()?,
                 exec_body: None,
                 statements: Some(ConditionalStatements::BeginEnd(function_body)),
-                characteristics: characteristics
-                    .as_ref()
-                    .map(|chars| chars.translate(schema, options))
-                    .transpose()?,
+                characteristics: None,
             },
         ))
     }

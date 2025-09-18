@@ -23,7 +23,7 @@ impl Translator for Function {
     fn translate(
         &self,
         _schema: &mut Self::Schema,
-        options: &Self::Options,
+        _options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         Ok(Function {
             name: translate_function_name(self.name.clone())?,

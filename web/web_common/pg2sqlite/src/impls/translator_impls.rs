@@ -2,7 +2,6 @@
 
 mod column;
 mod column_option;
-mod conditional_statements;
 mod constraint_characteristic;
 mod create_index;
 mod create_table;

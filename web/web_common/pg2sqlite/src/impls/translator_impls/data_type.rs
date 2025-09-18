@@ -13,7 +13,7 @@ impl Translator for DataType {
     fn translate(
         &self,
         _schema: &mut Self::Schema,
-        options: &Self::Options,
+        _options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         match self {
             DataType::Text | DataType::Integer(None) | DataType::Real => Ok(self.clone()),

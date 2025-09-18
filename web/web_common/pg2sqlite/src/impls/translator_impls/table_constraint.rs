@@ -15,7 +15,7 @@ impl Translator for TableConstraint {
 
     fn translate(
         &self,
-        schema: &mut Self::Schema,
+        _schema: &mut Self::Schema,
         options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         match self {

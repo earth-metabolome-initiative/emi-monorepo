@@ -13,7 +13,7 @@ impl Translator for ReferentialAction {
     fn translate(
         &self,
         _schema: &mut Self::Schema,
-        options: &Self::Options,
+        _options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         match self {
             ReferentialAction::NoAction => Ok(ReferentialAction::NoAction),

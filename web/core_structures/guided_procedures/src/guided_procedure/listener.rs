@@ -161,7 +161,7 @@ where
     fn leave_procedure_template(
         &mut self,
         _parents: &[&core_structures::ProcedureTemplate],
-        child: &core_structures::ProcedureTemplate,
+        _child: &core_structures::ProcedureTemplate,
     ) -> Result<Self::Output, Self::Error> {
         self.predecessor_procedure = self.parent_procedures.pop();
         Ok(GPBListenerOutput::NoOp)

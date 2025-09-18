@@ -16,7 +16,7 @@ pub fn create_photograph<C: LoadConnection>(
 where
     <Photograph as Insertable>::InsertableBuilder: DispatchableInsertableVariant<C, Error = InsertError<PhotographAttribute>, Row = Photograph>,
 {
-    let info = infer::get(photograph).expect("Failed to infer document type");
+    let _info = infer::get(photograph).expect("Failed to infer document type");
 
     // TODO: add validation for the photograph.
 
