@@ -41,7 +41,12 @@ impl Worker for DBWSWorker {
 
     fn create(scope: &yew_agent::prelude::WorkerScope<Self>) -> Self {
         console::log_1(&"Creating DBWSWorker".into());
-        scope.send_future(sqlite_wasm_rs::export::install_opfs_sahpool(None, true));
+        scope.send_future(async move {
+            sqlite_wasm_rs::sahpool_vfs::install(
+                &sqlite_wasm_rs::sahpool_vfs::OpfsSAHPoolCfg::default(),
+                true,
+            ).await
+        });
         scope.send_message(WSInternalMessage::Connect);
         Self { websocket: None, conn: None, listen_notify: ListenNotify::default() }
     }

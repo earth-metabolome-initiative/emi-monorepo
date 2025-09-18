@@ -90,9 +90,6 @@ sqlparser = { git = "https://github.com/LucaCappelletti94/sqlparser-rs", branch 
 arbitrary = { version = "1", features = ["derive"] }
 diesel = { version = "2.3.1", features = [
   "extras",
-  "sqlite",
-  "returning_clauses_for_sqlite_3_35",
-  "postgres",
   "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
 ] }
 # diesel_full_text_search = "2.2"

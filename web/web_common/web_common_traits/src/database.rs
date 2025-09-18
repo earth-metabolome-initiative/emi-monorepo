@@ -1,7 +1,6 @@
 //! Module with the traits for primitive operation on the database
 
 mod ancestor;
-mod connection;
 mod deletable;
 mod extension;
 mod foreign;
@@ -16,7 +15,6 @@ mod updatable;
 mod upsertable;
 
 pub use ancestor::{Ancestor, AncestorExists, Descendant};
-pub use connection::AnyConnection;
 pub use deletable::{Deletable, DeleteError, DeleteFromVec};
 pub use extension::ExtensionTable;
 pub use foreign::{ForeignKeys, HasForeignKeys};

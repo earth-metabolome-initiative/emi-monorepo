@@ -1,7 +1,5 @@
 //! Submodule providing the implementation of implicit numeric vocabularies.
 
-use numeric_common_traits::prelude::IntoUsize;
-
 use crate::traits::{BidirectionalVocabulary, Vocabulary};
 
 impl Vocabulary for u8 {
@@ -102,7 +100,7 @@ impl Vocabulary for u64 {
     }
 
     fn len(&self) -> usize {
-        u64::into_usize(*self)
+        *self as usize
     }
 
     fn sources(&self) -> Self::Sources<'_> {
