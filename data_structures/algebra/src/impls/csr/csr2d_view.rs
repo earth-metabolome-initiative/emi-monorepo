@@ -2,8 +2,8 @@
 
 use std::cmp::Ordering;
 
-use num_traits::{ConstOne, ConstZero};
-use numeric_common_traits::prelude::{IntoUsize, SaturatingSub};
+use num_traits::{ConstOne, ConstZero, SaturatingSub};
+use numeric_common_traits::prelude::IntoUsize;
 
 use crate::prelude::*;
 
@@ -79,7 +79,7 @@ impl<CSR: SparseMatrix2D> DoubleEndedIterator for CSR2DView<'_, CSR> {
 impl<'a, CSR: SparseMatrix2D> From<&'a CSR> for CSR2DView<'a, CSR> {
     fn from(csr2d: &'a CSR) -> Self {
         let next_row = CSR::RowIndex::ZERO;
-        let back_row = csr2d.number_of_rows().saturating_sub(CSR::RowIndex::ONE);
+        let back_row = csr2d.number_of_rows().saturating_sub(&CSR::RowIndex::ONE);
         let next = (next_row < csr2d.number_of_rows()).then(|| csr2d.sparse_row(next_row));
         let back = (back_row < csr2d.number_of_rows() && next_row < back_row)
             .then(|| csr2d.sparse_row(back_row));

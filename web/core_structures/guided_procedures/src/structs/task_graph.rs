@@ -7,7 +7,7 @@ use core_structures::ProcedureTemplate;
 use graph::{
     prelude::{GenericGraph, GenericMonoplexMonopartiteGraphBuilder, RootNodes, SinkNodes},
     traits::{
-        MonopartiteGraph, MonopartiteGraphBuilder, MonoplexGraph, MonoplexGraphBuilder,
+        MonopartiteGraph, MonopartiteGraphBuilder, MonoplexGraph, MonoplexGraphBuilder, SimplePath,
         TransposedMonoplexGraph,
     },
 };
@@ -59,6 +59,12 @@ impl TaskGraph {
         assert_eq!(root_nodes.len(), 1, "The task graph must have exactly one root node");
 
         Self { task_graph, root_node_id: root_nodes[0], sink_node_ids: sink_nodes }
+    }
+
+    /// Returns whether the graph is a simple path (i.e., a linear sequence of
+    /// nodes).
+    pub fn is_simple_path(&self) -> bool {
+        self.task_graph.is_simple_path()
     }
 
     /// Returns the root node of the task graph.

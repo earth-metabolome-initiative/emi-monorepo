@@ -1,10 +1,11 @@
 //! Implementation of the `Arbitrary` trait for the `CSR2D` struct.
 
 use arbitrary::{Arbitrary, Unstructured};
+use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use crate::{
     prelude::{MutabilityError, ValuedCSR2D},
-    traits::{IntoUsize, MatrixMut, PositiveInteger, SparseMatrixMut, TryFromUsize},
+    traits::{MatrixMut, SparseMatrixMut},
 };
 
 impl<'a, SparseIndex, RowIndex, ColumnIndex, Value> Arbitrary<'a>

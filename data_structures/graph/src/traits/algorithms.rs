@@ -8,3 +8,5 @@ pub mod root_nodes;
 pub use root_nodes::RootNodes;
 pub mod sink_nodes;
 pub use sink_nodes::SinkNodes;
+pub mod simple_path;
+pub use simple_path::SimplePath;

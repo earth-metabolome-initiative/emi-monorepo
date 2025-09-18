@@ -4,7 +4,7 @@
 //! they are not divided into different partitions.
 
 use algebra::prelude::*;
-use num_traits::ConstZero;
+use num_traits::{ConstZero, SaturatingAdd};
 use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use super::{BidirectionalVocabulary, Edges, Vocabulary};
@@ -21,7 +21,7 @@ pub trait MonopartiteEdges:
     type MonopartiteMatrix: SparseSquareMatrix<Index = Self::NodeId>;
 
     /// The identifier of the node.
-    type NodeId: PositiveInteger + IntoUsize + TryFromUsize;
+    type NodeId: PositiveInteger + IntoUsize + TryFromUsize + SaturatingAdd;
 
     /// Returns whether the graph has self-loops.
     fn has_self_loops(&self) -> bool {

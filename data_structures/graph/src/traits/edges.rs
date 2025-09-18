@@ -5,7 +5,7 @@ use algebra::prelude::{
     MatrixMut, SizedRowsSparseMatrix2D, SizedSparseMatrix, SparseMatrix, SparseMatrix2D,
     SparseMatrixMut,
 };
-use num_traits::ConstZero;
+use num_traits::{ConstZero, SaturatingAdd};
 use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
 use super::Edge;
@@ -16,11 +16,11 @@ pub trait Edges {
     /// The type of the edge.
     type Edge: Edge<SourceNodeId = Self::SourceNodeId, DestinationNodeId = Self::DestinationNodeId>;
     /// The type of the source node ID.
-    type SourceNodeId: PositiveInteger + IntoUsize + TryFromUsize;
+    type SourceNodeId: PositiveInteger + IntoUsize + TryFromUsize + SaturatingAdd;
     /// The type of the destination node ID.
-    type DestinationNodeId: PositiveInteger + IntoUsize + TryFromUsize;
+    type DestinationNodeId: PositiveInteger + IntoUsize + TryFromUsize + SaturatingAdd;
     /// The type of the edge identifier.
-    type EdgeId: PositiveInteger + IntoUsize + TryFromUsize;
+    type EdgeId: PositiveInteger + IntoUsize + TryFromUsize + SaturatingAdd;
     /// The underlying matrix type.
     type Matrix: SizedRowsSparseMatrix2D<
             RowIndex = Self::SourceNodeId,
