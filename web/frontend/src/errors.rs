@@ -46,7 +46,7 @@ impl From<ws_errors::WSError> for FrontendError {
 }
 
 impl From<diesel::result::Error> for FrontendError {
-    fn from(_err: diesel::result::Error) -> Self {
-        FrontendError::DB(DBError::QueryFailed)
+    fn from(err: diesel::result::Error) -> Self {
+        FrontendError::DB(DBError::QueryFailed(err))
     }
 }

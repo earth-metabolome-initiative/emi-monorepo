@@ -1,6 +1,8 @@
 name: ${DOCKER_PROJECT_NAME}
 services:
   postgres:
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
     container_name: ${POSTGRES_DOCKER_NAME}
     build:
       dockerfile: PostgresDockerfile

@@ -12,7 +12,7 @@ use crate::errors::{db_errors::DBError, ws_errors::WSError};
 pub mod db_internal_message;
 pub mod ws_internal_message;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, PartialEq)]
 /// Enumeration of internal messages used in the DB/WebSocket worker.
 pub enum InternalMessage {
     /// Message related to the database operations.

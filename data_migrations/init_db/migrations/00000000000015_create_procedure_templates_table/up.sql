@@ -61,7 +61,7 @@ RETURN NEW;
 END;
 $$;
 -- Trigger
-CREATE TRIGGER before_insert_next_procedure_templates BEFORE
+CREATE OR REPLACE TRIGGER before_insert_next_procedure_templates BEFORE
 INSERT ON next_procedure_templates FOR EACH ROW EXECUTE FUNCTION ensure_parent_procedure_templates();
 CREATE TABLE IF NOT EXISTS procedure_template_asset_models (
 	-- Identifier of the procedure template asset model

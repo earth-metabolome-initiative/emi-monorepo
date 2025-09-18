@@ -83,7 +83,7 @@ WHERE descendant_model = NEW.parent_model AND NEW.parent_model IS NOT NULL;
 RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-CREATE TRIGGER after_insert_asset_models
+CREATE OR REPLACE TRIGGER after_insert_asset_models
 AFTER
 INSERT ON asset_models FOR EACH ROW EXECUTE FUNCTION populate_asset_model_ancestors();
 -- When an `asset_models` row is deleted, we also delete all its descendants.
@@ -98,5 +98,5 @@ WHERE id IN (
 RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;
-CREATE TRIGGER after_delete_asset_models
+CREATE OR REPLACE TRIGGER after_delete_asset_models
 AFTER DELETE ON asset_models FOR EACH ROW EXECUTE FUNCTION delete_descendant_asset_models();

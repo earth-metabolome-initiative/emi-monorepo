@@ -20,7 +20,7 @@ impl Translator for Statement {
                 vec![create_table.translate(schema, options)?.into()]
             }
             Self::CreateIndex(create_index) => {
-                vec![create_index.translate(schema, options)?.into()]
+                create_index.translate(schema, options)?.map(Into::into).into_iter().collect()
             }
             Self::CreateFunction(create_function) => {
                 schema.add_function(create_function);

@@ -42,13 +42,15 @@ async fn main() -> std::io::Result<()> {
     {
         let mut connection = pool.get().unwrap();
         let database_name = std::env::var("POSTGRES_DB").expect("POSTGRES_DB must be set");
-        if !init_db::database_exists(&database_name, &mut connection)
-            .expect("Error checking if database exists")
-        {
+        if init_db::is_database_empty(&mut connection).expect("Error checking if database exists") {
+            log::info!("Database {database_name} is empty, creating it...");
             init_db::init_database(&database_name, true, &mut connection)
                 .await
                 .expect("Error creating database");
+            log::info!("Running init migration...");
             init_migration::init_migration(&mut connection).expect("Error running init migration");
+        } else {
+            log::info!("Database `{database_name}` already exists.");
         }
     }
 

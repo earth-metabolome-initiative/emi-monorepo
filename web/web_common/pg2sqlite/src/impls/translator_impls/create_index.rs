@@ -3,12 +3,15 @@
 
 use sqlparser::ast::{CreateIndex, IndexType};
 
-use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
+use crate::{
+    prelude::{Pg2SqliteOptions, PgSchema, Translator},
+    traits::{Schema, translation_options::TranslationOptions},
+};
 
 impl Translator for CreateIndex {
     type Schema = PgSchema;
     type Options = Pg2SqliteOptions;
-    type SQLiteEntry = Self;
+    type SQLiteEntry = Option<Self>;
 
     fn translate(
         &self,
@@ -23,7 +26,20 @@ impl Translator for CreateIndex {
             // let _fts5_table = create_fts5_from_index(self);
         }
 
-        Ok(CreateIndex {
+        // If the option to drop indexes without UUID primary key tables is set,
+        // we need to check if the index is on a table with a UUID primary key.
+        if options.should_drop_indexes_without_uuid_pk_tables() {
+            let table_name = self.table_name.to_string();
+            if !schema
+                .table_has_uuid_pk(&table_name)
+                .expect(&format!("Table `{table_name}` not found in schema"))
+            {
+                // Drop the index by returning None.
+                return Ok(None);
+            }
+        }
+
+        Ok(Some(CreateIndex {
             columns: self
                 .columns
                 .iter()
@@ -35,6 +51,6 @@ impl Translator for CreateIndex {
                 .map(|predicate| predicate.translate(schema, options))
                 .transpose()?,
             ..self.clone()
-        })
+        }))
     }
 }

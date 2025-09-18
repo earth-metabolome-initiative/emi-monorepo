@@ -107,8 +107,8 @@ pub(super) async fn portal_ws(
                                             .await
                                             .unwrap();
                                     }
-                                    Err(_error) => {
-                                        todo!("Handle ops error");
+                                    Err(error) => {
+                                        todo!("Handle ops error: {error}");
                                     }
                                 }
                             }
@@ -133,8 +133,8 @@ pub(super) async fn portal_ws(
                                                 .unwrap();
                                         }
                                     }
-                                    Err(_error) => {
-                                        todo!("Handle ops error");
+                                    Err(error) => {
+                                        todo!("Handle ops error: {error}");
                                     }
                                 }
                             }

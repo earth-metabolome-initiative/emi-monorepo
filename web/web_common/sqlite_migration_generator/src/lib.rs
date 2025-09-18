@@ -70,7 +70,11 @@ pub fn load_sqlite_from_csvs(csv_directory: TokenStream) -> TokenStream {
     let translated_sql: Vec<Statement> = Pg2Sqlite::default()
         .sql(&sql)
         .expect("Failed to parse SQL")
-        .translate(&Pg2SqliteOptions::default().remove_unsupported_check_constraints())
+        .translate(
+            &Pg2SqliteOptions::default()
+                .remove_unsupported_check_constraints()
+                .drop_indexes_without_uuid_pk_tables(),
+        )
         .expect("Failed to translate SQL");
 
     let translated_sql: String = translated_sql
@@ -142,7 +146,11 @@ pub fn load_sqlite_from_migrations(migrations_directory: TokenStream) -> TokenSt
     let translated_sql: Vec<Statement> = Pg2Sqlite::default()
         .ups(migrations_directory)
         .expect("Failed to parse SQL")
-        .translate(&Pg2SqliteOptions::default().remove_unsupported_check_constraints())
+        .translate(
+            &Pg2SqliteOptions::default()
+                .remove_unsupported_check_constraints()
+                .drop_indexes_without_uuid_pk_tables(),
+        )
         .expect("Failed to translate SQL");
 
     let translated_sql: String = translated_sql

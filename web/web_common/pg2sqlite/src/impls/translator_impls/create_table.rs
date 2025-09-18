@@ -3,7 +3,10 @@
 
 use sqlparser::ast::{CreateTable, TableConstraint};
 
-use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
+use crate::{
+    prelude::{Pg2SqliteOptions, PgSchema, Translator},
+    traits::schema::Schema,
+};
 
 impl Translator for CreateTable {
     type Schema = PgSchema;
@@ -15,7 +18,7 @@ impl Translator for CreateTable {
         schema: &mut Self::Schema,
         options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
-        Ok(Self {
+        let created_table = Self {
             columns: self
                 .columns
                 .iter()
@@ -30,6 +33,10 @@ impl Translator for CreateTable {
                 .flatten()
                 .collect(),
             ..self.clone()
-        })
+        };
+
+        schema.add_table(&created_table);
+
+        Ok(created_table)
     }
 }

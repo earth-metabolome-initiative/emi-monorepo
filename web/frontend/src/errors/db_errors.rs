@@ -3,7 +3,7 @@
 
 use std::fmt::Display;
 
-#[derive(Debug, Clone, PartialEq, Hash, PartialOrd, Eq, Ord)]
+#[derive(Debug, PartialEq)]
 /// An enum representing various device errors.
 pub enum DBError {
     /// When the connection to the database fails.
@@ -11,14 +11,14 @@ pub enum DBError {
     /// When installing `SAHPool` fails.
     InstallSAHPool,
     /// When a query fails.
-    QueryFailed,
+    QueryFailed(diesel::result::Error),
 }
 
 impl Display for DBError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             DBError::Connection => write!(f, "Failed to connect to the database."),
-            DBError::QueryFailed => write!(f, "Query failed."),
+            DBError::QueryFailed(err) => write!(f, "Query failed: {err}"),
             DBError::InstallSAHPool => write!(f, "Failed to install SAHPool."),
         }
     }
@@ -31,8 +31,8 @@ impl From<sqlite_wasm_rs::sahpool_vfs::OpfsSAHError> for DBError {
 }
 
 impl From<diesel::result::Error> for DBError {
-    fn from(_err: diesel::result::Error) -> Self {
-        DBError::QueryFailed
+    fn from(err: diesel::result::Error) -> Self {
+        DBError::QueryFailed(err)
     }
 }
 

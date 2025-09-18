@@ -3,17 +3,38 @@
 
 use sqlparser::{
     ast::{
-        BeginEndStatements, CreateFunction, CreateFunctionBody, DollarQuotedString, Expr,
-        ReturnStatement, ReturnStatementValue, Statement, Value, ValueWithSpan,
+        BeginEndStatements, CreateFunction, CreateFunctionBody, CreateTable, DollarQuotedString,
+        Expr, ReturnStatement, ReturnStatementValue, Statement, Value, ValueWithSpan,
         helpers::attached_token::AttachedToken,
     },
     keywords::Keyword,
     tokenizer::{Token, TokenWithSpan, Word},
 };
 
+use crate::traits::table_like::TableLike;
+
 /// Trait to define a schema for the translation between `PostgreSQL` and
 /// `SQLite`.
 pub trait Schema {
+    /// Returns a reference to a table defined in the schema by its name, if it
+    /// exists.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the table to be searched.
+    fn table(&self, name: &str) -> Option<&CreateTable>;
+
+    /// Returns whether the table with the given name has a primary key column
+    /// of type `UUID`, if the table exists.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the table to be searched.
+    fn table_has_uuid_pk(&self, name: &str) -> Option<bool> {
+        let table = self.table(name)?;
+        Some(table.has_uuid_pk())
+    }
+
     /// Returns a reference to a function defined in the schema by its name, if
     /// it exists.
     ///
@@ -95,4 +116,10 @@ pub trait Schema {
     ///
     /// * `function` - The function to be added.
     fn add_function(&mut self, function: &CreateFunction);
+
+    /// Adds a table to the schema.
+    ///
+    /// # Arguments
+    /// * `table` - The table to be added.
+    fn add_table(&mut self, table: &CreateTable);
 }

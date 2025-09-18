@@ -5,34 +5,44 @@ mod csv_migrations;
 mod errors;
 mod init;
 mod migrations;
-
 pub use init::init_database;
 
-/// Returns whether a database with the given name exists.
+/// Returns the number of tables in the given database.
 ///
 /// # Arguments
 ///
-/// * `database_name`: The name of the database to check.
 /// * `connection`: A mutable reference to an asynchronous `PostgreSQL`
 ///   connection.
 ///
 /// # Errors
 ///
 /// * If the query fails, an error of type `errors::Error` is returned.
-pub fn database_exists(
-    database_name: &str,
-    connection: &mut diesel::PgConnection,
-) -> Result<bool, errors::Error> {
-    use diesel::{QueryableByName, RunQueryDsl, sql_query, sql_types::Integer};
+pub fn number_of_tables(connection: &mut diesel::PgConnection) -> Result<i64, errors::Error> {
+    use diesel::{QueryableByName, RunQueryDsl, sql_query};
 
-    #[derive(QueryableByName)]
-    struct Exists {
-        #[diesel(sql_type = Integer)]
-        exists: i32,
+    #[derive(Debug, QueryableByName)]
+    struct TableCount {
+        #[diesel(sql_type = diesel::sql_types::BigInt)]
+        count: i64,
     }
 
-    Ok(sql_query(format!("SELECT 1 as exists FROM pg_database WHERE datname = '{database_name}'",))
-        .get_result::<Exists>(connection)?
-        .exists
-        == 1)
+    Ok(sql_query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public'")
+        .load::<TableCount>(connection)?
+        .pop()
+        .map(|tc| tc.count)
+        .unwrap_or(0))
+}
+
+/// Returns whether the given database is empty (i.e., has no tables).
+///
+///  # Arguments
+///
+/// * `connection`: A mutable reference to an asynchronous `PostgreSQL`
+///   connection.
+///
+///  # Errors
+///
+/// * If the query fails, an error of type `errors::Error` is returned.
+pub fn is_database_empty(connection: &mut diesel::PgConnection) -> Result<bool, errors::Error> {
+    Ok(number_of_tables(connection)? == 0)
 }
