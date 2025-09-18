@@ -6,6 +6,7 @@ use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
+use core_structures::User;
 
 use crate::{
     GuidedProcedure, ProcedureTemplateGraph, guided_procedure::GPBListener, ptg_visitor::PTGVisitor,
@@ -16,8 +17,8 @@ use crate::{
 pub struct GuidedProcedureBuilder<'graph, C> {
     graph: Option<&'graph ProcedureTemplateGraph>,
     connection: Option<&'graph mut C>,
-    /// The user ID which is conducting the guided procedure.
-    user_id: Option<i32>,
+    /// The user which is conducting the guided procedure.
+    author: Option<&'graph User>,
 }
 
 impl<'graph, C> GuidedProcedureBuilder<'graph, C> {
@@ -34,15 +35,15 @@ impl<'graph, C> GuidedProcedureBuilder<'graph, C> {
     }
 
     /// Sets the user ID for the guided procedure.
-    pub fn user_id(mut self, user_id: i32) -> Self {
-        self.user_id = Some(user_id);
+    pub fn author(mut self, author: &'graph User) -> Self {
+        self.author = Some(author);
         self
     }
 }
 
 impl<C> Default for GuidedProcedureBuilder<'_, C> {
     fn default() -> Self {
-        Self { graph: None, connection: None, user_id: None }
+        Self { graph: None, connection: None, author: None }
     }
 }
 
@@ -51,7 +52,7 @@ impl<C> Default for GuidedProcedureBuilder<'_, C> {
 pub enum GuidedProcedureAttribute {
     Graph,
     Connection,
-    UserId,
+    Author,
 }
 
 impl Display for GuidedProcedureAttribute {
@@ -59,7 +60,7 @@ impl Display for GuidedProcedureAttribute {
         match self {
             GuidedProcedureAttribute::Graph => write!(f, "graph"),
             GuidedProcedureAttribute::Connection => write!(f, "connection"),
-            GuidedProcedureAttribute::UserId => write!(f, "user_id"),
+            GuidedProcedureAttribute::Author => write!(f, "author"),
         }
     }
 }
@@ -70,7 +71,7 @@ impl<C> Attributed for GuidedProcedureBuilder<'_, C> {
 
 impl<C> IsCompleteBuilder for GuidedProcedureBuilder<'_, C> {
     fn is_complete(&self) -> bool {
-        self.graph.is_some() && self.connection.is_some() && self.user_id.is_some()
+        self.graph.is_some() && self.connection.is_some() && self.author.is_some()
     }
 }
 
@@ -81,13 +82,13 @@ impl<'graph, C> Builder for GuidedProcedureBuilder<'graph, C> {
     fn build(self) -> Result<Self::Object, Self::Error> {
         let graph =
             self.graph.ok_or(BuilderError::IncompleteBuild(GuidedProcedureAttribute::Graph))?;
-        let user_id =
-            self.user_id.ok_or(BuilderError::IncompleteBuild(GuidedProcedureAttribute::UserId))?;
+        let author =
+            self.author.ok_or(BuilderError::IncompleteBuild(GuidedProcedureAttribute::Author))?;
         let connection = self
             .connection
             .ok_or(BuilderError::IncompleteBuild(GuidedProcedureAttribute::Connection))?;
         Ok(GuidedProcedure {
-            visitor: PTGVisitor::new(graph, GPBListener::new(graph, user_id, connection)),
+            visitor: PTGVisitor::new(graph, GPBListener::new(graph, author, connection)),
         })
     }
 }

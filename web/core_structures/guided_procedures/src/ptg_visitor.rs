@@ -18,7 +18,7 @@ enum CurrentNodeVisitState {
     Visited,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Visitor pattern trait for traversing a `ProcedureTemplateGraph`.
 pub struct PTGVisitor<'graph, G, L> {
     /// The graph to traverse.
@@ -59,6 +59,11 @@ where
             ptam_iter: None,
             nodes_to_visit: Vec::new(),
         }
+    }
+
+    /// Returns a reference to the underlying graph.
+    pub fn graph(&self) -> &'graph ProcedureTemplateGraph {
+        self.graph.as_ref()
     }
 
     /// Returns a reference to the underlying listener.

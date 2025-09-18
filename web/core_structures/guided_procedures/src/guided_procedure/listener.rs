@@ -4,7 +4,7 @@ use std::{collections::HashMap, fmt::Debug};
 
 use common_traits::builder::IsCompleteBuilder;
 use core_structures::{
-    Procedure, ProcedureAsset, ProcedureTemplate, ProcedureTemplateAssetModel,
+    Procedure, ProcedureAsset, ProcedureTemplate, ProcedureTemplateAssetModel, User,
     tables::{insertables::ProcedureSettable, most_concrete_variants::ProcedureBuilderDAG},
 };
 use web_common_traits::{
@@ -21,7 +21,7 @@ use crate::{
 pub(super) struct GPBListener<'listener, C> {
     graph: &'listener ProcedureTemplateGraph,
     connection: &'listener mut C,
-    user_id: i32,
+    author: &'listener User,
     designated_successor: Option<&'listener ProcedureTemplate>,
     parent_procedures: Vec<<Procedure as PrimaryKeyLike>::PrimaryKey>,
     predecessor_procedure: Option<<Procedure as PrimaryKeyLike>::PrimaryKey>,
@@ -52,13 +52,13 @@ impl<C> ProcedureTemplateAssetGraph for GPBListener<'_, C> {
 impl<'listener, C> GPBListener<'listener, C> {
     pub(super) fn new(
         graph: &'listener ProcedureTemplateGraph,
-        user_id: i32,
+        author: &'listener User,
         connection: &'listener mut C,
     ) -> Self {
         Self {
             graph,
             connection,
-            user_id,
+            author,
             designated_successor: None,
             parent_procedures: Vec::new(),
             predecessor_procedure: None,
@@ -82,7 +82,7 @@ impl<'listener, C> GPBListener<'listener, C> {
                 ProcedureTemplateAssetModel = ProcedureTemplateAssetModel,
             > + PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
     {
-        let procedure = builder.insert(self.user_id, self.connection)?;
+        let procedure = builder.insert(self.author.id, self.connection)?;
         self.parent_procedures.push(procedure.primary_key());
         for (ptam_id, pa_id) in procedure.procedure_template_asset_models_and_procedure_assets() {
             let ptam: &ProcedureTemplateAssetModel =
@@ -139,7 +139,7 @@ where
         let mut procedure_builder = child
             .procedure_builder_dag()
             .procedure_template(child)?
-            .created_by(self.user_id)?
+            .created_by(self.author)?
             .complete_with(parents, &most_concrete_child, self)?;
 
         if let Some(parent_procedure) = self.parent_procedures.last() {

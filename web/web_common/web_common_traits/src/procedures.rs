@@ -11,6 +11,9 @@ pub trait ProcedureTemplateRoot {
     /// Returns the procedure builder DAG type associated with the current
     /// procedure template.
     fn procedure_builder_dag(&self) -> Self::ProcedureBuilderDAG;
+
+    /// Returns the type of the most concrete procedure as a string slice.
+    fn procedure_type(&self) -> &'static str;
 }
 
 /// Trait defining a procedure template.

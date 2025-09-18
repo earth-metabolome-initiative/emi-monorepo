@@ -81,6 +81,100 @@ impl web_common_traits::prelude::ProcedureTemplateRoot
             }
         }
     }
+    fn procedure_type(&self) -> &'static str {
+        match self.most_concrete_table.as_str() {
+            "aliquoting_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
+                >()
+            }
+            "ball_mill_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::ball_mill_procedures::BallMillProcedure,
+                >()
+            }
+            "capping_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure,
+                >()
+            }
+            "centrifuge_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure,
+                >()
+            }
+            "disposal_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure,
+                >()
+            }
+            "fractioning_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::fractioning_procedures::FractioningProcedure,
+                >()
+            }
+            "freeze_drying_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::freeze_drying_procedures::FreezeDryingProcedure,
+                >()
+            }
+            "freezing_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::freezing_procedures::FreezingProcedure,
+                >()
+            }
+            "geolocation_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
+                >()
+            }
+            "harvesting_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::harvesting_procedures::HarvestingProcedure,
+                >()
+            }
+            "packaging_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure,
+                >()
+            }
+            "photograph_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure,
+                >()
+            }
+            "pouring_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
+                >()
+            }
+            "procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::procedures::Procedure,
+                >()
+            }
+            "storage_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure,
+                >()
+            }
+            "supernatant_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
+                >()
+            }
+            "weighing_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure,
+                >()
+            }
+            most_concrete_column_ident => {
+                unreachable!(
+                    "Unknown most concrete variant: {most_concrete_column_ident}"
+                )
+            }
+        }
+    }
 }
 impl web_common_traits::prelude::ProcedureTemplateLike
     for crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate

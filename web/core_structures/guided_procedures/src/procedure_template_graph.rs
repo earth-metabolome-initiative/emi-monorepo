@@ -124,6 +124,16 @@ impl AsRef<Ownership> for ProcedureTemplateGraph {
 }
 
 impl ProcedureTemplateGraph {
+    /// Returns whether the associated procedure template graph is a simple path
+    /// which does not branch.
+    pub fn is_simple_path(&self) -> bool {
+        self.task_graphs.iter().all(
+            |tg_opt| {
+                if let Some(tg) = tg_opt { tg.is_simple_path() } else { true }
+            },
+        )
+    }
+
     /// Returns whether the provided procedure template asset model is owned by
     /// the root procedure template.
     ///

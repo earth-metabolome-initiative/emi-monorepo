@@ -55,8 +55,12 @@ pub fn directus_migration(
     let organism_model = organism_model(user, portal_conn)?;
     let phone_model = phone_model(user, portal_conn)?;
 
+    // let pseudocode =
+    // guided_procedures::GuidedProcedurePseudocode::new().graph(&procedure_graph)?.
+    // build()?; println!("{}", pseudocode.pseudocode::<anyhow::Error>());
+
     let guided_procedure = GuidedProcedure::new()
-        .user_id(user.id)
+        .author(user)
         .graph(&procedure_graph)
         .connection(portal_conn)
         .build()?;
@@ -79,6 +83,90 @@ pub fn directus_migration(
                 .created_by(user)?
                 .insert(user.id, conn)?;
             builder = builder.procedure_photograph(ProcedureAsset::new().asset(photograph)?)?;
+            Ok(builder)
+        })?
+        .and_then::<core_structures::PhotographProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Organism Details Picture\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::PhotographProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Organism Collected Part Picture\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::PhotographProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Sample Label and Panel Picture\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::GeolocationProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Organism Geolocation\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::HarvestingProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Harvest sample\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::PackagingProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Wrap in coffee filter paper\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::StorageProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Place in conical centrifugal tube\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::StorageProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Place in storage box\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::FreezingProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Freezing\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::FreezeDryingProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Freeze Drying\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::StorageProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Falcon Storage\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::FractioningProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Fractioning\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::BallMillProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Ball Mill 1\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::PouringProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Pouring Solvent\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::BallMillProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Ball Mill 2\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::CentrifugeProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Centrifuge\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::SupernatantProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Supernatant\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::DisposalProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Dispose of Eppendorf Tube\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::DisposalProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Dispose of Pipette Tips\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::CappingProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Capping\"");
+            Ok(builder)
+        })?
+        .and_then::<core_structures::StorageProcedure, anyhow::Error>(|builder, _conn| {
+            todo!("Implement the logic for \"Long Term Storage Vial Storage\"");
             Ok(builder)
         })?
         .finish()?;

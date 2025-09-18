@@ -96,7 +96,7 @@ impl<'a> ProcedureCodegen<'a> {
                 procedure_template.as_ref().most_concrete_table_column(false, conn)?
             {
                 let most_concrete_column_ident = most_concrete_column.snake_case_ident()?;
-                let cases = procedure_templates
+                let procedure_builder_dag_cases = procedure_templates
                     .iter()
                     .map(|table| {
                         let table_name = table.as_ref().table_name.as_str();
@@ -107,6 +107,17 @@ impl<'a> ProcedureCodegen<'a> {
                         })
                     })
                     .collect::<Result<Vec<_>, crate::errors::Error>>()?;
+                let procedure_type_cases = procedure_templates
+                    .iter()
+                    .map(|table| {
+                        let table_name = table.as_ref().table_name.as_str();
+                        let procedure = table.procedure(conn)?;
+                        let procedure_type = procedure.as_ref().import_struct_path()?;
+                        Ok(quote! {
+                            #table_name => std::any::type_name::<#procedure_type>()
+                        })
+                    })
+                    .collect::<Result<Vec<_>, crate::errors::Error>>()?;
                 Some(quote! {
                     impl web_common_traits::prelude::ProcedureTemplateRoot for #procedure_template_type {
                         type ProcedureBuilderDAG = #procedure_builder_dag_ty;
@@ -114,7 +125,16 @@ impl<'a> ProcedureCodegen<'a> {
                         fn procedure_builder_dag(&self) -> Self::ProcedureBuilderDAG {
                             use web_common_traits::database::Insertable;
                             match self.#most_concrete_column_ident.as_str() {
-                                #(#cases),*,
+                                #(#procedure_builder_dag_cases),*,
+                                most_concrete_column_ident => {
+                                    unreachable!("Unknown most concrete variant: {most_concrete_column_ident}")
+                                }
+                            }
+                        }
+
+                        fn procedure_type(&self) -> &'static str {
+                            match self.#most_concrete_column_ident.as_str() {
+                                #(#procedure_type_cases),*,
                                 most_concrete_column_ident => {
                                     unreachable!("Unknown most concrete variant: {most_concrete_column_ident}")
                                 }
