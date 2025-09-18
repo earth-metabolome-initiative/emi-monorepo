@@ -17,8 +17,12 @@ impl Translator for Expr {
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         Ok(match self {
             Expr::Function(func) => Expr::Function(func.translate(schema, options)?),
+            Expr::Identifier(_) => self.clone(),
             _ => {
-                unimplemented!("Expr translation for definition `{}` is not yet implemented.", self)
+                unimplemented!(
+                    "Expr translation for definition `{:?}` is not yet implemented.",
+                    self
+                )
             }
         })
     }

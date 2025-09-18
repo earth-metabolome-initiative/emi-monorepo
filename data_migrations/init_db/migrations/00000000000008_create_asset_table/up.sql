@@ -75,13 +75,11 @@ CREATE OR REPLACE FUNCTION populate_asset_model_ancestors() RETURNS TRIGGER AS $
 INSERT INTO asset_model_ancestors (descendant_model, ancestor_model)
 VALUES (NEW.id, NEW.id);
 -- Insert all ancestors of the parent model
-IF NEW.parent_model IS NOT NULL THEN
 INSERT INTO asset_model_ancestors (descendant_model, ancestor_model)
 SELECT NEW.id,
     ancestor_model
 FROM asset_model_ancestors
-WHERE descendant_model = NEW.parent_model;
-END IF;
+WHERE descendant_model = NEW.parent_model AND NEW.parent_model IS NOT NULL;
 RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

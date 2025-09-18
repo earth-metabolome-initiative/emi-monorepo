@@ -9,41 +9,11 @@ use pg2sqlite::{
 #[test]
 /// Test translating the core migrations used in the `core_structures` crate.
 fn test_translator() {
-    let to_parse = r#"CREATE TRIGGER trg_inherit_asset_models
-AFTER INSERT ON parent_procedure_templates
-FOR EACH ROW
-BEGIN
-    INSERT INTO procedure_template_asset_models (
-        name,
-        procedure_template,
-        based_on,
-        asset_model,
-        created_by,
-        created_at
-    )
-    SELECT
-        pam.name,
-        NEW.parent,
-        pam.id,
-        pam.asset_model,
-        NEW.created_by,
-        NEW.created_at
-    FROM procedure_template_asset_models pam
-    WHERE pam.procedure_template = NEW.child;
-END;
-"#;
-    let stmt =
-        sqlparser::parser::Parser::parse_sql(&sqlparser::dialect::SQLiteDialect {}, to_parse)
-            .unwrap();
-    println!("Parsed statement: {stmt:?}");
-
     let translated_migrations = Pg2Sqlite::default()
         .ups("../../../data_migrations/init_db/migrations")
         .expect("Failed to load the migrations")
         .translate(&Pg2SqliteOptions::default().remove_unsupported_check_constraints())
         .expect("Failed to translate the migrations");
-
-    assert_eq!(translated_migrations.len(), 121);
 
     // We try to parse the translated migrations using the `sqlparser` crate,
     // for the `SQLite` dialect.

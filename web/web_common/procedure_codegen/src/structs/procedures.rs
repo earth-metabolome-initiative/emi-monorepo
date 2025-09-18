@@ -93,11 +93,6 @@ impl Procedure {
         Ok(Self { table: table.as_ref().clone() })
     }
 
-    /// Returns whether the current procedure is the abstract.
-    pub(crate) fn is_abstract(&self) -> bool {
-        self.table.table_name == PROCEDURES_TABLE_NAME
-    }
-
     /// Returns whether the given table is a procedure table.
     ///
     /// # Arguments

@@ -5,6 +5,7 @@ use std::path::Path;
 
 use diesel::PgConnection;
 use quote::quote;
+use syn::Ident;
 use webcodegen::TableLike;
 
 use super::ProcedureCodegen;
@@ -72,7 +73,23 @@ impl<'a> ProcedureCodegen<'a> {
                     quote! { vec![#(#procedure_template_asset_models_and_procedure_assets),*] }
                 };
 
-            let requirements = vec![procedure.as_ref().setter_trait_ty()?];
+            let mut requirements = Vec::new();
+
+            let (parents_ident, template_ident, template_graph_ident) =
+                if complete_with_dispatches.is_empty() {
+                    (
+                        Ident::new("_parents", proc_macro2::Span::call_site()),
+                        Ident::new("_template", proc_macro2::Span::call_site()),
+                        Ident::new("_template_graph", proc_macro2::Span::call_site()),
+                    )
+                } else {
+                    requirements.push(procedure.as_ref().setter_trait_ty()?);
+                    (
+                        Ident::new("parents", proc_macro2::Span::call_site()),
+                        Ident::new("template", proc_macro2::Span::call_site()),
+                        Ident::new("template_graph", proc_macro2::Span::call_site()),
+                    )
+                };
 
             let maybe_mut =
                 if complete_with_dispatches.is_empty() { None } else { Some(quote! { mut }) };
@@ -101,9 +118,9 @@ impl<'a> ProcedureCodegen<'a> {
 
                         fn complete_with<G, PT>(
                             #maybe_mut self,
-                            parents: &[&PT],
-                            template: &<Self::Procedure as web_common_traits::prelude::ProcedureLike>::Template,
-                            template_graph: &G,
+                            #parents_ident: &[&PT],
+                            #template_ident: &<Self::Procedure as web_common_traits::prelude::ProcedureLike>::Template,
+                            #template_graph_ident: &G,
                         ) -> Result<Self, Self::Error> where
                             G: web_common_traits::prelude::ProcedureTemplateAssetGraph<
                                 ProcedureTemplateAssetModel = <Self::Procedure as web_common_traits::prelude::ProcedureLike>::ProcedureTemplateAssetModel,

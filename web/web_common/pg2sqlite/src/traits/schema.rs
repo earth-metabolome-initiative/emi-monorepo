@@ -1,7 +1,15 @@
 //! Submodule defining a schema for the translation between `PostgreSQL` and
 //! `SQLite`.
 
-use sqlparser::ast::CreateFunction;
+use sqlparser::{
+    ast::{
+        BeginEndStatements, CreateFunction, CreateFunctionBody, DollarQuotedString, Expr,
+        ReturnStatement, ReturnStatementValue, Statement, Value, ValueWithSpan,
+        helpers::attached_token::AttachedToken,
+    },
+    keywords::Keyword,
+    tokenizer::{Token, TokenWithSpan, Word},
+};
 
 /// Trait to define a schema for the translation between `PostgreSQL` and
 /// `SQLite`.
@@ -12,7 +20,74 @@ pub trait Schema {
     /// # Arguments
     ///
     /// * `name` - The name of the function to be searched.
-    fn has_function(&self, name: &str) -> Option<&CreateFunction>;
+    fn function(&self, name: &str) -> Option<&CreateFunction>;
+
+    /// Returns a reference to the body of a function defined in the schema by
+    /// its name, if it exists.
+    ///
+    /// # Arguments
+    ///
+    /// * `name` - The name of the function to be searched.
+    fn function_body(&self, name: &str) -> Option<BeginEndStatements> {
+        let function = self.function(name)?;
+        let function_body = function.function_body.as_ref()?;
+        match function_body {
+            CreateFunctionBody::AsBeginEnd(body) => Some(body.clone()),
+            CreateFunctionBody::AsBeforeOptions(Expr::Value(ValueWithSpan {
+                value: Value::DollarQuotedString(DollarQuotedString { value: maybe_body, tag: _ }),
+                span: _,
+            })) => {
+                // We strip spaces and semicolons from the body.
+                let maybe_body = maybe_body.trim().trim_end_matches(';').trim();
+
+                // We strip the `BEGIN` and `END` tokens, as they are not part of the
+                // actual body.
+                let maybe_body = maybe_body
+                    .strip_prefix("BEGIN")
+                    .expect("Function body should start with BEGIN")
+                    .strip_suffix("END")
+                    .expect("Function body should end with END")
+                    .trim();
+
+                let mut statements = sqlparser::parser::Parser::parse_sql(
+                    &sqlparser::dialect::PostgreSqlDialect {},
+                    &maybe_body,
+                )
+                .expect(&format!("Failed to parse function body: {maybe_body}"));
+
+                // The function body may end with a `RETURN NEW;` or `RETURN OLD;` statement.
+                // If that's the case, we remove it.
+                if let Some(Statement::Return(ReturnStatement {
+                    value: Some(ReturnStatementValue::Expr(expr)),
+                })) = statements.last()
+                {
+                    let string_expr = expr.to_string();
+                    if string_expr == "NEW" || string_expr == "OLD" {
+                        statements.pop();
+                    }
+                }
+
+                Some(BeginEndStatements {
+                    begin_token: AttachedToken(TokenWithSpan::wrap(Token::Word(Word {
+                        value: "BEGIN".into(),
+                        quote_style: None,
+                        keyword: Keyword::BEGIN,
+                    }))),
+                    statements,
+                    end_token: AttachedToken(TokenWithSpan::wrap(Token::Word(Word {
+                        value: "END".into(),
+                        quote_style: None,
+                        keyword: Keyword::END,
+                    }))),
+                })
+            }
+            _ => {
+                unimplemented!(
+                    "Function body extraction for definition `{function_body:?}` is not yet implemented.",
+                )
+            }
+        }
+    }
 
     /// Adds a function to the schema.
     ///

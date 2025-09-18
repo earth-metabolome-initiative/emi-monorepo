@@ -3,10 +3,7 @@
 
 use sqlparser::ast::Statement;
 
-use crate::{
-    impls::translator_impls::create_trigger::translate_create_trigger,
-    prelude::{Pg2SqliteOptions, PgSchema, Schema, Translator},
-};
+use crate::prelude::{Pg2SqliteOptions, PgSchema, Schema, Translator};
 
 impl Translator for Statement {
     type Schema = PgSchema;
@@ -20,51 +17,24 @@ impl Translator for Statement {
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         Ok(match self {
             Self::CreateTable(create_table) => {
-                vec![Self::CreateTable(create_table.translate(schema, options)?)]
+                vec![create_table.translate(schema, options)?.into()]
             }
             Self::CreateIndex(create_index) => {
-                vec![Statement::CreateIndex(create_index.translate(schema, options)?)]
+                vec![create_index.translate(schema, options)?.into()]
             }
             Self::CreateFunction(create_function) => {
                 schema.add_function(create_function);
                 Vec::new()
             }
-            Self::CreateTrigger {
-                or_alter,
-                or_replace,
-                is_constraint,
-                name,
-                period,
-                events,
-                table_name,
-                referenced_table_name,
-                referencing,
-                trigger_object,
-                include_each,
-                condition,
-                exec_body,
-                statements,
-                characteristics,
-            } => {
-                vec![translate_create_trigger(
-                    *or_alter,
-                    *or_replace,
-                    *is_constraint,
-                    name,
-                    *period,
-                    events,
-                    table_name,
-                    referenced_table_name,
-                    referencing,
-                    *trigger_object,
-                    *include_each,
-                    condition,
-                    exec_body,
-                    statements,
-                    characteristics,
-                    schema,
-                    options,
-                )?]
+            Self::CreateTrigger(create_trigger) => {
+                let (maybe_drop_trigger, create_trigger) =
+                    create_trigger.translate(schema, options)?;
+                let mut statements = vec![];
+                if let Some(drop_trigger) = maybe_drop_trigger {
+                    statements.push(drop_trigger.into());
+                }
+                statements.push(create_trigger.into());
+                statements
             }
             unsupported_statement => {
                 unimplemented!(

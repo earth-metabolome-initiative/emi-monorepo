@@ -2,12 +2,11 @@
 //! struct, including operations such as connecting to the database and
 //! installing the `SAHPool`.
 
-use diesel::{Connection, SqliteConnection, connection::SimpleConnection};
+use diesel::{Connection, OptionalExtension, SqliteConnection, connection::SimpleConnection};
 use web_common_traits::{
     crud::{CRUD, ExecuteCrudOperation},
     database::{Row, Tabular},
 };
-use diesel::OptionalExtension;
 use web_sys::console;
 use ws_messages::DBMessage;
 use yew_agent::worker::HandlerId;

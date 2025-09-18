@@ -22,9 +22,9 @@ impl web_common_traits::prelude::ProcedureBuilderLike
     type Procedure = crate::codegen::structs_codegen::tables::procedures::Procedure;
     fn complete_with<G, PT>(
         self,
-        parents: &[&PT],
-        template: &<Self::Procedure as web_common_traits::prelude::ProcedureLike>::Template,
-        template_graph: &G,
+        _parents: &[&PT],
+        _template: &<Self::Procedure as web_common_traits::prelude::ProcedureLike>::Template,
+        _template_graph: &G,
     ) -> Result<Self, Self::Error>
     where
         G: web_common_traits::prelude::ProcedureTemplateAssetGraph<
@@ -33,7 +33,6 @@ impl web_common_traits::prelude::ProcedureBuilderLike
             ProcedureTemplateRoot = PT,
         >,
     {
-        use crate::codegen::structs_codegen::tables::insertables::ProcedureSettable;
         Ok(self)
     }
 }

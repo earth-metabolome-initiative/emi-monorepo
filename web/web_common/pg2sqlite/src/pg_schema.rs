@@ -12,12 +12,12 @@ pub struct PgSchema {
 }
 
 impl Schema for PgSchema {
-    fn has_function(&self, name: &str) -> Option<&CreateFunction> {
+    fn function(&self, name: &str) -> Option<&CreateFunction> {
         self.functions.iter().find(|f| f.name.to_string().eq_ignore_ascii_case(name))
     }
 
     fn add_function(&mut self, function: &CreateFunction) {
-        if self.has_function(&function.name.to_string()).is_none() {
+        if self.function(&function.name.to_string()).is_none() {
             self.functions.push(function.clone());
         }
     }
