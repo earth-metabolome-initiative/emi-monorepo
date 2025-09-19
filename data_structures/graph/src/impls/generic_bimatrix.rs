@@ -1,4 +1,4 @@
-//! Submodule implementing Edges for GenericBiMatrix2D.
+//! Submodule implementing Edges for `GenericBiMatrix2D`.
 
 use algebra::prelude::*;
 use num_traits::ConstZero;

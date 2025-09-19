@@ -313,14 +313,13 @@ impl TaxonomyBuilder for OpenTreeOfLifeTaxonomyBuilder {
 
         // We check for each taxon entry that has a parent that the parent exists.
         for taxon_entry in &self.taxon_entries {
-            if let Some(parent_id) = taxon_entry.parent_id {
-                if !self.id_to_position.contains_key(&parent_id) {
+            if let Some(parent_id) = taxon_entry.parent_id
+                && !self.id_to_position.contains_key(&parent_id) {
                     return Err(crate::errors::TaxonEntryBuilderError::ParentNotFound(
                         taxon_entry.clone(),
                     )
                     .into());
                 }
-            }
 
             // TODO! Check that parent has a compatible rank!
         }

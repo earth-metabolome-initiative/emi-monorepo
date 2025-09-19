@@ -121,7 +121,7 @@ pub trait OwnershipLike: AsRef<Ownership> {
     fn procedure_template_asset_models(
         &self,
     ) -> impl Iterator<Item = &ProcedureTemplateAssetModel> {
-        self.as_ref().graph.right_nodes_vocabulary().iter().map(|am| am.as_ref())
+        self.as_ref().graph.right_nodes_vocabulary().iter()
     }
 
     /// Returns an iterator over all foreign procedure templates in the
@@ -210,7 +210,6 @@ pub trait OwnershipLike: AsRef<Ownership> {
                 .right_nodes_vocabulary()
                 .get(ptam_id)
                 .expect("Procedure template asset model id out of bounds")
-                .as_ref()
         })
     }
 
@@ -256,7 +255,6 @@ pub trait OwnershipLike: AsRef<Ownership> {
             .binary_search_by(|ptam: &ProcedureTemplateAssetModel| ptam.id.cmp(&primary_key))
             .ok()
             .and_then(|index| self.as_ref().graph.right_nodes_vocabulary().get(index))
-            .map(|ptam| ptam.as_ref())
     }
 
     /// Returns the certain based on aliases of the given procedure
@@ -299,14 +297,12 @@ pub trait OwnershipLike: AsRef<Ownership> {
         let certain_based_on_alias = if self.as_ref().derivatives.in_degree(ptam_id) == 1 {
             nv.get(self.as_ref().derivatives.predecessors(ptam_id).next()?)
                 .expect("Procedure template asset model id out of bounds")
-                .as_ref()
         } else {
             let mut certain_based_on_alias = None;
             for predecessor in self.as_ref().derivatives.predecessors(ptam_id) {
                 let predecessor_pt = nv
                     .get(predecessor)
-                    .expect("Procedure template asset model id out of bounds")
-                    .as_ref();
+                    .expect("Procedure template asset model id out of bounds");
 
                 for parent in parents {
                     if predecessor_pt.procedure_template == parent.procedure_template {

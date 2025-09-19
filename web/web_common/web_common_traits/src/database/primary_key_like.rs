@@ -42,7 +42,7 @@ where
     type PrimaryKey = PK;
 
     fn maybe_primary_key(&self) -> Option<Self::PrimaryKey> {
-        self.as_ref().map(|value| value.primary_key())
+        self.as_ref().map(PrimaryKeyLike::primary_key)
     }
 }
 

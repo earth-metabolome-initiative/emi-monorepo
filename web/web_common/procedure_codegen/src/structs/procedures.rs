@@ -44,7 +44,7 @@ impl AsRef<Table> for Procedure {
 /// # Arguments
 ///
 /// * `procedure_table` - The procedure table.
-/// * `conn` - A mutable reference to a PostgreSQL connection.
+/// * `conn` - A mutable reference to a `PostgreSQL` connection.
 ///
 /// # Errors
 ///
@@ -80,7 +80,7 @@ impl Procedure {
     /// # Arguments
     ///
     /// * `table_catalog` - The name of the database catalog (database name).
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -98,7 +98,7 @@ impl Procedure {
     /// # Arguments
     ///
     /// * `table` - The table to check.
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -134,7 +134,7 @@ impl Procedure {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -145,7 +145,7 @@ impl Procedure {
     ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
         let mut asset_model_fk_columns = Vec::new();
         for column in self.table.columns(conn)?.iter() {
-            if let Some(fk) = is_procedure_template_asset_model_foreign_key(&column, conn)? {
+            if let Some(fk) = is_procedure_template_asset_model_foreign_key(column, conn)? {
                 asset_model_fk_columns.push((column.clone(), fk));
             }
         }
@@ -157,7 +157,7 @@ impl Procedure {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -168,7 +168,7 @@ impl Procedure {
     ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
         let mut asset_model_fk_columns = Vec::new();
         for column in self.table.columns(conn)?.iter() {
-            if let Some(fk) = is_asset_model_foreign_key(&column, conn)? {
+            if let Some(fk) = is_asset_model_foreign_key(column, conn)? {
                 asset_model_fk_columns.push((column.clone(), fk));
             }
         }
@@ -180,7 +180,7 @@ impl Procedure {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -191,7 +191,7 @@ impl Procedure {
     ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
         let mut asset_fk_columns = Vec::new();
         for column in self.table.columns(conn)?.iter() {
-            if let Some(fk) = is_asset_foreign_key(&column, conn)? {
+            if let Some(fk) = is_asset_foreign_key(column, conn)? {
                 asset_fk_columns.push((column.clone(), fk));
             }
         }
@@ -203,7 +203,7 @@ impl Procedure {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -214,7 +214,7 @@ impl Procedure {
     ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
         let mut asset_fk_columns = Vec::new();
         for column in self.table.columns(conn)?.iter() {
-            if let Some(fk) = is_procedure_assets_foreign_key(&column, conn)? {
+            if let Some(fk) = is_procedure_assets_foreign_key(column, conn)? {
                 asset_fk_columns.push((column.clone(), fk));
             }
         }
@@ -225,7 +225,7 @@ impl Procedure {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -249,7 +249,7 @@ impl Procedure {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -265,7 +265,7 @@ impl Procedure {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -297,7 +297,7 @@ impl Procedure {
     ///
     /// * `table_catalog` - The name of the database catalog (database name).
     /// * `table_name` - The name of the procedure table.
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -319,7 +319,7 @@ impl Procedure {
     /// # Arguments
     ///
     /// * `table_catalog` - The name of the database catalog (database name).
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -331,7 +331,7 @@ impl Procedure {
         let mut procedures = Vec::new();
 
         for table in Table::load_all(conn, table_catalog, "public")?.as_ref() {
-            if Self::must_be_procedure_table(&table, conn).is_err() {
+            if Self::must_be_procedure_table(table, conn).is_err() {
                 continue;
             }
             procedures.push(Self { table: table.clone() });
@@ -344,7 +344,7 @@ impl Procedure {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -369,7 +369,7 @@ impl Procedure {
             );
             let (procedure_template_asset_model, _) = procedure_template_asset_models.iter().find(|(ptam_column, _)| {
                 ptam_column.column_name == expected_name
-            }).expect(&format!("Procedure asset column {procedure_asset_column} should have a matching procedure template asset model column called \"{expected_name}\""));
+            }).unwrap_or_else(|| panic!("Procedure asset column {procedure_asset_column} should have a matching procedure template asset model column called \"{expected_name}\""));
             coupled.push((procedure_asset_column, procedure_template_asset_model.clone()));
         }
 

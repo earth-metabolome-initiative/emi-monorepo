@@ -44,7 +44,7 @@ where
         _conn: &mut C,
     ) -> Result<Self::PrimaryKey, InsertError<Self::Attribute>> {
         self.ok_or(InsertError::BuilderError(
-            common_traits::prelude::BuilderError::IncompleteBuild(EmptyTuple::default()),
+            common_traits::prelude::BuilderError::IncompleteBuild(EmptyTuple),
         ))
     }
 }

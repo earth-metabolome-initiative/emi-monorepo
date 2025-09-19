@@ -45,7 +45,7 @@ impl<C> ProcedureTemplateAssetGraph for GPBListener<'_, C> {
             self.graph.ptam_by_primary_key(ptam_id).expect("PTAM not found in graph");
         let reference_ptam: &ProcedureTemplateAssetModel =
             self.graph.reference_based_on_alias(parents, ptam).expect("Alias not found in graph");
-        self.procedure_assets.get(&reference_ptam.id).cloned()
+        self.procedure_assets.get(&reference_ptam.id).copied()
     }
 }
 

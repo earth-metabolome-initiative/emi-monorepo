@@ -152,14 +152,13 @@ where
                 }
             })?;
 
-        if let Some(expected_number_of_edges) = expected_number_of_edges {
-            if edges.number_of_edges() != expected_number_of_edges {
+        if let Some(expected_number_of_edges) = expected_number_of_edges
+            && edges.number_of_edges() != expected_number_of_edges {
                 return Err(crate::errors::builder::edges::EdgesBuilderError::NumberOfEdges {
                     expected: expected_number_of_edges,
                     actual: edges.number_of_edges(),
                 });
             }
-        }
 
         Ok(edges)
     }

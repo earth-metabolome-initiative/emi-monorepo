@@ -201,12 +201,11 @@ impl TokenIter<'_> {
     fn consume_alphabetic(&mut self, char: char) -> Result<Token, crate::errors::Error> {
         assert!(char.is_alphabetic() && char.is_uppercase());
 
-        if let Some(&next) = self.chars.peek() {
-            if next.is_lowercase() && next.is_ascii_alphabetic() {
+        if let Some(&next) = self.chars.peek()
+            && next.is_lowercase() && next.is_ascii_alphabetic() {
                 self.chars.next();
                 return Element::try_from([char, next]).map(Into::into).map_err(Into::into);
             }
-        }
         // To handle cases like 'P', 'D' and 'T', which respectively
         // represent Protium, Deuterium and Tritium.
         if let Ok(isotope) = Isotope::try_from(char) {
@@ -224,8 +223,8 @@ impl TokenIter<'_> {
     /// indicate a two-letter element. This operation may fail, and in that case
     /// we may need to push the newly built token back to the `tokens` queue.
     fn consume_element(&mut self) -> Option<Element> {
-        if let Some(&next) = self.chars.peek() {
-            if next.is_ascii_alphabetic() && next.is_uppercase() {
+        if let Some(&next) = self.chars.peek()
+            && next.is_ascii_alphabetic() && next.is_uppercase() {
                 // If the next character is not lowercase, we consume only the first one.
                 let char = self.chars.next().unwrap();
                 if let Ok(token) = self.consume_alphabetic(char) {
@@ -237,19 +236,17 @@ impl TokenIter<'_> {
                     self.tokens.push_back(token);
                 }
             }
-        }
         None
     }
 
     /// Peaks the next character in the iterator and consumes it if it is a
     /// dot.
     fn consume_dot(&mut self) -> Option<Token> {
-        if let Some(&next) = self.chars.peek() {
-            if is_dot(next) {
+        if let Some(&next) = self.chars.peek()
+            && is_dot(next) {
                 self.chars.next();
                 return Some(Token::Dot);
             }
-        }
         None
     }
 
@@ -350,11 +347,10 @@ impl TokenIter<'_> {
                 // If this is not a charge, and it is followed by an
                 // element, this scalar may be meant as
                 // the mass number of an isotope.
-                else if let Some(element) = self.consume_element() {
-                    if let Ok(isotope) = Isotope::try_from((element, digit)) {
+                else if let Some(element) = self.consume_element()
+                    && let Ok(isotope) = Isotope::try_from((element, digit)) {
                         return Ok(Token::Isotope(isotope));
                     }
-                }
 
                 return Err(crate::errors::Error::InvalidSuperscriptPosition);
             }

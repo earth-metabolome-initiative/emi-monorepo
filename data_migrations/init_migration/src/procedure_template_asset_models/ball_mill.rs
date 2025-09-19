@@ -1,4 +1,4 @@
-//! Submodule defining partial builders for procedure template asset_models
+//! Submodule defining partial builders for procedure template `asset_models`
 //! related to ball mill.
 
 use core_structures::{User, tables::insertables::InsertableProcedureTemplateAssetModelBuilder};

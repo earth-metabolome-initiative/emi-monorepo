@@ -126,7 +126,7 @@ impl AsRef<Ownership> for ProcedureTemplateGraph {
 impl ProcedureTemplateGraph {
     /// Returns whether the associated procedure template graph is a simple path
     /// which does not branch.
-    pub fn is_simple_path(&self) -> bool {
+    #[must_use] pub fn is_simple_path(&self) -> bool {
         self.task_graphs.iter().all(
             |tg_opt| {
                 if let Some(tg) = tg_opt { tg.is_simple_path() } else { true }
@@ -141,7 +141,7 @@ impl ProcedureTemplateGraph {
     ///
     /// * `procedure_template_asset_model` - The procedure template asset model
     ///   to check ownership for.
-    pub fn root_owned_ptam(
+    #[must_use] pub fn root_owned_ptam(
         &self,
         procedure_template_asset_model: &ProcedureTemplateAssetModel,
     ) -> bool {
@@ -158,7 +158,7 @@ impl ProcedureTemplateGraph {
     ///
     /// * `procedure_template_asset_model` - The procedure template asset model
     ///   to check ownership for.
-    pub fn root_or_foreign_owned_ptam(
+    #[must_use] pub fn root_or_foreign_owned_ptam(
         &self,
         procedure_template_asset_model: &ProcedureTemplateAssetModel,
     ) -> bool {
@@ -175,7 +175,7 @@ impl ProcedureTemplateGraph {
     }
 
     /// Returns the task graph of the given procedure template, if it exists.
-    pub fn task_graph_of(&self, procedure_template: &ProcedureTemplate) -> Option<&TaskGraph> {
+    #[must_use] pub fn task_graph_of(&self, procedure_template: &ProcedureTemplate) -> Option<&TaskGraph> {
         let procedure_node_id = self.procedure_node_id(procedure_template);
         self.task_graphs[procedure_node_id].as_ref()
     }
@@ -193,7 +193,7 @@ impl ProcedureTemplateGraph {
     ///   closest procedure template for.
     /// * `allow_self` - Whether to allow the current procedure template to be
     ///   returned if it employs the given procedure template asset model.
-    pub fn closest_paths_to_procedure_template_using_ptam<'graph>(
+    #[must_use] pub fn closest_paths_to_procedure_template_using_ptam<'graph>(
         &'graph self,
         parents: &[&'graph ProcedureTemplate],
         parent: &'graph ProcedureTemplate,
@@ -247,7 +247,20 @@ impl ProcedureTemplateGraph {
                 "Parent procedure template must have a task graph if the current one does not.",
             );
 
-            if !task_graph.has_predecessors(current) {
+            if task_graph.has_predecessors(current) {
+                task_graph
+                    .predecessors(current)
+                    .flat_map(|predecessor| {
+                        self.closest_paths_to_procedure_template_using_ptam(
+                            parents,
+                            parent,
+                            predecessor,
+                            reference_ptam,
+                            true,
+                        )
+                    })
+                    .collect()
+            } else {
                 // If the current node does not have predecessors, it means we need to move to
                 // the parent's predecessors.
                 let (grand_parent, parents) = parents.split_last().unwrap();
@@ -262,19 +275,6 @@ impl ProcedureTemplateGraph {
                             parents,
                             grand_parent,
                             parent_predecessor,
-                            reference_ptam,
-                            true,
-                        )
-                    })
-                    .collect()
-            } else {
-                task_graph
-                    .predecessors(current)
-                    .flat_map(|predecessor| {
-                        self.closest_paths_to_procedure_template_using_ptam(
-                            parents,
-                            parent,
-                            predecessor,
                             reference_ptam,
                             true,
                         )
@@ -300,7 +300,7 @@ impl ProcedureTemplateGraph {
     ///
     /// * `procedure_template` - The procedure template to find the leaf node
     ///   for.
-    pub fn root_leaf_node_of<'graph>(
+    #[must_use] pub fn root_leaf_node_of<'graph>(
         &'graph self,
         parents: &[&'graph ProcedureTemplate],
         procedure_template: &'graph ProcedureTemplate,
@@ -323,7 +323,7 @@ impl ProcedureTemplateGraph {
     ///
     /// * `procedure_template` - The procedure template to find the leaf nodes
     ///   for.
-    pub fn sink_leaf_nodes_of<'graph>(
+    #[must_use] pub fn sink_leaf_nodes_of<'graph>(
         &'graph self,
         parents: &[&'graph ProcedureTemplate],
         procedure_template: &'graph ProcedureTemplate,

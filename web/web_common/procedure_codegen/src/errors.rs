@@ -43,12 +43,12 @@ pub enum Error {
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::Diesel(err) => write!(f, "Diesel error: {}", err),
-            Error::Syn(err) => write!(f, "Syn error: {}", err),
-            Error::Io(err) => write!(f, "I/O error: {}", err),
-            Error::Webcodegen(err) => write!(f, "Webcodegen error: {}", err),
-            Error::Procedure(err) => write!(f, "Procedure error: {}", err),
-            Error::ProcedureTemplate(err) => write!(f, "procedure template error: {}", err),
+            Error::Diesel(err) => write!(f, "Diesel error: {err}"),
+            Error::Syn(err) => write!(f, "Syn error: {err}"),
+            Error::Io(err) => write!(f, "I/O error: {err}"),
+            Error::Webcodegen(err) => write!(f, "Webcodegen error: {err}"),
+            Error::Procedure(err) => write!(f, "Procedure error: {err}"),
+            Error::ProcedureTemplate(err) => write!(f, "procedure template error: {err}"),
             Error::UncharacterizedAssetColumn(column) => {
                 write!(
                     f,

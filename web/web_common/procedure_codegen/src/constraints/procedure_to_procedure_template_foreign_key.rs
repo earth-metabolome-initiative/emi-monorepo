@@ -27,10 +27,8 @@ impl CustomTableConstraint for ProcedureToProcedureTemplateForeignKeyConstraint 
                 table.table_name.as_str(),
                 conn,
             )
-            .expect(&format!(
-                "Failed to load procedure by name for table `{}.{}` that must be a procedure table",
-                table.table_catalog, table.table_name
-            ));
+            .unwrap_or_else(|_| panic!("Failed to load procedure by name for table `{}.{}` that must be a procedure table",
+                table.table_catalog, table.table_name));
             let Some(procedure_template_foreign_key) = procedure.procedure_template_foreign_key(conn).expect(
 				"Failed to get procedure template foreign key for a procedure table that must be valid",
 			) else {

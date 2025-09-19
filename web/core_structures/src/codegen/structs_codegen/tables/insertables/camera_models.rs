@@ -35,9 +35,7 @@ pub enum CameraModelAttribute {
 impl core::str::FromStr for CameraModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
-        }
+        Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned()))
     }
 }
 impl<T1> common_traits::builder::Attributed

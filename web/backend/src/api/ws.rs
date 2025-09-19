@@ -21,7 +21,7 @@ pub fn configure(cfg: &mut web::ServiceConfig) {
 /// * `request` - The HTTP request
 /// * `stream` - The websocket stream
 /// * `diesel_pool` - The Diesel connection pool
-/// * `listen_notify_handle` - The handle to the ListenNotify server
+/// * `listen_notify_handle` - The handle to the `ListenNotify` server
 /// * `user` - The logged in user that is starting the websocket, as derived
 ///   from the JWT token middleware, if any.
 async fn start_websocket(

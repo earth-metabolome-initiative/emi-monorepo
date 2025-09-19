@@ -39,7 +39,7 @@ impl Translator for CreateTrigger {
 
         if let Some(statements) = statements {
             return Err(crate::errors::Error::UnknownPostgresFeature(
-                format!("Triggers with statements are not supported: `{}`", statements).into(),
+                format!("Triggers with statements are not supported: `{statements}`"),
             ));
         }
 
@@ -52,17 +52,15 @@ impl Translator for CreateTrigger {
         if matches!(exec_body.exec_type, TriggerExecBodyType::Procedure) {
             return Err(crate::errors::Error::UnknownPostgresFeature(
                 format!(
-                    "Triggers with execution body of type `Procedure` are not supported: `{}`",
-                    exec_body
-                )
-                .into(),
+                    "Triggers with execution body of type `Procedure` are not supported: `{exec_body}`"
+                ),
             ));
         }
 
         let function_name = exec_body.func_desc.name;
         let function_body = schema.function_body(&function_name.to_string()).ok_or_else(|| {
             crate::errors::Error::UnknownPostgresFeature(
-                format!("Trigger function `{}` is not defined", function_name).into(),
+                format!("Trigger function `{function_name}` is not defined"),
             )
         })?;
 
@@ -89,8 +87,7 @@ impl Translator for CreateTrigger {
 
         if let Some(characteristics) = &characteristics {
             return Err(crate::errors::Error::UnknownPostgresFeature(
-                format!("Triggers with characteristics are not supported: `{}`", characteristics)
-                    .into(),
+                format!("Triggers with characteristics are not supported: `{characteristics}`"),
             ));
         }
 

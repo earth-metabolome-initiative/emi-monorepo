@@ -40,7 +40,7 @@ impl ProcedureTemplate {
     /// # Arguments
     ///
     /// * `table_catalog` - The name of the database catalog (database name).
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -63,7 +63,7 @@ impl ProcedureTemplate {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -74,7 +74,7 @@ impl ProcedureTemplate {
     ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
         let mut asset_model_fk_columns = Vec::new();
         for column in self.table.columns(conn)?.as_ref() {
-            if let Some(fk) = is_asset_model_foreign_key(&column, conn)? {
+            if let Some(fk) = is_asset_model_foreign_key(column, conn)? {
                 asset_model_fk_columns.push((column.clone(), fk));
             }
         }
@@ -86,7 +86,7 @@ impl ProcedureTemplate {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -97,7 +97,7 @@ impl ProcedureTemplate {
     ) -> Result<Vec<(Column, KeyColumnUsage)>, crate::errors::Error> {
         let mut asset_model_fk_columns = Vec::new();
         for column in self.table.columns(conn)?.as_ref() {
-            if let Some(fk) = is_procedure_template_asset_model_foreign_key(&column, conn)? {
+            if let Some(fk) = is_procedure_template_asset_model_foreign_key(column, conn)? {
                 asset_model_fk_columns.push((column.clone(), fk));
             }
         }
@@ -108,7 +108,7 @@ impl ProcedureTemplate {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -132,7 +132,7 @@ impl ProcedureTemplate {
     /// # Arguments
     ///
     /// * `table` - The table to check.
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -164,7 +164,7 @@ impl ProcedureTemplate {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -212,7 +212,7 @@ impl ProcedureTemplate {
     /// # Arguments
     ///
     /// * `table_catalog` - The name of the database catalog (database name).
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -223,7 +223,7 @@ impl ProcedureTemplate {
     ) -> Result<Vec<Self>, crate::errors::Error> {
         let mut procedure_templates = Vec::new();
         for table in Table::load_all(conn, table_catalog, "public")?.as_ref() {
-            if Self::must_be_procedure_template_table(&table, conn).is_err() {
+            if Self::must_be_procedure_template_table(table, conn).is_err() {
                 continue;
             }
             procedure_templates.push(Self { table: table.clone() });
@@ -236,7 +236,7 @@ impl ProcedureTemplate {
     /// # Arguments
     ///
     /// * `table` - The table to convert.
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -255,7 +255,7 @@ impl ProcedureTemplate {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -281,7 +281,7 @@ impl ProcedureTemplate {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///

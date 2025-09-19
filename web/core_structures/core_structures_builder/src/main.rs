@@ -57,7 +57,7 @@ fn build_core_structures(conn: &mut PgConnection) -> Result<TimeTracker, anyhow:
         .output_directory(out_dir.as_ref())
         .generate_procedure_impls()
         .generate_procedure_template_impls()
-        .extension_network(&table_extension_network)
+        .extension_network(table_extension_network)
         .beautify()
         .build()?
         .generate(conn, DATABASE_NAME)?;
@@ -89,7 +89,7 @@ pub async fn main() {
             eprintln!("Failed to initialize the database: {err}");
             return;
         }
-    };
+    }
 
     match build_core_structures(&mut conn) {
         Ok(tracker) => {

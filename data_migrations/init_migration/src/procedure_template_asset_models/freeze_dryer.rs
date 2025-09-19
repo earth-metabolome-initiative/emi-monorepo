@@ -1,4 +1,4 @@
-//! Submodule defining partial builders for procedure template asset_models
+//! Submodule defining partial builders for procedure template `asset_models`
 //! related to freezedryers.
 
 use core_structures::{User, tables::insertables::InsertableProcedureTemplateAssetModelBuilder};
@@ -9,7 +9,7 @@ use crate::{
     procedure_template_asset_models::default_pmt::default_pmt,
 };
 
-/// Returns a partial builder for a freeze_dryer trackable.
+/// Returns a partial builder for a `freeze_dryer` trackable.
 ///
 /// # Arguments
 ///

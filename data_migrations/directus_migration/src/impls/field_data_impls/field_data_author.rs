@@ -1,4 +1,4 @@
-//! Submodule providing helpers methods to work with the FieldDatum author.
+//! Submodule providing helpers methods to work with the `FieldDatum` author.
 
 use core_structures::{User, tables::insertables::UserSettable};
 use diesel::PgConnection;

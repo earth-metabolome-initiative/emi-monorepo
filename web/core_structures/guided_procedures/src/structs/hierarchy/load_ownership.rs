@@ -108,6 +108,6 @@ impl Hierarchy {
         ))
         .expect("Failed to build ownership graph");
 
-        Ok(Ownership::new(graph, foreign_procedure_templates, conn)?)
+        Ownership::new(graph, foreign_procedure_templates, conn)
     }
 }

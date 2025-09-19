@@ -41,11 +41,10 @@ where
             let path = entry.path();
             if path.is_dir() {
                 stack.push(path);
-            } else if let Some(ext) = path.extension() {
-                if ext == extension {
+            } else if let Some(ext) = path.extension()
+                && ext == extension {
                     return Ok(path);
                 }
-            }
         }
     }
     Err(std::io::Error::new(

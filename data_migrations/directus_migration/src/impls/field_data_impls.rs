@@ -1,4 +1,4 @@
-//! Submodule providing helpers methods to work with the FieldDAtum objects
+//! Submodule providing helpers methods to work with the `FieldDAtum` objects
 
 use std::str::FromStr;
 
@@ -51,7 +51,7 @@ impl FieldDatumWrapper {
             SampleSourceKind::Organism => {
                 let organism = Organism::new()
                     .id(uuid)?
-                    .model(&sample_source_model)?
+                    .model(sample_source_model)?
                     .created_by(user)?
                     .insert(user.id, portal)?;
                 organism.primary_key()
@@ -59,7 +59,7 @@ impl FieldDatumWrapper {
             SampleSourceKind::Soil => {
                 let soil = Soil::new()
                     .id(uuid)?
-                    .model(&sample_source_model)?
+                    .model(sample_source_model)?
                     .created_by(user)?
                     .insert(user.id, portal)?;
                 soil.primary_key()

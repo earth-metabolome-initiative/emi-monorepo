@@ -46,9 +46,7 @@ pub enum PhoneModelAttribute {
 impl core::str::FromStr for PhoneModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
-        }
+        Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned()))
     }
 }
 impl<T1, T2> common_traits::builder::Attributed

@@ -145,8 +145,8 @@ where
                 }
             })?;
 
-        if let Some(expected_number_of_symbols) = expected_number_of_symbols {
-            if vocabulary.len() != expected_number_of_symbols {
+        if let Some(expected_number_of_symbols) = expected_number_of_symbols
+            && vocabulary.len() != expected_number_of_symbols {
                 return Err(
                     crate::errors::builder::vocabulary::VocabularyBuilderError::NumberOfSymbols {
                         expected: expected_number_of_symbols,
@@ -154,7 +154,6 @@ where
                     },
                 );
             }
-        }
 
         Ok(vocabulary)
     }

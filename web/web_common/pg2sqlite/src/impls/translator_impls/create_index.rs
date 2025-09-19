@@ -32,7 +32,7 @@ impl Translator for CreateIndex {
             let table_name = self.table_name.to_string();
             if !schema
                 .table_has_uuid_pk(&table_name)
-                .expect(&format!("Table `{table_name}` not found in schema"))
+                .unwrap_or_else(|| panic!("Table `{table_name}` not found in schema"))
             {
                 // Drop the index by returning None.
                 return Ok(None);

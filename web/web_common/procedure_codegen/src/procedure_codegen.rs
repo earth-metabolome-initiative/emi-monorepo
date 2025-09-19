@@ -40,7 +40,7 @@ pub struct ProcedureCodegen<'a> {
 
 impl<'a> ProcedureCodegen<'a> {
     /// Returns a new `ProcedureCodegenBuilder`.
-    pub fn builder() -> ProcedureCodegenBuilder<'a> {
+    #[must_use] pub fn builder() -> ProcedureCodegenBuilder<'a> {
         ProcedureCodegenBuilder::default()
     }
 
@@ -65,7 +65,7 @@ impl<'a> ProcedureCodegen<'a> {
     ///
     /// # Arguments
     ///
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     /// * `table_catalog` - The name of the database catalog (database name).
     ///
     /// # Errors

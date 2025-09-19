@@ -22,7 +22,7 @@ use crate::{
 ///
 /// # Implementation details
 /// The refresh token is expected to be present in the request as a cookie, with
-/// the name defined by the constant REFRESH_COOKIE_NAME. The refresh token is
+/// the name defined by the constant `REFRESH_COOKIE_NAME`. The refresh token is
 /// then decoded, and checked whether it is still present in the redis database.
 /// If it is, we check that the user associated to the token still exists in the
 /// database, and if it does, we create a new access token and return it. If any

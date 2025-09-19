@@ -10,7 +10,7 @@ use webcodegen::TableLike;
 use super::ProcedureCodegen;
 use crate::{Procedure, ProcedureTemplate};
 
-impl<'a> ProcedureCodegen<'a> {
+impl ProcedureCodegen<'_> {
     /// Generates the implementation of the `ProcedureTemplate` trait for all
     /// procedure templates.
     ///
@@ -18,7 +18,7 @@ impl<'a> ProcedureCodegen<'a> {
     ///
     /// * `root` - The root path where to output the generated code.
     /// * `table_catalog` - The name of the database catalog (database name).
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///
@@ -173,7 +173,7 @@ impl<'a> ProcedureCodegen<'a> {
         dag_variants.sort_unstable();
 
         let procedure_template_idents =
-            dag_variants.iter().map(|table| table.struct_ident()).collect::<Result<Vec<_>, _>>()?;
+            dag_variants.iter().map(webcodegen::TableLike::struct_ident).collect::<Result<Vec<_>, _>>()?;
 
         let submodule_path = root.with_extension("rs");
         std::fs::write(

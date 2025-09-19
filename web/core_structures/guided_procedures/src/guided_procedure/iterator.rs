@@ -52,7 +52,7 @@ impl<'graph> GuidedProcedure<'graph, diesel::PgConnection> {
         ExpectedProcedure: ProcedureLike,
         Option<ExpectedProcedure::Builder>: From<ProcedureBuilderDAG>,
     {
-        while let Some(result) = self.next() {
+        if let Some(result) = self.by_ref().next() {
             let (parents, template, builder_dag) = result?;
             let found = builder_dag.type_name();
             return if let Some(expected_builder) =

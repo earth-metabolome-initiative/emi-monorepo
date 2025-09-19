@@ -83,10 +83,10 @@ impl Hierarchy {
                 (
                     procedure_nodes
                         .binary_search(&source)
-                        .expect(&format!("Source node not found: `{}`", source.name)),
+                        .unwrap_or_else(|_| panic!("Source node not found: `{}`", source.name)),
                     procedure_nodes
                         .binary_search(&destination)
-                        .expect(&format!("Destination node not found: `{}`", destination.name)),
+                        .unwrap_or_else(|_| panic!("Destination node not found: `{}`", destination.name)),
                 )
             })
             .collect::<Vec<(usize, usize)>>();

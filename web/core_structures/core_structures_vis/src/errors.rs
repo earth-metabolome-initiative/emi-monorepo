@@ -18,9 +18,9 @@ pub enum Error {
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Error::MermaidERDError(err) => write!(f, "Mermaid ERD error: {}", err),
-            Error::MermaidFlowchartError(err) => write!(f, "Mermaid Flowchart error: {}", err),
-            Error::Diesel(err) => write!(f, "Diesel error: {}", err),
+            Error::MermaidERDError(err) => write!(f, "Mermaid ERD error: {err}"),
+            Error::MermaidFlowchartError(err) => write!(f, "Mermaid Flowchart error: {err}"),
+            Error::Diesel(err) => write!(f, "Diesel error: {err}"),
         }
     }
 }

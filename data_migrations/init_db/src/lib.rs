@@ -29,8 +29,7 @@ pub fn number_of_tables(connection: &mut diesel::PgConnection) -> Result<i64, er
     Ok(sql_query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public'")
         .load::<TableCount>(connection)?
         .pop()
-        .map(|tc| tc.count)
-        .unwrap_or(0))
+        .map_or(0, |tc| tc.count))
 }
 
 /// Returns whether the given database is empty (i.e., has no tables).

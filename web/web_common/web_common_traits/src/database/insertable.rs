@@ -323,7 +323,7 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName
                     columns
                         .iter()
                         .zip(expected_values.iter())
-                        .map(|(col, val)| format!("{}: {}", col, val))
+                        .map(|(col, val)| format!("{col}: {val}"))
                         .collect::<Vec<_>>()
                         .join(", ")
                 )
@@ -335,7 +335,7 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName
                     columns
                         .iter()
                         .zip(expected_values.iter())
-                        .map(|(col, val)| format!("{}: {}", col, val))
+                        .map(|(col, val)| format!("{col}: {val}"))
                         .collect::<Vec<_>>()
                         .join(", ")
                 )
@@ -387,8 +387,7 @@ where
             diesel::result::DatabaseErrorKind::ForeignKeyViolation,
             info,
         ) = &error
-        {
-            if let Some(detail) = info.details() {
+            && let Some(detail) = info.details() {
                 // We retrieve the names of the columns involved in the
                 // foreign key violation.
                 //
@@ -405,20 +404,18 @@ where
 
                 let mut equal_split = detail.split('=');
                 let before_equal = equal_split.next().and_then(|s| {
-                    Some(
-                        s.strip_suffix(")")?
-                            .split_once("(")?
+                    s.strip_suffix(")")?
+                            .split_once('(')?
                             .1
-                            .split(",")
+                            .split(',')
                             .map(str::trim)
                             .map(FieldName::from_str)
                             .collect::<Result<Vec<_>, _>>()
-                            .ok()?,
-                    )
+                            .ok()
                 });
                 let after_equal = equal_split
                     .next()
-                    .and_then(|s| Some(s.strip_prefix("(")?.rsplit(")").last()?.split(",")));
+                    .and_then(|s| Some(s.strip_prefix("(")?.rsplit(')').last()?.split(',')));
                 let table_name = detail.rsplit_once("table \"").and_then(|(_, after)| {
                     after.strip_suffix("\".") // We remove the trailing quote and dot.
                 });
@@ -436,14 +433,12 @@ where
                     };
                 }
             }
-        }
 
         if let diesel::result::Error::DatabaseError(
             diesel::result::DatabaseErrorKind::UniqueViolation,
             info,
         ) = &error
-        {
-            if let Some(detail) = info.details() {
+            && let Some(detail) = info.details() {
                 // We retrieve the names of the columns involved in the
                 // unique violation.
                 //
@@ -458,20 +453,18 @@ where
 
                 let mut equal_split = detail.split('=');
                 let before_equal = equal_split.next().and_then(|s| {
-                    Some(
-                        s.strip_suffix(")")?
-                            .split_once("(")?
+                    s.strip_suffix(")")?
+                            .split_once('(')?
                             .1
-                            .split(",")
+                            .split(',')
                             .map(str::trim)
                             .map(FieldName::from_str)
                             .collect::<Result<Vec<_>, _>>()
-                            .ok()?,
-                    )
+                            .ok()
                 });
                 let after_equal = equal_split
                     .next()
-                    .and_then(|s| Some(s.strip_prefix("(")?.rsplit(")").last()?.split(",")));
+                    .and_then(|s| Some(s.strip_prefix("(")?.rsplit(')').last()?.split(',')));
 
                 if let (Some(columns), Some(expected_values), Some(table)) =
                     (before_equal, after_equal, info.table_name())
@@ -485,24 +478,23 @@ where
                     };
                 }
             }
-        }
 
         if let diesel::result::Error::DatabaseError(_, info) = &error {
             println!("Message: {}", info.message());
             if let Some(constraint) = info.constraint_name() {
-                println!("Constraint: {}", constraint);
+                println!("Constraint: {constraint}");
             }
             if let Some(table) = info.table_name() {
-                println!("Table: {}", table);
+                println!("Table: {table}");
             }
             if let Some(details) = info.details() {
-                println!("Details: {}", details);
+                println!("Details: {details}");
             }
             if let Some(hint) = info.hint() {
-                println!("Hint: {}", hint);
+                println!("Hint: {hint}");
             }
             if let Some(column_name) = info.column_name() {
-                println!("Column: {}", column_name);
+                println!("Column: {column_name}");
             }
         } else {
             println!("Diesel error did not contain database error info.");

@@ -1,4 +1,4 @@
-//! Submodule defining the GuidedProcedurePseudocodeBuilder structure and its
+//! Submodule defining the `GuidedProcedurePseudocodeBuilder` structure and its
 //! associated methods.
 
 mod builder;
@@ -21,13 +21,13 @@ pub struct GuidedProcedurePseudocode<'graph> {
 }
 
 impl<'graph> GuidedProcedurePseudocode<'graph> {
-    /// Creates a new GuidedProcedurePseudocodeBuilder instance.
-    pub fn new() -> GuidedProcedurePseudocodeBuilder<'graph> {
+    /// Creates a new `GuidedProcedurePseudocodeBuilder` instance.
+    #[must_use] pub fn new() -> GuidedProcedurePseudocodeBuilder<'graph> {
         GuidedProcedurePseudocodeBuilder::default()
     }
 
     /// Writes out the guided procedure pseudocode.
-    pub fn pseudocode<E>(mut self) -> String {
+    #[must_use] pub fn pseudocode<E>(mut self) -> String {
         let mut output = String::new();
         let root_procedure_template = self.visitor.graph().root_procedure_template();
         let variable_name = root_procedure_template.name.to_lowercase().replace(' ', "_");

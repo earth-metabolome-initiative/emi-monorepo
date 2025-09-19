@@ -1,5 +1,5 @@
 //! Submodule for defining the compatibility rules between different
-//! asset_models.
+//! `asset_models`.
 
 use core_structures::User;
 
@@ -20,7 +20,7 @@ mod safelock_tubes_rules;
 mod samples;
 mod vial_rules;
 
-/// Initializes the compatibility rules for asset_models.
+/// Initializes the compatibility rules for `asset_models`.
 ///
 /// # Arguments
 ///

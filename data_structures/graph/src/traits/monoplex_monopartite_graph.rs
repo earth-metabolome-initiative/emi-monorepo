@@ -91,7 +91,7 @@ pub trait MonoplexMonopartiteGraph: MonoplexGraph<Edges = <Self as MonoplexMonop
                     }
                 }
             }
-            reachable_nodes.extend(temporary_frontier.iter().cloned());
+            reachable_nodes.extend(temporary_frontier.iter().copied());
             std::mem::swap(&mut frontier, &mut temporary_frontier);
             temporary_frontier.clear();
         }

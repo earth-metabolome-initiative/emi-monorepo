@@ -82,14 +82,13 @@ where
                     .into(),
             );
         }
-        if let Some(parent) = insertable_struct.asset(conn)? {
-            if !parent.can_update(user_id, conn)? {
+        if let Some(parent) = insertable_struct.asset(conn)?
+            && !parent.can_update(user_id, conn)? {
                 return Err(
                     generic_backend_request_errors::GenericBackendRequestError::Unauthorized
                         .into(),
                 );
             }
-        }
         if !insertable_struct.asset_model(conn)?.can_update(user_id, conn)? {
             return Err(
                 generic_backend_request_errors::GenericBackendRequestError::Unauthorized

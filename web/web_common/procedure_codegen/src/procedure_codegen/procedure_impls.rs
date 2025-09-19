@@ -11,7 +11,7 @@ use webcodegen::TableLike;
 use super::ProcedureCodegen;
 use crate::{Procedure, ProcedureTemplate};
 
-impl<'a> ProcedureCodegen<'a> {
+impl ProcedureCodegen<'_> {
     /// Generates the implementation of the `Procedure` trait for all
     /// procedures.
     ///
@@ -19,7 +19,7 @@ impl<'a> ProcedureCodegen<'a> {
     ///
     /// * `root` - The root path where to output the generated code.
     /// * `table_catalog` - The name of the database catalog (database name).
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
+    /// * `conn` - A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///

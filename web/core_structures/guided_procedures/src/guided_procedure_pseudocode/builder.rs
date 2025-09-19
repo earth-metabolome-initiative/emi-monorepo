@@ -15,6 +15,7 @@ use crate::{
 
 #[derive(Debug)]
 /// Struct representing a builder for guided procedures.
+#[derive(Default)]
 pub struct GuidedProcedurePseudocodeBuilder<'graph> {
     graph: Option<&'graph ProcedureTemplateGraph>,
 }
@@ -33,11 +34,6 @@ impl<'graph> GuidedProcedurePseudocodeBuilder<'graph> {
     }
 }
 
-impl Default for GuidedProcedurePseudocodeBuilder<'_> {
-    fn default() -> Self {
-        Self { graph: None }
-    }
-}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// Attributes that can be set in the `GuidedProcedurePseudocode`.

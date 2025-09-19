@@ -14,8 +14,8 @@ const VALID_PREFIXES: [&str; 4] =
 
 impl VisitMut for MethodRenamer {
     fn visit_expr_call_mut(&mut self, node: &mut ExprCall) {
-        if let Expr::Path(ExprPath { path, .. }) = node.func.as_mut() {
-            if let Some(ident) = path.get_ident() {
+        if let Expr::Path(ExprPath { path, .. }) = node.func.as_mut()
+            && let Some(ident) = path.get_ident() {
                 for prefix in VALID_PREFIXES {
                     if let Some(ident) = ident.to_string().strip_prefix(prefix) {
                         path.segments[0].ident =
@@ -24,7 +24,6 @@ impl VisitMut for MethodRenamer {
                     }
                 }
             }
-        }
 
         // Continue visiting other expressions within the method call.
         syn::visit_mut::visit_expr_call_mut(self, node);
@@ -190,12 +189,12 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// validation_errors::SingleFieldError>` or `Result<(),
 /// validation_errors::DoubleFieldError>`.
 fn is_result_unit_pgrx_error(output: &syn::ReturnType) -> bool {
-    if let syn::ReturnType::Type(_, ty) = output {
-        if let syn::Type::Path(type_path) = &**ty {
+    if let syn::ReturnType::Type(_, ty) = output
+        && let syn::Type::Path(type_path) = &**ty {
             // Ensure it's a `Result<T, E>`
-            if let Some(last_segment) = type_path.path.segments.last() {
-                if last_segment.ident == "Result" {
-                    if let syn::PathArguments::AngleBracketed(args) = &last_segment.arguments {
+            if let Some(last_segment) = type_path.path.segments.last()
+                && last_segment.ident == "Result"
+                    && let syn::PathArguments::AngleBracketed(args) = &last_segment.arguments {
                         let mut iter = args.args.iter();
                         // First generic argument: Must be `()`
                         if let Some(syn::GenericArgument::Type(syn::Type::Tuple(tuple))) =
@@ -217,10 +216,7 @@ fn is_result_unit_pgrx_error(output: &syn::ReturnType) -> bool {
                             return is_pgrx_validation_error(error_path);
                         }
                     }
-                }
-            }
         }
-    }
     false
 }
 

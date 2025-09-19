@@ -89,7 +89,7 @@ impl Display for GuidedProcedureError {
                 write!(f, "No more builders are available.")
             }
             GuidedProcedureError::Insert(e) => write!(f, "An insertion error occurred: {e}"),
-            GuidedProcedureError::Diesel(e) => write!(f, "A database error occurred: {}", e),
+            GuidedProcedureError::Diesel(e) => write!(f, "A database error occurred: {e}"),
         }
     }
 }

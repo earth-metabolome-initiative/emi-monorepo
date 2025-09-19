@@ -1,4 +1,4 @@
-//! Submodule defining the GuidedProcedureBuilder structure and its associated
+//! Submodule defining the `GuidedProcedureBuilder` structure and its associated
 //! methods.
 
 mod builder;
@@ -17,8 +17,8 @@ pub struct GuidedProcedure<'graph, C> {
 }
 
 impl<'graph, C> GuidedProcedure<'graph, C> {
-    /// Creates a new GuidedProcedureBuilder instance.
-    pub fn new() -> GuidedProcedureBuilder<'graph, C> {
+    /// Creates a new `GuidedProcedureBuilder` instance.
+    #[must_use] pub fn new() -> GuidedProcedureBuilder<'graph, C> {
         GuidedProcedureBuilder::default()
     }
 }

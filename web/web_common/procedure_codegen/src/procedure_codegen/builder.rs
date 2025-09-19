@@ -111,7 +111,7 @@ pub enum ProcedureCodegenBuilderError {
 impl Display for ProcedureCodegenBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ProcedureCodegenBuilderError::Builder(err) => write!(f, "Builder error: {}", err),
+            ProcedureCodegenBuilderError::Builder(err) => write!(f, "Builder error: {err}"),
         }
     }
 }
@@ -130,13 +130,13 @@ impl core::error::Error for ProcedureCodegenBuilderError {
     }
 }
 
-impl<'a> IsCompleteBuilder for ProcedureCodegenBuilder<'a> {
+impl IsCompleteBuilder for ProcedureCodegenBuilder<'_> {
     fn is_complete(&self) -> bool {
         self.output_directory.is_some() && self.extension_network.is_some()
     }
 }
 
-impl<'a> Attributed for ProcedureCodegenBuilder<'a> {
+impl Attributed for ProcedureCodegenBuilder<'_> {
     type Attribute = ProcedureCodegenAttribute;
 }
 

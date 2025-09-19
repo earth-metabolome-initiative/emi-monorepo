@@ -82,11 +82,9 @@ impl<'graph> ProcedureTemplateVisualization<'graph> {
         child: &ProcedureTemplate,
     ) -> Rc<FlowchartNode> {
         let node_id = procedure_template_hash(parents, child);
-        self.builder.get_node_by_id(node_id).expect(&format!(
-            "PT node {node_id} for \"{}\" with parents [{}] not found",
+        self.builder.get_node_by_id(node_id).unwrap_or_else(|| panic!("PT node {node_id} for \"{}\" with parents [{}] not found",
             child.name,
-            parents.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(", ")
-        ))
+            parents.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(", ")))
     }
 
     fn get_ptam_node(
@@ -95,11 +93,9 @@ impl<'graph> ProcedureTemplateVisualization<'graph> {
         ptam: &ProcedureTemplateAssetModel,
     ) -> Rc<FlowchartNode> {
         let node_id = procedure_template_asset_model_hash(parents, ptam);
-        self.builder.get_node_by_id(node_id).expect(&format!(
-            "PTAM node {node_id} for \"{}\" with parents {} not found",
+        self.builder.get_node_by_id(node_id).unwrap_or_else(|| panic!("PTAM node {node_id} for \"{}\" with parents {} not found",
             ptam.name,
-            parents.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(", ")
-        ))
+            parents.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(", ")))
     }
 }
 
@@ -144,9 +140,7 @@ impl<'graph> PTGListener<'graph> for &mut ProcedureTemplateVisualization<'graph>
         &mut self,
         foreign_procedure_template: &ProcedureTemplate,
     ) -> Result<(), Self::Error> {
-        let procedure_name = procedure_template_icon(foreign_procedure_template)
-            .map(|icon| format!("{} *{}*", icon, foreign_procedure_template.name))
-            .unwrap_or_else(|| format!("*{}*", foreign_procedure_template.name));
+        let procedure_name = procedure_template_icon(foreign_procedure_template).map_or_else(|| format!("*{}*", foreign_procedure_template.name), |icon| format!("{} *{}*", icon, foreign_procedure_template.name));
 
         let mut node_builder = FlowchartNodeBuilder::default()
             .label(procedure_name)?
@@ -197,9 +191,7 @@ impl<'graph> PTGListener<'graph> for &mut ProcedureTemplateVisualization<'graph>
         child: &ProcedureTemplate,
     ) -> Result<(), Self::Error> {
         let node_id = procedure_template_hash(parents, child);
-        let procedure_name = procedure_template_icon(child)
-            .map(|icon| format!("{} *{}*", icon, child.name))
-            .unwrap_or_else(|| format!("*{}*", child.name));
+        let procedure_name = procedure_template_icon(child).map_or_else(|| format!("*{}*", child.name), |icon| format!("{} *{}*", icon, child.name));
 
         let mut node_builder = FlowchartNodeBuilder::default()
             .id(node_id)
@@ -303,7 +295,7 @@ impl<'graph> PTGListener<'graph> for &mut ProcedureTemplateVisualization<'graph>
         ptam: &ProcedureTemplateAssetModel,
     ) -> Result<(), Self::Error> {
         let asset_model = self.graph.asset_model_of(ptam);
-        let label = if let Some(icon) = asset_model_icon(&asset_model) {
+        let label = if let Some(icon) = asset_model_icon(asset_model) {
             format!("{} {}", icon, ptam.name)
         } else {
             ptam.name.clone()
@@ -318,13 +310,11 @@ impl<'graph> PTGListener<'graph> for &mut ProcedureTemplateVisualization<'graph>
             } else {
                 FlowchartNodeShape::Hexagon
             }, self.graph
-            .reference_based_on_alias(parents, &ptam)
-            .expect(&format!(
-                "Expected PTAM \"{}\" from leaf PT \"{}\" to be either foreign-owned or have a reference based on alias using parents [{}]",
+            .reference_based_on_alias(parents, ptam)
+            .unwrap_or_else(|| panic!("Expected PTAM \"{}\" from leaf PT \"{}\" to be either foreign-owned or have a reference based on alias using parents [{}]",
                 ptam.name,
                 leaf.name,
-                parents.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(", ")
-            )))
+                parents.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(", "))))
         };
 
         let procedure_template_asset_model_node_builder = FlowchartNodeBuilder::default()

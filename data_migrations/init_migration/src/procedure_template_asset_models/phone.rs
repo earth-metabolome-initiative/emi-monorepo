@@ -1,4 +1,4 @@
-//! Submodule defining partial builders for procedure template asset_models
+//! Submodule defining partial builders for procedure template `asset_models`
 //! related to phones.
 
 use core_structures::{User, tables::insertables::InsertableProcedureTemplateAssetModelBuilder};

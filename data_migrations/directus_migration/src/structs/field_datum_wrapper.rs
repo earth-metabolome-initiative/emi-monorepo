@@ -1,4 +1,4 @@
-//! Submodule providing a wrapper over the directus_codegen generated FieldDatum
+//! Submodule providing a wrapper over the `directus_codegen` generated `FieldDatum`
 //! struct.
 
 use directus_codegen::FieldDatum;
