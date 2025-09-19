@@ -20,15 +20,16 @@ impl From<
         super::Rows::CommercialVolumeMeasuringDeviceLot(value)
     }
 }
-impl TryFrom<super::Rows>
-for Vec<
-    crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
+impl From<super::Rows>
+for Option<
+    Vec<
+        crate::codegen::structs_codegen::tables::commercial_volume_measuring_device_lots::CommercialVolumeMeasuringDeviceLot,
+    >,
 > {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::CommercialVolumeMeasuringDeviceLot(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::CommercialVolumeMeasuringDeviceLot(v) => Some(v),
+            _ => None,
         }
     }
 }

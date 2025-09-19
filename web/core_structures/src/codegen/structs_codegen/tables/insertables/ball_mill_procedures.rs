@@ -50,6 +50,7 @@ impl core::str::FromStr for BallMillProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Procedure" => Ok(Self::Procedure),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "BeadModel" => Ok(Self::BeadModel),
             "ProcedureTemplateBeadModel" => Ok(Self::ProcedureTemplateBeadModel),
@@ -70,6 +71,7 @@ impl core::str::FromStr for BallMillProcedureAttribute {
             "ProcedureMilledContainer" => Ok(Self::ProcedureMilledContainer(
                 crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
             )),
+            "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "bead_model" => Ok(Self::BeadModel),
             "procedure_template_bead_model" => Ok(Self::ProcedureTemplateBeadModel),

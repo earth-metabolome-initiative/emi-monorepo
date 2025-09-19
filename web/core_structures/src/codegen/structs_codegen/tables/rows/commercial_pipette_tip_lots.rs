@@ -20,15 +20,16 @@ impl From<
         super::Rows::CommercialPipetteTipLot(value)
     }
 }
-impl TryFrom<super::Rows>
-for Vec<
-    crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot,
+impl From<super::Rows>
+for Option<
+    Vec<
+        crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot,
+    >,
 > {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::CommercialPipetteTipLot(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::CommercialPipetteTipLot(v) => Some(v),
+            _ => None,
         }
     }
 }

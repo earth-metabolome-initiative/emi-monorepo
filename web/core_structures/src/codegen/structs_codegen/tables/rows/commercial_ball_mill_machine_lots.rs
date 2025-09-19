@@ -20,15 +20,16 @@ impl From<
         super::Rows::CommercialBallMillMachineLot(value)
     }
 }
-impl TryFrom<super::Rows>
-for Vec<
-    crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+impl From<super::Rows>
+for Option<
+    Vec<
+        crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+    >,
 > {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::CommercialBallMillMachineLot(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::CommercialBallMillMachineLot(v) => Some(v),
+            _ => None,
         }
     }
 }

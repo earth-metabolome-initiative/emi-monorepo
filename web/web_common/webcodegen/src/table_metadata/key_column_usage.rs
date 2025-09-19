@@ -251,7 +251,7 @@ pub enum PartialBuilderKind {
 
 impl PartialBuilderKind {
     /// Returns whether the partial builder constraint is discretionary
-    pub fn is_discretional(&self) -> bool {
+    pub fn is_discretional(self) -> bool {
         matches!(self, PartialBuilderKind::Discretional)
     }
 
@@ -266,7 +266,7 @@ impl PartialBuilderKind {
     ///
     /// * If an error occurs while querying the database.
     pub(crate) fn formatted_type<T: AsRef<Table>>(
-        &self,
+        self,
         table: &T,
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
@@ -403,6 +403,10 @@ impl KeyColumnUsage {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
     pub fn has_on_delete_cascade(&self, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
         let referential_constraint = self.referential_constraint(conn)?;
         Ok(referential_constraint.delete_rule == "CASCADE")
@@ -710,7 +714,7 @@ impl KeyColumnUsage {
             }
             if !has_other_constraints {
                 // If there are no other constraints, we use the getter identifier
-                return Ok(column.getter_ident()?);
+                return column.getter_ident();
             }
         }
 

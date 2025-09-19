@@ -48,7 +48,9 @@ impl core::str::FromStr for CommercialPackagingModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "PackagingModel" => Ok(Self::PackagingModel),
+            "id" => Ok(Self::Id),
             "packaging_model" => Ok(Self::PackagingModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }

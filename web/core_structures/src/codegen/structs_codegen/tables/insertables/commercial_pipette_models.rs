@@ -48,7 +48,9 @@ impl core::str::FromStr for CommercialPipetteModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "PipetteModel" => Ok(Self::PipetteModel),
+            "id" => Ok(Self::Id),
             "pipette_model" => Ok(Self::PipetteModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }

@@ -50,6 +50,7 @@ impl core::str::FromStr for PouringProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Procedure" => Ok(Self::Procedure),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "PouredFrom" => Ok(Self::PouredFrom),
             "ProcedureTemplatePouredFromModel" => Ok(Self::ProcedureTemplatePouredFromModel),
@@ -66,6 +67,7 @@ impl core::str::FromStr for PouringProcedureAttribute {
             "ProcedurePouredInto" => Ok(Self::ProcedurePouredInto(
                 crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
             )),
+            "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "poured_from" => Ok(Self::PouredFrom),
             "procedure_template_poured_from_model" => Ok(Self::ProcedureTemplatePouredFromModel),

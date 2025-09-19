@@ -7,14 +7,13 @@ impl From<crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDr
         super::Row::FreezeDryerModel(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel
+impl From<super::Row>
+    for Option<crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Row) -> Result<Self, Self::Error> {
+    fn from(value: super::Row) -> Self {
         match value {
-            super::Row::FreezeDryerModel(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Row enum: {value:?}"),
+            super::Row::FreezeDryerModel(v) => Some(v),
+            _ => None,
         }
     }
 }

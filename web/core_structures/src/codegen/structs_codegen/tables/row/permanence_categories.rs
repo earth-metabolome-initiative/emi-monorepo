@@ -7,14 +7,13 @@ impl From<crate::codegen::structs_codegen::tables::permanence_categories::Perman
         super::Row::PermanenceCategory(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory
+impl From<super::Row>
+    for Option<crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Row) -> Result<Self, Self::Error> {
+    fn from(value: super::Row) -> Self {
         match value {
-            super::Row::PermanenceCategory(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Row enum: {value:?}"),
+            super::Row::PermanenceCategory(v) => Some(v),
+            _ => None,
         }
     }
 }

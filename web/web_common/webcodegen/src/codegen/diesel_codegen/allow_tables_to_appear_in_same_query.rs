@@ -48,7 +48,7 @@ impl Codegen<'_> {
             for foreign_table in table
                 .foreign_tables(conn)?
                 .iter()
-                .map(|table| table.as_ref())
+                .map(AsRef::as_ref)
                 .chain(table.ancestral_extension_tables(conn)?.iter())
             {
                 // if the foreign table is the same as table we continue
@@ -57,8 +57,8 @@ impl Codegen<'_> {
                 }
 
                 // even if the tuple direction is reversed.
-                if table_hashset.contains(&(table, &foreign_table))
-                    || table_hashset.contains(&(&foreign_table, table))
+                if table_hashset.contains(&(table, foreign_table))
+                    || table_hashset.contains(&(foreign_table, table))
                 {
                     continue;
                 }
@@ -85,17 +85,16 @@ impl Codegen<'_> {
             // are siblings, but if we were to
             if let (Some(team_members), Some(team_projects)) =
                 (self.team_members_table, self.team_projects_table)
+                && table == team_members
             {
-                if table == team_members {
-                    let foreign_table_path = team_projects.import_diesel_path()?;
-                    submodule_token_stream.extend(quote::quote! {
-                        use #foreign_table_path;
-                        diesel::allow_tables_to_appear_in_same_query!(
-                            #table_name,
-                            team_projects
-                        );
-                    });
-                }
+                let foreign_table_path = team_projects.import_diesel_path()?;
+                submodule_token_stream.extend(quote::quote! {
+                    use #foreign_table_path;
+                    diesel::allow_tables_to_appear_in_same_query!(
+                        #table_name,
+                        team_projects
+                    );
+                });
             }
 
             // it out to the expected file.

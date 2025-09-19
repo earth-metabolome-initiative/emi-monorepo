@@ -15,12 +15,14 @@ pub struct KeyPair {
 
 impl KeyPair {
     /// Get the private key in PEM format.
-    #[must_use] pub fn private_pem(&self) -> &[u8] {
+    #[must_use]
+    pub fn private_pem(&self) -> &[u8] {
         &self.private_pem
     }
 
     /// Get the public key in PEM format.
-    #[must_use] pub fn public_pem(&self) -> &[u8] {
+    #[must_use]
+    pub fn public_pem(&self) -> &[u8] {
         &self.public_pem
     }
 }

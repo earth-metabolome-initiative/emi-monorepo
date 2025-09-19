@@ -12,14 +12,13 @@ impl From<Vec<crate::codegen::structs_codegen::tables::camera_models::CameraMode
         super::Rows::CameraModel(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::camera_models::CameraModel>
+impl From<super::Rows>
+    for Option<Vec<crate::codegen::structs_codegen::tables::camera_models::CameraModel>>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::CameraModel(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::CameraModel(v) => Some(v),
+            _ => None,
         }
     }
 }

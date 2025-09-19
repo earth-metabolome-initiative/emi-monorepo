@@ -9,20 +9,19 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::{
-    Codegen, Table, errors::WebCodeGenError, table_metadata::PartialBuilderKind, traits::TableLike,
+    Table, errors::WebCodeGenError, table_metadata::PartialBuilderKind, traits::TableLike,
 };
 
-impl Codegen<'_> {
+impl Table {
     pub(super) fn foreign_defined_completions(
         &self,
-        table: &Table,
         conn: &mut PgConnection,
     ) -> Result<(Vec<TokenStream>, Vec<TokenStream>), WebCodeGenError> {
         let mut foreign_defined_completions = Vec::new();
         let mut extra_requirements = Vec::new();
 
-        let buildable_trait = table.setter_trait_ty()?;
-        for foreign_define_column in table.foreign_definer_columns(false, conn)? {
+        let buildable_trait = self.setter_trait_ty()?;
+        for foreign_define_column in self.foreign_definer_columns(false, conn)? {
             let mut foreign_definer_ops = Vec::new();
             let foreign_define_column_ident = foreign_define_column.snake_case_ident()?;
             for (foreign_table, foreign_definer_constraints) in
@@ -43,7 +42,7 @@ impl Codegen<'_> {
                         let foreign_column_ident = foreign_column.snake_case_ident()?;
 
                         assignments.push(match (local_column.is_nullable(), foreign_column.is_nullable()) {
-                            (true, true) | (false, false) | (true, false)=> quote! {
+                            (true, true | false) | (false, false)=> quote! {
                                 self = <Self as #buildable_trait>::#local_column_setter(
                                     self,
                                     #foreign_table_snake_case.#foreign_column_ident
@@ -95,7 +94,7 @@ impl Codegen<'_> {
         }
 
         if !foreign_defined_completions.is_empty() {
-            let attributes = table.insertable_enum_ty()?;
+            let attributes = self.insertable_enum_ty()?;
             extra_requirements.push(quote! {
                 Self: #buildable_trait<Error= web_common_traits::database::InsertError<#attributes>>
             });

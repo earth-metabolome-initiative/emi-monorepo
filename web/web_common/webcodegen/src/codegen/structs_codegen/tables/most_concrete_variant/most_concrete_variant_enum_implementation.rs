@@ -97,7 +97,7 @@ impl Codegen<'_> {
 
         let documentation = vec![
             format!("Enum representing the most concrete variant of the `{table_name}` table DAG."),
-            "".to_owned(),
+            String::new(),
             "# Mermaid illustration of the DAG:".to_owned(),
             "```mermaid".to_owned(),
             format!("{mermaid}```"),

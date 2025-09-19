@@ -55,6 +55,7 @@ impl core::str::FromStr for AliquotingProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "Liters" => Ok(Self::Liters),
             "AliquotedFromModel" => Ok(Self::AliquotedFromModel),
             "ProcedureTemplateAliquotedFromModel" => {
@@ -88,6 +89,7 @@ impl core::str::FromStr for AliquotingProcedureTemplateAttribute {
                     ),
                 )
             }
+            "procedure_template" => Ok(Self::ProcedureTemplate),
             "liters" => Ok(Self::Liters),
             "aliquoted_from_model" => Ok(Self::AliquotedFromModel),
             "procedure_template_aliquoted_from_model" => {

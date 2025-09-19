@@ -11,6 +11,7 @@ use super::ProcedureCodegen;
 use crate::{Procedure, ProcedureTemplate};
 
 impl ProcedureCodegen<'_> {
+    #[allow(clippy::too_many_lines)]
     /// Generates the implementation of the `ProcedureTemplate` trait for all
     /// procedure templates.
     ///
@@ -172,8 +173,10 @@ impl ProcedureCodegen<'_> {
             self.extension_network.descendants(procedure_template_table.as_ref());
         dag_variants.sort_unstable();
 
-        let procedure_template_idents =
-            dag_variants.iter().map(webcodegen::TableLike::struct_ident).collect::<Result<Vec<_>, _>>()?;
+        let procedure_template_idents = dag_variants
+            .iter()
+            .map(webcodegen::TableLike::struct_ident)
+            .collect::<Result<Vec<_>, _>>()?;
 
         let submodule_path = root.with_extension("rs");
         std::fs::write(

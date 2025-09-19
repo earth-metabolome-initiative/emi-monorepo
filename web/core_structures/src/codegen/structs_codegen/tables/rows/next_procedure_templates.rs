@@ -20,16 +20,16 @@ impl From<
         super::Rows::NextProcedureTemplate(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<
+impl From<super::Rows>
+for Option<
+    Vec<
         crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate,
-    >
-{
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    >,
+> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::NextProcedureTemplate(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::NextProcedureTemplate(v) => Some(v),
+            _ => None,
         }
     }
 }

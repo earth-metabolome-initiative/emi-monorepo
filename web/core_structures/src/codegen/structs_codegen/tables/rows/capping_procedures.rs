@@ -16,14 +16,13 @@ impl From<Vec<crate::codegen::structs_codegen::tables::capping_procedures::Cappi
         super::Rows::CappingProcedure(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure>
+impl From<super::Rows>
+    for Option<Vec<crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure>>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::CappingProcedure(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::CappingProcedure(v) => Some(v),
+            _ => None,
         }
     }
 }

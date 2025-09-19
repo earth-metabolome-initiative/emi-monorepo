@@ -1,7 +1,5 @@
 //! Submodule implementing the `TryFrom` trait for the `MolecularFormula` struct
 
-use std::convert::Infallible;
-
 use crate::token::Token;
 
 impl TryFrom<&str> for crate::MolecularFormula {
@@ -31,11 +29,9 @@ impl TryFrom<&String> for crate::MolecularFormula {
     }
 }
 
-impl TryFrom<Token> for crate::MolecularFormula {
-    type Error = Infallible;
-
-    fn try_from(token: Token) -> Result<Self, Self::Error> {
-        Ok(match token {
+impl From<Token> for crate::MolecularFormula {
+    fn from(token: Token) -> Self {
+        match token {
             Token::Element(element) => element.into(),
             Token::Isotope(isotope) => isotope.into(),
             Token::Greek(greek_letter) => greek_letter.into(),
@@ -47,6 +43,6 @@ impl TryFrom<Token> for crate::MolecularFormula {
             | Token::Charge(_)
             | Token::Count(_)
             | Token::OpenSquareBracket => unreachable!("Invalid token for MolecularFormula"),
-        })
+        }
     }
 }

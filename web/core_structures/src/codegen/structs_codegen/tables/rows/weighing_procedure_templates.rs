@@ -20,15 +20,16 @@ impl From<
         super::Rows::WeighingProcedureTemplate(value)
     }
 }
-impl TryFrom<super::Rows>
-for Vec<
-    crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
+impl From<super::Rows>
+for Option<
+    Vec<
+        crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
+    >,
 > {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::WeighingProcedureTemplate(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::WeighingProcedureTemplate(v) => Some(v),
+            _ => None,
         }
     }
 }

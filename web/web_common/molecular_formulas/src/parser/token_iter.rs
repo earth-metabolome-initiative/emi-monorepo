@@ -202,10 +202,12 @@ impl TokenIter<'_> {
         assert!(char.is_alphabetic() && char.is_uppercase());
 
         if let Some(&next) = self.chars.peek()
-            && next.is_lowercase() && next.is_ascii_alphabetic() {
-                self.chars.next();
-                return Element::try_from([char, next]).map(Into::into).map_err(Into::into);
-            }
+            && next.is_lowercase()
+            && next.is_ascii_alphabetic()
+        {
+            self.chars.next();
+            return Element::try_from([char, next]).map(Into::into).map_err(Into::into);
+        }
         // To handle cases like 'P', 'D' and 'T', which respectively
         // represent Protium, Deuterium and Tritium.
         if let Ok(isotope) = Isotope::try_from(char) {
@@ -224,18 +226,20 @@ impl TokenIter<'_> {
     /// we may need to push the newly built token back to the `tokens` queue.
     fn consume_element(&mut self) -> Option<Element> {
         if let Some(&next) = self.chars.peek()
-            && next.is_ascii_alphabetic() && next.is_uppercase() {
-                // If the next character is not lowercase, we consume only the first one.
-                let char = self.chars.next().unwrap();
-                if let Ok(token) = self.consume_alphabetic(char) {
-                    // If the token is an element, we return it.
-                    if let Token::Element(element) = token {
-                        return Some(element);
-                    }
-                    // If the token is not an element, we push it back to the queue.
-                    self.tokens.push_back(token);
+            && next.is_ascii_alphabetic()
+            && next.is_uppercase()
+        {
+            // If the next character is not lowercase, we consume only the first one.
+            let char = self.chars.next().unwrap();
+            if let Ok(token) = self.consume_alphabetic(char) {
+                // If the token is an element, we return it.
+                if let Token::Element(element) = token {
+                    return Some(element);
                 }
+                // If the token is not an element, we push it back to the queue.
+                self.tokens.push_back(token);
             }
+        }
         None
     }
 
@@ -243,10 +247,11 @@ impl TokenIter<'_> {
     /// dot.
     fn consume_dot(&mut self) -> Option<Token> {
         if let Some(&next) = self.chars.peek()
-            && is_dot(next) {
-                self.chars.next();
-                return Some(Token::Dot);
-            }
+            && is_dot(next)
+        {
+            self.chars.next();
+            return Some(Token::Dot);
+        }
         None
     }
 
@@ -348,9 +353,10 @@ impl TokenIter<'_> {
                 // element, this scalar may be meant as
                 // the mass number of an isotope.
                 else if let Some(element) = self.consume_element()
-                    && let Ok(isotope) = Isotope::try_from((element, digit)) {
-                        return Ok(Token::Isotope(isotope));
-                    }
+                    && let Ok(isotope) = Isotope::try_from((element, digit))
+                {
+                    return Ok(Token::Isotope(isotope));
+                }
 
                 return Err(crate::errors::Error::InvalidSuperscriptPosition);
             }

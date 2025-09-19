@@ -8,12 +8,13 @@ impl From<Vec<crate::codegen::structs_codegen::tables::organisms::Organism>> for
         super::Rows::Organism(value)
     }
 }
-impl TryFrom<super::Rows> for Vec<crate::codegen::structs_codegen::tables::organisms::Organism> {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+impl From<super::Rows>
+    for Option<Vec<crate::codegen::structs_codegen::tables::organisms::Organism>>
+{
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::Organism(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::Organism(v) => Some(v),
+            _ => None,
         }
     }
 }

@@ -20,15 +20,16 @@ impl From<
         super::Rows::PackagingProcedureTemplate(value)
     }
 }
-impl TryFrom<super::Rows>
-for Vec<
-    crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+impl From<super::Rows>
+for Option<
+    Vec<
+        crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
+    >,
 > {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::PackagingProcedureTemplate(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::PackagingProcedureTemplate(v) => Some(v),
+            _ => None,
         }
     }
 }

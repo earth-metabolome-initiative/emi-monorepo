@@ -14,13 +14,15 @@ where
             return Ok(true);
         }
         if let Some(procedure_templates) = self.parent_procedure_template(conn)?
-            && !procedure_templates.can_update(user_id, conn)? {
-                return Ok(false);
-            }
+            && !procedure_templates.can_update(user_id, conn)?
+        {
+            return Ok(false);
+        }
         if let Some(procedure_templates) = self.predecessor_procedure_template(conn)?
-            && !procedure_templates.can_update(user_id, conn)? {
-                return Ok(false);
-            }
+            && !procedure_templates.can_update(user_id, conn)?
+        {
+            return Ok(false);
+        }
         if !self.procedure_template(conn)?.can_update(user_id, conn)? {
             return Ok(false);
         }

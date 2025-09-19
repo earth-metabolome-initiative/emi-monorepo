@@ -5,15 +5,15 @@ use diesel::PgConnection;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::{Codegen, Table, errors::WebCodeGenError, traits::TableLike};
+use crate::{Table, errors::WebCodeGenError, traits::TableLike};
 
-impl Codegen<'_> {
+impl Table {
+    #[allow(clippy::too_many_lines)]
     /// Returns the implementation of the `IsCompleteBuilder` trait for the
     /// insertable builder of the provided table.
     ///
     /// # Arguments
     ///
-    /// * `table` - The table for which the implementation is generated.
     /// * `conn` - The database connection to use for querying the database.
     ///
     /// # Errors
@@ -21,17 +21,16 @@ impl Codegen<'_> {
     /// If the provided connection to the database fails.
     pub(super) fn generate_is_complete_builder_implementation(
         &self,
-        table: &Table,
         conn: &mut PgConnection,
     ) -> Result<TokenStream, WebCodeGenError> {
-        let builder_ident = table.insertable_builder_ty()?;
+        let builder_ident = self.insertable_builder_ty()?;
         let mut completeness_statements = Vec::new();
         let mut where_constraints = Vec::new();
         let mut table_generics = Vec::new();
 
         // For each extension foreign key, we need to call recursively the `is_complete`
         // method
-        for foreign_key in table.extension_foreign_keys(conn)? {
+        for foreign_key in self.extension_foreign_keys(conn)? {
             let foreign_table = foreign_key.foreign_table(conn)?;
             let foreign_table_ident = foreign_table.struct_ident()?;
             table_generics.push(quote! { #foreign_table_ident });
@@ -46,8 +45,8 @@ impl Codegen<'_> {
 
         // For each of the other columns, if they are not optional, we need to check if
         // they are complete
-        let most_concrete_column = table.most_concrete_table_column(false, conn)?;
-        let insertable_columns = table.insertable_columns(conn, false)?;
+        let most_concrete_column = self.most_concrete_table_column(false, conn)?;
+        let insertable_columns = self.insertable_columns(conn, false)?;
         let number_of_insertable_columns = insertable_columns.len();
         for column in insertable_columns {
             // If the column is nullable, we do not need to check its completeness
@@ -119,20 +118,18 @@ impl Codegen<'_> {
                             self.#column_ident.is_complete()
                         }
                     }
-                } else {
-                    if let Some(foreign_definer) = maybe_foreign_definer {
-                        let statement = quote! {
-                            self.#column_ident.is_some() || #foreign_definer
-                        };
-                        if number_of_insertable_columns > 1 {
-                            quote! { (#statement) }
-                        } else {
-                            statement
-                        }
+                } else if let Some(foreign_definer) = maybe_foreign_definer {
+                    let statement = quote! {
+                        self.#column_ident.is_some() || #foreign_definer
+                    };
+                    if number_of_insertable_columns > 1 {
+                        quote! { (#statement) }
                     } else {
-                        quote! {
-                            self.#column_ident.is_some()
-                        }
+                        statement
+                    }
+                } else {
+                    quote! {
+                        self.#column_ident.is_some()
                     }
                 },
             );
@@ -151,7 +148,7 @@ impl Codegen<'_> {
         } else {
             Some(quote! { < #(#table_generics),* > })
         };
-        where_constraints.sort_unstable_by_key(|ts| ts.to_string());
+        where_constraints.sort_unstable_by_key(ToString::to_string);
         where_constraints.dedup_by_key(|ts| ts.to_string());
         let maybe_where_constraints = if where_constraints.is_empty() {
             None

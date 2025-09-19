@@ -38,65 +38,33 @@ impl Table {
     }
 
     /// Returns the name for the extension attributes.
+    ///
+    /// # Errors
+    ///
+    /// * If the name of the extension attributes cannot be retrieved.
     fn attributes_extension_enum_name(&self) -> Result<String, WebCodeGenError> {
         Ok(format!("{}ExtensionAttribute", self.struct_name()?))
     }
 
     /// Returns the [`Ident`](syn::Ident) for the extension attributes.
+    ///
+    /// # Errors
+    ///
+    /// * If the name of the extension attributes cannot be retrieved.
     pub(super) fn attributes_extension_enum_ident(&self) -> Result<Ident, WebCodeGenError> {
         Ok(Ident::new(&self.attributes_extension_enum_name()?, proc_macro2::Span::call_site()))
     }
 
     /// Returns the [`Type`](syn::Type) for the extension attributes.
+    ///
+    /// # Errors
+    ///
+    /// * If the name of the extension attributes cannot be retrieved.
     pub fn attributes_extension_enum_ty(&self) -> Result<syn::Type, WebCodeGenError> {
         Ok(syn::parse_str(&format!(
             "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_INSERTABLES_PATH}::{}",
             self.attributes_extension_enum_name()?
         ))?)
-    }
-
-    /// Returns the extension enum for the insertable attributes of the
-    /// current [`Table`].
-    ///
-    /// # Arguments
-    ///
-    /// * `extension_table` - The table for which the extension enum is
-    ///   generated.
-    /// * `ident` - The identifier for the enum variant.
-    pub fn into_extension_field_name(
-        &self,
-        extension_table: &Table,
-        ident: Ident,
-    ) -> Result<TokenStream, WebCodeGenError> {
-        let insertable_enum = self.attributes_enum_ident()?;
-        let insertable_extension_enum = self.attributes_extension_enum_ident()?;
-        let struct_ident = extension_table.struct_ident()?;
-
-        Ok(quote::quote! {
-            #insertable_enum::Extension(
-                #insertable_extension_enum::#struct_ident(#ident)
-            )
-        })
-    }
-
-    /// Returns the enum path lambda for the insertable attributes of the
-    /// extension of the current [`Table`].
-    ///
-    /// # Arguments
-    ///
-    /// * `extension_table` - The table for which the lambda is generated.
-    pub fn into_extension_field_name_lambda(
-        &self,
-        extension_table: &Table,
-    ) -> Result<TokenStream, WebCodeGenError> {
-        let enum_field_name = self.into_extension_field_name(
-            extension_table,
-            syn::Ident::new("attribute", proc_macro2::Span::call_site()),
-        )?;
-
-        Ok(quote::quote! {
-            |attribute| #enum_field_name
-        })
     }
 
     /// Returns the [`Type`](syn::Type) for the insertable attributes.
@@ -203,7 +171,7 @@ impl Table {
     ) -> Result<TokenStream, WebCodeGenError> {
         // We retrieve the insertable columns for the current table, without
         // the extension tables (i.e. not executing recursion to the ancestors).
-        let insertable_columns = self.insertable_columns(conn, false)?;
+        let insertable_columns = self.insertable_columns(conn, true)?;
 
         // We obtain the enum identifier.
         let insertable_enum = self.attributes_enum_ident()?;
@@ -270,6 +238,7 @@ impl Table {
         })
     }
 
+    #[allow(clippy::too_many_lines)]
     /// Returns the definition and implementation of the attributes enumeration
     /// for the current [`Table`].
     ///
@@ -391,11 +360,10 @@ impl Table {
                 .iter()
                 .enumerate()
                 .map(|(table_number, _)| {
-                    let generic_ident = syn::Ident::new(
+                    syn::Ident::new(
                         &format!("T{}", table_number + 1),
                         proc_macro2::Span::call_site(),
-                    );
-                    generic_ident
+                    )
                 })
                 .collect::<Vec<_>>();
             quote::quote! { <#(#generics),*> }

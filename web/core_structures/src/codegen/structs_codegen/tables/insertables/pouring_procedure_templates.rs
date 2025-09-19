@@ -49,6 +49,7 @@ impl core::str::FromStr for PouringProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "MeasuredWithModel" => Ok(Self::MeasuredWithModel),
             "ProcedureTemplateMeasuredWithModel" => {
                 Ok(
@@ -74,6 +75,7 @@ impl core::str::FromStr for PouringProcedureTemplateAttribute {
                 )
             }
             "Liters" => Ok(Self::Liters),
+            "procedure_template" => Ok(Self::ProcedureTemplate),
             "measured_with_model" => Ok(Self::MeasuredWithModel),
             "procedure_template_measured_with_model" => {
                 Ok(

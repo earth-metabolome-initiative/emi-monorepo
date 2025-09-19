@@ -15,7 +15,7 @@ use graph::{
 };
 use sorted_vec::prelude::SortedVec;
 
-use crate::{Table, errors::WebCodeGenError};
+use crate::Table;
 
 #[derive(Debug, Clone)]
 /// A network of columns that are "extend" each other.
@@ -29,17 +29,14 @@ pub struct TableExtensionNetwork {
 }
 
 impl TableExtensionNetwork {
-    /// Creates a new `TableExtensionNetwork` from a PostgreSQL connection.
+    /// Creates a new `TableExtensionNetwork` from a `PostgreSQL` connection.
     ///
     /// # Arguments
     ///
-    /// * `conn`: A mutable reference to a PostgreSQL connection.
+    /// * `conn`: A mutable reference to a `PostgreSQL` connection.
     /// * `table_catalog`: The catalog of the table to load columns from.
     /// * `table_schema`: An optional schema of the table to load columns from.
-    pub(crate) fn from_tables(
-        conn: &mut PgConnection,
-        tables: Vec<Table>,
-    ) -> Result<Self, WebCodeGenError> {
+    pub(crate) fn from_tables(conn: &mut PgConnection, tables: Vec<Table>) -> Self {
         let tables = SortedVec::try_from(tables).expect("Tables should be sorted and unique");
 
         let mut edges = tables
@@ -51,7 +48,7 @@ impl TableExtensionNetwork {
                     .ok()?
                     .iter()
                     .filter_map(|same_as_column| {
-                        let dst_id = tables.binary_search(&same_as_column).ok()?;
+                        let dst_id = tables.binary_search(same_as_column).ok()?;
                         Some((src_id, dst_id))
                     })
                     .collect();
@@ -86,9 +83,10 @@ impl TableExtensionNetwork {
             .build()
             .expect("Failed to build the transposed column same-as network graph");
 
-        Ok(Self { extension_graph, transposed_extension_graph })
+        Self { extension_graph, transposed_extension_graph }
     }
 
+    #[must_use]
     /// Returns all the descendant tables of the provided table in the
     /// extension network.
     ///

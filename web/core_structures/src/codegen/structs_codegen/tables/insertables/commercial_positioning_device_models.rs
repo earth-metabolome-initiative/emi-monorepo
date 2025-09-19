@@ -56,7 +56,9 @@ impl core::str::FromStr for CommercialPositioningDeviceModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "PositioningDeviceModel" => Ok(Self::PositioningDeviceModel),
+            "id" => Ok(Self::Id),
             "positioning_device_model" => Ok(Self::PositioningDeviceModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }

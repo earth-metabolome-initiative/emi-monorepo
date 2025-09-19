@@ -38,9 +38,9 @@ impl Translator for CreateTrigger {
         } = self.clone();
 
         if let Some(statements) = statements {
-            return Err(crate::errors::Error::UnknownPostgresFeature(
-                format!("Triggers with statements are not supported: `{statements}`"),
-            ));
+            return Err(crate::errors::Error::UnknownPostgresFeature(format!(
+                "Triggers with statements are not supported: `{statements}`"
+            )));
         }
 
         let Some(exec_body) = exec_body else {
@@ -50,18 +50,16 @@ impl Translator for CreateTrigger {
         };
 
         if matches!(exec_body.exec_type, TriggerExecBodyType::Procedure) {
-            return Err(crate::errors::Error::UnknownPostgresFeature(
-                format!(
-                    "Triggers with execution body of type `Procedure` are not supported: `{exec_body}`"
-                ),
-            ));
+            return Err(crate::errors::Error::UnknownPostgresFeature(format!(
+                "Triggers with execution body of type `Procedure` are not supported: `{exec_body}`"
+            )));
         }
 
         let function_name = exec_body.func_desc.name;
         let function_body = schema.function_body(&function_name.to_string()).ok_or_else(|| {
-            crate::errors::Error::UnknownPostgresFeature(
-                format!("Trigger function `{function_name}` is not defined"),
-            )
+            crate::errors::Error::UnknownPostgresFeature(format!(
+                "Trigger function `{function_name}` is not defined"
+            ))
         })?;
 
         let maybe_drop_trigger = or_replace.then(|| {
@@ -86,9 +84,9 @@ impl Translator for CreateTrigger {
         }
 
         if let Some(characteristics) = &characteristics {
-            return Err(crate::errors::Error::UnknownPostgresFeature(
-                format!("Triggers with characteristics are not supported: `{characteristics}`"),
-            ));
+            return Err(crate::errors::Error::UnknownPostgresFeature(format!(
+                "Triggers with characteristics are not supported: `{characteristics}`"
+            )));
         }
 
         Ok((

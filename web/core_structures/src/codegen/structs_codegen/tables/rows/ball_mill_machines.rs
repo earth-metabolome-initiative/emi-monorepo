@@ -16,14 +16,13 @@ impl From<Vec<crate::codegen::structs_codegen::tables::ball_mill_machines::BallM
         super::Rows::BallMillMachine(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine>
+impl From<super::Rows>
+    for Option<Vec<crate::codegen::structs_codegen::tables::ball_mill_machines::BallMillMachine>>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::BallMillMachine(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::BallMillMachine(v) => Some(v),
+            _ => None,
         }
     }
 }

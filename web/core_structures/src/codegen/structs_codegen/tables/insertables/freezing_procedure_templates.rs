@@ -47,6 +47,7 @@ impl core::str::FromStr for FreezingProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "Kelvin" => Ok(Self::Kelvin),
             "KelvinTolerancePercentage" => Ok(Self::KelvinTolerancePercentage),
             "Seconds" => Ok(Self::Seconds),
@@ -66,6 +67,7 @@ impl core::str::FromStr for FreezingProcedureTemplateAttribute {
                     ),
                 )
             }
+            "procedure_template" => Ok(Self::ProcedureTemplate),
             "kelvin" => Ok(Self::Kelvin),
             "kelvin_tolerance_percentage" => Ok(Self::KelvinTolerancePercentage),
             "seconds" => Ok(Self::Seconds),

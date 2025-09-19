@@ -68,7 +68,7 @@ pub struct ReadableList<C: AssignedComponent> {
 impl<C> Component for ReadableList<C>
 where
     C: AssignedComponent,
-    Vec<C::Row>: TryFrom<Rows, Error = std::convert::Infallible>,
+    Option<Vec<C::Row>>: From<Rows>,
 {
     type Message = ConnectorMessage;
     type Properties = ReadableListProps;
@@ -97,7 +97,13 @@ where
                 if updated_rows.is_empty() {
                     false
                 } else {
-                    let updated_rows: Vec<C::Row> = updated_rows.try_into().unwrap();
+                    let Some(updated_rows): Option<Vec<C::Row>> = updated_rows.into() else {
+                        console::error_1(&format!(
+                            "Failed to convert rows to expected type in ReadableList for table {}",
+                            <C::Row as StaticTabular>::static_table_name()
+                        ).into());
+                        return false;
+                    };
                     match operation {
                         CRUD::Read | CRUD::Create | CRUD::Update => {
                             self.items.upsert_sorted_vec(updated_rows).into()

@@ -3,12 +3,11 @@ impl From<crate::codegen::structs_codegen::tables::procedures::Procedure> for su
         super::Row::Procedure(value)
     }
 }
-impl TryFrom<super::Row> for crate::codegen::structs_codegen::tables::procedures::Procedure {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Row) -> Result<Self, Self::Error> {
+impl From<super::Row> for Option<crate::codegen::structs_codegen::tables::procedures::Procedure> {
+    fn from(value: super::Row) -> Self {
         match value {
-            super::Row::Procedure(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Row enum: {value:?}"),
+            super::Row::Procedure(v) => Some(v),
+            _ => None,
         }
     }
 }

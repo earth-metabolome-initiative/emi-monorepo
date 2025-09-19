@@ -19,8 +19,7 @@ pub(crate) const PROCEDURE_ASSETS_TABLE_NAME: &str = "procedure_assets";
 ///
 /// # Errors
 ///
-/// * Returns a `WebCodeGenError` if there is an error querying the
-///  database.
+/// * Returns a `WebCodeGenError` if there is an error querying the database.
 pub(crate) fn is_asset_foreign_key(
     column: &webcodegen::Column,
     conn: &mut PgConnection,
@@ -39,8 +38,7 @@ pub(crate) fn is_asset_foreign_key(
 ///
 /// # Errors
 ///
-/// * Returns a `WebCodeGenError` if there is an error querying the
-///  database.
+/// * Returns a `WebCodeGenError` if there is an error querying the database.
 pub(crate) fn is_asset_model_foreign_key(
     column: &webcodegen::Column,
     conn: &mut PgConnection,
@@ -60,8 +58,7 @@ pub(crate) fn is_asset_model_foreign_key(
 ///
 /// # Errors
 ///
-/// * Returns a `WebCodeGenError` if there is an error querying the
-/// database.
+/// * Returns a `WebCodeGenError` if there is an error querying the database.
 pub(crate) fn is_procedure_template_asset_model_foreign_key(
     column: &webcodegen::Column,
     conn: &mut PgConnection,
@@ -85,8 +82,7 @@ pub(crate) fn is_procedure_template_asset_model_foreign_key(
 ///
 /// # Errors
 ///
-/// * Returns a `WebCodeGenError` if there is an error querying the
-/// database.
+/// * Returns a `WebCodeGenError` if there is an error querying the database.
 pub(crate) fn is_procedure_assets_foreign_key(
     column: &webcodegen::Column,
     conn: &mut PgConnection,

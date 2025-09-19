@@ -148,8 +148,7 @@ impl Table {
             return Ok(None);
         };
         Ok(Some(syn::parse_str(&format!(
-            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_MOST_CONCRETE_VARIANTS_PATH}::{}",
-            name
+            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_MOST_CONCRETE_VARIANTS_PATH}::{name}",
         ))?))
     }
 
@@ -170,8 +169,7 @@ impl Table {
             return Ok(None);
         };
         Ok(Some(syn::parse_str(&format!(
-            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_MOST_CONCRETE_VARIANTS_PATH}::{}",
-            name
+            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_MOST_CONCRETE_VARIANTS_PATH}::{name}",
         ))?))
     }
     /// Returns the [`Type`](syn::Type) for the variant insert error DAG.
@@ -191,8 +189,7 @@ impl Table {
             return Ok(None);
         };
         Ok(Some(syn::parse_str(&format!(
-            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_MOST_CONCRETE_VARIANTS_PATH}::{}",
-            name
+            "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TABLES_PATH}::{CODEGEN_MOST_CONCRETE_VARIANTS_PATH}::{name}",
         ))?))
     }
 }

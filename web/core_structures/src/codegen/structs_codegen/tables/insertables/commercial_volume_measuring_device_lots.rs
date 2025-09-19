@@ -56,7 +56,9 @@ impl core::str::FromStr for CommercialVolumeMeasuringDeviceLotAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "ProductModel" => Ok(Self::ProductModel),
+            "id" => Ok(Self::Id),
             "product_model" => Ok(Self::ProductModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }

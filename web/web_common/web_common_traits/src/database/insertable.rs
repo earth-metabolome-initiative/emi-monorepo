@@ -77,6 +77,7 @@ pub trait SetPrimaryKey {
     /// The associated primary key type.
     type PrimaryKey;
 
+    #[must_use]
     /// Sets the primary key for the insertable variant.
     fn set_primary_key(self, primary_key: Self::PrimaryKey) -> Self;
 }
@@ -387,97 +388,97 @@ where
             diesel::result::DatabaseErrorKind::ForeignKeyViolation,
             info,
         ) = &error
-            && let Some(detail) = info.details() {
-                // We retrieve the names of the columns involved in the
-                // foreign key violation.
-                //
-                // An example of a detail is:
-                //
-                // Some("Key (frozen_with,
-                // frozen_container_id)=(af54ac83-a40f-4b83-940c-998fc70332ac,
-                // c11af75e-42cd-4972-bdd0-2edce335b5af) is not present in table
-                // \"compatibility_rules\".")
-                //
+            && let Some(detail) = info.details()
+        {
+            // We retrieve the names of the columns involved in the
+            // foreign key violation.
+            //
+            // An example of a detail is:
+            //
+            // Some("Key (frozen_with,
+            // frozen_container_id)=(af54ac83-a40f-4b83-940c-998fc70332ac,
+            // c11af75e-42cd-4972-bdd0-2edce335b5af) is not present in table
+            // \"compatibility_rules\".")
+            //
 
-                // We extract the names of the columns, their values and the name
-                // of the associated table.
+            // We extract the names of the columns, their values and the name
+            // of the associated table.
 
-                let mut equal_split = detail.split('=');
-                let before_equal = equal_split.next().and_then(|s| {
-                    s.strip_suffix(")")?
-                            .split_once('(')?
-                            .1
-                            .split(',')
-                            .map(str::trim)
-                            .map(FieldName::from_str)
-                            .collect::<Result<Vec<_>, _>>()
-                            .ok()
-                });
-                let after_equal = equal_split
-                    .next()
-                    .and_then(|s| Some(s.strip_prefix("(")?.rsplit(')').last()?.split(',')));
-                let table_name = detail.rsplit_once("table \"").and_then(|(_, after)| {
-                    after.strip_suffix("\".") // We remove the trailing quote and dot.
-                });
-                if let (Some(columns), Some(expected_values), Some(table), Some(foreign_table)) =
-                    (before_equal, after_equal, table_name, info.table_name())
-                {
-                    let expected_values =
-                        expected_values.map(str::trim).map(String::from).collect();
-                    return InsertError::ForeignKeyViolation {
-                        table: table.to_owned(),
-                        foreign_table: foreign_table.to_owned(),
-                        foreign_key: info.constraint_name().unwrap_or("unknown").to_string(),
-                        columns,
-                        expected_values,
-                    };
-                }
+            let mut equal_split = detail.split('=');
+            let before_equal = equal_split.next().and_then(|s| {
+                s.strip_suffix(")")?
+                    .split_once('(')?
+                    .1
+                    .split(',')
+                    .map(str::trim)
+                    .map(FieldName::from_str)
+                    .collect::<Result<Vec<_>, _>>()
+                    .ok()
+            });
+            let after_equal = equal_split
+                .next()
+                .and_then(|s| Some(s.strip_prefix("(")?.rsplit(')').next_back()?.split(',')));
+            let table_name = detail.rsplit_once("table \"").and_then(|(_, after)| {
+                after.strip_suffix("\".") // We remove the trailing quote and dot.
+            });
+            if let (Some(columns), Some(expected_values), Some(table), Some(foreign_table)) =
+                (before_equal, after_equal, table_name, info.table_name())
+            {
+                let expected_values = expected_values.map(str::trim).map(String::from).collect();
+                return InsertError::ForeignKeyViolation {
+                    table: table.to_owned(),
+                    foreign_table: foreign_table.to_owned(),
+                    foreign_key: info.constraint_name().unwrap_or("unknown").to_string(),
+                    columns,
+                    expected_values,
+                };
             }
+        }
 
         if let diesel::result::Error::DatabaseError(
             diesel::result::DatabaseErrorKind::UniqueViolation,
             info,
         ) = &error
-            && let Some(detail) = info.details() {
-                // We retrieve the names of the columns involved in the
-                // unique violation.
-                //
-                // An example of a detail is:
-                //
-                // Some("Key (procedure_template, name)=(5, Phone) already exists.")
-                // Some("Key (procedure_template, name)=(18, Metal Bead 3mm) already exists.")
-                //
+            && let Some(detail) = info.details()
+        {
+            // We retrieve the names of the columns involved in the
+            // unique violation.
+            //
+            // An example of a detail is:
+            //
+            // Some("Key (procedure_template, name)=(5, Phone) already exists.")
+            // Some("Key (procedure_template, name)=(18, Metal Bead 3mm) already exists.")
+            //
 
-                // We extract the names of the columns, their values and the name
-                // of the associated table.
+            // We extract the names of the columns, their values and the name
+            // of the associated table.
 
-                let mut equal_split = detail.split('=');
-                let before_equal = equal_split.next().and_then(|s| {
-                    s.strip_suffix(")")?
-                            .split_once('(')?
-                            .1
-                            .split(',')
-                            .map(str::trim)
-                            .map(FieldName::from_str)
-                            .collect::<Result<Vec<_>, _>>()
-                            .ok()
-                });
-                let after_equal = equal_split
-                    .next()
-                    .and_then(|s| Some(s.strip_prefix("(")?.rsplit(')').last()?.split(',')));
+            let mut equal_split = detail.split('=');
+            let before_equal = equal_split.next().and_then(|s| {
+                s.strip_suffix(")")?
+                    .split_once('(')?
+                    .1
+                    .split(',')
+                    .map(str::trim)
+                    .map(FieldName::from_str)
+                    .collect::<Result<Vec<_>, _>>()
+                    .ok()
+            });
+            let after_equal = equal_split
+                .next()
+                .and_then(|s| Some(s.strip_prefix("(")?.rsplit(')').next_back()?.split(',')));
 
-                if let (Some(columns), Some(expected_values), Some(table)) =
-                    (before_equal, after_equal, info.table_name())
-                {
-                    let expected_values =
-                        expected_values.map(str::trim).map(String::from).collect();
-                    return InsertError::UniqueConstraintViolation {
-                        table: table.to_owned(),
-                        columns,
-                        expected_values,
-                    };
-                }
+            if let (Some(columns), Some(expected_values), Some(table)) =
+                (before_equal, after_equal, info.table_name())
+            {
+                let expected_values = expected_values.map(str::trim).map(String::from).collect();
+                return InsertError::UniqueConstraintViolation {
+                    table: table.to_owned(),
+                    columns,
+                    expected_values,
+                };
             }
+        }
 
         if let diesel::result::Error::DatabaseError(_, info) = &error {
             println!("Message: {}", info.message());

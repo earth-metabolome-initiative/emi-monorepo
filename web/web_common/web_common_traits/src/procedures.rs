@@ -28,6 +28,14 @@ pub trait ProcedureTemplateLike {
 pub trait ProcedureTemplateQueries<C>: ProcedureTemplateLike {
     /// Returns all procedure template asset models associated with the current
     /// procedure template.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to the database connection.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error of type `diesel::result::Error` if the query fails.
     fn procedure_template_asset_models(
         &self,
         conn: &mut C,
@@ -48,6 +56,7 @@ pub trait ProcedureLike: PrimaryKeyLike {
     /// Associated builder type.
     type Builder: ProcedureBuilderLike<Procedure = Self>;
 
+    #[allow(clippy::type_complexity)]
     /// Returns the coupled procedure template asset model IDs alongside
     /// with their corresponding procedure asset IDs.
     fn procedure_template_asset_models_and_procedure_assets(

@@ -12,14 +12,13 @@ impl From<Vec<crate::codegen::structs_codegen::tables::digital_assets::DigitalAs
         super::Rows::DigitalAsset(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset>
+impl From<super::Rows>
+    for Option<Vec<crate::codegen::structs_codegen::tables::digital_assets::DigitalAsset>>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::DigitalAsset(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::DigitalAsset(v) => Some(v),
+            _ => None,
         }
     }
 }

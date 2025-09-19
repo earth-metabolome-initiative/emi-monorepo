@@ -18,14 +18,15 @@ impl From<Vec<crate::codegen::structs_codegen::tables::centrifuge_procedures::Ce
         super::Rows::CentrifugeProcedure(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure>
+impl From<super::Rows>
+    for Option<
+        Vec<crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure>,
+    >
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::CentrifugeProcedure(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::CentrifugeProcedure(v) => Some(v),
+            _ => None,
         }
     }
 }

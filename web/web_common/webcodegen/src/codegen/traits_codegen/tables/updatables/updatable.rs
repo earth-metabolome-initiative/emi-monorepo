@@ -152,10 +152,8 @@ impl Codegen<'_> {
 
                 parent_check.extend(if parent_key.is_nullable(conn)? {
                     quote::quote! {
-                        if let Some(#parent_table_ident) = self.#method_ident(conn)? {
-                            if !#recursive_call? {
-                                return Ok(false);
-                            }
+                        if let Some(#parent_table_ident) = self.#method_ident(conn)? && !#recursive_call? {
+                            return Ok(false);
                         }
                     }
                 } else {
@@ -219,7 +217,7 @@ impl Codegen<'_> {
             let maybe_where_clause = if where_constraints.is_empty() {
                 TokenStream::new()
             } else {
-                where_constraints.sort_unstable_by_key(|constraint| constraint.to_string());
+                where_constraints.sort_unstable_by_key(ToString::to_string);
                 where_constraints.dedup_by_key(|constraint| constraint.to_string());
 
                 quote::quote! { where #(#where_constraints),* }

@@ -48,7 +48,9 @@ impl core::str::FromStr for CommercialCameraModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "CameraModel" => Ok(Self::CameraModel),
+            "id" => Ok(Self::Id),
             "camera_model" => Ok(Self::CameraModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }

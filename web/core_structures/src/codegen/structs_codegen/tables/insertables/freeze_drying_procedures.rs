@@ -47,6 +47,7 @@ impl core::str::FromStr for FreezeDryingProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Procedure" => Ok(Self::Procedure),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "FreezeDriedContainer" => Ok(Self::FreezeDriedContainer),
             "FreezeDriedContainerModel" => Ok(Self::FreezeDriedContainerModel),
@@ -64,6 +65,7 @@ impl core::str::FromStr for FreezeDryingProcedureAttribute {
             "ProcedureFreezeDriedWith" => Ok(Self::ProcedureFreezeDriedWith(
                 crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
             )),
+            "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "freeze_dried_container" => Ok(Self::FreezeDriedContainer),
             "freeze_dried_container_model" => Ok(Self::FreezeDriedContainerModel),

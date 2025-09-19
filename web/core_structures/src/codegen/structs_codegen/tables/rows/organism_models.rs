@@ -14,14 +14,13 @@ impl From<Vec<crate::codegen::structs_codegen::tables::organism_models::Organism
         super::Rows::OrganismModel(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::organism_models::OrganismModel>
+impl From<super::Rows>
+    for Option<Vec<crate::codegen::structs_codegen::tables::organism_models::OrganismModel>>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::OrganismModel(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::OrganismModel(v) => Some(v),
+            _ => None,
         }
     }
 }

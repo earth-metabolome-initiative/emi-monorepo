@@ -85,9 +85,9 @@ impl core::error::Error for Error {
             Error::Webcodegen(err) => Some(err),
             Error::Procedure(err) => Some(err),
             Error::ProcedureTemplate(err) => Some(err),
-            Error::UncharacterizedAssetColumn(_) => None,
-            Error::CascadingAssetForeignKey(_) => None,
-            Error::UnusedForeignProcedureTemplateConstraint { .. } => None,
+            Error::UncharacterizedAssetColumn(_)
+            | Error::CascadingAssetForeignKey(_)
+            | Error::UnusedForeignProcedureTemplateConstraint { .. } => None,
         }
     }
 }

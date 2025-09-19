@@ -41,7 +41,7 @@ where
                     match err {
                         MutabilityError::MaxedOutSparseIndex
                         | MutabilityError::MaxedOutRowIndex
-                        | MutabilityError::MaxedOutColumnIndex => continue,
+                        | MutabilityError::MaxedOutColumnIndex => {}
                         _ => return Err(arbitrary::Error::IncorrectFormat),
                     }
                 }

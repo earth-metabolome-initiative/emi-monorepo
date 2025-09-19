@@ -37,9 +37,11 @@ impl core::str::FromStr for ReagentModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "Purity" => Ok(Self::Purity),
             "CasCode" => Ok(Self::CasCode),
             "MolecularFormula" => Ok(Self::MolecularFormula),
+            "id" => Ok(Self::Id),
             "purity" => Ok(Self::Purity),
             "cas_code" => Ok(Self::CasCode),
             "molecular_formula" => Ok(Self::MolecularFormula),

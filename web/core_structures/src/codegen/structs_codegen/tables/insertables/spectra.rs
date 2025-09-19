@@ -35,7 +35,9 @@ impl core::str::FromStr for SpectrumAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "SpectraCollectionId" => Ok(Self::SpectraCollectionId),
+            "id" => Ok(Self::Id),
             "spectra_collection_id" => Ok(Self::SpectraCollectionId),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }

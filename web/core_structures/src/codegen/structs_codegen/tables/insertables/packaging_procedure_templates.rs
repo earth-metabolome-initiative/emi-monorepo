@@ -44,6 +44,7 @@ impl core::str::FromStr for PackagingProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "PackagedWithModel" => Ok(Self::PackagedWithModel),
             "ProcedureTemplatePackagedWithModel" => {
                 Ok(
@@ -60,6 +61,7 @@ impl core::str::FromStr for PackagingProcedureTemplateAttribute {
                     ),
                 )
             }
+            "procedure_template" => Ok(Self::ProcedureTemplate),
             "packaged_with_model" => Ok(Self::PackagedWithModel),
             "procedure_template_packaged_with_model" => {
                 Ok(

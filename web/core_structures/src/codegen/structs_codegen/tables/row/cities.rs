@@ -3,12 +3,11 @@ impl From<crate::codegen::structs_codegen::tables::cities::City> for super::Row 
         super::Row::City(value)
     }
 }
-impl TryFrom<super::Row> for crate::codegen::structs_codegen::tables::cities::City {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Row) -> Result<Self, Self::Error> {
+impl From<super::Row> for Option<crate::codegen::structs_codegen::tables::cities::City> {
+    fn from(value: super::Row) -> Self {
         match value {
-            super::Row::City(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Row enum: {value:?}"),
+            super::Row::City(v) => Some(v),
+            _ => None,
         }
     }
 }

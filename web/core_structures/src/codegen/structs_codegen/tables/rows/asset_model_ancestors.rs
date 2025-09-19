@@ -18,14 +18,15 @@ impl From<Vec<crate::codegen::structs_codegen::tables::asset_model_ancestors::As
         super::Rows::AssetModelAncestor(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor>
+impl From<super::Rows>
+    for Option<
+        Vec<crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor>,
+    >
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::AssetModelAncestor(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::AssetModelAncestor(v) => Some(v),
+            _ => None,
         }
     }
 }

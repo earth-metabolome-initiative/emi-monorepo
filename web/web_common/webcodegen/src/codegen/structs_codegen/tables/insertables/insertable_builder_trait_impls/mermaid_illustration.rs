@@ -19,6 +19,7 @@ use mermaid::{
 
 use crate::{Column, Table};
 
+#[allow(clippy::too_many_lines)]
 /// Generates a mermaid-based illustration of the relationships between the
 /// provided columns.
 ///
@@ -44,7 +45,7 @@ pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Ord + Eq + Hash
         "Provided columns must be unique"
     );
 
-    let mut columns = unsorted_columns.into_iter().collect::<Vec<_>>();
+    let mut columns = unsorted_columns.iter().collect::<Vec<_>>();
     columns.sort_unstable();
 
     let mut inferred_columns = columns
@@ -239,7 +240,7 @@ pub(crate) fn columns_to_mermaid_illustration<C: AsRef<Column> + Ord + Eq + Hash
 
     let mut tables = columns
         .iter()
-        .map(|col| col.as_ref())
+        .map(AsRef::as_ref)
         .chain(inferred_columns.iter())
         .map(|col| col.table(conn))
         .collect::<Result<Vec<_>, _>>()?;

@@ -126,6 +126,14 @@ impl<V> SortedVec<V> {
     }
 
     /// Binary searches this slice with a comparator function.
+    /// If the slice is not sorted, the returned result is unspecified and
+    /// meaningless.
+    ///
+    /// # Errors
+    ///
+    /// * `Err(usize)` if the value is not found, containing the index where it
+    ///   could be inserted to maintain sorted order.
+    /// * `Ok(usize)` if the value is found, containing the index of the value.
     pub fn binary_search_by<F>(&self, f: F) -> Result<usize, usize>
     where
         F: FnMut(&V) -> core::cmp::Ordering,

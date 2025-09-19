@@ -37,9 +37,11 @@ impl core::str::FromStr for SampleAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "Model" => Ok(Self::Model),
             "SampleSource" => Ok(Self::SampleSource),
             "SampleSourceModel" => Ok(Self::SampleSourceModel),
+            "id" => Ok(Self::Id),
             "model" => Ok(Self::Model),
             "sample_source" => Ok(Self::SampleSource),
             "sample_source_model" => Ok(Self::SampleSourceModel),

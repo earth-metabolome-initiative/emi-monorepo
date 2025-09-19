@@ -50,6 +50,7 @@ impl core::str::FromStr for PhotographProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Procedure" => Ok(Self::Procedure),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "PhotographedAsset" => Ok(Self::PhotographedAsset),
             "ProcedureTemplatePhotographedAssetModel" => {
@@ -70,6 +71,7 @@ impl core::str::FromStr for PhotographProcedureAttribute {
             "ProcedurePhotograph" => Ok(Self::ProcedurePhotograph(
                 crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
             )),
+            "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "photographed_asset" => Ok(Self::PhotographedAsset),
             "procedure_template_photographed_asset_model" => {

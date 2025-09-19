@@ -51,7 +51,7 @@ impl Table {
             check_constraints.len(),
             check_constraints
                 .iter()
-                .map(|ts| ts.to_string())
+                .map(ToString::to_string)
                 .collect::<std::collections::HashSet<_>>()
                 .len(),
             "The check constraints should be unique"

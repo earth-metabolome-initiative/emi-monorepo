@@ -35,7 +35,9 @@ impl core::str::FromStr for VolumetricContainerAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "VolumetricContainerModel" => Ok(Self::VolumetricContainerModel),
+            "id" => Ok(Self::Id),
             "volumetric_container_model" => Ok(Self::VolumetricContainerModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }

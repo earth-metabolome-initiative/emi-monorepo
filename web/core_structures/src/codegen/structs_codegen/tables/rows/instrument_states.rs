@@ -16,14 +16,13 @@ impl From<Vec<crate::codegen::structs_codegen::tables::instrument_states::Instru
         super::Rows::InstrumentState(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::instrument_states::InstrumentState>
+impl From<super::Rows>
+    for Option<Vec<crate::codegen::structs_codegen::tables::instrument_states::InstrumentState>>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::InstrumentState(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::InstrumentState(v) => Some(v),
+            _ => None,
         }
     }
 }

@@ -52,6 +52,7 @@ impl core::str::FromStr for FractioningProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "Kilograms" => Ok(Self::Kilograms),
             "TolerancePercentage" => Ok(Self::TolerancePercentage),
             "WeighedWithModel" => Ok(Self::WeighedWithModel),
@@ -78,6 +79,7 @@ impl core::str::FromStr for FractioningProcedureTemplateAttribute {
                     ),
                 )
             }
+            "procedure_template" => Ok(Self::ProcedureTemplate),
             "kilograms" => Ok(Self::Kilograms),
             "tolerance_percentage" => Ok(Self::TolerancePercentage),
             "weighed_with_model" => Ok(Self::WeighedWithModel),

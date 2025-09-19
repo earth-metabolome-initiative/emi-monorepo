@@ -18,14 +18,15 @@ impl From<Vec<crate::codegen::structs_codegen::tables::commercial_bead_models::C
         super::Rows::CommercialBeadModel(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel>
+impl From<super::Rows>
+    for Option<
+        Vec<crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel>,
+    >
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::CommercialBeadModel(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::CommercialBeadModel(v) => Some(v),
+            _ => None,
         }
     }
 }

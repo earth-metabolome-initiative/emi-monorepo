@@ -144,14 +144,11 @@ impl Codegen<'_> {
                             super::Rows::#struct_ident(value)
                         }
                     }
-                    impl TryFrom<super::Rows> for Vec<#struct_path> {
-                        type Error = std::convert::Infallible;
-                        fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+                    impl From<super::Rows> for Option<Vec<#struct_path>> {
+                        fn from(value: super::Rows) -> Self {
                             match value {
-                                super::Rows::#struct_ident(v) => Ok(v),
-                                value => {
-                                    unreachable!("Unexpected variant in Rows enum: {value:?}")
-                                }
+                                super::Rows::#struct_ident(v) => Some(v),
+                                _ => None,
                             }
                         }
                     }

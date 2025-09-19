@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use diesel::PgConnection;
 
 use crate::{Column, Table, errors::WebCodeGenError};
@@ -54,16 +56,19 @@ pub trait CustomTableConstraint {
         let file_name_prefix = format!("{constraint_name}_{table_catalog}_{table_schema}_");
         let mut start_table: Option<String> = None;
         for entry in std::fs::read_dir(".")?.flatten() {
-            if let Ok(file_name) = entry.file_name().into_string() {
-                if file_name.starts_with(&file_name_prefix) && file_name.ends_with(".err") {
-                    let table_name = file_name
-                        .trim_start_matches(&file_name_prefix)
-                        .trim_end_matches(".err")
-                        .to_string();
-                    start_table = Some(table_name);
-                    std::fs::remove_file(entry.path())?;
-                    break;
-                }
+            if let Ok(file_name) = entry.file_name().into_string()
+                && file_name.starts_with(&file_name_prefix)
+                && Path::new(&file_name)
+                    .extension()
+                    .is_some_and(|ext| ext.eq_ignore_ascii_case("err"))
+            {
+                let table_name = file_name
+                    .trim_start_matches(&file_name_prefix)
+                    .trim_end_matches(".err")
+                    .to_string();
+                start_table = Some(table_name);
+                std::fs::remove_file(entry.path())?;
+                break;
             }
         }
 
@@ -79,7 +84,7 @@ pub trait CustomTableConstraint {
         }
 
         for table in Table::load_all(conn, table_catalog, table_schema)?.as_ref() {
-            if let Err(err) = self.check_constraint(conn, &table) {
+            if let Err(err) = self.check_constraint(conn, table) {
                 // We store this error into a file.
                 let file_name = format!("{file_name_prefix}{}.err", table.table_name);
                 std::fs::write(&file_name, err.to_string())?;
@@ -134,7 +139,7 @@ pub trait CustomColumnConstraint {
     ) -> Result<(), Self::Error> {
         for table in Table::load_all(conn, table_catalog, table_schema)?.as_ref() {
             for column in table.columns(conn)?.as_ref() {
-                self.check_constraint(conn, &column)?;
+                self.check_constraint(conn, column)?;
             }
         }
         Ok(())

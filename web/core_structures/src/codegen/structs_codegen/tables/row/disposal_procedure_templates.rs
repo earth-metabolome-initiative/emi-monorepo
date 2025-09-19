@@ -7,13 +7,14 @@ impl From<
         super::Row::DisposalProcedureTemplate(value)
     }
 }
-impl TryFrom<super::Row>
-for crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Row) -> Result<Self, Self::Error> {
+impl From<super::Row>
+for Option<
+    crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate,
+> {
+    fn from(value: super::Row) -> Self {
         match value {
-            super::Row::DisposalProcedureTemplate(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Row enum: {value:?}"),
+            super::Row::DisposalProcedureTemplate(v) => Some(v),
+            _ => None,
         }
     }
 }

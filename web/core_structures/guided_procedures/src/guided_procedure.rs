@@ -18,7 +18,8 @@ pub struct GuidedProcedure<'graph, C> {
 
 impl<'graph, C> GuidedProcedure<'graph, C> {
     /// Creates a new `GuidedProcedureBuilder` instance.
-    #[must_use] pub fn new() -> GuidedProcedureBuilder<'graph, C> {
+    #[must_use]
+    pub fn new() -> GuidedProcedureBuilder<'graph, C> {
         GuidedProcedureBuilder::default()
     }
 }

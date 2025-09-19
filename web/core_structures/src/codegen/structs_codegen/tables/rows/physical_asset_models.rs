@@ -18,14 +18,15 @@ impl From<Vec<crate::codegen::structs_codegen::tables::physical_asset_models::Ph
         super::Rows::PhysicalAssetModel(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel>
+impl From<super::Rows>
+    for Option<
+        Vec<crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel>,
+    >
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::PhysicalAssetModel(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::PhysicalAssetModel(v) => Some(v),
+            _ => None,
         }
     }
 }

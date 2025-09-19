@@ -3,14 +3,13 @@ impl From<crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser
         super::Row::TemporaryUser(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser
+impl From<super::Row>
+    for Option<crate::codegen::structs_codegen::tables::temporary_user::TemporaryUser>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Row) -> Result<Self, Self::Error> {
+    fn from(value: super::Row) -> Self {
         match value {
-            super::Row::TemporaryUser(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Row enum: {value:?}"),
+            super::Row::TemporaryUser(v) => Some(v),
+            _ => None,
         }
     }
 }

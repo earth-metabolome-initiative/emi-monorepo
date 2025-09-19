@@ -59,12 +59,10 @@ impl Table {
                         CheckConstraintError::NoInvolvedColumns(unknown_column, _),
                     ),
                 )) = &outcome
+                    && all_columns.contains(unknown_column)
+                    && !insertable_columns.contains(unknown_column)
                 {
-                    if all_columns.contains(unknown_column)
-                        && !insertable_columns.contains(unknown_column)
-                    {
-                        return None;
-                    }
+                    return None;
                 }
                 Some(outcome)
             })

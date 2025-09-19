@@ -44,6 +44,7 @@ impl core::str::FromStr for WeighingProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "WeighedContainerModel" => Ok(Self::WeighedContainerModel),
             "ProcedureTemplateWeighedContainerModel" => {
                 Ok(
@@ -60,6 +61,7 @@ impl core::str::FromStr for WeighingProcedureTemplateAttribute {
                     ),
                 )
             }
+            "procedure_template" => Ok(Self::ProcedureTemplate),
             "weighed_container_model" => Ok(Self::WeighedContainerModel),
             "procedure_template_weighed_container_model" => {
                 Ok(

@@ -13,7 +13,8 @@ use crate::{
 };
 mod foreign_defined_completions;
 
-impl Codegen<'_> {
+impl Table {
+    #[allow(clippy::too_many_lines)]
     /// Returns the implementation of the `TryInsert` trait for the insertable
     /// builder struct.
     ///
@@ -41,13 +42,12 @@ impl Codegen<'_> {
     /// primary key type value.
     fn generate_insertable_builder_try_insert_implementation(
         &self,
-        table: &Table,
         conn: &mut PgConnection,
     ) -> Result<(TokenStream, Vec<TokenStream>), WebCodeGenError> {
-        let insertable_enum = table.insertable_enum_ty()?;
+        let insertable_enum = self.insertable_enum_ty()?;
         let mut maybe_mut_self = false;
-        let attributes_enum = table.insertable_enum_ty()?;
-        let extension_tables = table.extension_tables(conn)?;
+        let attributes_enum = self.insertable_enum_ty()?;
+        let extension_tables = self.extension_tables(conn)?;
         let mut additional_use_imports = Vec::new();
         let right_generics = extension_tables
             .iter()
@@ -56,15 +56,17 @@ impl Codegen<'_> {
                 Ok(quote! {#generic_ident})
             })
             .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
-        let primary_key_type = table.primary_key_type(conn)?;
+        let primary_key_type = self.primary_key_type(conn)?;
         let mut additional_where_requirements = vec![];
         let mut try_insert_generic_constraint: HashSet<Arc<Table>> = HashSet::new();
         let mut attribute_availability_checks = Vec::new();
 
-        let generics_recursive_operation = if !right_generics.is_empty() {
-            let extension_foreign_keys = table.extension_foreign_keys(conn)?;
+        let generics_recursive_operation = if right_generics.is_empty() {
+            None
+        } else {
+            let extension_foreign_keys = self.extension_foreign_keys(conn)?;
 
-            let primary_keys = table.primary_key_columns(conn)?;
+            let primary_keys = self.primary_key_columns(conn)?;
 
             let primary_key = if primary_keys.len() == 1 {
                 &primary_keys[0]
@@ -186,11 +188,9 @@ impl Codegen<'_> {
             Some(quote! {
                 let #primary_key_ident = #primary_key_minting;
             })
-        } else {
-            None
         };
 
-        let assignments = table
+        let assignments = self
             .insertable_columns(conn, true)?
             .iter()
             .map(|column| {
@@ -252,7 +252,7 @@ impl Codegen<'_> {
         //
 
         let mut dependant_tables_completion: Vec<TokenStream> = Vec::new();
-        let primary_key_columns = table.primary_key_columns(conn)?;
+        let primary_key_columns = self.primary_key_columns(conn)?;
 
         // Then, for each column in the primary key, we determine the same-as
         // relationships and complete the dependant tables. It is possible that
@@ -264,7 +264,7 @@ impl Codegen<'_> {
             partial_builder_kind,
             potential_same_as_constraint,
             constraint,
-        ) in table.partial_builder_columns(conn)?
+        ) in self.partial_builder_columns(conn)?
         {
             let partial_builder_table = constraint.foreign_table(conn)?;
             let partial_builder_table_ref = partial_builder_table.as_ref();
@@ -320,7 +320,7 @@ impl Codegen<'_> {
                         ).map_err(|err| {
                             err.into_field_name(#insertable_enum::#camel_cased_column_ident)
                         })?;
-                    })
+                    });
                 }
             } else if !missing_same_as_assignments.is_empty() {
                 maybe_mut_self = true;
@@ -390,7 +390,7 @@ impl Codegen<'_> {
         };
 
         let (foreign_defined_completions, extra_requirements) =
-            self.foreign_defined_completions(table, conn)?;
+            self.foreign_defined_completions(conn)?;
         additional_where_requirements.extend(extra_requirements);
 
         if !foreign_defined_completions.is_empty() {
@@ -436,7 +436,9 @@ impl Codegen<'_> {
             additional_where_requirements,
         ))
     }
+}
 
+impl Codegen<'_> {
     #[allow(clippy::too_many_lines)]
     /// Generates the [`InsertableVariant`] trait implementation for the tables
     ///
@@ -475,21 +477,20 @@ impl Codegen<'_> {
             let mut additional_where_clause = Vec::new();
 
             for parent_key in table.parent_keys(conn)? {
-                let parent_key_method = parent_key.constraint_ident(conn)?;
                 let parent_table = parent_key.foreign_table(conn)?;
 
                 if !parent_table.allows_updatable(conn)? {
                     continue;
                 }
 
+                let parent_key_method = parent_key.constraint_ident(conn)?;
+                let parent_key_ident = parent_table.snake_case_ident()?;
                 let parent_table_path = parent_table.import_struct_path()?;
 
                 parent_checks.push(if parent_key.is_nullable(conn)? {
                     quote::quote! {
-                        if let Some(parent) = insertable_struct.#parent_key_method(conn)? {
-                            if !parent.can_update(user_id, conn)? {
-                                return Err(generic_backend_request_errors::GenericBackendRequestError::Unauthorized.into());
-                            }
+                        if let Some(#parent_key_ident) = insertable_struct.#parent_key_method(conn)? && !#parent_key_ident.can_update(user_id, conn)? {
+                            return Err(generic_backend_request_errors::GenericBackendRequestError::Unauthorized.into());
                         }
                     }
                 } else {
@@ -521,17 +522,17 @@ impl Codegen<'_> {
             let attributes_extension_enum = table.attributes_extension_enum_ty()?;
 
             let (try_insert, try_insert_additional_where_clause) =
-                self.generate_insertable_builder_try_insert_implementation(table, conn)?;
+                table.generate_insertable_builder_try_insert_implementation(conn)?;
 
             additional_where_clause.extend(try_insert_additional_where_clause);
-            additional_where_clause.sort_unstable_by(|a, b| a.to_string().cmp(&b.to_string()));
+            additional_where_clause.sort_unstable_by_key(ToString::to_string);
             additional_where_clause.dedup_by_key(|x| x.to_string());
 
             let extension_tables = table.extension_tables(conn)?;
             let generics = table
                 .extension_tables(conn)?
                 .iter()
-                .map(|extension_table| extension_table.struct_ident())
+                .map(TableLike::struct_ident)
                 .collect::<Result<Vec<Ident>, WebCodeGenError>>()?;
             let maybe_generics =
                 if generics.is_empty() { None } else { Some(quote! {<#(#generics),*>}) };

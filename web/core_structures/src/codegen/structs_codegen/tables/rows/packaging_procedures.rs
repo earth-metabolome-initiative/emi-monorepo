@@ -18,14 +18,15 @@ impl From<Vec<crate::codegen::structs_codegen::tables::packaging_procedures::Pac
         super::Rows::PackagingProcedure(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure>
+impl From<super::Rows>
+    for Option<
+        Vec<crate::codegen::structs_codegen::tables::packaging_procedures::PackagingProcedure>,
+    >
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::PackagingProcedure(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::PackagingProcedure(v) => Some(v),
+            _ => None,
         }
     }
 }

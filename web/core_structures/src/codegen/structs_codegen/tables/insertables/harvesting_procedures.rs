@@ -43,6 +43,7 @@ impl core::str::FromStr for HarvestingProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Procedure" => Ok(Self::Procedure),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "SampleSource" => Ok(Self::SampleSource),
             "ProcedureTemplateSampleSourceModel" => Ok(Self::ProcedureTemplateSampleSourceModel),
@@ -54,6 +55,7 @@ impl core::str::FromStr for HarvestingProcedureAttribute {
             "ProcedureSample" => Ok(Self::ProcedureSample(
                 crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
             )),
+            "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "sample_source" => Ok(Self::SampleSource),
             "procedure_template_sample_source_model" => {

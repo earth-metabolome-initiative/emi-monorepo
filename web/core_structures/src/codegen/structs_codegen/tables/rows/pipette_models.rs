@@ -12,14 +12,13 @@ impl From<Vec<crate::codegen::structs_codegen::tables::pipette_models::PipetteMo
         super::Rows::PipetteModel(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel>
+impl From<super::Rows>
+    for Option<Vec<crate::codegen::structs_codegen::tables::pipette_models::PipetteModel>>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::PipetteModel(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::PipetteModel(v) => Some(v),
+            _ => None,
         }
     }
 }

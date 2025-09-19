@@ -46,6 +46,7 @@ impl core::str::FromStr for GeolocationProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "GeolocatedWithModel" => Ok(Self::GeolocatedWithModel),
             "ProcedureTemplateGeolocatedWithModel" => {
                 Ok(
@@ -62,6 +63,7 @@ impl core::str::FromStr for GeolocationProcedureTemplateAttribute {
                     ),
                 )
             }
+            "procedure_template" => Ok(Self::ProcedureTemplate),
             "geolocated_with_model" => Ok(Self::GeolocatedWithModel),
             "procedure_template_geolocated_with_model" => {
                 Ok(

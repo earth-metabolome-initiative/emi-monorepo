@@ -20,15 +20,16 @@ impl From<
         super::Rows::CappingProcedureTemplate(value)
     }
 }
-impl TryFrom<super::Rows>
-for Vec<
-    crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+impl From<super::Rows>
+for Option<
+    Vec<
+        crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate,
+    >,
 > {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::CappingProcedureTemplate(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::CappingProcedureTemplate(v) => Some(v),
+            _ => None,
         }
     }
 }

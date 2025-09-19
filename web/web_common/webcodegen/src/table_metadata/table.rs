@@ -404,8 +404,7 @@ fn ancestral_extension_tables(
 ) -> Result<Arc<Vec<Table>>, WebCodeGenError> {
     let mut tables = Vec::new();
     for extended_table in table.extension_tables(conn)?.as_ref() {
-        tables
-            .extend(extended_table.ancestral_extension_tables(conn)?.as_ref().into_iter().cloned());
+        tables.extend(extended_table.ancestral_extension_tables(conn)?.as_ref().iter().cloned());
         tables.push(extended_table.as_ref().clone());
     }
     tables.sort_unstable();
@@ -490,6 +489,7 @@ impl Display for Table {
 }
 
 impl Table {
+    #[must_use]
     /// Returns whether the provided column is from the current table.
     ///
     /// # Arguments
@@ -572,7 +572,7 @@ impl Table {
         self.primary_key_columns(conn)?
             .as_ref()
             .iter()
-            .map(|column| column.snake_case_ident())
+            .map(Column::snake_case_ident)
             .collect::<Result<Vec<Ident>, WebCodeGenError>>()
     }
 
@@ -684,7 +684,7 @@ impl Table {
             if !foreign_key.has_on_delete_cascade(conn)?
                 && foreign_key.is_foreign_primary_key(conn)?
                 && !foreign_key.is_self_referential(conn)?
-                && !foreign_key.is_ancestral_same_as_constraint(conn)?.is_some()
+                && foreign_key.is_ancestral_same_as_constraint(conn)?.is_none()
             {
                 parent_keys.push(foreign_key.clone());
             }
@@ -866,7 +866,7 @@ impl Table {
     /// # Arguments
     ///
     /// * `include_ancestors` - Whether to include ancestor tables in the
-    ///  search.
+    ///   search.
     /// * `conn` - The database connection.
     ///
     /// # Errors
@@ -1258,7 +1258,7 @@ impl Table {
         self.primary_key_columns(conn).map(|columns| !columns.is_empty())
     }
 
-    /// Returns the KeyColumnUsage linking to extension tables, if any.
+    /// Returns the `KeyColumnUsage` linking to extension tables, if any.
     ///
     /// # Arguments
     ///
@@ -1638,8 +1638,8 @@ impl Table {
     ///
     /// # Arguments
     ///
-    /// * `include_mandatory_partial_builders` - Whether to include columns
-    ///  that require a partial builder.
+    /// * `include_mandatory_partial_builders` - Whether to include columns that
+    ///   require a partial builder.
     /// * `conn` - The database connection.
     ///
     /// # Errors
@@ -1729,7 +1729,7 @@ impl Table {
     ///
     /// * `table`: A reference to the table to start from.
     /// * `column`: A reference to the column to find the path to.
-    /// * `conn`: A mutable reference to a PostgreSQL connection.
+    /// * `conn`: A mutable reference to a `PostgreSQL` connection.
     pub(crate) fn extension_foreign_keys_path(
         &self,
         column: &Column,
@@ -1741,27 +1741,26 @@ impl Table {
         }
 
         for ancestor_table in self.extension_tables(conn)?.iter() {
-            match ancestor_table.extension_foreign_keys_path(column, conn)? {
-                Some(mut ancestor_foreign_keys_path) => {
-                    // We identify which of the foreign keys is the one that bridges
-                    // from the current table to the ancestor table.
-                    let foreign_key = self
-                        .foreign_keys(conn)
-                        .unwrap_or_default()
-                        .iter()
-                        .find(|fk| {
-                            fk.is_extension(conn).unwrap_or(false)
-                                && fk.foreign_table(conn).ok().map_or(false, |fk_table| {
-                                    fk_table.as_ref() == ancestor_table.as_ref()
-                                })
-                        })
-                        .cloned()
-                        .unwrap();
+            if let Some(mut ancestor_foreign_keys_path) =
+                ancestor_table.extension_foreign_keys_path(column, conn)?
+            {
+                // We identify which of the foreign keys is the one that bridges
+                // from the current table to the ancestor table.
+                let foreign_key = self
+                    .foreign_keys(conn)
+                    .unwrap_or_default()
+                    .iter()
+                    .find(|fk| {
+                        fk.is_extension(conn).unwrap_or(false)
+                            && fk.foreign_table(conn).ok().is_some_and(|fk_table| {
+                                fk_table.as_ref() == ancestor_table.as_ref()
+                            })
+                    })
+                    .cloned()
+                    .unwrap();
 
-                    ancestor_foreign_keys_path.insert(0, foreign_key);
-                    return Ok(Some(ancestor_foreign_keys_path));
-                }
-                None => continue,
+                ancestor_foreign_keys_path.insert(0, foreign_key);
+                return Ok(Some(ancestor_foreign_keys_path));
             }
         }
 
@@ -1821,7 +1820,7 @@ impl Table {
     /// # Arguments
     ///
     /// * `table`: A reference to the table to generate generics for.
-    /// * `conn`: A mutable reference to a PostgreSQL connection.
+    /// * `conn`: A mutable reference to a `PostgreSQL` connection.
     ///
     /// # Errors
     ///

@@ -46,6 +46,7 @@ impl core::str::FromStr for HarvestingProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "SampleSourceModel" => Ok(Self::SampleSourceModel),
             "ProcedureTemplateSampleSourceModel" => {
                 Ok(
@@ -62,6 +63,7 @@ impl core::str::FromStr for HarvestingProcedureTemplateAttribute {
                     ),
                 )
             }
+            "procedure_template" => Ok(Self::ProcedureTemplate),
             "sample_source_model" => Ok(Self::SampleSourceModel),
             "procedure_template_sample_source_model" => {
                 Ok(

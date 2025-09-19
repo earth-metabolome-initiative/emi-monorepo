@@ -37,7 +37,11 @@ pub enum VolumeMeasuringDeviceModelAttribute {
 impl core::str::FromStr for VolumeMeasuringDeviceModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned()))
+        match s {
+            "Id" => Ok(Self::Id),
+            "id" => Ok(Self::Id),
+            _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
+        }
     }
 }
 impl<T1> common_traits::builder::Attributed

@@ -7,14 +7,15 @@ impl From<crate::codegen::structs_codegen::tables::geolocation_procedures::Geolo
         super::Row::GeolocationProcedure(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure
+impl From<super::Row>
+    for Option<
+        crate::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure,
+    >
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Row) -> Result<Self, Self::Error> {
+    fn from(value: super::Row) -> Self {
         match value {
-            super::Row::GeolocationProcedure(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Row enum: {value:?}"),
+            super::Row::GeolocationProcedure(v) => Some(v),
+            _ => None,
         }
     }
 }

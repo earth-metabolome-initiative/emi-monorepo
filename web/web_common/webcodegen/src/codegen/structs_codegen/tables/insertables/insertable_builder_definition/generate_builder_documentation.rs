@@ -4,21 +4,20 @@
 use quote::quote;
 
 use crate::{
-    Codegen, Table, TableLike,
+    Table, TableLike,
     codegen::{CODEGEN_INSERTABLES_PATH, CODEGEN_TABLES_PATH},
     errors::WebCodeGenError,
 };
 
-impl Codegen<'_> {
+impl Table {
     pub(super) fn generate_builder_documentation(
         &self,
-        table: &Table,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<String>, WebCodeGenError> {
-        let ancestral_insertable_columns = table.ancestral_insertable_columns(conn)?;
-        let struct_name = table.struct_name()?;
-        let snake_case_table_name = table.singular_snake_case_name()?;
-        let has_created_by = table.has_created_by_column(true, conn)?;
+        let ancestral_insertable_columns = self.ancestral_insertable_columns(conn)?;
+        let struct_name = self.struct_name()?;
+        let snake_case_table_name = self.singular_snake_case_name()?;
+        let has_created_by = self.has_created_by_column(true, conn)?;
 
         // We determine the set of traits which are required
         // to call the setters for the columns.
@@ -64,20 +63,20 @@ impl Codegen<'_> {
 
         documentation.push(format!(
             "Builder for creating and inserting a new [`{}`]({}).",
-            table.struct_name()?,
-            table.import_struct_path_str()?
+            self.struct_name()?,
+            self.import_struct_path_str()?
         ));
-        documentation.push("".to_string());
+        documentation.push(String::new());
         documentation.push("# Implementation details".to_string());
         documentation.push("While this builder implements several methods, a reasonably complete **basic** usage example (*which may not apply to your own specific use case, please adapt accordingly*) is as follows:".to_string());
-        documentation.push("".to_string());
+        documentation.push(String::new());
         documentation.push("```rust,ignore".to_string());
         for required_import in &required_imports {
             documentation.push(format!("use {required_import};"));
         }
 
-        documentation.push("".to_string());
-        documentation.push(format!("let {snake_case_table_name} = {}::new()", struct_name));
+        documentation.push(String::new());
+        documentation.push(format!("let {snake_case_table_name} = {struct_name}::new()"));
         if !mandatory_columns.is_empty() {
             documentation.push("    // Set mandatory fields".to_string());
         }

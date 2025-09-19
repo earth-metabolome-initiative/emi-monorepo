@@ -50,7 +50,7 @@ pub const CODEGEN_FOREIGN_KEYS_PATH: &str = "foreign_keys";
 pub const CODEGEN_FOREIGN_PATH: &str = "foreign";
 /// Constant defining the submodule for the Tabular trait implementations.
 pub const CODEGEN_TABULAR_PATH: &str = "tabular";
-/// Constant defining the submodule for the InsertableVariant trait
+/// Constant defining the submodule for the `InsertableVariant` trait
 /// implementations.
 pub const CODEGEN_INSERTABLE_VARIANT_PATH: &str = "insertable_variant";
 /// Constant defining the submodule for the Updatable-related trait
@@ -133,6 +133,7 @@ pub struct Codegen<'a> {
 }
 
 impl<'a> Codegen<'a> {
+    #[must_use]
     /// Returns a reference to the table extension network.
     pub fn table_extension_network(&self) -> Option<&TableExtensionNetwork> {
         self.table_extension_network.as_ref()
@@ -446,9 +447,7 @@ impl<'a> Codegen<'a> {
         let syntax_tree: File = syn::parse_str(&code_string).unwrap();
 
         // Use prettyplease to format the syntax tree
-        let formatted_code = unparse(&syntax_tree);
-
-        formatted_code
+        unparse(&syntax_tree)
     }
 
     /// Returns the output directory.
@@ -535,7 +534,7 @@ impl<'a> Codegen<'a> {
         let mut tables = Table::load_all(conn, table_catalog, "public")?
             .iter()
             .filter(|table| !(table.is_temporary() || table.is_view()))
-            .filter(|table| !self.tables_deny_list.contains(&table))
+            .filter(|table| !self.tables_deny_list.contains(table))
             .cloned()
             .collect::<Vec<Table>>();
 
@@ -545,7 +544,7 @@ impl<'a> Codegen<'a> {
 
         let task = Task::new("Creating table extension network");
         self.table_extension_network =
-            Some(TableExtensionNetwork::from_tables(conn, tables.clone())?);
+            Some(TableExtensionNetwork::from_tables(conn, tables.clone()));
         time_tracker.add_completed_task(task);
 
         let codegen_directory = self.get_output_directory()?.join(CODEGEN_DIRECTORY);

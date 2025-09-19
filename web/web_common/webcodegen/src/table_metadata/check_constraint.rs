@@ -976,7 +976,7 @@ impl CheckConstraint {
     ///
     /// * If an error occurs while querying the database
     pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, WebCodeGenError> {
-        Ok(self.pg_constraint(conn)?.functions(conn)?)
+        self.pg_constraint(conn)?.functions(conn)
     }
 
     /// Returns the vector of [`PgOperator`] operators that are used in the
@@ -990,7 +990,7 @@ impl CheckConstraint {
     ///
     /// * If an error occurs while querying the database
     pub fn operators(&self, conn: &mut PgConnection) -> Result<Vec<PgOperator>, WebCodeGenError> {
-        Ok(self.pg_constraint(conn)?.operators(conn)?)
+        self.pg_constraint(conn)?.operators(conn)
     }
 
     /// Returns the [`PgConstraint`] that corresponds to this check constraint

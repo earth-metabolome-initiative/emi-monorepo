@@ -44,6 +44,7 @@ impl core::str::FromStr for CappingProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "CappedContainerModel" => Ok(Self::CappedContainerModel),
             "ProcedureTemplateCappedContainerModel" => {
                 Ok(
@@ -60,6 +61,7 @@ impl core::str::FromStr for CappingProcedureTemplateAttribute {
                     ),
                 )
             }
+            "procedure_template" => Ok(Self::ProcedureTemplate),
             "capped_container_model" => Ok(Self::CappedContainerModel),
             "procedure_template_capped_container_model" => {
                 Ok(

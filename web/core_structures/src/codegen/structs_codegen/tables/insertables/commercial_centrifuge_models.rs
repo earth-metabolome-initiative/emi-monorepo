@@ -48,7 +48,9 @@ impl core::str::FromStr for CommercialCentrifugeModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "CentrifugeModel" => Ok(Self::CentrifugeModel),
+            "id" => Ok(Self::Id),
             "centrifuge_model" => Ok(Self::CentrifugeModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }

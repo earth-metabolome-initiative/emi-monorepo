@@ -15,6 +15,7 @@ pub struct ProcedureAlignmentConstraint;
 impl CustomTableConstraint for ProcedureAlignmentConstraint {
     type Error = crate::errors::Error;
 
+    #[allow(clippy::too_many_lines)]
     fn check_constraint(
         &self,
         conn: &mut diesel::PgConnection,
@@ -79,13 +80,9 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
             procedure.procedure_template_asset_models(conn)?;
         for (procedure_template_column, _) in &procedure_template_asset_models_in_procedure_template
         {
-            if procedure_template_asset_models_in_procedure
-                .iter()
-                .find(|(procedure_column, _)| {
-                    procedure_column.column_name == procedure_template_column.column_name
-                })
-                .is_some()
-            {
+            if procedure_template_asset_models_in_procedure.iter().any(|(procedure_column, _)| {
+                procedure_column.column_name == procedure_template_column.column_name
+            }) {
                 continue;
             }
             return Err(ConstraintError::MissingColumn {
@@ -103,28 +100,23 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
         for (procedure_template_asset_model_in_procedure_template, _) in
             &procedure_template_asset_models_in_procedure_template
         {
-            let (procedure_template_asset_model_in_procedure, _) =
-                procedure_template_asset_models_in_procedure
-                    .iter()
-                    .find(|(procedure_column, _)| {
-                        procedure_column.column_name
-                            == procedure_template_asset_model_in_procedure_template.column_name
-                    })
-                    .unwrap();
+            let (ptam_in_procedure, _) = procedure_template_asset_models_in_procedure
+                .iter()
+                .find(|(procedure_column, _)| {
+                    procedure_column.column_name
+                        == procedure_template_asset_model_in_procedure_template.column_name
+                })
+                .unwrap();
 
-            let expected_local_columns = vec![
-                procedure_template_column_in_procedure.clone(),
-                procedure_template_asset_model_in_procedure.clone(),
-            ];
+            let expected_local_columns =
+                vec![procedure_template_column_in_procedure.clone(), ptam_in_procedure.clone()];
             let expected_foreign_columns = vec![
                 procedure_template_primary_key.clone(),
                 procedure_template_asset_model_in_procedure_template.clone(),
             ];
 
             let mut found_unique_index_foreign_key = false;
-            for foreign_key in
-                procedure_template_asset_model_in_procedure.foreign_keys(conn)?.iter()
-            {
+            for foreign_key in ptam_in_procedure.foreign_keys(conn)?.iter() {
                 let foreign_table = foreign_key.foreign_table(conn)?;
                 if foreign_table.as_ref() != procedure_template.as_ref() {
                     continue;
@@ -333,19 +325,21 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
 
             let expected_name =
                 format!("procedure_template_{}", asset_model_in_procedure_template.column_name);
-            let (procedure_template_asset_model_in_procedure_template, _) =
+            let (ptam_in_procedure_template, _) =
                 procedure_template_asset_models_in_procedure_template
                     .iter()
                     .find(|(procedure_template_asset_model_column, _)| {
                         procedure_template_asset_model_column.column_name == expected_name
                     })
-                    .unwrap_or_else(|| panic!("Could not find procedure template asset model column with name \
-                     {expected_name} associated with asset model column {expected_name}"));
+                    .unwrap_or_else(|| {
+                        panic!(
+                            "Could not find procedure template asset model column with name \
+                     {expected_name} associated with asset model column {expected_name}"
+                        )
+                    });
             let mut found_foreign_key = false;
-            let expected_local_columns = vec![
-                procedure_template_asset_model_in_procedure_template.clone(),
-                asset_model_in_procedure_template.clone(),
-            ];
+            let expected_local_columns =
+                vec![ptam_in_procedure_template.clone(), asset_model_in_procedure_template.clone()];
             let expected_foreign_columns = vec![
                 procedure_template_asset_models_primary_key.clone(),
                 asset_model_in_procedure_template_asset_models.clone(),
@@ -535,8 +529,12 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
                 .find(|(procedure_asset_column, _)| {
                     procedure_asset_column.column_name == expected_name
                 })
-                .unwrap_or_else(|| panic!("Could not find procedure asset model column with name \
-                     {expected_name} associated with asset model column {expected_name}"));
+                .unwrap_or_else(|| {
+                    panic!(
+                        "Could not find procedure asset model column with name \
+                     {expected_name} associated with asset model column {expected_name}"
+                    )
+                });
             let mut found_foreign_key = false;
             let expected_local_columns =
                 vec![procedure_asset.clone(), asset_model_in_procedure.clone()];
@@ -588,8 +586,12 @@ impl CustomTableConstraint for ProcedureAlignmentConstraint {
                 .find(|(procedure_asset_column, _)| {
                     procedure_asset_column.column_name == expected_name
                 })
-                .unwrap_or_else(|| panic!("Could not find procedure asset model column with name \
-                     {expected_name} associated with asset model column {expected_name}"));
+                .unwrap_or_else(|| {
+                    panic!(
+                        "Could not find procedure asset model column with name \
+                     {expected_name} associated with asset model column {expected_name}"
+                    )
+                });
             let mut found_foreign_key = false;
             let expected_local_columns = vec![procedure_asset.clone(), asset_in_procedure.clone()];
             let expected_foreign_columns =

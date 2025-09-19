@@ -89,9 +89,9 @@ impl JsonWebToken {
             .expect("Failed to get redis connection");
 
         let _: () = con
-        .set_ex(self.token_id, self.user_id, minutes.into() * 60)
-        .await
-        .expect("Failed to set token in redis");
+            .set_ex(self.token_id, self.user_id, minutes.into() * 60)
+            .await
+            .expect("Failed to set token in redis");
         Ok(())
     }
 

@@ -12,6 +12,7 @@ use crate::{
 };
 
 impl Table {
+    #[allow(clippy::too_many_lines)]
     /// Returns the assigment methods associated with the same-as and inferred
     /// same-as relationships for the provided column in the context of the
     /// provided table.
@@ -67,9 +68,7 @@ impl Table {
         for required_ancestor_column in &required_ancestor_columns {
             let foreign_key = &self
                 .extension_foreign_keys_path( required_ancestor_column, conn)?
-                .expect(&format!(
-                    "There should exist a foreign key path from table {self} to column {required_ancestor_column}",
-                ))[0];
+                .unwrap_or_else(|| panic!("There should exist a foreign key path from table {self} to column {required_ancestor_column}"))[0];
 
             let required_ancestor_table = required_ancestor_column.table(conn)?;
             let buildable_trait = required_ancestor_table.setter_trait_ty()?;
@@ -118,10 +117,9 @@ impl Table {
                     .iter()
                     .zip(foreign_columns.iter())
                     .find(|(local_column, _foreign_column)| local_column != &current_column)
-                    .expect(&format!("The current column {current_column} must be part of the foreign key from ({}) to ({}).",
-                        local_columns.iter().map(|c| c.to_string()).collect::<Vec<_>>().join(", "),
-                        foreign_columns.iter().map(|c| c.to_string()).collect::<Vec<_>>().join(", "),
-                    ));
+                    .unwrap_or_else(|| panic!("The current column {current_column} must be part of the foreign key from ({}) to ({}).",
+                        local_columns.iter().map(ToString::to_string).collect::<Vec<_>>().join(", "),
+                        foreign_columns.iter().map(ToString::to_string).collect::<Vec<_>>().join(", ")));
 
                 involved_columns.push(local_column.clone());
                 involved_columns.push(foreign_column.clone());
@@ -139,13 +137,13 @@ impl Table {
                 // otherwise we call the local one `local_...` and the foreign one
                 // `foreign_...`.
                 let (local_column_ident, foreign_column_ident) =
-                    if local_column_ident != foreign_column_ident {
-                        (local_column_ident, foreign_column_ident)
-                    } else {
+                    if local_column_ident == foreign_column_ident {
                         (
                             quote::format_ident!("local_{}", local_column_ident),
                             quote::format_ident!("foreign_{}", foreign_column_ident),
                         )
+                    } else {
+                        (local_column_ident, foreign_column_ident)
                     };
 
                 assignments.push(match partial_builder_kind {

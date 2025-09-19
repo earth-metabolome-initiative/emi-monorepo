@@ -40,6 +40,7 @@ impl core::str::FromStr for DisposalProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "DisposedAssetModel" => Ok(Self::DisposedAssetModel),
             "ProcedureTemplateDisposedAssetModel" => {
                 Ok(
@@ -48,6 +49,7 @@ impl core::str::FromStr for DisposalProcedureTemplateAttribute {
                     ),
                 )
             }
+            "procedure_template" => Ok(Self::ProcedureTemplate),
             "disposed_asset_model" => Ok(Self::DisposedAssetModel),
             "procedure_template_disposed_asset_model" => {
                 Ok(

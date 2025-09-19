@@ -34,7 +34,6 @@ impl<'graph> GuidedProcedurePseudocodeBuilder<'graph> {
     }
 }
 
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// Attributes that can be set in the `GuidedProcedurePseudocode`.
 pub enum GuidedProcedurePseudocodeAttribute {

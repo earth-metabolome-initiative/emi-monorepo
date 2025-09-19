@@ -79,17 +79,17 @@ pub enum WebCodeGenError {
 impl Display for WebCodeGenError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            WebCodeGenError::DieselError(err) => write!(f, "Diesel error: {}", err),
-            WebCodeGenError::MissingTable(table) => write!(f, "Missing table: {}", table),
+            WebCodeGenError::DieselError(err) => write!(f, "Diesel error: {err}"),
+            WebCodeGenError::MissingTable(table) => write!(f, "Missing table: {table}",),
             WebCodeGenError::MissingExtension(extension) => {
-                write!(f, "Missing extension: {}", extension)
+                write!(f, "Missing extension: {extension}")
             }
-            WebCodeGenError::IllegalTable(table) => write!(f, "Illegal table: {}", table),
+            WebCodeGenError::IllegalTable(table) => write!(f, "Illegal table: {table}",),
             WebCodeGenError::IllegalRolesTable(table) => {
-                write!(f, "Illegal roles table: {}", table)
+                write!(f, "Illegal roles table: {table}",)
             }
-            WebCodeGenError::ConstraintError(err) => write!(f, "Constraint error: {}", err),
-            WebCodeGenError::SynError(err) => write!(f, "Syn error: {}", err),
+            WebCodeGenError::ConstraintError(err) => write!(f, "Constraint error: {err}"),
+            WebCodeGenError::SynError(err) => write!(f, "Syn error: {err}"),
             WebCodeGenError::UnknownColumnType(column) => {
                 write!(
                     f,
@@ -99,18 +99,18 @@ impl Display for WebCodeGenError {
                     column.raw_data_type()
                 )
             }
-            WebCodeGenError::ColumnNotFound(name) => write!(f, "Column not found: {}", name),
+            WebCodeGenError::ColumnNotFound(name) => write!(f, "Column not found: {name}"),
             WebCodeGenError::UnknownDieselPostgresType(ty) => {
-                write!(f, "Unknown Diesel PostgreSQL type: {}", ty)
+                write!(f, "Unknown Diesel PostgreSQL type: {ty}")
             }
             WebCodeGenError::UnknownPostgresRustType(ty) => {
-                write!(f, "Unknown PostgreSQL Rust type: {}", ty)
+                write!(f, "Unknown PostgreSQL Rust type: {ty}")
             }
             WebCodeGenError::UnknownPostgresProc(proc) => {
-                write!(f, "Unknown PostgreSQL procedure: {}", proc)
+                write!(f, "Unknown PostgreSQL procedure: {proc}")
             }
             WebCodeGenError::NotUserDefinedType(ty) => {
-                write!(f, "Type is not user-defined: {}", ty)
+                write!(f, "Type is not user-defined: {ty}")
             }
             WebCodeGenError::MissingBaseType(ty) => {
                 write!(
@@ -123,44 +123,43 @@ impl Display for WebCodeGenError {
                 write!(f, "Sanitization errors: {errs}")
             }
             WebCodeGenError::CodeGenerationError(err) => {
-                write!(f, "Code generation error: {}", err)
+                write!(f, "Code generation error: {err}")
             }
             WebCodeGenError::IllegalTableCodegen(reason, table_name, table) => {
                 write!(
                     f,
-                    "Illegal table codegen for table `{}`: {}. Table details: {:?}",
-                    table_name, reason, table
+                    "Illegal table codegen for table `{table_name}`: {reason}. Table details: {table}",
                 )
             }
             WebCodeGenError::ExcessiveNumberOfColumns(table, count) => {
                 write!(
                     f,
-                    "Table `{}` has an excessive number of columns: {}",
-                    table.table_name, count
+                    "Table `{}` has an excessive number of columns: {count}",
+                    table.table_name
                 )
             }
             WebCodeGenError::MissingUpdateAtColumn(table) => {
-                write!(f, "Table `{}` is missing 'updated_at' column", table.table_name)
+                write!(f, "Table `{table}` is missing 'updated_at' column")
             }
             WebCodeGenError::MissingUpdatedByColumn(table) => {
-                write!(f, "Table `{}` is missing 'updated_by' column", table.table_name)
+                write!(f, "Table `{table}` is missing 'updated_by' column")
             }
             WebCodeGenError::NoPrimaryKeyColumn(table) => {
-                write!(f, "Table `{}` has no primary key column(s)", table.table_name)
+                write!(f, "Table `{table}` has no primary key column(s)")
             }
             WebCodeGenError::RolesMechanismIncomplete(table) => {
-                write!(f, "Table `{}` has incomplete roles mechanism tables", table.table_name)
+                write!(f, "Table `{table}` has incomplete roles mechanism tables")
             }
-            WebCodeGenError::IoError(err) => write!(f, "I/O error: {}", err),
+            WebCodeGenError::IoError(err) => write!(f, "I/O error: {err}"),
             WebCodeGenError::EmptyTableName(table) => {
-                write!(f, "Table has an empty name: {:?}", table)
+                write!(f, "Table has an empty name: {table}")
             }
             WebCodeGenError::EmptyColumnName(column) => {
-                write!(f, "Column has an empty name: {:?}", column)
+                write!(f, "Column has an empty name: {column}")
             }
-            WebCodeGenError::ParseIntError(err) => write!(f, "Parse int error: {}", err),
-            WebCodeGenError::ParseFloatError(err) => write!(f, "Parse float error: {}", err),
-            WebCodeGenError::ParseBoolError(err) => write!(f, "Parse bool error: {}", err),
+            WebCodeGenError::ParseIntError(err) => write!(f, "Parse int error: {err}"),
+            WebCodeGenError::ParseFloatError(err) => write!(f, "Parse float error: {err}"),
+            WebCodeGenError::ParseBoolError(err) => write!(f, "Parse bool error: {err}"),
             WebCodeGenError::UnsupportedTypeCasting(target_type, source_type) => {
                 write!(
                     f,
@@ -169,13 +168,9 @@ impl Display for WebCodeGenError {
                 )
             }
             WebCodeGenError::ColumnDoesNotHaveDefaultValue(column) => {
-                write!(
-                    f,
-                    "Column `{}.{}` does not have a default value",
-                    column.table_name, column.column_name
-                )
+                write!(f, "Column `{column}` does not have a default value",)
             }
-            WebCodeGenError::DiskCache(err) => write!(f, "Disk cache error: {}", err),
+            WebCodeGenError::DiskCache(err) => write!(f, "Disk cache error: {err}"),
         }
     }
 }
@@ -235,7 +230,7 @@ impl Display for CodeGenerationError {
                 write!(f, "Team projects table was not provided")
             }
             CodeGenerationError::CheckConstraintError(err) => {
-                write!(f, "Check constraint error: {}", err)
+                write!(f, "Check constraint error: {err}")
             }
         }
     }
@@ -341,10 +336,10 @@ impl Display for UnsupportedCheckConstraintErrorSyntax {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             UnsupportedCheckConstraintErrorSyntax::ExpectedNoScopedColumn(count) => {
-                write!(f, "Expected no scoped columns, but found {}", count)
+                write!(f, "Expected no scoped columns, but found {count}")
             }
             UnsupportedCheckConstraintErrorSyntax::ExpectedSingleScopedColumn(count) => {
-                write!(f, "Expected a single scoped column, but found {}", count)
+                write!(f, "Expected a single scoped column, but found {count}")
             }
             UnsupportedCheckConstraintErrorSyntax::ExpectedScopedColumn => {
                 write!(f, "Expected a scoped column")

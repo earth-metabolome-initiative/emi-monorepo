@@ -300,9 +300,8 @@ pub trait OwnershipLike: AsRef<Ownership> {
         } else {
             let mut certain_based_on_alias = None;
             for predecessor in self.as_ref().derivatives.predecessors(ptam_id) {
-                let predecessor_pt = nv
-                    .get(predecessor)
-                    .expect("Procedure template asset model id out of bounds");
+                let predecessor_pt =
+                    nv.get(predecessor).expect("Procedure template asset model id out of bounds");
 
                 for parent in parents {
                     if predecessor_pt.procedure_template == parent.procedure_template {

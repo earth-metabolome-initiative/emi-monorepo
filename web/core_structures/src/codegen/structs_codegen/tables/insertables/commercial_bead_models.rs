@@ -48,7 +48,9 @@ impl core::str::FromStr for CommercialBeadModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "BeadModel" => Ok(Self::BeadModel),
+            "id" => Ok(Self::Id),
             "bead_model" => Ok(Self::BeadModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }

@@ -271,10 +271,9 @@ fn associated_same_as_columns(
                 local_columns
                     .iter()
                     .zip(foreign_columns.iter())
-                    .filter_map(|(local_column, foreign_column)| {
+                    .find_map(|(local_column, foreign_column)| {
                         if local_column == column { Some(foreign_column.clone()) } else { None }
                     })
-                    .next()
                     .unwrap(),
                 constraint,
             ))
@@ -303,7 +302,7 @@ fn all_ancestral_same_as_columns(
         for ancestor in ancestral_extension_tables.iter() {
             for ancestor_column in ancestor.columns(conn)?.iter() {
                 // If the ancestor node is already in the reachable set, skip it.
-                if reachable_set.contains(&ancestor_column) {
+                if reachable_set.contains(ancestor_column) {
                     continue;
                 }
 
@@ -312,7 +311,7 @@ fn all_ancestral_same_as_columns(
 
                 // We update the frontier to mark as true columns which we have now discovered
                 // can be reached also from this ancestor column.
-                for (frontier_column, is_reachable) in frontier.iter_mut() {
+                for (frontier_column, is_reachable) in &mut frontier {
                     if !*is_reachable && ancestor_reachable_set.contains(frontier_column) {
                         *is_reachable = true;
                         changed = true;
@@ -339,7 +338,7 @@ fn all_ancestral_same_as_columns(
     // from any other column in the reachable set.
     let mut ancestral_same_as_columns = frontier
         .into_iter()
-        .filter_map(|(column, is_reachable)| if !is_reachable { Some(column) } else { None })
+        .filter_map(|(column, is_reachable)| if is_reachable { None } else { Some(column) })
         .collect::<Vec<_>>();
     ancestral_same_as_columns.sort_unstable();
 
@@ -1293,7 +1292,7 @@ impl Column {
     ///
     /// * `conn` - A mutable reference to a `PgConnection`
     pub fn has_foreign_keys(&self, conn: &mut PgConnection) -> bool {
-        self.foreign_keys(conn).map_or(false, |keys| !keys.is_empty())
+        self.foreign_keys(conn).is_ok_and(|keys| !keys.is_empty())
     }
 
     /// Returns whether the column is a foreign key with `ON DELETE CASCADE`
@@ -1312,7 +1311,7 @@ impl Column {
     /// A `bool` indicating whether the column is a foreign key with `ON DELETE
     /// CASCADE` constraint
     pub fn is_foreign_key_on_delete_cascade(&self, conn: &mut PgConnection) -> bool {
-        self.foreign_keys(conn).map_or(false, |keys| {
+        self.foreign_keys(conn).is_ok_and(|keys| {
             keys.iter().any(|key| key.has_on_delete_cascade(conn).unwrap_or(false))
         })
     }
@@ -1496,7 +1495,7 @@ impl Column {
                         key.columns(conn)
                             .unwrap_or_default()
                             .iter()
-                            .map(|col| col.to_string())
+                            .map(ToString::to_string)
                             .collect::<Vec<_>>()
                             .join(", ")
                     })
@@ -1650,7 +1649,7 @@ impl Column {
     /// # Arguments
     ///
     /// * `include_mandatory_partial_builder`: Whether to include mandatory
-    ///  partial builders
+    ///   partial builders
     /// * `conn`: A mutable reference to a `PgConnection`
     ///
     /// # Errors
@@ -1669,18 +1668,17 @@ impl Column {
         include_mandatory_partial_builder: bool,
         conn: &mut PgConnection,
     ) -> Result<Vec<KeyColumnUsage>, WebCodeGenError> {
-        if !include_mandatory_partial_builder {
-            if let Some((PartialBuilderKind::Mandatory, _, _)) =
+        if !include_mandatory_partial_builder
+            && let Some((PartialBuilderKind::Mandatory, _, _)) =
                 self.requires_partial_builder(conn)?
-            {
-                return Ok(Vec::new());
-            }
+        {
+            return Ok(Vec::new());
         }
 
         let mut foreign_definer_constraints = Vec::new();
         for foreign_key in self.foreign_keys(conn)?.iter() {
             let foreign_table = foreign_key.foreign_table(conn)?;
-            if !self.is_foreign_primary_key_of_table(&foreign_table, conn)?.is_some() {
+            if self.is_foreign_primary_key_of_table(&foreign_table, conn)?.is_none() {
                 continue;
             }
             if foreign_key.includes_local_primary_key(conn)? {
@@ -1808,8 +1806,7 @@ impl Column {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<Column>, WebCodeGenError> {
-        Ok(self
-            .ancestral_same_as_constraints(conn)?
+        self.ancestral_same_as_constraints(conn)?
             .into_iter()
             .map(|constraint| {
                 let local_columns = constraint.columns(conn)?;
@@ -1817,13 +1814,12 @@ impl Column {
                 Ok(local_columns
                     .iter()
                     .zip(foreign_columns.iter())
-                    .filter_map(|(local_column, foreign_column)| {
+                    .find_map(|(local_column, foreign_column)| {
                         if local_column == self { Some(foreign_column.clone()) } else { None }
                     })
-                    .next()
                     .unwrap())
             })
-            .collect::<Result<Vec<Column>, WebCodeGenError>>()?)
+            .collect::<Result<Vec<Column>, WebCodeGenError>>()
     }
 
     /// Returns the ancestral same-as reachable set for the column, if any.
@@ -2007,7 +2003,7 @@ impl Column {
                     continue;
                 }
 
-                for possible_matching_column in possible_matching_columns.iter() {
+                for possible_matching_column in &possible_matching_columns {
                     if possible_matching_column.is_ancestrally_same_as(&distinct_column, conn)? {
                         distinct_columns_and_constraints.push((
                             (*possible_matching_column).clone(),

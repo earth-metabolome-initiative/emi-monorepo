@@ -48,7 +48,9 @@ impl core::str::FromStr for CommercialCapModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "CapModel" => Ok(Self::CapModel),
+            "id" => Ok(Self::Id),
             "cap_model" => Ok(Self::CapModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }

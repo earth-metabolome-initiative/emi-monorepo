@@ -8,6 +8,7 @@ use quote::quote;
 use crate::{Codegen, Table, traits::TableLike};
 
 impl Codegen<'_> {
+    #[allow(clippy::too_many_lines)]
     /// Generate implementations of the builder structs associated with the
     /// [`MostConcreteVariant`] and [`MostConcreteVariant`]-adjacent traits for
     /// the provided tables.

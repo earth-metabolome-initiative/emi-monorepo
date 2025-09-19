@@ -11,6 +11,7 @@ mod is_complete_builder;
 use crate::{Codegen, Column, Table, errors::WebCodeGenError, traits::TableLike};
 
 impl Codegen<'_> {
+    #[allow(clippy::too_many_lines)]
     pub(super) fn generate_insertable_builder_definition(
         &self,
         table: &Table,
@@ -128,16 +129,15 @@ impl Codegen<'_> {
             }),
         );
 
-        let is_complete_builder_impl =
-            self.generate_is_complete_builder_implementation(table, conn)?;
+        let is_complete_builder_impl = table.generate_is_complete_builder_implementation(conn)?;
         let from_builder_to_id_or_builder_impl =
-            self.from_builder_to_id_or_builder_impl(table, conn)?;
+            table.generate_from_builder_to_id_or_builder_impl(conn)?;
         let builder_trait_definition = table.generate_builder_trait(conn)?;
         let builder_trait_impls = table.generate_builder_trait_impl_for_ancestral_tables(
             conn,
             self.check_constraints_extensions.as_slice(),
         )?;
-        let documentation: Vec<String> = self.generate_builder_documentation(table, conn)?;
+        let documentation: Vec<String> = table.generate_builder_documentation(conn)?;
         let diesel_table_path = table.import_diesel_path()?;
 
         Ok(quote! {

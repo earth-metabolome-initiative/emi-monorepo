@@ -82,9 +82,13 @@ impl<'graph> ProcedureTemplateVisualization<'graph> {
         child: &ProcedureTemplate,
     ) -> Rc<FlowchartNode> {
         let node_id = procedure_template_hash(parents, child);
-        self.builder.get_node_by_id(node_id).unwrap_or_else(|| panic!("PT node {node_id} for \"{}\" with parents [{}] not found",
-            child.name,
-            parents.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(", ")))
+        self.builder.get_node_by_id(node_id).unwrap_or_else(|| {
+            panic!(
+                "PT node {node_id} for \"{}\" with parents [{}] not found",
+                child.name,
+                parents.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(", ")
+            )
+        })
     }
 
     fn get_ptam_node(
@@ -93,9 +97,13 @@ impl<'graph> ProcedureTemplateVisualization<'graph> {
         ptam: &ProcedureTemplateAssetModel,
     ) -> Rc<FlowchartNode> {
         let node_id = procedure_template_asset_model_hash(parents, ptam);
-        self.builder.get_node_by_id(node_id).unwrap_or_else(|| panic!("PTAM node {node_id} for \"{}\" with parents {} not found",
-            ptam.name,
-            parents.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(", ")))
+        self.builder.get_node_by_id(node_id).unwrap_or_else(|| {
+            panic!(
+                "PTAM node {node_id} for \"{}\" with parents {} not found",
+                ptam.name,
+                parents.iter().map(|p| p.name.as_str()).collect::<Vec<_>>().join(", ")
+            )
+        })
     }
 }
 
@@ -140,7 +148,10 @@ impl<'graph> PTGListener<'graph> for &mut ProcedureTemplateVisualization<'graph>
         &mut self,
         foreign_procedure_template: &ProcedureTemplate,
     ) -> Result<(), Self::Error> {
-        let procedure_name = procedure_template_icon(foreign_procedure_template).map_or_else(|| format!("*{}*", foreign_procedure_template.name), |icon| format!("{} *{}*", icon, foreign_procedure_template.name));
+        let procedure_name = procedure_template_icon(foreign_procedure_template).map_or_else(
+            || format!("*{}*", foreign_procedure_template.name),
+            |icon| format!("{} *{}*", icon, foreign_procedure_template.name),
+        );
 
         let mut node_builder = FlowchartNodeBuilder::default()
             .label(procedure_name)?
@@ -191,7 +202,10 @@ impl<'graph> PTGListener<'graph> for &mut ProcedureTemplateVisualization<'graph>
         child: &ProcedureTemplate,
     ) -> Result<(), Self::Error> {
         let node_id = procedure_template_hash(parents, child);
-        let procedure_name = procedure_template_icon(child).map_or_else(|| format!("*{}*", child.name), |icon| format!("{} *{}*", icon, child.name));
+        let procedure_name = procedure_template_icon(child).map_or_else(
+            || format!("*{}*", child.name),
+            |icon| format!("{} *{}*", icon, child.name),
+        );
 
         let mut node_builder = FlowchartNodeBuilder::default()
             .id(node_id)

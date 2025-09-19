@@ -42,9 +42,10 @@ where
             if path.is_dir() {
                 stack.push(path);
             } else if let Some(ext) = path.extension()
-                && ext == extension {
-                    return Ok(path);
-                }
+                && ext == extension
+            {
+                return Ok(path);
+            }
         }
     }
     Err(std::io::Error::new(

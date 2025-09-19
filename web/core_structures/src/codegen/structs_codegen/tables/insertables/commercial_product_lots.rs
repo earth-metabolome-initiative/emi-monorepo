@@ -38,8 +38,10 @@ impl core::str::FromStr for CommercialProductLotAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "Lot" => Ok(Self::Lot),
             "ProductModel" => Ok(Self::ProductModel),
+            "id" => Ok(Self::Id),
             "lot" => Ok(Self::Lot),
             "product_model" => Ok(Self::ProductModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),

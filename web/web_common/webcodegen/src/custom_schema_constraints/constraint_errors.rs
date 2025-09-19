@@ -5,8 +5,8 @@ use sqlparser::ast::CascadeOption;
 
 use crate::{CheckConstraint, Column, KeyColumnUsage, Table};
 
-fn format_column_list(columns: &Vec<Column>) -> String {
-    format!("({})", columns.iter().map(|c| c.to_string()).collect::<Vec<String>>().join(", "))
+fn format_column_list(columns: &[Column]) -> String {
+    format!("({})", columns.iter().map(ToString::to_string).collect::<Vec<String>>().join(", "))
 }
 
 #[derive(Debug)]
@@ -115,10 +115,10 @@ pub enum ConstraintError {
         /// The name of the sibling column
         sibling_column_name: String,
     },
-    /// The same_as constraint is set to cascade on delete, which is not
+    /// The `same_as` constraint is set to cascade on delete, which is not
     /// allowed.
     SameAsConstraintMustNotCascade {
-        /// The columns in the host table that have the same_as constraint.
+        /// The columns in the host table that have the `same_as` constraint.
         columns: Vec<Column>,
         /// The foreign columns in the referenced table.
         foreign_columns: Vec<Column>,
@@ -163,6 +163,7 @@ pub enum ConstraintError {
     },
 }
 
+#[allow(clippy::too_many_lines)]
 impl Display for ConstraintError {
     fn fmt(&self, f: &mut Formatter) -> std::fmt::Result {
         match self {
@@ -222,10 +223,10 @@ impl Display for ConstraintError {
                         .map(|c| c.column_name.clone())
                         .collect::<Vec<String>>()
                         .join(", "),
-                    if *cascade_option != CascadeOption::Restrict {
-                        format!(" ON DELETE {}", cascade_option)
+                    if *cascade_option == CascadeOption::Restrict {
+                        String::new()
                     } else {
-                        "".to_string()
+                        format!(" ON DELETE {cascade_option}")
                     }
                 )
             }

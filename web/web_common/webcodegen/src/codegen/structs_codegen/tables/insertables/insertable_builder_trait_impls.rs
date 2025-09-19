@@ -19,8 +19,8 @@ impl Table {
     ///
     /// * `ancestor_column`: The column for which we want to find the closest
     ///   "same as" column.
-    /// * `conn`: The PostgreSQL connection to use to retrieve information about
-    ///   the table.
+    /// * `conn`: The `PostgreSQL` connection to use to retrieve information
+    ///   about the table.
     ///
     /// # Errors
     ///
@@ -60,8 +60,8 @@ impl Table {
     ///
     /// * `extension_network`: The network of table extensions to which the
     ///   current table belongs.
-    /// * `conn`: The PostgreSQL connection to use to retrieve information about
-    ///   the table.
+    /// * `conn`: The `PostgreSQL` connection to use to retrieve information
+    ///   about the table.
     /// * `insertable_column`: The insertable column for which the setter method
     ///   body must be generated.
     ///
@@ -112,9 +112,7 @@ impl Table {
             if &closest_same_as_column == insertable_column {
                 let foreign_key = &self
                     .extension_foreign_keys_path(insertable_column, conn)?
-                    .expect(&format!(
-                        "There should exist a foreign key path from table {self} to column {insertable_column}",
-                    ))[0];
+                    .unwrap_or_else(|| panic!("There should exist a foreign key path from table {self} to column {insertable_column}"))[0];
                 let foreign_key_ident = foreign_key.constraint_ident(conn)?;
                 let foreign_table = foreign_key.foreign_table(conn)?;
                 let foreign_table_ident = foreign_table.struct_ident()?;
@@ -177,6 +175,7 @@ impl Table {
         }
     }
 
+    #[allow(clippy::type_complexity)]
     /// Implements for the builder associated to the current table
     /// the trait associated with the provided ancestral table.
     ///
@@ -184,8 +183,8 @@ impl Table {
     ///
     /// * `extension_network`: The network of table extensions to which the
     ///   current table belongs.
-    /// * `conn`: The PostgreSQL connection to use to retrieve information about
-    ///   the table.
+    /// * `conn`: The `PostgreSQL` connection to use to retrieve information
+    ///   about the table.
     /// * `ancestral_table`: The ancestral table for which the trait
     ///   implementation must be generated.
     ///
@@ -223,10 +222,10 @@ impl Table {
 
                 let setter_method = insertable_column.getter_ident()?;
                 let column_snake_case_ident = insertable_column.snake_case_ident()?;
-                let maybe_generics = self.builder_trait_generics(&insertable_column, conn)?;
-                let argument_type = self.builder_trait_argument_type(&insertable_column, conn)?;
+                let maybe_generics = insertable_column.builder_trait_generics(conn)?;
+                let argument_type = insertable_column.builder_trait_argument_type(conn)?;
                 let maybe_where_constraints =
-                    self.builder_trait_where_constraints(&insertable_column, conn)?;
+                    insertable_column.builder_trait_where_constraints(conn)?;
 
                 let (
                     include_inlining,
@@ -251,7 +250,7 @@ impl Table {
                     let mermaid_illustraion = columns_to_mermaid_illustration(
                         true,
                         &relevant_columns,
-                        &insertable_column,
+                        insertable_column,
                         conn,
                     )?;
                     let mermaid_illustraion_string = mermaid_illustraion.to_string();
@@ -267,7 +266,7 @@ impl Table {
                         "```mermaid".to_string(),
                     ]);
                     documentation
-                        .extend(mermaid_illustraion_string.lines().map(|line| line.to_string()));
+                        .extend(mermaid_illustraion_string.lines().map(ToString::to_string));
                     documentation.push("```".to_string());
                 }
 
@@ -298,8 +297,8 @@ impl Table {
     ///
     /// * `extension_network`: The network of table extensions to which the
     ///   current table belongs.
-    /// * `conn`: The PostgreSQL connection to use to retrieve information about
-    ///   the table.
+    /// * `conn`: The `PostgreSQL` connection to use to retrieve information
+    ///   about the table.
     /// * `ancestral_table`: The ancestral table for which the trait
     ///   implementation must be generated.
     ///
@@ -359,7 +358,7 @@ impl Table {
                     })
                     .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
-                trait_idents.sort_unstable_by_key(|ident| ident.to_string());
+                trait_idents.sort_unstable_by_key(ToString::to_string);
 
                 Ok(if trait_idents.is_empty() {
                     quote! { #generic_ident }
@@ -370,7 +369,7 @@ impl Table {
             .collect::<Result<Vec<_>, WebCodeGenError>>()?;
         let right_generics = extension_tables
             .iter()
-            .map(|extension_table| extension_table.struct_ident())
+            .map(TableLike::struct_ident)
             .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
         let maybe_left_generics = if left_generics.is_empty() {
@@ -427,7 +426,7 @@ impl Table {
                 let generics = self
                     .extension_tables(conn)?
                     .iter()
-                    .map(|table| table.struct_ident())
+                    .map(TableLike::struct_ident)
                     .collect::<Result<Vec<_>, WebCodeGenError>>()?;
                 let dispatch = self
                     .extension_foreign_keys(conn)?
@@ -456,10 +455,10 @@ impl Table {
     ///
     /// # Arguments
     ///
-    /// * `conn`: The PostgreSQL connection to use to retrieve information about
-    ///   the table.
-    /// * `check_constraints_extensions`: The PostgreSQL extensions that may be
-    ///  required to implement the check constraints for the current table.
+    /// * `conn`: The `PostgreSQL` connection to use to retrieve information
+    ///   about the table.
+    /// * `check_constraints_extensions`: The `PostgreSQL` extensions that may
+    ///   be required to implement the check constraints for the current table.
     ///
     /// # Errors
     ///
@@ -486,7 +485,7 @@ impl Table {
         for ancestor in self.ancestral_extension_tables(conn)?.iter() {
             impls.push(self.generate_builder_trait_impl_for_ancestral_table(
                 conn,
-                &ancestor,
+                ancestor,
                 check_constraints_extensions,
                 |conn, insertable_column, check_constraints_extensions, extension_table_traits| {
                     self.dispatch_setter_method_body(

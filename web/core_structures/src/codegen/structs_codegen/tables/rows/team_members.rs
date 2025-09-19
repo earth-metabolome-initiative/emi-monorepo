@@ -8,14 +8,13 @@ impl From<Vec<crate::codegen::structs_codegen::tables::team_members::TeamMember>
         super::Rows::TeamMember(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::team_members::TeamMember>
+impl From<super::Rows>
+    for Option<Vec<crate::codegen::structs_codegen::tables::team_members::TeamMember>>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::TeamMember(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::TeamMember(v) => Some(v),
+            _ => None,
         }
     }
 }

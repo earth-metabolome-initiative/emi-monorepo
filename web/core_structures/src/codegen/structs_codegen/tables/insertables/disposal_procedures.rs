@@ -40,12 +40,14 @@ impl core::str::FromStr for DisposalProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Procedure" => Ok(Self::Procedure),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "DisposedAsset" => Ok(Self::DisposedAsset),
             "ProcedureTemplateDisposedAssetModel" => Ok(Self::ProcedureTemplateDisposedAssetModel),
             "ProcedureDisposedAsset" => Ok(Self::ProcedureDisposedAsset(
                 crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
             )),
+            "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "disposed_asset" => Ok(Self::DisposedAsset),
             "procedure_template_disposed_asset_model" => {

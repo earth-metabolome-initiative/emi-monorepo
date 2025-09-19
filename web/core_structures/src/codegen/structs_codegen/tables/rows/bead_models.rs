@@ -8,12 +8,13 @@ impl From<Vec<crate::codegen::structs_codegen::tables::bead_models::BeadModel>> 
         super::Rows::BeadModel(value)
     }
 }
-impl TryFrom<super::Rows> for Vec<crate::codegen::structs_codegen::tables::bead_models::BeadModel> {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+impl From<super::Rows>
+    for Option<Vec<crate::codegen::structs_codegen::tables::bead_models::BeadModel>>
+{
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::BeadModel(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::BeadModel(v) => Some(v),
+            _ => None,
         }
     }
 }

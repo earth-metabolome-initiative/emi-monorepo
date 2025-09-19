@@ -16,14 +16,13 @@ impl From<Vec<crate::codegen::structs_codegen::tables::commercial_cap_lots::Comm
         super::Rows::CommercialCapLot(value)
     }
 }
-impl TryFrom<super::Rows>
-    for Vec<crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot>
+impl From<super::Rows>
+    for Option<Vec<crate::codegen::structs_codegen::tables::commercial_cap_lots::CommercialCapLot>>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::CommercialCapLot(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::CommercialCapLot(v) => Some(v),
+            _ => None,
         }
     }
 }

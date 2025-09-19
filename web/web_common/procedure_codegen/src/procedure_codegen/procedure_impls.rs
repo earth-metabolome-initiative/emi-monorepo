@@ -12,6 +12,7 @@ use super::ProcedureCodegen;
 use crate::{Procedure, ProcedureTemplate};
 
 impl ProcedureCodegen<'_> {
+    #[allow(clippy::too_many_lines)]
     /// Generates the implementation of the `Procedure` trait for all
     /// procedures.
     ///

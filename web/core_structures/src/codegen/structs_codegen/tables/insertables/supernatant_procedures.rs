@@ -56,6 +56,7 @@ impl core::str::FromStr for SupernatantProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Procedure" => Ok(Self::Procedure),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "StratifiedSource" => Ok(Self::StratifiedSource),
             "ProcedureTemplateStratifiedSourceModel" => {
@@ -84,6 +85,7 @@ impl core::str::FromStr for SupernatantProcedureAttribute {
             "ProcedurePipetteTip" => Ok(Self::ProcedurePipetteTip(
                 crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
             )),
+            "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "stratified_source" => Ok(Self::StratifiedSource),
             "procedure_template_stratified_source_model" => {

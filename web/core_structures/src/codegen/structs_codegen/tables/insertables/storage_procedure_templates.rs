@@ -46,6 +46,7 @@ impl core::str::FromStr for StorageProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "Kelvin" => Ok(Self::Kelvin),
             "KelvinTolerancePercentage" => Ok(Self::KelvinTolerancePercentage),
             "StoredIntoModel" => Ok(Self::StoredIntoModel),
@@ -64,6 +65,7 @@ impl core::str::FromStr for StorageProcedureTemplateAttribute {
                     ),
                 )
             }
+            "procedure_template" => Ok(Self::ProcedureTemplate),
             "kelvin" => Ok(Self::Kelvin),
             "kelvin_tolerance_percentage" => Ok(Self::KelvinTolerancePercentage),
             "stored_into_model" => Ok(Self::StoredIntoModel),

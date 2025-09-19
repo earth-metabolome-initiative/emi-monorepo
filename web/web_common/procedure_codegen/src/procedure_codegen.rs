@@ -40,7 +40,8 @@ pub struct ProcedureCodegen<'a> {
 
 impl<'a> ProcedureCodegen<'a> {
     /// Returns a new `ProcedureCodegenBuilder`.
-    #[must_use] pub fn builder() -> ProcedureCodegenBuilder<'a> {
+    #[must_use]
+    pub fn builder() -> ProcedureCodegenBuilder<'a> {
         ProcedureCodegenBuilder::default()
     }
 

@@ -47,6 +47,7 @@ impl core::str::FromStr for StorageProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Procedure" => Ok(Self::Procedure),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "StoredAsset" => Ok(Self::StoredAsset),
             "StoredAssetModel" => Ok(Self::StoredAssetModel),
@@ -60,6 +61,7 @@ impl core::str::FromStr for StorageProcedureAttribute {
             "ProcedureStoredInto" => Ok(Self::ProcedureStoredInto(
                 crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
             )),
+            "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "stored_asset" => Ok(Self::StoredAsset),
             "stored_asset_model" => Ok(Self::StoredAssetModel),

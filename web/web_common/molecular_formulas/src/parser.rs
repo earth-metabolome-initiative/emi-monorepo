@@ -28,8 +28,8 @@ impl Parser<'_> {
         let new_formula = match (token, formula) {
             (Token::Residual | Token::Element(_) | Token::Isotope(_), previous) => {
                 Some(match previous {
-                    Some(previous) => previous.chain(token.try_into().unwrap()),
-                    None => token.try_into().unwrap(),
+                    Some(previous) => previous.chain(token.into()),
+                    None => token.into(),
                 })
             }
             (Token::Greek(greek_letter), None) => {

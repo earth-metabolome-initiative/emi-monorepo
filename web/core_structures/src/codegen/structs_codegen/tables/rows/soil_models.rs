@@ -8,12 +8,13 @@ impl From<Vec<crate::codegen::structs_codegen::tables::soil_models::SoilModel>> 
         super::Rows::SoilModel(value)
     }
 }
-impl TryFrom<super::Rows> for Vec<crate::codegen::structs_codegen::tables::soil_models::SoilModel> {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Rows) -> Result<Self, Self::Error> {
+impl From<super::Rows>
+    for Option<Vec<crate::codegen::structs_codegen::tables::soil_models::SoilModel>>
+{
+    fn from(value: super::Rows) -> Self {
         match value {
-            super::Rows::SoilModel(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Rows enum: {value:?}"),
+            super::Rows::SoilModel(v) => Some(v),
+            _ => None,
         }
     }
 }

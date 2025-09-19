@@ -55,6 +55,7 @@ impl core::str::FromStr for SupernatantProcedureTemplateAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "Liters" => Ok(Self::Liters),
             "StratifiedSourceModel" => Ok(Self::StratifiedSourceModel),
             "ProcedureTemplateStratifiedSourceModel" => {
@@ -88,6 +89,7 @@ impl core::str::FromStr for SupernatantProcedureTemplateAttribute {
                     ),
                 )
             }
+            "procedure_template" => Ok(Self::ProcedureTemplate),
             "liters" => Ok(Self::Liters),
             "stratified_source_model" => Ok(Self::StratifiedSourceModel),
             "procedure_template_stratified_source_model" => {

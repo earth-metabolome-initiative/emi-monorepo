@@ -54,7 +54,9 @@ impl core::str::FromStr for CommercialBallMillMachineModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "BallMillMachineModel" => Ok(Self::BallMillMachineModel),
+            "id" => Ok(Self::Id),
             "ball_mill_machine_model" => Ok(Self::BallMillMachineModel),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),
         }

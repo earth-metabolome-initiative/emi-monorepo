@@ -200,7 +200,7 @@ impl Codegen<'_> {
             // insert into the database.
             let builder_definition = self.generate_insertable_builder_definition(table, conn)?;
             let maybe_set_primary_key_impl =
-                self.generate_insertable_builder_set_primary_key(table, conn)?;
+                table.generate_insertable_builder_set_primary_key(conn)?;
             let try_insert_generic_impl: TokenStream =
                 self.generate_insertable_builder_try_insert_generic_implementation(table, conn)?;
 

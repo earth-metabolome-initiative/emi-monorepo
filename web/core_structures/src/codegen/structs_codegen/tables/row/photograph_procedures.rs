@@ -7,14 +7,13 @@ impl From<crate::codegen::structs_codegen::tables::photograph_procedures::Photog
         super::Row::PhotographProcedure(value)
     }
 }
-impl TryFrom<super::Row>
-    for crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure
+impl From<super::Row>
+    for Option<crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure>
 {
-    type Error = std::convert::Infallible;
-    fn try_from(value: super::Row) -> Result<Self, Self::Error> {
+    fn from(value: super::Row) -> Self {
         match value {
-            super::Row::PhotographProcedure(v) => Ok(v),
-            value => unreachable!("Unexpected variant in Row enum: {value:?}"),
+            super::Row::PhotographProcedure(v) => Some(v),
+            _ => None,
         }
     }
 }

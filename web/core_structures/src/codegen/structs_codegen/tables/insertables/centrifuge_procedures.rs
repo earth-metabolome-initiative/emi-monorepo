@@ -47,6 +47,7 @@ impl core::str::FromStr for CentrifugeProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Procedure" => Ok(Self::Procedure),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "CentrifugedContainer" => Ok(Self::CentrifugedContainer),
             "CentrifugedContainerModel" => Ok(Self::CentrifugedContainerModel),
@@ -64,6 +65,7 @@ impl core::str::FromStr for CentrifugeProcedureAttribute {
             "ProcedureCentrifugedWith" => Ok(Self::ProcedureCentrifugedWith(
                 crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
             )),
+            "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "centrifuged_container" => Ok(Self::CentrifugedContainer),
             "centrifuged_container_model" => Ok(Self::CentrifugedContainerModel),

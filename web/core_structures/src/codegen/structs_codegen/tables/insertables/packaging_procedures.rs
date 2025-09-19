@@ -44,6 +44,7 @@ impl core::str::FromStr for PackagingProcedureAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Procedure" => Ok(Self::Procedure),
             "ProcedureTemplate" => Ok(Self::ProcedureTemplate),
             "Sample" => Ok(Self::Sample),
             "SampleModel" => Ok(Self::SampleModel),
@@ -56,6 +57,7 @@ impl core::str::FromStr for PackagingProcedureAttribute {
             "ProcedurePackagedWith" => Ok(Self::ProcedurePackagedWith(
                 crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::Id,
             )),
+            "procedure" => Ok(Self::Procedure),
             "procedure_template" => Ok(Self::ProcedureTemplate),
             "sample" => Ok(Self::Sample),
             "sample_model" => Ok(Self::SampleModel),

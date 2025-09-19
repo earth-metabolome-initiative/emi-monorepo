@@ -55,7 +55,7 @@ impl Table {
                 let current_column_ident: Ident = column.snake_case_ident()?;
 
                 let maybe_clone =
-                    if !column.supports_copy(conn)? { Some(quote! { .clone() }) } else { None };
+                    if column.supports_copy(conn)? { None } else { Some(quote! { .clone() }) };
 
                 if column.is_nullable() {
                     column_values_retrieval.extend(quote! {
@@ -77,12 +77,10 @@ impl Table {
                         let column_ident = c.snake_case_ident()?;
                         if c.is_nullable() {
                             Ok(quote! { #column_ident })
+                        } else if c.supports_copy(conn)? {
+                            Ok(quote! { self.#column_ident })
                         } else {
-                            if c.supports_copy(conn)? {
-                                Ok(quote! { self.#column_ident })
-                            } else {
-                                Ok(quote! { self.#column_ident.clone() })
-                            }
+                            Ok(quote! { self.#column_ident.clone() })
                         }
                     })
                     .collect::<Result<Vec<_>, WebCodeGenError>>()?;

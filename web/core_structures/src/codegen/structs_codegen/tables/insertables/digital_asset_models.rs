@@ -36,8 +36,10 @@ impl core::str::FromStr for DigitalAssetModelAttribute {
     type Err = web_common_traits::database::InsertError<Self>;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
+            "Id" => Ok(Self::Id),
             "ParentModel" => Ok(Self::ParentModel),
             "MimeType" => Ok(Self::MimeType),
+            "id" => Ok(Self::Id),
             "parent_model" => Ok(Self::ParentModel),
             "mime_type" => Ok(Self::MimeType),
             _ => Err(web_common_traits::database::InsertError::UnknownAttribute(s.to_owned())),

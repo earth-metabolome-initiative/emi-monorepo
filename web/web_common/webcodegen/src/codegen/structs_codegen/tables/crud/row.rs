@@ -150,17 +150,11 @@ impl Codegen<'_> {
                             super::Row::#struct_ident(value)
                         }
                     }
-                    impl TryFrom<super::Row> for #struct_path {
-                        type Error = std::convert::Infallible;
-                        fn try_from(value: super::Row) -> Result<Self, Self::Error> {
+                    impl From<super::Row> for Option<#struct_path> {
+                        fn from(value: super::Row) -> Self {
                             match value {
-                                super::Row::#struct_ident(v) => Ok(v),
-                                value => {
-                                    // This should never happen, but we need to handle it
-                                    // because the compiler doesn't know that the enum is
-                                    // exhaustive.
-                                    unreachable!("Unexpected variant in Row enum: {value:?}")
-                                }
+                                super::Row::#struct_ident(v) => Some(v),
+                                _ => None,
                             }
                         }
                     }

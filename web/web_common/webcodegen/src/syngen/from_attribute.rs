@@ -261,7 +261,7 @@ impl Table {
 
             let mut additional_imports = tables
                 .iter()
-                .map(|table| table.import_diesel_path())
+                .map(TableLike::import_diesel_path)
                 .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
             let ok_return_type = if is_unique {
