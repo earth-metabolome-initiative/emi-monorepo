@@ -6,7 +6,7 @@ use actix_cors::Cors;
 use actix_files::NamedFile;
 use actix_web::{App, HttpRequest, HttpServer, Responder, http::header, middleware::Logger, web};
 use actix_web_codegen::get;
-use backend::ListenNotifyServer;
+use backend::{KeyPair, ListenNotifyServer};
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 use redis::Client;
 /// Entrypoint to load the index.html file
@@ -92,6 +92,14 @@ async fn main() -> std::io::Result<()> {
             .configure(backend::api::configure)
             // We register the listen-notify server
             .app_data(web::Data::new(listen_notify_server_handle.clone()))
+            // Pass the access token keys to all routes
+            .app_data(web::Data::new(
+                KeyPair::load_or_generate_keys(
+                    &PathBuf::from("/home/appuser/app/web/keys/"),
+                    "access_token",
+                )
+                .expect("Error loading or generating access token keys"),
+            ))
             // We serve the frontend as static files
             .route("/", web::get().to(index))
             .route("/login", web::get().to(index))

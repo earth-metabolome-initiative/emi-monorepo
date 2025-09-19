@@ -17,7 +17,7 @@ use diesel::OptionalExtension;
 use web_common_traits::database::Read;
 
 use super::JsonAccessToken;
-use crate::BackendError;
+use crate::{BackendError, KeyPair};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum MaybeUser {
@@ -91,18 +91,21 @@ impl FromRequest for MaybeUser {
         // to be authenticated and it still exists in the redis database, we still need
         // to check whether the user exists in the database, as it may have been deleted
         // in the meantime.
-        let diesel_pool = if let Some(pool) = req.app_data::<Data<crate::DBPool>>() {
-            pool.get_ref().clone()
-        } else {
-            log::error!("Database pool not present in request");
-            return Box::pin(ready(Err(ErrorInternalServerError(
-                serde_json::json!({"status": "fail", "message": "Internal server error"}),
-            ))));
+        let Some(diesel_pool) =
+            req.app_data::<Data<crate::DBPool>>().map(|pool| pool.get_ref().clone())
+        else {
+            unreachable!("Diesel pool not present in request - server has been misconfigured");
+        };
+
+        let Some(key): Option<KeyPair> =
+            req.app_data::<Data<KeyPair>>().map(|key| key.get_ref().clone())
+        else {
+            unreachable!("KeyPair not present in request - server has been misconfigured");
         };
 
         Box::pin(async move {
             let token = bearer.token();
-            let access_token = JsonAccessToken::decode(token)?;
+            let access_token = JsonAccessToken::decode(token, &key)?;
 
             let mut conn = diesel_pool.get().map_err(BackendError::from)?;
 

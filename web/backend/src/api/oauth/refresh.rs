@@ -7,6 +7,7 @@ use diesel::OptionalExtension;
 use web_common_traits::database::Read;
 
 use crate::{
+    KeyPair,
     api::oauth::jwt_cookies::{JsonAccessToken, JsonRefreshToken, REFRESH_COOKIE_NAME},
     errors::BackendError,
 };
@@ -30,8 +31,9 @@ pub async fn refresh_access_token_handler(
     req: HttpRequest,
     pool: web::Data<crate::DBPool>,
     redis_client: web::Data<redis::Client>,
+    key_pair: web::Data<crate::KeyPair>,
 ) -> HttpResponse {
-    match refresh_access_token(&req, &pool, &redis_client).await {
+    match refresh_access_token(&req, &pool, &redis_client, &key_pair).await {
         Ok((_, token)) => actix_web::HttpResponse::Ok().json(token),
         Err(error) => error.into(),
     }
@@ -39,11 +41,12 @@ pub async fn refresh_access_token_handler(
 
 pub(crate) async fn refresh_access_token(
     req: &HttpRequest,
-    pool: &web::Data<crate::DBPool>,
-    redis_client: &web::Data<redis::Client>,
+    pool: &crate::DBPool,
+    redis_client: &redis::Client,
+    key_pair: &KeyPair,
 ) -> Result<(User, AccessToken), BackendError> {
     let refresh_cookie = req.cookie(REFRESH_COOKIE_NAME).ok_or(BackendError::Unauthorized)?;
-    let refresh_token = JsonRefreshToken::decode(refresh_cookie.value())?;
+    let refresh_token = JsonRefreshToken::decode(refresh_cookie.value(), key_pair)?;
 
     // If the token is expired, we return an error.
     if refresh_token.is_expired() || !refresh_token.is_still_present_in_redis(redis_client).await? {
@@ -73,5 +76,5 @@ pub(crate) async fn refresh_access_token(
     // new access token, but this is a security measure to prevent
     // unauthorized access to the API.
 
-    Ok((user, AccessToken::new(access_token.encode()?)))
+    Ok((user, AccessToken::new(access_token.encode(key_pair)?)))
 }

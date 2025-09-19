@@ -14,13 +14,10 @@ prettyplease.workspace = true
 snake_case_sanitizer = { path = "../snake_case_sanitizer" }
 common_traits.workspace = true
 inflector.workspace = true
-futures.workspace = true
-generic_backend_request_errors.workspace = true
 time_requirements.workspace = true
 sqlparser.workspace = true
 strum.workspace = true
 strum_macros.workspace = true
-iso_codes.workspace = true
 cached.workspace = true
 graph.workspace = true
 sorted_vec.workspace = true

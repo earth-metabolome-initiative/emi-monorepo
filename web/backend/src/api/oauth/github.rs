@@ -59,6 +59,7 @@ async fn github_oauth_handler(
     query: web::Query<QueryCode>,
     pool: web::Data<crate::DBPool>,
     redis_client: web::Data<RedisClient>,
+    key_pair: web::Data<crate::KeyPair>,
 ) -> HttpResponse {
     let code = &query.code;
     let state = &query.state;
@@ -112,6 +113,7 @@ async fn github_oauth_handler(
         &github_config.provider,
         state,
         &redis_client,
+        &key_pair,
         &mut connection,
     )
     .await

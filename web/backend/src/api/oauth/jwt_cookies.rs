@@ -7,7 +7,6 @@ use actix_web::{
 };
 use actix_web_httpauth::extractors::bearer::BearerAuth;
 use api_path::api::oauth::jwt_cookies::USER_ONLINE_COOKIE_NAME;
-use base64::prelude::*;
 use chrono::{Duration, Utc};
 use core_structures::LoginProvider;
 use diesel::PgConnection;
@@ -18,7 +17,7 @@ use redis::AsyncCommands;
 use rosetta_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 
-use crate::errors::BackendError;
+use crate::{KeyPair, errors::BackendError};
 
 mod known_user;
 use known_user::handle_known_user;
@@ -29,6 +28,8 @@ pub use maybe_user::MaybeUser;
 
 /// Set a const with the expected cookie name.
 pub(crate) const REFRESH_COOKIE_NAME: &str = "refresh_token";
+const REFRESH_TOKEN_MINUTES: u16 = 60 * 24 * 7; // 7 days
+const ACCESS_TOKEN_MINUTES: u16 = 15; // 15 minutes
 
 pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpResponse {
     let refresh_cookie = Cookie::build(REFRESH_COOKIE_NAME, "")
@@ -51,31 +52,6 @@ pub(crate) fn eliminate_cookies(mut builder: HttpResponseBuilder) -> HttpRespons
     builder.finish()
 }
 
-#[derive(Debug)]
-struct JWTConfig {
-    access_token_public_key: String,
-    access_token_private_key: String,
-    access_token_minutes: i64,
-    refresh_token_minutes: i64,
-}
-
-impl JWTConfig {
-    fn from_env() -> Result<JWTConfig, BackendError> {
-        Ok(JWTConfig {
-            access_token_public_key: String::from_utf8(
-                base64::engine::general_purpose::STANDARD
-                    .decode(&std::env::var("ACCESS_TOKEN_PUBLIC_KEY")?)?,
-            )?,
-            access_token_private_key: String::from_utf8(
-                base64::engine::general_purpose::STANDARD
-                    .decode(&std::env::var("ACCESS_TOKEN_PRIVATE_KEY")?)?,
-            )?,
-            access_token_minutes: std::env::var("ACCESS_TOKEN_MINUTES")?.parse()?,
-            refresh_token_minutes: std::env::var("REFRESH_TOKEN_MINUTES")?.parse()?,
-        })
-    }
-}
-
 #[derive(Deserialize, Serialize, PartialEq, Debug)]
 struct JsonWebToken {
     user_id: i32,
@@ -86,11 +62,11 @@ struct JsonWebToken {
 }
 
 impl JsonWebToken {
-    fn new(user_id: i32, temporary: bool, minutes: i64) -> JsonWebToken {
+    fn new<M: Into<i64>>(user_id: i32, temporary: bool, minutes: M) -> JsonWebToken {
         let token_id = Uuid::new_v4();
         let now = Utc::now();
         let created_at = now.timestamp();
-        let expires_in = (now + Duration::try_minutes(minutes).unwrap()).timestamp();
+        let expires_in = (now + Duration::try_minutes(minutes.into()).unwrap()).timestamp();
         JsonWebToken { user_id, token_id, exp: expires_in, created_at, temporary }
     }
 
@@ -99,17 +75,23 @@ impl JsonWebToken {
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
     /// * `minutes` - The duration of the token in minutes.
-    async fn insert_into_redis(
+    async fn insert_into_redis<M: Into<u64>>(
         &self,
         redis_client: &redis::Client,
-        minutes: u64,
+        minutes: M,
     ) -> Result<(), BackendError> {
         // We insert the token: `user_id` pair into the redis database,
         // with as duration the same as the duration of the token.
 
-        let mut con = redis_client.get_multiplexed_async_connection().await?;
+        let mut con = redis_client
+            .get_multiplexed_async_connection()
+            .await
+            .expect("Failed to get redis connection");
 
-        Ok(con.set_ex(self.token_id, (self.user_id, self.temporary), minutes * 60).await?)
+        Ok(con
+            .set_ex(self.token_id, self.user_id, minutes.into() * 60)
+            .await
+            .expect("Failed to set token in redis"))
     }
 
     /// Checks whether the token is still present in the redis database and has
@@ -127,9 +109,9 @@ impl JsonWebToken {
         // the redis database with a different `user_id`. This may happen due to a
         // collision, or more likely, if some potentially malicious action is
         // taking place.
-        let (user_id, temporary): (i32, bool) = con.get(self.token_id).await?;
+        let user_id: i32 = con.get(self.token_id).await?;
 
-        Ok(user_id == self.user_id && temporary == self.temporary)
+        Ok(user_id == self.user_id)
     }
 
     /// Delete the token from the redis database.
@@ -150,21 +132,21 @@ impl JsonWebToken {
         Utc::now().timestamp() > self.exp
     }
 
-    fn encode(&self, private_key: &str) -> Result<String, jsonwebtoken::errors::Error> {
+    fn encode(&self, key: &KeyPair) -> Result<String, jsonwebtoken::errors::Error> {
         encode(
             &Header::new(Algorithm::RS256),
             &self,
-            &EncodingKey::from_rsa_pem(private_key.as_bytes())?,
+            &EncodingKey::from_rsa_pem(key.private_pem())?,
         )
     }
 
     fn decode(
         token: &str,
-        public_key: &str,
+        key: &KeyPair,
     ) -> Result<TokenData<JsonWebToken>, jsonwebtoken::errors::Error> {
         decode::<JsonWebToken>(
             token,
-            &DecodingKey::from_rsa_pem(public_key.as_bytes())?,
+            &DecodingKey::from_rsa_pem(key.public_pem())?,
             &Validation::new(Algorithm::RS256),
         )
     }
@@ -178,11 +160,7 @@ pub(crate) struct JsonRefreshToken {
 impl JsonRefreshToken {
     pub(crate) fn new(user_id: i32, temporary: bool) -> Result<JsonRefreshToken, BackendError> {
         Ok(JsonRefreshToken {
-            web_token: JsonWebToken::new(
-                user_id,
-                temporary,
-                JWTConfig::from_env()?.refresh_token_minutes,
-            ),
+            web_token: JsonWebToken::new(user_id, temporary, REFRESH_TOKEN_MINUTES),
         })
     }
 
@@ -191,10 +169,7 @@ impl JsonRefreshToken {
     /// # Arguments
     /// * `redis_client` - The redis client to use for the login.
     async fn insert_into_redis(&self, redis_client: &redis::Client) -> Result<(), BackendError> {
-        let config = JWTConfig::from_env()?;
-        self.web_token
-            .insert_into_redis(redis_client, u64::try_from(config.refresh_token_minutes).unwrap())
-            .await
+        self.web_token.insert_into_redis(redis_client, REFRESH_TOKEN_MINUTES).await
     }
 
     /// Checks whether the token is still present in the redis database and has
@@ -228,18 +203,12 @@ impl JsonRefreshToken {
         self.web_token.is_expired()
     }
 
-    pub(crate) fn encode(&self) -> Result<String, BackendError> {
-        Ok(self.web_token.encode(&JWTConfig::from_env()?.access_token_private_key)?)
+    pub(crate) fn encode(&self, key: &KeyPair) -> Result<String, BackendError> {
+        Ok(self.web_token.encode(key)?)
     }
 
-    pub(crate) fn decode(token: &str) -> Result<JsonRefreshToken, BackendError> {
-        Ok(JsonRefreshToken {
-            web_token: JsonWebToken::decode(
-                token,
-                &JWTConfig::from_env()?.access_token_public_key,
-            )?
-            .claims,
-        })
+    pub(crate) fn decode(token: &str, key: &KeyPair) -> Result<JsonRefreshToken, BackendError> {
+        Ok(JsonRefreshToken { web_token: JsonWebToken::decode(token, key)?.claims })
     }
 }
 
@@ -251,11 +220,7 @@ pub(crate) struct JsonAccessToken {
 impl JsonAccessToken {
     pub fn new(user_id: i32, temporary: bool) -> Result<JsonAccessToken, BackendError> {
         Ok(JsonAccessToken {
-            web_token: JsonWebToken::new(
-                user_id,
-                temporary,
-                JWTConfig::from_env()?.access_token_minutes,
-            ),
+            web_token: JsonWebToken::new(user_id, temporary, ACCESS_TOKEN_MINUTES),
         })
     }
 
@@ -267,10 +232,7 @@ impl JsonAccessToken {
         &self,
         redis_client: &redis::Client,
     ) -> Result<(), BackendError> {
-        let config = JWTConfig::from_env()?;
-        self.web_token
-            .insert_into_redis(redis_client, u64::try_from(config.access_token_minutes).unwrap())
-            .await
+        self.web_token.insert_into_redis(redis_client, ACCESS_TOKEN_MINUTES).await
     }
 
     /// Checks whether the token is still present in the redis database and has
@@ -308,16 +270,12 @@ impl JsonAccessToken {
         self.web_token.temporary
     }
 
-    pub fn encode(&self) -> Result<String, BackendError> {
-        let config = JWTConfig::from_env()?;
-        Ok(self.web_token.encode(&config.access_token_private_key)?)
+    pub fn encode(&self, key: &KeyPair) -> Result<String, BackendError> {
+        Ok(self.web_token.encode(key)?)
     }
 
-    pub fn decode(token: &str) -> Result<JsonAccessToken, BackendError> {
-        let config = JWTConfig::from_env()?;
-        Ok(JsonAccessToken {
-            web_token: JsonWebToken::decode(token, &config.access_token_public_key)?.claims,
-        })
+    pub fn decode(token: &str, key: &KeyPair) -> Result<JsonAccessToken, BackendError> {
+        Ok(JsonAccessToken { web_token: JsonWebToken::decode(token, key)?.claims })
     }
 }
 
@@ -330,20 +288,19 @@ impl JsonAccessToken {
 async fn encode_jwt_refresh_cookie<'a>(
     user_id: i32,
     redis_client: &redis::Client,
+    key: &KeyPair,
     temporary: bool,
 ) -> Result<Cookie<'a>, BackendError> {
     log::info!("Creating refresh token");
-    let config = JWTConfig::from_env()?;
-
     let token = JsonRefreshToken::new(user_id, temporary)?;
 
     token.insert_into_redis(redis_client).await?;
 
-    let cookie = Cookie::build(REFRESH_COOKIE_NAME, token.encode()?)
+    let cookie = Cookie::build(REFRESH_COOKIE_NAME, token.encode(key)?)
         .same_site(actix_web::cookie::SameSite::Strict)
         .secure(true)
         .path("/")
-        .max_age(ActixWebDuration::minutes(config.refresh_token_minutes))
+        .max_age(ActixWebDuration::minutes(REFRESH_TOKEN_MINUTES.into()))
         // The HTTP_ONLY flag is set to true to prevent the cookie from being accessed by
         // JavaScript. This is a security measure to prevent XSS attacks.
         .http_only(true)
@@ -354,12 +311,11 @@ async fn encode_jwt_refresh_cookie<'a>(
 
 /// Function to create the user online cookie
 fn encode_user_online_cookie<'a>() -> Result<Cookie<'a>, BackendError> {
-    let config = JWTConfig::from_env()?;
     Ok(Cookie::build(USER_ONLINE_COOKIE_NAME, "true")
         .same_site(actix_web::cookie::SameSite::Strict)
         .secure(true)
         .path("/")
-        .max_age(ActixWebDuration::minutes(config.refresh_token_minutes))
+        .max_age(ActixWebDuration::minutes(REFRESH_TOKEN_MINUTES.into()))
         // We want to be able to check the existence of this cookie from the frontend
         // by using javascript (or in our case Yew) so we set http_only to false.
         .http_only(false)
@@ -381,13 +337,14 @@ pub(crate) async fn build_login_response(
     provider: &LoginProvider,
     _state: &str,
     redis_client: &redis::Client,
+    key: &KeyPair,
     conn: &mut PgConnection,
 ) -> Result<HttpResponse, BackendError> {
     let refresh_cookie = if let Some(user) = handle_known_user(emails, provider, conn)? {
-        encode_jwt_refresh_cookie(user.id, redis_client, false).await?
+        encode_jwt_refresh_cookie(user.id, redis_client, key, false).await?
     } else {
         let temporary_user = handle_unknown_user(primary_email, provider, conn)?;
-        encode_jwt_refresh_cookie(temporary_user.id, redis_client, true).await?
+        encode_jwt_refresh_cookie(temporary_user.id, redis_client, key, true).await?
     };
 
     let login_cookie = encode_user_online_cookie()?;
@@ -405,7 +362,10 @@ pub(crate) async fn access_token_validator(
     req: ServiceRequest,
     credentials: BearerAuth,
 ) -> Result<ServiceRequest, (actix_web::error::Error, ServiceRequest)> {
-    match JsonAccessToken::decode(credentials.token()) {
+    let Some(key) = req.app_data::<actix_web::web::Data<KeyPair>>() else {
+        unreachable!("KeyPair not present in request - server has been misconfigured");
+    };
+    match JsonAccessToken::decode(credentials.token(), key) {
         Ok(token) => {
             if token.is_expired() {
                 return Err((BackendError::Unauthorized.into(), req));

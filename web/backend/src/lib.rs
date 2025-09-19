@@ -4,6 +4,8 @@ pub mod errors;
 pub(crate) use api::LNCommand;
 pub use api::{ListenNotifyHandle, ListenNotifyServer};
 pub use errors::BackendError;
+pub mod keys;
+pub use keys::KeyPair;
 
 pub(crate) type Conn = diesel::PgConnection;
 

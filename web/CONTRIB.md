@@ -66,6 +66,12 @@ To start the docker compose, you need to run the following command:
 USER_ID=$(id -u) GROUP_ID=$(id -g) docker compose -f docker-compose-develop.yml --env-file .env_develop up -d --build -V
 ```
 
+or to shut it down:
+
+```bash
+USER_ID=$(id -u) GROUP_ID=$(id -g) docker compose -f docker-compose-develop.yml --env-file .env_develop down -v
+```
+
 ### Install the generated certificates
 
 ```bash

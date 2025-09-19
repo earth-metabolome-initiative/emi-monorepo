@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 tokio.workspace = true
 webcodegen.workspace = true
-diesel_migrations_utils.workspace = true
 quote.workspace = true
 const_format.workspace = true
 diesel = { workspace = true, features = ["postgres"] }

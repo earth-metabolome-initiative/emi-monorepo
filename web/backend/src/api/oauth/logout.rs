@@ -43,13 +43,14 @@ pub async fn logout(
     req: HttpRequest,
     maybe_bearer: MaybeBearer,
     redis_client: web::Data<redis::Client>,
+    key_pair: web::Data<crate::KeyPair>,
 ) -> HttpResponse {
     // We try to extract the bearer token from the request. If we find it,
     // we handle the removal of the access token from the redis database,
     // otherwise we solely remove the refresh token from the redis database.
 
     if let Some(bearer) = maybe_bearer.bearer {
-        let access_token = match JsonAccessToken::decode(bearer.token()) {
+        let access_token = match JsonAccessToken::decode(bearer.token(), &key_pair) {
             Ok(token) => token,
             Err(error) => {
                 return error.into();
@@ -71,7 +72,7 @@ pub async fn logout(
         return BackendError::Unauthorized.into();
     };
 
-    let Ok(refresh_token) = JsonRefreshToken::decode(refresh_cookie.value()) else {
+    let Ok(refresh_token) = JsonRefreshToken::decode(refresh_cookie.value(), &key_pair) else {
         return BackendError::Unauthorized.into();
     };
 
