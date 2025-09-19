@@ -101,10 +101,10 @@ impl Pg2Sqlite {
             if path.is_file() {
                 // If the file name is `up.sql` we parse it and add it to the
                 // set of PostgreSQL statements to be translated.
-                if let Some(file_name) = path.file_name() {
-                    if file_name == "up.sql" {
-                        self = self.file(path)?;
-                    }
+                if let Some(file_name) = path.file_name()
+                    && file_name == "up.sql"
+                {
+                    self = self.file(path)?;
                 }
             } else if path.is_dir() {
                 self = self.ups(path)?;

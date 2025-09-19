@@ -21,6 +21,8 @@ impl From<(u8, u8, u8)> for Color {
 }
 
 impl From<Rgb> for Color {
+    #[allow(clippy::cast_possible_truncation)]
+    #[allow(clippy::cast_sign_loss)]
     fn from(rgb: Rgb) -> Self {
         Color { red: rgb.red() as u8, green: rgb.green() as u8, blue: rgb.blue() as u8 }
     }

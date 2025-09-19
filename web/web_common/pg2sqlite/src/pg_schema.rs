@@ -1,11 +1,11 @@
-//! Submodule defining a simplified schema struct for PostgreSQL.
+//! Submodule defining a simplified schema struct for `PostgreSQL`.
 
 use sqlparser::ast::{CreateFunction, CreateTable};
 
 use crate::traits::Schema;
 
 #[derive(Debug, Clone, Default)]
-/// Simplified schema struct for PostgreSQL.
+/// Simplified schema struct for `PostgreSQL`.
 pub struct PgSchema {
     /// The set of functions defined in the schema.
     functions: Vec<CreateFunction>,

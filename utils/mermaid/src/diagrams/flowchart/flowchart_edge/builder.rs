@@ -38,6 +38,7 @@ pub struct FlowchartEdgeBuilder {
 }
 
 impl FlowchartEdgeBuilder {
+    #[must_use]
     /// Creates a new `FlowchartEdgeBuilder`.
     pub fn id(mut self, id: usize) -> Self {
         self.id = Some(id);

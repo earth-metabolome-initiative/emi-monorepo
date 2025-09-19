@@ -19,6 +19,7 @@ pub enum Direction {
 }
 
 impl Direction {
+    #[must_use]
     /// Changes the orientation from vertical to horizontal or vice versa.
     pub fn flip(self) -> Self {
         match self {

@@ -2,7 +2,7 @@
 //! insertable builder into an insertable object after having processed the
 //! necessary parent builders, if any.
 
-use common_traits::builder::{Attributed, IsCompleteBuilder};
+use common_traits::builder::{Attributed, EmptyTuple, IsCompleteBuilder};
 
 use crate::{
     database::{IdOrBuilder, InsertError},
@@ -44,7 +44,7 @@ where
         _conn: &mut C,
     ) -> Result<Self::PrimaryKey, InsertError<Self::Attribute>> {
         self.ok_or(InsertError::BuilderError(
-            common_traits::prelude::BuilderError::IncompleteBuild(Default::default()),
+            common_traits::prelude::BuilderError::IncompleteBuild(EmptyTuple::default()),
         ))
     }
 }

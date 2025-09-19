@@ -23,7 +23,7 @@ impl Translator for OrderByExpr {
 
         Ok(OrderByExpr {
             expr: self.expr.translate(schema, options)?,
-            options: self.options.clone(),
+            options: self.options,
             with_fill: None,
         })
     }

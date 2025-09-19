@@ -91,6 +91,11 @@ impl StyleClassBuilder {
     /// # Arguments
     ///
     /// * `property` - A `StyleProperty` that will be added to the style class.
+    ///
+    /// # Errors
+    ///
+    /// * Returns `StyleClassError::DuplicateProperty` if the property is
+    ///   already present.
     pub fn property(mut self, property: StyleProperty) -> Result<Self, StyleClassError> {
         if self.properties.contains(&property) {
             return Err(StyleClassError::DuplicateProperty(property));

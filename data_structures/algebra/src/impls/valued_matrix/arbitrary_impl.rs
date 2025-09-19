@@ -36,7 +36,7 @@ where
 
         for edge in edges {
             match csr.add(edge) {
-                Ok(_) => {}
+                Ok(()) => {}
                 Err(err) => {
                     match err {
                         MutabilityError::MaxedOutSparseIndex

@@ -8,24 +8,24 @@ use std::fmt::Display;
 pub enum Theme {
     /// The classic Mermaid chart theme.
     MermaidChart,
-    /// The Neo theme, a modern style for diagrams.
+    /// The `Neo` theme, a modern style for diagrams.
     Neo,
-    /// The NeoDark theme, a dark variant of Neo.
+    /// The `NeoDark` theme, a dark variant of Neo.
     NeoDark,
     /// The default theme for Mermaid diagrams.
     #[default]
     Default,
-    /// The Forest theme, with green accents and natural tones.
+    /// The `Forest` theme, with green accents and natural tones.
     Forest,
-    /// The Base theme, a minimal and clean style.
+    /// The `Base` theme, a minimal and clean style.
     Base,
-    /// The Dark theme, for diagrams with a dark background.
+    /// The `Dark` theme, for diagrams with a dark background.
     Dark,
-    /// The Neutral theme, with muted and balanced colors.
+    /// The `Neutral` theme, with muted and balanced colors.
     Neutral,
-    /// The Redux theme, a vibrant and bold style.
+    /// The `Redux` theme, a vibrant and bold style.
     Redux,
-    /// The ReduxDark theme, a dark variant of Redux.
+    /// The `ReduxDark` theme, a dark variant of Redux.
     ReduxDark,
 }
 

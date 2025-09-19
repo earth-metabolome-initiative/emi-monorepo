@@ -8,7 +8,7 @@ use std::fmt::Display;
 pub enum Look {
     /// The Neo look, a modern style for diagrams.
     Neo,
-    /// The HandDrawn look, a sketch-like style for diagrams.
+    /// The hand-drawn look, a sketch-like style for diagrams.
     HandDrawn,
     #[default]
     /// The Classic look, the traditional Mermaid style.

@@ -72,9 +72,9 @@ pub trait Schema {
 
                 let mut statements = sqlparser::parser::Parser::parse_sql(
                     &sqlparser::dialect::PostgreSqlDialect {},
-                    &maybe_body,
+                    maybe_body,
                 )
-                .expect(&format!("Failed to parse function body: {maybe_body}"));
+                .unwrap_or_else(|_| panic!("Failed to parse function body: {maybe_body}"));
 
                 // The function body may end with a `RETURN NEW;` or `RETURN OLD;` statement.
                 // If that's the case, we remove it.

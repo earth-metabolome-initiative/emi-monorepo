@@ -35,7 +35,7 @@ where
 
         for (row, column) in edges {
             match csr.add((row, column)) {
-                Ok(_) => {}
+                Ok(()) => {}
                 Err(err) => {
                     match err {
                         MutabilityError::MaxedOutSparseIndex

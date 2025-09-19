@@ -49,9 +49,9 @@ impl TableLike for sqlparser::ast::CreateTable {
                             .find(|col| {
                                 col.name.value.eq_ignore_ascii_case(&ident.column.to_string())
                             })
-                            .expect(&format!(
-                                "Primary key column `{ident}` not found in table columns"
-                            ))
+                            .unwrap_or_else(|| {
+                                panic!("Primary key column `{ident}` not found in table columns")
+                            })
                     })
                     .collect::<Vec<_>>(),
             );
