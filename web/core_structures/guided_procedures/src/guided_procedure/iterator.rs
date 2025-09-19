@@ -40,9 +40,17 @@ where
 
 #[cfg(feature = "backend")]
 impl<'graph> GuidedProcedure<'graph, diesel::PgConnection> {
+    #[allow(clippy::type_complexity)]
     /// Attempts to retrieve the next builder of the expected type from the
     /// iterator. If the next builder is not of the expected type, an error is
     /// returned. If there are no more builders, an error is also returned.
+    ///
+    /// # Errors
+    ///
+    /// * Returns `GuidedProcedureError::UnexpectedBuilder` if the next builder
+    ///   is not of the expected type.
+    /// * Returns `GuidedProcedureError::NoMoreBuilders` if there are no more
+    ///   builders in the iterator.
     fn try_next<ExpectedProcedure>(
         &mut self,
     ) -> Result<(Vec<&'graph ProcedureTemplate>, ExpectedProcedure::Builder), GuidedProcedureError>

@@ -41,7 +41,7 @@ where
         ptam_builders.push((node, edge));
     }
 
-    let colors = Color::maximally_distinct(ptam_builders.len() as u16, 70, 80);
+    let colors = Color::maximally_distinct(u16::try_from(ptam_builders.len()).unwrap(), 70, 80);
 
     for ((node_builder, edge_builder), color) in ptam_builders.into_iter().zip(colors.into_iter()) {
         builder.style_class(

@@ -19,6 +19,7 @@ use diesel::{
     },
 };
 
+#[allow(clippy::type_complexity)]
 /// Recursively loads all sub-procedure templates of the given procedure
 /// template, returning a vector of all loaded sub-procedure templates and a
 /// vector of edges representing the parent-child relationships between them.

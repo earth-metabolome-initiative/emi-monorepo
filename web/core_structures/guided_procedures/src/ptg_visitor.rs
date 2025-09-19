@@ -19,6 +19,7 @@ enum CurrentNodeVisitState {
 }
 
 #[derive(Debug, Clone)]
+#[allow(clippy::type_complexity)]
 /// Visitor pattern trait for traversing a `ProcedureTemplateGraph`.
 pub struct PTGVisitor<'graph, G, L> {
     /// The graph to traverse.

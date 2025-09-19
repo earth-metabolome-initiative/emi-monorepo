@@ -17,6 +17,14 @@ fn asset_model_hash(asset_model: &AssetModel) -> u64 {
 
 /// Generates an Entity-Relationship Diagram (ERD) for the asset models
 /// hierarchy.
+///
+/// # Arguments
+///
+/// * `conn` - A mutable reference to the `PostgreSQL` database connection.
+///
+/// # Errors
+///
+/// * Returns an `Error` if there is an issue generating the ERD.
 pub fn asset_model_hierarchy(conn: &mut PgConnection) -> Result<ERDiagram, Error> {
     let asset_models: Vec<AssetModel> = AssetModel::bounded_read(0, u16::MAX, conn)?;
     let compatibility_rules: Vec<AssetCompatibilityRule> =
