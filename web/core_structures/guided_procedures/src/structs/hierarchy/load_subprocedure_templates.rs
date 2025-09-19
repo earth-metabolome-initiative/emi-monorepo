@@ -30,7 +30,7 @@ use diesel::{
 /// * `conn` - The database connection to use for loading the sub-procedure
 ///   templates.
 pub(super) fn load_subprocedure_templates<C: LoadConnection>(
-    procedure_template: Rc<ProcedureTemplate>,
+    procedure_template: &Rc<ProcedureTemplate>,
     conn: &mut C,
 ) -> Result<
     (Vec<Rc<ProcedureTemplate>>, Vec<(Rc<ProcedureTemplate>, Rc<ProcedureTemplate>)>),
@@ -59,10 +59,10 @@ where
     {
         let child_procedure = Rc::from(parent_child_relation.child(conn)?);
         let (child_subprocedure_templates, child_edges) =
-            load_subprocedure_templates(child_procedure.clone(), conn)?;
-        subprocedure_templates.push(child_procedure.clone());
+            load_subprocedure_templates(&child_procedure, conn)?;
         subprocedure_templates.extend(child_subprocedure_templates);
-        edges.push((procedure_template.clone(), child_procedure));
+        edges.push((procedure_template.clone(), child_procedure.clone()));
+        subprocedure_templates.push(child_procedure);
         edges.extend(child_edges);
     }
 

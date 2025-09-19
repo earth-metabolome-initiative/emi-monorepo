@@ -45,7 +45,7 @@ impl<'graph> GuidedProcedurePseudocode<'graph> {
             .join("\n"),
         );
 
-        output.push_str(&format!("{variable_name}\n"));
+        output.push_str(&variable_name);
 
         let error_type = std::any::type_name::<E>();
 
@@ -54,19 +54,19 @@ impl<'graph> GuidedProcedurePseudocode<'graph> {
             output.push_str(
                 &[
                     format!(
-                        "    .and_then::<{procedure_type}, {error_type}>(|mut builder, conn| {{"
+                        "\n    .and_then::<{procedure_type}, {error_type}>(|mut builder, conn| {{"
                     ),
                     format!(
                         "        todo!(\"Implement the logic for \\\"{}\\\"\");",
                         procedure.name
                     ),
                     "        Ok(builder)".to_owned(),
-                    "    })?\n".to_owned(),
+                    "    })?".to_owned(),
                 ]
                 .join("\n"),
             );
         }
-        output.push_str("    .finish()?;\n");
+        output.push_str("\n    .finish()?;\n");
 
         output
     }

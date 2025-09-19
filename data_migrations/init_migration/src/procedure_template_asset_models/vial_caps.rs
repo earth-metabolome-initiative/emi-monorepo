@@ -23,7 +23,7 @@ pub(crate) fn splitted_cap_vial_1_5ml_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, splitted_cap_vial_1_5ml(user, conn)?, conn)
+    default_pmt(&splitted_cap_vial_1_5ml(user, conn)?, conn)
 }
 
 /// Returns a partial builder for a sealed vial cap 1.5ml trackable.
@@ -40,5 +40,5 @@ pub(crate) fn sealed_cap_vial_1_5ml_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, sealed_cap_vial_1_5ml(user, conn)?, conn)
+    default_pmt(&sealed_cap_vial_1_5ml(user, conn)?, conn)
 }

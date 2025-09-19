@@ -135,7 +135,7 @@ impl Hierarchy {
 
         let number_of_nodes = sorted_nodes.len();
         let edges = GenericEdgesBuilder::default()
-            .expected_number_of_edges(edges.len() as u8)
+            .expected_number_of_edges(edges.len())
             .expected_shape(number_of_nodes)
             .edges(edges)
             .build()

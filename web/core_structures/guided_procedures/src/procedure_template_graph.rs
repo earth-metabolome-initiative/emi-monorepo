@@ -59,11 +59,12 @@ impl ProcedureTemplateGraph {
     ///
     /// * Returns a `diesel::result::Error` if there is an issue querying the
     ///   database.
-    pub fn new<C: LoadConnection>(
+    pub fn new<C>(
         procedure_template: &ProcedureTemplate,
         conn: &mut C,
     ) -> Result<Self, diesel::result::Error>
     where
+        C: LoadConnection,
         <NextProcedureTemplate as HasTable>::Table:
             FilterDsl<<next_procedure_templates::parent as EqAll<i32>>::Output>,
         <<NextProcedureTemplate as HasTable>::Table as FilterDsl<

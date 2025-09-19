@@ -34,6 +34,7 @@ mod load_task_graph;
 use load_subprocedure_templates::load_subprocedure_templates;
 
 #[derive(Debug, Clone)]
+#[allow(clippy::type_complexity)]
 /// Represents the hierarchy of procedure templates rooted at a given procedure
 /// template, including all its sub-procedure templates.
 pub struct Hierarchy {
@@ -42,18 +43,19 @@ pub struct Hierarchy {
     hierarchy: GenericGraph<
         Rc<SortedVec<Rc<ProcedureTemplate>>>,
         GenericBiMatrix2D<
-            SquareCSR2D<CSR2D<u16, usize, usize>>,
-            SquareCSR2D<CSR2D<u16, usize, usize>>,
+            SquareCSR2D<CSR2D<usize, usize, usize>>,
+            SquareCSR2D<CSR2D<usize, usize, usize>>,
         >,
     >,
 }
 
 impl Hierarchy {
-    pub(crate) fn new<C: LoadConnection>(
+    pub(crate) fn new<C>(
         procedure_template: &ProcedureTemplate,
         conn: &mut C,
     ) -> Result<Self, diesel::result::Error>
     where
+        C: LoadConnection,
         <ParentProcedureTemplate as HasTable>::Table:
             FilterDsl<<parent_procedure_templates::parent as EqAll<i32>>::Output>,
         <<ParentProcedureTemplate as HasTable>::Table as FilterDsl<
@@ -71,8 +73,7 @@ impl Hierarchy {
         ProcedureTemplate: web_common_traits::database::Read<C>,
     {
         let procedure_template = Rc::new(procedure_template.clone());
-        let (mut procedure_nodes, edges) =
-            load_subprocedure_templates(procedure_template.clone(), conn)?;
+        let (mut procedure_nodes, edges) = load_subprocedure_templates(&procedure_template, conn)?;
         procedure_nodes.push(procedure_template);
         procedure_nodes.sort_unstable_by(|a, b| a.procedure_template.cmp(&b.procedure_template));
         procedure_nodes.dedup();
@@ -93,8 +94,8 @@ impl Hierarchy {
         numerical_edges.sort_unstable();
         numerical_edges.dedup();
         let number_of_nodes = procedure_nodes.len();
-        let directed: SquareCSR2D<CSR2D<u16, usize, usize>> = GenericEdgesBuilder::default()
-            .expected_number_of_edges(numerical_edges.len() as u16)
+        let directed: SquareCSR2D<CSR2D<usize, usize, usize>> = GenericEdgesBuilder::default()
+            .expected_number_of_edges(numerical_edges.len())
             .expected_shape(number_of_nodes)
             .edges(numerical_edges)
             .build()

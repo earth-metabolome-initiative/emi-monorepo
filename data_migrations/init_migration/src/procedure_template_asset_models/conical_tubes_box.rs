@@ -23,7 +23,7 @@ pub(crate) fn cct_box_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, polystyrene_box(user, conn)?, conn)
+    default_pmt(&polystyrene_box(user, conn)?, conn)
 }
 
 /// Returns a partial builder for a conical tubes rack trackable.
@@ -40,5 +40,5 @@ pub(crate) fn cct_rack_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, conical_centrifugal_tube_50ml_rack(user, conn)?, conn)
+    default_pmt(&conical_centrifugal_tube_50ml_rack(user, conn)?, conn)
 }

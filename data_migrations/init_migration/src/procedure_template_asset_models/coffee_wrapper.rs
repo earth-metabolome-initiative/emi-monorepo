@@ -23,5 +23,5 @@ pub(crate) fn coffee_wrapper_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, coffee_filter_wrapper(user, conn)?, conn)
+    default_pmt(&coffee_filter_wrapper(user, conn)?, conn)
 }

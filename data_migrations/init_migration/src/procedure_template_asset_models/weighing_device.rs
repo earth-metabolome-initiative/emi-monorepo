@@ -23,5 +23,5 @@ pub(crate) fn weighing_device_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, weighing_scale(user, conn)?, conn)
+    default_pmt(&weighing_scale(user, conn)?, conn)
 }

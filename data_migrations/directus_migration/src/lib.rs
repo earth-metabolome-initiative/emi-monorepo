@@ -35,13 +35,30 @@ const DIRECTUS_DATABASE_URL: &str = const_format::formatcp!(
     "postgres://{DIRECTUS_DATABASE_USER}:{DIRECTUS_DATABASE_PASSWORD}@{DIRECTUS_HOSTNAME}:{DIRECTUS_DATABASE_PORT}/{DIRECTUS_DATABASE_NAME}",
 );
 /// Establishes a connection to the Directus database.
+///
+/// # Errors
+///
+/// * Returns an `anyhow::Error` if there is an issue connecting to the
+///   database.
 pub fn directus_connection() -> Result<PgConnection, anyhow::Error> {
     let conn = PgConnection::establish(DIRECTUS_DATABASE_URL)?;
     Ok(conn)
 }
 
+#[allow(clippy::too_many_lines)]
 /// Executes the data migration from the Directus database to the portal
 /// database.
+///
+/// # Arguments
+///
+/// * `user` - The user performing the migration.
+/// * `directus_conn` - A mutable reference to the Directus database connection.
+/// * `portal_conn` - A mutable reference to the portal database connection.
+///
+/// # Errors
+///
+/// * Returns an `anyhow::Error` if there is an issue during the migration
+///   process.
 pub fn directus_migration(
     user: &User,
     directus_conn: &mut PgConnection,

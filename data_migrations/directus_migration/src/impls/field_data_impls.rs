@@ -34,7 +34,7 @@ impl FieldDatumWrapper {
     pub fn has_sample_source(&self) -> bool {
         self.sample_source_uuid().is_some()
     }
-    ///
+
     pub fn sample_source(
         &self,
         user: &User,

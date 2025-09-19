@@ -8,7 +8,7 @@ impl FieldDatumWrapper {
     /// # Examples
     ///
     /// * A `FieldDatum` should be skipped if it lacks a sample source or if its
-    /// sample source kind is unsupported.
+    ///   sample source kind is unsupported.
     ///
     /// * Skip entries where `collector_fullname` and `picture_panel` are both
     ///   None

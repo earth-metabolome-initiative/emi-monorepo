@@ -2,7 +2,7 @@
 //! a standard procedure template `asset_model`.
 
 use core_structures::{
-    AssetModel, ProcedureTemplateAssetModel, User,
+    AssetModel, ProcedureTemplateAssetModel,
     tables::insertables::{
         InsertableProcedureTemplateAssetModelBuilder, ProcedureTemplateAssetModelSettable,
     },
@@ -17,16 +17,15 @@ use web_common_traits::{
 ///
 /// # Arguments
 ///
-/// * `user` - The user who is creating the `asset_model`.
 /// * `asset_model` - The `asset_model` to associate with the procedure template
 ///   `asset_model`.
+/// * `conn` - The database connection to use.
 ///
 /// # Errors
 ///
 /// * If the connection to the database fails.
 pub(super) fn default_pmt<AssetModelLike>(
-    user: &User,
-    asset_model_like: AssetModelLike,
+    asset_model_like: &AssetModelLike,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder>
 where

@@ -159,10 +159,8 @@ pub(crate) struct JsonRefreshToken {
 }
 
 impl JsonRefreshToken {
-    pub(crate) fn new(user_id: i32, temporary: bool) -> Result<JsonRefreshToken, BackendError> {
-        Ok(JsonRefreshToken {
-            web_token: JsonWebToken::new(user_id, temporary, REFRESH_TOKEN_MINUTES),
-        })
+    pub(crate) fn new(user_id: i32, temporary: bool) -> JsonRefreshToken {
+        JsonRefreshToken { web_token: JsonWebToken::new(user_id, temporary, REFRESH_TOKEN_MINUTES) }
     }
 
     /// Function to insert the token into the redis database.
@@ -219,10 +217,8 @@ pub(crate) struct JsonAccessToken {
 }
 
 impl JsonAccessToken {
-    pub fn new(user_id: i32, temporary: bool) -> Result<JsonAccessToken, BackendError> {
-        Ok(JsonAccessToken {
-            web_token: JsonWebToken::new(user_id, temporary, ACCESS_TOKEN_MINUTES),
-        })
+    pub fn new(user_id: i32, temporary: bool) -> JsonAccessToken {
+        JsonAccessToken { web_token: JsonWebToken::new(user_id, temporary, ACCESS_TOKEN_MINUTES) }
     }
 
     /// Function to insert the token into the redis database.
@@ -293,7 +289,7 @@ async fn encode_jwt_refresh_cookie<'a>(
     temporary: bool,
 ) -> Result<Cookie<'a>, BackendError> {
     log::info!("Creating refresh token");
-    let token = JsonRefreshToken::new(user_id, temporary)?;
+    let token = JsonRefreshToken::new(user_id, temporary);
 
     token.insert_into_redis(redis_client).await?;
 
@@ -311,8 +307,8 @@ async fn encode_jwt_refresh_cookie<'a>(
 }
 
 /// Function to create the user online cookie
-fn encode_user_online_cookie<'a>() -> Result<Cookie<'a>, BackendError> {
-    Ok(Cookie::build(USER_ONLINE_COOKIE_NAME, "true")
+fn encode_user_online_cookie<'a>() -> actix_web::cookie::Cookie<'a> {
+    Cookie::build(USER_ONLINE_COOKIE_NAME, "true")
         .same_site(actix_web::cookie::SameSite::Strict)
         .secure(true)
         .path("/")
@@ -320,7 +316,7 @@ fn encode_user_online_cookie<'a>() -> Result<Cookie<'a>, BackendError> {
         // We want to be able to check the existence of this cookie from the frontend
         // by using javascript (or in our case Yew) so we set http_only to false.
         .http_only(false)
-        .finish())
+        .finish()
 }
 
 /// Function to build the overall response for a successful login.
@@ -348,7 +344,7 @@ pub(crate) async fn build_login_response(
         encode_jwt_refresh_cookie(temporary_user.id, redis_client, key, true).await?
     };
 
-    let login_cookie = encode_user_online_cookie()?;
+    let login_cookie = encode_user_online_cookie();
 
     let response = HttpResponse::Found()
         .append_header((LOCATION, "/"))

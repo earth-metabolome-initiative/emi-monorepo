@@ -65,7 +65,7 @@ pub(crate) async fn refresh_access_token(
         .ok_or(BackendError::Unauthorized)?;
 
     // If the user exists, we create a new access token and return it.
-    let access_token = JsonAccessToken::new(refresh_token.user_id(), false)?;
+    let access_token = JsonAccessToken::new(refresh_token.user_id(), false);
 
     access_token.insert_into_redis(redis_client).await?;
 

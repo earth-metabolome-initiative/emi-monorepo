@@ -8,9 +8,7 @@ use core_structures::{
     AssetModel, ProcedureTemplate, ProcedureTemplateAssetModel,
     tables::most_concrete_variants::ProcedureTemplateDAG,
 };
-use diesel::{
-    BelongingToDsl, associations::BelongsTo, connection::LoadConnection, query_dsl::LoadQuery,
-};
+use diesel::{BelongingToDsl, associations::BelongsTo, query_dsl::LoadQuery};
 use graph::{
     prelude::{GenericBiGraph, GenericEdgesBuilder, MonopartiteGraph},
     traits::EdgesBuilder,
@@ -36,10 +34,7 @@ impl Hierarchy {
     ///
     /// * Returns a `diesel::result::Error` if there is an issue querying the
     ///   database.
-    pub(crate) fn ownership<C: LoadConnection>(
-        &self,
-        conn: &mut C,
-    ) -> Result<Ownership, diesel::result::Error>
+    pub(crate) fn ownership<C>(&self, conn: &mut C) -> Result<Ownership, diesel::result::Error>
     where
         ProcedureTemplateAssetModel: Read<C>,
         C: diesel::connection::LoadConnection,

@@ -19,6 +19,7 @@ use sorted_vec::prelude::SortedVec;
 use web_common_traits::{database::Read, prelude::Builder};
 
 #[derive(Debug, Clone)]
+#[allow(clippy::type_complexity)]
 /// Bipartite graph representing procedure templates and their asset models.
 pub struct Ownership {
     /// Bipartite graph.
@@ -37,13 +38,14 @@ pub struct Ownership {
     derivatives: GenericGraph<
         Rc<SortedVec<ProcedureTemplateAssetModel>>,
         GenericBiMatrix2D<
-            SquareCSR2D<CSR2D<u16, usize, usize>>,
-            SquareCSR2D<CSR2D<u16, usize, usize>>,
+            SquareCSR2D<CSR2D<usize, usize, usize>>,
+            SquareCSR2D<CSR2D<usize, usize, usize>>,
         >,
     >,
 }
 
 impl Ownership {
+    #[allow(clippy::type_complexity)]
     pub(super) fn new<C: LoadConnection>(
         graph: GenericBiGraph<
             Rc<SortedVec<Rc<ProcedureTemplate>>>,
@@ -76,8 +78,8 @@ impl Ownership {
             .collect::<Result<Vec<AssetModel>, diesel::result::Error>>()?;
 
         let number_of_nodes = ptams.len();
-        let directed: SquareCSR2D<CSR2D<u16, usize, usize>> = GenericEdgesBuilder::default()
-            .expected_number_of_edges(edges.len() as u16)
+        let directed: SquareCSR2D<CSR2D<usize, usize, usize>> = GenericEdgesBuilder::default()
+            .expected_number_of_edges(edges.len())
             .expected_shape(number_of_nodes)
             .edges(edges)
             .build()

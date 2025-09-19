@@ -29,10 +29,8 @@ where
         match self.visitor.next()? {
             Ok(output) => {
                 match output {
-                    super::listener::GPBListenerOutput::NoOp => self.next(),
-                    super::listener::GPBListenerOutput::Builder((parents, template, builder)) => {
-                        Some(Ok((parents, template, builder)))
-                    }
+                    None => self.next(),
+                    Some(res) => Some(Ok(res)),
                 }
             }
             Err(e) => Some(Err(e)),
@@ -73,6 +71,22 @@ impl<'graph> GuidedProcedure<'graph, diesel::PgConnection> {
     /// Attempts to retrieve the next builder of the expected type from the
     /// iterator. If the next builder is not of the expected type, an error is
     /// returned. If there are no more builders, an error is also returned.
+    ///
+    /// # Arguments
+    ///
+    /// * `map` - A closure that takes the expected builder and a mutable
+    ///   reference to the database connection, and returns a modified builder
+    ///   or an error.
+    ///
+    /// # Errors
+    ///
+    /// * Returns `GuidedProcedureError::UnexpectedBuilder` if the next builder
+    ///   is not of the expected type.
+    /// * Returns `GuidedProcedureError::NoMoreBuilders` if there are no more
+    ///   builders in the iterator.
+    /// * Returns `GuidedProcedureError::ProcedureInsertErrorDAG` if the
+    ///   insertion of the builder into the database fails.
+    /// * Returns any error returned by the `map` closure.
     pub fn and_then<ExpectedProcedure, E>(
         mut self,
         map: impl FnOnce(
@@ -103,6 +117,11 @@ impl<'graph> GuidedProcedure<'graph, diesel::PgConnection> {
 
     /// Finalizes the guided procedure by ensuring all builders have been
     /// processed and inserted into the database.
+    ///
+    /// # Errors
+    ///
+    /// * Returns `GuidedProcedureError::UnprocessedBuilder` if there are any
+    ///   remaining builders that have not been processed.
     pub fn finish(mut self) -> Result<(), GuidedProcedureError> {
         if let Some(result) = self.next() {
             let (_parents, template, builder_dag) = result?;

@@ -34,6 +34,7 @@ use crate::{
     procedure_templates::sample_extraction_solvent_procedure,
 };
 
+#[allow(clippy::too_many_lines)]
 pub(super) fn init_dbgi_sample_processing_procedures(
     user: &core_structures::User,
     cct: &ProcedureTemplateAssetModel,

@@ -23,5 +23,5 @@ pub(crate) fn safelock_ball_mill_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, ball_mill_machine(user, conn)?, conn)
+    default_pmt(&ball_mill_machine(user, conn)?, conn)
 }

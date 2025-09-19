@@ -23,5 +23,5 @@ pub(crate) fn freeze_dryer_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, freeze_dryer(user, conn)?, conn)
+    default_pmt(&freeze_dryer(user, conn)?, conn)
 }

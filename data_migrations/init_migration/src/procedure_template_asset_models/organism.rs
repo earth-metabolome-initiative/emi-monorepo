@@ -23,7 +23,7 @@ pub(crate) fn organism_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, organism_model(user, conn)?, conn)
+    default_pmt(&organism_model(user, conn)?, conn)
 }
 
 /// Returns a partial builder for a sample trackable.
@@ -40,5 +40,5 @@ pub(crate) fn sample_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(user, organism_sample_model(user, conn)?, conn)
+    default_pmt(&organism_sample_model(user, conn)?, conn)
 }

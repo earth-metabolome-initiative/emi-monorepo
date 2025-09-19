@@ -97,17 +97,13 @@ impl<'listener, C> GPBListener<'listener, C> {
     }
 }
 
-pub enum GPBListenerOutput<'graph> {
-    NoOp,
-    Builder((Vec<&'graph ProcedureTemplate>, &'graph ProcedureTemplate, ProcedureBuilderDAG)),
-}
-
 impl<'graph, C> PTGListener<'graph> for GPBListener<'graph, C>
 where
     ProcedureTemplate: MostConcreteVariant<C>,
     ProcedureBuilderDAG: DispatchableInsertableVariant<C>,
 {
-    type Output = GPBListenerOutput<'graph>;
+    type Output =
+        Option<(Vec<&'graph ProcedureTemplate>, &'graph ProcedureTemplate, ProcedureBuilderDAG)>;
     type FilteredSuccessors<I>
         = Option<&'graph core_structures::ProcedureTemplate>
     where
@@ -118,7 +114,7 @@ where
         &mut self,
         _foreign_procedure_template: &core_structures::ProcedureTemplate,
     ) -> Result<Self::Output, Self::Error> {
-        Ok(GPBListenerOutput::NoOp)
+        Ok(None)
     }
 
     fn continue_task(
@@ -152,9 +148,9 @@ where
 
         Ok(if procedure_builder.is_complete() {
             self.insert(parents, procedure_builder)?;
-            GPBListenerOutput::NoOp
+            None
         } else {
-            GPBListenerOutput::Builder((parents.to_vec(), child, procedure_builder))
+            Some((parents.to_vec(), child, procedure_builder))
         })
     }
 
@@ -164,7 +160,7 @@ where
         _child: &core_structures::ProcedureTemplate,
     ) -> Result<Self::Output, Self::Error> {
         self.predecessor_procedure = self.parent_procedures.pop();
-        Ok(GPBListenerOutput::NoOp)
+        Ok(None)
     }
 
     fn enter_leaf_ptam(
@@ -173,7 +169,7 @@ where
         _leaf: &core_structures::ProcedureTemplate,
         _procedure_template_asset_model: &core_structures::ProcedureTemplateAssetModel,
     ) -> Result<Self::Output, Self::Error> {
-        Ok(GPBListenerOutput::NoOp)
+        Ok(None)
     }
 
     fn filter_successors<I>(
