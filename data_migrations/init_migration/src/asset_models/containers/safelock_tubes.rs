@@ -30,7 +30,17 @@ pub(crate) fn safelock_tubes_2ml(
 use crate::brands::eppendorf;
 
 /// Returns and possibly creates an Eppendorf Safe-Lock Tube 2ml product.
-pub(crate) fn init_eppendorf_safelock_tube(
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the Eppendorf Safe-Lock Tube is being created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+/// * If the Eppendorf Safe-Lock Tube cannot be created.
+pub fn eppendorf_safelock_tube(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<CommercialProduct> {

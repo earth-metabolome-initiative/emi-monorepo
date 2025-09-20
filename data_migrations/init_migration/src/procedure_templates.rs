@@ -2,7 +2,8 @@
 
 mod dbgi_plan;
 mod vinesh_plan;
-pub use dbgi_plan::init_dbgi_plan;
+pub use dbgi_plan::dbgi_plan;
+pub use vinesh_plan::vinesh_plan;
 mod analysis_procedures;
 mod collection_preparation_procedures;
 mod data_enrichment_procedures;

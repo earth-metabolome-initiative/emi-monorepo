@@ -73,7 +73,17 @@ pub(crate) fn sealed_cap_vial_1_5ml(
 }
 
 /// Returns and possibly creates a Splitted cap
-pub(crate) fn init_macherey_nagel_splitted_cap(
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the splitted cap is being created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+/// * If the splitted cap cannot be created.
+pub fn macherey_nagel_splitted_cap(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<CommercialCapModel> {
@@ -94,7 +104,17 @@ pub(crate) fn init_macherey_nagel_splitted_cap(
 }
 
 /// Returns and possibly creates a sealed cap
-pub(crate) fn init_advion_interchim_sealed_cap(
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the sealed cap is being created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+/// * If the sealed cap cannot be created.
+pub fn init_advion_interchim_sealed_cap(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<CommercialCapModel> {

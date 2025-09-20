@@ -4,9 +4,6 @@ use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTem
 use diesel::OptionalExtension;
 use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
-/// The name of the DBGI Collection preparation procedure template.
-pub const E70_ETHANOL: &str = "Ethanol 70 percent";
-
 /// Initializes the DBGI Collection preparation procedure template in the
 /// database.
 ///
@@ -19,10 +16,12 @@ pub const E70_ETHANOL: &str = "Ethanol 70 percent";
 ///
 /// * If the connection fails to insert the procedure template.
 /// * If the procedure template building fails.
-pub(crate) fn init_ethanol_70_percent(
+pub(crate) fn ethanol_70_percent(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureTemplate> {
+    const E70_ETHANOL: &str = "Ethanol 70 percent";
+
     if let Some(procedure) = ProcedureTemplate::from_name(E70_ETHANOL, conn).optional()? {
         return Ok(procedure);
     }

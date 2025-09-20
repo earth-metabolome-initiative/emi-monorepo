@@ -23,7 +23,7 @@ use crate::brands::gilson;
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn pipette_200ul(user: &User, conn: &mut PgConnection) -> anyhow::Result<PipetteModel> {
+pub fn pipette_200ul(user: &User, conn: &mut PgConnection) -> anyhow::Result<PipetteModel> {
     let name = "Pipette 200μl";
 
     if let Some(existing) = PipetteModel::from_name(name, conn).optional()? {
@@ -54,7 +54,7 @@ pub(crate) fn pipette_200ul(user: &User, conn: &mut PgConnection) -> anyhow::Res
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn pipette_1000ul(user: &User, conn: &mut PgConnection) -> anyhow::Result<PipetteModel> {
+pub fn pipette_1000ul(user: &User, conn: &mut PgConnection) -> anyhow::Result<PipetteModel> {
     let name = "Pipette 1000µl";
 
     if let Some(existing) = PipetteModel::from_name(name, conn).optional()? {
@@ -72,7 +72,17 @@ pub(crate) fn pipette_1000ul(user: &User, conn: &mut PgConnection) -> anyhow::Re
 
 /// Returns and possibly initializes the Gilson pipettes 200
 /// trackable in the database.
-pub(crate) fn init_gilson_pipette_200(
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the Gilson pipette is being created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+/// * If the Gilson pipette cannot be created.
+pub fn init_gilson_pipette_200(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<CommercialProduct> {
@@ -95,7 +105,17 @@ pub(crate) fn init_gilson_pipette_200(
 
 /// Returns and possibly initializes the Gilson pipette 1000 instrument
 /// trackable in the database.
-pub(crate) fn init_gilson_pipette_1000(
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the Gilson pipette is being created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+/// * If the Gilson pipette cannot be created.
+pub fn init_gilson_pipette_1000(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<CommercialProduct> {

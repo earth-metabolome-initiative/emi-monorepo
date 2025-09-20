@@ -34,7 +34,7 @@ pub const DBGI_PLAN: &str = "DBGI Plan";
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub fn init_dbgi_plan(
+pub fn dbgi_plan(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureTemplate> {

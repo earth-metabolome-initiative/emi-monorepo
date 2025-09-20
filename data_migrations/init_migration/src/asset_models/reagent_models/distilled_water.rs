@@ -22,10 +22,7 @@ use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn distilled_water(
-    user: &User,
-    conn: &mut PgConnection,
-) -> anyhow::Result<ReagentModel> {
+pub fn distilled_water(user: &User, conn: &mut PgConnection) -> anyhow::Result<ReagentModel> {
     let name = "Distilled water";
 
     if let Some(existing) = ReagentModel::from_name(name, conn).optional()? {

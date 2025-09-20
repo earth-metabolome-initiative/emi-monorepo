@@ -3,7 +3,7 @@
 use diesel::{Connection, PgConnection};
 
 pub mod asset_models;
-mod brands;
+pub mod brands;
 mod login_providers;
 mod procedure_template_asset_models;
 mod procedure_templates;
@@ -12,7 +12,7 @@ mod users;
 use asset_models::init_compatibility_rules;
 pub(crate) use brands::{fisherbrand, greiner_bio_one};
 use login_providers::init_login_providers;
-pub use procedure_templates::init_dbgi_plan;
+pub use procedure_templates::{dbgi_plan, vinesh_plan};
 pub use users::init_root_user;
 
 /// Executes the init migration.

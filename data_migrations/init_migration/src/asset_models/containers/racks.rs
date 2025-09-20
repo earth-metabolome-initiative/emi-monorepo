@@ -78,7 +78,18 @@ pub(crate) fn conical_centrifugal_tube_50ml_rack(
 
 /// Returns and possibly creates a Fisherbrand Delrin Conical Centrifugal Tube
 /// Rack 50ml product.
-pub(crate) fn init_fisherbrand_cct_rack(
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the Fisherbrand Conical Centrifugal Tube Rack
+///   is being created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+/// * If the Fisherbrand Conical Centrifugal Tube Rack cannot be created.
+pub fn fisherbrand_cct_rack(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<CommercialProduct> {

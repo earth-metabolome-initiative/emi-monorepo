@@ -1,10 +1,7 @@
 //! Submodule defining the Vinesh plan procedure template.
 use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateSettable};
+use diesel::OptionalExtension;
 use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
-
-/// The name of the Vinesh plan procedure template.
-pub const VINESH_PLAN: &str = "Vinesh Plan";
-
 /// Initializes the Vinesh plan procedure template in the database.
 ///
 /// # Arguments
@@ -16,10 +13,20 @@ pub const VINESH_PLAN: &str = "Vinesh Plan";
 ///
 /// * If the connection fails to insert the procedure template.
 /// * If the procedure template building fails.
-pub fn init_vinesh_plan(
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+pub fn vinesh_plan(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureTemplate> {
+    const VINESH_PLAN: &str = "Vinesh Plan";
+
+    if let Some(procedure) = ProcedureTemplate::from_name(VINESH_PLAN, conn).optional()? {
+        return Ok(procedure);
+    }
+
     let vinesh_plan = ProcedureTemplate::new()
         .name(VINESH_PLAN)?
         .description("Vinesh Plan procedure template")?

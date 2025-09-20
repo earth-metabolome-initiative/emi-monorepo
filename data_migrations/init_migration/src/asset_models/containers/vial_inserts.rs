@@ -45,7 +45,17 @@ pub(crate) fn vial_insert_200ul(
 }
 
 /// Returns and possibly creates a vial insert
-pub(crate) fn init_vici_schweiz_insert(
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the vial insert is being created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+/// * If the vial insert cannot be created.
+pub fn vici_schweiz_insert(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<CommercialProduct> {

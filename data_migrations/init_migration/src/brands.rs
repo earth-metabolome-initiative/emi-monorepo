@@ -15,7 +15,7 @@ use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn fisher_scientific(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
+pub fn fisher_scientific(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
     if let Some(brand) = Brand::from_name("Fisher Scientific", conn).optional()? {
         return Ok(brand);
     }
@@ -33,7 +33,7 @@ pub(crate) fn fisher_scientific(user: &User, conn: &mut PgConnection) -> anyhow:
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn acros_organics(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
+pub fn acros_organics(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
     let brand_name = "Acros Organics";
     if let Some(brand) = Brand::from_name(brand_name, conn).optional()? {
         return Ok(brand);
@@ -52,7 +52,7 @@ pub(crate) fn acros_organics(user: &User, conn: &mut PgConnection) -> anyhow::Re
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn greiner_bio_one(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
+pub fn greiner_bio_one(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
     let brand_name = "greiner BIO-ONE";
     if let Some(brand) = Brand::from_name(brand_name, conn).optional()? {
         return Ok(brand);
@@ -72,7 +72,7 @@ pub(crate) fn greiner_bio_one(user: &User, conn: &mut PgConnection) -> anyhow::R
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn macherey_nagel(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
+pub fn macherey_nagel(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
     let brand_name = "MACHINERY-NAGEL GmbH & Co. KG";
     if let Some(brand) = Brand::from_name(brand_name, conn).optional()? {
         return Ok(brand);
@@ -92,7 +92,7 @@ pub(crate) fn macherey_nagel(user: &User, conn: &mut PgConnection) -> anyhow::Re
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn vici_schweiz(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
+pub fn vici_schweiz(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
     let brand_name = "VICI Schweiz AG";
     if let Some(brand) = Brand::from_name(brand_name, conn).optional()? {
         return Ok(brand);
@@ -112,7 +112,7 @@ pub(crate) fn vici_schweiz(user: &User, conn: &mut PgConnection) -> anyhow::Resu
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn advion_interchim(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
+pub fn advion_interchim(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
     let brand_name = "Advion Interchim scientific";
     if let Some(brand) = Brand::from_name(brand_name, conn).optional()? {
         return Ok(brand);
@@ -132,7 +132,7 @@ pub(crate) fn advion_interchim(user: &User, conn: &mut PgConnection) -> anyhow::
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn eppendorf(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
+pub fn eppendorf(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
     let brand_name = "eppendorf";
     if let Some(brand) = Brand::from_name(brand_name, conn).optional()? {
         return Ok(brand);
@@ -152,7 +152,7 @@ pub(crate) fn eppendorf(user: &User, conn: &mut PgConnection) -> anyhow::Result<
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn gilson(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
+pub fn gilson(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
     let brand_name = "gilson";
     if let Some(brand) = Brand::from_name(brand_name, conn).optional()? {
         return Ok(brand);
@@ -172,7 +172,7 @@ pub(crate) fn gilson(user: &User, conn: &mut PgConnection) -> anyhow::Result<Bra
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn sarstedt(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
+pub fn sarstedt(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
     let brand_name = "SARSTEDT AG & Co. KG";
     if let Some(brand) = Brand::from_name(brand_name, conn).optional()? {
         return Ok(brand);
@@ -192,7 +192,7 @@ pub(crate) fn sarstedt(user: &User, conn: &mut PgConnection) -> anyhow::Result<B
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn axygen(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
+pub fn axygen(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
     let brand_name = "AXYGEN";
     if let Some(brand) = Brand::from_name(brand_name, conn).optional()? {
         return Ok(brand);
@@ -212,7 +212,7 @@ pub(crate) fn axygen(user: &User, conn: &mut PgConnection) -> anyhow::Result<Bra
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn retsch(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
+pub fn retsch(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
     let brand_name = "Retsch MILLING & SIEVING";
     if let Some(brand) = Brand::from_name(brand_name, conn).optional()? {
         return Ok(brand);
@@ -232,7 +232,7 @@ pub(crate) fn retsch(user: &User, conn: &mut PgConnection) -> anyhow::Result<Bra
 ///
 /// * If the connection to the database fails.
 /// * If the brand cannot be created.
-pub(crate) fn fisherbrand(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
+pub fn fisherbrand(user: &User, conn: &mut PgConnection) -> anyhow::Result<Brand> {
     let brand_name = "Fisherbrand";
     if let Some(brand) = Brand::from_name(brand_name, conn).optional()? {
         return Ok(brand);

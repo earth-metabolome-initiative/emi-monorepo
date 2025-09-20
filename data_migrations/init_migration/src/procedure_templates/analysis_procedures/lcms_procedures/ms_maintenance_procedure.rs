@@ -4,7 +4,7 @@ use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTem
 use diesel::OptionalExtension;
 use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
-pub(crate) fn init_ms_maintenance_procedure(
+pub(crate) fn ms_maintenance_procedure(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureTemplate> {

@@ -45,7 +45,17 @@ pub(crate) fn vial_1_5ml(
 }
 
 /// Returns and possibly creates a Machinery Nagel Vial 1.5ml product.
-pub(crate) fn init_macherey_nagel_vial(
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the Macherey Nagel Vial is being created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+/// * If the Macherey Nagel Vial cannot be created.
+pub fn macherey_nagel_vial(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<CommercialProduct> {

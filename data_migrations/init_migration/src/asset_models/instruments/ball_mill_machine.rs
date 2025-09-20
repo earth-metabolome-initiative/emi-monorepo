@@ -44,10 +44,17 @@ pub(crate) fn ball_mill_machine(
 
 /// Returns and possibly initializes the Retsch MM 400 Ball Mill instrument
 /// trackable in the database.
-pub(crate) fn init_retsch_mm400(
-    user: &User,
-    conn: &mut PgConnection,
-) -> anyhow::Result<CommercialProduct> {
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the Retsch MM 400 Ball Mill is being created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+/// * If the Retsch MM 400 Ball Mill cannot be created.
+pub fn retsch_mm400(user: &User, conn: &mut PgConnection) -> anyhow::Result<CommercialProduct> {
     let device_name = "Retsch MM 400 Ball Mill";
     if let Some(instrument) = CommercialProduct::from_name(device_name, conn).optional()? {
         return Ok(instrument);

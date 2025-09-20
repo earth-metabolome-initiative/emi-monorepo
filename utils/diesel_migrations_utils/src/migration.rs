@@ -162,7 +162,7 @@ impl<'a> TryFrom<&'a Path> for Migration {
             ));
         }
 
-        Ok(Migration { name: name.to_string(), number, number_of_digits })
+        Ok(Migration { name, number, number_of_digits })
     }
 }
 

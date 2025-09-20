@@ -20,7 +20,7 @@ use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn methanol_hplc(user: &User, conn: &mut PgConnection) -> anyhow::Result<ReagentModel> {
+pub fn methanol_hplc(user: &User, conn: &mut PgConnection) -> anyhow::Result<ReagentModel> {
     let name = "Methanol, >= 99.8%, HPLC grade";
 
     if let Some(existing) = ReagentModel::from_name(name, conn).optional()? {

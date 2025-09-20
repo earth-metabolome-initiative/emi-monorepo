@@ -79,7 +79,12 @@ pub(crate) fn vial_rack_1_5ml(
 ///
 /// * `user` - The user for whom the product is being created.
 /// * `conn` - The database connection.
-pub(crate) fn init_fisherbrand_kryobox_vial_rack(
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+/// * If the product cannot be created.
+pub fn fisherbrand_kryobox_vial_rack(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<CommercialProduct> {

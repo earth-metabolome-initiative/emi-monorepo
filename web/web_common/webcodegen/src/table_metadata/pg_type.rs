@@ -352,13 +352,11 @@ pub fn postgres_type_to_diesel(
     postgres_type: &str,
     nullable: bool,
 ) -> Result<Type, WebCodeGenError> {
-    let rust_type_str = postgres_type_to_diesel_str(postgres_type)?;
+    let mut rust_type_str = postgres_type_to_diesel_str(postgres_type)?;
 
-    let rust_type_str = if nullable {
-        format!("diesel::sql_types::Nullable<{rust_type_str}>")
-    } else {
-        rust_type_str.to_string()
-    };
+    if nullable {
+        rust_type_str = format!("diesel::sql_types::Nullable<{rust_type_str}>");
+    }
 
     Ok(parse_str::<Type>(&rust_type_str)?)
 }

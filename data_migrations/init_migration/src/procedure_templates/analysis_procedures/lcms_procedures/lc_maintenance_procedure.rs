@@ -3,12 +3,12 @@
 use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateSettable};
 use diesel::OptionalExtension;
 use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
-const LC_MAINTENANCE: &str = "LC Maintenance";
 
-pub(crate) fn init_lc_maintenance_procedure(
+pub(crate) fn lc_maintenance_procedure(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureTemplate> {
+    const LC_MAINTENANCE: &str = "LC Maintenance";
     if let Some(procedure) = ProcedureTemplate::from_name(LC_MAINTENANCE, conn).optional()? {
         return Ok(procedure);
     }

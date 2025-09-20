@@ -64,8 +64,8 @@ pub fn directus_migration(
     directus_conn: &mut PgConnection,
     portal_conn: &mut PgConnection,
 ) -> anyhow::Result<()> {
-    let procedure_template = init_migration::init_dbgi_plan(user, portal_conn)
-        .expect("Failed to initialize the DBGI plan");
+    let procedure_template =
+        init_migration::dbgi_plan(user, portal_conn).expect("Failed to initialize the DBGI plan");
     let procedure_graph = ProcedureTemplateGraph::new(&procedure_template, portal_conn)?;
 
     let photograph_model = photograph_model(user, portal_conn)?;

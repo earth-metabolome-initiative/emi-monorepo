@@ -20,7 +20,7 @@ use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn formic_acid(user: &User, conn: &mut PgConnection) -> anyhow::Result<ReagentModel> {
+pub fn formic_acid(user: &User, conn: &mut PgConnection) -> anyhow::Result<ReagentModel> {
     let name = "Formic acid";
 
     if let Some(existing) = ReagentModel::from_name(name, conn).optional()? {

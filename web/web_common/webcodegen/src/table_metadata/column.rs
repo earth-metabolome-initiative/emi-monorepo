@@ -712,8 +712,7 @@ impl Column {
             other => format!("&{other}"),
         };
 
-        let rust_type =
-            if self.is_nullable() { format!("Option<{rust_type}>") } else { rust_type.to_string() };
+        let rust_type = if self.is_nullable() { format!("Option<{rust_type}>") } else { rust_type };
 
         Ok(syn::parse_str(&rust_type)?)
     }

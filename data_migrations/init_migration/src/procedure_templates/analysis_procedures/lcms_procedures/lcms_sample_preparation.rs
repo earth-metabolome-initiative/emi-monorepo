@@ -4,12 +4,12 @@ use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTem
 use diesel::OptionalExtension;
 use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
-const NEGATIVE_IONIZATION_LCMS: &str = "Negative Ionization LC-MS";
-
-pub(crate) fn init_lcms_sample_procedure(
+pub(crate) fn lcms_sample_procedure(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureTemplate> {
+    const NEGATIVE_IONIZATION_LCMS: &str = "Negative Ionization LC-MS";
+
     if let Some(procedure) =
         ProcedureTemplate::from_name(NEGATIVE_IONIZATION_LCMS, conn).optional()?
     {

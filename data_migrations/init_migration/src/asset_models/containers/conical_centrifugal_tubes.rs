@@ -46,10 +46,18 @@ pub(crate) fn conical_centrifugal_tube_50ml(
 
 /// Returns and possibly creates a Greiner Conical Centrifugal Tube 50ml
 /// product.
-pub(crate) fn init_greiner_cct(
-    user: &User,
-    conn: &mut PgConnection,
-) -> anyhow::Result<CommercialProduct> {
+///
+/// # Arguments
+///
+/// * `user` - The user for whom the Greiner Conical Centrifugal Tube is being
+///   created.
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the connection to the database fails.
+/// * If the Greiner Conical Centrifugal Tube cannot be created.
+pub fn greiner_cct(user: &User, conn: &mut PgConnection) -> anyhow::Result<CommercialProduct> {
     let conical_tube = "Greiner Conical Centrifugal Tube 50ml";
     if let Some(conical_tube) = CommercialProduct::from_name(conical_tube, conn).optional()? {
         return Ok(conical_tube);

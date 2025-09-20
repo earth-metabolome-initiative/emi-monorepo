@@ -3,7 +3,7 @@
 
 use core_structures_vis::MermaidDB;
 use init_db::init_database;
-use init_migration::{init_dbgi_plan, init_migration, init_root_user};
+use init_migration::{dbgi_plan, init_migration, init_root_user};
 use reference_docker::reference_docker_with_connection;
 use time_requirements::prelude::{Task, TimeTracker};
 
@@ -42,7 +42,7 @@ async fn test_init_migration() {
 
     let user = init_root_user(&mut conn).expect("Failed to initialize the root user");
     let procedure_template =
-        init_dbgi_plan(&user, &mut conn).expect("Failed to initialize the DBGI plan");
+        dbgi_plan(&user, &mut conn).expect("Failed to initialize the DBGI plan");
 
     let flowchart = procedure_template
         .to_mermaid(&mut conn)
