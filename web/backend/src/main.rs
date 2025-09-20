@@ -29,7 +29,9 @@ async fn frontend_static_files(req: HttpRequest) -> impl Responder {
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> std::io::Result<()> {
-    env_logger::init();
+    env_logger::Builder::from_default_env()
+        .filter(Some("sqlparser"), log::LevelFilter::Warn) // only warnings and above
+        .init();
     let database_url =
         std::env::var("DOCKER_DATABASE_URL").expect("DOCKER_DATABASE_URL must be set");
 
