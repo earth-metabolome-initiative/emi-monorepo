@@ -57,13 +57,21 @@ $sidebar-hover-color: #f76a00;
             }
         }
     }
+
+    // When we are not dealing with small screens, the sidebar is always visible
+    transform: none;
+    // And therefore, the show class has no effect
+    // &.show {}
 }
 
 // Media query for smaller screens
 @media screen and (max-width: $small-screen-width) {
     .sidebar {
-        &.hidden {
-            transform: translateX(-$sidebar-width);
+        // Conversely, on small screens, the sidebar is hidden by default
+        transform: translateX(-$sidebar-width);
+        // And can be shown by adding the "show" class
+        &.show {
+            transform: translateX(0);
         }
 
         .sidebar-content {
