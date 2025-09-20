@@ -64,6 +64,39 @@ impl<T1, T2> common_traits::builder::Attributed
 {
     type Attribute = CommercialBeadModelAttribute;
 }
+impl web_common_traits::database::TableField for CommercialBeadModelAttribute {}
+impl web_common_traits::database::HasTableType for CommercialBeadModelAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
+    > for CommercialBeadModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
+    ) -> Self {
+        CommercialBeadModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    > for CommercialBeadModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    ) -> Self {
+        CommercialBeadModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for CommercialBeadModelAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        CommercialBeadModelAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for CommercialBeadModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -646,28 +679,22 @@ impl<BeadModel, CommercialProduct, C> web_common_traits::database::TryInsertGene
 for InsertableCommercialBeadModelBuilder<BeadModel, CommercialProduct>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel,
-        Error = web_common_traits::database::InsertError<CommercialBeadModelAttribute>,
-    >,
-    BeadModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    CommercialProduct: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel,
+            Error = web_common_traits::database::InsertError<
+                CommercialBeadModelAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<CommercialBeadModelAttribute>;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<CommercialBeadModelAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::commercial_bead_models::CommercialBeadModel = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

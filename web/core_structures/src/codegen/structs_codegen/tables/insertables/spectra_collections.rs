@@ -45,6 +45,28 @@ impl<T1> common_traits::builder::Attributed
 {
     type Attribute = SpectraCollectionAttribute;
 }
+impl web_common_traits::database::TableField for SpectraCollectionAttribute {}
+impl web_common_traits::database::HasTableType for SpectraCollectionAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
+    > for SpectraCollectionAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::DigitalAssetAttribute,
+    ) -> Self {
+        SpectraCollectionAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for SpectraCollectionAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        SpectraCollectionAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for SpectraCollectionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -408,22 +430,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection,
             Error = web_common_traits::database::InsertError<SpectraCollectionAttribute>,
-        >,
-    DigitalAsset:
-        web_common_traits::database::TryInsertGeneric<C, PrimaryKey = ::rosetta_uuid::Uuid>,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<SpectraCollectionAttribute>,
-    > {
+    type Error = web_common_traits::database::InsertError<SpectraCollectionAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::spectra_collections::SpectraCollection = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

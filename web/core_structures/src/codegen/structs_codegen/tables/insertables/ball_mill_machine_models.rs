@@ -49,6 +49,28 @@ impl<T1> common_traits::builder::Attributed
 {
     type Attribute = BallMillMachineModelAttribute;
 }
+impl web_common_traits::database::TableField for BallMillMachineModelAttribute {}
+impl web_common_traits::database::HasTableType for BallMillMachineModelAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    > for BallMillMachineModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    ) -> Self {
+        BallMillMachineModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for BallMillMachineModelAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        BallMillMachineModelAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for BallMillMachineModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -384,27 +406,22 @@ impl<PhysicalAssetModel, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableBallMillMachineModelBuilder<PhysicalAssetModel>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
-        Error = web_common_traits::database::InsertError<BallMillMachineModelAttribute>,
-    >,
-    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
+            Error = web_common_traits::database::InsertError<
+                BallMillMachineModelAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<BallMillMachineModelAttribute>;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<BallMillMachineModelAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

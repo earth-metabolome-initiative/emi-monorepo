@@ -58,6 +58,39 @@ impl<T1, T2> common_traits::builder::Attributed
 {
     type Attribute = PhoneModelAttribute;
 }
+impl web_common_traits::database::TableField for PhoneModelAttribute {}
+impl web_common_traits::database::HasTableType for PhoneModelAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
+    > for PhoneModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::CameraModelAttribute,
+    ) -> Self {
+        PhoneModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute,
+    > for PhoneModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute,
+    ) -> Self {
+        PhoneModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for PhoneModelAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        PhoneModelAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for PhoneModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -434,20 +467,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::phone_models::PhoneModel,
             Error = web_common_traits::database::InsertError<PhoneModelAttribute>,
-        >,
-    CameraModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    PositioningDeviceModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<PhoneModelAttribute>>
-    {
+    type Error = web_common_traits::database::InsertError<PhoneModelAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::phone_models::PhoneModel =
-            self.insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

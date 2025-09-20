@@ -40,14 +40,6 @@ where
             crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
         >,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable<
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
-        >,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-        C,
-    >,
 {
     fn insert(self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;

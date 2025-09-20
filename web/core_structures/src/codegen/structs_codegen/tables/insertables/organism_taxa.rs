@@ -27,6 +27,10 @@ impl common_traits::builder::Attributed
 {
     type Attribute = OrganismTaxonAttribute;
 }
+impl web_common_traits::database::TableField for OrganismTaxonAttribute {}
+impl web_common_traits::database::HasTableType for OrganismTaxonAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
 impl core::fmt::Display for OrganismTaxonAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -312,18 +316,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon,
             Error = web_common_traits::database::InsertError<OrganismTaxonAttribute>,
-        >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = (::rosetta_uuid::Uuid, i32)>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<OrganismTaxonAttribute>>
-    {
+    type Error = web_common_traits::database::InsertError<OrganismTaxonAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::organism_taxa::OrganismTaxon =
-            self.insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

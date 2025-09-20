@@ -46,16 +46,8 @@ impl Table {
     ) -> Result<(TokenStream, Vec<TokenStream>), WebCodeGenError> {
         let insertable_enum = self.insertable_enum_ty()?;
         let mut maybe_mut_self = false;
-        let attributes_enum = self.insertable_enum_ty()?;
-        let extension_tables = self.extension_tables(conn)?;
         let mut additional_use_imports = Vec::new();
-        let right_generics = extension_tables
-            .iter()
-            .map(|extension_table| {
-                let generic_ident = extension_table.struct_ident()?;
-                Ok(quote! {#generic_ident})
-            })
-            .collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
+        let right_generics = self.generics(conn)?;
         let primary_key_type = self.primary_key_type(conn)?;
         let mut additional_where_requirements = vec![];
         let mut try_insert_generic_constraint: HashSet<Arc<Table>> = HashSet::new();
@@ -64,6 +56,10 @@ impl Table {
         let generics_recursive_operation = if right_generics.is_empty() {
             None
         } else {
+            additional_use_imports.push(quote! {
+                use web_common_traits::database::FromExtension;
+            });
+
             let extension_foreign_keys = self.extension_foreign_keys(conn)?;
 
             let primary_keys = self.primary_key_columns(conn)?;
@@ -100,9 +96,7 @@ impl Table {
                     quote! {
                         self.#extension_foreign_key_ident
                             .mint_primary_key(user_id, conn)
-                            .map_err(|err| {
-                                err.into_field_name(|attribute| {#attributes_enum::Extension(From::from(attribute))})
-                            })?
+                            .map_err(Self::Error::from_extension)?
                     }
                 }
                 _ => {
@@ -140,9 +134,7 @@ impl Table {
                                     let _ = self.#other_extension_foreign_key_ident
                                         .set_primary_key(#primary_key_ident)
                                         .mint_primary_key(user_id, conn)
-                                        .map_err(|err| {
-                                            err.into_field_name(|attribute| {#attributes_enum::Extension(From::from(attribute))})
-                                        })?;
+                                        .map_err(Self::Error::from_extension)?;
                                 })
                             }).collect::<Result<Vec<TokenStream>, WebCodeGenError>>()?;
 
@@ -168,9 +160,7 @@ impl Table {
                                     // and in the case of a parent builder, it inserts it into the database and returns
                                     // the primary key.
                                     let #primary_key_ident = self.#extension_foreign_key_ident.mint_primary_key(user_id, conn)
-                                        .map_err(|err| {
-                                            err.into_field_name(|attribute| {#attributes_enum::Extension(From::from(attribute))})
-                                        })?;
+                                        .map_err(Self::Error::from_extension)?;
                                     #(#other_foreign_keys_handling)*
 
                                     // Finally, we return the primary key.
@@ -327,14 +317,9 @@ impl Table {
             }
 
             if !try_insert_generic_constraint.contains(&partial_builder_table) {
-                let foreign_attributes = partial_builder_table.insertable_enum_ty()?;
-                let partial_builder_table_primary_key_type =
-                    partial_builder_table.primary_key_type(conn)?;
                 additional_where_requirements.push(quote! {
-                    #foreign_builder: web_common_traits::database::TryInsertGeneric<
+                    #foreign_builder: web_common_traits::database::DispatchableInsertableVariant<
                         C,
-                        Attribute = #foreign_attributes,
-                        PrimaryKey = #partial_builder_table_primary_key_type
                     >
                 });
                 try_insert_generic_constraint.insert(partial_builder_table);
@@ -474,7 +459,7 @@ impl Codegen<'_> {
             // the parent tables.
 
             let mut parent_checks = Vec::new();
-            let mut additional_where_clause = Vec::new();
+            let mut parent_check_where_constraints = Vec::new();
 
             for parent_key in table.parent_keys(conn)? {
                 let parent_table = parent_key.foreign_table(conn)?;
@@ -501,32 +486,23 @@ impl Codegen<'_> {
                     }
                 });
 
-                additional_where_clause.push(quote::quote! {
-                    #parent_table_path: web_common_traits::database::Read<C>
-                });
-
-                additional_where_clause.push(quote::quote! {
-                    #parent_table_path: web_common_traits::database::Updatable<C>
+                parent_check_where_constraints.push(quote::quote! {
+                    #parent_table_path: web_common_traits::database::Updatable<C> + web_common_traits::database::Read<C>
                 });
             }
 
-            let mut additional_imports = Vec::new();
-
-            if !parent_checks.is_empty() {
-                additional_imports.push(quote::quote! {
+            let maybe_parent_check_use = if parent_checks.is_empty() {
+                None
+            } else {
+                Some(quote::quote! {
                     use web_common_traits::database::Updatable;
-                });
-            }
+                })
+            };
 
             let attributes_enum = table.insertable_enum_ty()?;
-            let attributes_extension_enum = table.attributes_extension_enum_ty()?;
 
             let (try_insert, try_insert_additional_where_clause) =
                 table.generate_insertable_builder_try_insert_implementation(conn)?;
-
-            additional_where_clause.extend(try_insert_additional_where_clause);
-            additional_where_clause.sort_unstable_by_key(ToString::to_string);
-            additional_where_clause.dedup_by_key(|x| x.to_string());
 
             let extension_tables = table.extension_tables(conn)?;
             let generics = table
@@ -538,34 +514,44 @@ impl Codegen<'_> {
                 if generics.is_empty() { None } else { Some(quote! {<#(#generics),*>}) };
 
             let mut maybe_mut: Option<TokenStream> = None;
-            let maybe_complete_most_concrete_table =
-                if table.has_most_concrete_table_column(true, conn)? {
-                    let current_table_name = table.table_name.clone();
-                    maybe_mut = Some(quote! {mut});
-                    additional_where_clause.push(quote! {
-                        Self: web_common_traits::database::MostConcreteTable
-                    });
-                    additional_imports.push(quote! {
+            let (
+                maybe_complete_most_concrete_table_use,
+                maybe_complete_most_concrete_table_constraint,
+                maybe_complete_most_concrete_table,
+            ) = if table.has_most_concrete_table_column(true, conn)? {
+                let current_table_name = table.table_name.clone();
+                maybe_mut = Some(quote! {mut});
+                (
+                    Some(quote! {
                         use web_common_traits::database::MostConcreteTable;
-                    });
+                    }),
+                    Some(quote! {
+                        Self: web_common_traits::database::MostConcreteTable
+                    }),
                     Some(quote! {
                         self.set_most_concrete_table(#current_table_name);
-                    })
-                } else {
-                    None
-                };
+                    }),
+                )
+            } else {
+                (None, None, None)
+            };
 
-            additional_where_clause.extend(
-                extension_tables
+            let maybe_error_from_extension = if extension_tables.is_empty() {
+                None
+            } else {
+                let from_extensions = extension_tables
                     .iter()
                     .map(|extension_table| {
                         let struct_ident = extension_table.struct_ident()?;
                         Ok(quote! {
-                            #attributes_extension_enum: From<<#struct_ident as common_traits::builder::Attributed>::Attribute>
+                            web_common_traits::database::FromExtension<<#struct_ident as web_common_traits::database::TryInsertGeneric<C>>::Error>
                         })
                     })
-                    .collect::<Result<Vec<_>, WebCodeGenError>>()?,
-            );
+                    .collect::<Result<Vec<_>, WebCodeGenError>>()?;
+                Some(quote! {
+                    Self::Error: #(#from_extensions)+*,
+                })
+            };
 
             let maybe_backend_insert = if parent_checks.is_empty() {
                 Some(quote! {
@@ -606,7 +592,8 @@ impl Codegen<'_> {
                         Row = #table_path,
                         Error = web_common_traits::database::InsertError<#attributes_enum>,
                     >,
-                    #(#additional_where_clause),*
+                    #(#parent_check_where_constraints,)*
+                    #maybe_complete_most_concrete_table_constraint
                 {
                     fn insert(
                         #maybe_mut self,
@@ -616,7 +603,8 @@ impl Codegen<'_> {
                         use diesel::RunQueryDsl;
                         use diesel::associations::HasTable;
                         use web_common_traits::database::InsertableVariant;
-                        #(#additional_imports)*
+                        #maybe_parent_check_use
+                        #maybe_complete_most_concrete_table_use
 
                         #maybe_complete_most_concrete_table
                         let insertable_struct: #insertable_struct = self.try_insert(user_id, conn)?;
@@ -634,9 +622,9 @@ impl Codegen<'_> {
                         <#table_path as diesel::associations::HasTable>::Table,
                         <#insertable_struct as diesel::Insertable<<#table_path as diesel::associations::HasTable>::Table>>::Values,
                     >: for<'query> diesel::query_dsl::LoadQuery<'query, C, #table_path>,
-                    #(#additional_where_clause),*
+                    #maybe_error_from_extension
+                    #(#try_insert_additional_where_clause),*
                 {
-
                     #try_insert
 				}
 			}))?;

@@ -63,6 +63,39 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFr
 > {
     type Attribute = CommercialFreezerModelAttribute;
 }
+impl web_common_traits::database::TableField for CommercialFreezerModelAttribute {}
+impl web_common_traits::database::HasTableType for CommercialFreezerModelAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute,
+    > for CommercialFreezerModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::FreezerModelAttribute,
+    ) -> Self {
+        CommercialFreezerModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    > for CommercialFreezerModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    ) -> Self {
+        CommercialFreezerModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for CommercialFreezerModelAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        CommercialFreezerModelAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for CommercialFreezerModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -621,28 +654,24 @@ impl<FreezerModel, CommercialProduct, C> web_common_traits::database::TryInsertG
 for InsertableCommercialFreezerModelBuilder<FreezerModel, CommercialProduct>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
-        Error = web_common_traits::database::InsertError<CommercialFreezerModelAttribute>,
-    >,
-    FreezerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    CommercialProduct: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel,
+            Error = web_common_traits::database::InsertError<
+                CommercialFreezerModelAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<
+        CommercialFreezerModelAttribute,
+    >;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<CommercialFreezerModelAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::commercial_freezer_models::CommercialFreezerModel = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

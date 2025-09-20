@@ -52,14 +52,7 @@ where
             crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute,
         >,
     >,
-    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelExtensionAttribute: From<
-        <PhysicalAssetModel as common_traits::builder::Attributed>::Attribute,
-    >,
 {
     fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
@@ -94,13 +87,12 @@ where
         C,
         crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel,
     >,
+    Self::Error: web_common_traits::database::FromExtension<
+        <PhysicalAssetModel as web_common_traits::database::TryInsertGeneric<C>>::Error,
+    >,
     PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
-    >,
-    Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelExtensionAttribute: From<
-        <PhysicalAssetModel as common_traits::builder::Attributed>::Attribute,
     >,
 {
     fn try_insert(
@@ -108,16 +100,11 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::FromExtension;
         let id = self
             .id
             .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(|attribute| {
-                    crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute::Extension(
-                        From::from(attribute),
-                    )
-                })
-            })?;
+            .map_err(Self::Error::from_extension)?;
         Ok(Self::InsertableVariant { id })
     }
 }

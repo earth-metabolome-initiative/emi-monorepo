@@ -21,6 +21,10 @@ impl common_traits::builder::Attributed
 {
     type Attribute = UserOrganizationAttribute;
 }
+impl web_common_traits::database::TableField for UserOrganizationAttribute {}
+impl web_common_traits::database::HasTableType for UserOrganizationAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
 impl core::fmt::Display for UserOrganizationAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -206,18 +210,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::user_organizations::UserOrganization,
             Error = web_common_traits::database::InsertError<UserOrganizationAttribute>,
-        >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = (i32, i16)>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<UserOrganizationAttribute>>
-    {
+    type Error = web_common_traits::database::InsertError<UserOrganizationAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::user_organizations::UserOrganization = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

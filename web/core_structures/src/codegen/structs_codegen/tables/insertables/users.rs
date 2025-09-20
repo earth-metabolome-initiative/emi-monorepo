@@ -28,6 +28,10 @@ impl common_traits::builder::Attributed
 {
     type Attribute = UserAttribute;
 }
+impl web_common_traits::database::TableField for UserAttribute {}
+impl web_common_traits::database::HasTableType for UserAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
 impl core::fmt::Display for UserAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -315,17 +319,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::users::User,
             Error = web_common_traits::database::InsertError<UserAttribute>,
-        >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<UserAttribute>> {
+    type Error = web_common_traits::database::InsertError<UserAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::users::User =
-            self.insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

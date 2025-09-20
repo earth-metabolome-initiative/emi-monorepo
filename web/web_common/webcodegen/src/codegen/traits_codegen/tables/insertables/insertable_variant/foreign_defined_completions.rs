@@ -100,6 +100,9 @@ impl Table {
             });
         }
 
+        extra_requirements.sort_unstable_by_key(ToString::to_string);
+        extra_requirements.dedup_by_key(|ts| ts.to_string());
+
         Ok((foreign_defined_completions, extra_requirements))
     }
 }

@@ -146,257 +146,380 @@ pub enum TableName {
     WeighingProcedureTemplate,
     WeighingProcedure,
 }
+impl web_common_traits::database::TableEnum for TableName {}
+impl core::str::FromStr for TableName {
+    type Err = String;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "addresses" => Ok(TableName::Address),
+            "aliquoting_procedure_templates" => Ok(TableName::AliquotingProcedureTemplate),
+            "aliquoting_procedures" => Ok(TableName::AliquotingProcedure),
+            "asset_compatibility_rules" => Ok(TableName::AssetCompatibilityRule),
+            "asset_model_ancestors" => Ok(TableName::AssetModelAncestor),
+            "asset_models" => Ok(TableName::AssetModel),
+            "assets" => Ok(TableName::Asset),
+            "ball_mill_machine_models" => Ok(TableName::BallMillMachineModel),
+            "ball_mill_machines" => Ok(TableName::BallMillMachine),
+            "ball_mill_procedure_templates" => Ok(TableName::BallMillProcedureTemplate),
+            "ball_mill_procedures" => Ok(TableName::BallMillProcedure),
+            "bead_models" => Ok(TableName::BeadModel),
+            "brands" => Ok(TableName::Brand),
+            "camera_models" => Ok(TableName::CameraModel),
+            "cameras" => Ok(TableName::Camera),
+            "cap_models" => Ok(TableName::CapModel),
+            "capping_procedure_templates" => Ok(TableName::CappingProcedureTemplate),
+            "capping_procedures" => Ok(TableName::CappingProcedure),
+            "centrifuge_models" => Ok(TableName::CentrifugeModel),
+            "centrifuge_procedure_templates" => Ok(TableName::CentrifugeProcedureTemplate),
+            "centrifuge_procedures" => Ok(TableName::CentrifugeProcedure),
+            "centrifuges" => Ok(TableName::Centrifuge),
+            "cities" => Ok(TableName::City),
+            "colors" => Ok(TableName::Color),
+            "commercial_ball_mill_machine_lots" => Ok(TableName::CommercialBallMillMachineLot),
+            "commercial_ball_mill_machine_models" => Ok(TableName::CommercialBallMillMachineModel),
+            "commercial_bead_lots" => Ok(TableName::CommercialBeadLot),
+            "commercial_bead_models" => Ok(TableName::CommercialBeadModel),
+            "commercial_camera_lots" => Ok(TableName::CommercialCameraLot),
+            "commercial_camera_models" => Ok(TableName::CommercialCameraModel),
+            "commercial_cap_lots" => Ok(TableName::CommercialCapLot),
+            "commercial_cap_models" => Ok(TableName::CommercialCapModel),
+            "commercial_centrifuge_lots" => Ok(TableName::CommercialCentrifugeLot),
+            "commercial_centrifuge_models" => Ok(TableName::CommercialCentrifugeModel),
+            "commercial_freeze_dryer_lots" => Ok(TableName::CommercialFreezeDryerLot),
+            "commercial_freeze_dryer_models" => Ok(TableName::CommercialFreezeDryerModel),
+            "commercial_freezer_lots" => Ok(TableName::CommercialFreezerLot),
+            "commercial_freezer_models" => Ok(TableName::CommercialFreezerModel),
+            "commercial_packaging_lots" => Ok(TableName::CommercialPackagingLot),
+            "commercial_packaging_models" => Ok(TableName::CommercialPackagingModel),
+            "commercial_pipette_lots" => Ok(TableName::CommercialPipetteLot),
+            "commercial_pipette_models" => Ok(TableName::CommercialPipetteModel),
+            "commercial_pipette_tip_lots" => Ok(TableName::CommercialPipetteTipLot),
+            "commercial_pipette_tip_models" => Ok(TableName::CommercialPipetteTipModel),
+            "commercial_positioning_device_lots" => Ok(TableName::CommercialPositioningDeviceLot),
+            "commercial_positioning_device_models" => {
+                Ok(TableName::CommercialPositioningDeviceModel)
+            }
+            "commercial_product_lots" => Ok(TableName::CommercialProductLot),
+            "commercial_products" => Ok(TableName::CommercialProduct),
+            "commercial_volume_measuring_device_lots" => {
+                Ok(TableName::CommercialVolumeMeasuringDeviceLot)
+            }
+            "commercial_volume_measuring_device_models" => {
+                Ok(TableName::CommercialVolumeMeasuringDeviceModel)
+            }
+            "commercial_weighing_device_lots" => Ok(TableName::CommercialWeighingDeviceLot),
+            "commercial_weighing_device_models" => Ok(TableName::CommercialWeighingDeviceModel),
+            "container_compatibility_rules" => Ok(TableName::ContainerCompatibilityRule),
+            "container_models" => Ok(TableName::ContainerModel),
+            "containers" => Ok(TableName::Container),
+            "countries" => Ok(TableName::Country),
+            "digital_asset_models" => Ok(TableName::DigitalAssetModel),
+            "digital_assets" => Ok(TableName::DigitalAsset),
+            "disposal_procedure_templates" => Ok(TableName::DisposalProcedureTemplate),
+            "disposal_procedures" => Ok(TableName::DisposalProcedure),
+            "email_providers" => Ok(TableName::EmailProvider),
+            "fractioning_procedure_templates" => Ok(TableName::FractioningProcedureTemplate),
+            "fractioning_procedures" => Ok(TableName::FractioningProcedure),
+            "freeze_dryer_models" => Ok(TableName::FreezeDryerModel),
+            "freeze_dryers" => Ok(TableName::FreezeDryer),
+            "freeze_drying_procedure_templates" => Ok(TableName::FreezeDryingProcedureTemplate),
+            "freeze_drying_procedures" => Ok(TableName::FreezeDryingProcedure),
+            "freezer_models" => Ok(TableName::FreezerModel),
+            "freezers" => Ok(TableName::Freezer),
+            "freezing_procedure_templates" => Ok(TableName::FreezingProcedureTemplate),
+            "freezing_procedures" => Ok(TableName::FreezingProcedure),
+            "geolocation_procedure_templates" => Ok(TableName::GeolocationProcedureTemplate),
+            "geolocation_procedures" => Ok(TableName::GeolocationProcedure),
+            "harvesting_procedure_templates" => Ok(TableName::HarvestingProcedureTemplate),
+            "harvesting_procedures" => Ok(TableName::HarvestingProcedure),
+            "instrument_states" => Ok(TableName::InstrumentState),
+            "login_providers" => Ok(TableName::LoginProvider),
+            "materials" => Ok(TableName::Material),
+            "next_procedure_templates" => Ok(TableName::NextProcedureTemplate),
+            "observation_subjects" => Ok(TableName::ObservationSubject),
+            "organism_models" => Ok(TableName::OrganismModel),
+            "organism_taxa" => Ok(TableName::OrganismTaxon),
+            "organisms" => Ok(TableName::Organism),
+            "organizations" => Ok(TableName::Organization),
+            "packaging_models" => Ok(TableName::PackagingModel),
+            "packaging_procedure_templates" => Ok(TableName::PackagingProcedureTemplate),
+            "packaging_procedures" => Ok(TableName::PackagingProcedure),
+            "parent_procedure_templates" => Ok(TableName::ParentProcedureTemplate),
+            "permanence_categories" => Ok(TableName::PermanenceCategory),
+            "phone_models" => Ok(TableName::PhoneModel),
+            "photograph_procedure_templates" => Ok(TableName::PhotographProcedureTemplate),
+            "photograph_procedures" => Ok(TableName::PhotographProcedure),
+            "photographs" => Ok(TableName::Photograph),
+            "physical_asset_models" => Ok(TableName::PhysicalAssetModel),
+            "physical_assets" => Ok(TableName::PhysicalAsset),
+            "pipette_models" => Ok(TableName::PipetteModel),
+            "pipette_tip_models" => Ok(TableName::PipetteTipModel),
+            "pipettes" => Ok(TableName::Pipette),
+            "positioning_device_models" => Ok(TableName::PositioningDeviceModel),
+            "positioning_devices" => Ok(TableName::PositioningDevice),
+            "pouring_procedure_templates" => Ok(TableName::PouringProcedureTemplate),
+            "pouring_procedures" => Ok(TableName::PouringProcedure),
+            "procedure_assets" => Ok(TableName::ProcedureAsset),
+            "procedure_template_asset_models" => Ok(TableName::ProcedureTemplateAssetModel),
+            "procedure_templates" => Ok(TableName::ProcedureTemplate),
+            "procedures" => Ok(TableName::Procedure),
+            "project_states" => Ok(TableName::ProjectState),
+            "projects" => Ok(TableName::Project),
+            "ranks" => Ok(TableName::Rank),
+            "reagent_models" => Ok(TableName::ReagentModel),
+            "roles" => Ok(TableName::Role),
+            "rooms" => Ok(TableName::Room),
+            "sample_models" => Ok(TableName::SampleModel),
+            "sample_source_models" => Ok(TableName::SampleSourceModel),
+            "sample_sources" => Ok(TableName::SampleSource),
+            "sample_states" => Ok(TableName::SampleState),
+            "samples" => Ok(TableName::Sample),
+            "soil_models" => Ok(TableName::SoilModel),
+            "soils" => Ok(TableName::Soil),
+            "spatial_ref_sys" => Ok(TableName::SpatialRefSy),
+            "spectra" => Ok(TableName::Spectrum),
+            "spectra_collections" => Ok(TableName::SpectraCollection),
+            "storage_procedure_templates" => Ok(TableName::StorageProcedureTemplate),
+            "storage_procedures" => Ok(TableName::StorageProcedure),
+            "supernatant_procedure_templates" => Ok(TableName::SupernatantProcedureTemplate),
+            "supernatant_procedures" => Ok(TableName::SupernatantProcedure),
+            "taxa" => Ok(TableName::Taxon),
+            "team_members" => Ok(TableName::TeamMember),
+            "team_projects" => Ok(TableName::TeamProject),
+            "team_states" => Ok(TableName::TeamState),
+            "teams" => Ok(TableName::Team),
+            "temporary_user" => Ok(TableName::TemporaryUser),
+            "units" => Ok(TableName::Unit),
+            "user_emails" => Ok(TableName::UserEmail),
+            "user_organizations" => Ok(TableName::UserOrganization),
+            "users" => Ok(TableName::User),
+            "volume_measuring_device_models" => Ok(TableName::VolumeMeasuringDeviceModel),
+            "volume_measuring_devices" => Ok(TableName::VolumeMeasuringDevice),
+            "volumetric_container_models" => Ok(TableName::VolumetricContainerModel),
+            "volumetric_containers" => Ok(TableName::VolumetricContainer),
+            "weighing_device_models" => Ok(TableName::WeighingDeviceModel),
+            "weighing_devices" => Ok(TableName::WeighingDevice),
+            "weighing_procedure_templates" => Ok(TableName::WeighingProcedureTemplate),
+            "weighing_procedures" => Ok(TableName::WeighingProcedure),
+            _ => Err(format!("Unknown table name: {}", s)),
+        }
+    }
+}
 impl core::fmt::Display for TableName {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
-            TableName::Address => write!(f, stringify!(Address)),
+            TableName::Address => write!(f, "addresses"),
             TableName::AliquotingProcedureTemplate => {
-                write!(f, stringify!(AliquotingProcedureTemplate))
+                write!(f, "aliquoting_procedure_templates")
             }
-            TableName::AliquotingProcedure => write!(f, stringify!(AliquotingProcedure)),
-            TableName::AssetCompatibilityRule => {
-                write!(f, stringify!(AssetCompatibilityRule))
-            }
-            TableName::AssetModelAncestor => write!(f, stringify!(AssetModelAncestor)),
-            TableName::AssetModel => write!(f, stringify!(AssetModel)),
-            TableName::Asset => write!(f, stringify!(Asset)),
-            TableName::BallMillMachineModel => {
-                write!(f, stringify!(BallMillMachineModel))
-            }
-            TableName::BallMillMachine => write!(f, stringify!(BallMillMachine)),
+            TableName::AliquotingProcedure => write!(f, "aliquoting_procedures"),
+            TableName::AssetCompatibilityRule => write!(f, "asset_compatibility_rules"),
+            TableName::AssetModelAncestor => write!(f, "asset_model_ancestors"),
+            TableName::AssetModel => write!(f, "asset_models"),
+            TableName::Asset => write!(f, "assets"),
+            TableName::BallMillMachineModel => write!(f, "ball_mill_machine_models"),
+            TableName::BallMillMachine => write!(f, "ball_mill_machines"),
             TableName::BallMillProcedureTemplate => {
-                write!(f, stringify!(BallMillProcedureTemplate))
+                write!(f, "ball_mill_procedure_templates")
             }
-            TableName::BallMillProcedure => write!(f, stringify!(BallMillProcedure)),
-            TableName::BeadModel => write!(f, stringify!(BeadModel)),
-            TableName::Brand => write!(f, stringify!(Brand)),
-            TableName::CameraModel => write!(f, stringify!(CameraModel)),
-            TableName::Camera => write!(f, stringify!(Camera)),
-            TableName::CapModel => write!(f, stringify!(CapModel)),
+            TableName::BallMillProcedure => write!(f, "ball_mill_procedures"),
+            TableName::BeadModel => write!(f, "bead_models"),
+            TableName::Brand => write!(f, "brands"),
+            TableName::CameraModel => write!(f, "camera_models"),
+            TableName::Camera => write!(f, "cameras"),
+            TableName::CapModel => write!(f, "cap_models"),
             TableName::CappingProcedureTemplate => {
-                write!(f, stringify!(CappingProcedureTemplate))
+                write!(f, "capping_procedure_templates")
             }
-            TableName::CappingProcedure => write!(f, stringify!(CappingProcedure)),
-            TableName::CentrifugeModel => write!(f, stringify!(CentrifugeModel)),
+            TableName::CappingProcedure => write!(f, "capping_procedures"),
+            TableName::CentrifugeModel => write!(f, "centrifuge_models"),
             TableName::CentrifugeProcedureTemplate => {
-                write!(f, stringify!(CentrifugeProcedureTemplate))
+                write!(f, "centrifuge_procedure_templates")
             }
-            TableName::CentrifugeProcedure => write!(f, stringify!(CentrifugeProcedure)),
-            TableName::Centrifuge => write!(f, stringify!(Centrifuge)),
-            TableName::City => write!(f, stringify!(City)),
-            TableName::Color => write!(f, stringify!(Color)),
+            TableName::CentrifugeProcedure => write!(f, "centrifuge_procedures"),
+            TableName::Centrifuge => write!(f, "centrifuges"),
+            TableName::City => write!(f, "cities"),
+            TableName::Color => write!(f, "colors"),
             TableName::CommercialBallMillMachineLot => {
-                write!(f, stringify!(CommercialBallMillMachineLot))
+                write!(f, "commercial_ball_mill_machine_lots")
             }
             TableName::CommercialBallMillMachineModel => {
-                write!(f, stringify!(CommercialBallMillMachineModel))
+                write!(f, "commercial_ball_mill_machine_models")
             }
-            TableName::CommercialBeadLot => write!(f, stringify!(CommercialBeadLot)),
-            TableName::CommercialBeadModel => write!(f, stringify!(CommercialBeadModel)),
-            TableName::CommercialCameraLot => write!(f, stringify!(CommercialCameraLot)),
-            TableName::CommercialCameraModel => {
-                write!(f, stringify!(CommercialCameraModel))
-            }
-            TableName::CommercialCapLot => write!(f, stringify!(CommercialCapLot)),
-            TableName::CommercialCapModel => write!(f, stringify!(CommercialCapModel)),
-            TableName::CommercialCentrifugeLot => {
-                write!(f, stringify!(CommercialCentrifugeLot))
-            }
+            TableName::CommercialBeadLot => write!(f, "commercial_bead_lots"),
+            TableName::CommercialBeadModel => write!(f, "commercial_bead_models"),
+            TableName::CommercialCameraLot => write!(f, "commercial_camera_lots"),
+            TableName::CommercialCameraModel => write!(f, "commercial_camera_models"),
+            TableName::CommercialCapLot => write!(f, "commercial_cap_lots"),
+            TableName::CommercialCapModel => write!(f, "commercial_cap_models"),
+            TableName::CommercialCentrifugeLot => write!(f, "commercial_centrifuge_lots"),
             TableName::CommercialCentrifugeModel => {
-                write!(f, stringify!(CommercialCentrifugeModel))
+                write!(f, "commercial_centrifuge_models")
             }
             TableName::CommercialFreezeDryerLot => {
-                write!(f, stringify!(CommercialFreezeDryerLot))
+                write!(f, "commercial_freeze_dryer_lots")
             }
             TableName::CommercialFreezeDryerModel => {
-                write!(f, stringify!(CommercialFreezeDryerModel))
+                write!(f, "commercial_freeze_dryer_models")
             }
-            TableName::CommercialFreezerLot => {
-                write!(f, stringify!(CommercialFreezerLot))
-            }
-            TableName::CommercialFreezerModel => {
-                write!(f, stringify!(CommercialFreezerModel))
-            }
-            TableName::CommercialPackagingLot => {
-                write!(f, stringify!(CommercialPackagingLot))
-            }
+            TableName::CommercialFreezerLot => write!(f, "commercial_freezer_lots"),
+            TableName::CommercialFreezerModel => write!(f, "commercial_freezer_models"),
+            TableName::CommercialPackagingLot => write!(f, "commercial_packaging_lots"),
             TableName::CommercialPackagingModel => {
-                write!(f, stringify!(CommercialPackagingModel))
+                write!(f, "commercial_packaging_models")
             }
-            TableName::CommercialPipetteLot => {
-                write!(f, stringify!(CommercialPipetteLot))
-            }
-            TableName::CommercialPipetteModel => {
-                write!(f, stringify!(CommercialPipetteModel))
-            }
+            TableName::CommercialPipetteLot => write!(f, "commercial_pipette_lots"),
+            TableName::CommercialPipetteModel => write!(f, "commercial_pipette_models"),
             TableName::CommercialPipetteTipLot => {
-                write!(f, stringify!(CommercialPipetteTipLot))
+                write!(f, "commercial_pipette_tip_lots")
             }
             TableName::CommercialPipetteTipModel => {
-                write!(f, stringify!(CommercialPipetteTipModel))
+                write!(f, "commercial_pipette_tip_models")
             }
             TableName::CommercialPositioningDeviceLot => {
-                write!(f, stringify!(CommercialPositioningDeviceLot))
+                write!(f, "commercial_positioning_device_lots")
             }
             TableName::CommercialPositioningDeviceModel => {
-                write!(f, stringify!(CommercialPositioningDeviceModel))
+                write!(f, "commercial_positioning_device_models")
             }
-            TableName::CommercialProductLot => {
-                write!(f, stringify!(CommercialProductLot))
-            }
-            TableName::CommercialProduct => write!(f, stringify!(CommercialProduct)),
+            TableName::CommercialProductLot => write!(f, "commercial_product_lots"),
+            TableName::CommercialProduct => write!(f, "commercial_products"),
             TableName::CommercialVolumeMeasuringDeviceLot => {
-                write!(f, stringify!(CommercialVolumeMeasuringDeviceLot))
+                write!(f, "commercial_volume_measuring_device_lots")
             }
             TableName::CommercialVolumeMeasuringDeviceModel => {
-                write!(f, stringify!(CommercialVolumeMeasuringDeviceModel))
+                write!(f, "commercial_volume_measuring_device_models")
             }
             TableName::CommercialWeighingDeviceLot => {
-                write!(f, stringify!(CommercialWeighingDeviceLot))
+                write!(f, "commercial_weighing_device_lots")
             }
             TableName::CommercialWeighingDeviceModel => {
-                write!(f, stringify!(CommercialWeighingDeviceModel))
+                write!(f, "commercial_weighing_device_models")
             }
             TableName::ContainerCompatibilityRule => {
-                write!(f, stringify!(ContainerCompatibilityRule))
+                write!(f, "container_compatibility_rules")
             }
-            TableName::ContainerModel => write!(f, stringify!(ContainerModel)),
-            TableName::Container => write!(f, stringify!(Container)),
-            TableName::Country => write!(f, stringify!(Country)),
-            TableName::DigitalAssetModel => write!(f, stringify!(DigitalAssetModel)),
-            TableName::DigitalAsset => write!(f, stringify!(DigitalAsset)),
+            TableName::ContainerModel => write!(f, "container_models"),
+            TableName::Container => write!(f, "containers"),
+            TableName::Country => write!(f, "countries"),
+            TableName::DigitalAssetModel => write!(f, "digital_asset_models"),
+            TableName::DigitalAsset => write!(f, "digital_assets"),
             TableName::DisposalProcedureTemplate => {
-                write!(f, stringify!(DisposalProcedureTemplate))
+                write!(f, "disposal_procedure_templates")
             }
-            TableName::DisposalProcedure => write!(f, stringify!(DisposalProcedure)),
-            TableName::EmailProvider => write!(f, stringify!(EmailProvider)),
+            TableName::DisposalProcedure => write!(f, "disposal_procedures"),
+            TableName::EmailProvider => write!(f, "email_providers"),
             TableName::FractioningProcedureTemplate => {
-                write!(f, stringify!(FractioningProcedureTemplate))
+                write!(f, "fractioning_procedure_templates")
             }
-            TableName::FractioningProcedure => {
-                write!(f, stringify!(FractioningProcedure))
-            }
-            TableName::FreezeDryerModel => write!(f, stringify!(FreezeDryerModel)),
-            TableName::FreezeDryer => write!(f, stringify!(FreezeDryer)),
+            TableName::FractioningProcedure => write!(f, "fractioning_procedures"),
+            TableName::FreezeDryerModel => write!(f, "freeze_dryer_models"),
+            TableName::FreezeDryer => write!(f, "freeze_dryers"),
             TableName::FreezeDryingProcedureTemplate => {
-                write!(f, stringify!(FreezeDryingProcedureTemplate))
+                write!(f, "freeze_drying_procedure_templates")
             }
-            TableName::FreezeDryingProcedure => {
-                write!(f, stringify!(FreezeDryingProcedure))
-            }
-            TableName::FreezerModel => write!(f, stringify!(FreezerModel)),
-            TableName::Freezer => write!(f, stringify!(Freezer)),
+            TableName::FreezeDryingProcedure => write!(f, "freeze_drying_procedures"),
+            TableName::FreezerModel => write!(f, "freezer_models"),
+            TableName::Freezer => write!(f, "freezers"),
             TableName::FreezingProcedureTemplate => {
-                write!(f, stringify!(FreezingProcedureTemplate))
+                write!(f, "freezing_procedure_templates")
             }
-            TableName::FreezingProcedure => write!(f, stringify!(FreezingProcedure)),
+            TableName::FreezingProcedure => write!(f, "freezing_procedures"),
             TableName::GeolocationProcedureTemplate => {
-                write!(f, stringify!(GeolocationProcedureTemplate))
+                write!(f, "geolocation_procedure_templates")
             }
-            TableName::GeolocationProcedure => {
-                write!(f, stringify!(GeolocationProcedure))
-            }
+            TableName::GeolocationProcedure => write!(f, "geolocation_procedures"),
             TableName::HarvestingProcedureTemplate => {
-                write!(f, stringify!(HarvestingProcedureTemplate))
+                write!(f, "harvesting_procedure_templates")
             }
-            TableName::HarvestingProcedure => write!(f, stringify!(HarvestingProcedure)),
-            TableName::InstrumentState => write!(f, stringify!(InstrumentState)),
-            TableName::LoginProvider => write!(f, stringify!(LoginProvider)),
-            TableName::Material => write!(f, stringify!(Material)),
-            TableName::NextProcedureTemplate => {
-                write!(f, stringify!(NextProcedureTemplate))
-            }
-            TableName::ObservationSubject => write!(f, stringify!(ObservationSubject)),
-            TableName::OrganismModel => write!(f, stringify!(OrganismModel)),
-            TableName::OrganismTaxon => write!(f, stringify!(OrganismTaxon)),
-            TableName::Organism => write!(f, stringify!(Organism)),
-            TableName::Organization => write!(f, stringify!(Organization)),
-            TableName::PackagingModel => write!(f, stringify!(PackagingModel)),
+            TableName::HarvestingProcedure => write!(f, "harvesting_procedures"),
+            TableName::InstrumentState => write!(f, "instrument_states"),
+            TableName::LoginProvider => write!(f, "login_providers"),
+            TableName::Material => write!(f, "materials"),
+            TableName::NextProcedureTemplate => write!(f, "next_procedure_templates"),
+            TableName::ObservationSubject => write!(f, "observation_subjects"),
+            TableName::OrganismModel => write!(f, "organism_models"),
+            TableName::OrganismTaxon => write!(f, "organism_taxa"),
+            TableName::Organism => write!(f, "organisms"),
+            TableName::Organization => write!(f, "organizations"),
+            TableName::PackagingModel => write!(f, "packaging_models"),
             TableName::PackagingProcedureTemplate => {
-                write!(f, stringify!(PackagingProcedureTemplate))
+                write!(f, "packaging_procedure_templates")
             }
-            TableName::PackagingProcedure => write!(f, stringify!(PackagingProcedure)),
-            TableName::ParentProcedureTemplate => {
-                write!(f, stringify!(ParentProcedureTemplate))
-            }
-            TableName::PermanenceCategory => write!(f, stringify!(PermanenceCategory)),
-            TableName::PhoneModel => write!(f, stringify!(PhoneModel)),
+            TableName::PackagingProcedure => write!(f, "packaging_procedures"),
+            TableName::ParentProcedureTemplate => write!(f, "parent_procedure_templates"),
+            TableName::PermanenceCategory => write!(f, "permanence_categories"),
+            TableName::PhoneModel => write!(f, "phone_models"),
             TableName::PhotographProcedureTemplate => {
-                write!(f, stringify!(PhotographProcedureTemplate))
+                write!(f, "photograph_procedure_templates")
             }
-            TableName::PhotographProcedure => write!(f, stringify!(PhotographProcedure)),
-            TableName::Photograph => write!(f, stringify!(Photograph)),
-            TableName::PhysicalAssetModel => write!(f, stringify!(PhysicalAssetModel)),
-            TableName::PhysicalAsset => write!(f, stringify!(PhysicalAsset)),
-            TableName::PipetteModel => write!(f, stringify!(PipetteModel)),
-            TableName::PipetteTipModel => write!(f, stringify!(PipetteTipModel)),
-            TableName::Pipette => write!(f, stringify!(Pipette)),
-            TableName::PositioningDeviceModel => {
-                write!(f, stringify!(PositioningDeviceModel))
-            }
-            TableName::PositioningDevice => write!(f, stringify!(PositioningDevice)),
+            TableName::PhotographProcedure => write!(f, "photograph_procedures"),
+            TableName::Photograph => write!(f, "photographs"),
+            TableName::PhysicalAssetModel => write!(f, "physical_asset_models"),
+            TableName::PhysicalAsset => write!(f, "physical_assets"),
+            TableName::PipetteModel => write!(f, "pipette_models"),
+            TableName::PipetteTipModel => write!(f, "pipette_tip_models"),
+            TableName::Pipette => write!(f, "pipettes"),
+            TableName::PositioningDeviceModel => write!(f, "positioning_device_models"),
+            TableName::PositioningDevice => write!(f, "positioning_devices"),
             TableName::PouringProcedureTemplate => {
-                write!(f, stringify!(PouringProcedureTemplate))
+                write!(f, "pouring_procedure_templates")
             }
-            TableName::PouringProcedure => write!(f, stringify!(PouringProcedure)),
-            TableName::ProcedureAsset => write!(f, stringify!(ProcedureAsset)),
+            TableName::PouringProcedure => write!(f, "pouring_procedures"),
+            TableName::ProcedureAsset => write!(f, "procedure_assets"),
             TableName::ProcedureTemplateAssetModel => {
-                write!(f, stringify!(ProcedureTemplateAssetModel))
+                write!(f, "procedure_template_asset_models")
             }
-            TableName::ProcedureTemplate => write!(f, stringify!(ProcedureTemplate)),
-            TableName::Procedure => write!(f, stringify!(Procedure)),
-            TableName::ProjectState => write!(f, stringify!(ProjectState)),
-            TableName::Project => write!(f, stringify!(Project)),
-            TableName::Rank => write!(f, stringify!(Rank)),
-            TableName::ReagentModel => write!(f, stringify!(ReagentModel)),
-            TableName::Role => write!(f, stringify!(Role)),
-            TableName::Room => write!(f, stringify!(Room)),
-            TableName::SampleModel => write!(f, stringify!(SampleModel)),
-            TableName::SampleSourceModel => write!(f, stringify!(SampleSourceModel)),
-            TableName::SampleSource => write!(f, stringify!(SampleSource)),
-            TableName::SampleState => write!(f, stringify!(SampleState)),
-            TableName::Sample => write!(f, stringify!(Sample)),
-            TableName::SoilModel => write!(f, stringify!(SoilModel)),
-            TableName::Soil => write!(f, stringify!(Soil)),
-            TableName::SpatialRefSy => write!(f, stringify!(SpatialRefSy)),
-            TableName::Spectrum => write!(f, stringify!(Spectrum)),
-            TableName::SpectraCollection => write!(f, stringify!(SpectraCollection)),
+            TableName::ProcedureTemplate => write!(f, "procedure_templates"),
+            TableName::Procedure => write!(f, "procedures"),
+            TableName::ProjectState => write!(f, "project_states"),
+            TableName::Project => write!(f, "projects"),
+            TableName::Rank => write!(f, "ranks"),
+            TableName::ReagentModel => write!(f, "reagent_models"),
+            TableName::Role => write!(f, "roles"),
+            TableName::Room => write!(f, "rooms"),
+            TableName::SampleModel => write!(f, "sample_models"),
+            TableName::SampleSourceModel => write!(f, "sample_source_models"),
+            TableName::SampleSource => write!(f, "sample_sources"),
+            TableName::SampleState => write!(f, "sample_states"),
+            TableName::Sample => write!(f, "samples"),
+            TableName::SoilModel => write!(f, "soil_models"),
+            TableName::Soil => write!(f, "soils"),
+            TableName::SpatialRefSy => write!(f, "spatial_ref_sys"),
+            TableName::Spectrum => write!(f, "spectra"),
+            TableName::SpectraCollection => write!(f, "spectra_collections"),
             TableName::StorageProcedureTemplate => {
-                write!(f, stringify!(StorageProcedureTemplate))
+                write!(f, "storage_procedure_templates")
             }
-            TableName::StorageProcedure => write!(f, stringify!(StorageProcedure)),
+            TableName::StorageProcedure => write!(f, "storage_procedures"),
             TableName::SupernatantProcedureTemplate => {
-                write!(f, stringify!(SupernatantProcedureTemplate))
+                write!(f, "supernatant_procedure_templates")
             }
-            TableName::SupernatantProcedure => {
-                write!(f, stringify!(SupernatantProcedure))
-            }
-            TableName::Taxon => write!(f, stringify!(Taxon)),
-            TableName::TeamMember => write!(f, stringify!(TeamMember)),
-            TableName::TeamProject => write!(f, stringify!(TeamProject)),
-            TableName::TeamState => write!(f, stringify!(TeamState)),
-            TableName::Team => write!(f, stringify!(Team)),
-            TableName::TemporaryUser => write!(f, stringify!(TemporaryUser)),
-            TableName::Unit => write!(f, stringify!(Unit)),
-            TableName::UserEmail => write!(f, stringify!(UserEmail)),
-            TableName::UserOrganization => write!(f, stringify!(UserOrganization)),
-            TableName::User => write!(f, stringify!(User)),
+            TableName::SupernatantProcedure => write!(f, "supernatant_procedures"),
+            TableName::Taxon => write!(f, "taxa"),
+            TableName::TeamMember => write!(f, "team_members"),
+            TableName::TeamProject => write!(f, "team_projects"),
+            TableName::TeamState => write!(f, "team_states"),
+            TableName::Team => write!(f, "teams"),
+            TableName::TemporaryUser => write!(f, "temporary_user"),
+            TableName::Unit => write!(f, "units"),
+            TableName::UserEmail => write!(f, "user_emails"),
+            TableName::UserOrganization => write!(f, "user_organizations"),
+            TableName::User => write!(f, "users"),
             TableName::VolumeMeasuringDeviceModel => {
-                write!(f, stringify!(VolumeMeasuringDeviceModel))
+                write!(f, "volume_measuring_device_models")
             }
-            TableName::VolumeMeasuringDevice => {
-                write!(f, stringify!(VolumeMeasuringDevice))
-            }
+            TableName::VolumeMeasuringDevice => write!(f, "volume_measuring_devices"),
             TableName::VolumetricContainerModel => {
-                write!(f, stringify!(VolumetricContainerModel))
+                write!(f, "volumetric_container_models")
             }
-            TableName::VolumetricContainer => write!(f, stringify!(VolumetricContainer)),
-            TableName::WeighingDeviceModel => write!(f, stringify!(WeighingDeviceModel)),
-            TableName::WeighingDevice => write!(f, stringify!(WeighingDevice)),
+            TableName::VolumetricContainer => write!(f, "volumetric_containers"),
+            TableName::WeighingDeviceModel => write!(f, "weighing_device_models"),
+            TableName::WeighingDevice => write!(f, "weighing_devices"),
             TableName::WeighingProcedureTemplate => {
-                write!(f, stringify!(WeighingProcedureTemplate))
+                write!(f, "weighing_procedure_templates")
             }
-            TableName::WeighingProcedure => write!(f, stringify!(WeighingProcedure)),
+            TableName::WeighingProcedure => write!(f, "weighing_procedures"),
         }
     }
 }

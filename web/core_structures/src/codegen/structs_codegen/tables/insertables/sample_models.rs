@@ -50,6 +50,28 @@ impl<T1> common_traits::builder::Attributed
 {
     type Attribute = SampleModelAttribute;
 }
+impl web_common_traits::database::TableField for SampleModelAttribute {}
+impl web_common_traits::database::HasTableType for SampleModelAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    > for SampleModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    ) -> Self {
+        SampleModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for SampleModelAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        SampleModelAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for SampleModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -440,19 +462,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::sample_models::SampleModel,
             Error = web_common_traits::database::InsertError<SampleModelAttribute>,
-        >,
-    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<SampleModelAttribute>>
-    {
+    type Error = web_common_traits::database::InsertError<SampleModelAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::sample_models::SampleModel =
-            self.insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

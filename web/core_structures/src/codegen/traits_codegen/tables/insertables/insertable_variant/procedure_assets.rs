@@ -36,38 +36,21 @@ where
             crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         >,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable<
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
-        >,
-    >,
-    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Read<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Updatable<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
-        C,
-    >,
+            C,
+        > + web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Updatable<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
-        C,
-    >,
+            C,
+        > + web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Updatable<
+            C,
+        > + web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Updatable<
-        C,
-    >,
+            C,
+        > + web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+            C,
+        > + web_common_traits::database::Read<C>,
 {
     fn insert(self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
@@ -135,31 +118,13 @@ where
             crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         >,
     >,
-    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::asset_models::AssetModel: web_common_traits::database::Updatable<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Updatable<
         C,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Updatable<
         C,
     >,
 {

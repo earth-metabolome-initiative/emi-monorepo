@@ -74,7 +74,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::asset_models::AssetModel,
     >,
-    Self: web_common_traits::database::MostConcreteTable,
 {
     fn try_insert(
         self,

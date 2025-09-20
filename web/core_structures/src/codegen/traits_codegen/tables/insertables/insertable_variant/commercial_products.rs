@@ -51,11 +51,7 @@ where
             crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
         >,
     >,
-    AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::CommercialProductExtensionAttribute: From<
-        <AssetModel as common_traits::builder::Attributed>::Attribute,
-    >,
 {
     fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
@@ -90,17 +86,17 @@ where
         C,
         crate::codegen::structs_codegen::tables::commercial_products::CommercialProduct,
     >,
-    AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::CommercialProductExtensionAttribute: From<
-        <AssetModel as common_traits::builder::Attributed>::Attribute,
+    Self::Error: web_common_traits::database::FromExtension<
+        <AssetModel as web_common_traits::database::TryInsertGeneric<C>>::Error,
     >,
+    AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
 {
     fn try_insert(
         self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::FromExtension;
         let brand_id = self
             .brand_id
             .ok_or(
@@ -111,13 +107,7 @@ where
         let id = self
             .id
             .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(|attribute| {
-                    crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute::Extension(
-                        From::from(attribute),
-                    )
-                })
-            })?;
+            .map_err(Self::Error::from_extension)?;
         Ok(Self::InsertableVariant {
             id,
             deprecation_date: self.deprecation_date,

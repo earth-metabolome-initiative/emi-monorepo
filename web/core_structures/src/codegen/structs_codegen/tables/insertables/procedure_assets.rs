@@ -36,6 +36,10 @@ impl common_traits::builder::Attributed
 {
     type Attribute = ProcedureAssetAttribute;
 }
+impl web_common_traits::database::TableField for ProcedureAssetAttribute {}
+impl web_common_traits::database::HasTableType for ProcedureAssetAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
 impl core::fmt::Display for ProcedureAssetAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -680,18 +684,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             Error = web_common_traits::database::InsertError<ProcedureAssetAttribute>,
-        >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<ProcedureAssetAttribute>>
-    {
+    type Error = web_common_traits::database::InsertError<ProcedureAssetAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset =
-            self.insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

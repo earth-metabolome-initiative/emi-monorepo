@@ -202,7 +202,7 @@ impl Codegen<'_> {
             let maybe_set_primary_key_impl =
                 table.generate_insertable_builder_set_primary_key(conn)?;
             let try_insert_generic_impl: TokenStream =
-                self.generate_insertable_builder_try_insert_generic_implementation(table, conn)?;
+                table.generate_insertable_builder_try_insert_generic_implementation(conn)?;
 
             let ifv_file = root.join(format!("{}.rs", table.snake_case_name()?));
             std::fs::write(

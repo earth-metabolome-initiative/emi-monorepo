@@ -1,6 +1,9 @@
 //! Submodule defining a trait for what a `Builder` should be able to do.
 
-use std::fmt::{Debug, Display};
+use std::{
+    fmt::{Debug, Display},
+    str::FromStr,
+};
 
 /// Trait defining what a `CompleteBuilder` should be able to do.
 pub trait IsCompleteBuilder {
@@ -24,6 +27,14 @@ pub trait Attributed {
 #[derive(Default, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// A struct representing an empty tuple, used for builders without attributes.
 pub struct EmptyTuple;
+
+impl FromStr for EmptyTuple {
+    type Err = core::convert::Infallible;
+
+    fn from_str(_: &str) -> Result<Self, Self::Err> {
+        Ok(EmptyTuple)
+    }
+}
 
 impl Debug for EmptyTuple {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

@@ -1861,6 +1861,22 @@ impl Table {
         }))
     }
 
+    /// Returns the extension table idents for the table builder implementation.
+    ///
+    /// # Arguments
+    ///
+    /// * `table`: A reference to the table to generate generics for.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the generics cannot be generated.
+    pub(crate) fn generics(&self, conn: &mut PgConnection) -> Result<Vec<Ident>, WebCodeGenError> {
+        self.extension_tables(conn)?
+            .iter()
+            .map(TableLike::struct_ident)
+            .collect::<Result<Vec<_>, WebCodeGenError>>()
+    }
+
     /// Returns the generics for the table builder implementation.
     ///
     /// # Arguments
@@ -1870,29 +1886,17 @@ impl Table {
     /// # Errors
     ///
     /// Returns an error if the generics cannot be generated.
-    pub(crate) fn generics_for_table_builder_implementation(
+    pub(crate) fn formatted_generics(
         &self,
         conn: &mut PgConnection,
     ) -> Result<Option<TokenStream>, WebCodeGenError> {
-        let extensions = self.extension_tables(conn)?;
+        let generics = self.generics(conn)?;
 
         // If the table is at the root of the extension graph, it has no
         // builder type generics.
-        if extensions.is_empty() {
+        if generics.is_empty() {
             return Ok(None);
         }
-
-        // Otherwise, for each extended table, we generate the set of generics
-        // with the expected default values to define the builder type.
-        let generics = extensions
-            .iter()
-            .map(|extended_table| {
-                let extended_table_ident = extended_table.struct_ident()?;
-                Ok(quote::quote! {
-                    #extended_table_ident
-                })
-            })
-            .collect::<Result<Vec<_>, WebCodeGenError>>()?;
 
         Ok(Some(quote::quote! {
             <#(#generics),*>

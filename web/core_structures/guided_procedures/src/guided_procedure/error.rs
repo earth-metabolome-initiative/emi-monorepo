@@ -8,31 +8,59 @@ use core_structures::{ProcedureTemplate, tables::most_concrete_variants::Procedu
 #[derive(Debug)]
 /// Enum representing the possible errors which might occur when using the
 /// `GuidedProcedure`.
-pub enum GuidedProcedureError {
+pub enum InternalGuidedProcedureError<'graph> {
     /// When the provided designated successor was not found in the viable
     /// successors.
     DesignatedSuccessorNotFound {
-        designated_successor: ProcedureTemplate,
-        viable_successors: Vec<ProcedureTemplate>,
+        designated_successor: &'graph ProcedureTemplate,
+        viable_successors: Vec<&'graph ProcedureTemplate>,
     },
     /// When no designated successor was provided but multiple viable successors
     /// were found.
-    UnclearSuccessor { viable_successors: Vec<ProcedureTemplate> },
+    UnclearSuccessor { viable_successors: Vec<&'graph ProcedureTemplate> },
     /// Unexpected builder type encountered.
-    UnexpectedBuilder { expected: &'static str, found: &'static str, template: ProcedureTemplate },
+    UnexpectedBuilder {
+        expected: &'static str,
+        found: &'static str,
+        template: &'graph ProcedureTemplate,
+    },
     /// No more builders are available.
     NoMoreBuilders,
     /// A builder was not yet processed.
-    UnprocessedBuilder { found: &'static str, template: ProcedureTemplate },
+    UnprocessedBuilder { found: &'static str, template: &'graph ProcedureTemplate },
     /// An insertion failed because a unique constraint was violated.
     Insert(ProcedureInsertErrorDAG),
     /// An error occurred while interacting with the database.
     Diesel(diesel::result::Error),
 }
 
+#[derive(Debug)]
+/// Enum representing the possible errors which might occur when using the
+/// `GuidedProcedure`.
+pub enum GuidedProcedureError {
+    /// No more builders are available.
+    NoMoreBuilders,
+    /// An insertion failed because a unique constraint was violated.
+    Insert(ProcedureInsertErrorDAG),
+    /// An error occurred while interacting with the database.
+    Diesel(diesel::result::Error),
+}
+
+impl From<diesel::result::Error> for InternalGuidedProcedureError<'_> {
+    fn from(e: diesel::result::Error) -> Self {
+        InternalGuidedProcedureError::Diesel(e)
+    }
+}
+
 impl From<diesel::result::Error> for GuidedProcedureError {
     fn from(e: diesel::result::Error) -> Self {
         GuidedProcedureError::Diesel(e)
+    }
+}
+
+impl From<ProcedureInsertErrorDAG> for InternalGuidedProcedureError<'_> {
+    fn from(e: ProcedureInsertErrorDAG) -> Self {
+        InternalGuidedProcedureError::Insert(e)
     }
 }
 
@@ -42,13 +70,10 @@ impl From<ProcedureInsertErrorDAG> for GuidedProcedureError {
     }
 }
 
-impl Display for GuidedProcedureError {
+impl Display for InternalGuidedProcedureError<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            GuidedProcedureError::DesignatedSuccessorNotFound {
-                designated_successor,
-                viable_successors,
-            } => {
+            Self::DesignatedSuccessorNotFound { designated_successor, viable_successors } => {
                 write!(
                     f,
                     "The designated successor '{}' was not found in the viable successors: [{}]",
@@ -60,7 +85,7 @@ impl Display for GuidedProcedureError {
                         .join(", ")
                 )
             }
-            GuidedProcedureError::UnclearSuccessor { viable_successors } => {
+            Self::UnclearSuccessor { viable_successors } => {
                 write!(
                     f,
                     "Multiple viable successors were found: [{}]. Please specify a designated successor.",
@@ -71,25 +96,47 @@ impl Display for GuidedProcedureError {
                         .join(", ")
                 )
             }
-            GuidedProcedureError::UnexpectedBuilder { expected, found, template } => {
+            Self::UnexpectedBuilder { expected, found, template } => {
                 write!(
                     f,
                     "Expected builder of type `{expected}`, but a builder of type `{found}` is required to build the procedure template \"{}\" from table \"{}\".",
                     template.name, template.most_concrete_table
                 )
             }
-            GuidedProcedureError::UnprocessedBuilder { found, template } => {
+            Self::UnprocessedBuilder { found, template } => {
                 write!(
                     f,
                     "A builder of type `{found}` was not yet processed for the procedure template \"{}\" from table \"{}\". You most likely need to add another `.and_then(|builder, conn| {{...}})` to your guided procedure.",
                     template.name, template.most_concrete_table
                 )
             }
-            GuidedProcedureError::NoMoreBuilders => {
+            Self::NoMoreBuilders => {
                 write!(f, "No more builders are available.")
             }
-            GuidedProcedureError::Insert(e) => write!(f, "An insertion error occurred: {e}"),
-            GuidedProcedureError::Diesel(e) => write!(f, "A database error occurred: {e}"),
+            Self::Insert(e) => write!(f, "An insertion error occurred: {e}"),
+            Self::Diesel(e) => write!(f, "A database error occurred: {e}"),
+        }
+    }
+}
+
+impl Display for GuidedProcedureError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::NoMoreBuilders => {
+                write!(f, "No more builders are available.")
+            }
+            Self::Insert(e) => write!(f, "An insertion error occurred: {e}"),
+            Self::Diesel(e) => write!(f, "A database error occurred: {e}"),
+        }
+    }
+}
+
+impl std::error::Error for InternalGuidedProcedureError<'_> {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Diesel(e) => Some(e),
+            Self::Insert(e) => Some(e),
+            _ => None,
         }
     }
 }
@@ -97,9 +144,9 @@ impl Display for GuidedProcedureError {
 impl std::error::Error for GuidedProcedureError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            GuidedProcedureError::Diesel(e) => Some(e),
-            GuidedProcedureError::Insert(e) => Some(e),
-            _ => None,
+            Self::Diesel(e) => Some(e),
+            Self::Insert(e) => Some(e),
+            Self::NoMoreBuilders => None,
         }
     }
 }

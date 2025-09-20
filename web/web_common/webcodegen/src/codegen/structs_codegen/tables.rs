@@ -15,6 +15,7 @@ use crate::{
 mod crud;
 mod insertables;
 mod most_concrete_variant;
+pub(crate) use crud::table_names_enum_path;
 
 impl Codegen<'_> {
     /// Generate implementations of the structs representing rows of the tables

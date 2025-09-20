@@ -30,6 +30,10 @@ impl common_traits::builder::Attributed
 {
     type Attribute = SpatialRefSyAttribute;
 }
+impl web_common_traits::database::TableField for SpatialRefSyAttribute {}
+impl web_common_traits::database::HasTableType for SpatialRefSyAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
 impl core::fmt::Display for SpatialRefSyAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -313,18 +317,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy,
             Error = web_common_traits::database::InsertError<SpatialRefSyAttribute>,
-        >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<SpatialRefSyAttribute>>
-    {
+    type Error = web_common_traits::database::InsertError<SpatialRefSyAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::spatial_ref_sys::SpatialRefSy =
-            self.insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

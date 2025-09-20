@@ -47,6 +47,28 @@ impl<T1> common_traits::builder::Attributed
 {
     type Attribute = FreezeDryerModelAttribute;
 }
+impl web_common_traits::database::TableField for FreezeDryerModelAttribute {}
+impl web_common_traits::database::HasTableType for FreezeDryerModelAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    > for FreezeDryerModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    ) -> Self {
+        FreezeDryerModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for FreezeDryerModelAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        FreezeDryerModelAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for FreezeDryerModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -386,19 +408,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel,
             Error = web_common_traits::database::InsertError<FreezeDryerModelAttribute>,
-        >,
-    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<FreezeDryerModelAttribute>>
-    {
+    type Error = web_common_traits::database::InsertError<FreezeDryerModelAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::freeze_dryer_models::FreezeDryerModel = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

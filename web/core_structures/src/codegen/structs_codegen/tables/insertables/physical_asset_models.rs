@@ -50,6 +50,28 @@ impl<T1> common_traits::builder::Attributed
 {
     type Attribute = PhysicalAssetModelAttribute;
 }
+impl web_common_traits::database::TableField for PhysicalAssetModelAttribute {}
+impl web_common_traits::database::HasTableType for PhysicalAssetModelAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+    > for PhysicalAssetModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+    ) -> Self {
+        PhysicalAssetModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for PhysicalAssetModelAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        PhysicalAssetModelAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for PhysicalAssetModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -440,24 +462,20 @@ impl<AssetModel, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertablePhysicalAssetModelBuilder<AssetModel>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
-        Error = web_common_traits::database::InsertError<PhysicalAssetModelAttribute>,
-    >,
-    AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+            C,
+            Row = crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+            Error = web_common_traits::database::InsertError<PhysicalAssetModelAttribute>,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<PhysicalAssetModelAttribute>;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<PhysicalAssetModelAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

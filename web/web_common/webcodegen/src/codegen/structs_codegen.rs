@@ -11,7 +11,7 @@ use crate::{Table, traits::TableLike};
 
 mod tables;
 mod types;
-
+pub(crate) use tables::table_names_enum_path;
 use time_requirements::prelude::{Task, TimeTracker};
 
 impl Codegen<'_> {

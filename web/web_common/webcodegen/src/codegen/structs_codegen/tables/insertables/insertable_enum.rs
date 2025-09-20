@@ -9,6 +9,7 @@ use crate::{
     Table,
     codegen::{
         CODEGEN_DIRECTORY, CODEGEN_INSERTABLES_PATH, CODEGEN_STRUCTS_MODULE, CODEGEN_TABLES_PATH,
+        structs_codegen::table_names_enum_path,
     },
     errors::WebCodeGenError,
     traits::TableLike,
@@ -369,6 +370,29 @@ impl Table {
             quote::quote! { <#(#generics),*> }
         };
 
+        let table_enum_ty = table_names_enum_path();
+
+        let mut insert_error_from_extension_impls = extension_tables.iter().map(|extended_table|{
+            let extended_table_enum_ty = extended_table.insertable_enum_ty()?;
+            Ok(quote::quote!{
+                impl web_common_traits::database::FromExtension<#extended_table_enum_ty> for #insertable_enum {
+                    fn from_extension(attribute: #extended_table_enum_ty) -> Self {
+                        #insertable_enum::Extension(From::from(attribute))
+                    }
+                }
+            })
+        }).collect::<Result<Vec<_>, WebCodeGenError>>()?;
+
+        if !extension_tables.is_empty() {
+            insert_error_from_extension_impls.push(quote::quote!{
+                impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple> for #insertable_enum {
+                    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+                        #insertable_enum::Extension(From::from(attribute))
+                    }
+                }
+            });
+        }
+
         Ok(quote::quote! {
             #insertable_extension_enum_definition
 
@@ -385,6 +409,14 @@ impl Table {
             impl #maybe_generics common_traits::builder::Attributed for #builder #maybe_generics{
                 type Attribute = #insertable_enum;
             }
+
+            impl web_common_traits::database::TableField for #insertable_enum {}
+
+            impl web_common_traits::database::HasTableType for #insertable_enum {
+                type Table = #table_enum_ty;
+            }
+
+            #(#insert_error_from_extension_impls)*
 
             impl core::fmt::Display for #insertable_enum {
                 fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {

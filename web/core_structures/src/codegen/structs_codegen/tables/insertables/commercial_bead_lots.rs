@@ -64,6 +64,39 @@ impl<T1, T2> common_traits::builder::Attributed
 {
     type Attribute = CommercialBeadLotAttribute;
 }
+impl web_common_traits::database::TableField for CommercialBeadLotAttribute {}
+impl web_common_traits::database::HasTableType for CommercialBeadLotAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+    > for CommercialBeadLotAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+    ) -> Self {
+        CommercialBeadLotAttribute::Extension(From::from(attribute))
+    }
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
+    > for CommercialBeadLotAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::BeadModelAttribute,
+    ) -> Self {
+        CommercialBeadLotAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for CommercialBeadLotAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        CommercialBeadLotAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for CommercialBeadLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -706,22 +739,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot,
             Error = web_common_traits::database::InsertError<CommercialBeadLotAttribute>,
-        >,
-    CommercialProductLot: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    BeadModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<CommercialBeadLotAttribute>,
-    > {
+    type Error = web_common_traits::database::InsertError<CommercialBeadLotAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::commercial_bead_lots::CommercialBeadLot = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

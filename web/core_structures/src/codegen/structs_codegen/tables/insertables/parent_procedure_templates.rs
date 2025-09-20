@@ -26,6 +26,10 @@ impl common_traits::builder::Attributed
 for crate::codegen::structs_codegen::tables::insertables::InsertableParentProcedureTemplateBuilder {
     type Attribute = ParentProcedureTemplateAttribute;
 }
+impl web_common_traits::database::TableField for ParentProcedureTemplateAttribute {}
+impl web_common_traits::database::HasTableType for ParentProcedureTemplateAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
 impl core::fmt::Display for ParentProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -337,25 +341,24 @@ impl<C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableParentProcedureTemplateBuilder
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
-        Error = web_common_traits::database::InsertError<
-            ParentProcedureTemplateAttribute,
-        >,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate,
+            Error = web_common_traits::database::InsertError<
+                ParentProcedureTemplateAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = (i32, i32)>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<
+        ParentProcedureTemplateAttribute,
+    >;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<ParentProcedureTemplateAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

@@ -9,7 +9,10 @@ use syn::Ident;
 
 use crate::{
     Codegen, Table,
-    codegen::{CODEGEN_DIRECTORY, CODEGEN_TABLES_PATH},
+    codegen::{
+        CODEGEN_DIRECTORY, CODEGEN_TABLES_PATH,
+        structs_codegen::tables::crud::table_names::table_names_enum_path,
+    },
     traits::TableLike,
 };
 
@@ -42,7 +45,7 @@ impl Codegen<'_> {
         _conn: &mut diesel::PgConnection,
     ) -> Result<(), crate::errors::WebCodeGenError> {
         std::fs::create_dir_all(root)?;
-        let table_name_enum_path = Self::table_names_enum_path();
+        let table_name_enum_path = table_names_enum_path();
         let table_primary_keys_path = Self::table_primary_keys_enum_path();
         let row_enum_path = Self::row_enum_path();
         let sqlite_upsert: Vec<TokenStream> = tables

@@ -119,6 +119,28 @@ impl<T1> common_traits::builder::Attributed
 {
     type Attribute = AliquotingProcedureAttribute;
 }
+impl web_common_traits::database::TableField for AliquotingProcedureAttribute {}
+impl web_common_traits::database::HasTableType for AliquotingProcedureAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+    > for AliquotingProcedureAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
+    ) -> Self {
+        AliquotingProcedureAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for AliquotingProcedureAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        AliquotingProcedureAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for AliquotingProcedureAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -2754,30 +2776,22 @@ impl<Procedure, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableAliquotingProcedureBuilder<Procedure>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
-        Error = web_common_traits::database::InsertError<AliquotingProcedureAttribute>,
-    >,
-    Procedure: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure,
+            Error = web_common_traits::database::InsertError<
+                AliquotingProcedureAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<AliquotingProcedureAttribute>;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<AliquotingProcedureAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::aliquoting_procedures::AliquotingProcedure = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

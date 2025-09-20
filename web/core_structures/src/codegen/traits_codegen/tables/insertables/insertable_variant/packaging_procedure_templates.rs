@@ -49,27 +49,7 @@ where
             crate::codegen::structs_codegen::tables::insertables::PackagingProcedureTemplateAttribute,
         >,
     >,
-    ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
-    Self: crate::codegen::structs_codegen::tables::insertables::PackagingProcedureTemplateSettable<
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::PackagingProcedureTemplateAttribute,
-        >,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
-        PrimaryKey = i32,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
-        C,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::PackagingProcedureTemplateExtensionAttribute: From<
-        <ProcedureTemplate as common_traits::builder::Attributed>::Attribute,
-    >,
 {
     fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
@@ -104,26 +84,23 @@ where
         C,
         crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
     >,
+    Self::Error: web_common_traits::database::FromExtension<
+        <ProcedureTemplate as web_common_traits::database::TryInsertGeneric<C>>::Error,
+    >,
     ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::DispatchableInsertableVariant<
+        C,
     >,
     Self: crate::codegen::structs_codegen::tables::insertables::PackagingProcedureTemplateSettable<
         Error = web_common_traits::database::InsertError<
             crate::codegen::structs_codegen::tables::insertables::PackagingProcedureTemplateAttribute,
         >,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute,
-        PrimaryKey = i32,
-    >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
         C,
-    >,
-    Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::PackagingProcedureTemplateExtensionAttribute: From<
-        <ProcedureTemplate as common_traits::builder::Attributed>::Attribute,
     >,
 {
     fn try_insert(
@@ -131,6 +108,7 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::FromExtension;
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let web_common_traits::database::IdOrBuilder::Id(
@@ -176,13 +154,7 @@ where
         let procedure_template = self
             .procedure_template
             .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(|attribute| {
-                    crate::codegen::structs_codegen::tables::insertables::PackagingProcedureTemplateAttribute::Extension(
-                        From::from(attribute),
-                    )
-                })
-            })?;
+            .map_err(Self::Error::from_extension)?;
         let procedure_template_packaged_with_model = match self
             .procedure_template_packaged_with_model
         {

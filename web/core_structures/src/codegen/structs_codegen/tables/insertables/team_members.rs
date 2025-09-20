@@ -21,6 +21,10 @@ impl common_traits::builder::Attributed
 {
     type Attribute = TeamMemberAttribute;
 }
+impl web_common_traits::database::TableField for TeamMemberAttribute {}
+impl web_common_traits::database::HasTableType for TeamMemberAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
 impl core::fmt::Display for TeamMemberAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -194,18 +198,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::team_members::TeamMember,
             Error = web_common_traits::database::InsertError<TeamMemberAttribute>,
-        >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = (i32, i32)>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<TeamMemberAttribute>>
-    {
+    type Error = web_common_traits::database::InsertError<TeamMemberAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::team_members::TeamMember =
-            self.insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

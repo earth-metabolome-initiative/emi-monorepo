@@ -55,6 +55,28 @@ impl<T1> common_traits::builder::Attributed
 {
     type Attribute = CommercialProductLotAttribute;
 }
+impl web_common_traits::database::TableField for CommercialProductLotAttribute {}
+impl web_common_traits::database::HasTableType for CommercialProductLotAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    > for CommercialProductLotAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    ) -> Self {
+        CommercialProductLotAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for CommercialProductLotAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        CommercialProductLotAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for CommercialProductLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -561,27 +583,22 @@ impl<PhysicalAssetModel, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableCommercialProductLotBuilder<PhysicalAssetModel>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
-        Error = web_common_traits::database::InsertError<CommercialProductLotAttribute>,
-    >,
-    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot,
+            Error = web_common_traits::database::InsertError<
+                CommercialProductLotAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<CommercialProductLotAttribute>;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<CommercialProductLotAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::commercial_product_lots::CommercialProductLot = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

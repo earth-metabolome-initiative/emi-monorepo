@@ -28,6 +28,10 @@ impl common_traits::builder::Attributed
 {
     type Attribute = InstrumentStateAttribute;
 }
+impl web_common_traits::database::TableField for InstrumentStateAttribute {}
+impl web_common_traits::database::HasTableType for InstrumentStateAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
 impl core::fmt::Display for InstrumentStateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -297,18 +301,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::instrument_states::InstrumentState,
             Error = web_common_traits::database::InsertError<InstrumentStateAttribute>,
-        >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i16>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<InstrumentStateAttribute>>
-    {
+    type Error = web_common_traits::database::InsertError<InstrumentStateAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::instrument_states::InstrumentState = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

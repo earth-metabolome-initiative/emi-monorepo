@@ -44,25 +44,7 @@ where
             crate::codegen::structs_codegen::tables::insertables::SampleAttribute,
         >,
     >,
-    PhysicalAsset: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
-    Self: crate::codegen::structs_codegen::tables::insertables::SampleSettable<
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::SampleAttribute,
-        >,
-    >,
-    crate::codegen::structs_codegen::tables::assets::Asset: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::sample_models::SampleModel: web_common_traits::database::Read<
-        C,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::SampleExtensionAttribute: From<
-        <PhysicalAsset as common_traits::builder::Attributed>::Attribute,
-    >,
 {
     fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
@@ -97,6 +79,9 @@ where
         C,
         crate::codegen::structs_codegen::tables::samples::Sample,
     >,
+    Self::Error: web_common_traits::database::FromExtension<
+        <PhysicalAsset as web_common_traits::database::TryInsertGeneric<C>>::Error,
+    >,
     PhysicalAsset: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
@@ -112,16 +97,13 @@ where
     crate::codegen::structs_codegen::tables::sample_models::SampleModel: web_common_traits::database::Read<
         C,
     >,
-    Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::SampleExtensionAttribute: From<
-        <PhysicalAsset as common_traits::builder::Attributed>::Attribute,
-    >,
 {
     fn try_insert(
         mut self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::FromExtension;
         use web_common_traits::database::Read;
         if let Some(model) = self.model {
             let sample_models = crate::codegen::structs_codegen::tables::sample_models::SampleModel::read(
@@ -160,13 +142,7 @@ where
         let id = self
             .id
             .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(|attribute| {
-                    crate::codegen::structs_codegen::tables::insertables::SampleAttribute::Extension(
-                        From::from(attribute),
-                    )
-                })
-            })?;
+            .map_err(Self::Error::from_extension)?;
         Ok(Self::InsertableVariant {
             id,
             model,

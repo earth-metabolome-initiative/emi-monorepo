@@ -129,6 +129,28 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProc
 > {
     type Attribute = BallMillProcedureTemplateAttribute;
 }
+impl web_common_traits::database::TableField for BallMillProcedureTemplateAttribute {}
+impl web_common_traits::database::HasTableType for BallMillProcedureTemplateAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+    > for BallMillProcedureTemplateAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+    ) -> Self {
+        BallMillProcedureTemplateAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for BallMillProcedureTemplateAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        BallMillProcedureTemplateAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for BallMillProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -1597,32 +1619,24 @@ impl<ProcedureTemplate, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableBallMillProcedureTemplateBuilder<ProcedureTemplate>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
-        Error = web_common_traits::database::InsertError<
-            BallMillProcedureTemplateAttribute,
-        >,
-    >,
-    ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate,
+            Error = web_common_traits::database::InsertError<
+                BallMillProcedureTemplateAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<
+        BallMillProcedureTemplateAttribute,
+    >;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<BallMillProcedureTemplateAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

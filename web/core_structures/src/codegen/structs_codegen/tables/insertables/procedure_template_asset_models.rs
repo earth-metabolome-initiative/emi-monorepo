@@ -27,6 +27,10 @@ impl common_traits::builder::Attributed
 for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder {
     type Attribute = ProcedureTemplateAssetModelAttribute;
 }
+impl web_common_traits::database::TableField for ProcedureTemplateAssetModelAttribute {}
+impl web_common_traits::database::HasTableType for ProcedureTemplateAssetModelAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
 impl core::fmt::Display for ProcedureTemplateAssetModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -390,25 +394,24 @@ impl<C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableProcedureTemplateAssetModelBuilder
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
-        Error = web_common_traits::database::InsertError<
-            ProcedureTemplateAssetModelAttribute,
-        >,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
+            Error = web_common_traits::database::InsertError<
+                ProcedureTemplateAssetModelAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<
+        ProcedureTemplateAssetModelAttribute,
+    >;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<ProcedureTemplateAssetModelAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

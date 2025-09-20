@@ -73,7 +73,6 @@ where
         C,
         crate::codegen::structs_codegen::tables::assets::Asset,
     >,
-    Self: web_common_traits::database::MostConcreteTable,
 {
     fn try_insert(
         self,

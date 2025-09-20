@@ -36,20 +36,15 @@ where
             crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
         >,
     >,
-    Self: crate::codegen::structs_codegen::tables::insertables::ProcedureSettable<
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
-        >,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
-        C,
-    >,
+            C,
+        > + web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+            C,
+        > + web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
+            C,
+        > + web_common_traits::database::Read<C>,
     Self: web_common_traits::database::MostConcreteTable,
 {
     fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
@@ -112,16 +107,9 @@ where
             crate::codegen::structs_codegen::tables::insertables::ProcedureAttribute,
         >,
     >,
-    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Updatable<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::procedures::Procedure: web_common_traits::database::Read<
         C,
     >,
-    Self: web_common_traits::database::MostConcreteTable,
 {
     fn try_insert(
         mut self,

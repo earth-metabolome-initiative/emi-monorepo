@@ -22,6 +22,10 @@ impl common_traits::builder::Attributed
 {
     type Attribute = RankAttribute;
 }
+impl web_common_traits::database::TableField for RankAttribute {}
+impl web_common_traits::database::HasTableType for RankAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
 impl core::fmt::Display for RankAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -187,17 +191,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::ranks::Rank,
             Error = web_common_traits::database::InsertError<RankAttribute>,
-        >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i16>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<RankAttribute>> {
+    type Error = web_common_traits::database::InsertError<RankAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::ranks::Rank =
-            self.insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

@@ -2,7 +2,6 @@
 
 use std::path::Path;
 
-use proc_macro2::TokenStream;
 use syn::Ident;
 
 use crate::{
@@ -11,15 +10,15 @@ use crate::{
     traits::TableLike,
 };
 
-impl Codegen<'_> {
-    pub(crate) fn table_names_enum_path() -> TokenStream {
-        let codegen_ident = Ident::new(CODEGEN_DIRECTORY, proc_macro2::Span::call_site());
-        let tables_module_ident = Ident::new(CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
-        quote::quote! {
-            crate::#codegen_ident::#tables_module_ident::table_names::TableName
-        }
+pub(crate) fn table_names_enum_path() -> syn::Type {
+    let codegen_ident = Ident::new(CODEGEN_DIRECTORY, proc_macro2::Span::call_site());
+    let tables_module_ident = Ident::new(CODEGEN_TABLES_PATH, proc_macro2::Span::call_site());
+    syn::parse_quote! {
+        crate::#codegen_ident::#tables_module_ident::table_names::TableName
     }
+}
 
+impl Codegen<'_> {
     /// Generate implementations of the `TableName` enum for the provided
     /// tables.
     ///
@@ -40,6 +39,8 @@ impl Codegen<'_> {
         std::fs::create_dir_all(root)?;
 
         let table_idents = tables.iter().map(Table::struct_ident).collect::<Result<Vec<_>, _>>()?;
+        let table_snake_case =
+            tables.iter().map(Table::snake_case_name).collect::<Result<Vec<_>, _>>()?;
         let tables_enum_file = root.join("table_names.rs");
         std::fs::write(
             &tables_enum_file,
@@ -50,11 +51,25 @@ impl Codegen<'_> {
                     #(#table_idents),*
                 }
 
+                impl web_common_traits::database::TableEnum for TableName {}
+
+                impl core::str::FromStr for TableName {
+                    type Err = String;
+                    fn from_str(s: &str) -> Result<Self, Self::Err> {
+                        match s {
+                            #(
+                                #table_snake_case => Ok(TableName::#table_idents)
+                            ),*,
+                            _ => Err(format!("Unknown table name: {}", s)),
+                        }
+                    }
+                }
+
                 impl core::fmt::Display for TableName {
                     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
                         match self {
                             #(
-                                TableName::#table_idents => write!(f, stringify!(#table_idents)),
+                                TableName::#table_idents => write!(f, #table_snake_case),
                             )*
                         }
                     }

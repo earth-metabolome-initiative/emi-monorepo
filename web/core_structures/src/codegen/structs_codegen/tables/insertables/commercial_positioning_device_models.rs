@@ -71,6 +71,39 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPo
 > {
     type Attribute = CommercialPositioningDeviceModelAttribute;
 }
+impl web_common_traits::database::TableField for CommercialPositioningDeviceModelAttribute {}
+impl web_common_traits::database::HasTableType for CommercialPositioningDeviceModelAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute,
+    > for CommercialPositioningDeviceModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::PositioningDeviceModelAttribute,
+    ) -> Self {
+        CommercialPositioningDeviceModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    > for CommercialPositioningDeviceModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    ) -> Self {
+        CommercialPositioningDeviceModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for CommercialPositioningDeviceModelAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        CommercialPositioningDeviceModelAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for CommercialPositioningDeviceModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -664,35 +697,24 @@ for InsertableCommercialPositioningDeviceModelBuilder<
 >
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel,
-        Error = web_common_traits::database::InsertError<
-            CommercialPositioningDeviceModelAttribute,
-        >,
-    >,
-    PositioningDeviceModel: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
-    CommercialProduct: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel,
+            Error = web_common_traits::database::InsertError<
+                CommercialPositioningDeviceModelAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<
+        CommercialPositioningDeviceModelAttribute,
+    >;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<
-            CommercialPositioningDeviceModelAttribute,
-        >,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::commercial_positioning_device_models::CommercialPositioningDeviceModel = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

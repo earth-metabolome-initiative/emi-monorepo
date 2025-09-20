@@ -49,6 +49,28 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableVolumetricCo
 > {
     type Attribute = VolumetricContainerModelAttribute;
 }
+impl web_common_traits::database::TableField for VolumetricContainerModelAttribute {}
+impl web_common_traits::database::HasTableType for VolumetricContainerModelAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
+    > for VolumetricContainerModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::ContainerModelAttribute,
+    ) -> Self {
+        VolumetricContainerModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for VolumetricContainerModelAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        VolumetricContainerModelAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for VolumetricContainerModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -449,26 +471,24 @@ impl<ContainerModel, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableVolumetricContainerModelBuilder<ContainerModel>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
-        Error = web_common_traits::database::InsertError<
-            VolumetricContainerModelAttribute,
-        >,
-    >,
-    ContainerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+            C,
+            Row = crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+            Error = web_common_traits::database::InsertError<
+                VolumetricContainerModelAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<
+        VolumetricContainerModelAttribute,
+    >;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<VolumetricContainerModelAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

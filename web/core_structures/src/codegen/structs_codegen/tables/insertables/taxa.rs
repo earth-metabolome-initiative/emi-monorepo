@@ -27,6 +27,10 @@ impl common_traits::builder::Attributed
 {
     type Attribute = TaxonAttribute;
 }
+impl web_common_traits::database::TableField for TaxonAttribute {}
+impl web_common_traits::database::HasTableType for TaxonAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
 impl core::fmt::Display for TaxonAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -267,17 +271,13 @@ where
             C,
             Row = crate::codegen::structs_codegen::tables::taxa::Taxon,
             Error = web_common_traits::database::InsertError<TaxonAttribute>,
-        >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, web_common_traits::database::InsertError<TaxonAttribute>> {
+    type Error = web_common_traits::database::InsertError<TaxonAttribute>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::taxa::Taxon =
-            self.insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

@@ -69,6 +69,39 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialBa
 > {
     type Attribute = CommercialBallMillMachineLotAttribute;
 }
+impl web_common_traits::database::TableField for CommercialBallMillMachineLotAttribute {}
+impl web_common_traits::database::HasTableType for CommercialBallMillMachineLotAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+    > for CommercialBallMillMachineLotAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+    ) -> Self {
+        CommercialBallMillMachineLotAttribute::Extension(From::from(attribute))
+    }
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute,
+    > for CommercialBallMillMachineLotAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::BallMillMachineModelAttribute,
+    ) -> Self {
+        CommercialBallMillMachineLotAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for CommercialBallMillMachineLotAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        CommercialBallMillMachineLotAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for CommercialBallMillMachineLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -710,33 +743,24 @@ for InsertableCommercialBallMillMachineLotBuilder<
 >
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
-        Error = web_common_traits::database::InsertError<
-            CommercialBallMillMachineLotAttribute,
-        >,
-    >,
-    CommercialProductLot: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
-    BallMillMachineModel: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
+            Error = web_common_traits::database::InsertError<
+                CommercialBallMillMachineLotAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<
+        CommercialBallMillMachineLotAttribute,
+    >;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<CommercialBallMillMachineLotAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

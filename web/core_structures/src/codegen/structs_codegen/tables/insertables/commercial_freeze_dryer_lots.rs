@@ -67,6 +67,39 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialFr
 > {
     type Attribute = CommercialFreezeDryerLotAttribute;
 }
+impl web_common_traits::database::TableField for CommercialFreezeDryerLotAttribute {}
+impl web_common_traits::database::HasTableType for CommercialFreezeDryerLotAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+    > for CommercialFreezeDryerLotAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+    ) -> Self {
+        CommercialFreezeDryerLotAttribute::Extension(From::from(attribute))
+    }
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::FreezeDryerModelAttribute,
+    > for CommercialFreezeDryerLotAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::FreezeDryerModelAttribute,
+    ) -> Self {
+        CommercialFreezeDryerLotAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for CommercialFreezeDryerLotAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        CommercialFreezeDryerLotAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for CommercialFreezeDryerLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -682,30 +715,24 @@ impl<
 for InsertableCommercialFreezeDryerLotBuilder<CommercialProductLot, FreezeDryerModel>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
-        Error = web_common_traits::database::InsertError<
-            CommercialFreezeDryerLotAttribute,
-        >,
-    >,
-    CommercialProductLot: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
-    FreezeDryerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+            C,
+            Row = crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot,
+            Error = web_common_traits::database::InsertError<
+                CommercialFreezeDryerLotAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<
+        CommercialFreezeDryerLotAttribute,
+    >;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<CommercialFreezeDryerLotAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::commercial_freeze_dryer_lots::CommercialFreezeDryerLot = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

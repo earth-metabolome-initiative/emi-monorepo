@@ -108,6 +108,28 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugePr
 > {
     type Attribute = CentrifugeProcedureTemplateAttribute;
 }
+impl web_common_traits::database::TableField for CentrifugeProcedureTemplateAttribute {}
+impl web_common_traits::database::HasTableType for CentrifugeProcedureTemplateAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+    > for CentrifugeProcedureTemplateAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAttribute,
+    ) -> Self {
+        CentrifugeProcedureTemplateAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for CentrifugeProcedureTemplateAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        CentrifugeProcedureTemplateAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for CentrifugeProcedureTemplateAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -1232,32 +1254,24 @@ impl<ProcedureTemplate, C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableCentrifugeProcedureTemplateBuilder<ProcedureTemplate>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
-        Error = web_common_traits::database::InsertError<
-            CentrifugeProcedureTemplateAttribute,
-        >,
-    >,
-    ProcedureTemplate: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
+            Error = web_common_traits::database::InsertError<
+                CentrifugeProcedureTemplateAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<
+        CentrifugeProcedureTemplateAttribute,
+    >;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<CentrifugeProcedureTemplateAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

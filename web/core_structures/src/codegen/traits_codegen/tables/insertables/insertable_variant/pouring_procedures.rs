@@ -51,30 +51,7 @@ where
             crate::codegen::structs_codegen::tables::insertables::PouringProcedureAttribute,
         >,
     >,
-    Procedure: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
-    Self: crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable<
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::PouringProcedureAttribute,
-        >,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
-    crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
-        C,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::PouringProcedureExtensionAttribute: From<
-        <Procedure as common_traits::builder::Attributed>::Attribute,
-    >,
 {
     fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
@@ -109,19 +86,20 @@ where
         C,
         crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
     >,
+    Self::Error: web_common_traits::database::FromExtension<
+        <Procedure as web_common_traits::database::TryInsertGeneric<C>>::Error,
+    >,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::DispatchableInsertableVariant<
+        C,
     >,
     Self: crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable<
         Error = web_common_traits::database::InsertError<
             crate::codegen::structs_codegen::tables::insertables::PouringProcedureAttribute,
         >,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
-        PrimaryKey = ::rosetta_uuid::Uuid,
     >,
     crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate: web_common_traits::database::Read<
         C,
@@ -129,16 +107,13 @@ where
     crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
-    Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::PouringProcedureExtensionAttribute: From<
-        <Procedure as common_traits::builder::Attributed>::Attribute,
-    >,
 {
     fn try_insert(
         mut self,
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::FromExtension;
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
@@ -256,13 +231,7 @@ where
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(|attribute| {
-                    crate::codegen::structs_codegen::tables::insertables::PouringProcedureAttribute::Extension(
-                        From::from(attribute),
-                    )
-                })
-            })?;
+            .map_err(Self::Error::from_extension)?;
         let procedure_poured_from = match self.procedure_poured_from {
             web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(

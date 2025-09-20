@@ -5,6 +5,8 @@ use std::{convert::Infallible, str::FromStr};
 use common_traits::{builder::IsCompleteBuilder, prelude::BuilderError};
 use generic_backend_request_errors::GenericBackendRequestError;
 
+use crate::database::TableField;
+
 #[derive(
     Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, serde::Deserialize, serde::Serialize,
 )]
@@ -171,7 +173,7 @@ pub trait DispatchableInsertableVariant<C>: DispatchableInsertVariantMetadata {
 
 /// A trait for types that can be constructed in the frontend or backend to
 /// execute the insert operation.
-pub trait InsertableVariant<C>: InsertableVariantMetadata {
+pub trait InsertableVariant<C>: SetPrimaryKey + InsertableVariantMetadata {
     /// Attempts to convert the builder into an insertable object, executing
     /// the necessary database operations if required.
     ///
@@ -215,7 +217,7 @@ pub trait BackendInsertableVariant:
 #[derive(Debug, Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
 /// Enumeration of the possible errors associated to the frontend insert
 /// operations.
-pub enum InsertError<FieldName> {
+pub enum InsertError<FieldName: TableField> {
     /// A build error occurred.
     BuilderError(BuilderError<FieldName>),
     /// A validation error occurred.
@@ -225,9 +227,9 @@ pub enum InsertError<FieldName> {
     /// A foreign key was violated.
     ForeignKeyViolation {
         /// The name of the table where the row is being inserted.
-        table: String,
+        table: FieldName::Table,
         /// The name of the table where the foreign key points to.
-        foreign_table: String,
+        foreign_table: FieldName::Table,
         /// The name of the foreign key constraint that was violated.
         foreign_key: String,
         /// The names of the columns involved in the foreign key violation.
@@ -238,7 +240,7 @@ pub enum InsertError<FieldName> {
     /// A unique constraint was violated.
     UniqueConstraintViolation {
         /// The name of the table where the row is being inserted.
-        table: String,
+        table: FieldName::Table,
         /// The names of the columns involved in the unique constraint
         /// violation.
         columns: Vec<FieldName>,
@@ -251,12 +253,13 @@ pub enum InsertError<FieldName> {
     ServerError(GenericBackendRequestError),
 }
 
-impl<FieldName> InsertError<FieldName> {
+impl<FieldName: TableField> InsertError<FieldName> {
     /// Converts the `InsertError` into a new `InsertError` with a different
     /// field name.
     pub fn into_field_name<F, NewFieldName>(self, convert: F) -> InsertError<NewFieldName>
     where
         F: Fn(FieldName) -> NewFieldName,
+        NewFieldName: TableField<Table = FieldName::Table>,
     {
         match self {
             InsertError::BuilderError(error) => {
@@ -294,12 +297,9 @@ impl<FieldName> InsertError<FieldName> {
     }
 }
 
-impl<FieldName: core::fmt::Debug + core::fmt::Display> core::error::Error
-    for InsertError<FieldName>
-{
-}
+impl<FieldName: TableField> core::error::Error for InsertError<FieldName> {}
 
-impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName> {
+impl<FieldName: TableField> core::fmt::Display for InsertError<FieldName> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
             InsertError::BuilderError(error) => {
@@ -351,36 +351,37 @@ impl<FieldName: core::fmt::Display> core::fmt::Display for InsertError<FieldName
     }
 }
 
-impl<FieldName> From<BuilderError<FieldName>> for InsertError<FieldName> {
+impl<FieldName: TableField> From<BuilderError<FieldName>> for InsertError<FieldName> {
     fn from(error: BuilderError<FieldName>) -> Self {
         InsertError::BuilderError(error)
     }
 }
 
-impl<FieldName> From<validation_errors::Error<FieldName>> for InsertError<FieldName> {
+impl<FieldName: TableField> From<validation_errors::Error<FieldName>> for InsertError<FieldName> {
     fn from(error: validation_errors::Error<FieldName>) -> Self {
         InsertError::ValidationError(error)
     }
 }
 
-impl<FieldName> From<validation_errors::SingleFieldError<FieldName>> for InsertError<FieldName> {
+impl<FieldName: TableField> From<validation_errors::SingleFieldError<FieldName>>
+    for InsertError<FieldName>
+{
     fn from(error: validation_errors::SingleFieldError<FieldName>) -> Self {
         let validation_error: validation_errors::Error<FieldName> = error.into();
         validation_error.into()
     }
 }
 
-impl<FieldName> From<validation_errors::DoubleFieldError<FieldName>> for InsertError<FieldName> {
+impl<FieldName: TableField> From<validation_errors::DoubleFieldError<FieldName>>
+    for InsertError<FieldName>
+{
     fn from(error: validation_errors::DoubleFieldError<FieldName>) -> Self {
         let validation_error: validation_errors::Error<FieldName> = error.into();
         validation_error.into()
     }
 }
 
-impl<FieldName> From<diesel::result::Error> for InsertError<FieldName>
-where
-    FieldName: FromStr,
-{
+impl<FieldName: TableField> From<diesel::result::Error> for InsertError<FieldName> {
     fn from(error: diesel::result::Error) -> Self {
         // We check whether the error is a foreign key violation, and
         // if it is a compatibility rule violation.
@@ -421,13 +422,16 @@ where
             let table_name = detail.rsplit_once("table \"").and_then(|(_, after)| {
                 after.strip_suffix("\".") // We remove the trailing quote and dot.
             });
-            if let (Some(columns), Some(expected_values), Some(table), Some(foreign_table)) =
-                (before_equal, after_equal, table_name, info.table_name())
-            {
+            if let (Some(columns), Some(expected_values), Some(table), Some(foreign_table)) = (
+                before_equal,
+                after_equal,
+                table_name.and_then(|table| FieldName::Table::from_str(table).ok()),
+                info.table_name().and_then(|table| FieldName::Table::from_str(table).ok()),
+            ) {
                 let expected_values = expected_values.map(str::trim).map(String::from).collect();
                 return InsertError::ForeignKeyViolation {
-                    table: table.to_owned(),
-                    foreign_table: foreign_table.to_owned(),
+                    table,
+                    foreign_table,
                     foreign_key: info.constraint_name().unwrap_or("unknown").to_string(),
                     columns,
                     expected_values,
@@ -468,15 +472,13 @@ where
                 .next()
                 .and_then(|s| Some(s.strip_prefix("(")?.rsplit(')').next_back()?.split(',')));
 
-            if let (Some(columns), Some(expected_values), Some(table)) =
-                (before_equal, after_equal, info.table_name())
-            {
+            if let (Some(columns), Some(expected_values), Some(table)) = (
+                before_equal,
+                after_equal,
+                info.table_name().and_then(|table| FieldName::Table::from_str(table).ok()),
+            ) {
                 let expected_values = expected_values.map(str::trim).map(String::from).collect();
-                return InsertError::UniqueConstraintViolation {
-                    table: table.to_owned(),
-                    columns,
-                    expected_values,
-                };
+                return InsertError::UniqueConstraintViolation { table, columns, expected_values };
             }
         }
 
@@ -505,13 +507,13 @@ where
     }
 }
 
-impl<FieldName> From<GenericBackendRequestError> for InsertError<FieldName> {
+impl<FieldName: TableField> From<GenericBackendRequestError> for InsertError<FieldName> {
     fn from(error: GenericBackendRequestError) -> Self {
         InsertError::ServerError(error)
     }
 }
 
-impl<FieldName> From<Infallible> for InsertError<FieldName> {
+impl<FieldName: TableField> From<Infallible> for InsertError<FieldName> {
     fn from(_error: Infallible) -> Self {
         unreachable!()
     }

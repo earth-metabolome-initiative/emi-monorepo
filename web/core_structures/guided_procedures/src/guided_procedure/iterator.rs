@@ -13,7 +13,10 @@ use web_common_traits::database::{
 };
 use web_common_traits::prelude::{MostConcreteVariant, ProcedureLike};
 
-use crate::{GuidedProcedure, guided_procedure::error::GuidedProcedureError};
+use crate::{
+    GuidedProcedure,
+    guided_procedure::error::{GuidedProcedureError, InternalGuidedProcedureError},
+};
 
 impl<'graph, C> Iterator for GuidedProcedure<'graph, C>
 where
@@ -22,7 +25,7 @@ where
 {
     type Item = Result<
         (Vec<&'graph ProcedureTemplate>, &'graph ProcedureTemplate, ProcedureBuilderDAG),
-        GuidedProcedureError,
+        InternalGuidedProcedureError<'graph>,
     >;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -40,42 +43,6 @@ where
 
 #[cfg(feature = "backend")]
 impl<'graph> GuidedProcedure<'graph, diesel::PgConnection> {
-    #[allow(clippy::type_complexity)]
-    /// Attempts to retrieve the next builder of the expected type from the
-    /// iterator. If the next builder is not of the expected type, an error is
-    /// returned. If there are no more builders, an error is also returned.
-    ///
-    /// # Errors
-    ///
-    /// * Returns `GuidedProcedureError::UnexpectedBuilder` if the next builder
-    ///   is not of the expected type.
-    /// * Returns `GuidedProcedureError::NoMoreBuilders` if there are no more
-    ///   builders in the iterator.
-    fn try_next<ExpectedProcedure>(
-        &mut self,
-    ) -> Result<(Vec<&'graph ProcedureTemplate>, ExpectedProcedure::Builder), GuidedProcedureError>
-    where
-        ExpectedProcedure: ProcedureLike,
-        Option<ExpectedProcedure::Builder>: From<ProcedureBuilderDAG>,
-    {
-        if let Some(result) = self.by_ref().next() {
-            let (parents, template, builder_dag) = result?;
-            let found = builder_dag.type_name();
-            return if let Some(expected_builder) =
-                Option::<ExpectedProcedure::Builder>::from(builder_dag)
-            {
-                Ok((parents, expected_builder))
-            } else {
-                Err(GuidedProcedureError::UnexpectedBuilder {
-                    expected: std::any::type_name::<ExpectedProcedure::Builder>(),
-                    found,
-                    template: template.clone(),
-                })
-            };
-        }
-        Err(GuidedProcedureError::NoMoreBuilders)
-    }
-
     /// Attempts to retrieve the next builder of the expected type from the
     /// iterator. If the next builder is not of the expected type, an error is
     /// returned. If there are no more builders, an error is also returned.
@@ -110,16 +77,33 @@ impl<'graph> GuidedProcedure<'graph, diesel::PgConnection> {
                 ProcedureTemplateAssetModel = ProcedureTemplateAssetModel,
             > + PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>,
         ExpectedProcedure::Builder: DispatchableInsertableVariant<diesel::PgConnection> + Debug,
-        E: From<GuidedProcedureError>,
+        E: From<ProcedureInsertErrorDAG>,
         Option<ExpectedProcedure::Builder>: From<ProcedureBuilderDAG>,
     {
-        let (parents, builder) = self.try_next::<ExpectedProcedure>()?;
+        let (parents, builder): (Vec<&'graph ProcedureTemplate>, ExpectedProcedure::Builder) =
+            if let Some(result) = self.next() {
+                let (parents, template, builder_dag) = result.unwrap();
+                let found = builder_dag.type_name();
+                if let Some(expected_builder) =
+                    Option::<ExpectedProcedure::Builder>::from(builder_dag)
+                {
+                    (parents, expected_builder)
+                } else {
+                    // return Err(GuidedProcedureError::UnexpectedBuilder {
+                    //     expected: std::any::type_name::<ExpectedProcedure::Builder>(),
+                    //     found,
+                    //     template,
+                    // }.into());
+                    unreachable!("Expected builder not found, but should have been checked earlier")
+                }
+            } else {
+                unreachable!("No more builders available")
+            };
         let builder = map(builder, self.visitor.listener_mut().connection())?;
         self.visitor
             .listener_mut()
             .insert(&parents, builder)
-            .map_err(ProcedureInsertErrorDAG::from)
-            .map_err(GuidedProcedureError::from)?;
+            .map_err(ProcedureInsertErrorDAG::from)?;
         Ok(self)
     }
 
@@ -132,11 +116,12 @@ impl<'graph> GuidedProcedure<'graph, diesel::PgConnection> {
     ///   remaining builders that have not been processed.
     pub fn finish(mut self) -> Result<(), GuidedProcedureError> {
         if let Some(result) = self.next() {
-            let (_parents, template, builder_dag) = result?;
-            Err(GuidedProcedureError::UnprocessedBuilder {
-                found: builder_dag.type_name(),
-                template: template.clone(),
-            })
+            let (_parents, template, builder_dag) = result.unwrap();
+            // Err(GuidedProcedureError::UnprocessedBuilder {
+            //     found: builder_dag.type_name(),
+            //     template,
+            // })
+            todo!()
         } else {
             Ok(())
         }

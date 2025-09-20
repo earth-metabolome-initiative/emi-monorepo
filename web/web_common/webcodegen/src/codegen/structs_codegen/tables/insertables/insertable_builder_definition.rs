@@ -20,7 +20,7 @@ impl Codegen<'_> {
         let maybe_generics = table.generics_for_table_builder_definition(conn)?;
         let insertable_columns = table.insertable_columns(conn, true)?;
         let builder_ident = table.insertable_builder_ident()?;
-        let maybe_impl_generics = table.generics_for_table_builder_implementation(conn)?;
+        let maybe_impl_generics = table.formatted_generics(conn)?;
 
         let has_sql_default_types = insertable_columns.iter().any(Column::has_default);
         let mut derives = vec![

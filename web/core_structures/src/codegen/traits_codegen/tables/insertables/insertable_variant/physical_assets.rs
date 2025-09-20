@@ -45,14 +45,7 @@ where
             crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute,
         >,
     >,
-    Asset: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::PhysicalAssetExtensionAttribute: From<
-        <Asset as common_traits::builder::Attributed>::Attribute,
-    >,
 {
     fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
@@ -87,13 +80,12 @@ where
         C,
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
     >,
+    Self::Error: web_common_traits::database::FromExtension<
+        <Asset as web_common_traits::database::TryInsertGeneric<C>>::Error,
+    >,
     Asset: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
-    Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::PhysicalAssetExtensionAttribute: From<
-        <Asset as common_traits::builder::Attributed>::Attribute,
     >,
 {
     fn try_insert(
@@ -101,6 +93,7 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::FromExtension;
         let model = self
             .model
             .ok_or(
@@ -111,13 +104,7 @@ where
         let id = self
             .id
             .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(|attribute| {
-                    crate::codegen::structs_codegen::tables::insertables::PhysicalAssetAttribute::Extension(
-                        From::from(attribute),
-                    )
-                })
-            })?;
+            .map_err(Self::Error::from_extension)?;
         Ok(Self::InsertableVariant {
             id,
             model,

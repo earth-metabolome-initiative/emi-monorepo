@@ -1,10 +1,9 @@
 //! Contains enum of the different templates available in Directus
 
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[allow(clippy::upper_case_acronyms)]
 pub(crate) enum DirectusTemplates {
-    DBGITemplate,
-    VineshPartOfOrganismTemplate,
-    VineshWholeOrganismTemplate,
+    DBGI,
+    VineshPartOfOrganism,
+    VineshWholeOrganism,
 }
-
-// TODO write a method that returns the associated template according to the
-// sample id

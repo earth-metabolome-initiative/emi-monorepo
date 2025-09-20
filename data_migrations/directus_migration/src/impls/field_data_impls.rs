@@ -16,7 +16,9 @@ use web_common_traits::{
     prelude::Insertable,
 };
 
-use crate::{sample_source_kind::SampleSourceKind, structs::FieldDatumWrapper};
+use crate::{
+    errors::SampleIDError, sample_source_kind::SampleSourceKind, structs::FieldDatumWrapper,
+};
 
 mod field_data_author;
 mod should_skip;
@@ -133,7 +135,11 @@ impl FieldDatumWrapper {
     }
 
     /// Returns the sample id after validation.
-    pub fn sample_id(&self) -> Result<String, anyhow::Error> {
+    pub fn sample_id(&self) -> Result<String, SampleIDError> {
+        if self.as_ref().sample_id.is_empty() {
+            return Err(SampleIDError::Empty);
+        }
+
         Ok(self.as_ref().sample_id.clone())
     }
 }

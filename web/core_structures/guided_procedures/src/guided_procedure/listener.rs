@@ -14,7 +14,8 @@ use web_common_traits::{
 };
 
 use crate::{
-    PTGListener, ProcedureTemplateGraph, guided_procedure::error::GuidedProcedureError,
+    PTGListener, ProcedureTemplateGraph,
+    guided_procedure::error::{GuidedProcedureError, InternalGuidedProcedureError},
     structs::OwnershipLike,
 };
 #[derive(Debug)]
@@ -108,7 +109,7 @@ where
         = Option<&'graph core_structures::ProcedureTemplate>
     where
         I: Iterator<Item = &'graph core_structures::ProcedureTemplate>;
-    type Error = GuidedProcedureError;
+    type Error = InternalGuidedProcedureError<'graph>;
 
     fn enter_foreign_procedure_template(
         &mut self,
@@ -186,16 +187,16 @@ where
             [single_successor] => Some(single_successor),
             _ => {
                 let Some(designated_successor) = self.designated_successor else {
-                    return Err(GuidedProcedureError::UnclearSuccessor {
-                        viable_successors: successors.into_iter().cloned().collect(),
+                    return Err(InternalGuidedProcedureError::UnclearSuccessor {
+                        viable_successors: successors,
                     });
                 };
                 if successors.contains(&designated_successor) {
                     Some(designated_successor)
                 } else {
-                    return Err(GuidedProcedureError::DesignatedSuccessorNotFound {
-                        designated_successor: designated_successor.clone(),
-                        viable_successors: successors.into_iter().cloned().collect(),
+                    return Err(InternalGuidedProcedureError::DesignatedSuccessorNotFound {
+                        designated_successor,
+                        viable_successors: successors,
                     });
                 }
             }

@@ -18,10 +18,10 @@ use webcodegen::{
 use crate::errors::Error;
 
 /// Constant defining the module name for procedure trait implementations.
-pub const PROCEDURE_TRAIT_IMPL_MODULE: &str = "procedures";
+pub const PROCEDURE_TRAIT_IMPL_MODULE: &str = "procedures_codegen";
 /// Constant defining the module name for procedure template trait
 /// implementations.
-pub const PROCEDURE_TEMPLATE_TRAIT_IMPL_MODULE: &str = "procedure_templates";
+pub const PROCEDURE_TEMPLATE_TRAIT_IMPL_MODULE: &str = "procedure_templates_codegen";
 
 #[derive(Debug, Clone)]
 /// Main struct for the procedure code generation.

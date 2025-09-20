@@ -9,7 +9,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 use crate::{
-    codegen::{Codegen, Table},
+    codegen::{Codegen, Table, structs_codegen::table_names_enum_path},
     traits::TableLike,
 };
 
@@ -32,7 +32,7 @@ impl Codegen<'_> {
         // We generate each table in a separate document under the provided root, and we
         // collect all of the imported modules in a public one.
         let mut table_tabular_main_module = TokenStream::new();
-        let table_name_enum_path = Self::table_names_enum_path();
+        let table_name_enum_path = table_names_enum_path();
         let table_primary_keys_enum_path = Self::table_primary_keys_enum_path();
         for table in tables {
             let table_struct = table.import_struct_path()?;

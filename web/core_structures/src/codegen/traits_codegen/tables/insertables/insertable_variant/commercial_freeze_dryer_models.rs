@@ -63,18 +63,7 @@ where
             crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute,
         >,
     >,
-    CommercialProduct: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
-    FreezeDryerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelExtensionAttribute: From<
-        <FreezeDryerModel as common_traits::builder::Attributed>::Attribute,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelExtensionAttribute: From<
-        <CommercialProduct as common_traits::builder::Attributed>::Attribute,
-    >,
 {
     fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
@@ -111,17 +100,18 @@ where
         C,
         crate::codegen::structs_codegen::tables::commercial_freeze_dryer_models::CommercialFreezeDryerModel,
     >,
+    Self::Error: web_common_traits::database::FromExtension<
+            <FreezeDryerModel as web_common_traits::database::TryInsertGeneric<C>>::Error,
+        >
+        + web_common_traits::database::FromExtension<
+            <CommercialProduct as web_common_traits::database::TryInsertGeneric<
+                C,
+            >>::Error,
+        >,
+    FreezeDryerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
     CommercialProduct: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = i32,
-    >,
-    FreezeDryerModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelExtensionAttribute: From<
-        <FreezeDryerModel as common_traits::builder::Attributed>::Attribute,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelExtensionAttribute: From<
-        <CommercialProduct as common_traits::builder::Attributed>::Attribute,
     >,
 {
     fn try_insert(
@@ -129,6 +119,7 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::FromExtension;
         let freeze_dryer_model = self
             .freeze_dryer_model
             .ok_or(
@@ -140,47 +131,23 @@ where
             let id = self
                 .commercial_freeze_dryer_models_id_fkey
                 .mint_primary_key(user_id, conn)
-                .map_err(|err| {
-                    err.into_field_name(|attribute| {
-                        crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute::Extension(
-                            From::from(attribute),
-                        )
-                    })
-                })?;
+                .map_err(Self::Error::from_extension)?;
             let _ = self
                 .commercial_freeze_dryer_models_id_fkey1
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
-                .map_err(|err| {
-                    err.into_field_name(|attribute| {
-                        crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute::Extension(
-                            From::from(attribute),
-                        )
-                    })
-                })?;
+                .map_err(Self::Error::from_extension)?;
             id
         } else {
             let id = self
                 .commercial_freeze_dryer_models_id_fkey1
                 .mint_primary_key(user_id, conn)
-                .map_err(|err| {
-                    err.into_field_name(|attribute| {
-                        crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute::Extension(
-                            From::from(attribute),
-                        )
-                    })
-                })?;
+                .map_err(Self::Error::from_extension)?;
             let _ = self
                 .commercial_freeze_dryer_models_id_fkey
                 .set_primary_key(id)
                 .mint_primary_key(user_id, conn)
-                .map_err(|err| {
-                    err.into_field_name(|attribute| {
-                        crate::codegen::structs_codegen::tables::insertables::CommercialFreezeDryerModelAttribute::Extension(
-                            From::from(attribute),
-                        )
-                    })
-                })?;
+                .map_err(Self::Error::from_extension)?;
             id
         };
         Ok(Self::InsertableVariant {

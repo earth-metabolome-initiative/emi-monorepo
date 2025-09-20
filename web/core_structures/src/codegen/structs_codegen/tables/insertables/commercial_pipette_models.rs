@@ -63,6 +63,39 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPi
 > {
     type Attribute = CommercialPipetteModelAttribute;
 }
+impl web_common_traits::database::TableField for CommercialPipetteModelAttribute {}
+impl web_common_traits::database::HasTableType for CommercialPipetteModelAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute,
+    > for CommercialPipetteModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::PipetteModelAttribute,
+    ) -> Self {
+        CommercialPipetteModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    > for CommercialPipetteModelAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductAttribute,
+    ) -> Self {
+        CommercialPipetteModelAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for CommercialPipetteModelAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        CommercialPipetteModelAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for CommercialPipetteModelAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -621,28 +654,24 @@ impl<PipetteModel, CommercialProduct, C> web_common_traits::database::TryInsertG
 for InsertableCommercialPipetteModelBuilder<PipetteModel, CommercialProduct>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::commercial_pipette_models::CommercialPipetteModel,
-        Error = web_common_traits::database::InsertError<CommercialPipetteModelAttribute>,
-    >,
-    PipetteModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
-    CommercialProduct: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::commercial_pipette_models::CommercialPipetteModel,
+            Error = web_common_traits::database::InsertError<
+                CommercialPipetteModelAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<
+        CommercialPipetteModelAttribute,
+    >;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<CommercialPipetteModelAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::commercial_pipette_models::CommercialPipetteModel = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

@@ -51,30 +51,7 @@ where
             crate::codegen::structs_codegen::tables::insertables::CappingProcedureAttribute,
         >,
     >,
-    Procedure: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
-    Self: crate::codegen::structs_codegen::tables::insertables::CappingProcedureSettable<
-        Error = web_common_traits::database::InsertError<
-            crate::codegen::structs_codegen::tables::insertables::CappingProcedureAttribute,
-        >,
-    >,
-    crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
-        C,
-    >,
     Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::CappingProcedureExtensionAttribute: From<
-        <Procedure as common_traits::builder::Attributed>::Attribute,
-    >,
 {
     fn insert(mut self, user_id: i32, conn: &mut C) -> Result<Self::Row, Self::Error> {
         use diesel::RunQueryDsl;
@@ -109,9 +86,15 @@ where
         C,
         crate::codegen::structs_codegen::tables::capping_procedures::CappingProcedure,
     >,
+    Self::Error: web_common_traits::database::FromExtension<
+        <Procedure as web_common_traits::database::TryInsertGeneric<C>>::Error,
+    >,
     Procedure: web_common_traits::database::TryInsertGeneric<
         C,
         PrimaryKey = ::rosetta_uuid::Uuid,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::DispatchableInsertableVariant<
+        C,
     >,
     Self: crate::codegen::structs_codegen::tables::insertables::CappingProcedureSettable<
         Error = web_common_traits::database::InsertError<
@@ -121,17 +104,8 @@ where
     crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder: web_common_traits::database::TryInsertGeneric<
-        C,
-        Attribute = crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
-        PrimaryKey = ::rosetta_uuid::Uuid,
-    >,
     crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
         C,
-    >,
-    Self: web_common_traits::database::MostConcreteTable,
-    crate::codegen::structs_codegen::tables::insertables::CappingProcedureExtensionAttribute: From<
-        <Procedure as common_traits::builder::Attributed>::Attribute,
     >,
 {
     fn try_insert(
@@ -139,6 +113,7 @@ where
         user_id: i32,
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
+        use web_common_traits::database::FromExtension;
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let Some(procedure_template) = self.procedure_template {
@@ -239,13 +214,7 @@ where
         let procedure = self
             .procedure
             .mint_primary_key(user_id, conn)
-            .map_err(|err| {
-                err.into_field_name(|attribute| {
-                    crate::codegen::structs_codegen::tables::insertables::CappingProcedureAttribute::Extension(
-                        From::from(attribute),
-                    )
-                })
-            })?;
+            .map_err(Self::Error::from_extension)?;
         let procedure_capped_container = match self.procedure_capped_container {
             web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(

@@ -21,6 +21,10 @@ impl common_traits::builder::Attributed
 {
     type Attribute = AssetModelAncestorAttribute;
 }
+impl web_common_traits::database::TableField for AssetModelAncestorAttribute {}
+impl web_common_traits::database::HasTableType for AssetModelAncestorAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
 impl core::fmt::Display for AssetModelAncestorAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -212,23 +216,20 @@ impl<C> web_common_traits::database::TryInsertGeneric<C>
 for InsertableAssetModelAncestorBuilder
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
-        Error = web_common_traits::database::InsertError<AssetModelAncestorAttribute>,
-    >,
+            C,
+            Row = crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
+            Error = web_common_traits::database::InsertError<AssetModelAncestorAttribute>,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = (i32, i32)>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<AssetModelAncestorAttribute>;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<AssetModelAncestorAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

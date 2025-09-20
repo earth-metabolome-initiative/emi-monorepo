@@ -65,6 +65,39 @@ for crate::codegen::structs_codegen::tables::insertables::InsertableCommercialPi
 > {
     type Attribute = CommercialPipetteTipLotAttribute;
 }
+impl web_common_traits::database::TableField for CommercialPipetteTipLotAttribute {}
+impl web_common_traits::database::HasTableType for CommercialPipetteTipLotAttribute {
+    type Table = crate::codegen::tables::table_names::TableName;
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+    > for CommercialPipetteTipLotAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::CommercialProductLotAttribute,
+    ) -> Self {
+        CommercialPipetteTipLotAttribute::Extension(From::from(attribute))
+    }
+}
+impl
+    web_common_traits::database::FromExtension<
+        crate::codegen::structs_codegen::tables::insertables::PipetteTipModelAttribute,
+    > for CommercialPipetteTipLotAttribute
+{
+    fn from_extension(
+        attribute: crate::codegen::structs_codegen::tables::insertables::PipetteTipModelAttribute,
+    ) -> Self {
+        CommercialPipetteTipLotAttribute::Extension(From::from(attribute))
+    }
+}
+impl web_common_traits::database::FromExtension<common_traits::builder::EmptyTuple>
+    for CommercialPipetteTipLotAttribute
+{
+    fn from_extension(attribute: common_traits::builder::EmptyTuple) -> Self {
+        CommercialPipetteTipLotAttribute::Extension(From::from(attribute))
+    }
+}
 impl core::fmt::Display for CommercialPipetteTipLotAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
@@ -680,30 +713,24 @@ impl<
 for InsertableCommercialPipetteTipLotBuilder<CommercialProductLot, PipetteTipModel>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
-        C,
-        Row = crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot,
-        Error = web_common_traits::database::InsertError<
-            CommercialPipetteTipLotAttribute,
-        >,
-    >,
-    CommercialProductLot: web_common_traits::database::TryInsertGeneric<
-        C,
-        PrimaryKey = i32,
-    >,
-    PipetteTipModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+            C,
+            Row = crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot,
+            Error = web_common_traits::database::InsertError<
+                CommercialPipetteTipLotAttribute,
+            >,
+        > + web_common_traits::database::SetPrimaryKey<PrimaryKey = i32>
+        + common_traits::builder::IsCompleteBuilder,
 {
+    type Error = web_common_traits::database::InsertError<
+        CommercialPipetteTipLotAttribute,
+    >;
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<
-        Self::PrimaryKey,
-        web_common_traits::database::InsertError<CommercialPipetteTipLotAttribute>,
-    > {
+    ) -> Result<Self::PrimaryKey, Self::Error> {
         use diesel::Identifiable;
         use web_common_traits::database::DispatchableInsertableVariant;
-        let insertable: crate::codegen::structs_codegen::tables::commercial_pipette_tip_lots::CommercialPipetteTipLot = self
-            .insert(user_id, conn)?;
-        Ok(insertable.id())
+        Ok(self.insert(user_id, conn)?.id())
     }
 }

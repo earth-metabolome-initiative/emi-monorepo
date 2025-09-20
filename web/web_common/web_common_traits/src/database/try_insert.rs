@@ -2,16 +2,19 @@
 //! insertable builder into an insertable object after having processed the
 //! necessary parent builders, if any.
 
-use common_traits::builder::{Attributed, EmptyTuple, IsCompleteBuilder};
-
-use crate::{
-    database::{IdOrBuilder, InsertError},
-    prelude::SetPrimaryKey,
+use common_traits::{
+    builder::{Attributed, EmptyTuple, IsCompleteBuilder},
+    prelude::BuilderError,
 };
+
+use crate::{database::IdOrBuilder, prelude::SetPrimaryKey};
 
 /// Trait defining the properties that any generic associated with a type
 /// implementing `TryInsert` must have.
-pub trait TryInsertGeneric<C>: SetPrimaryKey + IsCompleteBuilder + Attributed {
+pub trait TryInsertGeneric<C>: SetPrimaryKey + IsCompleteBuilder {
+    /// The error type returned if the insert operation fails.
+    type Error;
+
     /// Consumes the generic, potentially inserting it into the database,
     /// and returns the primary key.
     ///
@@ -24,11 +27,7 @@ pub trait TryInsertGeneric<C>: SetPrimaryKey + IsCompleteBuilder + Attributed {
     ///
     /// * `InsertError` - If the insert operation fails, it returns an error
     ///   containing the attributes of the insertable object.
-    fn mint_primary_key(
-        self,
-        user_id: i32,
-        conn: &mut C,
-    ) -> Result<Self::PrimaryKey, InsertError<Self::Attribute>>;
+    fn mint_primary_key(self, user_id: i32, conn: &mut C) -> Result<Self::PrimaryKey, Self::Error>;
 }
 
 /// When the extended table in a DAG structure is not another builder
@@ -38,14 +37,14 @@ impl<C, T> TryInsertGeneric<C> for Option<T>
 where
     T: SetPrimaryKey<PrimaryKey = T>,
 {
+    type Error = BuilderError<EmptyTuple>;
+
     fn mint_primary_key(
         self,
         _user_id: i32,
         _conn: &mut C,
-    ) -> Result<Self::PrimaryKey, InsertError<Self::Attribute>> {
-        self.ok_or(InsertError::BuilderError(
-            common_traits::prelude::BuilderError::IncompleteBuild(EmptyTuple),
-        ))
+    ) -> Result<Self::PrimaryKey, Self::Error> {
+        self.ok_or(common_traits::prelude::BuilderError::IncompleteBuild(EmptyTuple))
     }
 }
 
@@ -76,11 +75,13 @@ where
     Id: SetPrimaryKey<PrimaryKey = Id>,
     Builder: TryInsertGeneric<C, PrimaryKey = Id>,
 {
+    type Error = Builder::Error;
+
     fn mint_primary_key(
         self,
         user_id: i32,
         conn: &mut C,
-    ) -> Result<Self::PrimaryKey, InsertError<Self::Attribute>> {
+    ) -> Result<Self::PrimaryKey, Builder::Error> {
         match self {
             Self::Id(id) => Ok(id),
             Self::Builder(builder) => builder.mint_primary_key(user_id, conn),
