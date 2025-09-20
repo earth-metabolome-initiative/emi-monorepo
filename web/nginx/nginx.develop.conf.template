@@ -16,7 +16,7 @@ http {
 
     server {
         listen ${NGINX_HTTPS_PORT} ssl;
-        server_name ${DOMAIN};
+        server_name ${DOMAIN} ${SERVER_IP};
 
         ssl_certificate /app/${DOMAIN}.pem;
         ssl_certificate_key /app/${DOMAIN}-key.pem;
