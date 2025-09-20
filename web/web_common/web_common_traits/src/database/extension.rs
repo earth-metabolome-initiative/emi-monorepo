@@ -24,7 +24,7 @@ where
 
 impl<T, C> ExtensionTable<T> for &C
 where
-    Self: ExtensionTable<T>,
+    C: ExtensionTable<T>,
     T: PrimaryKeyLike,
     Self: PrimaryKeyLike<PrimaryKey = <T as PrimaryKeyLike>::PrimaryKey>,
 {
@@ -32,7 +32,7 @@ where
 
 impl<T, C> ExtensionTable<T> for Box<C>
 where
-    Self: ExtensionTable<T>,
+    C: ExtensionTable<T>,
     T: PrimaryKeyLike,
     Self: PrimaryKeyLike<PrimaryKey = <T as PrimaryKeyLike>::PrimaryKey>,
 {
@@ -40,7 +40,7 @@ where
 
 impl<T, C> ExtensionTable<T> for Rc<C>
 where
-    Self: ExtensionTable<T>,
+    C: ExtensionTable<T>,
     T: PrimaryKeyLike,
     Self: PrimaryKeyLike<PrimaryKey = <T as PrimaryKeyLike>::PrimaryKey>,
 {

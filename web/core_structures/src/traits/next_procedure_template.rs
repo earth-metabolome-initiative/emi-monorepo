@@ -8,17 +8,14 @@ use web_common_traits::{
 };
 
 use crate::{
-    NextProcedureTemplate, ProcedureTemplate,
+    NextProcedureTemplate, ProcedureTemplate, User,
     codegen::structs_codegen::tables::insertables::NextProcedureTemplateSettable,
     tables::insertables::NextProcedureTemplateAttribute,
 };
 
 /// Trait defining the methods for managing parent-child relationships in
 /// procedure templates.
-pub trait AppendProcedureTemplate: ExtensionTable<ProcedureTemplate>
-where
-    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
-{
+pub trait AppendProcedureTemplate: ExtensionTable<ProcedureTemplate> {
     /// Creates a new parent-child relationship for a procedure.
     ///
     /// # Arguments
@@ -34,9 +31,9 @@ where
     /// * If the insertion fails, an `InsertError` is returned.
     fn append(
         &self,
-        current_procedure: &Box<dyn ExtensionTable<ProcedureTemplate>>,
-        successor_procedure: &Box<dyn ExtensionTable<ProcedureTemplate>>,
-        user: &crate::User,
+        current_procedure: &dyn ExtensionTable<ProcedureTemplate>,
+        successor_procedure: &dyn ExtensionTable<ProcedureTemplate>,
+        user: &User,
         conn: &mut diesel::PgConnection,
     ) -> Result<crate::NextProcedureTemplate, InsertError<NextProcedureTemplateAttribute>> {
         // Then, we create a new NextProcedureTemplate entry linking the parent
@@ -65,7 +62,7 @@ where
     fn extend(
         &self,
         children: &[Box<dyn ExtensionTable<ProcedureTemplate>>],
-        user: &crate::User,
+        user: &User,
         conn: &mut diesel::PgConnection,
     ) -> Result<Vec<crate::NextProcedureTemplate>, InsertError<NextProcedureTemplateAttribute>>
     {
@@ -73,15 +70,10 @@ where
             .iter()
             .zip(children.iter().skip(1))
             .map(|(current_procedure, successor_procedure)| {
-                self.append(current_procedure, successor_procedure, user, conn)
+                self.append(&**current_procedure, &**successor_procedure, user, conn)
             })
             .collect()
     }
 }
 
-impl<T> AppendProcedureTemplate for T
-where
-    T: ExtensionTable<ProcedureTemplate>,
-    for<'a> &'a T: diesel::Identifiable<Id = &'a i32>,
-{
-}
+impl<T> AppendProcedureTemplate for T where T: ExtensionTable<ProcedureTemplate> {}
