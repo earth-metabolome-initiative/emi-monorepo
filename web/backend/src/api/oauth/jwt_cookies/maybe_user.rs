@@ -3,7 +3,7 @@
 //! This is used in the context of JWT authentication and cookies, where a user
 //! may be authenticated via a JWT token or may be anonymous.
 
-use std::{future::ready, pin::Pin};
+use std::{fmt::Display, future::ready, pin::Pin};
 
 use actix_http::Payload;
 use actix_web::{
@@ -16,7 +16,7 @@ use core_structures::{TemporaryUser, User};
 use diesel::OptionalExtension;
 use web_common_traits::database::Read;
 
-use super::JsonAccessToken;
+use super::{JsonAccessToken, REFRESH_COOKIE_NAME};
 use crate::{BackendError, KeyPair};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -24,6 +24,16 @@ pub enum MaybeUser {
     TemporaryUser(TemporaryUser),
     User(User),
     Anonymous,
+}
+
+impl Display for MaybeUser {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MaybeUser::TemporaryUser(user) => write!(f, "TemporaryUser(id={})", user.id),
+            MaybeUser::User(user) => write!(f, "User(id={})", user.id),
+            MaybeUser::Anonymous => write!(f, "Anonymous"),
+        }
+    }
 }
 
 impl From<User> for MaybeUser {
@@ -65,15 +75,12 @@ impl FromRequest for MaybeUser {
     type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
 
     fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
-        // First, we extract the token from the request.
-        // An authentication header is expected to be present in the request, and is
-        // of the form:
-        // Authorization: Bearer <token here>
-        //
-
-        // TODO! INCLUDE THE HANDLING OF COOKIES HERE AS WELL.
-
-        let Ok(bearer) = BearerAuth::from_request(req, payload).into_inner() else {
+        // We try to extract the refresh cookie if it is present.
+        let token = if let Some(cookie) = req.cookie(REFRESH_COOKIE_NAME) {
+            cookie.value().to_owned()
+        } else if let Ok(bearer) = BearerAuth::from_request(req, payload).into_inner() {
+            bearer.token().to_owned()
+        } else {
             return Box::pin(ready(Ok(MaybeUser::Anonymous)));
         };
 
@@ -104,8 +111,7 @@ impl FromRequest for MaybeUser {
         };
 
         Box::pin(async move {
-            let token = bearer.token();
-            let access_token = JsonAccessToken::decode(token, &key)?;
+            let access_token = JsonAccessToken::decode(token.as_str(), &key)?;
 
             let mut conn = diesel_pool.get().map_err(BackendError::from)?;
 

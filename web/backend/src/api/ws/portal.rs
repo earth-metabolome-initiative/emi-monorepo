@@ -67,7 +67,7 @@ pub(super) async fn portal_ws(
         match select(messages, tick).await {
             // commands & messages received from client
             Either::Left((Either::Left((Some(Ok(msg)), _)), _)) => {
-                log::debug!("msg: {msg:?}");
+                log::debug!("msg {user}: {msg:?}");
 
                 match msg {
                     AggregatedMessage::Ping(_) | AggregatedMessage::Pong(_) => {
