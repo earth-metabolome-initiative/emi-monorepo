@@ -1,0 +1,11 @@
+[package]
+name = "pg_traits"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+pg_diesel.workspace = true
+syn.workspace = true
+
+[lints]
+workspace = true

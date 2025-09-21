@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 diesel = { workspace = true, features = ["postgres", "chrono", "uuid"] }
 itertools = "0.14.0"
-serde.workspace = true
 syn.workspace = true
 quote.workspace = true
 proc-macro2.workspace = true

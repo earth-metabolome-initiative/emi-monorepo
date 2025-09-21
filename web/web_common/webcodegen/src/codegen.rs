@@ -490,7 +490,7 @@ impl<'a> Codegen<'a> {
             }
             let mut additional_custom_types = custom_types.clone();
             for custom_type in custom_types {
-                additional_custom_types.extend(custom_type.internal_custom_types(conn)?);
+                additional_custom_types.extend(custom_type.internal_user_defined_types(conn)?);
             }
 
             for pg_type in additional_custom_types {

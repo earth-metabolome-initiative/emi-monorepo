@@ -1,0 +1,23 @@
+[package]
+name = "pg_diesel"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+diesel = { workspace = true, features = ["postgres"] }
+cached = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
+pg_cached = { workspace = true}
+
+[dev-dependencies]
+tokio.workspace = true
+reference_docker.workspace = true
+
+[lints]
+workspace = true
+
+[features]
+default = ["io_cached"]
+serde = ["dep:serde"]
+cached = ["dep:cached", "pg_cached/cached"]
+io_cached = ["cached", "cached/disk_store", "serde", "pg_cached/io_cached"]
