@@ -35,11 +35,13 @@ impl web_common_traits::prelude::HasForeignKeys
     where
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(
-                self.geolocated_asset,
-            ),
-        ));
+        if let Some(geolocated_asset) = self.geolocated_asset {
+            connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(
+                    geolocated_asset,
+                ),
+            ));
+        }
         if let Some(geolocated_with) = self.geolocated_with {
             connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PositioningDevice(
@@ -86,7 +88,7 @@ impl web_common_traits::prelude::HasForeignKeys
             );
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
-        foreign_keys.geolocated_asset.is_some()
+        (foreign_keys.geolocated_asset.is_some() || self.geolocated_asset.is_some())
             && (foreign_keys.geolocated_with.is_some() || self.geolocated_with.is_some())
             && foreign_keys.procedure.is_some()
             && foreign_keys.procedure_geolocated_asset.is_some()
@@ -133,7 +135,10 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.geolocated_asset == physical_assets.id {
+                if self
+                    .geolocated_asset
+                    .is_some_and(|geolocated_asset| geolocated_asset == physical_assets.id)
+                {
                     foreign_keys.geolocated_asset = Some(physical_assets);
                     updated = true;
                 }
@@ -142,7 +147,10 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::PhysicalAsset(physical_assets),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.geolocated_asset == physical_assets.id {
+                if self
+                    .geolocated_asset
+                    .is_some_and(|geolocated_asset| geolocated_asset == physical_assets.id)
+                {
                     foreign_keys.geolocated_asset = None;
                     updated = true;
                 }

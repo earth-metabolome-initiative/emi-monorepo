@@ -25,7 +25,7 @@ use crate::procedure_template_asset_models::{
 ///
 /// * If the connection fails to insert the procedure template.
 /// * If the procedure template building fails.
-pub(crate) fn organism_observation_procedure(
+pub fn organism_observation_procedure(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<(ProcedureTemplate, ProcedureTemplateAssetModel)> {

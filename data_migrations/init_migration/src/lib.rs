@@ -6,7 +6,7 @@ pub mod asset_models;
 pub mod brands;
 mod login_providers;
 mod procedure_template_asset_models;
-mod procedure_templates;
+pub mod procedure_templates;
 mod users;
 
 use asset_models::init_compatibility_rules;

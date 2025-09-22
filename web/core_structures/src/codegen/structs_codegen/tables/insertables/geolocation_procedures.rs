@@ -147,7 +147,7 @@ impl core::fmt::Display for GeolocationProcedureAttribute {
 pub struct InsertableGeolocationProcedure {
     pub(crate) procedure: ::rosetta_uuid::Uuid,
     pub(crate) procedure_template: i32,
-    pub(crate) geolocated_asset: ::rosetta_uuid::Uuid,
+    pub(crate) geolocated_asset: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure_template_geolocated_asset_model: i32,
     pub(crate) procedure_geolocated_asset: ::rosetta_uuid::Uuid,
     pub(crate) geolocated_with: Option<::rosetta_uuid::Uuid>,
@@ -160,18 +160,23 @@ impl InsertableGeolocationProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        Option<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>,
         diesel::result::Error,
     >
     where
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
             web_common_traits::database::Read<C>,
     {
+        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
+        let Some(geolocated_asset) = self.geolocated_asset else {
+            return Ok(None);
+        };
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(
-            self.geolocated_asset,
+            geolocated_asset,
             conn,
         )
+        .optional()
     }
     pub fn geolocated_with<C: diesel::connection::LoadConnection>(
         &self,
@@ -217,11 +222,15 @@ impl InsertableGeolocationProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
         diesel::result::Error,
     > {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(geolocated_asset) = self.geolocated_asset else {
+            return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
@@ -229,12 +238,13 @@ impl InsertableGeolocationProcedure {
                     .eq(&self.procedure_geolocated_asset)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.geolocated_asset),
+                            .eq(geolocated_asset),
                     ),
             )
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
+            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn geolocation_procedures_procedure_geolocated_asset_procedur_fkey(
@@ -523,7 +533,6 @@ where
     fn is_complete(&self) -> bool {
         self.procedure.is_complete()
             && self.procedure_template.is_some()
-            && (self.geolocated_asset.is_some() || self.procedure_geolocated_asset.is_complete())
             && (self.procedure_template_geolocated_asset_model.is_some()
                 || self.procedure_template.is_some()
                 || self.procedure_geolocated_asset.is_complete())
@@ -584,7 +593,7 @@ pub trait GeolocationProcedureSettable: Sized {
     /// * If the provided value does not pass schema-defined validation.
     fn geolocated_asset<GA>(self, geolocated_asset: GA) -> Result<Self, Self::Error>
     where
-        GA: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
+        GA: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
     /// `public.geolocation_procedures.
     /// procedure_template_geolocated_asset_model` column.
@@ -857,11 +866,11 @@ where
     ///```
     fn geolocated_asset<GA>(mut self, geolocated_asset: GA) -> Result<Self, Self::Error>
     where
-        GA: web_common_traits::database::PrimaryKeyLike<
+        GA: web_common_traits::database::MaybePrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
         >,
     {
-        let geolocated_asset = <GA as web_common_traits::database::PrimaryKeyLike>::primary_key(
+        let geolocated_asset = <GA as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
             &geolocated_asset,
         );
         if let web_common_traits::database::IdOrBuilder::Builder(
@@ -881,7 +890,7 @@ where
                 })?
                 .into();
         }
-        self.geolocated_asset = Some(geolocated_asset);
+        self.geolocated_asset = geolocated_asset;
         Ok(self)
     }
     ///Sets the value of the `public.geolocation_procedures.procedure_template_geolocated_asset_model` column.

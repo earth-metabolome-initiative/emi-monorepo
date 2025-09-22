@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS geolocation_procedures (
 	-- The template of this procedure should be a geolocation procedure template.
 	procedure_template INTEGER NOT NULL REFERENCES geolocation_procedure_templates(procedure_template),
 	-- The asset being geolocated, which must be a physical asset.
-	geolocated_asset UUID NOT NULL REFERENCES physical_assets(id),
+	geolocated_asset UUID REFERENCES physical_assets(id),
 	-- The procedure template asset model associated to the `geolocated_asset`.
 	procedure_template_geolocated_asset_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure asset associated to the `geolocated_asset`.

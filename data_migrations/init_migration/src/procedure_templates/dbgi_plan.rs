@@ -13,7 +13,7 @@ use crate::procedure_templates::{
 mod organism_observation_procedure;
 mod part_of_organism_collection_procedure;
 mod sample_processing_procedures;
-use organism_observation_procedure::organism_observation_procedure;
+pub use organism_observation_procedure::organism_observation_procedure;
 use part_of_organism_collection_procedure::part_of_organism_collection;
 
 /// The name of the DBGI plan procedure template.

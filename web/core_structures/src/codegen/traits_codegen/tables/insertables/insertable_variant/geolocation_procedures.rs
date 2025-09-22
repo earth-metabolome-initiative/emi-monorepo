@@ -139,12 +139,10 @@ where
                 procedure_geolocated_asset,
                 conn,
             )?;
-            if let Some(asset) = procedure_assets.asset {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureSettable>::geolocated_asset(
-                    self,
-                    asset,
-                )?;
-            }
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureSettable>::geolocated_asset(
+                self,
+                procedure_assets.asset,
+            )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureSettable>::procedure_template_geolocated_asset_model(
                 self,
                 procedure_assets.procedure_template_asset_model,
@@ -171,13 +169,6 @@ where
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureAttribute::ProcedureTemplate,
-                ),
-            )?;
-        let geolocated_asset = self
-            .geolocated_asset
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureAttribute::GeolocatedAsset,
                 ),
             )?;
         let procedure_template_geolocated_asset_model = self
@@ -254,7 +245,7 @@ where
         Ok(Self::InsertableVariant {
             procedure,
             procedure_template,
-            geolocated_asset,
+            geolocated_asset: self.geolocated_asset,
             procedure_template_geolocated_asset_model,
             procedure_geolocated_asset,
             geolocated_with: self.geolocated_with,

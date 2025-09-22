@@ -11,7 +11,8 @@ mod structs;
 use core_structures::{
     Photograph, PhotographProcedure, ProcedureAsset, Sample, User,
     tables::insertables::{
-        AssetSettable, PhotographProcedureSettable, ProcedureAssetSettable, SampleSettable,
+        AssetSettable, GeolocationProcedureSettable, PhotographProcedureSettable,
+        ProcedureAssetSettable, SampleSettable,
     },
 };
 use diesel::{Connection, PgConnection};
@@ -19,6 +20,7 @@ use guided_procedures::{GuidedProcedure, ProcedureTemplateGraph};
 use init_migration::asset_models::{
     instruments::phone::phone_model, organisms::organism_model, photographs::photograph_model,
 };
+use postgis_diesel::types::Point;
 use web_common_traits::{
     database::{BoundedRead, DispatchableInsertableVariant},
     prelude::{Builder, Insertable},
@@ -65,7 +67,9 @@ pub fn directus_migration(
     portal_conn: &mut PgConnection,
 ) -> anyhow::Result<()> {
     let procedure_template =
-        init_migration::dbgi_plan(user, portal_conn).expect("Failed to initialize the DBGI plan");
+        // init_migration::dbgi_plan(user, portal_conn).expect("Failed to initialize the DBGI plan");
+        init_migration::procedure_templates::organism_observation_procedure(user, portal_conn).expect("Failed to initialize the organism observation procedure").0;
+
     let procedure_graph = ProcedureTemplateGraph::new(&procedure_template, portal_conn)?;
 
     let photograph_model = photograph_model(user, portal_conn)?;
@@ -73,17 +77,18 @@ pub fn directus_migration(
     let phone_model = phone_model(user, portal_conn)?;
 
     // let pseudocode =
-    // guided_procedures::GuidedProcedurePseudocode::new().graph(&procedure_graph)?.
-    // build()?; println!("{}", pseudocode.pseudocode::<anyhow::Error>());
+    //     guided_procedures::GuidedProcedurePseudocode::new().graph(&
+    // procedure_graph)?.build()?; println!("{}",
+    // pseudocode.pseudocode::<anyhow::Error>());
 
-    let guided_procedure = GuidedProcedure::new()
+    let organism_observation_procedure = GuidedProcedure::new()
         .author(user)
         .graph(&procedure_graph)
         .connection(portal_conn)
         .build()?;
 
-    guided_procedure
-        .and_then::<PhotographProcedure, anyhow::Error>(|mut builder, conn| {
+    organism_observation_procedure
+        .and_then::<core_structures::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure, anyhow::Error>(|mut builder, conn| {
             let photograph = Photograph::new()
                 .model(&photograph_model)?
                 .created_by(user)?
@@ -94,7 +99,7 @@ pub fn directus_migration(
                 .procedure_photograph(ProcedureAsset::new().asset(photograph)?)?;
             Ok(builder)
         })?
-        .and_then::<PhotographProcedure, anyhow::Error>(|mut builder, conn| {
+        .and_then::<core_structures::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure, anyhow::Error>(|mut builder, conn| {
             let photograph = Photograph::new()
                 .model(&photograph_model)?
                 .created_by(user)?
@@ -102,68 +107,34 @@ pub fn directus_migration(
             builder = builder.procedure_photograph(ProcedureAsset::new().asset(photograph)?)?;
             Ok(builder)
         })?
-        .and_then::<core_structures::PhotographProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Organism Details Picture\"");
+        .and_then::<core_structures::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure, anyhow::Error>(|mut builder, conn| {
+            let photograph = Photograph::new()
+                .model(&photograph_model)?
+                .created_by(user)?
+                .insert(user.id, conn)?;
+            builder = builder.procedure_photograph(ProcedureAsset::new().asset(photograph)?)?;
+            Ok(builder)
         })?
-        .and_then::<core_structures::PhotographProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Organism Collected Part Picture\"");
+        .and_then::<core_structures::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure, anyhow::Error>(|mut builder, conn| {
+            let photograph = Photograph::new()
+                .model(&photograph_model)?
+                .created_by(user)?
+                .insert(user.id, conn)?;
+            builder = builder.procedure_photograph(ProcedureAsset::new().asset(photograph)?)?;
+            Ok(builder)
         })?
-        .and_then::<core_structures::PhotographProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Sample Label and Panel Picture\"");
+        .and_then::<core_structures::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure, anyhow::Error>(|mut builder, conn| {
+            let photograph = Photograph::new()
+                .model(&photograph_model)?
+                .created_by(user)?
+                .insert(user.id, conn)?;
+            builder = builder.procedure_photograph(ProcedureAsset::new().asset(photograph)?)?;
+            Ok(builder)
         })?
-        .and_then::<core_structures::GeolocationProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Organism Geolocation\"");
-        })?
-        .and_then::<core_structures::HarvestingProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Harvest sample\"");
-        })?
-        .and_then::<core_structures::PackagingProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Wrap in coffee filter paper\"");
-        })?
-        .and_then::<core_structures::StorageProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Place in conical centrifugal tube\"");
-        })?
-        .and_then::<core_structures::StorageProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Place in storage box\"");
-        })?
-        .and_then::<core_structures::FreezingProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Freezing\"");
-        })?
-        .and_then::<core_structures::FreezeDryingProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Freeze Drying\"");
-        })?
-        .and_then::<core_structures::StorageProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Falcon Storage\"");
-        })?
-        .and_then::<core_structures::FractioningProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Fractioning\"");
-        })?
-        .and_then::<core_structures::BallMillProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Ball Mill 1\"");
-        })?
-        .and_then::<core_structures::PouringProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Pouring Solvent\"");
-        })?
-        .and_then::<core_structures::BallMillProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Ball Mill 2\"");
-        })?
-        .and_then::<core_structures::CentrifugeProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Centrifuge\"");
-        })?
-        .and_then::<core_structures::SupernatantProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Supernatant\"");
-        })?
-        .and_then::<core_structures::DisposalProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Dispose of Eppendorf Tube\"");
-        })?
-        .and_then::<core_structures::DisposalProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Dispose of Pipette Tips\"");
-        })?
-        .and_then::<core_structures::CappingProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Capping\"");
-        })?
-        .and_then::<core_structures::StorageProcedure, anyhow::Error>(|_builder, _conn| {
-            todo!("Implement the logic for \"Long Term Storage Vial Storage\"");
+        .and_then::<core_structures::codegen::structs_codegen::tables::geolocation_procedures::GeolocationProcedure, anyhow::Error>(|mut builder, conn| {
+            let location = Point::new(-5.023, 60.145, None);
+            builder = builder.location(location)?;
+            Ok(builder)
         })?
         .finish()?;
 

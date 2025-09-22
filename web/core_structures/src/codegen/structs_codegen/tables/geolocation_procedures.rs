@@ -28,7 +28,7 @@
 pub struct GeolocationProcedure {
     pub procedure: ::rosetta_uuid::Uuid,
     pub procedure_template: i32,
-    pub geolocated_asset: ::rosetta_uuid::Uuid,
+    pub geolocated_asset: Option<::rosetta_uuid::Uuid>,
     pub procedure_template_geolocated_asset_model: i32,
     pub procedure_geolocated_asset: ::rosetta_uuid::Uuid,
     pub geolocated_with: Option<::rosetta_uuid::Uuid>,
@@ -82,18 +82,23 @@ impl GeolocationProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        Option<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>,
         diesel::result::Error,
     >
     where
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
             web_common_traits::database::Read<C>,
     {
+        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
+        let Some(geolocated_asset) = self.geolocated_asset else {
+            return Ok(None);
+        };
         crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(
-            self.geolocated_asset,
+            geolocated_asset,
             conn,
         )
+        .optional()
     }
     pub fn geolocated_with<C: diesel::connection::LoadConnection>(
         &self,
@@ -139,11 +144,15 @@ impl GeolocationProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
         diesel::result::Error,
     > {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(geolocated_asset) = self.geolocated_asset else {
+            return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
@@ -151,12 +160,13 @@ impl GeolocationProcedure {
                     .eq(&self.procedure_geolocated_asset)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.geolocated_asset),
+                            .eq(geolocated_asset),
                     ),
             )
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
+            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn geolocation_procedures_procedure_geolocated_asset_procedur_fkey(
