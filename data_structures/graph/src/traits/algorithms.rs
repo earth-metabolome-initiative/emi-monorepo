@@ -10,3 +10,5 @@ pub mod sink_nodes;
 pub use sink_nodes::SinkNodes;
 pub mod simple_path;
 pub use simple_path::SimplePath;
+pub mod resnik;
+pub use resnik::Resnik;

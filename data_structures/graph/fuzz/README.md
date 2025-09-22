@@ -41,3 +41,15 @@ and to run the crash cases:
 ```bash
 cargo hfuzz run-debug sink_nodes hfuzz_workspace/*/*.fuzz
 ```
+
+### Resnik
+
+```bash
+cargo hfuzz run resnik
+```
+
+and to run the crash cases:
+
+```bash
+cargo hfuzz run-debug resnik hfuzz_workspace/*/*.fuzz
+```
