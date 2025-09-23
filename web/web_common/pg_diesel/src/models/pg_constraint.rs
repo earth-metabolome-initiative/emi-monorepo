@@ -90,7 +90,7 @@ impl PgConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, crate::error::Error> {
+    pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, diesel::result::Error> {
         cached_queries::functions(self, conn)
     }
 
@@ -107,7 +107,7 @@ impl PgConstraint {
     pub fn operators(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<PgOperator>, crate::error::Error> {
+    ) -> Result<Vec<PgOperator>, diesel::result::Error> {
         cached_queries::operators(self, conn)
     }
 }

@@ -94,7 +94,7 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub fn extension(&self, conn: &mut PgConnection) -> Result<PgExtension, crate::error::Error> {
+    pub fn extension(&self, conn: &mut PgConnection) -> Result<PgExtension, diesel::result::Error> {
         cached_queries::extension(self, conn)
     }
 
@@ -115,7 +115,7 @@ impl PgType {
     pub fn internal_user_defined_types(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<PgType>, crate::error::Error> {
+    ) -> Result<Vec<PgType>, diesel::result::Error> {
         let mut internal_user_defined_types = Vec::new();
         for attribute in self.attributes(conn)? {
             let pg_type = attribute.pg_type(conn)?;
@@ -145,7 +145,7 @@ impl PgType {
     pub fn base_type(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Option<PgType>, crate::error::Error> {
+    ) -> Result<Option<PgType>, diesel::result::Error> {
         if self.typbasetype == 0 {
             Ok(None)
         } else {
@@ -163,7 +163,7 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub fn from_oid(oid: u32, conn: &mut PgConnection) -> Result<PgType, crate::error::Error> {
+    pub fn from_oid(oid: u32, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
         cached_queries::from_oid(oid, conn)
     }
 
@@ -181,7 +181,7 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub fn is_user_defined(&self, conn: &mut PgConnection) -> Result<bool, crate::error::Error> {
+    pub fn is_user_defined(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
         Ok(&self.typcategory == "U" && self.base_type(conn)?.is_some())
     }
 
@@ -214,7 +214,7 @@ impl PgType {
     pub fn attributes(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<PgAttribute>, crate::error::Error> {
+    ) -> Result<Vec<PgAttribute>, diesel::result::Error> {
         cached_queries::attributes(self, conn)
     }
 
@@ -232,7 +232,7 @@ impl PgType {
     /// # Errors
     ///
     /// * Returns an error if the provided database connection fails.
-    pub fn variants(&self, conn: &mut PgConnection) -> Result<Vec<PgEnum>, crate::error::Error> {
+    pub fn variants(&self, conn: &mut PgConnection) -> Result<Vec<PgEnum>, diesel::result::Error> {
         cached_queries::variants(self, conn)
     }
 }

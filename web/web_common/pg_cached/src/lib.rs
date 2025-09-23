@@ -95,12 +95,20 @@ fn auto_cached_dispatch(args: AutoCachedArgs, item: ItemFn) -> TokenStream {
                 .expect("error building disk cache")
         }} "##
         );
+        let map_error = quote! {
+            |e| {
+                diesel::result::Error::DatabaseError(
+                    diesel::result::DatabaseErrorKind::SerializationFailure,
+                    Box::new(format!("DiskCache error: {}", e))
+                )
+            }
+        }.to_string();
         let decorator = quote! {
             #[cached::proc_macro::io_cached(
                 disk = true,
                 sync_to_disk_on_cache_change = true,
                 create = #create,
-                map_error = r##"|e| crate::error::Error::from(e)"##,
+                map_error = #map_error,
                 key = #key,
                 convert = #convert
             )]

@@ -11,7 +11,7 @@ use std::sync::Arc;
 pub(super) fn columns(
     index: &PgIndex,
     conn: &mut PgConnection,
-) -> Result<Arc<Vec<Column>>, crate::error::Error> {
+) -> Result<Arc<Vec<Column>>, diesel::result::Error> {
     use crate::schema::{columns, pg_attribute, pg_class, pg_index};
 
     Ok(Arc::new(
@@ -37,7 +37,7 @@ pub(super) fn columns(
 pub(super) fn table(
     index: &PgIndex,
     conn: &mut PgConnection,
-) -> Result<crate::models::Table, crate::error::Error> {
+) -> Result<crate::models::Table, diesel::result::Error> {
     use crate::schema::{pg_class, tables};
 
     Ok(pg_class::table

@@ -87,7 +87,7 @@ impl Table {
     pub fn foreign_keys(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<KeyColumnUsage>, crate::error::Error> {
+    ) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
         cached_queries::foreign_keys(self, conn)
     }
 
@@ -108,7 +108,7 @@ impl Table {
     pub fn foreign_tables(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Table>, crate::error::Error> {
+    ) -> Result<Vec<Table>, diesel::result::Error> {
         let mut tables = Vec::new();
         for foreign_key_constraint in self.foreign_keys(conn)? {
             tables.push(foreign_key_constraint.foreign_table(conn)?);
@@ -131,7 +131,7 @@ impl Table {
     /// # Errors
     ///
     /// * If the indices cannot be loaded from the database.
-    pub fn indices(&self, conn: &mut PgConnection) -> Result<Vec<PgIndex>, crate::error::Error> {
+    pub fn indices(&self, conn: &mut PgConnection) -> Result<Vec<PgIndex>, diesel::result::Error> {
         cached_queries::indices(self, conn)
     }
 
@@ -151,7 +151,7 @@ impl Table {
     pub fn unique_indices(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<PgIndex>, crate::error::Error> {
+    ) -> Result<Vec<PgIndex>, diesel::result::Error> {
         cached_queries::unique_indices(self, conn)
     }
 
@@ -174,7 +174,7 @@ impl Table {
         conn: &mut PgConnection,
         table_catalog: &str,
         table_schema: &str,
-    ) -> Result<Vec<Self>, crate::error::Error> {
+    ) -> Result<Vec<Self>, diesel::result::Error> {
         cached_queries::load_all_tables(table_catalog, table_schema, conn)
     }
 
@@ -199,7 +199,7 @@ impl Table {
         table_schema: &str,
         table_catalog: &str,
         conn: &mut PgConnection,
-    ) -> Result<Self, crate::error::Error> {
+    ) -> Result<Self, diesel::result::Error> {
         cached_queries::load_table(conn, table_name, table_schema, table_catalog)
     }
 
@@ -216,7 +216,7 @@ impl Table {
     /// # Errors
     ///
     /// * If the columns cannot be loaded from the database.
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, crate::error::Error> {
+    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
         cached_queries::columns(self, conn)
     }
 
@@ -238,7 +238,7 @@ impl Table {
         &self,
         column_name: &str,
         conn: &mut PgConnection,
-    ) -> Result<Column, crate::error::Error> {
+    ) -> Result<Column, diesel::result::Error> {
         cached_queries::column_by_name(self, column_name, conn)
     }
 
@@ -255,7 +255,7 @@ impl Table {
     /// # Errors
     ///
     /// * If the primary key columns cannot be loaded from the database.
-    pub fn has_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, crate::error::Error> {
+    pub fn has_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
         self.primary_key_columns(conn).map(|columns| !columns.is_empty())
     }
 
@@ -271,7 +271,7 @@ impl Table {
     pub fn has_non_primary_keys(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<bool, crate::error::Error> {
+    ) -> Result<bool, diesel::result::Error> {
         self.non_primary_key_columns(conn).map(|columns| !columns.is_empty())
     }
 
@@ -291,7 +291,7 @@ impl Table {
     pub fn non_primary_key_columns(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Column>, crate::error::Error> {
+    ) -> Result<Vec<Column>, diesel::result::Error> {
         let mut columns = self.columns(conn)?;
         let primary_key_columns = self.primary_key_columns(conn)?;
         columns.retain(|column| !primary_key_columns.contains(column));
@@ -314,7 +314,7 @@ impl Table {
     pub fn primary_key_columns(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Column>, crate::error::Error> {
+    ) -> Result<Vec<Column>, diesel::result::Error> {
         cached_queries::primary_key_columns(self, conn)
     }
 
@@ -334,7 +334,7 @@ impl Table {
     pub fn has_composite_primary_key(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<bool, crate::error::Error> {
+    ) -> Result<bool, diesel::result::Error> {
         Ok(self.primary_key_columns(conn)?.len() > 1)
     }
 
@@ -354,7 +354,7 @@ impl Table {
     pub fn check_constraints(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<CheckConstraint>, crate::error::Error> {
+    ) -> Result<Vec<CheckConstraint>, diesel::result::Error> {
         cached_queries::check_constraints(self, conn)
     }
 
@@ -371,7 +371,7 @@ impl Table {
     /// # Errors
     ///
     /// * If the triggers cannot be loaded from the database.
-    pub fn triggers(&self, conn: &mut PgConnection) -> Result<Vec<PgTrigger>, crate::error::Error> {
+    pub fn triggers(&self, conn: &mut PgConnection) -> Result<Vec<PgTrigger>, diesel::result::Error> {
         cached_queries::triggers(self, conn)
     }
 }

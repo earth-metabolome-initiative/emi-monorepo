@@ -12,7 +12,7 @@ use diesel::{
 pub(super) fn foreign_keys(
     column: &Column,
     conn: &mut PgConnection,
-) -> Result<Vec<KeyColumnUsage>, crate::error::Error> {
+) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
     use crate::schema::{
         columns, constraint_column_usage, key_column_usage, table_constraints, tables,
     };
@@ -65,7 +65,7 @@ pub(super) fn foreign_keys(
 pub(super) fn check_constraints(
     column: &Column,
     conn: &mut PgConnection,
-) -> Result<Vec<CheckConstraint>, crate::error::Error> {
+) -> Result<Vec<CheckConstraint>, diesel::result::Error> {
     use crate::schema::{check_constraints, constraint_column_usage};
     Ok(check_constraints::table
         .inner_join(
@@ -97,7 +97,7 @@ pub(super) fn check_constraints(
 pub(super) fn table(
     column: &Column,
     conn: &mut PgConnection,
-) -> Result<Table, crate::error::Error> {
+) -> Result<Table, diesel::result::Error> {
     use crate::schema::tables;
     Ok(tables::table
         .filter(tables::table_name.eq(&column.table_name))
@@ -110,7 +110,7 @@ pub(super) fn table(
 pub(super) fn geometry(
     column: &Column,
     conn: &mut PgConnection,
-) -> Result<Option<GeometryColumn>, crate::error::Error> {
+) -> Result<Option<GeometryColumn>, diesel::result::Error> {
     use crate::schema::geometry_columns;
 
     Ok(geometry_columns::table
@@ -125,7 +125,7 @@ pub(super) fn geometry(
 pub(super) fn geography(
     column: &Column,
     conn: &mut PgConnection,
-) -> Result<Option<GeographyColumn>, crate::error::Error> {
+) -> Result<Option<GeographyColumn>, diesel::result::Error> {
     use crate::schema::geography_columns;
 
     Ok(geography_columns::table
@@ -140,7 +140,7 @@ pub(super) fn geography(
 pub(super) fn pg_type(
     column: &Column,
     conn: &mut PgConnection,
-) -> Result<PgType, crate::error::Error> {
+) -> Result<PgType, diesel::result::Error> {
     use crate::schema::{pg_attribute, pg_class, pg_namespace, pg_type};
 
     Ok(pg_type::table

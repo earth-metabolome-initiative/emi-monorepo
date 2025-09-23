@@ -86,7 +86,7 @@ impl PgExtension {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, crate::error::Error> {
+    pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, diesel::result::Error> {
         cached_queries::functions(self, conn)
     }
 
@@ -100,7 +100,7 @@ impl PgExtension {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn types(&self, conn: &mut PgConnection) -> Result<Vec<PgType>, crate::error::Error> {
+    pub fn types(&self, conn: &mut PgConnection) -> Result<Vec<PgType>, diesel::result::Error> {
         cached_queries::types(self, conn)
     }
 
@@ -114,7 +114,7 @@ impl PgExtension {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn enums(&self, conn: &mut PgConnection) -> Result<Vec<PgEnum>, crate::error::Error> {
+    pub fn enums(&self, conn: &mut PgConnection) -> Result<Vec<PgEnum>, diesel::result::Error> {
         cached_queries::enums(self, conn)
     }
 }

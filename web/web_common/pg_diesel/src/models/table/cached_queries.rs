@@ -11,7 +11,7 @@ pub(super) fn load_all_tables(
     table_catalog: &str,
     table_schema: &str,
     conn: &mut PgConnection,
-) -> Result<Vec<Table>, crate::error::Error> {
+) -> Result<Vec<Table>, diesel::result::Error> {
     use crate::schema::tables;
     Ok(
         tables::table
@@ -30,7 +30,7 @@ pub(super) fn load_table(
     table_name: &str,
     table_schema: &str,
     table_catalog: &str,
-) -> Result<Table, crate::error::Error> {
+) -> Result<Table, diesel::result::Error> {
     use crate::schema::tables;
     Ok(
         tables::table
@@ -45,7 +45,7 @@ pub(super) fn load_table(
 pub(super) fn columns(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<Column>, crate::error::Error> {
+) -> Result<Vec<Column>, diesel::result::Error> {
     use crate::schema::columns;
     Ok(
         columns::table
@@ -61,7 +61,7 @@ pub(super) fn columns(
 pub(super) fn primary_key_columns(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<Column>, crate::error::Error> {
+) -> Result<Vec<Column>, diesel::result::Error> {
     use crate::schema::{columns, key_column_usage, table_constraints};
     Ok(
         key_column_usage::table
@@ -128,7 +128,7 @@ pub(super) fn primary_key_columns(
 pub(super) fn foreign_keys(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<KeyColumnUsage>, crate::error::Error> {
+) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
     use crate::schema::{key_column_usage, referential_constraints};
     Ok(
         key_column_usage::table
@@ -163,7 +163,7 @@ pub(super) fn foreign_keys(
 pub(super) fn unique_indices(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<PgIndex>, crate::error::Error> {
+) -> Result<Vec<PgIndex>, diesel::result::Error> {
     use crate::schema::{pg_class, pg_index};
 
     let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
@@ -183,7 +183,7 @@ pub(super) fn unique_indices(
 pub(super) fn indices(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<PgIndex>, crate::error::Error> {
+) -> Result<Vec<PgIndex>, diesel::result::Error> {
     use crate::schema::{pg_class, pg_index};
 
     let (pg_class1, pg_class2) = diesel::alias!(pg_class as pg_class1, pg_class as pg_class2);
@@ -202,7 +202,7 @@ pub(super) fn indices(
 pub(super) fn triggers(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<PgTrigger>, crate::error::Error> {
+) -> Result<Vec<PgTrigger>, diesel::result::Error> {
     use crate::schema::{pg_class, pg_namespace, pg_trigger};
     Ok(pg_trigger::table
         .inner_join(pg_class::table.on(pg_trigger::tgrelid.eq(pg_class::oid)))
@@ -217,7 +217,7 @@ pub(super) fn triggers(
 pub(super) fn check_constraints(
     table: &Table,
     conn: &mut PgConnection,
-) -> Result<Vec<CheckConstraint>, crate::error::Error> {
+) -> Result<Vec<CheckConstraint>, diesel::result::Error> {
     use crate::schema::{check_constraints, table_constraints};
 
     Ok(check_constraints::table
@@ -241,7 +241,7 @@ pub(super) fn column_by_name(
     table: &Table,
     column_name: &str,
     conn: &mut PgConnection,
-) -> Result<Column, crate::error::Error> {
+) -> Result<Column, diesel::result::Error> {
     use crate::schema::columns;
     Ok(columns::table
         .filter(columns::table_name.eq(&table.table_name))

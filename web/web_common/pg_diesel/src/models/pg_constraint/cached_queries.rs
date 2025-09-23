@@ -7,7 +7,7 @@ use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, 
 pub(super) fn functions(
     pg_constraint: &PgConstraint,
     conn: &mut PgConnection,
-) -> Result<Vec<PgProc>, crate::error::Error> {
+) -> Result<Vec<PgProc>, diesel::result::Error> {
     use crate::schema::{pg_constraint, pg_depend, pg_proc};
     Ok(pg_constraint::table
         // Join to pg_depend where the constraint's OID is recorded as the dependent.
@@ -25,7 +25,7 @@ pub(super) fn functions(
 pub(super) fn operators(
     pg_constraint: &PgConstraint,
     conn: &mut PgConnection,
-) -> Result<Vec<PgOperator>, crate::error::Error> {
+) -> Result<Vec<PgOperator>, diesel::result::Error> {
     use crate::schema::{pg_constraint, pg_depend, pg_operator};
     Ok(pg_constraint::table
         // Join to pg_depend where the constraint's OID is recorded as the dependent.

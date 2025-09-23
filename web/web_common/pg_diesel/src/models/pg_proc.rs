@@ -89,7 +89,7 @@ impl PgProc {
     pub fn argument_types(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<PgType>, crate::error::Error> {
+    ) -> Result<Vec<PgType>, diesel::result::Error> {
         self.proargtypes.iter().map(|oid| PgType::from_oid(*oid, conn)).collect()
     }
 
@@ -102,7 +102,7 @@ impl PgProc {
     /// # Errors
     ///
     /// * If the return type does not exist.
-    pub fn return_type(&self, conn: &mut PgConnection) -> Result<PgType, crate::error::Error> {
+    pub fn return_type(&self, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
         PgType::from_oid(self.prorettype, conn)
     }
 
@@ -116,7 +116,7 @@ impl PgProc {
     /// # Errors
     ///
     /// * If the function is not contained in an extension
-    pub fn extension(&self, conn: &mut PgConnection) -> Result<PgExtension, crate::error::Error> {
+    pub fn extension(&self, conn: &mut PgConnection) -> Result<PgExtension, diesel::result::Error> {
         cached_queries::extension(self, conn)
     }
 }

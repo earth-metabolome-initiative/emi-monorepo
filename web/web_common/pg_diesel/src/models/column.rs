@@ -139,7 +139,7 @@ impl Column {
     pub fn check_constraints(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<CheckConstraint>, crate::error::Error> {
+    ) -> Result<Vec<CheckConstraint>, diesel::result::Error> {
         cached_queries::check_constraints(self, conn)
     }
 
@@ -156,7 +156,7 @@ impl Column {
     pub fn geometry(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Option<GeometryColumn>, crate::error::Error> {
+    ) -> Result<Option<GeometryColumn>, diesel::result::Error> {
         cached_queries::geometry(self, conn)
     }
 
@@ -173,7 +173,7 @@ impl Column {
     pub fn geography(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Option<GeographyColumn>, crate::error::Error> {
+    ) -> Result<Option<GeographyColumn>, diesel::result::Error> {
         cached_queries::geography(self, conn)
     }
 
@@ -201,12 +201,12 @@ impl Column {
     /// # Returns
     ///
     /// A `Result` containing the [`PgType`] of the column if the operation was
-    /// successful, or a `crate::error::Error` if an error occurred
+    /// successful, or a `diesel::result::Error` if an error occurred
     ///
     /// # Errors
     ///
     /// If an error occurs while querying the database
-    pub fn pg_type(&self, conn: &mut PgConnection) -> Result<PgType, crate::error::Error> {
+    pub fn pg_type(&self, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
         cached_queries::pg_type(self, conn)
     }
 
@@ -231,7 +231,7 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, crate::error::Error> {
+    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
         cached_queries::table(self, conn)
     }
 
@@ -244,7 +244,7 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn is_unique(&self, conn: &mut PgConnection) -> Result<bool, crate::error::Error> {
+    pub fn is_unique(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
         let table = self.table(conn)?;
         let pg_indices = table.unique_indices(conn)?;
 
@@ -311,7 +311,7 @@ impl Column {
     pub fn foreign_keys(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<KeyColumnUsage>, crate::error::Error> {
+    ) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
         cached_queries::foreign_keys(self, conn)
     }
 
@@ -357,7 +357,7 @@ impl Column {
     pub fn is_part_of_primary_key(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<bool, crate::error::Error> {
+    ) -> Result<bool, diesel::result::Error> {
         let table = self.table(conn)?;
         let primary_key_columns = table.primary_key_columns(conn)?;
         Ok(primary_key_columns.contains(self))
@@ -372,7 +372,7 @@ impl Column {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn is_primary_key(&self, conn: &mut PgConnection) -> Result<bool, crate::error::Error> {
+    pub fn is_primary_key(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
         let table = self.table(conn)?;
         let primary_key_columns = table.primary_key_columns(conn)?;
         Ok(primary_key_columns.len() == 1 && primary_key_columns.contains(self))
@@ -390,7 +390,7 @@ impl Column {
     pub fn foreign_primary_keys(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<KeyColumnUsage>, crate::error::Error> {
+    ) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
         Ok(self
             .foreign_keys(conn)?
             .iter()

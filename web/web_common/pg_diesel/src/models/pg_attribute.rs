@@ -74,7 +74,7 @@ impl PgAttribute {
     /// # Errors
     ///
     /// Returns an error if the provided database connection fails.
-    pub fn pg_type(&self, conn: &mut PgConnection) -> Result<PgType, crate::error::Error> {
+    pub fn pg_type(&self, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
         cached_queries::pg_type(self, conn)
     }
 }

@@ -7,7 +7,7 @@ use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, 
 pub(super) fn function(
     pg_operator: &PgOperator,
     conn: &mut PgConnection,
-) -> Result<PgProc, crate::error::Error> {
+) -> Result<PgProc, diesel::result::Error> {
     use crate::schema::pg_proc;
     Ok(pg_proc::table
         .filter(pg_proc::oid.eq(pg_operator.oprcode))
@@ -19,7 +19,7 @@ pub(super) fn function(
 pub(super) fn extension(
     pg_operator: &PgOperator,
     conn: &mut PgConnection,
-) -> Result<PgExtension, crate::error::Error> {
+) -> Result<PgExtension, diesel::result::Error> {
     use crate::schema::{pg_depend, pg_extension};
     Ok(pg_extension::table
         .inner_join(pg_depend::table.on(pg_extension::oid.eq(pg_depend::refobjid)))
@@ -32,7 +32,7 @@ pub(super) fn extension(
 pub(super) fn left_operand_type(
     pg_operator: &PgOperator,
     conn: &mut PgConnection,
-) -> Result<PgType, crate::error::Error> {
+) -> Result<PgType, diesel::result::Error> {
     use crate::schema::pg_type;
     Ok(pg_type::table
         .filter(pg_type::oid.eq(pg_operator.oprleft))
@@ -44,7 +44,7 @@ pub(super) fn left_operand_type(
 pub(super) fn right_operand_type(
     pg_operator: &PgOperator,
     conn: &mut PgConnection,
-) -> Result<PgType, crate::error::Error> {
+) -> Result<PgType, diesel::result::Error> {
     use crate::schema::pg_type;
     Ok(pg_type::table
         .filter(pg_type::oid.eq(pg_operator.oprright))
@@ -56,7 +56,7 @@ pub(super) fn right_operand_type(
 pub(super) fn result_type(
 	pg_operator: &PgOperator,
 	conn: &mut PgConnection,
-) -> Result<PgType, crate::error::Error> {
+) -> Result<PgType, diesel::result::Error> {
 	use crate::schema::pg_type;
 	Ok(pg_type::table
 		.filter(pg_type::oid.eq(pg_operator.oprresult))

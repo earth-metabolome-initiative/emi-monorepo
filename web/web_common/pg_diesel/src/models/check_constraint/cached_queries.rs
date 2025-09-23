@@ -10,7 +10,7 @@ use diesel::{
 pub(super) fn columns(
     check_constraint: &CheckConstraint,
     conn: &mut PgConnection,
-) -> Result<Vec<Column>, crate::error::Error> {
+) -> Result<Vec<Column>, diesel::result::Error> {
     use diesel::RunQueryDsl;
 
     use crate::schema::{columns, constraint_column_usage};
@@ -44,7 +44,7 @@ pub(super) fn columns(
 pub fn table_constraint(
     check_constraint: &CheckConstraint,
     conn: &mut PgConnection,
-) -> Result<TableConstraint, crate::error::Error> {
+) -> Result<TableConstraint, diesel::result::Error> {
     use crate::schema::table_constraints;
 
     Ok(table_constraints::table
@@ -62,7 +62,7 @@ pub fn table_constraint(
 pub fn pg_constraint(
     check_constraint: &CheckConstraint,
     conn: &mut PgConnection,
-) -> Result<PgConstraint, crate::error::Error> {
+) -> Result<PgConstraint, diesel::result::Error> {
     use crate::schema::{pg_constraint, pg_namespace};
     Ok(pg_constraint::table
         .inner_join(pg_namespace::table.on(pg_constraint::connamespace.eq(pg_namespace::oid)))

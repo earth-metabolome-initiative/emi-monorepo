@@ -63,7 +63,7 @@ impl PgIndex {
     /// # Errors
     ///
     /// If an error occurs while loading the table from the database
-    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, crate::error::Error> {
+    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
         cached_queries::table(self, conn)
     }
 
@@ -79,7 +79,7 @@ impl PgIndex {
     pub fn columns(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Arc<Vec<Column>>, crate::error::Error> {
+    ) -> Result<Arc<Vec<Column>>, diesel::result::Error> {
         cached_queries::columns(self, conn)
     }
 

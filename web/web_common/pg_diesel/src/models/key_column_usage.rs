@@ -63,7 +63,7 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn to_sql(&self, conn: &mut PgConnection) -> Result<String, crate::error::Error> {
+    pub fn to_sql(&self, conn: &mut PgConnection) -> Result<String, diesel::result::Error> {
         let local_columns = self.columns(conn)?;
         let foreign_table = self.foreign_table(conn)?;
         let foreign_columns = self.foreign_columns(conn)?;
@@ -98,7 +98,7 @@ impl KeyColumnUsage {
     pub fn has_on_delete_cascade(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<bool, crate::error::Error> {
+    ) -> Result<bool, diesel::result::Error> {
         let referential_constraint = self.referential_constraint(conn)?;
         Ok(referential_constraint.delete_rule == "CASCADE")
     }
@@ -116,7 +116,7 @@ impl KeyColumnUsage {
     pub(crate) fn referential_constraint(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<ReferentialConstraint, crate::error::Error> {
+    ) -> Result<ReferentialConstraint, diesel::result::Error> {
         cached_queries::referential_constraint(self, conn)
     }
 
@@ -129,7 +129,7 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while loading the table from the database
-    pub(crate) fn table(&self, conn: &mut PgConnection) -> Result<Table, crate::error::Error> {
+    pub(crate) fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
         cached_queries::table(self, conn)
     }
 
@@ -142,7 +142,7 @@ impl KeyColumnUsage {
     pub fn is_self_referential(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<bool, crate::error::Error> {
+    ) -> Result<bool, diesel::result::Error> {
         Ok(self.table(conn)? == self.foreign_table(conn)?)
     }
 
@@ -155,7 +155,7 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while loading the foreign table from the database
-    pub fn foreign_table(&self, conn: &mut PgConnection) -> Result<Table, crate::error::Error> {
+    pub fn foreign_table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
         cached_queries::foreign_table(self, conn)
     }
 
@@ -169,7 +169,7 @@ impl KeyColumnUsage {
     ///
     /// * If an error occurs while loading the key column usages from the
     ///   database
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, crate::error::Error> {
+    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
         cached_queries::columns(self, conn)
     }
 
@@ -185,7 +185,7 @@ impl KeyColumnUsage {
     pub fn column_mappings(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<(Column, Column)>, crate::error::Error> {
+    ) -> Result<Vec<(Column, Column)>, diesel::result::Error> {
         Ok(self
             .columns(conn)?
             .iter()
@@ -207,7 +207,7 @@ impl KeyColumnUsage {
     pub fn is_composite(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<bool, crate::error::Error> {
+    ) -> Result<bool, diesel::result::Error> {
         self.columns(conn).map(|columns| columns.len() > 1)
     }
 
@@ -221,7 +221,7 @@ impl KeyColumnUsage {
     ///
     /// * If an error occurs while loading the key column usages from the
     ///   database
-    pub fn is_nullable(&self, conn: &mut PgConnection) -> Result<bool, crate::error::Error> {
+    pub fn is_nullable(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
         self.columns(conn).map(|columns| columns.iter().any(Column::is_nullable))
     }
 
@@ -239,7 +239,7 @@ impl KeyColumnUsage {
     pub fn foreign_columns(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<Column>, crate::error::Error> {
+    ) -> Result<Vec<Column>, diesel::result::Error> {
         cached_queries::foreign_columns(self, conn)
     }
 
@@ -255,7 +255,7 @@ impl KeyColumnUsage {
     pub fn is_foreign_primary_key(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<bool, crate::error::Error> {
+    ) -> Result<bool, diesel::result::Error> {
         let foreign_table = self.foreign_table(conn)?;
 
         // Check if the foreign table has a primary key
@@ -276,7 +276,7 @@ impl KeyColumnUsage {
     pub fn is_local_primary_key(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<bool, crate::error::Error> {
+    ) -> Result<bool, diesel::result::Error> {
         let table = self.table(conn)?;
 
         // Check if the table has a primary key
@@ -298,7 +298,7 @@ impl KeyColumnUsage {
     pub fn includes_local_primary_key(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<bool, crate::error::Error> {
+    ) -> Result<bool, diesel::result::Error> {
         let table = self.table(conn)?;
         let primary_keys = table.primary_key_columns(conn)?;
         let columns = self.columns(conn)?;
@@ -318,7 +318,7 @@ impl KeyColumnUsage {
     pub fn includes_foreign_primary_key(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<bool, crate::error::Error> {
+    ) -> Result<bool, diesel::result::Error> {
         let foreign_table = self.foreign_table(conn)?;
         let primary_keys = foreign_table.primary_key_columns(conn)?;
         let foreign_columns = self.foreign_columns(conn)?;
@@ -338,7 +338,7 @@ impl KeyColumnUsage {
     pub fn is_foreign_unique_key(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Option<PgIndex>, crate::error::Error> {
+    ) -> Result<Option<PgIndex>, diesel::result::Error> {
         let foreign_table = self.foreign_table(conn)?;
         let foreign_columns = self.foreign_columns(conn)?;
 

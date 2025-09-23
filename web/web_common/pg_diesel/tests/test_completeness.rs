@@ -12,16 +12,16 @@ async fn test_schema_completeness() {
         .await
         .expect("Failed to start container");
 
-	// We load the schema.rs document
-	let diesel_schema = include_str!("../../pg_diesel/src/schema.rs");
+    // We load the schema.rs document
+    let diesel_schema = include_str!("../../pg_diesel/src/schema.rs");
 
     for schema in ["pg_toast", "pg_catalog", "information_schema"] {
         let tables =
-            Table::load_all(&mut conn, database_name, "pg_catalog").expect("Failed to load tables");
-		for table in tables {
-			let needle = format!("{}.{}", table.table_schema, table.table_name);
-			assert!(diesel_schema.contains(&needle), "Table {table} not found in schema.rs");
-		}
+            Table::load_all(&mut conn, database_name, schema).expect("Failed to load tables");
+        for table in tables {
+            let needle = format!("{}.{}", table.table_schema, table.table_name);
+            assert!(diesel_schema.contains(&needle), "Table {table} not found in schema.rs");
+        }
     }
 
     docker.stop().await.unwrap();

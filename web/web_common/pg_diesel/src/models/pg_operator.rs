@@ -58,7 +58,7 @@ impl PgOperator {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn function(&self, conn: &mut PgConnection) -> Result<PgProc, crate::error::Error> {
+    pub fn function(&self, conn: &mut PgConnection) -> Result<PgProc, diesel::result::Error> {
         cached_queries::function(self, conn)
     }
 
@@ -72,7 +72,7 @@ impl PgOperator {
     /// # Errors
     ///
     /// * If the function is not contained in an extension
-    pub fn extension(&self, conn: &mut PgConnection) -> Result<PgExtension, crate::error::Error> {
+    pub fn extension(&self, conn: &mut PgConnection) -> Result<PgExtension, diesel::result::Error> {
         cached_queries::extension(self, conn)
     }
 
@@ -88,7 +88,7 @@ impl PgOperator {
     pub fn left_operand_type(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<PgType, crate::error::Error> {
+    ) -> Result<PgType, diesel::result::Error> {
         cached_queries::left_operand_type(self, conn)
     }
 
@@ -104,7 +104,7 @@ impl PgOperator {
     pub fn right_operand_type(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<PgType, crate::error::Error> {
+    ) -> Result<PgType, diesel::result::Error> {
         cached_queries::right_operand_type(self, conn)
     }
 
@@ -117,7 +117,7 @@ impl PgOperator {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn result_type(&self, conn: &mut PgConnection) -> Result<PgType, crate::error::Error> {
+    pub fn result_type(&self, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
         cached_queries::result_type(self, conn)
     }
 }

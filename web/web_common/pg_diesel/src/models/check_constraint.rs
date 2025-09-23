@@ -54,7 +54,7 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, crate::error::Error> {
+    pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, diesel::result::Error> {
         self.pg_constraint(conn)?.functions(conn)
     }
 
@@ -71,7 +71,7 @@ impl CheckConstraint {
     pub fn operators(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Vec<PgOperator>, crate::error::Error> {
+    ) -> Result<Vec<PgOperator>, diesel::result::Error> {
         self.pg_constraint(conn)?.operators(conn)
     }
 
@@ -87,7 +87,7 @@ impl CheckConstraint {
     pub fn pg_constraint(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<PgConstraint, crate::error::Error> {
+    ) -> Result<PgConstraint, diesel::result::Error> {
         use diesel::RunQueryDsl;
 
         use crate::schema::{pg_constraint, pg_namespace};
@@ -101,7 +101,7 @@ impl CheckConstraint {
             .filter(pg_namespace::nspname.eq(&self.constraint_schema))
             .select(PgConstraint::as_select())
             .first(conn)
-            .map_err(crate::error::Error::from)
+            .map_err(diesel::result::Error::from)
     }
 
     /// Returns the table constraint associated with this check constraint
@@ -116,7 +116,7 @@ impl CheckConstraint {
     pub fn table_constraint(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<TableConstraint, crate::error::Error> {
+    ) -> Result<TableConstraint, diesel::result::Error> {
         cached_queries::table_constraint(self, conn)
     }
 
@@ -129,7 +129,7 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If an error occurs while querying the database
-    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, crate::error::Error> {
+    pub fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
         self.table_constraint(conn)?.table(conn)
     }
 
@@ -142,7 +142,7 @@ impl CheckConstraint {
     /// # Errors
     ///
     /// * If their is an error while querying the database.
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, crate::error::Error> {
+    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
         cached_queries::columns(self, conn)
     }
 }

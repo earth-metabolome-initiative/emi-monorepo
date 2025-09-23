@@ -7,7 +7,7 @@ use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, 
 pub(super) fn extension(
     pg_proc: &PgProc,
     conn: &mut PgConnection,
-) -> Result<PgExtension, crate::error::Error> {
+) -> Result<PgExtension, diesel::result::Error> {
     use crate::schema::{pg_depend, pg_extension};
     Ok(pg_extension::table
         .inner_join(pg_depend::table.on(pg_extension::oid.eq(pg_depend::refobjid)))

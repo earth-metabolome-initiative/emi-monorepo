@@ -11,7 +11,7 @@ use crate::models::{Column, KeyColumnUsage, ReferentialConstraint, Table};
 pub(super) fn referential_constraint(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
-) -> Result<ReferentialConstraint, crate::error::Error> {
+) -> Result<ReferentialConstraint, diesel::result::Error> {
     use crate::schema::referential_constraints;
     Ok(referential_constraints::table
         .filter(referential_constraints::constraint_name.eq(&key_column_usage.constraint_name))
@@ -27,7 +27,7 @@ pub(super) fn referential_constraint(
 pub(super) fn foreign_columns(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
-) -> Result<Vec<Column>, crate::error::Error> {
+) -> Result<Vec<Column>, diesel::result::Error> {
     use diesel::result::Error as DieselError;
 
     use crate::schema::{columns, constraint_column_usage};
@@ -67,7 +67,7 @@ pub(super) fn foreign_columns(
 pub(super) fn table(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
-) -> Result<Table, crate::error::Error> {
+) -> Result<Table, diesel::result::Error> {
     use crate::schema::tables;
 
     Ok(tables::table
@@ -82,7 +82,7 @@ pub(super) fn table(
 pub(super) fn columns(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
-) -> Result<Vec<Column>, crate::error::Error> {
+) -> Result<Vec<Column>, diesel::result::Error> {
     use crate::schema::{columns, key_column_usage};
     Ok(key_column_usage::table
         .filter(key_column_usage::constraint_name.eq(&key_column_usage.constraint_name))
@@ -113,7 +113,7 @@ pub(super) fn columns(
 pub(super) fn foreign_table(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
-) -> Result<Table, crate::error::Error> {
+) -> Result<Table, diesel::result::Error> {
     use crate::schema::{constraint_table_usage, tables};
 
     let constraint = key_column_usage.referential_constraint(conn)?;

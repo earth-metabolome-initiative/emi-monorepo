@@ -8,7 +8,7 @@ use crate::models::{PgEnum, PgExtension, PgProc, PgType};
 pub(super) fn enums(
     pg_extension: &PgExtension,
     conn: &mut PgConnection,
-) -> Result<Vec<PgEnum>, crate::error::Error> {
+) -> Result<Vec<PgEnum>, diesel::result::Error> {
     use crate::schema::{pg_depend, pg_enum, pg_type};
 
     Ok(pg_enum::table
@@ -23,7 +23,7 @@ pub(super) fn enums(
 pub(super) fn types(
     pg_extension: &PgExtension,
     conn: &mut PgConnection,
-) -> Result<Vec<PgType>, crate::error::Error> {
+) -> Result<Vec<PgType>, diesel::result::Error> {
     use crate::schema::{pg_depend, pg_type};
     Ok(pg_depend::table
         .inner_join(pg_type::table.on(pg_depend::objid.eq(pg_type::oid)))
@@ -36,7 +36,7 @@ pub(super) fn types(
 pub(super) fn functions(
     pg_extension: &PgExtension,
     conn: &mut PgConnection,
-) -> Result<Vec<PgProc>, crate::error::Error> {
+) -> Result<Vec<PgProc>, diesel::result::Error> {
     use crate::schema::{pg_depend, pg_proc};
     Ok(pg_depend::table
         .inner_join(pg_proc::table.on(pg_depend::objid.eq(pg_proc::oid)))

@@ -10,7 +10,7 @@ use diesel::{
 pub(super) fn variants(
     pg_type: &PgType,
     conn: &mut PgConnection,
-) -> Result<Vec<PgEnum>, crate::error::Error> {
+) -> Result<Vec<PgEnum>, diesel::result::Error> {
     use crate::schema::pg_enum;
 
     Ok(pg_enum::table
@@ -24,7 +24,7 @@ pub(super) fn variants(
 pub(super) fn attributes(
     pg_type: &PgType,
     conn: &mut PgConnection,
-) -> Result<Vec<PgAttribute>, crate::error::Error> {
+) -> Result<Vec<PgAttribute>, diesel::result::Error> {
     use crate::schema::{pg_attribute, pg_type};
 
     Ok(pg_attribute::table
@@ -38,7 +38,7 @@ pub(super) fn attributes(
 pub(super) fn extension(
     pg_type: &PgType,
     conn: &mut PgConnection,
-) -> Result<PgExtension, crate::error::Error> {
+) -> Result<PgExtension, diesel::result::Error> {
     use crate::schema::{pg_depend, pg_extension};
     Ok(pg_depend::table
         .filter(pg_depend::objid.eq(pg_type.oid))
@@ -52,7 +52,7 @@ pub(super) fn extension(
 pub(super) fn from_oid(
     oid: u32,
     conn: &mut PgConnection,
-) -> Result<PgType, crate::error::Error> {
+) -> Result<PgType, diesel::result::Error> {
     use crate::schema::pg_type;
     Ok(pg_type::table.filter(pg_type::oid.eq(oid)).first::<PgType>(conn)?)
 }
