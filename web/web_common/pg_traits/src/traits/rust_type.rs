@@ -1,58 +1,6 @@
 //! Provides a method returning the rust type which should be employed in the rust
 //! struct to represent the type of a struct derived from or associated with a database table.
 
-/// Trait to be implemented by structs derived from database tables to indicate
-/// which rust type should be used in the rust struct to represent their type.
-pub trait RustType {
-    /// The error type returned by the method.
-    type Error;
-
-    /// Returns the rust type as a syn::Type.
-    fn rust_type(&self, conn: &mut diesel::PgConnection) -> Result<syn::Type, Self::Error>;
-}
-
-/// Returns the Syn rust type of the `PgType`.
-///
-/// # Arguments
-///
-/// * `optional` - A boolean indicating whether the type is optional.
-/// * `conn` - The Postgres connection.
-///
-/// # Returns
-///
-/// A Result containing the Syn rust type of the `PgType`, or an error if
-/// the type is not supported.
-///
-/// # Errors
-///
-/// * Returns an error if the provided database connection fails.
-pub fn rust_type(&self, optional: bool, conn: &mut PgConnection) -> Result<Type, WebCodeGenError> {
-    match rust_type_str(&self.typname, conn) {
-        Ok(rust_type) => Ok(parse_str::<Type>(rust_type)?),
-        Err(error) => {
-            if self.is_composite() || self.is_enum() {
-                let mut struct_name = format!(
-                    "crate::{CODEGEN_DIRECTORY}::{CODEGEN_STRUCTS_MODULE}::{CODEGEN_TYPES_PATH}::{}::{}",
-                    self.snake_case_name()?,
-                    self.camelcased_name()
-                );
-                if optional {
-                    struct_name = format!("Option<{struct_name}>");
-                }
-
-                Ok(parse_str::<Type>(&struct_name)?)
-            } else if self.is_user_defined(conn)? {
-                let Some(base_type) = self.base_type(conn)? else {
-                    return Err(WebCodeGenError::MissingBaseType(Box::new(self.clone())));
-                };
-                base_type.rust_type(optional, conn)
-            } else {
-                Err(error)
-            }
-        }
-    }
-}
-
 /// Returns the Syn rust type of the column.
 ///
 /// # Arguments
@@ -81,7 +29,7 @@ pub fn rust_type_str<S: AsRef<str>>(
         "oid" => "u32",
 
         // Text types
-        "character varying" | "varchar" | "text" | "name" | "xml" | "character" | "char"
+        "character varying" | "varchar" | "text" | "name" | "character" | "char"
         | "citext" => "String",
 
         // Boolean types
@@ -128,4 +76,97 @@ pub fn rust_type_str<S: AsRef<str>>(
 
         other => return Err(WebCodeGenError::UnknownPostgresRustType(other.to_owned())),
     })
+}
+
+
+/// Converts a `PostgreSQL` type to a `Diesel` type.
+///
+/// # Arguments
+///
+/// * `postgres_type` - A string slice that holds the `PostgreSQL` type name.
+///
+/// # Returns
+///
+/// A `Type` representing the corresponding Diesel type.
+///
+/// # Errors
+///
+/// * Returns an error if the type is not supported.
+pub fn postgres_type_to_diesel_str(postgres_type: &str) -> Result<String, WebCodeGenError> {
+    if let Some(postgres_type) = postgres_type.strip_suffix("[]") {
+        return Ok(format!(
+            "diesel::sql_types::Array<{}>",
+            postgres_type_to_diesel_str(postgres_type)?
+        ));
+    }
+
+    Ok(match postgres_type {
+        // Numeric types
+        "integer" | "i32" => "diesel::sql_types::Integer",
+        "smallint" | "int2" => "diesel::sql_types::SmallInt",
+        "bigint" | "int8" => "diesel::sql_types::BigInt",
+        "real" | "float4" => "diesel::sql_types::Float",
+        "double precision" | "float8" => "diesel::sql_types::Double",
+        "money" => "diesel::pg::sql_types::Money",
+
+        // Text types
+        "text" | "character varying" | "name" | "cstring" => "diesel::sql_types::Text",
+        "citext" => "diesel::sql_types::Citext",
+        "char" | "character" => "diesel::sql_types::CChar",
+        "bpchar" => "diesel::sql_types::Bpchar",
+
+        // Boolean types
+        "boolean" | "bool" => "diesel::sql_types::Bool",
+
+        // Temporal types
+        "timestamp without time zone" | "timestamp" => "diesel::sql_types::Timestamp",
+        "timestamp with time zone" | "timestamptz" => {
+            "rosetta_timestamp::diesel_impls::TimestampUTC"
+        }
+        "time" => "diesel::sql_types::Time",
+        "date" => "diesel::sql_types::Date",
+        "interval" => "diesel::sql_types::Interval",
+
+        // Binary types
+        "bytea" => "diesel::sql_types::Binary",
+
+        // JSON types
+        "json" => "diesel::sql_types::Json",
+        "jsonb" => "diesel::sql_types::Jsonb",
+
+        // Network address types
+        "macaddr" => "diesel::sql_types::Macaddr",
+        "inet" => "diesel::sql_types::Inet",
+
+        // Object Identifier types
+        "oid" => "diesel::sql_types::Oid",
+
+        // Full-text search types
+        "tsvector" => "diesel_full_text_search::TsVector",
+        "tsquery" => "diesel_full_text_search::TsQuery",
+
+        // GIS types
+        "geometry" | "point" | "polygon" | "geometry(Point,4326)" | "line" => {
+            "::postgis_diesel::sql_types::Geometry"
+        }
+        "geography" => "::postgis_diesel::sql_types::Geography",
+
+        // Other
+        "uuid" => "::rosetta_uuid::diesel_impls::Uuid",
+
+        // ISO Codes
+        "countrycode" | "CountryCode" => "::iso_codes::country_codes::diesel_impls::CountryCode",
+
+        "mediatype" | "MediaType" => "::media_types::diesel_impls::MediaType",
+
+        "cas" => "::cas_codes::diesel_impls::CAS",
+        "molecularformula" => {
+            "::molecular_formulas::molecular_formula::diesel_impls::MolecularFormula"
+        }
+
+        _ => {
+            return Err(WebCodeGenError::UnknownDieselPostgresType(postgres_type.to_owned()));
+        }
+    }
+    .to_owned())
 }

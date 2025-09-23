@@ -190,6 +190,7 @@ procedure_codegen = { path = "web/web_common/procedure_codegen" }
 mermaid = { path = "utils/mermaid" }
 colorsys = "0.7.0"
 prettyplease = "0.2"
+enumflags2 = "0.7.12"
 guided_procedures = { path = "web/core_structures/guided_procedures" }
 directus_codegen = { path = "data_migrations/directus_migration/directus_codegen" }
 pg_cached = { path = "web/web_common/pg_cached" }
