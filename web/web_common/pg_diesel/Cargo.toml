@@ -7,7 +7,7 @@ edition = "2024"
 diesel = { workspace = true, features = ["postgres"] }
 cached = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
-pg_cached = { workspace = true}
+pg_cached = { workspace = true }
 
 [dev-dependencies]
 tokio.workspace = true
