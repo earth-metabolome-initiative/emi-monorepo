@@ -33,4 +33,4 @@ pub trait RootNodes: MonoplexMonopartiteGraph {
     }
 }
 
-impl<G: MonoplexMonopartiteGraph> RootNodes for G {}
+impl<G: ?Sized + MonoplexMonopartiteGraph> RootNodes for G {}
