@@ -10,20 +10,26 @@ use algebra::prelude::KahnError;
 pub enum ResnikError {
     /// Error for when a graph is not a DAG / contains a cycle
     NotDag,
-    /// Error for unexpected occurence size
-    IneqOccurenceSize {
+    /// Error for unexpected occurrence size
+    InequalOccurrenceSize {
         /// The expected size for the uccurence
         expected: usize,
-        /// The actual size found for the occurence
+        /// The actual size found for the occurrence
         found: usize,
-    }
+    },
+    /// Error for negative occurrences
+    NegativeOccurrence,
+    /// Error for non finite occurrences (infinite and NaN)
+    NonFiniteOccurrence,
 }
 
 impl Display for ResnikError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::NotDag => write!(f,"The graph is not a DAG"),
-            Self::IneqOccurenceSize { expected, found } => write!(f,"Received an occurence vector with {found} entries but expected {expected} entries")
+            Self::InequalOccurrenceSize { expected, found } => write!(f,"Received an occurrence vector with {found} entries but expected {expected} entries"),
+            Self::NegativeOccurrence => write!(f, "Occurrences must never be negative - negative occurrence found"),
+            Self::NonFiniteOccurrence => write!(f, "Non Finite Occurrence found - occurrences must be finite"),
         }
     }
 }

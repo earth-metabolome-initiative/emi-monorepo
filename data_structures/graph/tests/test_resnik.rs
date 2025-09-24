@@ -6,7 +6,7 @@ use graph::{
         Builder, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder,
         GenericVocabularyBuilder, Resnik,
     },
-    traits::{resnik::ResnikError, EdgesBuilder, MonopartiteGraphBuilder, MonoplexGraphBuilder, VocabularyBuilder},
+    traits::{resnik::{self, ResnikError}, EdgesBuilder, MonopartiteGraphBuilder, MonoplexGraphBuilder, VocabularyBuilder},
 };
 use functional_properties::similarity::ScalarSimilarity;
 use sorted_vec::prelude::SortedVec;
@@ -26,7 +26,7 @@ fn test_resnik_on_tree() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
     let graph: DiGraph<usize> =
         GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
-    let resnik = graph.resnik(None)?;
+    let resnik = graph.resnik(&[1.0,1.0,1.0])?;
     assert!(resnik.similarity(&0,&0) > 0.99, "Self Similarity Must be 1");
     assert!(resnik.similarity(&0,&1) < 0.99, "Score should not be 1");
     Ok(())
@@ -47,14 +47,14 @@ fn test_resnik_not_dag() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
     let graph: DiGraph<usize> =
         GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
-    let resnik = graph.resnik(None);
+    let resnik = graph.resnik(&[1.0,1.0,1.0]);
     assert_eq!(resnik, Err(ResnikError::NotDag));
     Ok(())
 }
 
 
 #[test]
-fn test_resnik_incorrect_occurences() -> Result<(), Box<dyn std::error::Error>> {
+fn test_resnik_incorrect_occurrences() -> Result<(), Box<dyn std::error::Error>> {
     let nodes: Vec<usize> = vec![0, 1, 2];
     let edges: Vec<(usize, usize)> = vec![(0, 1), (0, 2), (1, 2)];
     let nodes: SortedVec<usize> = GenericVocabularyBuilder::default()
@@ -68,7 +68,13 @@ fn test_resnik_incorrect_occurences() -> Result<(), Box<dyn std::error::Error>> 
         .build()?;
     let graph: DiGraph<usize> =
         GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
-    let resnik = graph.resnik(Some(&Vec::new()));
-    assert_eq!(resnik, Err(ResnikError::IneqOccurenceSize { expected: 3, found: 0 }));
+    let resnik = graph.resnik(&Vec::new());
+    assert_eq!(resnik, Err(ResnikError::InequalOccurrenceSize { expected: 3, found: 0 }));
+    let resnik = graph.resnik(&[-1.0,-2.0,-3.0]);
+    assert_eq!(resnik, Err(ResnikError::NegativeOccurrence));
+    let resnik = graph.resnik(&[f64::INFINITY, f64::NAN, f64::INFINITY]);
+    assert_eq!(resnik, Err(ResnikError::NonFiniteOccurrence));
     Ok(())
 }
+
+
