@@ -1,8 +1,9 @@
-//! Submodule implementing the method `std` for the [`RequiredCrate`] struct which
-//! initializes a `RequiredCrate` instance describing the `std` crate.
+//! Submodule implementing the method `std` for the [`RequiredCrate`] struct
+//! which initializes a `RequiredCrate` instance describing the `std` crate.
+
+use common_traits::builder::Builder;
 
 use crate::{RequiredCrate, RequiredType};
-use common_traits::builder::Builder;
 
 impl RequiredCrate {
     /// Initializes a `RequiredCrate` instance describing the `std` crate.
@@ -23,7 +24,8 @@ impl RequiredCrate {
 }
 
 impl RequiredType {
-    /// Returns a `RequiredType` instance describing the `String` type from the `std` crate.
+    /// Returns a `RequiredType` instance describing the `String` type from the
+    /// `std` crate.
     fn string() -> Self {
         RequiredType::new()
             .diesel_type(syn::parse_str("diesel::sql_types::Text").unwrap())
@@ -38,7 +40,8 @@ impl RequiredType {
             .unwrap()
     }
 
-    /// Returns a `RequiredType` instance describing the `Vec<u8>` type from the `std` crate.
+    /// Returns a `RequiredType` instance describing the `Vec<u8>` type from the
+    /// `std` crate.
     fn vec_u8() -> Self {
         RequiredType::new()
             .diesel_type(syn::parse_str("diesel::sql_types::Binary").unwrap())
@@ -53,7 +56,8 @@ impl RequiredType {
             .unwrap()
     }
 
-    /// Returns a `RequiredType` instance describing the `std::net::IpAddr` type from the `std` crate.
+    /// Returns a `RequiredType` instance describing the `std::net::IpAddr` type
+    /// from the `std` crate.
     fn ip_addr() -> Self {
         RequiredType::new()
             .diesel_type(syn::parse_str("diesel::sql_types::Inet").unwrap())
@@ -68,7 +72,8 @@ impl RequiredType {
             .unwrap()
     }
 
-    /// Returns a `RequiredType` instance describing the `std::net::MacAddr` type from the `std` crate.
+    /// Returns a `RequiredType` instance describing the `std::net::MacAddr`
+    /// type from the `std` crate.
     fn mac_addr() -> Self {
         RequiredType::new()
             .diesel_type(syn::parse_str("diesel::sql_types::MacAddr").unwrap())

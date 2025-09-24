@@ -5,9 +5,8 @@ use diesel::{
     QueryableByName, Selectable, SelectableHelper,
 };
 
-use crate::models::{Table, TableConstraint};
-
 use super::{Column, PgConstraint, PgOperator, PgProc};
+use crate::models::{Table, TableConstraint};
 
 mod cached_queries;
 

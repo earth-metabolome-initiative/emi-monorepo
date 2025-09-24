@@ -1,16 +1,16 @@
-//! Submodule implementing traits for the [`PgAttribute`](pg_diesel::models::PgAttribute) model.
+//! Submodule implementing traits for the
+//! [`PgAttribute`](pg_diesel::models::PgAttribute) model.
 
-use pg_diesel::models::{PgAttribute, PgType};
+use pg_diesel::models::PgAttribute;
 
-use crate::Supports;
+use crate::AssociatedType;
 
-impl<TraitMarker> Supports<TraitMarker> for PgAttribute
-where
-    PgType: Supports<TraitMarker>,
-{
-    type Error = PgType::Error;
-
-    fn supports(&self, conn: &mut PgConnection) -> Result<bool, Self::Error> {
-        self.pg_type(conn)?.supports(conn)
+impl AssociatedType for PgAttribute {
+    fn associated_type<'required_crate>(
+        &self,
+        crates: &'required_crate [crate::RequiredCrate],
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Option<&'required_crate crate::RequiredType>, diesel::result::Error> {
+        self.pg_type(conn)?.associated_type(crates, conn)
     }
 }

@@ -1,21 +1,22 @@
-//! Submodule implementing traits for the [`Table`](pg_diesel::models::Table) model.
+//! Submodule implementing traits for the [`Table`](pg_diesel::models::Table)
+//! model.
 
-use pg_diesel::models::{Table, Column};
+use pg_diesel::models::Table;
 
-use crate::Supports;
+use crate::{Supports, Trait};
 
-impl<TraitMarker> Supports<TraitMarker> for Table
-where
-    Column: Supports<TraitMarker>,
-{
-    type Error = Column::Error;
-
-    fn supports(&self, conn: &mut PgConnection) -> Result<bool, Self::Error> {
+impl Supports for Table {
+    fn supports(
+        &self,
+        supported_trait: Trait,
+        crates: &[crate::RequiredCrate],
+        conn: &mut diesel::PgConnection,
+    ) -> Result<bool, diesel::result::Error> {
         for column in self.columns(conn)? {
-			if !column.supports::<TraitMarker>(conn)? {
-				return Ok(false);
-			}
-		}
-		Ok(true)
+            if !column.supports(supported_trait, crates, conn)? {
+                return Ok(false);
+            }
+        }
+        Ok(true)
     }
 }

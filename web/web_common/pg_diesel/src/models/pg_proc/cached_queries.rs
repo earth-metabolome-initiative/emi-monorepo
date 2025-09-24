@@ -1,7 +1,8 @@
 //! Submodule defining the cached queries methods used in the [`PgProc`] struct.
 
-use crate::models::{PgExtension, PgProc};
 use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, SelectableHelper};
+
+use crate::models::{PgExtension, PgProc};
 
 #[pg_cached::oid_auto_cached]
 pub(super) fn extension(

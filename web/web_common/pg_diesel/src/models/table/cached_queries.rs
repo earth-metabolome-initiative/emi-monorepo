@@ -1,10 +1,11 @@
 //! Submodule defining the cached queries methods used in the [`Table`] struct.
 
-use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgIndex, PgTrigger, Table};
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, NullableExpressionMethods, PgConnection,
     QueryDsl, RunQueryDsl, SelectableHelper,
 };
+
+use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgIndex, PgTrigger, Table};
 
 #[pg_cached::auto_cached]
 pub(super) fn load_all_tables(
@@ -13,15 +14,13 @@ pub(super) fn load_all_tables(
     conn: &mut PgConnection,
 ) -> Result<Vec<Table>, diesel::result::Error> {
     use crate::schema::tables;
-    Ok(
-        tables::table
-            .filter(tables::table_catalog.eq(table_catalog))
-            .filter(tables::table_schema.eq(table_schema))
-            .filter(tables::table_name.ne("__diesel_schema_migrations"))
-            .order_by(tables::table_name)
-            .select(Table::as_select())
-            .load::<Table>(conn)?,
-    )
+    Ok(tables::table
+        .filter(tables::table_catalog.eq(table_catalog))
+        .filter(tables::table_schema.eq(table_schema))
+        .filter(tables::table_name.ne("__diesel_schema_migrations"))
+        .order_by(tables::table_name)
+        .select(Table::as_select())
+        .load::<Table>(conn)?)
 }
 
 #[pg_cached::auto_cached]
@@ -32,13 +31,11 @@ pub(super) fn load_table(
     table_catalog: &str,
 ) -> Result<Table, diesel::result::Error> {
     use crate::schema::tables;
-    Ok(
-        tables::table
-            .filter(tables::table_name.eq(table_name))
-            .filter(tables::table_schema.eq(table_schema))
-            .filter(tables::table_catalog.eq(table_catalog))
-            .first::<Table>(conn)?,
-    )
+    Ok(tables::table
+        .filter(tables::table_name.eq(table_name))
+        .filter(tables::table_schema.eq(table_schema))
+        .filter(tables::table_catalog.eq(table_catalog))
+        .first::<Table>(conn)?)
 }
 
 #[pg_cached::auto_cached]
@@ -47,14 +44,12 @@ pub(super) fn columns(
     conn: &mut PgConnection,
 ) -> Result<Vec<Column>, diesel::result::Error> {
     use crate::schema::columns;
-    Ok(
-        columns::table
-            .filter(columns::table_name.eq(&table.table_name))
-            .filter(columns::table_schema.eq(&table.table_schema))
-            .filter(columns::table_catalog.eq(&table.table_catalog))
-            .order_by(columns::ordinal_position)
-            .load::<Column>(conn)?,
-    )
+    Ok(columns::table
+        .filter(columns::table_name.eq(&table.table_name))
+        .filter(columns::table_schema.eq(&table.table_schema))
+        .filter(columns::table_catalog.eq(&table.table_catalog))
+        .order_by(columns::ordinal_position)
+        .load::<Column>(conn)?)
 }
 
 #[pg_cached::auto_cached]
@@ -63,65 +58,55 @@ pub(super) fn primary_key_columns(
     conn: &mut PgConnection,
 ) -> Result<Vec<Column>, diesel::result::Error> {
     use crate::schema::{columns, key_column_usage, table_constraints};
-    Ok(
-        key_column_usage::table
-            .inner_join(
-                columns::table.on(key_column_usage::table_name
-                    .nullable()
-                    .eq(columns::table_name.nullable())
-                    .and(
-                        key_column_usage::table_schema
-                            .nullable()
-                            .eq(columns::table_schema.nullable()),
-                    )
-                    .and(
-                        key_column_usage::table_catalog
-                            .nullable()
-                            .eq(columns::table_catalog.nullable()),
-                    )
-                    .and(
-                        key_column_usage::column_name
-                            .nullable()
-                            .eq(columns::column_name.nullable()),
-                    )),
-            )
-            .inner_join(
-                table_constraints::table.on(key_column_usage::constraint_name
-                    .nullable()
-                    .eq(table_constraints::constraint_name.nullable())
-                    .and(
-                        key_column_usage::constraint_schema
-                            .nullable()
-                            .eq(table_constraints::constraint_schema.nullable()),
-                    )
-                    .and(
-                        key_column_usage::constraint_catalog
-                            .nullable()
-                            .eq(table_constraints::constraint_catalog.nullable()),
-                    )
-                    .and(
-                        key_column_usage::table_name
-                            .nullable()
-                            .eq(table_constraints::table_name.nullable()),
-                    )
-                    .and(
-                        key_column_usage::table_schema
-                            .nullable()
-                            .eq(table_constraints::table_schema.nullable()),
-                    )
-                    .and(
-                        key_column_usage::table_catalog
-                            .nullable()
-                            .eq(table_constraints::table_catalog.nullable()),
-                    )),
-            )
-            .filter(key_column_usage::table_name.eq(&table.table_name))
-            .filter(key_column_usage::table_schema.eq(&table.table_schema))
-            .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
-            .filter(table_constraints::constraint_type.eq("PRIMARY KEY"))
-            .select(Column::as_select())
-            .load::<Column>(conn)?,
-    )
+    Ok(key_column_usage::table
+        .inner_join(
+            columns::table.on(key_column_usage::table_name
+                .nullable()
+                .eq(columns::table_name.nullable())
+                .and(key_column_usage::table_schema.nullable().eq(columns::table_schema.nullable()))
+                .and(
+                    key_column_usage::table_catalog
+                        .nullable()
+                        .eq(columns::table_catalog.nullable()),
+                )
+                .and(key_column_usage::column_name.nullable().eq(columns::column_name.nullable()))),
+        )
+        .inner_join(
+            table_constraints::table.on(key_column_usage::constraint_name
+                .nullable()
+                .eq(table_constraints::constraint_name.nullable())
+                .and(
+                    key_column_usage::constraint_schema
+                        .nullable()
+                        .eq(table_constraints::constraint_schema.nullable()),
+                )
+                .and(
+                    key_column_usage::constraint_catalog
+                        .nullable()
+                        .eq(table_constraints::constraint_catalog.nullable()),
+                )
+                .and(
+                    key_column_usage::table_name
+                        .nullable()
+                        .eq(table_constraints::table_name.nullable()),
+                )
+                .and(
+                    key_column_usage::table_schema
+                        .nullable()
+                        .eq(table_constraints::table_schema.nullable()),
+                )
+                .and(
+                    key_column_usage::table_catalog
+                        .nullable()
+                        .eq(table_constraints::table_catalog.nullable()),
+                )),
+        )
+        .filter(key_column_usage::table_name.eq(&table.table_name))
+        .filter(key_column_usage::table_schema.eq(&table.table_schema))
+        .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
+        .filter(table_constraints::constraint_type.eq("PRIMARY KEY"))
+        .select(Column::as_select())
+        .load::<Column>(conn)?)
 }
 
 #[pg_cached::auto_cached]
@@ -130,33 +115,31 @@ pub(super) fn foreign_keys(
     conn: &mut PgConnection,
 ) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
     use crate::schema::{key_column_usage, referential_constraints};
-    Ok(
-        key_column_usage::table
-            .inner_join(
-                referential_constraints::table.on(key_column_usage::constraint_name
-                    .eq(referential_constraints::constraint_name)
-                    .and(
-                        key_column_usage::constraint_schema
-                            .eq(referential_constraints::constraint_schema),
-                    )
-                    .and(
-                        key_column_usage::constraint_catalog
-                            .eq(referential_constraints::constraint_catalog),
-                    )),
-            )
-            .filter(key_column_usage::table_name.eq(&table.table_name))
-            .filter(key_column_usage::table_schema.eq(&table.table_schema))
-            .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
-            .filter(key_column_usage::ordinal_position.eq(1))
-            .order_by((
-                key_column_usage::constraint_catalog,
-                key_column_usage::constraint_schema,
-                key_column_usage::constraint_name,
-                key_column_usage::ordinal_position,
-            ))
-            .select(KeyColumnUsage::as_select())
-            .load::<KeyColumnUsage>(conn)?,
-    )
+    Ok(key_column_usage::table
+        .inner_join(
+            referential_constraints::table.on(key_column_usage::constraint_name
+                .eq(referential_constraints::constraint_name)
+                .and(
+                    key_column_usage::constraint_schema
+                        .eq(referential_constraints::constraint_schema),
+                )
+                .and(
+                    key_column_usage::constraint_catalog
+                        .eq(referential_constraints::constraint_catalog),
+                )),
+        )
+        .filter(key_column_usage::table_name.eq(&table.table_name))
+        .filter(key_column_usage::table_schema.eq(&table.table_schema))
+        .filter(key_column_usage::table_catalog.eq(&table.table_catalog))
+        .filter(key_column_usage::ordinal_position.eq(1))
+        .order_by((
+            key_column_usage::constraint_catalog,
+            key_column_usage::constraint_schema,
+            key_column_usage::constraint_name,
+            key_column_usage::ordinal_position,
+        ))
+        .select(KeyColumnUsage::as_select())
+        .load::<KeyColumnUsage>(conn)?)
 }
 
 #[pg_cached::auto_cached]

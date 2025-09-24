@@ -204,10 +204,7 @@ impl KeyColumnUsage {
     ///
     /// * If an error occurs while loading the key column usages from the
     ///   database
-    pub fn is_composite(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<bool, diesel::result::Error> {
+    pub fn is_composite(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
         self.columns(conn).map(|columns| columns.len() > 1)
     }
 

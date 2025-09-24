@@ -6,9 +6,8 @@ use diesel::{
     Selectable, SelectableHelper,
 };
 
-use crate::models::{PgEnum, PgType};
-
 use super::PgProc;
+use crate::models::{PgEnum, PgType};
 
 mod cached_queries;
 

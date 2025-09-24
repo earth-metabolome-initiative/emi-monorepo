@@ -4,9 +4,8 @@ use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
 mod cached_queries;
 
-use crate::models::{GeographyColumn, GeometryColumn, KeyColumnUsage, PgType, Table};
-
 use super::check_constraint::CheckConstraint;
+use crate::models::{GeographyColumn, GeometryColumn, KeyColumnUsage, PgType, Table};
 
 /// Struct defining the `information_schema.columns` table.
 #[derive(

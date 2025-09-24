@@ -24,14 +24,13 @@ mod referential_constraint;
 mod table;
 mod table_constraint;
 
-pub use geography_columns::GeographyColumn;
-pub use geometry_columns::GeometryColumn;
-
 pub use check_constraint::CheckConstraint;
 pub use column::Column;
 pub use constraint_column_usage::ConstraintColumnUsage;
 pub use constraint_table_usage::ConstraintTableUsage;
 pub use domain_constraint::DomainConstraint;
+pub use geography_columns::GeographyColumn;
+pub use geometry_columns::GeometryColumn;
 pub use key_column_usage::KeyColumnUsage;
 pub use pg_attribute::PgAttribute;
 pub use pg_class::PGClass;

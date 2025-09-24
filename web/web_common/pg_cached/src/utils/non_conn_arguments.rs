@@ -10,8 +10,8 @@ use crate::utils::is_conn_argument::is_conn_argument;
 ///
 /// # Arguments
 ///
-/// * `inputs` - A reference to a `Punctuated<FnArg, Comma>` representing
-///   the inputs of the function.
+/// * `inputs` - A reference to a `Punctuated<FnArg, Comma>` representing the
+///   inputs of the function.
 pub(crate) fn non_conn_arguments_idents(
     inputs: &syn::punctuated::Punctuated<syn::FnArg, syn::token::Comma>,
 ) -> Vec<&Ident> {
@@ -32,8 +32,8 @@ pub(crate) fn non_conn_arguments_idents(
 ///
 /// # Arguments
 ///
-/// * `inputs` - A reference to a `Punctuated<FnArg, Comma>` representing
-///   the inputs of the function.
+/// * `inputs` - A reference to a `Punctuated<FnArg, Comma>` representing the
+///   inputs of the function.
 pub(crate) fn first_non_conn_argument_ident(
     inputs: &syn::punctuated::Punctuated<syn::FnArg, syn::token::Comma>,
 ) -> Option<&Ident> {

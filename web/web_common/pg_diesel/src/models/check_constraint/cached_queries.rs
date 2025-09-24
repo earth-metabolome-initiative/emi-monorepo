@@ -1,10 +1,12 @@
-//! Submodule defining the cached queries methods used in the [`CheckConstraint`] struct.
+//! Submodule defining the cached queries methods used in the
+//! [`CheckConstraint`] struct.
 
-use crate::models::{CheckConstraint, Column, PgConstraint, TableConstraint};
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl,
     SelectableHelper,
 };
+
+use crate::models::{CheckConstraint, Column, PgConstraint, TableConstraint};
 
 #[pg_cached::auto_cached]
 pub(super) fn columns(

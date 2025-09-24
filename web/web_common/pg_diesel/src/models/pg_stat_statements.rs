@@ -9,14 +9,7 @@ use diesel::{
 ///
 /// Only the most relevant 32 columns are included to comply with Diesel’s
 /// default column limit.
-#[derive(
-    Queryable,
-    QueryableByName,
-    Selectable,
-    Debug,
-    Clone,
-    PartialEq,
-)]
+#[derive(Queryable, QueryableByName, Selectable, Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[diesel(table_name = crate::schema::pg_stat_statements)]
 pub struct PgStatStatement {

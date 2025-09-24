@@ -1,4 +1,5 @@
-//! Submodule defining the cached queries methods used in the [`PgExtension`] struct.
+//! Submodule defining the cached queries methods used in the [`PgExtension`]
+//! struct.
 
 use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, SelectableHelper};
 

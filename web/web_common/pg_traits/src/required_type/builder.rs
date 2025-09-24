@@ -7,16 +7,22 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 
-use crate::{required_type::traits_mask::{Trait, TraitsMask}, RequiredType};
+use crate::{
+    RequiredType,
+    required_type::traits_mask::{Trait, TraitsMask},
+};
 
 #[derive(Default)]
 /// Builder for the `RequiredType` struct.
 pub struct RequiredTypeBuilder {
-    /// The diesel type defined within the crate compatible with the given postgres type.
+    /// The diesel type defined within the crate compatible with the given
+    /// postgres type.
     diesel_type: Option<syn::Type>,
-    /// The rust type defined within the crate compatible with the given postgres type.
+    /// The rust type defined within the crate compatible with the given
+    /// postgres type.
     rust_type: Option<syn::Type>,
-    /// The postgres types which are compatible with the diesel and rust types defined within the crate.
+    /// The postgres types which are compatible with the diesel and rust types
+    /// defined within the crate.
     postgres_types: Vec<&'static str>,
     /// Trait mask representing the traits supported by the current type.
     traits: TraitsMask,
@@ -25,11 +31,14 @@ pub struct RequiredTypeBuilder {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// Enumeration of the attributes of the `RequiredType` struct.
 pub enum RequiredTypeAttribute {
-    /// The diesel type defined within the crate compatible with the given postgres type.
+    /// The diesel type defined within the crate compatible with the given
+    /// postgres type.
     DieselType,
-    /// The rust type defined within the crate compatible with the given postgres type.
+    /// The rust type defined within the crate compatible with the given
+    /// postgres type.
     RustType,
-    /// The postgres types which are compatible with the diesel and rust types defined within the crate.
+    /// The postgres types which are compatible with the diesel and rust types
+    /// defined within the crate.
     PostgresTypes,
     /// The trait mask representing the traits.
     Traits,
@@ -42,6 +51,8 @@ pub enum RequiredTypeBuilderError {
     Builder(BuilderError<RequiredTypeAttribute>),
     /// Provided a duplicated postgres type.
     DuplicatedPostgresType,
+    /// If the provided postgres type is not lowercase.
+    NotLowercasePostgresType,
 }
 
 impl Display for RequiredTypeBuilderError {
@@ -51,6 +62,9 @@ impl Display for RequiredTypeBuilderError {
             RequiredTypeBuilderError::DuplicatedPostgresType => {
                 write!(f, "Provided a duplicated postgres type")
             }
+            RequiredTypeBuilderError::NotLowercasePostgresType => {
+                write!(f, "Provided a postgres type which is not lowercase")
+            }
         }
     }
 }
@@ -59,25 +73,28 @@ impl core::error::Error for RequiredTypeBuilderError {
     fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         match self {
             RequiredTypeBuilderError::Builder(e) => Some(e),
-            RequiredTypeBuilderError::DuplicatedPostgresType => None,
+            _ => None,
         }
     }
 }
 
 impl RequiredTypeBuilder {
-    /// Sets the diesel type defined within the crate compatible with the given postgres type.
+    /// Sets the diesel type defined within the crate compatible with the given
+    /// postgres type.
     pub fn diesel_type(mut self, diesel_type: syn::Type) -> Self {
         self.diesel_type = Some(diesel_type);
         self
     }
 
-    /// Sets the rust type defined within the crate compatible with the given postgres type.
+    /// Sets the rust type defined within the crate compatible with the given
+    /// postgres type.
     pub fn rust_type(mut self, rust_type: syn::Type) -> Self {
         self.rust_type = Some(rust_type);
         self
     }
 
-    /// Adds a postgres type which is compatible with the diesel and rust types defined within the crate.
+    /// Adds a postgres type which is compatible with the diesel and rust types
+    /// defined within the crate.
     ///
     /// # Arguments
     /// * `postgres_type` - The postgres type to add.
@@ -91,6 +108,9 @@ impl RequiredTypeBuilder {
     ) -> Result<Self, RequiredTypeBuilderError> {
         if self.postgres_types.contains(&postgres_type) {
             return Err(RequiredTypeBuilderError::DuplicatedPostgresType);
+        }
+        if postgres_type != postgres_type.to_lowercase() {
+            return Err(RequiredTypeBuilderError::NotLowercasePostgresType);
         }
         self.postgres_types.push(postgres_type);
         Ok(self)
@@ -114,7 +134,7 @@ impl RequiredTypeBuilder {
         self.traits.set_supports(Trait::Default);
         self
     }
-    
+
     /// Sets that the current type supports hash.
     pub fn supports_hash(mut self) -> Self {
         self.traits.set_supports(Trait::Hash);
@@ -156,7 +176,8 @@ impl RequiredTypeBuilder {
         self
     }
 
-    /// Adds several postgres types which are compatible with the diesel and rust types defined within the crate.
+    /// Adds several postgres types which are compatible with the diesel and
+    /// rust types defined within the crate.
     ///
     /// # Arguments
     /// * `postgres_types` - The postgres types to add.

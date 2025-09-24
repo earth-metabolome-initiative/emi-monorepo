@@ -1,7 +1,9 @@
-//! Submodule defining the cached queries methods used in the [`PgOperator`] struct.
+//! Submodule defining the cached queries methods used in the [`PgOperator`]
+//! struct.
+
+use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, SelectableHelper};
 
 use crate::models::{PgExtension, PgOperator, PgProc, PgType};
-use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, SelectableHelper};
 
 #[pg_cached::oid_auto_cached]
 pub(super) fn function(
@@ -54,12 +56,12 @@ pub(super) fn right_operand_type(
 
 #[pg_cached::oid_auto_cached]
 pub(super) fn result_type(
-	pg_operator: &PgOperator,
-	conn: &mut PgConnection,
+    pg_operator: &PgOperator,
+    conn: &mut PgConnection,
 ) -> Result<PgType, diesel::result::Error> {
-	use crate::schema::pg_type;
-	Ok(pg_type::table
-		.filter(pg_type::oid.eq(pg_operator.oprresult))
-		.select(PgType::as_select())
-		.first::<PgType>(conn)?)
+    use crate::schema::pg_type;
+    Ok(pg_type::table
+        .filter(pg_type::oid.eq(pg_operator.oprresult))
+        .select(PgType::as_select())
+        .first::<PgType>(conn)?)
 }

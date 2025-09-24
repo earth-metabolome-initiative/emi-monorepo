@@ -371,7 +371,10 @@ impl Table {
     /// # Errors
     ///
     /// * If the triggers cannot be loaded from the database.
-    pub fn triggers(&self, conn: &mut PgConnection) -> Result<Vec<PgTrigger>, diesel::result::Error> {
+    pub fn triggers(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<PgTrigger>, diesel::result::Error> {
         cached_queries::triggers(self, conn)
     }
 }

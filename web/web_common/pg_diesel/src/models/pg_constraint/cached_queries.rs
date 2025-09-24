@@ -1,7 +1,9 @@
-//! Submodule defining the cached queries methods used in the [`PgConstraint`] struct.
+//! Submodule defining the cached queries methods used in the [`PgConstraint`]
+//! struct.
+
+use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, SelectableHelper};
 
 use crate::models::{PgConstraint, PgOperator, PgProc};
-use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, SelectableHelper};
 
 #[pg_cached::oid_auto_cached]
 pub(super) fn functions(

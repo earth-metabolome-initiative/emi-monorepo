@@ -1,4 +1,5 @@
-//! Submodule with the implementations of the [`HasOid`] trait for various structs.
+//! Submodule with the implementations of the [`HasOid`] trait for various
+//! structs.
 
 use crate::traits::HasOid;
 

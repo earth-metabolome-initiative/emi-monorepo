@@ -1,7 +1,10 @@
 //! Submodule defining an abstraction for determining if a PostgreSQL index
 //! can be used to define a "same-as" relationship between two tables.
 
-pub(crate) fn is_same_as_index(index: &PgIndex, conn: &mut PgConnection) -> Result<bool, WebCodeGenError> {
+pub(crate) fn is_same_as_index(
+    index: &PgIndex,
+    conn: &mut PgConnection,
+) -> Result<bool, WebCodeGenError> {
     // If the index is not unique, it cannot be a same-as index
     if !index.is_unique() {
         return Ok(false);

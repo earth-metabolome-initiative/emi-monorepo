@@ -2,12 +2,9 @@
 
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::spanned::Spanned;
-use syn::{ItemFn, parse_macro_input};
+use syn::{ItemFn, parse_macro_input, spanned::Spanned};
 
-use crate::utils::first_non_conn_argument_ident;
-use crate::utils::function_hash;
-use crate::utils::non_conn_arguments_idents;
+use crate::utils::{first_non_conn_argument_ident, function_hash, non_conn_arguments_idents};
 
 mod utils;
 
@@ -15,13 +12,15 @@ mod utils;
 struct AutoCachedArgs {
     /// The type of the cache key (e.g., "u32" or "u64").
     key: String,
-    /// The expression used to convert the function arguments into the cache key.
+    /// The expression used to convert the function arguments into the cache
+    /// key.
     convert: String,
 }
 
 impl AutoCachedArgs {
     /// Creates an `AutoCachedArgs` instance for the `oid_auto_cached` macro.
-    /// It uses the `oid` field of the first non-connection argument as the cache key.
+    /// It uses the `oid` field of the first non-connection argument as the
+    /// cache key.
     ///
     /// # Arguments
     /// * `item` - A reference to the `ItemFn` representing the function.
@@ -40,7 +39,8 @@ impl AutoCachedArgs {
             convert: quote! { {
                 use crate::traits::HasOid;
                 #first_non_conn_arg.oid()
-            } }.to_string(),
+            } }
+            .to_string(),
         })
     }
 
@@ -77,7 +77,7 @@ impl AutoCachedArgs {
     }
 }
 
-fn auto_cached_dispatch(args: AutoCachedArgs, item: ItemFn) -> TokenStream {
+fn auto_cached_dispatch(args: AutoCachedArgs, item: &ItemFn) -> TokenStream {
     let key = args.key;
     let convert = args.convert;
 
@@ -102,7 +102,8 @@ fn auto_cached_dispatch(args: AutoCachedArgs, item: ItemFn) -> TokenStream {
                     Box::new(format!("DiskCache error: {}", e))
                 )
             }
-        }.to_string();
+        }
+        .to_string();
         let decorator = quote! {
             #[cached::proc_macro::io_cached(
                 disk = true,
@@ -114,7 +115,7 @@ fn auto_cached_dispatch(args: AutoCachedArgs, item: ItemFn) -> TokenStream {
             )]
             #item
         };
-        return decorator.into();
+        decorator.into()
     }
 
     #[cfg(all(feature = "cached", not(feature = "io_cached")))]
@@ -126,50 +127,51 @@ fn auto_cached_dispatch(args: AutoCachedArgs, item: ItemFn) -> TokenStream {
             )]
             #item
         };
-        return decorator.into();
+        decorator.into()
     }
 
     #[cfg(not(feature = "cached"))]
     {
         // passthrough if no caching
-        return quote!(#item).into();
+        quote!(#item).into()
     }
 }
 
 #[proc_macro_attribute]
-/// An attribute macro that applies caching to a function based on its arguments.
-/// This macro uses the `io_cached` crate for caching if the `io_cached` feature is enabled,
-/// otherwise it falls back to the `cached` crate if the `cached` feature is enabled.
-/// If neither feature is enabled, the macro leaves the function unchanged.
-/// The cache key is derived from hashing all arguments that are not a database connection.
+/// An attribute macro that applies caching to a function based on its
+/// arguments. This macro uses the `io_cached` crate for caching if the
+/// `io_cached` feature is enabled, otherwise it falls back to the `cached`
+/// crate if the `cached` feature is enabled. If neither feature is enabled, the
+/// macro leaves the function unchanged. The cache key is derived from hashing
+/// all arguments that are not a database connection.
 ///
 /// # Arguments
 /// * `attr` - The attribute arguments (not used in this macro).
 /// * `item` - The function to which the macro is applied.
 ///
 /// # Returns
-/// A `TokenStream` representing the modified function with caching applied, or the original
-/// function if no caching features are enabled.
+/// A `TokenStream` representing the modified function with caching applied, or
+/// the original function if no caching features are enabled.
 ///
 /// # Errors
-/// If the function does not have at least one argument other than the connection,
-/// a compile-time error is returned.
+/// If the function does not have at least one argument other than the
+/// connection, a compile-time error is returned.
 pub fn auto_cached(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let item = parse_macro_input!(item as ItemFn);
     let args = match AutoCachedArgs::hash_based(&item) {
         Ok(args) => args,
         Err(error) => return error.to_compile_error().into(),
     };
-    auto_cached_dispatch(args, item)
+    auto_cached_dispatch(args, &item)
 }
 
 #[proc_macro_attribute]
-/// An attribute macro that applies caching to a function based on its first argument's `oid` field.
-/// This macro uses the `io_cached` crate for caching if the `io_cached` feature is enabled,
-/// otherwise it falls back to the `cached` crate if the `cached` feature is enabled.
-/// If neither feature is enabled, the macro leaves the function unchanged.
-/// The cache key is derived from the `oid` field of the first argument that is not a database
-/// connection.
+/// An attribute macro that applies caching to a function based on its first
+/// argument's `oid` field. This macro uses the `io_cached` crate for caching if
+/// the `io_cached` feature is enabled, otherwise it falls back to the `cached`
+/// crate if the `cached` feature is enabled. If neither feature is enabled, the
+/// macro leaves the function unchanged. The cache key is derived from the `oid`
+/// field of the first argument that is not a database connection.
 ///
 /// # Arguments
 ///
@@ -177,18 +179,18 @@ pub fn auto_cached(_attr: TokenStream, item: TokenStream) -> TokenStream {
 /// * `item` - The function to which the macro is applied.
 ///
 /// # Returns
-/// A `TokenStream` representing the modified function with caching applied, or the original
-/// function if no caching features are enabled.
+/// A `TokenStream` representing the modified function with caching applied, or
+/// the original function if no caching features are enabled.
 ///
 /// # Errors
-/// If the function does not have at least one argument other than the connection,
-/// or if the first non-connection argument does not have an `oid` field,
-/// a compile-time error is returned.
+/// If the function does not have at least one argument other than the
+/// connection, or if the first non-connection argument does not have an `oid`
+/// field, a compile-time error is returned.
 pub fn oid_auto_cached(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let item = parse_macro_input!(item as ItemFn);
     let args = match AutoCachedArgs::oid(&item) {
         Ok(args) => args,
         Err(error) => return error.to_compile_error().into(),
     };
-    auto_cached_dispatch(args, item)
+    auto_cached_dispatch(args, &item)
 }

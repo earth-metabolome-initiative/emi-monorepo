@@ -37,13 +37,15 @@ impl Display for RequiredCrateAttribute {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-/// Enumeration of errors that can occur during the building of a `RequiredCrate`.
+/// Enumeration of errors that can occur during the building of a
+/// `RequiredCrate`.
 pub enum RequiredCrateBuilderError {
     /// An error occurred during the building process.
     Builder(BuilderError<RequiredCrateAttribute>),
     /// The name of the crate is invalid.
     InvalidName,
-    /// A type handling the same postgres type has already been added to the crate.
+    /// A type handling the same postgres type has already been added to the
+    /// crate.
     DuplicatedPostgresType,
 }
 
@@ -76,7 +78,8 @@ impl RequiredCrateBuilder {
     ///
     /// # Arguments
     /// * `name` - The name of the crate.
-    pub fn name(mut self, name: String) -> Result<Self, RequiredCrateBuilderError> {
+    pub fn name<S: ToString>(mut self, name: S) -> Result<Self, RequiredCrateBuilderError> {
+        let name = name.to_string();
         if name.trim().is_empty() || name.contains(' ') {
             return Err(RequiredCrateBuilderError::InvalidName);
         }

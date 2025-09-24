@@ -2,9 +2,8 @@
 
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
-use crate::models::PgExtension;
-
 use super::PgType;
+use crate::models::PgExtension;
 
 mod cached_queries;
 

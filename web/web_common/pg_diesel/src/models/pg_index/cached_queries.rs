@@ -1,11 +1,14 @@
-//! Submodule defining the cached queries methods used in the [`PgIndex`] struct.
+//! Submodule defining the cached queries methods used in the [`PgIndex`]
+//! struct.
 
-use crate::models::{Column, PgIndex, Table};
+use std::sync::Arc;
+
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl,
     SelectableHelper,
 };
-use std::sync::Arc;
+
+use crate::models::{Column, PgIndex, Table};
 
 #[pg_cached::oid_auto_cached]
 pub(super) fn columns(

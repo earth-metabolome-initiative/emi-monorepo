@@ -1,11 +1,12 @@
 //! Submodule defining the cached queries methods used in the [`Column`] struct.
 
-use crate::models::{
-    CheckConstraint, Column, GeographyColumn, GeometryColumn, KeyColumnUsage, PgType, Table,
-};
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, PgConnection, QueryDsl,
     RunQueryDsl, SelectableHelper,
+};
+
+use crate::models::{
+    CheckConstraint, Column, GeographyColumn, GeometryColumn, KeyColumnUsage, PgType, Table,
 };
 
 #[pg_cached::auto_cached]

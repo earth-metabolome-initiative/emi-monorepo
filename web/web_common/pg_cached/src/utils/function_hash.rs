@@ -1,7 +1,8 @@
 //! Returns an hash of a function based on its signature and attributes.
 
-use quote::ToTokens;
 use std::hash::Hasher;
+
+use quote::ToTokens;
 
 /// Returns a u64 hash of the given function's signature and body.
 ///

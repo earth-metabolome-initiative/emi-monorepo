@@ -1,4 +1,5 @@
-//! Submodule defining the cached queries methods used in the [`KeyColumnUsage`] struct.
+//! Submodule defining the cached queries methods used in the [`KeyColumnUsage`]
+//! struct.
 
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl,

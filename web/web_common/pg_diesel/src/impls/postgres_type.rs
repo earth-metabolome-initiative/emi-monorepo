@@ -1,5 +1,5 @@
-//! Submodule providing implementations of the [`PostgresType`] trait for various
-//! diesel model structs representing PostgreSQL system catalog tables.
+//! Submodule providing implementations of the [`PostgresType`] trait for
+//! various diesel model structs representing PostgreSQL system catalog tables.
 
 use crate::{
     models::{Column, PgType},

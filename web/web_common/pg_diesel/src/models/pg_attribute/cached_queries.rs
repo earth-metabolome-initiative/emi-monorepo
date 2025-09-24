@@ -1,7 +1,9 @@
-//! Submodule defining the cached queries methods used in the [`PgAttribute`] struct.
+//! Submodule defining the cached queries methods used in the [`PgAttribute`]
+//! struct.
+
+use diesel::{ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl};
 
 use crate::models::{PgAttribute, PgType};
-use diesel::{ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl};
 
 #[pg_cached::auto_cached]
 pub(super) fn pg_type(

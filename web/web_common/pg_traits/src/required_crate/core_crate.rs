@@ -1,8 +1,9 @@
-//! Submodule implementing the method `core` for the [`RequiredCrate`] struct which
-//! initializes a `RequiredCrate` instance describing the `core` crate.
+//! Submodule implementing the method `core` for the [`RequiredCrate`] struct
+//! which initializes a `RequiredCrate` instance describing the `core` crate.
+
+use common_traits::builder::Builder;
 
 use crate::RequiredCrate;
-use common_traits::builder::Builder;
 
 mod numeric;
 

@@ -1,10 +1,11 @@
 //! Submodule defining the cached queries methods used in the [`PgType`] struct.
 
-use crate::models::{PgAttribute, PgEnum, PgExtension, PgType};
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl,
     SelectableHelper,
 };
+
+use crate::models::{PgAttribute, PgEnum, PgExtension, PgType};
 
 #[pg_cached::oid_auto_cached]
 pub(super) fn variants(
@@ -49,10 +50,7 @@ pub(super) fn extension(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn from_oid(
-    oid: u32,
-    conn: &mut PgConnection,
-) -> Result<PgType, diesel::result::Error> {
+pub(super) fn from_oid(oid: u32, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
     use crate::schema::pg_type;
     Ok(pg_type::table.filter(pg_type::oid.eq(oid)).first::<PgType>(conn)?)
 }
