@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
 mod cached_queries;
@@ -79,7 +77,7 @@ impl PgIndex {
     pub fn columns(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<Arc<Vec<Column>>, diesel::result::Error> {
+    ) -> Result<Vec<Column>, diesel::result::Error> {
         cached_queries::columns(self, conn)
     }
 

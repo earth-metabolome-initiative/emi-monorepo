@@ -1,7 +1,6 @@
 //! Submodule defining the cached queries methods used in the [`PgIndex`]
 //! struct.
 
-use std::sync::Arc;
 
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl,
@@ -14,10 +13,10 @@ use crate::models::{Column, PgIndex, Table};
 pub(super) fn columns(
     index: &PgIndex,
     conn: &mut PgConnection,
-) -> Result<Arc<Vec<Column>>, diesel::result::Error> {
+) -> Result<Vec<Column>, diesel::result::Error> {
     use crate::schema::{columns, pg_attribute, pg_class, pg_index};
 
-    Ok(Arc::new(
+    Ok(
         pg_index::table
             .inner_join(pg_class::table.on(pg_class::oid.eq(pg_index::indrelid)))
             .inner_join(pg_attribute::table.on(pg_attribute::attrelid.eq(pg_class::oid)))
@@ -33,7 +32,7 @@ pub(super) fn columns(
             )
             .select(Column::as_select())
             .load::<Column>(conn)?,
-    ))
+    )
 }
 
 #[pg_cached::oid_auto_cached]
