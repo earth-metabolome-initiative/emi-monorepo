@@ -21,6 +21,8 @@ pub enum ResnikError {
     NegativeOccurrence,
     /// Error for non finite occurrences (infinite and NaN)
     NonFiniteOccurrence,
+    /// All occurrences are 0 
+    NoOccurrencesAboveZero
 }
 
 impl Display for ResnikError {
@@ -30,6 +32,7 @@ impl Display for ResnikError {
             Self::InequalOccurrenceSize { expected, found } => write!(f,"Received an occurrence vector with {found} entries but expected {expected} entries"),
             Self::NegativeOccurrence => write!(f, "Occurrences must never be negative - negative occurrence found"),
             Self::NonFiniteOccurrence => write!(f, "Non Finite Occurrence found - occurrences must be finite"),
+            Self::NoOccurrencesAboveZero => write!(f, "None of the occurrences had values above 0"),
         }
     }
 }

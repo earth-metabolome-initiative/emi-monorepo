@@ -74,6 +74,8 @@ fn test_resnik_incorrect_occurrences() -> Result<(), Box<dyn std::error::Error>>
     assert_eq!(resnik, Err(ResnikError::NegativeOccurrence));
     let resnik = graph.resnik(&[f64::INFINITY, f64::NAN, f64::INFINITY]);
     assert_eq!(resnik, Err(ResnikError::NonFiniteOccurrence));
+    let resnik = graph.resnik(&[0.0,0.0,0.0]);
+    assert_eq!(resnik, Err(ResnikError::NoOccurrencesAboveZero));
     Ok(())
 }
 

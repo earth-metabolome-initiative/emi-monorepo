@@ -11,8 +11,8 @@ fn main() {
             let Ok(resnik) = csr.resnik(occurrences.as_ref()) else {
                 return ;
             };
-            for src in csr.node_ids() {
-                for dst in csr.node_ids() {
+            for src in csr.node_ids().take(10) {
+                for dst in csr.node_ids(){
                     resnik.similarity(&src, &dst);
                 }
             }
