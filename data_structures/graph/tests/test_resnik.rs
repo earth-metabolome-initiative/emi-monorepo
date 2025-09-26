@@ -1,14 +1,17 @@
 //! Test submodule for the `Rensik` trait.
 
 use algebra::impls::{CSR2D, SquareCSR2D};
+use functional_properties::similarity::ScalarSimilarity;
 use graph::{
     prelude::{
         Builder, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder,
         GenericVocabularyBuilder, Resnik,
     },
-    traits::{resnik::{self, ResnikError}, EdgesBuilder, MonopartiteGraphBuilder, MonoplexGraphBuilder, VocabularyBuilder},
+    traits::{
+        EdgesBuilder, MonopartiteGraphBuilder, MonoplexGraphBuilder, VocabularyBuilder,
+        resnik::ResnikError,
+    },
 };
-use functional_properties::similarity::ScalarSimilarity;
 use sorted_vec::prelude::SortedVec;
 
 #[test]
@@ -26,16 +29,16 @@ fn test_resnik_on_tree() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
     let graph: DiGraph<usize> =
         GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
-    let resnik = graph.resnik(&[1.0,1.0,1.0])?;
-    assert!(resnik.similarity(&0,&0) > 0.99, "Self Similarity Must be 1");
-    assert!(resnik.similarity(&0,&1) < 0.99, "Score should not be 1");
+    let resnik = graph.resnik(&[1.0, 1.0, 1.0])?;
+    assert!(resnik.similarity(&0, &0) > 0.99, "Self Similarity Must be 1");
+    assert!(resnik.similarity(&0, &1) < 0.99, "Score should not be 1");
     Ok(())
 }
 
 #[test]
 fn test_resnik_not_dag() -> Result<(), Box<dyn std::error::Error>> {
     let nodes: Vec<usize> = vec![0, 1, 2];
-    let edges: Vec<(usize, usize)> = vec![(0, 1), (0, 2), (1, 2),(2,0)];
+    let edges: Vec<(usize, usize)> = vec![(0, 1), (0, 2), (1, 2), (2, 0)];
     let nodes: SortedVec<usize> = GenericVocabularyBuilder::default()
         .expected_number_of_symbols(nodes.len())
         .symbols(nodes.into_iter().enumerate())
@@ -47,11 +50,10 @@ fn test_resnik_not_dag() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
     let graph: DiGraph<usize> =
         GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
-    let resnik = graph.resnik(&[1.0,1.0,1.0]);
+    let resnik = graph.resnik(&[1.0, 1.0, 1.0]);
     assert_eq!(resnik, Err(ResnikError::NotDag));
     Ok(())
 }
-
 
 #[test]
 fn test_resnik_incorrect_occurrences() -> Result<(), Box<dyn std::error::Error>> {
@@ -69,14 +71,16 @@ fn test_resnik_incorrect_occurrences() -> Result<(), Box<dyn std::error::Error>>
     let graph: DiGraph<usize> =
         GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
     let resnik = graph.resnik(&Vec::new());
-    assert_eq!(resnik, Err(ResnikError::InequalOccurrenceSize { expected: 3, found: 0 }));
-    let resnik = graph.resnik(&[-1.0,-2.0,-3.0]);
+    // length mismatch
+    assert_eq!(resnik, Err(ResnikError::UnequalOccurrenceSize { expected: 3, found: 0 }));
+    // Negative occurrences found
+    let resnik = graph.resnik(&[-1.0, -2.0, -3.0]);
     assert_eq!(resnik, Err(ResnikError::NegativeOccurrence));
+    // Non finite cases found
     let resnik = graph.resnik(&[f64::INFINITY, f64::NAN, f64::INFINITY]);
     assert_eq!(resnik, Err(ResnikError::NonFiniteOccurrence));
-    let resnik = graph.resnik(&[0.0,0.0,0.0]);
+    // No occurrences above zero
+    let resnik = graph.resnik(&[0.0, 0.0, 0.0]);
     assert_eq!(resnik, Err(ResnikError::NoOccurrencesAboveZero));
     Ok(())
 }
-
-

@@ -1,14 +1,12 @@
-//! Submodule providing `Resnik` Errors for working with Resnik
+//! Submodule providing `Information Content` Errors for working with IC based
+//! Algorithms
 
 use std::fmt::Display;
 
-use algebra::prelude::KahnError;
-
-/// Resnik Enum for Errors that may occur during Resnik process
+/// Information Content Enum for Errors that may occur during IC calculation
+/// process
 #[derive(Debug, PartialEq)]
-pub enum ResnikError {
-    /// Error for when a graph is not a DAG / contains a cycle
-    NotDag,
+pub enum InformationContentError {
     /// Error for unexpected occurrence size
     UnequalOccurrenceSize {
         /// The expected size for the occurrence
@@ -24,10 +22,9 @@ pub enum ResnikError {
     NoOccurrencesAboveZero,
 }
 
-impl Display for ResnikError {
+impl Display for InformationContentError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::NotDag => write!(f, "The graph is not a DAG"),
             Self::UnequalOccurrenceSize { expected, found } => {
                 write!(
                     f,
@@ -45,12 +42,4 @@ impl Display for ResnikError {
     }
 }
 
-impl core::error::Error for ResnikError {}
-
-impl From<KahnError> for ResnikError {
-    fn from(value: KahnError) -> Self {
-        match value {
-            KahnError::Cycle => Self::NotDag,
-        }
-    }
-}
+impl core::error::Error for InformationContentError {}

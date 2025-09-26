@@ -12,3 +12,5 @@ pub mod simple_path;
 pub use simple_path::SimplePath;
 pub mod resnik;
 pub use resnik::Resnik;
+pub mod information_content;
+pub use information_content::InformationContent;
