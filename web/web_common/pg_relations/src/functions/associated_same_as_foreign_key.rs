@@ -3,6 +3,7 @@ use pg_diesel::models::{KeyColumnUsage, PgIndex};
 
 use crate::{functions::is_same_as_index, traits::Extension};
 
+// TODO! SAME AS MUST HAVE ON UPDATE CASCADE!
 
 /// Returns whether this key column usage is an associated same-as
 /// constraint.
