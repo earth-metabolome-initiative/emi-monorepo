@@ -45,3 +45,9 @@ name = "resnik"
 path = "fuzz_targets/resnik.rs"
 test = false
 doc = false
+
+[[bin]]
+name = "information_content"
+path = "fuzz_targets/information_content.rs"
+test = false
+doc = false

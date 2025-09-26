@@ -53,3 +53,16 @@ and to run the crash cases:
 ```bash
 cargo hfuzz run-debug resnik hfuzz_workspace/*/*.fuzz
 ```
+
+
+### Information Content
+
+```bash
+cargo hfuzz run information_content
+```
+
+and to run the crash cases:
+
+```bash
+cargo hfuzz run-debug information_content hfuzz_workspace/*/*.fuzz
+```
