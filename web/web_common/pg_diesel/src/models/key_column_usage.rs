@@ -46,12 +46,6 @@ impl Display for KeyColumnUsage {
     }
 }
 
-impl AsRef<KeyColumnUsage> for KeyColumnUsage {
-    fn as_ref(&self) -> &KeyColumnUsage {
-        self
-    }
-}
-
 impl KeyColumnUsage {
     /// Returns the SQL definition of the key column usage as a foreign key
     /// constraint.
@@ -64,7 +58,7 @@ impl KeyColumnUsage {
     ///
     /// * If an error occurs while querying the database
     pub fn to_sql(&self, conn: &mut PgConnection) -> Result<String, diesel::result::Error> {
-        let local_columns = self.columns(conn)?;
+        let local_columns = self.local_columns(conn)?;
         let foreign_table = self.foreign_table(conn)?;
         let foreign_columns = self.foreign_columns(conn)?;
 
@@ -129,8 +123,8 @@ impl KeyColumnUsage {
     /// # Errors
     ///
     /// * If an error occurs while loading the table from the database
-    pub(crate) fn table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
-        cached_queries::table(self, conn)
+    pub fn local_table(&self, conn: &mut PgConnection) -> Result<Table, diesel::result::Error> {
+        cached_queries::local_table(self, conn)
     }
 
     /// Returns whether the key column usage is self-referential, i.e. the
@@ -143,7 +137,7 @@ impl KeyColumnUsage {
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, diesel::result::Error> {
-        Ok(self.table(conn)? == self.foreign_table(conn)?)
+        Ok(self.local_table(conn)? == self.foreign_table(conn)?)
     }
 
     /// Returns the foreign table associated with this key column usage
@@ -159,7 +153,7 @@ impl KeyColumnUsage {
         cached_queries::foreign_table(self, conn)
     }
 
-    /// Returns all the columns involved in the constraint
+    /// Returns all the local columns involved in the constraint
     ///
     /// # Arguments
     ///
@@ -169,8 +163,8 @@ impl KeyColumnUsage {
     ///
     /// * If an error occurs while loading the key column usages from the
     ///   database
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
-        cached_queries::columns(self, conn)
+    pub fn local_columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
+        cached_queries::local_columns(self, conn)
     }
 
     /// Returns the column mapping between the local and foreign columns
@@ -187,7 +181,7 @@ impl KeyColumnUsage {
         conn: &mut PgConnection,
     ) -> Result<Vec<(Column, Column)>, diesel::result::Error> {
         Ok(self
-            .columns(conn)?
+            .local_columns(conn)?
             .iter()
             .cloned()
             .zip(self.foreign_columns(conn)?.iter().cloned())
@@ -205,7 +199,7 @@ impl KeyColumnUsage {
     /// * If an error occurs while loading the key column usages from the
     ///   database
     pub fn is_composite(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
-        self.columns(conn).map(|columns| columns.len() > 1)
+        self.local_columns(conn).map(|columns| columns.len() > 1)
     }
 
     /// Returns whether any column involved in the constraint is nullable
@@ -219,7 +213,7 @@ impl KeyColumnUsage {
     /// * If an error occurs while loading the key column usages from the
     ///   database
     pub fn is_nullable(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
-        self.columns(conn).map(|columns| columns.iter().any(Column::is_nullable))
+        self.local_columns(conn).map(|columns| columns.iter().any(Column::is_nullable))
     }
 
     /// Returns the columns in the foreign table that are referenced by this key
@@ -274,11 +268,11 @@ impl KeyColumnUsage {
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, diesel::result::Error> {
-        let table = self.table(conn)?;
+        let table = self.local_table(conn)?;
 
         // Check if the table has a primary key
         let primary_keys = table.primary_key_columns(conn)?;
-        let columns = self.columns(conn)?;
+        let columns = self.local_columns(conn)?;
         Ok(primary_keys == columns)
     }
 
@@ -296,9 +290,9 @@ impl KeyColumnUsage {
         &self,
         conn: &mut PgConnection,
     ) -> Result<bool, diesel::result::Error> {
-        let table = self.table(conn)?;
-        let primary_keys = table.primary_key_columns(conn)?;
-        let columns = self.columns(conn)?;
+        let local_table = self.local_table(conn)?;
+        let primary_keys = local_table.primary_key_columns(conn)?;
+        let columns = self.local_columns(conn)?;
         Ok(primary_keys.iter().all(|pk| columns.contains(pk)))
     }
 

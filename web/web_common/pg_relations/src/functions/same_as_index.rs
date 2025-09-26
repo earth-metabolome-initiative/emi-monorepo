@@ -1,10 +1,13 @@
 //! Submodule defining an abstraction for determining if a PostgreSQL index
 //! can be used to define a "same-as" relationship between two tables.
 
+use diesel::PgConnection;
+use pg_diesel::models::{Column, PgIndex};
+
 pub(crate) fn is_same_as_index(
     index: &PgIndex,
     conn: &mut PgConnection,
-) -> Result<bool, WebCodeGenError> {
+) -> Result<bool, diesel::result::Error> {
     // If the index is not unique, it cannot be a same-as index
     if !index.is_unique() {
         return Ok(false);
@@ -52,7 +55,7 @@ pub(crate) fn is_same_as_index(
         }
         // If the foreign key does not include all of the non-primary key columns, it
         // cannot be a same-as index.
-        let mut fk_columns = foreign_key.columns(conn)?.as_ref().clone();
+        let mut fk_columns = foreign_key.local_columns(conn)?.clone();
         fk_columns.sort_unstable();
 
         if non_primary_key_columns == fk_columns {

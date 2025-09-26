@@ -65,7 +65,7 @@ pub(super) fn foreign_columns(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn table(
+pub(super) fn local_table(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
 ) -> Result<Table, diesel::result::Error> {
@@ -80,7 +80,7 @@ pub(super) fn table(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn columns(
+pub(super) fn local_columns(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
 ) -> Result<Vec<Column>, diesel::result::Error> {

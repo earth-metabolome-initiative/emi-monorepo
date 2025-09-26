@@ -1,6 +1,13 @@
 //! Submodule providing trait definitions describing abstractions over
 //! PostgreSQL relations.
 
+mod extension;
+pub use extension::Extension;
+mod authored;
+pub use authored::Authored;
+mod most_concrete;
+pub use most_concrete::MostConcrete;
+
 pub(super) fn same_as_indices(
     table: &Table,
     conn: &mut PgConnection,

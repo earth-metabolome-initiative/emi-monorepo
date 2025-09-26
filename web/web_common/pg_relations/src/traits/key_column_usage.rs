@@ -14,21 +14,6 @@
 
 
 
-#[derive(
-    Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, serde::Serialize, serde::Deserialize,
-)]
-/// The kind of partial builder constraint
-pub enum PartialBuilderKind {
-    /// The partial builder constraint is discretionary, i.e. the user
-    /// may provide either the primary key or the builder of the associated
-    /// table when creating a new instance of the host table.
-    Discretional,
-    /// The partial builder constraint is mandatory, i.e. the user must
-    /// use a partial builder of the associated table when creating a new
-    /// instance of the host table.
-    Mandatory,
-}
-
 impl PartialBuilderKind {
     /// Returns whether the partial builder constraint is discretionary
     pub fn is_discretional(self) -> bool {
