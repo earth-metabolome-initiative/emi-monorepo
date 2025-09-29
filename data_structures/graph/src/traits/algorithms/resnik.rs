@@ -1,54 +1,51 @@
-//! Submodule providing `Resnik` trait
-//! implementation.
-use algebra::prelude::Kahn;
-mod error;
-pub use error::ResnikError;
+//! Submodule providing `Resnik` trait based on the algorithm implementation.
 use functional_properties::prelude::ScalarSimilarity;
-use numeric_common_traits::prelude::IntoUsize;
 
 use crate::{
     prelude::information_content::InformationContentError,
     traits::{
-        InformationContent, MonoplexMonopartiteGraph, RootNodes, edges::Edges,
+        InformationContent, MonoplexMonopartiteGraph,
         information_content::InformationContentResult,
     },
 };
 
 /// Struct to provide methods to compute Resnik Similarity Score
 #[derive(Debug, PartialEq)]
-pub struct ResnikResult<'graph, G: ?Sized + MonoplexMonopartiteGraph> {
-    /// The graph to be analyzed
-    graph: &'graph G,
-    /// The information content and max information content
-    information_contents: InformationContentResult,
-    /// Root nodes of the graph
-    root_nodes: Vec<G::NodeId>,
+pub struct ResnikResult<'graph, G: ?Sized + MonoplexMonopartiteGraph> (InformationContentResult<'graph, G>);
+
+impl <'graph, G: ?Sized + MonoplexMonopartiteGraph> AsRef<InformationContentResult<'graph, G>> for ResnikResult<'graph, G> {
+    fn as_ref(&self) -> &InformationContentResult<'graph, G> {
+        &self.0
+    }
+} 
+
+impl <'graph, G: ?Sized + MonoplexMonopartiteGraph> From <InformationContentResult<'graph, G>> for ResnikResult<'graph, G> {
+    fn from(value: InformationContentResult<'graph, G>) -> Self {
+        Self(value)
+    }
 }
 
-impl<'graph, G> ScalarSimilarity<G::NodeId, G::NodeId> for ResnikResult<'_, G>
+impl<G> ScalarSimilarity<G::NodeId, G::NodeId> for ResnikResult<'_, G>
 where
     G: MonoplexMonopartiteGraph,
 {
     type Similarity = f64;
     fn similarity(&self, left: &G::NodeId, right: &G::NodeId) -> Self::Similarity {
-        if left == right {
-            return 1.0;
-        }
         let mut max_score = 0.0;
-        for root_node in &self.root_nodes {
-            if let InformationContentSearch::BothNodesFound(score) =
-                information_content_search(self, left, right, root_node)
+        for root_node in self.as_ref().root_nodes() {
+            if let InformationContentSearch::Both(score) =
+                information_content_search(self.as_ref(), left, right, root_node)
                 && max_score < score
             {
                 max_score = score;
             }
         }
-        max_score / self.information_contents.max_information_content
+        max_score
     }
 }
 
-fn information_content_search<'graph, G>(
-    resnik_result: &ResnikResult<'_, G>,
+fn information_content_search<G>(
+    information_content_result: &InformationContentResult<'_, G>,
     left: &G::NodeId,
     right: &G::NodeId,
     current_node: &G::NodeId,
@@ -58,42 +55,41 @@ where
 {
     // Base cases
     let mut state = if left == current_node {
-        InformationContentSearch::LeftNodeFound
+        InformationContentSearch::Left
     } else if right == current_node {
-        InformationContentSearch::RightNodeFound
+        InformationContentSearch::Right
     } else {
         InformationContentSearch::NotFound
     };
-    for successor in resnik_result.graph.successors(*current_node) {
-        state = match (state, information_content_search(resnik_result, left, right, &successor)) {
-            (InformationContentSearch::LeftNodeFound, InformationContentSearch::RightNodeFound)
-            | (InformationContentSearch::RightNodeFound, InformationContentSearch::LeftNodeFound) => {
-                InformationContentSearch::BothNodesFound(
-                    resnik_result.information_contents.information_contents
-                        [current_node.into_usize()],
+    for successor in information_content_result.graph().successors(*current_node) {
+        state = match (state, information_content_search(information_content_result, left, right, &successor)) {
+            (InformationContentSearch::Left, InformationContentSearch::Right)
+            | (InformationContentSearch::Right, InformationContentSearch::Left) => {
+                InformationContentSearch::Both(
+                    information_content_result[*current_node],
                 )
             }
             (InformationContentSearch::NotFound, other) => other,
             (
-                InformationContentSearch::BothNodesFound(current),
-                InformationContentSearch::BothNodesFound(other),
+                InformationContentSearch::Both(current),
+                InformationContentSearch::Both(other),
             ) => {
-                InformationContentSearch::BothNodesFound(if current > other {
+                InformationContentSearch::Both(if current > other {
                     current
                 } else {
                     other
                 })
             }
-            (_, InformationContentSearch::BothNodesFound(other)) => {
-                InformationContentSearch::BothNodesFound(other)
+            (_, InformationContentSearch::Both(other)) => {
+                InformationContentSearch::Both(other)
             }
             (_, InformationContentSearch::NotFound)
-            | (InformationContentSearch::LeftNodeFound, InformationContentSearch::LeftNodeFound)
+            | (InformationContentSearch::Left, InformationContentSearch::Left)
             | (
-                InformationContentSearch::RightNodeFound,
-                InformationContentSearch::RightNodeFound,
+                InformationContentSearch::Right,
+                InformationContentSearch::Right,
             )
-            | (InformationContentSearch::BothNodesFound(_), _) => continue,
+            | (InformationContentSearch::Both(_), _) => continue,
         };
     }
     state
@@ -103,39 +99,27 @@ where
 #[derive(Clone, Copy)]
 enum InformationContentSearch {
     NotFound,
-    LeftNodeFound,
-    RightNodeFound,
-    BothNodesFound(f64),
+    Left,
+    Right,
+    Both(f64),
 }
 
 /// Trait providing the `Resnik` method
-/// TODO: Finish
+/// 
+/// # Reference
+/// The implementation of the Resnik score as described in [Using Information Content to Evaluate Semantic Similarity in a Taxonomy](https://arxiv.org/pdf/cmp-lg/9511007)
 pub trait Resnik: MonoplexMonopartiteGraph {
     /// The method for applying the Resnik
-    ///
+    /// 
+    /// # Arguments 
+    /// - `occurrences`: the number of times each node has been observed
+    /// 
     /// # Errors
     /// - If the graph is not a dag
     /// - If the occurrences are not equal
-    fn resnik(&self, occurrences: &[f64]) -> Result<ResnikResult<'_, Self>, ResnikError> {
-        // Check whether the graph is a DAG (characterize by having no cycles)
-        let _topological_ordering = self.edges().matrix().kahn()?;
+    fn resnik(&self, occurrences: &[usize]) -> Result<ResnikResult<'_, Self>, InformationContentError> {
         // Compute IC using information content method
-        let information_content = self.information_content(occurrences).map_err(|e| {
-            match e {
-                InformationContentError::UnequalOccurrenceSize { expected, found } => {
-                    ResnikError::UnequalOccurrenceSize { expected, found }
-                }
-                InformationContentError::NonFiniteOccurrence => ResnikError::NonFiniteOccurrence,
-                InformationContentError::NegativeOccurrence => ResnikError::NegativeOccurrence,
-                InformationContentError::NoOccurrencesAboveZero => {
-                    ResnikError::NoOccurrencesAboveZero
-                }
-            }
-        })?;
-
-        // 3) Resnik still needs roots for the pairwise search
-        let root_nodes = self.root_nodes();
-        Ok(ResnikResult { graph: self, information_contents: information_content, root_nodes })
+        Ok(self.information_content(occurrences)?.into())
     }
 }
 

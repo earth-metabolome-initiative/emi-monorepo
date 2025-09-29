@@ -14,3 +14,5 @@ pub mod resnik;
 pub use resnik::Resnik;
 pub mod information_content;
 pub use information_content::InformationContent;
+pub mod lin;
+pub use lin::Lin;

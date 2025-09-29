@@ -42,27 +42,14 @@ and to run the crash cases:
 cargo hfuzz run-debug sink_nodes hfuzz_workspace/*/*.fuzz
 ```
 
-### Resnik
+### Lin
 
 ```bash
-cargo hfuzz run resnik
+cargo hfuzz run lin
 ```
 
 and to run the crash cases:
 
 ```bash
-cargo hfuzz run-debug resnik hfuzz_workspace/*/*.fuzz
-```
-
-
-### Information Content
-
-```bash
-cargo hfuzz run information_content
-```
-
-and to run the crash cases:
-
-```bash
-cargo hfuzz run-debug information_content hfuzz_workspace/*/*.fuzz
+cargo hfuzz run-debug lin hfuzz_workspace/*/*.fuzz
 ```
