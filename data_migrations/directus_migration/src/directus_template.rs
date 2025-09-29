@@ -2,8 +2,9 @@
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[allow(clippy::upper_case_acronyms)]
-pub(crate) enum DirectusTemplates {
+pub(crate) enum DirectusTemplate {
     DBGI,
     VineshPartOfOrganism,
     VineshWholeOrganism,
+    FIBL,
 }

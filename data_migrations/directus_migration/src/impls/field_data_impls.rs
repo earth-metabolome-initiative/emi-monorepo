@@ -2,6 +2,7 @@
 
 use std::str::FromStr;
 
+use chrono::format;
 use core_structures::{
     Organism, SampleModel, SampleSource, SampleSourceModel, Soil, User,
     tables::insertables::AssetSettable,
@@ -22,6 +23,7 @@ use crate::{
 
 mod field_data_author;
 mod should_skip;
+mod template_dispatch;
 
 impl FieldDatumWrapper {
     /// Returns the sample source UUID if the field datum has a sample source.
@@ -136,10 +138,16 @@ impl FieldDatumWrapper {
 
     /// Returns the sample id after validation.
     pub fn sample_id(&self) -> Result<String, SampleIDError> {
-        if self.as_ref().sample_id.is_empty() {
+        let sample_id = self.as_ref().sample_id.trim();
+        if sample_id.is_empty() {
             return Err(SampleIDError::Empty);
         }
 
-        Ok(self.as_ref().sample_id.clone())
+        Ok(sample_id.to_owned())
+    }
+
+    /// Returns the geolocation of the observation.
+    pub fn geolocation(&self) -> postgis_diesel::types::Point {
+        self.as_ref().geometry.expect(& format!("FieldDatum {self:#?} has no geometry"))
     }
 }

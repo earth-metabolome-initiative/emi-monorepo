@@ -15,7 +15,7 @@ impl FieldDatumWrapper {
         if let Some(user) = self.dispatch_user_from_picture_panel(portal)? {
             return Ok(user);
         }
-        todo!("dispatch author retrieval to field_data_author module")
+        todo!("dispatch author retrieval to field_data_author module failed for FieldDatum {self:#?}");
     }
 
     fn dispatch_user_from_picture_panel(
@@ -42,6 +42,7 @@ impl FieldDatumWrapper {
 
         if picture_panel.starts_with("DCIM/edouard_brulhart_mw_2023/")
             || picture_panel.starts_with("DCIM/SBL_20004_2023/")
+            || picture_general.starts_with("DCIM/edouard_bruelhart/")
         {
             return Ok(Some(get_or_insert_user("Edouard", "Brülhart", portal)?));
         }
@@ -55,6 +56,7 @@ impl FieldDatumWrapper {
 
         if picture_panel.starts_with("DCIM/heloise_coen/")
             || picture_panel.starts_with("DCIM/below_ground/")
+            || picture_panel.starts_with("DCIM/above_ground/")
         {
             return Ok(Some(get_or_insert_user("Héloïse", "Coen", portal)?));
         }
@@ -66,13 +68,21 @@ impl FieldDatumWrapper {
         if picture_panel.starts_with("DCIM/JPEG_") {
             return Ok(Some(get_or_insert_user("Stéphanie", "Guetchueng", portal)?));
         }
-
+        // The default collector, when no other information is available for the JBUF project is Edouard Brülhart.
         if picture_panel.starts_with("files/") && qfield_project.contains("jbuf") {
             return Ok(Some(get_or_insert_user("Edouard", "Brülhart", portal)?));
         }
-
-        if picture_panel.starts_with("files/") && qfield_project.contains("jbn") {
+        // The default collector, when no other information is available for the JBN project is Emmanuel Defossez.
+        if picture_panel.starts_with("files/") || picture_panel.starts_with("DCIM/example/") && qfield_project.contains("jbn") {
             return Ok(Some(get_or_insert_user("Emmanuel", "Defossez", portal)?));
+        }
+
+        if picture_panel.starts_with("DCIM/sbl_20004_2024/") {
+            return Ok(Some(get_or_insert_user("Etienne", "Diethelm", portal)?));
+        }
+        if picture_panel.starts_with("DCIM/Clement_Duckert/")
+        || picture_panel.starts_with("DCIM/clement_duckert/") {
+            return Ok(Some(get_or_insert_user("Clément", "Duckert", portal)?));
         }
 
         Ok(None)
