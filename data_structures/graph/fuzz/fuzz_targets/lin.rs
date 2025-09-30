@@ -21,6 +21,7 @@ fn main() {
                         assert!({symmetric_similarity - similarity}.abs() < f64::EPSILON, "Expected sim({src}, {dst}) == sim({dst},{src}) got {similarity}!={symmetric_similarity}, with occurrences: {occurrences:?}");
                     }
                     assert!(similarity <= 1.0, "Expected sim({src},{dst}) = {similarity} <= 1");
+                    assert!(similarity >= 0.0, "Expected sim({src},{dst}) = {similarity} >= 0");
                 }
             }
         });

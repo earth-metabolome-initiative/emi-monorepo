@@ -33,12 +33,13 @@ fn test_information_content_incorrect_occurrences() -> Result<(), Box<dyn std::e
         Err(InformationContentError::UnequalOccurrenceSize { expected: 3, found: 0 })
     );
     // No occurrences above zero found
-    let ic = graph.information_content(&[0,0,0]);
-    assert_eq!(ic, Err(InformationContentError::NoOccurrencesAboveZero));
+    let ic = graph.information_content(&[1, 1, 0]);
+    assert_eq!(ic, Err(InformationContentError::SinkNodeZeroOccurrence));
+    //
+    let _ic = graph.information_content(&[0, 0, 1])?;
 
     Ok(())
 }
-
 
 #[test]
 fn test_ic_not_dag() -> Result<(), Box<dyn std::error::Error>> {

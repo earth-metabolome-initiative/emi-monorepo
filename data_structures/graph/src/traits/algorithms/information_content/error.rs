@@ -1,7 +1,8 @@
 //! Submodule providing `Information Content` Errors for working with IC based
 //! Algorithms
-use algebra::prelude::KahnError;
 use std::fmt::Display;
+
+use algebra::prelude::KahnError;
 
 /// Information Content Enum for Errors that may occur during IC calculation
 /// process
@@ -16,8 +17,8 @@ pub enum InformationContentError {
         /// The actual size found for the occurrence
         found: usize,
     },
-    /// All occurrences are 0
-    NoOccurrencesAboveZero,
+    /// Sink Node found with 0 occurrence count
+    SinkNodeZeroOccurrence,
 }
 
 impl Display for InformationContentError {
@@ -30,7 +31,7 @@ impl Display for InformationContentError {
                     "Received an occurrence vector with {found} entries but expected {expected} entries"
                 )
             }
-            Self::NoOccurrencesAboveZero => write!(f, "None of the occurrences had values above 0"),
+            Self::SinkNodeZeroOccurrence => write!(f, "Found a Sink Node with a 0 Occurrence"),
         }
     }
 }

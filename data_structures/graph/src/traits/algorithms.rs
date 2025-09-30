@@ -16,3 +16,5 @@ pub mod information_content;
 pub use information_content::InformationContent;
 pub mod lin;
 pub use lin::Lin;
+pub mod singleton_nodes;
+pub use singleton_nodes::SingletonNodes;

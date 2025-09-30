@@ -8,7 +8,8 @@ use graph::{
         GenericVocabularyBuilder, Lin,
     },
     traits::{
-        EdgesBuilder, MonopartiteGraph, MonopartiteGraphBuilder, MonoplexGraphBuilder, VocabularyBuilder
+        EdgesBuilder, MonopartiteGraph, MonopartiteGraphBuilder, MonoplexGraphBuilder,
+        VocabularyBuilder,
     },
 };
 use sorted_vec::prelude::SortedVec;
@@ -36,4 +37,3 @@ fn test_lin_on_tree() -> Result<(), Box<dyn std::error::Error>> {
     assert!(lin.similarity(&0, &1) < 0.99, "Score should not be 1");
     Ok(())
 }
-
