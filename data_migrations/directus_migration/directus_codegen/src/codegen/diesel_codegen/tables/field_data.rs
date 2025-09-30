@@ -22,18 +22,17 @@ diesel::table! {
     diesel::sql_types::Text >, collector_inat -> diesel::sql_types::Nullable <
     diesel::sql_types::Text >, latitude -> diesel::sql_types::Nullable <
     diesel::sql_types::Float >, longitude -> diesel::sql_types::Nullable <
-    diesel::sql_types::Float >, qfield_project -> diesel::sql_types::Nullable <
-    diesel::sql_types::Text >, picture_free -> diesel::sql_types::Nullable <
-    diesel::sql_types::Text >, comment_eco -> diesel::sql_types::Nullable <
-    diesel::sql_types::Text >, weather -> diesel::sql_types::Nullable <
-    diesel::sql_types::Text >, sample_name -> diesel::sql_types::Nullable <
-    diesel::sql_types::Text >, name_proposition -> diesel::sql_types::Nullable <
-    diesel::sql_types::Text >, ipen -> diesel::sql_types::Nullable <
-    diesel::sql_types::Text >, match_name -> diesel::sql_types::Nullable <
-    diesel::sql_types::Text >, ott_id -> diesel::sql_types::Nullable <
-    diesel::sql_types::Text >, rank -> diesel::sql_types::Nullable <
-    diesel::sql_types::Text >, #[sql_name = "wikidataID"] wikidata_id ->
-    diesel::sql_types::Nullable < diesel::sql_types::Text >, unknown ->
+    diesel::sql_types::Float >, qfield_project -> diesel::sql_types::Text, picture_free
+    -> diesel::sql_types::Nullable < diesel::sql_types::Text >, comment_eco ->
+    diesel::sql_types::Nullable < diesel::sql_types::Text >, weather ->
+    diesel::sql_types::Nullable < diesel::sql_types::Text >, sample_name ->
+    diesel::sql_types::Nullable < diesel::sql_types::Text >, name_proposition ->
+    diesel::sql_types::Nullable < diesel::sql_types::Text >, ipen ->
+    diesel::sql_types::Nullable < diesel::sql_types::Text >, match_name ->
+    diesel::sql_types::Nullable < diesel::sql_types::Text >, ott_id ->
+    diesel::sql_types::Nullable < diesel::sql_types::Text >, rank ->
+    diesel::sql_types::Nullable < diesel::sql_types::Text >, #[sql_name = "wikidataID"]
+    wikidata_id -> diesel::sql_types::Nullable < diesel::sql_types::Text >, unknown ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, comment_env ->
     diesel::sql_types::Nullable < diesel::sql_types::Text >, herbivory_percent ->
     diesel::sql_types::Nullable < diesel::sql_types::Float >, #[sql_name =

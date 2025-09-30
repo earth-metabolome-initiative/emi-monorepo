@@ -1,13 +1,5 @@
 //! Submodule gathering the methods used in the DBGI Directus migration
 
-use crate::FieldDatumWrapper;
-use guided_procedures::ProcedureTemplateGraph;
-use init_migration::asset_models::instruments::phone::phone_model;
-use init_migration::asset_models::photographs::photograph_model;
-use init_migration::dbgi_plan;
-
-use guided_procedures::GuidedProcedure;
-
 use core_structures::{
     Photograph, PhotographProcedure, ProcedureAsset, Sample, User,
     tables::insertables::{
@@ -15,11 +7,17 @@ use core_structures::{
         ProcedureAssetSettable, SampleSettable,
     },
 };
-
+use guided_procedures::{GuidedProcedure, ProcedureTemplateGraph};
+use init_migration::{
+    asset_models::{instruments::phone::phone_model, photographs::photograph_model},
+    dbgi_plan,
+};
 use web_common_traits::{
     database::{BoundedRead, DispatchableInsertableVariant},
     prelude::{Builder, Insertable},
 };
+
+use crate::FieldDatumWrapper;
 
 impl FieldDatumWrapper {
     pub(crate) fn dbgi_wizard_migration(

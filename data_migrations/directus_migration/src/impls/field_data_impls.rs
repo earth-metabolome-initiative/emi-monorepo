@@ -148,6 +148,6 @@ impl FieldDatumWrapper {
 
     /// Returns the geolocation of the observation.
     pub fn geolocation(&self) -> postgis_diesel::types::Point {
-        self.as_ref().geometry.expect(& format!("FieldDatum {self:#?} has no geometry"))
+        self.as_ref().geometry.expect(&format!("FieldDatum {self:#?} has no geometry"))
     }
 }

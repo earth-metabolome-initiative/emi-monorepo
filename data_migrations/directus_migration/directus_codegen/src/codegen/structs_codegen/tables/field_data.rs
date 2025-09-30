@@ -33,7 +33,7 @@ pub struct FieldDatum {
     pub collector_inat: Option<String>,
     pub latitude: Option<f32>,
     pub longitude: Option<f32>,
-    pub qfield_project: Option<String>,
+    pub qfield_project: String,
     pub picture_free: Option<String>,
     pub comment_eco: Option<String>,
     pub weather: Option<String>,

@@ -9,10 +9,12 @@ mod sample_source_kind;
 mod structs;
 
 use chrono::format;
-use core_structures::{tables::insertables::{
+use core_structures::{
+    Photograph, PhotographProcedure, ProcedureAsset, Sample, User,
+    tables::insertables::{
         AssetSettable, GeolocationProcedureSettable, PhotographProcedureSettable,
         ProcedureAssetSettable, SampleSettable,
-    }, Photograph, PhotographProcedure, ProcedureAsset, Sample, User
+    },
 };
 use diesel::{Connection, PgConnection};
 use guided_procedures::{GuidedProcedure, ProcedureTemplateGraph};
@@ -65,10 +67,6 @@ pub fn directus_migration(
     directus_conn: &mut PgConnection,
     portal_conn: &mut PgConnection,
 ) -> anyhow::Result<()> {
-
-
-
-
     // let pseudocode =
     //     guided_procedures::GuidedProcedurePseudocode::new().graph(&
     // procedure_graph)?.build()?; println!("{}",
@@ -80,8 +78,6 @@ pub fn directus_migration(
             continue;
         }
         let user = field_data_row.author(portal_conn)?;
-
-
 
         field_data_row.procedure_dispatch(&user, portal_conn)?;
     }
