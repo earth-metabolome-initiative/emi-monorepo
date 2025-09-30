@@ -4,7 +4,11 @@ use sqlparser::ast::{CreateTable, Ident};
 
 use crate::traits::{Constrainable, ConstrainableTable};
 
-impl Constrainable for CreateTable {}
+impl Constrainable for CreateTable {
+    fn context_name(&self) -> String {
+        format!("`{}`", self.name)
+    }
+}
 
 impl ConstrainableTable for CreateTable {
     fn name(&self) -> &str {

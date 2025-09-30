@@ -1,9 +1,9 @@
 //! Submodule providing the `ConstraintFailureInformation` trait for error reporting.
 
-use std::fmt::Display;
+use std::fmt::{Debug, Display};
 
 /// Trait for types that provide information about a constraint failure.
-pub trait ConstraintFailureInformation: Display {
+pub trait ConstraintFailureInformation: Display + Debug {
     /// Type of constraint which failed.
     fn constraint(&self) -> &'static str;
 
@@ -12,4 +12,7 @@ pub trait ConstraintFailureInformation: Display {
 
     /// Error message describing the failure.
     fn message(&self) -> &str;
+
+    /// What should be done to fix the failure.
+    fn resolution(&self) -> Option<&str>;
 }
