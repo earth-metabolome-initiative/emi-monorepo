@@ -1,4 +1,5 @@
-//! Submodule providing the `ConstraintFailureInformation` trait for error reporting.
+//! Submodule providing the `ConstraintFailureInformation` trait for error
+//! reporting.
 
 use std::fmt::{Debug, Display};
 

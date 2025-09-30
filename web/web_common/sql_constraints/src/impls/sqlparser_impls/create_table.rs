@@ -1,4 +1,6 @@
-//! Submodule implementing traits from `sql_constraints` crate for the [`CreateTable`](sqlparser::ast::CreateTable) struct from the `sqlparser` crate.
+//! Submodule implementing traits from `sql_constraints` crate for the
+//! [`CreateTable`](sqlparser::ast::CreateTable) struct from the `sqlparser`
+//! crate.
 
 use sqlparser::ast::{CreateTable, Ident};
 
@@ -11,7 +13,7 @@ impl Constrainable for CreateTable {
 }
 
 impl ConstrainableTable for CreateTable {
-    fn name(&self) -> &str {
+    fn table_name(&self) -> &str {
         let object_name_parts = &self.name.0;
         let last_object_name_parts = &object_name_parts[object_name_parts.len() - 1];
         match last_object_name_parts {

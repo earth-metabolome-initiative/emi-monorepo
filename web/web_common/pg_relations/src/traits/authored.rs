@@ -1,4 +1,5 @@
-//! Submodule defining the `Authored` trait which provides author-related columns.
+//! Submodule defining the `Authored` trait which provides author-related
+//! columns.
 
 use diesel::PgConnection;
 use pg_diesel::models::{Column, Table};
@@ -9,12 +10,14 @@ use crate::traits::Extension;
 /// i.e. a column indicating who created a row in this table,
 /// and related columns.
 pub trait Authored: Extension {
-    /// Returns the column which indicates who created a row in this table, if any.
+    /// Returns the column which indicates who created a row in this table, if
+    /// any.
     ///
     /// # Arguments
     ///
     /// * `users` - The users table.
-    /// * `recursive` - Whether to search ancestor tables for a `created_by` column.
+    /// * `recursive` - Whether to search ancestor tables for a `created_by`
+    ///   column.
     /// * `conn` - The database connection.
     ///
     /// # Errors
@@ -27,12 +30,14 @@ pub trait Authored: Extension {
         conn: &mut PgConnection,
     ) -> Result<Option<Column>, diesel::result::Error>;
 
-	/// Returns the column which indicates who updated a row in this table, if any.
+    /// Returns the column which indicates who updated a row in this table, if
+    /// any.
     ///
     /// # Arguments
     ///
     /// * `users` - The users table.
-    /// * `recursive` - Whether to search ancestor tables for a `updated_by` column.
+    /// * `recursive` - Whether to search ancestor tables for a `updated_by`
+    ///   column.
     /// * `conn` - The database connection.
     ///
     /// # Errors
@@ -87,12 +92,12 @@ impl Authored for Table {
         user_column(self, users, recursive, "created_by", conn)
     }
 
-	fn updated_by(
-		&self,
-		users: &Table,
-		recursive: bool,
-		conn: &mut PgConnection,
-	) -> Result<Option<Column>, diesel::result::Error> {
-		user_column(self, users, recursive, "updated_by", conn)
-	}
+    fn updated_by(
+        &self,
+        users: &Table,
+        recursive: bool,
+        conn: &mut PgConnection,
+    ) -> Result<Option<Column>, diesel::result::Error> {
+        user_column(self, users, recursive, "updated_by", conn)
+    }
 }

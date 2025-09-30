@@ -163,7 +163,10 @@ impl KeyColumnUsage {
     ///
     /// * If an error occurs while loading the key column usages from the
     ///   database
-    pub fn local_columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
+    pub fn local_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Column>, diesel::result::Error> {
         cached_queries::local_columns(self, conn)
     }
 

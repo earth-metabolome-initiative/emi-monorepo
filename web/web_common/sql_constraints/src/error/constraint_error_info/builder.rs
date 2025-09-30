@@ -111,10 +111,14 @@ impl Display for ConstraintErrorInfoBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ConstraintErrorInfoBuilderError::Builder(err) => write!(f, "Builder error: {err}"),
-            ConstraintErrorInfoBuilderError::EmptyConstraint => write!(f, "Constraint cannot be empty"),
+            ConstraintErrorInfoBuilderError::EmptyConstraint => {
+                write!(f, "Constraint cannot be empty")
+            }
             ConstraintErrorInfoBuilderError::EmptyMessage => write!(f, "Message cannot be empty"),
             ConstraintErrorInfoBuilderError::EmptyObject => write!(f, "Object cannot be empty"),
-            ConstraintErrorInfoBuilderError::EmptyResolution => write!(f, "Resolution cannot be empty"),
+            ConstraintErrorInfoBuilderError::EmptyResolution => {
+                write!(f, "Resolution cannot be empty")
+            }
         }
     }
 }

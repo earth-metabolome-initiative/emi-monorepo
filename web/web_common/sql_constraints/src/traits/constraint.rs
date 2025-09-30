@@ -1,5 +1,5 @@
-//! Submodule defining the `Constraint` trait, which defines a constraint which can be applied to
-//! a `Constrainable` object.
+//! Submodule defining the `Constraint` trait, which defines a constraint which
+//! can be applied to a `Constrainable` object.
 
 use crate::traits::{Constrainable, ConstraintFailureInformation};
 

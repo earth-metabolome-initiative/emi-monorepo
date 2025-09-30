@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 pg_diesel.workspace = true
 diesel.workspace = true
-serde = {workspace = true, optional = true}
+serde = { workspace = true, optional = true }
 
 [lints]
 workspace = true

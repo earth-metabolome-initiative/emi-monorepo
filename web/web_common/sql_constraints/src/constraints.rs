@@ -2,3 +2,5 @@
 
 mod table_constraints;
 pub use table_constraints::*;
+mod column_constraints;
+pub use column_constraints::*;

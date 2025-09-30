@@ -1,4 +1,5 @@
-//! Submodule defining a struct implementing `ConstraintFailureInformation` for error reporting.
+//! Submodule defining a struct implementing `ConstraintFailureInformation` for
+//! error reporting.
 
 mod builder;
 
@@ -7,7 +8,8 @@ use std::fmt::Display;
 use crate::traits::ConstraintFailureInformation;
 
 #[derive(Debug)]
-/// Struct implementing `ConstraintFailureInformation` for detailed error reporting.
+/// Struct implementing `ConstraintFailureInformation` for detailed error
+/// reporting.
 pub struct ConstraintErrorInfo {
     /// Type of constraint which failed.
     constraint: &'static str,
@@ -20,10 +22,10 @@ pub struct ConstraintErrorInfo {
 }
 
 impl ConstraintErrorInfo {
-	/// Create a new `ConstraintErrorInfo` using the builder pattern.
-	pub fn new() -> builder::ConstraintErrorInfoBuilder {
-		builder::ConstraintErrorInfoBuilder::default()
-	}
+    /// Create a new `ConstraintErrorInfo` using the builder pattern.
+    pub fn new() -> builder::ConstraintErrorInfoBuilder {
+        builder::ConstraintErrorInfoBuilder::default()
+    }
 }
 
 impl From<ConstraintErrorInfo> for Box<dyn ConstraintFailureInformation> {

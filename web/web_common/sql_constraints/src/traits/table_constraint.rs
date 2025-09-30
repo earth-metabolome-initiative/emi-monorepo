@@ -1,5 +1,5 @@
-//! Submodule defining the `TableConstraint` trait, which defines a constraint which applies to an object
-//! that implements the `ConstrainableTable` trait.
+//! Submodule defining the `TableConstraint` trait, which defines a constraint
+//! which applies to an object that implements the `ConstrainableTable` trait.
 
 use crate::{
     error::Error,

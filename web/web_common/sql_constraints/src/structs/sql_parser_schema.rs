@@ -59,8 +59,13 @@ impl SqlParserSchema {
 
 impl Schema for SqlParserSchema {
     type TableType = sqlparser::ast::CreateTable;
+    type ColumnType = sqlparser::ast::ColumnDef;
 
     fn tables(&self) -> impl Iterator<Item = &Self::TableType> {
         self.tables.iter()
+    }
+
+    fn columns(&self, table: &Self::TableType) -> impl Iterator<Item = Self::ColumnType> {
+        table.columns.iter().map(|col| col.clone())
     }
 }

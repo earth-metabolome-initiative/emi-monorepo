@@ -4,8 +4,6 @@ pub(crate) mod functions;
 mod impls;
 pub mod traits;
 
-
-
 /// Returns the associated same-as foreign keys of the table, if any.
 ///
 /// # Arguments
@@ -92,7 +90,6 @@ pub(crate) fn associated_tables(
 
     Ok(associated_tables)
 }
-
 
 /// Returns the columns and foreign keys of the table which require partial
 /// builders.
@@ -283,4 +280,3 @@ pub fn singleton_foreign_keys(
         .cloned()
         .collect())
 }
-

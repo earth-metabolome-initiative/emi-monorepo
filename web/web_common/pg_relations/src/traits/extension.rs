@@ -1,5 +1,5 @@
-//! Submodule defining the Extension trait which characterizes whether a table is an extension
-//! of another table.
+//! Submodule defining the Extension trait which characterizes whether a table
+//! is an extension of another table.
 
 use diesel::PgConnection;
 use pg_diesel::models::{KeyColumnUsage, Table};
@@ -7,10 +7,12 @@ use pg_diesel::models::{KeyColumnUsage, Table};
 use crate::functions::is_extension_foreign_key;
 
 /// Trait characterizing whether a table is an extension of another table,
-/// i.e. it has the same primary key as another table and possibly additional columns,
-/// which is defined by a primary key which also is a foreign key to another table's primary key.
+/// i.e. it has the same primary key as another table and possibly additional
+/// columns, which is defined by a primary key which also is a foreign key to
+/// another table's primary key.
 pub trait Extension {
-    /// Returns the foreign key constraint which defines the extension relationship, if any.
+    /// Returns the foreign key constraint which defines the extension
+    /// relationship, if any.
     ///
     /// # Arguments
     ///

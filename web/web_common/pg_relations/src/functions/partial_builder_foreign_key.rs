@@ -3,9 +3,7 @@ use pg_diesel::models::{Column, KeyColumnUsage};
 
 use crate::traits::Extension;
 
-#[derive(
-    Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord,
-)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// The kind of partial builder constraint
 pub enum PartialBuilderKind {

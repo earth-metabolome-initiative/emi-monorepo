@@ -74,10 +74,7 @@ impl PgIndex {
     /// # Errors
     ///
     /// If an error occurs while loading the columns from the database
-    pub fn columns(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<Column>, diesel::result::Error> {
+    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
         cached_queries::columns(self, conn)
     }
 

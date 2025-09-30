@@ -57,7 +57,7 @@ impl Constraint for LowercaseTableName {
 }
 impl TableConstraint for LowercaseTableName {
     fn validate_table(&self, table: &dyn ConstrainableTable) -> Result<(), crate::error::Error> {
-        if table.name().chars().all(|c| !c.is_alphabetic() || c.is_lowercase()) {
+        if table.table_name().chars().all(|c| !c.is_alphabetic() || c.is_lowercase()) {
             Ok(())
         } else {
             Err(crate::error::Error::Table(self.error_information(table)))

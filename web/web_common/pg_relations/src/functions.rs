@@ -7,6 +7,6 @@ mod extension_foreign_key;
 pub(crate) use extension_foreign_key::is_extension_foreign_key;
 mod ancestral_same_as_foreign_key;
 mod associated_same_as_foreign_key;
-mod partial_builder_foreign_key;
 mod author_column;
 mod most_concrete_column;
+mod partial_builder_foreign_key;
