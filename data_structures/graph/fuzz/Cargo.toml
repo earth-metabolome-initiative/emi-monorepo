@@ -45,3 +45,9 @@ name = "lin"
 path = "fuzz_targets/lin.rs"
 test = false
 doc = false
+
+[[bin]]
+name = "wu_palmer"
+path = "fuzz_targets/wu_palmer.rs"
+test = false
+doc = false

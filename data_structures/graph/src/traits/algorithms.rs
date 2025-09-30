@@ -18,3 +18,5 @@ pub mod lin;
 pub use lin::Lin;
 pub mod singleton_nodes;
 pub use singleton_nodes::SingletonNodes;
+pub mod wu_palmer;
+pub use wu_palmer::WuPalmer;

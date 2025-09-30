@@ -70,7 +70,7 @@ where
         let right_ic = ic[*right];
         let resnik_score = resnik.similarity(left, right);
         // reminder: resnik score needs to always be less than max of left_ic/right_ic
-        let mut denominator = left_ic + right_ic;
+        let mut denominator =  left_ic + right_ic;
         if denominator < f64::EPSILON {
             denominator = f64::EPSILON;
         }

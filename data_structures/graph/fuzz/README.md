@@ -53,3 +53,14 @@ and to run the crash cases:
 ```bash
 cargo hfuzz run-debug lin hfuzz_workspace/*/*.fuzz
 ```
+
+
+### Wu-Palmer
+```bash
+cargo hfuzz run wu_palmer
+```
+
+and to run the crash cases:
+```bash
+cargo hfuzz run-debug wu_palmer hfuzz_workspaces/*/*.fuzz
+```
