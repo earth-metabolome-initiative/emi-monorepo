@@ -20,7 +20,6 @@ The `up.sql` should contain the SQL commands to create the new procedure templat
     - Remove the cache via `rm -rf cache/`
     - Run `cargo run --release`
 
-
 ## Notes
 
 Here is a list of reserved and non-reserved words in the database that should not be used as identifiers for tables or columns.
