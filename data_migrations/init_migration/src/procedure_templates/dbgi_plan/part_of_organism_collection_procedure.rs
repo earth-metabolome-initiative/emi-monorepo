@@ -19,6 +19,10 @@ use crate::{
     },
     procedure_templates::dbgi_plan::organism_observation_procedure::organism_observation_procedure,
 };
+use core_structures::PhotographProcedureTemplate;
+use core_structures::tables::insertables::PhotographProcedureTemplateSettable;
+use crate::procedure_template_asset_models::photograph::photograph_builder;
+use core_structures::tables::insertables::ProcedureTemplateAssetModelSettable;
 
 /// Initializes the part of organism collection procedure template in the
 /// database.
@@ -45,7 +49,7 @@ pub(crate) fn part_of_organism_collection(
         return Ok((existing, cct));
     }
 
-    let (_, organism) = organism_observation_procedure(user, conn)?;
+    let (_, organism, phone) = organism_observation_procedure(user, conn)?;
 
     let collection = ProcedureTemplate::new()
         .name(name)?
@@ -106,6 +110,22 @@ pub(crate) fn part_of_organism_collection(
         .insert(user.id, conn)?;
     let cct = place_in_tube.procedure_template_stored_into_model(conn)?;
 
+    // Take a picture of the sample collection tube with a visible label
+    // together with the organism panel
+
+    let sample_label_and_panel_picture = PhotographProcedureTemplate::new()
+        .name("Sample Label and Panel Picture")?
+        .description(
+            "Photograph of the sample collection tube with a visible label together with the organism panel.",
+        )?
+        .procedure_template_photographed_with_model(&phone)?
+        .procedure_template_photographed_asset_model(&cct)?
+        .procedure_template_photograph_model(
+            photograph_builder(user, conn)?.name("Sample Label and Panel Picture")?,
+        )?
+        .created_by(user)?
+        .insert(user.id, conn)?;
+
     // Put it in the storage box
     let place_in_storage_box = StorageProcedureTemplate::new()
         .name("Place in storage box")?
@@ -126,6 +146,7 @@ pub(crate) fn part_of_organism_collection(
             sample_harvesting.into(),
             coffee_filter_wrapping.into(),
             place_in_tube.into(),
+            sample_label_and_panel_picture.into(),
             place_in_storage_box.into(),
         ],
         user,

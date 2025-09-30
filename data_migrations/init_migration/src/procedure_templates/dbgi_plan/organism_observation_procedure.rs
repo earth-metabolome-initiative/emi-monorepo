@@ -14,6 +14,8 @@ use crate::procedure_template_asset_models::{
     organism::organism_builder, phone::phone_builder, photograph::photograph_builder,
 };
 
+use web_common_traits::database::PrimaryKeyLike;
+
 /// Initializes the Organism observation procedure template in the database.
 ///
 /// # Arguments
@@ -28,16 +30,19 @@ use crate::procedure_template_asset_models::{
 pub fn organism_observation_procedure(
     user: &User,
     conn: &mut diesel::PgConnection,
-) -> anyhow::Result<(ProcedureTemplate, ProcedureTemplateAssetModel)> {
+) -> anyhow::Result<(ProcedureTemplate, ProcedureTemplateAssetModel, ProcedureTemplateAssetModel)> {
     let name = "Organism observation procedure";
-    let photograph_procedure_name = "Organism and Panel Picture";
+
+    const ORGANISM_PTAM_NAME: &str = "Organism";
+    const PHONE_PTAM_NAME: &str = "Phone";
 
     if let Some(existing) = ProcedureTemplate::from_name(name, conn).optional()? {
-        let photograph_procedure =
-            PhotographProcedureTemplate::from_name(photograph_procedure_name, conn)?;
-        let organism = photograph_procedure.procedure_template_photographed_asset_model(conn)?;
-        return Ok((existing, organism));
+        let organism = ProcedureTemplateAssetModel::from_name_and_procedure_template(ORGANISM_PTAM_NAME, existing.primary_key(), conn)?;
+        let phone = ProcedureTemplateAssetModel::from_name_and_procedure_template(PHONE_PTAM_NAME, existing.primary_key(), conn)?;
+        return Ok((existing, organism, phone));
     }
+
+
 
     let observation_procedure = ProcedureTemplate::new()
         .name(name)?
@@ -58,23 +63,23 @@ pub fn organism_observation_procedure(
 
     // Take a picture of organism and its panel
     let organism_and_panel_picture = PhotographProcedureTemplate::new()
-        .name(photograph_procedure_name)?
+        .name("Organism and Panel Picture")?
         .description("Photograph of the organism and its panel in the botanical garden")?
-        .procedure_template_photographed_with_model(phone_builder(user, conn)?)?
-        .procedure_template_photographed_asset_model(organism_builder(user, conn)?)?
+        .procedure_template_photographed_with_model(phone_builder(user, conn)?.name(PHONE_PTAM_NAME)?)?
+        .procedure_template_photographed_asset_model(organism_builder(user, conn)?.name(ORGANISM_PTAM_NAME)?)?
         .procedure_template_photograph_model(
             photograph_builder(user, conn)?.name("Organism and Panel Picture")?,
         )?
         .created_by(user)?
         .insert(user.id, conn)?;
     let organism = organism_and_panel_picture.procedure_template_photographed_asset_model(conn)?;
-    let phone = organism_and_panel_picture.procedure_template_photographed_with_model;
+    let phone = organism_and_panel_picture.procedure_template_photographed_with_model(conn)?;
 
     // Take a picture of the full organism
     let organism_picture = PhotographProcedureTemplate::new()
         .name("Organism Picture")?
         .description("Photograph of the full organism for identification.")?
-        .procedure_template_photographed_with_model(phone)?
+        .procedure_template_photographed_with_model(&phone)?
         .procedure_template_photographed_asset_model(&organism)?
         .procedure_template_photograph_model(
             photograph_builder(user, conn)?.name("Organism Picture")?,
@@ -87,7 +92,7 @@ pub fn organism_observation_procedure(
     let organism_details_picture = PhotographProcedureTemplate::new()
         .name("Organism Details Picture")?
         .description("Photograph of details of the organism to facilitate identification.")?
-        .procedure_template_photographed_with_model(phone)?
+        .procedure_template_photographed_with_model(&phone)?
         .procedure_template_photographed_asset_model(&organism)?
         .procedure_template_photograph_model(
             photograph_builder(user, conn)?.name("Organism Details Picture")?,
@@ -103,7 +108,7 @@ pub fn organism_observation_procedure(
         .description(
             "Photograph of the part of the organism that will be collected as a sample (e.g. a leaf, a flower, a piece of bark).",
         )?
-        .procedure_template_photographed_with_model(phone)?
+        .procedure_template_photographed_with_model(&phone)?
         .procedure_template_photographed_asset_model(&organism)?
         .procedure_template_photograph_model(
             photograph_builder(user, conn)?.name("Organism Collected Part Picture")?,
@@ -111,27 +116,12 @@ pub fn organism_observation_procedure(
         .created_by(user)?
         .insert(user.id, conn)?;
 
-    // Take a picture of the sample collection tube with a visible label
-    // together with the organism panel
-
-    let sample_label_and_panel_picture = PhotographProcedureTemplate::new()
-        .name("Sample Label and Panel Picture")?
-        .description(
-            "Photograph of the sample collection tube with a visible label together with the organism panel.",
-        )?
-        .procedure_template_photographed_with_model(phone)?
-        .procedure_template_photographed_asset_model(&organism)?
-        .procedure_template_photograph_model(
-            photograph_builder(user, conn)?.name("Sample Label and Panel Picture")?,
-        )?
-        .created_by(user)?
-        .insert(user.id, conn)?;
 
     // Logging geolocation
     let organism_geolocation = GeolocationProcedureTemplate::new()
         .name("Organism Geolocation")?
         .description("Geolocation of the organism observation.")?
-        .procedure_template_geolocated_with_model(phone)?
+        .procedure_template_geolocated_with_model(&phone)?
         .procedure_template_geolocated_asset_model(&organism)?
         .created_by(user)?
         .insert(user.id, conn)?;
@@ -143,12 +133,11 @@ pub fn organism_observation_procedure(
             organism_picture.into(),
             organism_details_picture.into(),
             organism_collected_part_picture.into(),
-            sample_label_and_panel_picture.into(),
             organism_geolocation.into(),
         ],
         user,
         conn,
     )?;
 
-    Ok((observation_procedure, organism))
+    Ok((observation_procedure, organism, phone))
 }

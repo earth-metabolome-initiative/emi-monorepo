@@ -4,7 +4,7 @@
 #[allow(clippy::upper_case_acronyms)]
 pub(crate) enum DirectusTemplate {
     DBGI,
-    VineshPartOfOrganism,
-    VineshWholeOrganism,
+    EMIPartOfOrganism,
+    EMIWholeOrganism,
     FIBL,
 }

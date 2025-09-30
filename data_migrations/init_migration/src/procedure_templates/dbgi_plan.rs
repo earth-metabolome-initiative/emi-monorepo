@@ -44,7 +44,7 @@ pub fn dbgi_plan(
         .created_by(user)?
         .insert(user.id, conn)?;
 
-    let (observation_procedure, _organism) = organism_observation_procedure(user, conn)?;
+    let (observation_procedure, _organism, _phone) = organism_observation_procedure(user, conn)?;
     let (part_of_organism_collection, cct) = part_of_organism_collection(user, conn)?;
     let sample_processing_procedure =
         sample_processing_procedures::init_dbgi_sample_processing_procedures(user, &cct, conn)?;

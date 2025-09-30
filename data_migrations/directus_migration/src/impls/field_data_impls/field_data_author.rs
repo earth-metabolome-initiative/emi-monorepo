@@ -32,9 +32,7 @@ impl FieldDatumWrapper {
             return Ok(None);
         };
 
-        let Some(qfield_project) = &self.as_ref().qfield_project else {
-            return Ok(None);
-        };
+        let qfield_project = self.as_ref().qfield_project.as_str().trim();
 
         if picture_panel.starts_with("DCIM/Audrey_layer/")
             || picture_panel.starts_with("DCIM/Audrey_le_cabec/")
