@@ -20,3 +20,5 @@ pub mod singleton_nodes;
 pub use singleton_nodes::SingletonNodes;
 pub mod wu_palmer;
 pub use wu_palmer::WuPalmer;
+pub mod randomized_graphs;
+pub use randomized_graphs::RandomizedDAG;

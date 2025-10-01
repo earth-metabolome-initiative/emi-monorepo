@@ -23,3 +23,10 @@ std = ["alloc", "sorted_vec/std"]
 arbitrary = ["algebra/arbitrary", "dep:arbitrary"]
 alloc = ["sorted_vec/alloc"]
 serde = ["algebra/serde", "dep:serde"]
+
+[dev-dependencies]
+criterion.workspace = true
+
+[[bench]]
+name = "wu_palmer"
+harness = false
