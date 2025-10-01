@@ -63,7 +63,7 @@ members = [
   "web/web_common/pg_cached",
   "web/web_common/pg_relations",
   "web/web_common/pg_constraints",
-  "web/web_common/sql_constraints",
+  "web/web_common/sql_constraints", "web/web_common/sql_traits",
 ]
 
 [workspace.dependencies]
@@ -199,6 +199,7 @@ guided_procedures = { path = "web/core_structures/guided_procedures" }
 directus_codegen = { path = "data_migrations/directus_migration/directus_codegen" }
 pg_cached = { path = "web/web_common/pg_cached" }
 pg_diesel = { path = "web/web_common/pg_diesel" }
+sql_traits = { path = "web/web_common/sql_traits" }
 
 [workspace.lints.rust]
 missing_docs = "forbid"
