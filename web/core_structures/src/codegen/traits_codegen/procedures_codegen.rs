@@ -10,6 +10,7 @@ mod geolocation_procedures;
 mod harvesting_procedures;
 mod packaging_procedures;
 mod photograph_procedures;
+mod placing_procedures;
 mod pouring_procedures;
 mod procedures;
 mod storage_procedures;
@@ -67,6 +68,9 @@ impl web_common_traits::prelude::ProcedureLike
                 procedure.procedure_template_asset_models_and_procedure_assets()
             }
             Self::PhotographProcedure(procedure) => {
+                procedure.procedure_template_asset_models_and_procedure_assets()
+            }
+            Self::PlacingProcedure(procedure) => {
                 procedure.procedure_template_asset_models_and_procedure_assets()
             }
             Self::PouringProcedure(procedure) => {
@@ -175,6 +179,12 @@ impl web_common_traits::prelude::ProcedureBuilderLike
                 (
                     Self::PhotographProcedure(builder),
                     crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG::PhotographProcedureTemplate(
+                        template,
+                    ),
+                ) => builder.complete_with(parents, template, template_graph)?.into(),
+                (
+                    Self::PlacingProcedure(builder),
+                    crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG::PlacingProcedureTemplate(
                         template,
                     ),
                 ) => builder.complete_with(parents, template, template_graph)?.into(),

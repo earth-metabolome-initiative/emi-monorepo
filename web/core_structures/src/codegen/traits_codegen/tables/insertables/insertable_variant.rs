@@ -96,6 +96,8 @@ mod physical_assets;
 mod pipette_models;
 mod pipette_tip_models;
 mod pipettes;
+mod placing_procedure_templates;
+mod placing_procedures;
 mod positioning_device_models;
 mod positioning_devices;
 mod pouring_procedure_templates;

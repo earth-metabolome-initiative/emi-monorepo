@@ -97,6 +97,8 @@ mod physical_assets;
 mod pipette_models;
 mod pipette_tip_models;
 mod pipettes;
+mod placing_procedure_templates;
+mod placing_procedures;
 mod positioning_device_models;
 mod positioning_devices;
 mod pouring_procedure_templates;
@@ -392,6 +394,12 @@ pub enum Row {
         crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
     ),
     Pipette(crate::codegen::structs_codegen::tables::pipettes::Pipette),
+    PlacingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate,
+    ),
+    PlacingProcedure(
+        crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure,
+    ),
     PositioningDeviceModel(
         crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
     ),
@@ -726,6 +734,12 @@ impl Row {
                 pipette_tip_models.upsert(conn)?.map(Row::from)
             }
             Row::Pipette(pipettes) => pipettes.upsert(conn)?.map(Row::from),
+            Row::PlacingProcedureTemplate(placing_procedure_templates) => {
+                placing_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::PlacingProcedure(placing_procedures) => {
+                placing_procedures.upsert(conn)?.map(Row::from)
+            }
             Row::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.upsert(conn)?.map(Row::from)
             }
@@ -1005,6 +1019,10 @@ impl web_common_traits::prelude::Row for Row {
             Row::PipetteModel(pipette_models) => pipette_models.primary_key(),
             Row::PipetteTipModel(pipette_tip_models) => pipette_tip_models.primary_key(),
             Row::Pipette(pipettes) => pipettes.primary_key(),
+            Row::PlacingProcedureTemplate(placing_procedure_templates) => {
+                placing_procedure_templates.primary_key()
+            }
+            Row::PlacingProcedure(placing_procedures) => placing_procedures.primary_key(),
             Row::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.primary_key()
             }

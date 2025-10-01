@@ -275,6 +275,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
                 crate::codegen::tables::rows::Rows::from(pipette_tip_models)
             }
             super::Row::Pipette(pipettes) => crate::codegen::tables::rows::Rows::from(pipettes),
+            super::Row::PlacingProcedureTemplate(placing_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(placing_procedure_templates)
+            }
+            super::Row::PlacingProcedure(placing_procedures) => {
+                crate::codegen::tables::rows::Rows::from(placing_procedures)
+            }
             super::Row::PositioningDeviceModel(positioning_device_models) => {
                 crate::codegen::tables::rows::Rows::from(positioning_device_models)
             }

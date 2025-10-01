@@ -268,6 +268,12 @@ impl web_common_traits::prelude::Tabular for super::Rows {
                 crate::codegen::tables::table_names::TableName::PipetteTipModel
             }
             super::Rows::Pipette(_) => crate::codegen::tables::table_names::TableName::Pipette,
+            super::Rows::PlacingProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::PlacingProcedureTemplate
+            }
+            super::Rows::PlacingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::PlacingProcedure
+            }
             super::Rows::PositioningDeviceModel(_) => {
                 crate::codegen::tables::table_names::TableName::PositioningDeviceModel
             }

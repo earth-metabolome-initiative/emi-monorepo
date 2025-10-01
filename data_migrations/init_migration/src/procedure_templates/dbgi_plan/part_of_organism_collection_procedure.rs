@@ -1,10 +1,11 @@
 //! Submodule defining the Ethanol 70 percent procedure creation.
 
 use core_structures::{
-    HarvestingProcedureTemplate, PackagingProcedureTemplate, ProcedureTemplate,
-    ProcedureTemplateAssetModel, StorageProcedureTemplate, User,
+    HarvestingProcedureTemplate, PackagingProcedureTemplate, PhotographProcedureTemplate,
+    ProcedureTemplate, ProcedureTemplateAssetModel, StorageProcedureTemplate, User,
     tables::insertables::{
         HarvestingProcedureTemplateSettable, PackagingProcedureTemplateSettable,
+        PhotographProcedureTemplateSettable, ProcedureTemplateAssetModelSettable,
         ProcedureTemplateSettable, StorageProcedureTemplateSettable,
     },
     traits::AppendProcedureTemplate,
@@ -16,13 +17,10 @@ use crate::{
     procedure_template_asset_models::{
         coffee_wrapper::coffee_wrapper_builder, conical_tubes::cct_builder,
         conical_tubes_box::cct_box_builder, organism::sample_builder,
+        photograph::photograph_builder,
     },
     procedure_templates::dbgi_plan::organism_observation_procedure::organism_observation_procedure,
 };
-use core_structures::PhotographProcedureTemplate;
-use core_structures::tables::insertables::PhotographProcedureTemplateSettable;
-use crate::procedure_template_asset_models::photograph::photograph_builder;
-use core_structures::tables::insertables::ProcedureTemplateAssetModelSettable;
 
 /// Initializes the part of organism collection procedure template in the
 /// database.

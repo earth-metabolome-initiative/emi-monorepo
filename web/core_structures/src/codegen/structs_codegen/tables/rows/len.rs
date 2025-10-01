@@ -99,6 +99,8 @@ impl super::Rows {
             super::Rows::PipetteModel(rows) => rows.len(),
             super::Rows::PipetteTipModel(rows) => rows.len(),
             super::Rows::Pipette(rows) => rows.len(),
+            super::Rows::PlacingProcedureTemplate(rows) => rows.len(),
+            super::Rows::PlacingProcedure(rows) => rows.len(),
             super::Rows::PositioningDeviceModel(rows) => rows.len(),
             super::Rows::PositioningDevice(rows) => rows.len(),
             super::Rows::PouringProcedureTemplate(rows) => rows.len(),

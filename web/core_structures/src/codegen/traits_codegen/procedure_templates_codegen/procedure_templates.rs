@@ -54,6 +54,10 @@ impl web_common_traits::prelude::ProcedureTemplateRoot
                 crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure::new()
                     .into()
             }
+            "placing_procedure_templates" => {
+                crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure::new()
+                    .into()
+            }
             "pouring_procedure_templates" => {
                 crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure::new()
                     .into()
@@ -141,6 +145,11 @@ impl web_common_traits::prelude::ProcedureTemplateRoot
             "photograph_procedure_templates" => {
                 std::any::type_name::<
                     crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure,
+                >()
+            }
+            "placing_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure,
                 >()
             }
             "pouring_procedure_templates" => {

@@ -27,3 +27,11 @@ Here is a list of reserved and non-reserved words in the database that should no
 https://www.postgresql.org/docs/current/sql-keywords-appendix.html
 
 In our case it is OK to use the `non-reserved` words, but it is not recommended.
+
+For reformatting
+
+4. cd to root
+4. switch to nightly `rustup default nightly`
+5. format `cargo fmt`
+6. switch back to default rust `rustup default stable`
+

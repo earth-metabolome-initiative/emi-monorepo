@@ -75,6 +75,12 @@ pub enum ProcedureTemplateInsertErrorDAG {
             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureTemplateAttribute,
         >,
     ),
+    ///Insert error associated with the `placing_procedure_templates` table.
+    PlacingProcedureTemplate(
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PlacingProcedureTemplateAttribute,
+        >,
+    ),
     ///Insert error associated with the `pouring_procedure_templates` table.
     PouringProcedureTemplate(
         web_common_traits::database::InsertError<
@@ -121,6 +127,7 @@ impl std::fmt::Display for ProcedureTemplateInsertErrorDAG {
             Self::HarvestingProcedureTemplate(e) => write!(f, "{e}"),
             Self::PackagingProcedureTemplate(e) => write!(f, "{e}"),
             Self::PhotographProcedureTemplate(e) => write!(f, "{e}"),
+            Self::PlacingProcedureTemplate(e) => write!(f, "{e}"),
             Self::PouringProcedureTemplate(e) => write!(f, "{e}"),
             Self::ProcedureTemplate(e) => write!(f, "{e}"),
             Self::StorageProcedureTemplate(e) => write!(f, "{e}"),
@@ -144,6 +151,7 @@ impl std::error::Error for ProcedureTemplateInsertErrorDAG {
             Self::HarvestingProcedureTemplate(e) => Some(e),
             Self::PackagingProcedureTemplate(e) => Some(e),
             Self::PhotographProcedureTemplate(e) => Some(e),
+            Self::PlacingProcedureTemplate(e) => Some(e),
             Self::PouringProcedureTemplate(e) => Some(e),
             Self::ProcedureTemplate(e) => Some(e),
             Self::StorageProcedureTemplate(e) => Some(e),
@@ -308,6 +316,21 @@ impl From<
         >,
     ) -> Self {
         ProcedureTemplateInsertErrorDAG::PhotographProcedureTemplate(error)
+    }
+}
+impl
+    From<
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PlacingProcedureTemplateAttribute,
+        >,
+    > for ProcedureTemplateInsertErrorDAG
+{
+    fn from(
+        error: web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PlacingProcedureTemplateAttribute,
+        >,
+    ) -> Self {
+        ProcedureTemplateInsertErrorDAG::PlacingProcedureTemplate(error)
     }
 }
 impl

@@ -8,13 +8,11 @@ use core_structures::{
     traits::AppendProcedureTemplate,
 };
 use diesel::OptionalExtension;
-use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable, PrimaryKeyLike};
 
 use crate::procedure_template_asset_models::{
     organism::organism_builder, phone::phone_builder, photograph::photograph_builder,
 };
-
-use web_common_traits::database::PrimaryKeyLike;
 
 /// Initializes the Organism observation procedure template in the database.
 ///
@@ -37,12 +35,18 @@ pub fn organism_observation_procedure(
     const PHONE_PTAM_NAME: &str = "Phone";
 
     if let Some(existing) = ProcedureTemplate::from_name(name, conn).optional()? {
-        let organism = ProcedureTemplateAssetModel::from_name_and_procedure_template(ORGANISM_PTAM_NAME, existing.primary_key(), conn)?;
-        let phone = ProcedureTemplateAssetModel::from_name_and_procedure_template(PHONE_PTAM_NAME, existing.primary_key(), conn)?;
+        let organism = ProcedureTemplateAssetModel::from_name_and_procedure_template(
+            ORGANISM_PTAM_NAME,
+            existing.primary_key(),
+            conn,
+        )?;
+        let phone = ProcedureTemplateAssetModel::from_name_and_procedure_template(
+            PHONE_PTAM_NAME,
+            existing.primary_key(),
+            conn,
+        )?;
         return Ok((existing, organism, phone));
     }
-
-
 
     let observation_procedure = ProcedureTemplate::new()
         .name(name)?
@@ -65,8 +69,12 @@ pub fn organism_observation_procedure(
     let organism_and_panel_picture = PhotographProcedureTemplate::new()
         .name("Organism and Panel Picture")?
         .description("Photograph of the organism and its panel in the botanical garden")?
-        .procedure_template_photographed_with_model(phone_builder(user, conn)?.name(PHONE_PTAM_NAME)?)?
-        .procedure_template_photographed_asset_model(organism_builder(user, conn)?.name(ORGANISM_PTAM_NAME)?)?
+        .procedure_template_photographed_with_model(
+            phone_builder(user, conn)?.name(PHONE_PTAM_NAME)?,
+        )?
+        .procedure_template_photographed_asset_model(
+            organism_builder(user, conn)?.name(ORGANISM_PTAM_NAME)?,
+        )?
         .procedure_template_photograph_model(
             photograph_builder(user, conn)?.name("Organism and Panel Picture")?,
         )?
@@ -115,7 +123,6 @@ pub fn organism_observation_procedure(
         )?
         .created_by(user)?
         .insert(user.id, conn)?;
-
 
     // Logging geolocation
     let organism_geolocation = GeolocationProcedureTemplate::new()

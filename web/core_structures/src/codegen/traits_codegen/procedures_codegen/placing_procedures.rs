@@ -1,0 +1,39 @@
+impl web_common_traits::prelude::ProcedureLike
+    for crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure
+{
+    type Template = crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate;
+    type ProcedureAsset = crate::ProcedureAsset;
+    type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
+    type Builder =
+        crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder;
+    fn procedure_template_asset_models_and_procedure_assets(
+        &self,
+    ) -> Vec<
+        (
+            <Self::ProcedureTemplateAssetModel as web_common_traits::database::PrimaryKeyLike>::PrimaryKey,
+            <Self::ProcedureAsset as web_common_traits::database::PrimaryKeyLike>::PrimaryKey,
+        ),
+    >{
+        Vec::new()
+    }
+}
+impl web_common_traits::prelude::ProcedureBuilderLike
+    for crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder
+{
+    type Procedure = crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure;
+    fn complete_with<G, PT>(
+        self,
+        _parents: &[&PT],
+        _template: &<Self::Procedure as web_common_traits::prelude::ProcedureLike>::Template,
+        _template_graph: &G,
+    ) -> Result<Self, Self::Error>
+    where
+        G: web_common_traits::prelude::ProcedureTemplateAssetGraph<
+            ProcedureTemplateAssetModel = <Self::Procedure as web_common_traits::prelude::ProcedureLike>::ProcedureTemplateAssetModel,
+            ProcedureAsset = <Self::Procedure as web_common_traits::prelude::ProcedureLike>::ProcedureAsset,
+            ProcedureTemplateRoot = PT,
+        >,
+    {
+        Ok(self)
+    }
+}

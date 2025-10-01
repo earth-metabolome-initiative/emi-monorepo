@@ -10,6 +10,7 @@ mod geolocation_procedure_templates;
 mod harvesting_procedure_templates;
 mod packaging_procedure_templates;
 mod photograph_procedure_templates;
+mod placing_procedure_templates;
 mod pouring_procedure_templates;
 mod procedure_templates;
 mod storage_procedure_templates;
@@ -73,6 +74,9 @@ where
                     value.procedure_template_asset_models(conn)?
                 }
                 Self::PhotographProcedureTemplate(value) => {
+                    value.procedure_template_asset_models(conn)?
+                }
+                Self::PlacingProcedureTemplate(value) => {
                     value.procedure_template_asset_models(conn)?
                 }
                 Self::PouringProcedureTemplate(value) => {

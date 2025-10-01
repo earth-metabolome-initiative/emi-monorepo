@@ -294,6 +294,12 @@ where
     crate::codegen::structs_codegen::tables::pipettes::Pipette: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::database::Read<
         C,
     >,
@@ -1318,6 +1324,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::pipettes::Pipette::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PlacingProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PlacingProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure::read(
                             primary_key,
                             conn,
                         )?

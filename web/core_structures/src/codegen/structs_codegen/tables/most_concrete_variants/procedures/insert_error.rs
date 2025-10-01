@@ -75,6 +75,12 @@ pub enum ProcedureInsertErrorDAG {
             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureAttribute,
         >,
     ),
+    /// Insert error associated with the `placing_procedures` table.
+    PlacingProcedure(
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PlacingProcedureAttribute,
+        >,
+    ),
     /// Insert error associated with the `pouring_procedures` table.
     PouringProcedure(
         web_common_traits::database::InsertError<
@@ -121,6 +127,7 @@ impl std::fmt::Display for ProcedureInsertErrorDAG {
             Self::HarvestingProcedure(e) => write!(f, "{e}"),
             Self::PackagingProcedure(e) => write!(f, "{e}"),
             Self::PhotographProcedure(e) => write!(f, "{e}"),
+            Self::PlacingProcedure(e) => write!(f, "{e}"),
             Self::PouringProcedure(e) => write!(f, "{e}"),
             Self::Procedure(e) => write!(f, "{e}"),
             Self::StorageProcedure(e) => write!(f, "{e}"),
@@ -144,6 +151,7 @@ impl std::error::Error for ProcedureInsertErrorDAG {
             Self::HarvestingProcedure(e) => Some(e),
             Self::PackagingProcedure(e) => Some(e),
             Self::PhotographProcedure(e) => Some(e),
+            Self::PlacingProcedure(e) => Some(e),
             Self::PouringProcedure(e) => Some(e),
             Self::Procedure(e) => Some(e),
             Self::StorageProcedure(e) => Some(e),
@@ -330,6 +338,21 @@ impl
         >,
     ) -> Self {
         ProcedureInsertErrorDAG::PhotographProcedure(error)
+    }
+}
+impl
+    From<
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PlacingProcedureAttribute,
+        >,
+    > for ProcedureInsertErrorDAG
+{
+    fn from(
+        error: web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PlacingProcedureAttribute,
+        >,
+    ) -> Self {
+        ProcedureInsertErrorDAG::PlacingProcedure(error)
     }
 }
 impl

@@ -96,6 +96,8 @@ pub mod physical_assets;
 pub mod pipette_models;
 pub mod pipette_tip_models;
 pub mod pipettes;
+pub mod placing_procedure_templates;
+pub mod placing_procedures;
 pub mod positioning_device_models;
 pub mod positioning_devices;
 pub mod pouring_procedure_templates;

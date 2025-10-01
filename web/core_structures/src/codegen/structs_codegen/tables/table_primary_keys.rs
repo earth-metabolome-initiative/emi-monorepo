@@ -99,6 +99,8 @@ pub enum TablePrimaryKey {
     PipetteModel(i32),
     PipetteTipModel(i32),
     Pipette(::rosetta_uuid::Uuid),
+    PlacingProcedureTemplate(i32),
+    PlacingProcedure(::rosetta_uuid::Uuid),
     PositioningDeviceModel(i32),
     PositioningDevice(::rosetta_uuid::Uuid),
     PouringProcedureTemplate(i32),
@@ -426,6 +428,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
                 crate::codegen::tables::table_names::TableName::PipetteTipModel
             }
             TablePrimaryKey::Pipette(_) => crate::codegen::tables::table_names::TableName::Pipette,
+            TablePrimaryKey::PlacingProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::PlacingProcedureTemplate
+            }
+            TablePrimaryKey::PlacingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::PlacingProcedure
+            }
             TablePrimaryKey::PositioningDeviceModel(_) => {
                 crate::codegen::tables::table_names::TableName::PositioningDeviceModel
             }

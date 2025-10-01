@@ -294,6 +294,12 @@ where
     crate::codegen::structs_codegen::tables::pipettes::Pipette: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -1220,6 +1226,22 @@ where
             }
             crate::codegen::tables::table_names::TableName::Pipette => {
                 crate::codegen::structs_codegen::tables::pipettes::Pipette::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::PlacingProcedureTemplate => {
+                crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::PlacingProcedure => {
+                crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure::bounded_read(
                         offset,
                         limit,
                         conn,

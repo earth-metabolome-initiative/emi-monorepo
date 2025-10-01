@@ -518,6 +518,17 @@ pub use pipettes::{
     InsertablePipette, InsertablePipetteBuilder, PipetteAttribute, PipetteExtensionAttribute,
     PipetteSettable,
 };
+mod placing_procedure_templates;
+pub use placing_procedure_templates::{
+    InsertablePlacingProcedureTemplate, InsertablePlacingProcedureTemplateBuilder,
+    PlacingProcedureTemplateAttribute, PlacingProcedureTemplateExtensionAttribute,
+    PlacingProcedureTemplateSettable,
+};
+mod placing_procedures;
+pub use placing_procedures::{
+    InsertablePlacingProcedure, InsertablePlacingProcedureBuilder, PlacingProcedureAttribute,
+    PlacingProcedureExtensionAttribute, PlacingProcedureSettable,
+};
 mod positioning_device_models;
 pub use positioning_device_models::{
     InsertablePositioningDeviceModel, InsertablePositioningDeviceModelBuilder,

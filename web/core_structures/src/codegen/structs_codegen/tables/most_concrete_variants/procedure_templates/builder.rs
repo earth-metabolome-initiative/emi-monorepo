@@ -50,6 +50,10 @@ pub enum ProcedureTemplateBuilderDAG {
     PhotographProcedureTemplate(
         crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureTemplateBuilder,
     ),
+    ///Builder for the `placing_procedure_templates` table.
+    PlacingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder,
+    ),
     ///Builder for the `pouring_procedure_templates` table.
     PouringProcedureTemplate(
         crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateBuilder,
@@ -135,6 +139,11 @@ impl ProcedureTemplateBuilderDAG {
                     crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureTemplateBuilder,
                 >()
             }
+            Self::PlacingProcedureTemplate(_) => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder,
+                >()
+            }
             Self::PouringProcedureTemplate(_) => {
                 std::any::type_name::<
                     crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateBuilder,
@@ -178,6 +187,7 @@ impl common_traits::builder::IsCompleteBuilder for ProcedureTemplateBuilderDAG {
             Self::HarvestingProcedureTemplate(builder) => builder.is_complete(),
             Self::PackagingProcedureTemplate(builder) => builder.is_complete(),
             Self::PhotographProcedureTemplate(builder) => builder.is_complete(),
+            Self::PlacingProcedureTemplate(builder) => builder.is_complete(),
             Self::PouringProcedureTemplate(builder) => builder.is_complete(),
             Self::ProcedureTemplate(builder) => builder.is_complete(),
             Self::StorageProcedureTemplate(builder) => builder.is_complete(),
@@ -230,6 +240,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureTemplateBuilder: web_common_traits::database::DispatchableInsertableVariant<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder: web_common_traits::database::DispatchableInsertableVariant<
         C,
     >,
     crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateBuilder: web_common_traits::database::DispatchableInsertableVariant<
@@ -287,6 +300,9 @@ where
                 Self::PhotographProcedureTemplate(variant) => {
                     variant.insert(user_id, conn)?.into()
                 }
+                Self::PlacingProcedureTemplate(variant) => {
+                    variant.insert(user_id, conn)?.into()
+                }
                 Self::PouringProcedureTemplate(variant) => {
                     variant.insert(user_id, conn)?.into()
                 }
@@ -319,6 +335,7 @@ where
     crate::codegen::structs_codegen::tables::insertables::InsertableHarvestingProcedureTemplateBuilder: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateBuilder: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureTemplateBuilder: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable,
+    crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateBuilder: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateBuilder: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureTemplateBuilder: crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable,
@@ -414,6 +431,13 @@ where
                 }
                 Self::PhotographProcedureTemplate(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::name(
+                            builder,
+                            name,
+                        )?
+                        .into()
+                }
+                Self::PlacingProcedureTemplate(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::name(
                             builder,
                             name,
                         )?
@@ -550,6 +574,13 @@ where
                         )?
                         .into()
                 }
+                Self::PlacingProcedureTemplate(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::description(
+                            builder,
+                            description,
+                        )?
+                        .into()
+                }
                 Self::PouringProcedureTemplate(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::description(
                             builder,
@@ -675,6 +706,13 @@ where
                 }
                 Self::PhotographProcedureTemplate(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
+                            builder,
+                            created_by,
+                        )?
+                        .into()
+                }
+                Self::PlacingProcedureTemplate(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_by(
                             builder,
                             created_by,
                         )?
@@ -813,6 +851,13 @@ where
                         )?
                         .into()
                 }
+                Self::PlacingProcedureTemplate(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_at(
+                            builder,
+                            created_at,
+                        )?
+                        .into()
+                }
                 Self::PouringProcedureTemplate(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::created_at(
                             builder,
@@ -938,6 +983,13 @@ where
                 }
                 Self::PhotographProcedureTemplate(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
+                            builder,
+                            updated_by,
+                        )?
+                        .into()
+                }
+                Self::PlacingProcedureTemplate(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_by(
                             builder,
                             updated_by,
                         )?
@@ -1076,6 +1128,13 @@ where
                         )?
                         .into()
                 }
+                Self::PlacingProcedureTemplate(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_at(
+                            builder,
+                            updated_at,
+                        )?
+                        .into()
+                }
                 Self::PouringProcedureTemplate(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::updated_at(
                             builder,
@@ -1202,6 +1261,13 @@ where
                 }
                 Self::PhotographProcedureTemplate(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
+                            builder,
+                            deprecated,
+                        )?
+                        .into()
+                }
+                Self::PlacingProcedureTemplate(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
                             builder,
                             deprecated,
                         )?
@@ -1482,6 +1548,26 @@ for Option<
     fn from(value: ProcedureTemplateBuilderDAG) -> Self {
         match value {
             ProcedureTemplateBuilderDAG::PhotographProcedureTemplate(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<
+    crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder,
+> for ProcedureTemplateBuilderDAG {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder,
+    ) -> Self {
+        ProcedureTemplateBuilderDAG::PlacingProcedureTemplate(value)
+    }
+}
+impl From<ProcedureTemplateBuilderDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureTemplateBuilder,
+> {
+    fn from(value: ProcedureTemplateBuilderDAG) -> Self {
+        match value {
+            ProcedureTemplateBuilderDAG::PlacingProcedureTemplate(v) => Some(v),
             _ => None,
         }
     }

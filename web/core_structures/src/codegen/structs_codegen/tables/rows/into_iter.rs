@@ -467,6 +467,16 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::Pipette(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Pipette).collect::<Vec<_>>()
             }
+            super::Rows::PlacingProcedureTemplate(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PlacingProcedureTemplate)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::PlacingProcedure(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PlacingProcedure)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::PositioningDeviceModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::PositioningDeviceModel)
