@@ -4,7 +4,7 @@ use std::hint::black_box;
 
 use algebra::impls::{CSR2D, SquareCSR2D};
 use criterion::{Criterion, criterion_group, criterion_main};
-use functional_properties::similarity::{self, ScalarSimilarity};
+use functional_properties::similarity::ScalarSimilarity;
 use graph::{
     prelude::{GenericGraph, RandomizedDAG},
     traits::{MonopartiteGraph, WuPalmer, randomized_graphs::XorShift64},
@@ -15,11 +15,11 @@ fn bench_wu_palmer(c: &mut Criterion) {
     c.bench_function("wu_palmer_100", |b| {
         const NUMBER_OF_DAGS: usize = 10;
         let mut dags = Vec::with_capacity(NUMBER_OF_DAGS);
-        let mut xorshift = XorShift64::new(24537839457);
+        let mut xorshift = XorShift64::from(24537839457);
         for _ in 0..NUMBER_OF_DAGS {
-            let seed = xorshift.next();
-            let dag: GenericGraph<usize, SquareCSR2D<CSR2D<usize, usize, usize>>> =
-                RandomizedDAG::randomized_dag(seed, 100);
+            let seed = xorshift.next().unwrap();
+            let dag: GenericGraph<u64, SquareCSR2D<CSR2D<u64, u64, u64>>> =
+                RandomizedDAG::randomized_dag(seed, 15);
             dags.push(dag);
         }
         b.iter(|| {
