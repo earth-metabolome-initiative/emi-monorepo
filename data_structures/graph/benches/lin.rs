@@ -1,4 +1,4 @@
-//! Criterion benchmark to evaluate the performance of the 'wu-palmer' function.
+//! Criterion benchmark to evaluate the performance of the 'lin' function.
 
 use std::hint::black_box;
 
@@ -7,12 +7,12 @@ use criterion::{Criterion, criterion_group, criterion_main};
 use functional_properties::similarity::ScalarSimilarity;
 use graph::{
     prelude::{GenericGraph, RandomizedDAG},
-    traits::{MonopartiteGraph, WuPalmer, randomized_graphs::XorShift64},
+    traits::{Lin, MonopartiteGraph, randomized_graphs::XorShift64},
 };
 
-/// Benchmark for the `wu-palmer` function
-fn bench_wu_palmer(c: &mut Criterion) {
-    c.bench_function("wu_palmer_10", |b| {
+/// Benchmark for the `lin` function
+fn bench_lin(c: &mut Criterion) {
+    c.bench_function("lin_10", |b| {
         const NUMBER_OF_DAGS: usize = 10;
         let mut dags = Vec::with_capacity(NUMBER_OF_DAGS);
         let mut xorshift = XorShift64::from(24537839457);
@@ -25,11 +25,11 @@ fn bench_wu_palmer(c: &mut Criterion) {
         b.iter(|| {
             let mut total_similarity = 0.0;
             for dag in &dags {
-                let wu_palmer = dag.wu_palmer().unwrap();
-
+                let occurrences: Vec<usize> = vec![1; dag.number_of_nodes() as usize];
+                let lin = dag.lin(&occurrences).unwrap();
                 for src in black_box(dag.node_ids()) {
                     for dst in black_box(dag.node_ids()) {
-                        total_similarity += wu_palmer.similarity(black_box(&src), black_box(&dst));
+                        total_similarity += lin.similarity(black_box(&src), black_box(&dst))
                     }
                 }
             }
@@ -38,5 +38,5 @@ fn bench_wu_palmer(c: &mut Criterion) {
     });
 }
 
-criterion_group!(benches, bench_wu_palmer);
+criterion_group!(benches, bench_lin);
 criterion_main!(benches);

@@ -30,3 +30,7 @@ criterion.workspace = true
 [[bench]]
 name = "wu_palmer"
 harness = false
+
+[[bench]]
+name = "lin"
+harness = false
