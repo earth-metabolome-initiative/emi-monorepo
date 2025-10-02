@@ -19,3 +19,4 @@ pub mod safelock;
 pub mod vial_caps;
 pub mod volume_measuring_device;
 pub mod weighing_device;
+pub mod markers;

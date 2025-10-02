@@ -8,5 +8,6 @@ pub mod organisms;
 pub mod photographs;
 pub mod reagent_models;
 pub mod soils;
+pub mod markers;
 
 pub(crate) use compatibility_rules::init_compatibility_rules;
