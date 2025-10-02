@@ -33,4 +33,4 @@ pub trait SinkNodes: MonoplexMonopartiteGraph {
     }
 }
 
-impl<G: MonoplexMonopartiteGraph> SinkNodes for G {}
+impl<G: MonoplexMonopartiteGraph + ?Sized> SinkNodes for G {}

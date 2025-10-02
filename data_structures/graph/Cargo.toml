@@ -12,6 +12,7 @@ arbitrary = { workspace = true, optional = true }
 numeric_common_traits.workspace = true
 num-traits.workspace = true
 multi_ranged.workspace = true
+functional_properties.workspace = true
 
 [lints]
 workspace = true
@@ -22,3 +23,14 @@ std = ["alloc", "sorted_vec/std"]
 arbitrary = ["algebra/arbitrary", "dep:arbitrary"]
 alloc = ["sorted_vec/alloc"]
 serde = ["algebra/serde", "dep:serde"]
+
+[dev-dependencies]
+criterion.workspace = true
+
+[[bench]]
+name = "wu_palmer"
+harness = false
+
+[[bench]]
+name = "lin"
+harness = false

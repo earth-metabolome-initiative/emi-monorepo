@@ -27,5 +27,6 @@
 		"trackables",
 		"trybuild",
 		"yewdux"
-	]
+	],
+	"rust-analyzer.diagnostics.useRustcErrorCode": true
 }

@@ -117,3 +117,33 @@ impl BidirectionalVocabulary for usize {
         Some(*destination)
     }
 }
+
+impl Vocabulary for u64 {
+    type SourceSymbol = u64;
+    type DestinationSymbol = u64;
+    type Sources<'a> = core::ops::Range<u64>;
+    type Destinations<'a> = core::ops::Range<u64>;
+
+    fn convert(&self, source: &Self::SourceSymbol) -> Option<Self::DestinationSymbol> {
+        Some(*source)
+    }
+
+    #[allow(clippy::cast_possible_truncation)]
+    fn len(&self) -> usize {
+        *self as usize
+    }
+
+    fn sources(&self) -> Self::Sources<'_> {
+        0..*self
+    }
+
+    fn destinations(&self) -> Self::Destinations<'_> {
+        0..*self
+    }
+}
+
+impl BidirectionalVocabulary for u64 {
+    fn invert(&self, destination: &Self::DestinationSymbol) -> Option<Self::SourceSymbol> {
+        Some(*destination)
+    }
+}
