@@ -1,18 +1,11 @@
-//! Submodule implementing traits from `sql_constraints` crate for the
-//! [`CreateTable`](sqlparser::ast::CreateTable) struct from the `sqlparser`
-//! crate.
+//! Submodule implementing the [`TableLike`] trait for `sqlparser`'s
+//! [`CreateTable`](sqlparser::ast::CreateTable) struct.
 
-use sqlparser::ast::{CreateTable, Ident};
+use ::sqlparser::ast::{CreateTable, Ident};
 
-use crate::traits::{Constrainable, ConstrainableTable};
+use crate::traits::TableLike;
 
-impl Constrainable for CreateTable {
-    fn context_name(&self) -> String {
-        format!("`{}`", self.name)
-    }
-}
-
-impl ConstrainableTable for CreateTable {
+impl TableLike for CreateTable {
     fn table_name(&self) -> &str {
         let object_name_parts = &self.name.0;
         let last_object_name_parts = &object_name_parts[object_name_parts.len() - 1];

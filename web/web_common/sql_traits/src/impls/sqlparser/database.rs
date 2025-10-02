@@ -1,24 +1,22 @@
-//! Submodule providing the `SqlParserSchema` struct, which is used to provide
-//! a dynamic schema implementation for the [`sqlparser`](https://crates.io/crates/sqlparser) crate.
-
+//! Submodule implementing the [`DatabaseLike`] trait.
 use std::path::Path;
 
 use sqlparser::ast::{CreateTable, Statement};
 
-use crate::traits::Schema;
+use crate::traits::DatabaseLike;
 
 #[derive(Debug, Default)]
 /// Struct representing a SQL schema parsed using the `sqlparser` crate.
-pub struct SqlParserSchema {
+pub struct SqlParserDatabase {
     /// Vector of tables in the schema.
     tables: Vec<CreateTable>,
 }
 
-impl SqlParserSchema {
+impl SqlParserDatabase {
     /// Recursively visits a directory, parsing all `.sql` files found
     /// and integrating their SQL statements into the schema.
     pub fn from_directory(path: &Path) -> Result<Self, Box<dyn std::error::Error>> {
-        let mut schema = SqlParserSchema::default();
+        let mut schema = SqlParserDatabase::default();
 
         for entry in std::fs::read_dir(path)? {
             let entry = entry?;
@@ -28,7 +26,7 @@ impl SqlParserSchema {
             }
 
             if entry.path().is_dir() {
-                let sub_schema = SqlParserSchema::from_directory(&entry.path())?;
+                let sub_schema = SqlParserDatabase::from_directory(&entry.path())?;
                 schema.tables.extend(sub_schema.tables);
             }
         }
@@ -36,9 +34,10 @@ impl SqlParserSchema {
         Ok(schema)
     }
 
-    /// Creates a new `SqlParserSchema` by parsing SQL statements from a string.
+    /// Creates a new `SqlParserDatabase` by parsing SQL statements from a
+    /// string.
     pub fn from_sql(sql: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let mut schema = SqlParserSchema::default();
+        let mut schema = SqlParserDatabase::default();
         schema.parse_sql(sql)?;
         Ok(schema)
     }
@@ -57,15 +56,15 @@ impl SqlParserSchema {
     }
 }
 
-impl Schema for SqlParserSchema {
-    type TableType = sqlparser::ast::CreateTable;
-    type ColumnType = sqlparser::ast::ColumnDef;
+impl DatabaseLike for SqlParserDatabase {
+    type Table = CreateTable;
+    type Column = sqlparser::ast::ColumnDef;
 
-    fn tables(&self) -> impl Iterator<Item = &Self::TableType> {
+    fn tables(&self) -> impl Iterator<Item = &Self::Table> {
         self.tables.iter()
     }
 
-    fn columns(&self, table: &Self::TableType) -> impl Iterator<Item = Self::ColumnType> {
-        table.columns.iter().map(|col| col.clone())
+    fn columns(&self, table: &Self::Table) -> impl Iterator<Item = Self::Column> {
+        table.columns.clone().into_iter()
     }
 }

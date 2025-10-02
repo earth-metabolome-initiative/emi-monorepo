@@ -2,10 +2,11 @@
 //! that column names are lowercase.
 
 use common_traits::builder::Builder;
+use sql_traits::traits::{ColumnLike, TableLike};
 
 use crate::{
     error::ConstraintErrorInfo,
-    traits::{ColumnConstraint, ConstrainableColumn, Constrainer, Constraint, GenericConstrainer},
+    traits::{ColumnConstraint, Constrainer, GenericConstrainer},
 };
 
 /// Struct defining a constraint that enforces that column names are lowercase.
@@ -17,36 +18,46 @@ use crate::{
 ///
 /// ```rust
 /// use sql_constraints::prelude::*;
+/// use sqlparser::ast::{CreateTable, ColumnDef};
 ///
-/// let constrainer: GenericConstrainer = LowercaseColumnName.into();
+/// let constrainer: GenericConstrainer<CreateTable, ColumnDef> = LowercaseColumnName::default().into();
 ///
-/// let invalid_schema = SqlParserSchema::from_sql("CREATE TABLE mytable (Id INT);").unwrap();
+/// let invalid_schema = SqlParserDatabase::from_sql("CREATE TABLE mytable (Id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
-/// let valid_schema = SqlParserSchema::from_sql("CREATE TABLE mytable (id INT);").unwrap();
+/// let valid_schema = SqlParserDatabase::from_sql("CREATE TABLE mytable (id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 /// ```
-pub struct LowercaseColumnName;
+pub struct LowercaseColumnName<C>(std::marker::PhantomData<C>);
 
-impl From<LowercaseColumnName> for GenericConstrainer {
-    fn from(constraint: LowercaseColumnName) -> Self {
+impl<C> Default for LowercaseColumnName<C> {
+    fn default() -> Self {
+        Self(std::marker::PhantomData)
+    }
+}
+
+impl<C: ColumnLike + 'static, T: TableLike> From<LowercaseColumnName<C>>
+    for GenericConstrainer<T, C>
+{
+    fn from(constraint: LowercaseColumnName<C>) -> Self {
         let mut constrainer = GenericConstrainer::default();
         constrainer.register_column_constraint(Box::new(constraint));
         constrainer
     }
 }
 
-impl Constraint for LowercaseColumnName {
-    fn error_information(
+impl<C: ColumnLike> ColumnConstraint for LowercaseColumnName<C> {
+    type Column = C;
+    fn column_error_information(
         &self,
-        context: &dyn crate::traits::Constrainable,
-    ) -> Box<dyn crate::traits::ConstraintFailureInformation> {
+        column: &Self::Column,
+    ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         ConstraintErrorInfo::new()
             .constraint("LowercaseColumnName")
             .unwrap()
-            .object(context.context_name().to_owned())
+            .object(column.column_name().to_owned())
             .unwrap()
-            .message(format!("Column name '{}' is not lowercase", context.context_name()))
+            .message(format!("Column name '{}' is not lowercase", column.column_name()))
             .unwrap()
             .resolution("Rename the column to be all lowercase".to_string())
             .unwrap()
@@ -54,13 +65,12 @@ impl Constraint for LowercaseColumnName {
             .unwrap()
             .into()
     }
-}
-impl ColumnConstraint for LowercaseColumnName {
-    fn validate_column(&self, column: &dyn ConstrainableColumn) -> Result<(), crate::error::Error> {
+
+    fn validate_column(&self, column: &Self::Column) -> Result<(), crate::error::Error> {
         if column.column_name().chars().all(|c| !c.is_alphabetic() || c.is_lowercase()) {
             Ok(())
         } else {
-            Err(crate::error::Error::Column(self.error_information(column)))
+            Err(crate::error::Error::Column(self.column_error_information(column)))
         }
     }
 }

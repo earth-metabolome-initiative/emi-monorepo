@@ -2,10 +2,11 @@
 //! table names are lowercase.
 
 use common_traits::builder::Builder;
+use sql_traits::traits::{ColumnLike, TableLike};
 
 use crate::{
     error::ConstraintErrorInfo,
-    traits::{ConstrainableTable, Constrainer, Constraint, GenericConstrainer, TableConstraint},
+    traits::{Constrainer, GenericConstrainer, TableConstraint},
 };
 
 /// Struct defining a constraint that enforces that table names are lowercase.
@@ -17,36 +18,44 @@ use crate::{
 ///
 /// ```rust
 /// use sql_constraints::prelude::*;
+/// use sqlparser::ast::{CreateTable, ColumnDef};
 ///
-/// let constrainer: GenericConstrainer = LowercaseTableName.into();
+/// let constrainer: GenericConstrainer<CreateTable, ColumnDef> = LowercaseTableName::default().into();
 ///
-/// let invalid_schema = SqlParserSchema::from_sql("CREATE TABLE MyTable (id INT);").unwrap();
+/// let invalid_schema = SqlParserDatabase::from_sql("CREATE TABLE MyTable (id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
-/// let valid_schema = SqlParserSchema::from_sql("CREATE TABLE mytable (id INT);").unwrap();
+/// let valid_schema = SqlParserDatabase::from_sql("CREATE TABLE mytable (id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 /// ```
-pub struct LowercaseTableName;
+pub struct LowercaseTableName<T>(std::marker::PhantomData<T>);
 
-impl From<LowercaseTableName> for GenericConstrainer {
-    fn from(constraint: LowercaseTableName) -> Self {
+impl<T> Default for LowercaseTableName<T> {
+    fn default() -> Self {
+        Self(std::marker::PhantomData)
+    }
+}
+
+impl<T: TableLike + 'static, C: ColumnLike> From<LowercaseTableName<T>> for GenericConstrainer<T, C> {
+    fn from(constraint: LowercaseTableName<T>) -> Self {
         let mut constrainer = GenericConstrainer::default();
         constrainer.register_table_constraint(Box::new(constraint));
         constrainer
     }
 }
 
-impl Constraint for LowercaseTableName {
-    fn error_information(
+impl<T: TableLike> TableConstraint for LowercaseTableName<T> {
+    type Table = T;
+    fn table_error_information(
         &self,
-        context: &dyn crate::traits::Constrainable,
-    ) -> Box<dyn crate::traits::ConstraintFailureInformation> {
+        context: &Self::Table,
+    ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         ConstraintErrorInfo::new()
             .constraint("LowercaseTableName")
             .unwrap()
-            .object(context.context_name().to_owned())
+            .object(context.table_name().to_owned())
             .unwrap()
-            .message(format!("Table name '{}' is not lowercase", context.context_name()))
+            .message(format!("Table name '{}' is not lowercase", context.table_name()))
             .unwrap()
             .resolution("Rename the table to be all lowercase".to_string())
             .unwrap()
@@ -54,13 +63,12 @@ impl Constraint for LowercaseTableName {
             .unwrap()
             .into()
     }
-}
-impl TableConstraint for LowercaseTableName {
-    fn validate_table(&self, table: &dyn ConstrainableTable) -> Result<(), crate::error::Error> {
+
+    fn validate_table(&self, table: &Self::Table) -> Result<(), crate::error::Error> {
         if table.table_name().chars().all(|c| !c.is_alphabetic() || c.is_lowercase()) {
             Ok(())
         } else {
-            Err(crate::error::Error::Table(self.error_information(table)))
+            Err(crate::error::Error::Table(self.table_error_information(table)))
         }
     }
 }

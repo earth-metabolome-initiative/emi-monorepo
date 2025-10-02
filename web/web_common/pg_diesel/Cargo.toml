@@ -8,6 +8,7 @@ diesel = { workspace = true, features = ["postgres"] }
 cached = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
 pg_cached = { workspace = true }
+sql_traits.workspace = true
 
 [dev-dependencies]
 tokio.workspace = true
