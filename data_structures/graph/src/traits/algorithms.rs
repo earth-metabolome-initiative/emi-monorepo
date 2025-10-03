@@ -11,9 +11,11 @@ pub use sink_nodes::SinkNodes;
 pub mod simple_path;
 pub use simple_path::SimplePath;
 pub mod resnik;
-pub use resnik::{Resnik,ResnikResult};
+pub use resnik::{Resnik, ResnikResult};
 pub mod information_content;
-pub use information_content::{InformationContent, InformationContentResult, InformationContentError};
+pub use information_content::{
+    InformationContent, InformationContentError, InformationContentResult,
+};
 pub mod lin;
 pub use lin::{Lin, LinResult};
 pub mod singleton_nodes;
