@@ -99,8 +99,6 @@ pub enum TableName {
     PipetteModel,
     PipetteTipModel,
     Pipette,
-    PlacingProcedureTemplate,
-    PlacingProcedure,
     PositioningDeviceModel,
     PositioningDevice,
     PouringProcedureTemplate,
@@ -129,6 +127,8 @@ pub enum TableName {
     StorageProcedure,
     SupernatantProcedureTemplate,
     SupernatantProcedure,
+    TaggingProcedureTemplate,
+    TaggingProcedure,
     Taxon,
     TeamMember,
     TeamProject,
@@ -257,8 +257,6 @@ impl core::str::FromStr for TableName {
             "pipette_models" => Ok(TableName::PipetteModel),
             "pipette_tip_models" => Ok(TableName::PipetteTipModel),
             "pipettes" => Ok(TableName::Pipette),
-            "placing_procedure_templates" => Ok(TableName::PlacingProcedureTemplate),
-            "placing_procedures" => Ok(TableName::PlacingProcedure),
             "positioning_device_models" => Ok(TableName::PositioningDeviceModel),
             "positioning_devices" => Ok(TableName::PositioningDevice),
             "pouring_procedure_templates" => Ok(TableName::PouringProcedureTemplate),
@@ -287,6 +285,8 @@ impl core::str::FromStr for TableName {
             "storage_procedures" => Ok(TableName::StorageProcedure),
             "supernatant_procedure_templates" => Ok(TableName::SupernatantProcedureTemplate),
             "supernatant_procedures" => Ok(TableName::SupernatantProcedure),
+            "tagging_procedure_templates" => Ok(TableName::TaggingProcedureTemplate),
+            "tagging_procedures" => Ok(TableName::TaggingProcedure),
             "taxa" => Ok(TableName::Taxon),
             "team_members" => Ok(TableName::TeamMember),
             "team_projects" => Ok(TableName::TeamProject),
@@ -464,10 +464,6 @@ impl core::fmt::Display for TableName {
             TableName::PipetteModel => write!(f, "pipette_models"),
             TableName::PipetteTipModel => write!(f, "pipette_tip_models"),
             TableName::Pipette => write!(f, "pipettes"),
-            TableName::PlacingProcedureTemplate => {
-                write!(f, "placing_procedure_templates")
-            }
-            TableName::PlacingProcedure => write!(f, "placing_procedures"),
             TableName::PositioningDeviceModel => write!(f, "positioning_device_models"),
             TableName::PositioningDevice => write!(f, "positioning_devices"),
             TableName::PouringProcedureTemplate => {
@@ -504,6 +500,10 @@ impl core::fmt::Display for TableName {
                 write!(f, "supernatant_procedure_templates")
             }
             TableName::SupernatantProcedure => write!(f, "supernatant_procedures"),
+            TableName::TaggingProcedureTemplate => {
+                write!(f, "tagging_procedure_templates")
+            }
+            TableName::TaggingProcedure => write!(f, "tagging_procedures"),
             TableName::Taxon => write!(f, "taxa"),
             TableName::TeamMember => write!(f, "team_members"),
             TableName::TeamProject => write!(f, "team_projects"),

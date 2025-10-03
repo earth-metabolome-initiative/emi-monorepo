@@ -99,8 +99,6 @@ pub enum TablePrimaryKey {
     PipetteModel(i32),
     PipetteTipModel(i32),
     Pipette(::rosetta_uuid::Uuid),
-    PlacingProcedureTemplate(i32),
-    PlacingProcedure(::rosetta_uuid::Uuid),
     PositioningDeviceModel(i32),
     PositioningDevice(::rosetta_uuid::Uuid),
     PouringProcedureTemplate(i32),
@@ -129,6 +127,8 @@ pub enum TablePrimaryKey {
     StorageProcedure(::rosetta_uuid::Uuid),
     SupernatantProcedureTemplate(i32),
     SupernatantProcedure(::rosetta_uuid::Uuid),
+    TaggingProcedureTemplate(i32),
+    TaggingProcedure(::rosetta_uuid::Uuid),
     Taxon(i32),
     TeamMember((i32, i32)),
     TeamProject((i32, i32)),
@@ -428,12 +428,6 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
                 crate::codegen::tables::table_names::TableName::PipetteTipModel
             }
             TablePrimaryKey::Pipette(_) => crate::codegen::tables::table_names::TableName::Pipette,
-            TablePrimaryKey::PlacingProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::PlacingProcedureTemplate
-            }
-            TablePrimaryKey::PlacingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::PlacingProcedure
-            }
             TablePrimaryKey::PositioningDeviceModel(_) => {
                 crate::codegen::tables::table_names::TableName::PositioningDeviceModel
             }
@@ -505,6 +499,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::SupernatantProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::SupernatantProcedure
+            }
+            TablePrimaryKey::TaggingProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::TaggingProcedureTemplate
+            }
+            TablePrimaryKey::TaggingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::TaggingProcedure
             }
             TablePrimaryKey::Taxon(_) => crate::codegen::tables::table_names::TableName::Taxon,
             TablePrimaryKey::TeamMember(_) => {

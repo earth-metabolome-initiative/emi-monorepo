@@ -294,12 +294,6 @@ where
     crate::codegen::structs_codegen::tables::pipettes::Pipette: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure: web_common_traits::prelude::BoundedRead<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -382,6 +376,12 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::tagging_procedure_templates::TaggingProcedureTemplate: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::tagging_procedures::TaggingProcedure: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::taxa::Taxon: web_common_traits::prelude::BoundedRead<
@@ -1232,22 +1232,6 @@ where
                     )
                     .map(super::Rows::from)
             }
-            crate::codegen::tables::table_names::TableName::PlacingProcedureTemplate => {
-                crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
-            crate::codegen::tables::table_names::TableName::PlacingProcedure => {
-                crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure::bounded_read(
-                        offset,
-                        limit,
-                        conn,
-                    )
-                    .map(super::Rows::from)
-            }
             crate::codegen::tables::table_names::TableName::PositioningDeviceModel => {
                 crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel::bounded_read(
                         offset,
@@ -1466,6 +1450,22 @@ where
             }
             crate::codegen::tables::table_names::TableName::SupernatantProcedure => {
                 crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::TaggingProcedureTemplate => {
+                crate::codegen::structs_codegen::tables::tagging_procedure_templates::TaggingProcedureTemplate::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::TaggingProcedure => {
+                crate::codegen::structs_codegen::tables::tagging_procedures::TaggingProcedure::bounded_read(
                         offset,
                         limit,
                         conn,

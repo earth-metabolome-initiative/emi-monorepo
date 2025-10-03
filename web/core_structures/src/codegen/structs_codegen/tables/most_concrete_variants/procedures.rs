@@ -21,29 +21,29 @@ pub use insert_error::ProcedureInsertErrorDAG;
 /// v9@{shape: rect, label: "harvesting_procedures"}
 /// v10@{shape: rect, label: "packaging_procedures"}
 /// v11@{shape: rect, label: "photograph_procedures"}
-/// v12@{shape: rect, label: "placing_procedures"}
-/// v13@{shape: rect, label: "pouring_procedures"}
-/// v14@{shape: rect, label: "procedures"}
-/// v15@{shape: rect, label: "storage_procedures"}
-/// v16@{shape: rect, label: "supernatant_procedures"}
+/// v12@{shape: rect, label: "pouring_procedures"}
+/// v13@{shape: rect, label: "procedures"}
+/// v14@{shape: rect, label: "storage_procedures"}
+/// v15@{shape: rect, label: "supernatant_procedures"}
+/// v16@{shape: rect, label: "tagging_procedures"}
 /// v17@{shape: rect, label: "weighing_procedures"}
-/// v0 --->|"`extends`"| v14
-/// v1 --->|"`extends`"| v14
-/// v2 --->|"`extends`"| v14
-/// v3 --->|"`extends`"| v14
-/// v4 --->|"`extends`"| v14
-/// v5 --->|"`extends`"| v14
-/// v6 --->|"`extends`"| v14
-/// v7 --->|"`extends`"| v14
-/// v8 --->|"`extends`"| v14
-/// v9 --->|"`extends`"| v14
-/// v10 --->|"`extends`"| v14
-/// v11 --->|"`extends`"| v14
-/// v12 --->|"`extends`"| v8
-/// v13 --->|"`extends`"| v14
-/// v15 --->|"`extends`"| v14
-/// v16 --->|"`extends`"| v14
-/// v17 --->|"`extends`"| v14
+/// v0 --->|"`extends`"| v13
+/// v1 --->|"`extends`"| v13
+/// v2 --->|"`extends`"| v13
+/// v3 --->|"`extends`"| v13
+/// v4 --->|"`extends`"| v13
+/// v5 --->|"`extends`"| v13
+/// v6 --->|"`extends`"| v13
+/// v7 --->|"`extends`"| v13
+/// v8 --->|"`extends`"| v13
+/// v9 --->|"`extends`"| v13
+/// v10 --->|"`extends`"| v13
+/// v11 --->|"`extends`"| v13
+/// v12 --->|"`extends`"| v13
+/// v14 --->|"`extends`"| v13
+/// v15 --->|"`extends`"| v13
+/// v16 --->|"`extends`"| v13
+/// v17 --->|"`extends`"| v13
 /// ```
 pub enum ProcedureDAG {
     /// Variant representing the `aliquoting_procedures` table.
@@ -92,8 +92,6 @@ pub enum ProcedureDAG {
     PhotographProcedure(
         crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure,
     ),
-    /// Variant representing the `placing_procedures` table.
-    PlacingProcedure(crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure),
     /// Variant representing the `pouring_procedures` table.
     PouringProcedure(crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure),
     /// Variant representing the `procedures` table.
@@ -104,6 +102,8 @@ pub enum ProcedureDAG {
     SupernatantProcedure(
         crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
     ),
+    /// Variant representing the `tagging_procedures` table.
+    TaggingProcedure(crate::codegen::structs_codegen::tables::tagging_procedures::TaggingProcedure),
     /// Variant representing the `weighing_procedures` table.
     WeighingProcedure(
         crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure,
@@ -343,25 +343,6 @@ impl From<ProcedureDAG>
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure>
-    for ProcedureDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure,
-    ) -> Self {
-        ProcedureDAG::PlacingProcedure(value)
-    }
-}
-impl From<ProcedureDAG>
-    for Option<crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure>
-{
-    fn from(value: ProcedureDAG) -> Self {
-        match value {
-            ProcedureDAG::PlacingProcedure(v) => Some(v),
-            _ => None,
-        }
-    }
-}
 impl From<crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure>
     for ProcedureDAG
 {
@@ -434,6 +415,25 @@ impl From<ProcedureDAG>
         }
     }
 }
+impl From<crate::codegen::structs_codegen::tables::tagging_procedures::TaggingProcedure>
+    for ProcedureDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::tagging_procedures::TaggingProcedure,
+    ) -> Self {
+        ProcedureDAG::TaggingProcedure(value)
+    }
+}
+impl From<ProcedureDAG>
+    for Option<crate::codegen::structs_codegen::tables::tagging_procedures::TaggingProcedure>
+{
+    fn from(value: ProcedureDAG) -> Self {
+        match value {
+            ProcedureDAG::TaggingProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure>
     for ProcedureDAG
 {
@@ -474,11 +474,11 @@ impl web_common_traits::database::PrimaryKeyLike for ProcedureDAG {
             Self::HarvestingProcedure(variant) => variant.primary_key(),
             Self::PackagingProcedure(variant) => variant.primary_key(),
             Self::PhotographProcedure(variant) => variant.primary_key(),
-            Self::PlacingProcedure(variant) => variant.primary_key(),
             Self::PouringProcedure(variant) => variant.primary_key(),
             Self::Procedure(variant) => variant.primary_key(),
             Self::StorageProcedure(variant) => variant.primary_key(),
             Self::SupernatantProcedure(variant) => variant.primary_key(),
+            Self::TaggingProcedure(variant) => variant.primary_key(),
             Self::WeighingProcedure(variant) => variant.primary_key(),
         }
     }
@@ -510,8 +510,6 @@ where
         web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::photograph_procedures::PhotographProcedure:
         web_common_traits::database::Read<C>,
-    crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure:
-        web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure:
         web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::procedures::Procedure:
@@ -519,6 +517,8 @@ where
     crate::codegen::structs_codegen::tables::storage_procedures::StorageProcedure:
         web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure:
+        web_common_traits::database::Read<C>,
+    crate::codegen::structs_codegen::tables::tagging_procedures::TaggingProcedure:
         web_common_traits::database::Read<C>,
     crate::codegen::structs_codegen::tables::weighing_procedures::WeighingProcedure:
         web_common_traits::database::Read<C>,
@@ -599,12 +599,6 @@ where
                     >>::read(*self.id(), conn)?
                         .into()
                 }
-                "placing_procedures" => {
-                    <crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
                 "pouring_procedures" => {
                     <crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure as web_common_traits::database::Read<
                         C,
@@ -620,6 +614,12 @@ where
                 }
                 "supernatant_procedures" => {
                     <crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "tagging_procedures" => {
+                    <crate::codegen::structs_codegen::tables::tagging_procedures::TaggingProcedure as web_common_traits::database::Read<
                         C,
                     >>::read(*self.id(), conn)?
                         .into()

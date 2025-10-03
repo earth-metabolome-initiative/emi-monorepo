@@ -5,7 +5,8 @@ use core_structures::{User, tables::insertables::InsertableProcedureTemplateAsse
 use diesel::PgConnection;
 
 use crate::{
-    asset_models::markers::marker_arrow_model, procedure_template_asset_models::default_pmt::default_pmt,
+    asset_models::markers::marker_arrow_model,
+    procedure_template_asset_models::default_pmt::default_pmt,
 };
 
 /// Returns a partial builder for a marker arrow.

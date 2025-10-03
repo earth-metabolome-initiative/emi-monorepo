@@ -99,8 +99,6 @@ mod physical_assets;
 mod pipette_models;
 mod pipette_tip_models;
 mod pipettes;
-mod placing_procedure_templates;
-mod placing_procedures;
 mod positioning_device_models;
 mod positioning_devices;
 mod pouring_procedure_templates;
@@ -130,6 +128,8 @@ mod storage_procedures;
 mod supernatant_procedure_templates;
 mod supernatant_procedures;
 mod tabular;
+mod tagging_procedure_templates;
+mod tagging_procedures;
 mod taxa;
 mod team_members;
 mod team_projects;
@@ -535,16 +535,6 @@ pub enum Rows {
         Vec<crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel>,
     ),
     Pipette(Vec<crate::codegen::structs_codegen::tables::pipettes::Pipette>),
-    PlacingProcedureTemplate(
-        Vec<
-            crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate,
-        >,
-    ),
-    PlacingProcedure(
-        Vec<
-            crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure,
-        >,
-    ),
     PositioningDeviceModel(
         Vec<
             crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
@@ -633,6 +623,16 @@ pub enum Rows {
     SupernatantProcedure(
         Vec<
             crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
+        >,
+    ),
+    TaggingProcedureTemplate(
+        Vec<
+            crate::codegen::structs_codegen::tables::tagging_procedure_templates::TaggingProcedureTemplate,
+        >,
+    ),
+    TaggingProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::tagging_procedures::TaggingProcedure,
         >,
     ),
     Taxon(Vec<crate::codegen::structs_codegen::tables::taxa::Taxon>),
@@ -1389,20 +1389,6 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::PlacingProcedureTemplate(placing_procedure_templates) => {
-                placing_procedure_templates
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
-            Rows::PlacingProcedure(placing_procedures) => {
-                placing_procedures
-                    .iter()
-                    .filter_map(|entry| entry.upsert(conn).transpose())
-                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
-                    .into()
-            }
             Rows::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models
                     .iter()
@@ -1594,6 +1580,20 @@ impl Rows {
             }
             Rows::SupernatantProcedure(supernatant_procedures) => {
                 supernatant_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::TaggingProcedureTemplate(tagging_procedure_templates) => {
+                tagging_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::TaggingProcedure(tagging_procedures) => {
+                tagging_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1925,10 +1925,6 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::PipetteModel(pipette_models) => pipette_models.primary_keys(),
             Rows::PipetteTipModel(pipette_tip_models) => pipette_tip_models.primary_keys(),
             Rows::Pipette(pipettes) => pipettes.primary_keys(),
-            Rows::PlacingProcedureTemplate(placing_procedure_templates) => {
-                placing_procedure_templates.primary_keys()
-            }
-            Rows::PlacingProcedure(placing_procedures) => placing_procedures.primary_keys(),
             Rows::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.primary_keys()
             }
@@ -1969,6 +1965,10 @@ impl web_common_traits::prelude::Rows for Rows {
             Rows::SupernatantProcedure(supernatant_procedures) => {
                 supernatant_procedures.primary_keys()
             }
+            Rows::TaggingProcedureTemplate(tagging_procedure_templates) => {
+                tagging_procedure_templates.primary_keys()
+            }
+            Rows::TaggingProcedure(tagging_procedures) => tagging_procedures.primary_keys(),
             Rows::Taxon(taxa) => taxa.primary_keys(),
             Rows::TeamMember(team_members) => team_members.primary_keys(),
             Rows::TeamProject(team_projects) => team_projects.primary_keys(),

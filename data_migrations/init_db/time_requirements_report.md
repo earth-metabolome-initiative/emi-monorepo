@@ -1,56 +1,56 @@
 # Time Report for Test Init DB
 
-The total time spent on all tasks was 5 minutes.
-The slowest task was `Init DB` which took 5 minutes, 25 seconds, 977 ms, 511 µs and 461 ns (98.78% of all time).
+The total time spent on all tasks was 6 minutes.
+The slowest task was `Init DB` which took 6 minutes, 49 ms, 705 µs and 624 ns (99.17% of all time).
 
-| name              | time                                             | percentage | comment |
-|-------------------|--------------------------------------------------|------------|---------|
-| Booting up Docker | 3 seconds, 123 ms, 162 µs and 240 ns             | 0.91%      |         |
-| Init DB           | 5 minutes, 25 seconds, 977 ms, 511 µs and 461 ns | 98.78%     |         |
+| name              | time                                 | percentage | comment |
+|-------------------|--------------------------------------|------------|---------|
+| Booting up Docker | 3 seconds, 281 ms, 463 µs and 786 ns | 0.83%      |         |
+| Init DB           | 6 minutes, 49 ms, 705 µs and 624 ns  | 99.17%     |         |
 
 ## Time Report for Init DB
 
-The total time spent on all tasks was 5 minutes.
-The slowest task was `Init DB Transaction` which took 5 minutes, 25 seconds, 977 ms, 308 µs and 976 ns (100.00% of all time).
+The total time spent on all tasks was 6 minutes.
+The slowest task was `Init DB Transaction` which took 6 minutes, 49 ms, 573 µs and 221 ns (100.00% of all time).
 
-| name                | time                                             | percentage | comment |
-|---------------------|--------------------------------------------------|------------|---------|
-| Retrieve CSVs       | 202 µs and 485 ns                                | 0.00%      |         |
-| Init DB Transaction | 5 minutes, 25 seconds, 977 ms, 308 µs and 976 ns | 100.00%    |         |
+| name                | time                                | percentage | comment |
+|---------------------|-------------------------------------|------------|---------|
+| Retrieve CSVs       | 132 µs and 403 ns                   | 0.00%      |         |
+| Init DB Transaction | 6 minutes, 49 ms, 573 µs and 221 ns | 100.00%    |         |
 
 ### Time Report for Init DB Transaction
 
-The total time spent on all tasks was 5 minutes.
-The slowest task was `Consistency Constraint Checks` which took 5 minutes, 19 seconds, 700 ms, 981 µs and 635 ns (98.15% of all time).
+The total time spent on all tasks was 6 minutes.
+The slowest task was `Consistency Constraint Checks` which took 5 minutes, 53 seconds, 652 ms, 815 µs and 436 ns (98.06% of all time).
 
 | name                          | time                                             | percentage | comment |
 |-------------------------------|--------------------------------------------------|------------|---------|
-| Initialize CSVs               | 5 seconds, 617 ms, 22 µs and 299 ns              | 1.54%      |         |
-| Initialize Migrations         | 659 ms, 305 µs and 42 ns                         | 0.00%      |         |
-| Consistency Constraint Checks | 5 minutes, 19 seconds, 700 ms, 981 µs and 635 ns | 98.15%     |         |
+| Initialize CSVs               | 5 seconds, 713 ms, 965 µs and 895 ns             | 1.39%      |         |
+| Initialize Migrations         | 682 ms, 791 µs and 890 ns                        | 0.00%      |         |
+| Consistency Constraint Checks | 5 minutes, 53 seconds, 652 ms, 815 µs and 436 ns | 98.06%     |         |
 
 #### Time Report for Consistency Constraint Checks
 
 The total time spent on all tasks was 5 minutes.
-The slowest task was `Procedure and procedure template alignment` which took 5 minutes, 10 seconds, 788 ms, 941 µs and 753 ns (97.18% of all time).
+The slowest task was `Procedure and procedure template alignment` which took 5 minutes, 44 seconds, 813 ms, 515 µs and 64 ns (97.45% of all time).
 
-| name                                               | time                                             | percentage | comment |
-|----------------------------------------------------|--------------------------------------------------|------------|---------|
-| Procedure and procedure template alignment         | 5 minutes, 10 seconds, 788 ms, 941 µs and 753 ns | 97.18%     |         |
-| Check constraints in schema 'public'               | 7 seconds, 902 ms, 381 µs and 396 ns             | 2.19%      |         |
-| Procedure and procedure template check constraints | 1 second, 9 ms, 658 µs and 486 ns                | 0.31%      |         |
+| name                                               | time                                            | percentage | comment |
+|----------------------------------------------------|-------------------------------------------------|------------|---------|
+| Procedure and procedure template alignment         | 5 minutes, 44 seconds, 813 ms, 515 µs and 64 ns | 97.45%     |         |
+| Check constraints in schema 'public'               | 8 seconds, 246 ms, 247 µs and 264 ns            | 2.27%      |         |
+| Procedure and procedure template check constraints | 593 ms, 53 µs and 108 ns                        | 0.00%      |         |
 
 ##### Time Report for Check constraints in schema 'public'
 
 The total time spent on all tasks was now.
-The slowest task was `Compatible foreign type constraints` which took 7 seconds, 787 ms, 819 µs and 588 ns (100.00% of all time).
+The slowest task was `Compatible foreign type constraints` which took 8 seconds, 143 ms, 594 µs and 150 ns (100.00% of all time).
 
 | name                                     | time                                 | percentage | comment |
 |------------------------------------------|--------------------------------------|------------|---------|
-| Compatible foreign type constraints      | 7 seconds, 787 ms, 819 µs and 588 ns | 100.00%    |         |
-| Lowercase column and table names         | 82 ms, 289 µs and 895 ns             | 0.00%      |         |
-| Standard column names and types          | 17 ms, 972 µs and 424 ns             | 0.00%      |         |
-| Not-null constraints on standard columns | 11 ms, 286 µs and 310 ns             | 0.00%      |         |
-| Word deprecation constraints             | 3 ms, 13 µs and 179 ns               | 0.00%      |         |
+| Compatible foreign type constraints      | 8 seconds, 143 ms, 594 µs and 150 ns | 100.00%    |         |
+| Lowercase column and table names         | 85 ms, 820 µs and 389 ns             | 0.00%      |         |
+| Standard column names and types          | 9 ms, 321 µs and 129 ns              | 0.00%      |         |
+| Not-null constraints on standard columns | 6 ms, 62 µs and 373 ns               | 0.00%      |         |
+| Word deprecation constraints             | 1 ms, 449 µs and 223 ns              | 0.00%      |         |
 
 ![Plot](time_requirements_report.png)

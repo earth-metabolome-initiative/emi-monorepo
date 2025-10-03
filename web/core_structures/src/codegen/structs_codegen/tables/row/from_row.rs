@@ -275,12 +275,6 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
                 crate::codegen::tables::rows::Rows::from(pipette_tip_models)
             }
             super::Row::Pipette(pipettes) => crate::codegen::tables::rows::Rows::from(pipettes),
-            super::Row::PlacingProcedureTemplate(placing_procedure_templates) => {
-                crate::codegen::tables::rows::Rows::from(placing_procedure_templates)
-            }
-            super::Row::PlacingProcedure(placing_procedures) => {
-                crate::codegen::tables::rows::Rows::from(placing_procedures)
-            }
             super::Row::PositioningDeviceModel(positioning_device_models) => {
                 crate::codegen::tables::rows::Rows::from(positioning_device_models)
             }
@@ -350,6 +344,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::SupernatantProcedure(supernatant_procedures) => {
                 crate::codegen::tables::rows::Rows::from(supernatant_procedures)
+            }
+            super::Row::TaggingProcedureTemplate(tagging_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(tagging_procedure_templates)
+            }
+            super::Row::TaggingProcedure(tagging_procedures) => {
+                crate::codegen::tables::rows::Rows::from(tagging_procedures)
             }
             super::Row::Taxon(taxa) => crate::codegen::tables::rows::Rows::from(taxa),
             super::Row::TeamMember(team_members) => {

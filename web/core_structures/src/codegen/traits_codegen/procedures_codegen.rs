@@ -10,11 +10,11 @@ mod geolocation_procedures;
 mod harvesting_procedures;
 mod packaging_procedures;
 mod photograph_procedures;
-mod placing_procedures;
 mod pouring_procedures;
 mod procedures;
 mod storage_procedures;
 mod supernatant_procedures;
+mod tagging_procedures;
 mod weighing_procedures;
 impl web_common_traits::prelude::ProcedureLike
     for crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureDAG
@@ -70,9 +70,6 @@ impl web_common_traits::prelude::ProcedureLike
             Self::PhotographProcedure(procedure) => {
                 procedure.procedure_template_asset_models_and_procedure_assets()
             }
-            Self::PlacingProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
-            }
             Self::PouringProcedure(procedure) => {
                 procedure.procedure_template_asset_models_and_procedure_assets()
             }
@@ -83,6 +80,9 @@ impl web_common_traits::prelude::ProcedureLike
                 procedure.procedure_template_asset_models_and_procedure_assets()
             }
             Self::SupernatantProcedure(procedure) => {
+                procedure.procedure_template_asset_models_and_procedure_assets()
+            }
+            Self::TaggingProcedure(procedure) => {
                 procedure.procedure_template_asset_models_and_procedure_assets()
             }
             Self::WeighingProcedure(procedure) => {
@@ -183,12 +183,6 @@ impl web_common_traits::prelude::ProcedureBuilderLike
                     ),
                 ) => builder.complete_with(parents, template, template_graph)?.into(),
                 (
-                    Self::PlacingProcedure(builder),
-                    crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG::PlacingProcedureTemplate(
-                        template,
-                    ),
-                ) => builder.complete_with(parents, template, template_graph)?.into(),
-                (
                     Self::PouringProcedure(builder),
                     crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG::PouringProcedureTemplate(
                         template,
@@ -209,6 +203,12 @@ impl web_common_traits::prelude::ProcedureBuilderLike
                 (
                     Self::SupernatantProcedure(builder),
                     crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG::SupernatantProcedureTemplate(
+                        template,
+                    ),
+                ) => builder.complete_with(parents, template, template_graph)?.into(),
+                (
+                    Self::TaggingProcedure(builder),
+                    crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG::TaggingProcedureTemplate(
                         template,
                     ),
                 ) => builder.complete_with(parents, template, template_graph)?.into(),

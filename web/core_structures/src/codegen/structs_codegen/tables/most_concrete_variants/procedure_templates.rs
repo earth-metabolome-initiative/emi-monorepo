@@ -22,29 +22,29 @@ pub use insert_error::ProcedureTemplateInsertErrorDAG;
 /// v9@{shape: rect, label: "harvesting_procedure_templates"}
 /// v10@{shape: rect, label: "packaging_procedure_templates"}
 /// v11@{shape: rect, label: "photograph_procedure_templates"}
-/// v12@{shape: rect, label: "placing_procedure_templates"}
-/// v13@{shape: rect, label: "pouring_procedure_templates"}
-/// v14@{shape: rect, label: "procedure_templates"}
-/// v15@{shape: rect, label: "storage_procedure_templates"}
-/// v16@{shape: rect, label: "supernatant_procedure_templates"}
+/// v12@{shape: rect, label: "pouring_procedure_templates"}
+/// v13@{shape: rect, label: "procedure_templates"}
+/// v14@{shape: rect, label: "storage_procedure_templates"}
+/// v15@{shape: rect, label: "supernatant_procedure_templates"}
+/// v16@{shape: rect, label: "tagging_procedure_templates"}
 /// v17@{shape: rect, label: "weighing_procedure_templates"}
-/// v0 --->|"`extends`"| v14
-/// v1 --->|"`extends`"| v14
-/// v2 --->|"`extends`"| v14
-/// v3 --->|"`extends`"| v14
-/// v4 --->|"`extends`"| v14
-/// v5 --->|"`extends`"| v14
-/// v6 --->|"`extends`"| v14
-/// v7 --->|"`extends`"| v14
-/// v8 --->|"`extends`"| v14
-/// v9 --->|"`extends`"| v14
-/// v10 --->|"`extends`"| v14
-/// v11 --->|"`extends`"| v14
-/// v12 --->|"`extends`"| v8
-/// v13 --->|"`extends`"| v14
-/// v15 --->|"`extends`"| v14
-/// v16 --->|"`extends`"| v14
-/// v17 --->|"`extends`"| v14
+/// v0 --->|"`extends`"| v13
+/// v1 --->|"`extends`"| v13
+/// v2 --->|"`extends`"| v13
+/// v3 --->|"`extends`"| v13
+/// v4 --->|"`extends`"| v13
+/// v5 --->|"`extends`"| v13
+/// v6 --->|"`extends`"| v13
+/// v7 --->|"`extends`"| v13
+/// v8 --->|"`extends`"| v13
+/// v9 --->|"`extends`"| v13
+/// v10 --->|"`extends`"| v13
+/// v11 --->|"`extends`"| v13
+/// v12 --->|"`extends`"| v13
+/// v14 --->|"`extends`"| v13
+/// v15 --->|"`extends`"| v13
+/// v16 --->|"`extends`"| v13
+/// v17 --->|"`extends`"| v13
 /// ```
 pub enum ProcedureTemplateDAG {
     ///Variant representing the `aliquoting_procedure_templates` table.
@@ -95,10 +95,6 @@ pub enum ProcedureTemplateDAG {
     PhotographProcedureTemplate(
         crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate,
     ),
-    ///Variant representing the `placing_procedure_templates` table.
-    PlacingProcedureTemplate(
-        crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate,
-    ),
     ///Variant representing the `pouring_procedure_templates` table.
     PouringProcedureTemplate(
         crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
@@ -114,6 +110,10 @@ pub enum ProcedureTemplateDAG {
     ///Variant representing the `supernatant_procedure_templates` table.
     SupernatantProcedureTemplate(
         crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
+    ),
+    ///Variant representing the `tagging_procedure_templates` table.
+    TaggingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::tagging_procedure_templates::TaggingProcedureTemplate,
     ),
     ///Variant representing the `weighing_procedure_templates` table.
     WeighingProcedureTemplate(
@@ -361,26 +361,6 @@ for Option<
     }
 }
 impl From<
-    crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate,
-> for ProcedureTemplateDAG {
-    fn from(
-        value: crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate,
-    ) -> Self {
-        ProcedureTemplateDAG::PlacingProcedureTemplate(value)
-    }
-}
-impl From<ProcedureTemplateDAG>
-for Option<
-    crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate,
-> {
-    fn from(value: ProcedureTemplateDAG) -> Self {
-        match value {
-            ProcedureTemplateDAG::PlacingProcedureTemplate(v) => Some(v),
-            _ => None,
-        }
-    }
-}
-impl From<
     crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
 > for ProcedureTemplateDAG {
     fn from(
@@ -460,6 +440,26 @@ for Option<
     }
 }
 impl From<
+    crate::codegen::structs_codegen::tables::tagging_procedure_templates::TaggingProcedureTemplate,
+> for ProcedureTemplateDAG {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::tagging_procedure_templates::TaggingProcedureTemplate,
+    ) -> Self {
+        ProcedureTemplateDAG::TaggingProcedureTemplate(value)
+    }
+}
+impl From<ProcedureTemplateDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::tagging_procedure_templates::TaggingProcedureTemplate,
+> {
+    fn from(value: ProcedureTemplateDAG) -> Self {
+        match value {
+            ProcedureTemplateDAG::TaggingProcedureTemplate(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<
     crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate,
 > for ProcedureTemplateDAG {
     fn from(
@@ -500,11 +500,11 @@ impl web_common_traits::database::PrimaryKeyLike for ProcedureTemplateDAG {
             Self::HarvestingProcedureTemplate(variant) => variant.primary_key(),
             Self::PackagingProcedureTemplate(variant) => variant.primary_key(),
             Self::PhotographProcedureTemplate(variant) => variant.primary_key(),
-            Self::PlacingProcedureTemplate(variant) => variant.primary_key(),
             Self::PouringProcedureTemplate(variant) => variant.primary_key(),
             Self::ProcedureTemplate(variant) => variant.primary_key(),
             Self::StorageProcedureTemplate(variant) => variant.primary_key(),
             Self::SupernatantProcedureTemplate(variant) => variant.primary_key(),
+            Self::TaggingProcedureTemplate(variant) => variant.primary_key(),
             Self::WeighingProcedureTemplate(variant) => variant.primary_key(),
         }
     }
@@ -548,9 +548,6 @@ where
     crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
@@ -561,6 +558,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::tagging_procedure_templates::TaggingProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate: web_common_traits::database::Read<
@@ -646,12 +646,6 @@ where
                     >>::read(*self.id(), conn)?
                         .into()
                 }
-                "placing_procedure_templates" => {
-                    <crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate as web_common_traits::database::Read<
-                        C,
-                    >>::read(*self.id(), conn)?
-                        .into()
-                }
                 "pouring_procedure_templates" => {
                     <crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate as web_common_traits::database::Read<
                         C,
@@ -667,6 +661,12 @@ where
                 }
                 "supernatant_procedure_templates" => {
                     <crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "tagging_procedure_templates" => {
+                    <crate::codegen::structs_codegen::tables::tagging_procedure_templates::TaggingProcedureTemplate as web_common_traits::database::Read<
                         C,
                     >>::read(*self.id(), conn)?
                         .into()

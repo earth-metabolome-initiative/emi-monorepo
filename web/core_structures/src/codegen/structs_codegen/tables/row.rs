@@ -97,8 +97,6 @@ mod physical_assets;
 mod pipette_models;
 mod pipette_tip_models;
 mod pipettes;
-mod placing_procedure_templates;
-mod placing_procedures;
 mod positioning_device_models;
 mod positioning_devices;
 mod pouring_procedure_templates;
@@ -129,6 +127,8 @@ mod storage_procedures;
 mod supernatant_procedure_templates;
 mod supernatant_procedures;
 mod tabular;
+mod tagging_procedure_templates;
+mod tagging_procedures;
 mod taxa;
 mod team_members;
 mod team_projects;
@@ -394,12 +394,6 @@ pub enum Row {
         crate::codegen::structs_codegen::tables::pipette_tip_models::PipetteTipModel,
     ),
     Pipette(crate::codegen::structs_codegen::tables::pipettes::Pipette),
-    PlacingProcedureTemplate(
-        crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate,
-    ),
-    PlacingProcedure(
-        crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure,
-    ),
     PositioningDeviceModel(
         crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel,
     ),
@@ -453,6 +447,12 @@ pub enum Row {
     ),
     SupernatantProcedure(
         crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure,
+    ),
+    TaggingProcedureTemplate(
+        crate::codegen::structs_codegen::tables::tagging_procedure_templates::TaggingProcedureTemplate,
+    ),
+    TaggingProcedure(
+        crate::codegen::structs_codegen::tables::tagging_procedures::TaggingProcedure,
     ),
     Taxon(crate::codegen::structs_codegen::tables::taxa::Taxon),
     TeamMember(crate::codegen::structs_codegen::tables::team_members::TeamMember),
@@ -734,12 +734,6 @@ impl Row {
                 pipette_tip_models.upsert(conn)?.map(Row::from)
             }
             Row::Pipette(pipettes) => pipettes.upsert(conn)?.map(Row::from),
-            Row::PlacingProcedureTemplate(placing_procedure_templates) => {
-                placing_procedure_templates.upsert(conn)?.map(Row::from)
-            }
-            Row::PlacingProcedure(placing_procedures) => {
-                placing_procedures.upsert(conn)?.map(Row::from)
-            }
             Row::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.upsert(conn)?.map(Row::from)
             }
@@ -791,6 +785,12 @@ impl Row {
             }
             Row::SupernatantProcedure(supernatant_procedures) => {
                 supernatant_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::TaggingProcedureTemplate(tagging_procedure_templates) => {
+                tagging_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::TaggingProcedure(tagging_procedures) => {
+                tagging_procedures.upsert(conn)?.map(Row::from)
             }
             Row::Taxon(taxa) => taxa.upsert(conn)?.map(Row::from),
             Row::TeamMember(team_members) => team_members.upsert(conn)?.map(Row::from),
@@ -1019,10 +1019,6 @@ impl web_common_traits::prelude::Row for Row {
             Row::PipetteModel(pipette_models) => pipette_models.primary_key(),
             Row::PipetteTipModel(pipette_tip_models) => pipette_tip_models.primary_key(),
             Row::Pipette(pipettes) => pipettes.primary_key(),
-            Row::PlacingProcedureTemplate(placing_procedure_templates) => {
-                placing_procedure_templates.primary_key()
-            }
-            Row::PlacingProcedure(placing_procedures) => placing_procedures.primary_key(),
             Row::PositioningDeviceModel(positioning_device_models) => {
                 positioning_device_models.primary_key()
             }
@@ -1063,6 +1059,10 @@ impl web_common_traits::prelude::Row for Row {
             Row::SupernatantProcedure(supernatant_procedures) => {
                 supernatant_procedures.primary_key()
             }
+            Row::TaggingProcedureTemplate(tagging_procedure_templates) => {
+                tagging_procedure_templates.primary_key()
+            }
+            Row::TaggingProcedure(tagging_procedures) => tagging_procedures.primary_key(),
             Row::Taxon(taxa) => taxa.primary_key(),
             Row::TeamMember(team_members) => team_members.primary_key(),
             Row::TeamProject(team_projects) => team_projects.primary_key(),

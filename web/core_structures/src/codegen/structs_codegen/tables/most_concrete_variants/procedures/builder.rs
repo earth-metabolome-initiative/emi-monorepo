@@ -50,10 +50,6 @@ pub enum ProcedureBuilderDAG {
     PhotographProcedure(
         crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureBuilder,
     ),
-    ///Builder for the `placing_procedures` table.
-    PlacingProcedure(
-        crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder,
-    ),
     ///Builder for the `pouring_procedures` table.
     PouringProcedure(
         crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder,
@@ -69,6 +65,10 @@ pub enum ProcedureBuilderDAG {
     ///Builder for the `supernatant_procedures` table.
     SupernatantProcedure(
         crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder,
+    ),
+    ///Builder for the `tagging_procedures` table.
+    TaggingProcedure(
+        crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder,
     ),
     ///Builder for the `weighing_procedures` table.
     WeighingProcedure(
@@ -139,11 +139,6 @@ impl ProcedureBuilderDAG {
                     crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureBuilder,
                 >()
             }
-            Self::PlacingProcedure(_) => {
-                std::any::type_name::<
-                    crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder,
-                >()
-            }
             Self::PouringProcedure(_) => {
                 std::any::type_name::<
                     crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder,
@@ -162,6 +157,11 @@ impl ProcedureBuilderDAG {
             Self::SupernatantProcedure(_) => {
                 std::any::type_name::<
                     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder,
+                >()
+            }
+            Self::TaggingProcedure(_) => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder,
                 >()
             }
             Self::WeighingProcedure(_) => {
@@ -187,11 +187,11 @@ impl common_traits::builder::IsCompleteBuilder for ProcedureBuilderDAG {
             Self::HarvestingProcedure(builder) => builder.is_complete(),
             Self::PackagingProcedure(builder) => builder.is_complete(),
             Self::PhotographProcedure(builder) => builder.is_complete(),
-            Self::PlacingProcedure(builder) => builder.is_complete(),
             Self::PouringProcedure(builder) => builder.is_complete(),
             Self::Procedure(builder) => builder.is_complete(),
             Self::StorageProcedure(builder) => builder.is_complete(),
             Self::SupernatantProcedure(builder) => builder.is_complete(),
+            Self::TaggingProcedure(builder) => builder.is_complete(),
             Self::WeighingProcedure(builder) => builder.is_complete(),
         }
     }
@@ -227,8 +227,6 @@ where
         web_common_traits::database::DispatchableInsertableVariant<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureBuilder:
         web_common_traits::database::DispatchableInsertableVariant<C>,
-    crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder:
-        web_common_traits::database::DispatchableInsertableVariant<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder:
         web_common_traits::database::DispatchableInsertableVariant<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder:
@@ -236,6 +234,8 @@ where
     crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureBuilder:
         web_common_traits::database::DispatchableInsertableVariant<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder:
+        web_common_traits::database::DispatchableInsertableVariant<C>,
+    crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder:
         web_common_traits::database::DispatchableInsertableVariant<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder:
         web_common_traits::database::DispatchableInsertableVariant<C>,
@@ -254,11 +254,11 @@ where
             Self::HarvestingProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::PackagingProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::PhotographProcedure(variant) => variant.insert(user_id, conn)?.into(),
-            Self::PlacingProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::PouringProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::Procedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::StorageProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::SupernatantProcedure(variant) => variant.insert(user_id, conn)?.into(),
+            Self::TaggingProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::WeighingProcedure(variant) => variant.insert(user_id, conn)?.into(),
         })
     }
@@ -289,8 +289,6 @@ where
         crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureBuilder:
         crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
-    crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder:
-        crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder:
         crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder:
@@ -298,6 +296,8 @@ where
     crate::codegen::structs_codegen::tables::insertables::InsertableStorageProcedureBuilder:
         crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder:
+        crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
+    crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder:
         crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertableWeighingProcedureBuilder:
         crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
@@ -396,13 +396,6 @@ where
                         )?
                         .into()
                 }
-                Self::PlacingProcedure(builder) => {
-                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
-                            builder,
-                            procedure,
-                        )?
-                        .into()
-                }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                             builder,
@@ -426,6 +419,13 @@ where
                 }
                 Self::SupernatantProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
+                            builder,
+                            procedure,
+                        )?
+                        .into()
+                }
+                Self::TaggingProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                             builder,
                             procedure,
                         )?
@@ -533,13 +533,6 @@ where
                         )?
                         .into()
                 }
-                Self::PlacingProcedure(builder) => {
-                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
-                            builder,
-                            procedure_template,
-                        )?
-                        .into()
-                }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                             builder,
@@ -563,6 +556,13 @@ where
                 }
                 Self::SupernatantProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
+                            builder,
+                            procedure_template,
+                        )?
+                        .into()
+                }
+                Self::TaggingProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                             builder,
                             procedure_template,
                         )?
@@ -670,13 +670,6 @@ where
                         )?
                         .into()
                 }
-                Self::PlacingProcedure(builder) => {
-                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
-                            builder,
-                            parent_procedure,
-                        )?
-                        .into()
-                }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
                             builder,
@@ -700,6 +693,13 @@ where
                 }
                 Self::SupernatantProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
+                            builder,
+                            parent_procedure,
+                        )?
+                        .into()
+                }
+                Self::TaggingProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
                             builder,
                             parent_procedure,
                         )?
@@ -811,13 +811,6 @@ where
                         )?
                         .into()
                 }
-                Self::PlacingProcedure(builder) => {
-                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
-                            builder,
-                            parent_procedure_template,
-                        )?
-                        .into()
-                }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
                             builder,
@@ -841,6 +834,13 @@ where
                 }
                 Self::SupernatantProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
+                            builder,
+                            parent_procedure_template,
+                        )?
+                        .into()
+                }
+                Self::TaggingProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
                             builder,
                             parent_procedure_template,
                         )?
@@ -948,13 +948,6 @@ where
                         )?
                         .into()
                 }
-                Self::PlacingProcedure(builder) => {
-                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
-                            builder,
-                            predecessor_procedure,
-                        )?
-                        .into()
-                }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
                             builder,
@@ -978,6 +971,13 @@ where
                 }
                 Self::SupernatantProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
+                            builder,
+                            predecessor_procedure,
+                        )?
+                        .into()
+                }
+                Self::TaggingProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
                             builder,
                             predecessor_procedure,
                         )?
@@ -1089,13 +1089,6 @@ where
                         )?
                         .into()
                 }
-                Self::PlacingProcedure(builder) => {
-                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
-                            builder,
-                            predecessor_procedure_template,
-                        )?
-                        .into()
-                }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
                             builder,
@@ -1119,6 +1112,13 @@ where
                 }
                 Self::SupernatantProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
+                            builder,
+                            predecessor_procedure_template,
+                        )?
+                        .into()
+                }
+                Self::TaggingProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
                             builder,
                             predecessor_procedure_template,
                         )?
@@ -1226,13 +1226,6 @@ where
                         )?
                         .into()
                 }
-                Self::PlacingProcedure(builder) => {
-                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
-                            builder,
-                            created_by,
-                        )?
-                        .into()
-                }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                             builder,
@@ -1256,6 +1249,13 @@ where
                 }
                 Self::SupernatantProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
+                            builder,
+                            created_by,
+                        )?
+                        .into()
+                }
+                Self::TaggingProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                             builder,
                             created_by,
                         )?
@@ -1365,13 +1365,6 @@ where
                         )?
                         .into()
                 }
-                Self::PlacingProcedure(builder) => {
-                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_at(
-                            builder,
-                            created_at,
-                        )?
-                        .into()
-                }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_at(
                             builder,
@@ -1395,6 +1388,13 @@ where
                 }
                 Self::SupernatantProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_at(
+                            builder,
+                            created_at,
+                        )?
+                        .into()
+                }
+                Self::TaggingProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_at(
                             builder,
                             created_at,
                         )?
@@ -1502,13 +1502,6 @@ where
                         )?
                         .into()
                 }
-                Self::PlacingProcedure(builder) => {
-                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
-                            builder,
-                            updated_by,
-                        )?
-                        .into()
-                }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                             builder,
@@ -1532,6 +1525,13 @@ where
                 }
                 Self::SupernatantProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
+                            builder,
+                            updated_by,
+                        )?
+                        .into()
+                }
+                Self::TaggingProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                             builder,
                             updated_by,
                         )?
@@ -1641,13 +1641,6 @@ where
                         )?
                         .into()
                 }
-                Self::PlacingProcedure(builder) => {
-                    <crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
-                            builder,
-                            updated_at,
-                        )?
-                        .into()
-                }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
                             builder,
@@ -1671,6 +1664,13 @@ where
                 }
                 Self::SupernatantProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
+                            builder,
+                            updated_at,
+                        )?
+                        .into()
+                }
+                Self::TaggingProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
                             builder,
                             updated_at,
                         )?
@@ -1946,27 +1946,6 @@ impl From<ProcedureBuilderDAG>
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder>
-    for ProcedureBuilderDAG
-{
-    fn from(
-        value: crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder,
-    ) -> Self {
-        ProcedureBuilderDAG::PlacingProcedure(value)
-    }
-}
-impl From<ProcedureBuilderDAG>
-    for Option<
-        crate::codegen::structs_codegen::tables::insertables::InsertablePlacingProcedureBuilder,
-    >
-{
-    fn from(value: ProcedureBuilderDAG) -> Self {
-        match value {
-            ProcedureBuilderDAG::PlacingProcedure(v) => Some(v),
-            _ => None,
-        }
-    }
-}
 impl From<crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder>
     for ProcedureBuilderDAG
 {
@@ -2047,6 +2026,27 @@ impl From<ProcedureBuilderDAG>
     fn from(value: ProcedureBuilderDAG) -> Self {
         match value {
             ProcedureBuilderDAG::SupernatantProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder>
+    for ProcedureBuilderDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder,
+    ) -> Self {
+        ProcedureBuilderDAG::TaggingProcedure(value)
+    }
+}
+impl From<ProcedureBuilderDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::insertables::InsertableTaggingProcedureBuilder,
+    >
+{
+    fn from(value: ProcedureBuilderDAG) -> Self {
+        match value {
+            ProcedureBuilderDAG::TaggingProcedure(v) => Some(v),
             _ => None,
         }
     }

@@ -518,17 +518,6 @@ pub use pipettes::{
     InsertablePipette, InsertablePipetteBuilder, PipetteAttribute, PipetteExtensionAttribute,
     PipetteSettable,
 };
-mod placing_procedure_templates;
-pub use placing_procedure_templates::{
-    InsertablePlacingProcedureTemplate, InsertablePlacingProcedureTemplateBuilder,
-    PlacingProcedureTemplateAttribute, PlacingProcedureTemplateExtensionAttribute,
-    PlacingProcedureTemplateSettable,
-};
-mod placing_procedures;
-pub use placing_procedures::{
-    InsertablePlacingProcedure, InsertablePlacingProcedureBuilder, PlacingProcedureAttribute,
-    PlacingProcedureExtensionAttribute, PlacingProcedureSettable,
-};
 mod positioning_device_models;
 pub use positioning_device_models::{
     InsertablePositioningDeviceModel, InsertablePositioningDeviceModelBuilder,
@@ -660,6 +649,17 @@ pub use supernatant_procedures::{
     InsertableSupernatantProcedure, InsertableSupernatantProcedureBuilder,
     SupernatantProcedureAttribute, SupernatantProcedureExtensionAttribute,
     SupernatantProcedureSettable,
+};
+mod tagging_procedure_templates;
+pub use tagging_procedure_templates::{
+    InsertableTaggingProcedureTemplate, InsertableTaggingProcedureTemplateBuilder,
+    TaggingProcedureTemplateAttribute, TaggingProcedureTemplateExtensionAttribute,
+    TaggingProcedureTemplateSettable,
+};
+mod tagging_procedures;
+pub use tagging_procedures::{
+    InsertableTaggingProcedure, InsertableTaggingProcedureBuilder, TaggingProcedureAttribute,
+    TaggingProcedureExtensionAttribute, TaggingProcedureSettable,
 };
 mod taxa;
 pub use taxa::{InsertableTaxon, InsertableTaxonBuilder, TaxonAttribute, TaxonSettable};

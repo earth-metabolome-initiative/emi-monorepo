@@ -10,11 +10,11 @@ mod geolocation_procedure_templates;
 mod harvesting_procedure_templates;
 mod packaging_procedure_templates;
 mod photograph_procedure_templates;
-mod placing_procedure_templates;
 mod pouring_procedure_templates;
 mod procedure_templates;
 mod storage_procedure_templates;
 mod supernatant_procedure_templates;
+mod tagging_procedure_templates;
 mod weighing_procedure_templates;
 impl web_common_traits::prelude::ProcedureTemplateLike
     for crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG
@@ -76,9 +76,6 @@ where
                 Self::PhotographProcedureTemplate(value) => {
                     value.procedure_template_asset_models(conn)?
                 }
-                Self::PlacingProcedureTemplate(value) => {
-                    value.procedure_template_asset_models(conn)?
-                }
                 Self::PouringProcedureTemplate(value) => {
                     value.procedure_template_asset_models(conn)?
                 }
@@ -86,6 +83,9 @@ where
                     value.procedure_template_asset_models(conn)?
                 }
                 Self::SupernatantProcedureTemplate(value) => {
+                    value.procedure_template_asset_models(conn)?
+                }
+                Self::TaggingProcedureTemplate(value) => {
                     value.procedure_template_asset_models(conn)?
                 }
                 Self::WeighingProcedureTemplate(value) => {

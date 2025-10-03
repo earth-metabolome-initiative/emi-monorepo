@@ -294,12 +294,6 @@ where
     crate::codegen::structs_codegen::tables::pipettes::Pipette: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate: web_common_traits::database::Read<
-        C,
-    >,
-    crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure: web_common_traits::database::Read<
-        C,
-    >,
     crate::codegen::structs_codegen::tables::positioning_device_models::PositioningDeviceModel: web_common_traits::database::Read<
         C,
     >,
@@ -382,6 +376,12 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::tagging_procedure_templates::TaggingProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::tagging_procedures::TaggingProcedure: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::taxa::Taxon: web_common_traits::database::Read<
@@ -1329,24 +1329,6 @@ where
                         )?
                         .into()
                 }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PlacingProcedureTemplate(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::placing_procedure_templates::PlacingProcedureTemplate::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .into()
-                }
-                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PlacingProcedure(
-                    primary_key,
-                ) => {
-                    crate::codegen::structs_codegen::tables::placing_procedures::PlacingProcedure::read(
-                            primary_key,
-                            conn,
-                        )?
-                        .into()
-                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PositioningDeviceModel(
                     primary_key,
                 ) => {
@@ -1594,6 +1576,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::supernatant_procedures::SupernatantProcedure::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::TaggingProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::tagging_procedure_templates::TaggingProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::TaggingProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::tagging_procedures::TaggingProcedure::read(
                             primary_key,
                             conn,
                         )?

@@ -268,12 +268,6 @@ impl web_common_traits::prelude::Tabular for super::Rows {
                 crate::codegen::tables::table_names::TableName::PipetteTipModel
             }
             super::Rows::Pipette(_) => crate::codegen::tables::table_names::TableName::Pipette,
-            super::Rows::PlacingProcedureTemplate(_) => {
-                crate::codegen::tables::table_names::TableName::PlacingProcedureTemplate
-            }
-            super::Rows::PlacingProcedure(_) => {
-                crate::codegen::tables::table_names::TableName::PlacingProcedure
-            }
             super::Rows::PositioningDeviceModel(_) => {
                 crate::codegen::tables::table_names::TableName::PositioningDeviceModel
             }
@@ -339,6 +333,12 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             }
             super::Rows::SupernatantProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::SupernatantProcedure
+            }
+            super::Rows::TaggingProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::TaggingProcedureTemplate
+            }
+            super::Rows::TaggingProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::TaggingProcedure
             }
             super::Rows::Taxon(_) => crate::codegen::tables::table_names::TableName::Taxon,
             super::Rows::TeamMember(_) => {

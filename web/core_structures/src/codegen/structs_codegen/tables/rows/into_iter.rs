@@ -467,16 +467,6 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::Pipette(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Pipette).collect::<Vec<_>>()
             }
-            super::Rows::PlacingProcedureTemplate(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::PlacingProcedureTemplate)
-                    .collect::<Vec<_>>()
-            }
-            super::Rows::PlacingProcedure(rows) => {
-                rows.into_iter()
-                    .map(crate::codegen::tables::row::Row::PlacingProcedure)
-                    .collect::<Vec<_>>()
-            }
             super::Rows::PositioningDeviceModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::PositioningDeviceModel)
@@ -601,6 +591,16 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::SupernatantProcedure(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::SupernatantProcedure)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::TaggingProcedureTemplate(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::TaggingProcedureTemplate)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::TaggingProcedure(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::TaggingProcedure)
                     .collect::<Vec<_>>()
             }
             super::Rows::Taxon(rows) => {
