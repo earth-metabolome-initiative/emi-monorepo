@@ -27,6 +27,12 @@ pub enum ProcedureInsertErrorDAG {
             crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureAttribute,
         >,
     ),
+    /// Insert error associated with the `cleaning_procedures` table.
+    CleaningProcedure(
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CleaningProcedureAttribute,
+        >,
+    ),
     /// Insert error associated with the `disposal_procedures` table.
     DisposalProcedure(
         web_common_traits::database::InsertError<
@@ -81,6 +87,12 @@ pub enum ProcedureInsertErrorDAG {
             crate::codegen::structs_codegen::tables::insertables::PouringProcedureAttribute,
         >,
     ),
+    /// Insert error associated with the `ppe_reminder_procedures` table.
+    PpeReminderProcedure(
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PpeReminderProcedureAttribute,
+        >,
+    ),
     /// Insert error associated with the `procedures` table.
     Procedure(
         web_common_traits::database::InsertError<
@@ -119,6 +131,7 @@ impl std::fmt::Display for ProcedureInsertErrorDAG {
             Self::BallMillProcedure(e) => write!(f, "{e}"),
             Self::CappingProcedure(e) => write!(f, "{e}"),
             Self::CentrifugeProcedure(e) => write!(f, "{e}"),
+            Self::CleaningProcedure(e) => write!(f, "{e}"),
             Self::DisposalProcedure(e) => write!(f, "{e}"),
             Self::FractioningProcedure(e) => write!(f, "{e}"),
             Self::FreezeDryingProcedure(e) => write!(f, "{e}"),
@@ -128,6 +141,7 @@ impl std::fmt::Display for ProcedureInsertErrorDAG {
             Self::PackagingProcedure(e) => write!(f, "{e}"),
             Self::PhotographProcedure(e) => write!(f, "{e}"),
             Self::PouringProcedure(e) => write!(f, "{e}"),
+            Self::PpeReminderProcedure(e) => write!(f, "{e}"),
             Self::Procedure(e) => write!(f, "{e}"),
             Self::StorageProcedure(e) => write!(f, "{e}"),
             Self::SupernatantProcedure(e) => write!(f, "{e}"),
@@ -143,6 +157,7 @@ impl std::error::Error for ProcedureInsertErrorDAG {
             Self::BallMillProcedure(e) => Some(e),
             Self::CappingProcedure(e) => Some(e),
             Self::CentrifugeProcedure(e) => Some(e),
+            Self::CleaningProcedure(e) => Some(e),
             Self::DisposalProcedure(e) => Some(e),
             Self::FractioningProcedure(e) => Some(e),
             Self::FreezeDryingProcedure(e) => Some(e),
@@ -152,6 +167,7 @@ impl std::error::Error for ProcedureInsertErrorDAG {
             Self::PackagingProcedure(e) => Some(e),
             Self::PhotographProcedure(e) => Some(e),
             Self::PouringProcedure(e) => Some(e),
+            Self::PpeReminderProcedure(e) => Some(e),
             Self::Procedure(e) => Some(e),
             Self::StorageProcedure(e) => Some(e),
             Self::SupernatantProcedure(e) => Some(e),
@@ -218,6 +234,21 @@ impl
         >,
     ) -> Self {
         ProcedureInsertErrorDAG::CentrifugeProcedure(error)
+    }
+}
+impl
+    From<
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CleaningProcedureAttribute,
+        >,
+    > for ProcedureInsertErrorDAG
+{
+    fn from(
+        error: web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::CleaningProcedureAttribute,
+        >,
+    ) -> Self {
+        ProcedureInsertErrorDAG::CleaningProcedure(error)
     }
 }
 impl
@@ -353,6 +384,21 @@ impl
         >,
     ) -> Self {
         ProcedureInsertErrorDAG::PouringProcedure(error)
+    }
+}
+impl
+    From<
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PpeReminderProcedureAttribute,
+        >,
+    > for ProcedureInsertErrorDAG
+{
+    fn from(
+        error: web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PpeReminderProcedureAttribute,
+        >,
+    ) -> Self {
+        ProcedureInsertErrorDAG::PpeReminderProcedure(error)
     }
 }
 impl

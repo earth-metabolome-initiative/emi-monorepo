@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS personal_protective_equipment_models CASCADE;

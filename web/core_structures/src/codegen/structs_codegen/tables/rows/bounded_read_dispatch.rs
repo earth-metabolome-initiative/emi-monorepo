@@ -69,6 +69,12 @@ where
     crate::codegen::structs_codegen::tables::cities::City: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::cleaning_procedure_templates::CleaningProcedureTemplate: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::cleaning_procedures::CleaningProcedure: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::colors::Color: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -267,6 +273,9 @@ where
     crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory: web_common_traits::prelude::BoundedRead<
         C,
     >,
+    crate::codegen::structs_codegen::tables::personal_protective_equipment_models::PersonalProtectiveEquipmentModel: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::phone_models::PhoneModel: web_common_traits::prelude::BoundedRead<
         C,
     >,
@@ -304,6 +313,12 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::ppe_reminder_procedure_templates::PpeReminderProcedureTemplate: web_common_traits::prelude::BoundedRead<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::ppe_reminder_procedures::PpeReminderProcedure: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::prelude::BoundedRead<
@@ -626,6 +641,22 @@ where
             }
             crate::codegen::tables::table_names::TableName::City => {
                 crate::codegen::structs_codegen::tables::cities::City::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::CleaningProcedureTemplate => {
+                crate::codegen::structs_codegen::tables::cleaning_procedure_templates::CleaningProcedureTemplate::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::CleaningProcedure => {
+                crate::codegen::structs_codegen::tables::cleaning_procedures::CleaningProcedure::bounded_read(
                         offset,
                         limit,
                         conn,
@@ -1160,6 +1191,14 @@ where
                     )
                     .map(super::Rows::from)
             }
+            crate::codegen::tables::table_names::TableName::PersonalProtectiveEquipmentModel => {
+                crate::codegen::structs_codegen::tables::personal_protective_equipment_models::PersonalProtectiveEquipmentModel::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
             crate::codegen::tables::table_names::TableName::PhoneModel => {
                 crate::codegen::structs_codegen::tables::phone_models::PhoneModel::bounded_read(
                         offset,
@@ -1258,6 +1297,22 @@ where
             }
             crate::codegen::tables::table_names::TableName::PouringProcedure => {
                 crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::PpeReminderProcedureTemplate => {
+                crate::codegen::structs_codegen::tables::ppe_reminder_procedure_templates::PpeReminderProcedureTemplate::bounded_read(
+                        offset,
+                        limit,
+                        conn,
+                    )
+                    .map(super::Rows::from)
+            }
+            crate::codegen::tables::table_names::TableName::PpeReminderProcedure => {
+                crate::codegen::structs_codegen::tables::ppe_reminder_procedures::PpeReminderProcedure::bounded_read(
                         offset,
                         limit,
                         conn,

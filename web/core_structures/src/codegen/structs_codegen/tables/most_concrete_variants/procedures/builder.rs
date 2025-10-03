@@ -18,6 +18,10 @@ pub enum ProcedureBuilderDAG {
     CentrifugeProcedure(
         crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureBuilder,
     ),
+    ///Builder for the `cleaning_procedures` table.
+    CleaningProcedure(
+        crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder,
+    ),
     ///Builder for the `disposal_procedures` table.
     DisposalProcedure(
         crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder,
@@ -53,6 +57,10 @@ pub enum ProcedureBuilderDAG {
     ///Builder for the `pouring_procedures` table.
     PouringProcedure(
         crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder,
+    ),
+    ///Builder for the `ppe_reminder_procedures` table.
+    PpeReminderProcedure(
+        crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder,
     ),
     ///Builder for the `procedures` table.
     Procedure(
@@ -97,6 +105,11 @@ impl ProcedureBuilderDAG {
             Self::CentrifugeProcedure(_) => {
                 std::any::type_name::<
                     crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureBuilder,
+                >()
+            }
+            Self::CleaningProcedure(_) => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder,
                 >()
             }
             Self::DisposalProcedure(_) => {
@@ -144,6 +157,11 @@ impl ProcedureBuilderDAG {
                     crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder,
                 >()
             }
+            Self::PpeReminderProcedure(_) => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder,
+                >()
+            }
             Self::Procedure(_) => {
                 std::any::type_name::<
                     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder,
@@ -179,6 +197,7 @@ impl common_traits::builder::IsCompleteBuilder for ProcedureBuilderDAG {
             Self::BallMillProcedure(builder) => builder.is_complete(),
             Self::CappingProcedure(builder) => builder.is_complete(),
             Self::CentrifugeProcedure(builder) => builder.is_complete(),
+            Self::CleaningProcedure(builder) => builder.is_complete(),
             Self::DisposalProcedure(builder) => builder.is_complete(),
             Self::FractioningProcedure(builder) => builder.is_complete(),
             Self::FreezeDryingProcedure(builder) => builder.is_complete(),
@@ -188,6 +207,7 @@ impl common_traits::builder::IsCompleteBuilder for ProcedureBuilderDAG {
             Self::PackagingProcedure(builder) => builder.is_complete(),
             Self::PhotographProcedure(builder) => builder.is_complete(),
             Self::PouringProcedure(builder) => builder.is_complete(),
+            Self::PpeReminderProcedure(builder) => builder.is_complete(),
             Self::Procedure(builder) => builder.is_complete(),
             Self::StorageProcedure(builder) => builder.is_complete(),
             Self::SupernatantProcedure(builder) => builder.is_complete(),
@@ -211,6 +231,8 @@ where
         web_common_traits::database::DispatchableInsertableVariant<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureBuilder:
         web_common_traits::database::DispatchableInsertableVariant<C>,
+    crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder:
+        web_common_traits::database::DispatchableInsertableVariant<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder:
         web_common_traits::database::DispatchableInsertableVariant<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureBuilder:
@@ -228,6 +250,8 @@ where
     crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureBuilder:
         web_common_traits::database::DispatchableInsertableVariant<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder:
+        web_common_traits::database::DispatchableInsertableVariant<C>,
+    crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder:
         web_common_traits::database::DispatchableInsertableVariant<C>,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder:
         web_common_traits::database::DispatchableInsertableVariant<C>,
@@ -246,6 +270,7 @@ where
             Self::BallMillProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::CappingProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::CentrifugeProcedure(variant) => variant.insert(user_id, conn)?.into(),
+            Self::CleaningProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::DisposalProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::FractioningProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::FreezeDryingProcedure(variant) => variant.insert(user_id, conn)?.into(),
@@ -255,6 +280,7 @@ where
             Self::PackagingProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::PhotographProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::PouringProcedure(variant) => variant.insert(user_id, conn)?.into(),
+            Self::PpeReminderProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::Procedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::StorageProcedure(variant) => variant.insert(user_id, conn)?.into(),
             Self::SupernatantProcedure(variant) => variant.insert(user_id, conn)?.into(),
@@ -273,6 +299,8 @@ where
         crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureBuilder:
         crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
+    crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder:
+        crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder:
         crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertableFractioningProcedureBuilder:
@@ -290,6 +318,8 @@ where
     crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureBuilder:
         crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder:
+        crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
+    crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder:
         crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertableProcedureBuilder:
         crate::codegen::structs_codegen::tables::insertables::ProcedureSettable,
@@ -335,6 +365,13 @@ where
                 }
                 Self::CentrifugeProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableCentrifugeProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
+                            builder,
+                            procedure,
+                        )?
+                        .into()
+                }
+                Self::CleaningProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                             builder,
                             procedure,
                         )?
@@ -398,6 +435,13 @@ where
                 }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
+                            builder,
+                            procedure,
+                        )?
+                        .into()
+                }
+                Self::PpeReminderProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure(
                             builder,
                             procedure,
                         )?
@@ -477,6 +521,13 @@ where
                         )?
                         .into()
                 }
+                Self::CleaningProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
+                            builder,
+                            procedure_template,
+                        )?
+                        .into()
+                }
                 Self::DisposalProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                             builder,
@@ -535,6 +586,13 @@ where
                 }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
+                            builder,
+                            procedure_template,
+                        )?
+                        .into()
+                }
+                Self::PpeReminderProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::procedure_template(
                             builder,
                             procedure_template,
                         )?
@@ -614,6 +672,13 @@ where
                         )?
                         .into()
                 }
+                Self::CleaningProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
+                            builder,
+                            parent_procedure,
+                        )?
+                        .into()
+                }
                 Self::DisposalProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
                             builder,
@@ -672,6 +737,13 @@ where
                 }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
+                            builder,
+                            parent_procedure,
+                        )?
+                        .into()
+                }
+                Self::PpeReminderProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure(
                             builder,
                             parent_procedure,
                         )?
@@ -755,6 +827,13 @@ where
                         )?
                         .into()
                 }
+                Self::CleaningProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
+                            builder,
+                            parent_procedure_template,
+                        )?
+                        .into()
+                }
                 Self::DisposalProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
                             builder,
@@ -813,6 +892,13 @@ where
                 }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
+                            builder,
+                            parent_procedure_template,
+                        )?
+                        .into()
+                }
+                Self::PpeReminderProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::parent_procedure_template(
                             builder,
                             parent_procedure_template,
                         )?
@@ -892,6 +978,13 @@ where
                         )?
                         .into()
                 }
+                Self::CleaningProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
+                            builder,
+                            predecessor_procedure,
+                        )?
+                        .into()
+                }
                 Self::DisposalProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
                             builder,
@@ -950,6 +1043,13 @@ where
                 }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
+                            builder,
+                            predecessor_procedure,
+                        )?
+                        .into()
+                }
+                Self::PpeReminderProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure(
                             builder,
                             predecessor_procedure,
                         )?
@@ -1033,6 +1133,13 @@ where
                         )?
                         .into()
                 }
+                Self::CleaningProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
+                            builder,
+                            predecessor_procedure_template,
+                        )?
+                        .into()
+                }
                 Self::DisposalProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
                             builder,
@@ -1091,6 +1198,13 @@ where
                 }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
+                            builder,
+                            predecessor_procedure_template,
+                        )?
+                        .into()
+                }
+                Self::PpeReminderProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::predecessor_procedure_template(
                             builder,
                             predecessor_procedure_template,
                         )?
@@ -1170,6 +1284,13 @@ where
                         )?
                         .into()
                 }
+                Self::CleaningProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
+                            builder,
+                            created_by,
+                        )?
+                        .into()
+                }
                 Self::DisposalProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                             builder,
@@ -1228,6 +1349,13 @@ where
                 }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
+                            builder,
+                            created_by,
+                        )?
+                        .into()
+                }
+                Self::PpeReminderProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_by(
                             builder,
                             created_by,
                         )?
@@ -1309,6 +1437,13 @@ where
                         )?
                         .into()
                 }
+                Self::CleaningProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_at(
+                            builder,
+                            created_at,
+                        )?
+                        .into()
+                }
                 Self::DisposalProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_at(
                             builder,
@@ -1367,6 +1502,13 @@ where
                 }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_at(
+                            builder,
+                            created_at,
+                        )?
+                        .into()
+                }
+                Self::PpeReminderProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::created_at(
                             builder,
                             created_at,
                         )?
@@ -1446,6 +1588,13 @@ where
                         )?
                         .into()
                 }
+                Self::CleaningProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
+                            builder,
+                            updated_by,
+                        )?
+                        .into()
+                }
                 Self::DisposalProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                             builder,
@@ -1504,6 +1653,13 @@ where
                 }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
+                            builder,
+                            updated_by,
+                        )?
+                        .into()
+                }
+                Self::PpeReminderProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_by(
                             builder,
                             updated_by,
                         )?
@@ -1585,6 +1741,13 @@ where
                         )?
                         .into()
                 }
+                Self::CleaningProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
+                            builder,
+                            updated_at,
+                        )?
+                        .into()
+                }
                 Self::DisposalProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
                             builder,
@@ -1643,6 +1806,13 @@ where
                 }
                 Self::PouringProcedure(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePouringProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
+                            builder,
+                            updated_at,
+                        )?
+                        .into()
+                }
+                Self::PpeReminderProcedure(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureSettable>::updated_at(
                             builder,
                             updated_at,
                         )?
@@ -1769,6 +1939,27 @@ impl From<ProcedureBuilderDAG>
     fn from(value: ProcedureBuilderDAG) -> Self {
         match value {
             ProcedureBuilderDAG::CentrifugeProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder>
+    for ProcedureBuilderDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder,
+    ) -> Self {
+        ProcedureBuilderDAG::CleaningProcedure(value)
+    }
+}
+impl From<ProcedureBuilderDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::insertables::InsertableCleaningProcedureBuilder,
+    >
+{
+    fn from(value: ProcedureBuilderDAG) -> Self {
+        match value {
+            ProcedureBuilderDAG::CleaningProcedure(v) => Some(v),
             _ => None,
         }
     }
@@ -1963,6 +2154,29 @@ impl From<ProcedureBuilderDAG>
     fn from(value: ProcedureBuilderDAG) -> Self {
         match value {
             ProcedureBuilderDAG::PouringProcedure(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl
+    From<
+        crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder,
+    > for ProcedureBuilderDAG
+{
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder,
+    ) -> Self {
+        ProcedureBuilderDAG::PpeReminderProcedure(value)
+    }
+}
+impl From<ProcedureBuilderDAG>
+    for Option<
+        crate::codegen::structs_codegen::tables::insertables::InsertablePpeReminderProcedureBuilder,
+    >
+{
+    fn from(value: ProcedureBuilderDAG) -> Self {
+        match value {
+            ProcedureBuilderDAG::PpeReminderProcedure(v) => Some(v),
             _ => None,
         }
     }

@@ -1,9 +1,10 @@
 use core_structures::{
-    GeolocationProcedureTemplate, PhotographProcedureTemplate, TaggingProcedureTemplate,
-    ProcedureTemplate, ProcedureTemplateAssetModel, User,
+    GeolocationProcedureTemplate, PhotographProcedureTemplate, ProcedureTemplate,
+    ProcedureTemplateAssetModel, TaggingProcedureTemplate, User,
     tables::insertables::{
         GeolocationProcedureTemplateSettable, PhotographProcedureTemplateSettable,
         ProcedureTemplateAssetModelSettable, ProcedureTemplateSettable,
+        TaggingProcedureTemplateSettable,
     },
     traits::AppendProcedureTemplate,
 };
@@ -66,26 +67,24 @@ pub fn organism_observation_procedure(
 			"Place a colored cardboard arrow in the field pointing towards the organism to facilitate its identification later.",
         )?
         .procedure_template_geolocated_with_model(phone_builder(user, conn)?.name(PHONE_PTAM_NAME)?)?
-        .procedure_template_geolocated_asset_model(marker_arrow_model_builder(user, conn)?)?
+        .procedure_template_tag_asset_model(marker_arrow_model_builder(user, conn)?)?
+        .procedure_template_tagged_asset_model(organism_builder(user, conn)?.name(ORGANISM_PTAM_NAME)?)?
         .created_by(user)?
         .insert(user.id, conn)?;
-    let phone = GeolocationProcedureTemplate::read(arrow_reminder.primary_key(), conn)?
-        .procedure_template_geolocated_with_model(conn)?;
+    let phone = arrow_reminder.procedure_template_geolocated_with_model(conn)?;
+    let organism = arrow_reminder.procedure_template_tagged_asset_model(conn)?;
 
     // Take a picture of organism and its panel
     let organism_and_panel_picture = PhotographProcedureTemplate::new()
         .name("Organism and Panel Picture")?
         .description("Photograph of the organism and its panel in the botanical garden")?
         .procedure_template_photographed_with_model(&phone)?
-        .procedure_template_photographed_asset_model(
-            organism_builder(user, conn)?.name(ORGANISM_PTAM_NAME)?,
-        )?
+        .procedure_template_photographed_asset_model(&organism)?
         .procedure_template_photograph_model(
             photograph_builder(user, conn)?.name("Organism and Panel Picture")?,
         )?
         .created_by(user)?
         .insert(user.id, conn)?;
-    let organism = organism_and_panel_picture.procedure_template_photographed_asset_model(conn)?;
 
     // Take a picture of the full organism
     let organism_picture = PhotographProcedureTemplate::new()

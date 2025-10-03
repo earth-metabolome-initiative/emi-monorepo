@@ -22,6 +22,8 @@ mod centrifuge_procedure_templates;
 mod centrifuge_procedures;
 mod centrifuges;
 mod cities;
+mod cleaning_procedure_templates;
+mod cleaning_procedures;
 mod colors;
 mod commercial_ball_mill_machine_lots;
 mod commercial_ball_mill_machine_models;
@@ -90,6 +92,7 @@ mod packaging_procedure_templates;
 mod packaging_procedures;
 mod parent_procedure_templates;
 mod permanence_categories;
+mod personal_protective_equipment_models;
 mod phone_models;
 mod photograph_procedure_templates;
 mod photograph_procedures;
@@ -103,6 +106,8 @@ mod positioning_device_models;
 mod positioning_devices;
 mod pouring_procedure_templates;
 mod pouring_procedures;
+mod ppe_reminder_procedure_templates;
+mod ppe_reminder_procedures;
 mod procedure_assets;
 mod procedure_template_asset_models;
 mod procedure_templates;
@@ -224,6 +229,16 @@ pub enum Rows {
     ),
     Centrifuge(Vec<crate::codegen::structs_codegen::tables::centrifuges::Centrifuge>),
     City(Vec<crate::codegen::structs_codegen::tables::cities::City>),
+    CleaningProcedureTemplate(
+        Vec<
+            crate::codegen::structs_codegen::tables::cleaning_procedure_templates::CleaningProcedureTemplate,
+        >,
+    ),
+    CleaningProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::cleaning_procedures::CleaningProcedure,
+        >,
+    ),
     Color(Vec<crate::codegen::structs_codegen::tables::colors::Color>),
     CommercialBallMillMachineLot(
         Vec<
@@ -508,6 +523,11 @@ pub enum Rows {
             crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
         >,
     ),
+    PersonalProtectiveEquipmentModel(
+        Vec<
+            crate::codegen::structs_codegen::tables::personal_protective_equipment_models::PersonalProtectiveEquipmentModel,
+        >,
+    ),
     PhoneModel(Vec<crate::codegen::structs_codegen::tables::phone_models::PhoneModel>),
     PhotographProcedureTemplate(
         Vec<
@@ -553,6 +573,16 @@ pub enum Rows {
     PouringProcedure(
         Vec<
             crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
+        >,
+    ),
+    PpeReminderProcedureTemplate(
+        Vec<
+            crate::codegen::structs_codegen::tables::ppe_reminder_procedure_templates::PpeReminderProcedureTemplate,
+        >,
+    ),
+    PpeReminderProcedure(
+        Vec<
+            crate::codegen::structs_codegen::tables::ppe_reminder_procedures::PpeReminderProcedure,
         >,
     ),
     ProcedureAsset(
@@ -857,6 +887,20 @@ impl Rows {
             }
             Rows::City(cities) => {
                 cities
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CleaningProcedureTemplate(cleaning_procedure_templates) => {
+                cleaning_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::CleaningProcedure(cleaning_procedures) => {
+                cleaning_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1326,6 +1370,13 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
+            Rows::PersonalProtectiveEquipmentModel(personal_protective_equipment_models) => {
+                personal_protective_equipment_models
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
             Rows::PhoneModel(phone_models) => {
                 phone_models
                     .iter()
@@ -1412,6 +1463,20 @@ impl Rows {
             }
             Rows::PouringProcedure(pouring_procedures) => {
                 pouring_procedures
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::PpeReminderProcedureTemplate(ppe_reminder_procedure_templates) => {
+                ppe_reminder_procedure_templates
+                    .iter()
+                    .filter_map(|entry| entry.upsert(conn).transpose())
+                    .collect::<Result<Vec<_>, diesel::result::Error>>()?
+                    .into()
+            }
+            Rows::PpeReminderProcedure(ppe_reminder_procedures) => {
+                ppe_reminder_procedures
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1770,6 +1835,10 @@ impl web_common_traits::prelude::Rows for Rows {
             }
             Rows::Centrifuge(centrifuges) => centrifuges.primary_keys(),
             Rows::City(cities) => cities.primary_keys(),
+            Rows::CleaningProcedureTemplate(cleaning_procedure_templates) => {
+                cleaning_procedure_templates.primary_keys()
+            }
+            Rows::CleaningProcedure(cleaning_procedures) => cleaning_procedures.primary_keys(),
             Rows::Color(colors) => colors.primary_keys(),
             Rows::CommercialBallMillMachineLot(commercial_ball_mill_machine_lots) => {
                 commercial_ball_mill_machine_lots.primary_keys()
@@ -1912,6 +1981,9 @@ impl web_common_traits::prelude::Rows for Rows {
                 parent_procedure_templates.primary_keys()
             }
             Rows::PermanenceCategory(permanence_categories) => permanence_categories.primary_keys(),
+            Rows::PersonalProtectiveEquipmentModel(personal_protective_equipment_models) => {
+                personal_protective_equipment_models.primary_keys()
+            }
             Rows::PhoneModel(phone_models) => phone_models.primary_keys(),
             Rows::PhotographProcedureTemplate(photograph_procedure_templates) => {
                 photograph_procedure_templates.primary_keys()
@@ -1933,6 +2005,12 @@ impl web_common_traits::prelude::Rows for Rows {
                 pouring_procedure_templates.primary_keys()
             }
             Rows::PouringProcedure(pouring_procedures) => pouring_procedures.primary_keys(),
+            Rows::PpeReminderProcedureTemplate(ppe_reminder_procedure_templates) => {
+                ppe_reminder_procedure_templates.primary_keys()
+            }
+            Rows::PpeReminderProcedure(ppe_reminder_procedures) => {
+                ppe_reminder_procedures.primary_keys()
+            }
             Rows::ProcedureAsset(procedure_assets) => procedure_assets.primary_keys(),
             Rows::ProcedureTemplateAssetModel(procedure_template_asset_models) => {
                 procedure_template_asset_models.primary_keys()

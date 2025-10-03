@@ -162,6 +162,10 @@ pub enum AssetModelBuilderDAG {
     PackagingModel(
         crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder,
     ),
+    ///Builder for the `personal_protective_equipment_models` table.
+    PersonalProtectiveEquipmentModel(
+        crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder,
+    ),
     ///Builder for the `phone_models` table.
     PhoneModel(
         crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder,
@@ -415,6 +419,11 @@ impl AssetModelBuilderDAG {
                     crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder,
                 >()
             }
+            Self::PersonalProtectiveEquipmentModel(_) => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder,
+                >()
+            }
             Self::PhoneModel(_) => {
                 std::any::type_name::<
                     crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder,
@@ -521,6 +530,7 @@ impl common_traits::builder::IsCompleteBuilder for AssetModelBuilderDAG {
             Self::FreezerModel(builder) => builder.is_complete(),
             Self::OrganismModel(builder) => builder.is_complete(),
             Self::PackagingModel(builder) => builder.is_complete(),
+            Self::PersonalProtectiveEquipmentModel(builder) => builder.is_complete(),
             Self::PhoneModel(builder) => builder.is_complete(),
             Self::PhysicalAssetModel(builder) => builder.is_complete(),
             Self::PipetteModel(builder) => builder.is_complete(),
@@ -664,6 +674,9 @@ where
     crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder: web_common_traits::database::DispatchableInsertableVariant<
         C,
     >,
+    crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder: web_common_traits::database::DispatchableInsertableVariant<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder: web_common_traits::database::DispatchableInsertableVariant<
         C,
     >,
@@ -796,6 +809,9 @@ where
                 Self::FreezerModel(variant) => variant.insert(user_id, conn)?.into(),
                 Self::OrganismModel(variant) => variant.insert(user_id, conn)?.into(),
                 Self::PackagingModel(variant) => variant.insert(user_id, conn)?.into(),
+                Self::PersonalProtectiveEquipmentModel(variant) => {
+                    variant.insert(user_id, conn)?.into()
+                }
                 Self::PhoneModel(variant) => variant.insert(user_id, conn)?.into(),
                 Self::PhysicalAssetModel(variant) => {
                     variant.insert(user_id, conn)?.into()
@@ -865,6 +881,7 @@ where
     crate::codegen::structs_codegen::tables::insertables::InsertableFreezerModelBuilder: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertableOrganismModelBuilder: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable,
+    crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable,
     crate::codegen::structs_codegen::tables::insertables::InsertablePipetteModelBuilder: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable,
@@ -1163,6 +1180,13 @@ where
                 }
                 Self::PackagingModel(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
+                            builder,
+                            name,
+                        )?
+                        .into()
+                }
+                Self::PersonalProtectiveEquipmentModel(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                             builder,
                             name,
                         )?
@@ -1544,6 +1568,13 @@ where
                         )?
                         .into()
                 }
+                Self::PersonalProtectiveEquipmentModel(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
+                            builder,
+                            description,
+                        )?
+                        .into()
+                }
                 Self::PhoneModel(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                             builder,
@@ -1919,6 +1950,13 @@ where
                         )?
                         .into()
                 }
+                Self::PersonalProtectiveEquipmentModel(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::parent_model(
+                            builder,
+                            parent_model,
+                        )?
+                        .into()
+                }
                 Self::PhoneModel(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::parent_model(
                             builder,
@@ -2289,6 +2327,13 @@ where
                 }
                 Self::PackagingModel(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
+                            builder,
+                            created_by,
+                        )?
+                        .into()
+                }
+                Self::PersonalProtectiveEquipmentModel(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                             builder,
                             created_by,
                         )?
@@ -2672,6 +2717,13 @@ where
                         )?
                         .into()
                 }
+                Self::PersonalProtectiveEquipmentModel(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
+                            builder,
+                            created_at,
+                        )?
+                        .into()
+                }
                 Self::PhoneModel(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePhoneModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                             builder,
@@ -3042,6 +3094,13 @@ where
                 }
                 Self::PackagingModel(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
+                            builder,
+                            updated_by,
+                        )?
+                        .into()
+                }
+                Self::PersonalProtectiveEquipmentModel(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                             builder,
                             updated_by,
                         )?
@@ -3420,6 +3479,13 @@ where
                 }
                 Self::PackagingModel(builder) => {
                     <crate::codegen::structs_codegen::tables::insertables::InsertablePackagingModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
+                            builder,
+                            updated_at,
+                        )?
+                        .into()
+                }
+                Self::PersonalProtectiveEquipmentModel(builder) => {
+                    <crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                             builder,
                             updated_at,
                         )?
@@ -4328,6 +4394,26 @@ impl From<AssetModelBuilderDAG>
     fn from(value: AssetModelBuilderDAG) -> Self {
         match value {
             AssetModelBuilderDAG::PackagingModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<
+    crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder,
+> for AssetModelBuilderDAG {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder,
+    ) -> Self {
+        AssetModelBuilderDAG::PersonalProtectiveEquipmentModel(value)
+    }
+}
+impl From<AssetModelBuilderDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::insertables::InsertablePersonalProtectiveEquipmentModelBuilder,
+> {
+    fn from(value: AssetModelBuilderDAG) -> Self {
+        match value {
+            AssetModelBuilderDAG::PersonalProtectiveEquipmentModel(v) => Some(v),
             _ => None,
         }
     }

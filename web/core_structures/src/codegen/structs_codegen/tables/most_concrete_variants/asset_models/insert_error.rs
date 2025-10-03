@@ -243,6 +243,12 @@ pub enum AssetModelInsertErrorDAG {
             crate::codegen::structs_codegen::tables::insertables::PackagingModelAttribute,
         >,
     ),
+    ///Insert error associated with the `personal_protective_equipment_models` table.
+    PersonalProtectiveEquipmentModel(
+        web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PersonalProtectiveEquipmentModelAttribute,
+        >,
+    ),
     ///Insert error associated with the `phone_models` table.
     PhoneModel(
         web_common_traits::database::InsertError<
@@ -359,6 +365,7 @@ impl std::fmt::Display for AssetModelInsertErrorDAG {
             Self::FreezerModel(e) => write!(f, "{e}"),
             Self::OrganismModel(e) => write!(f, "{e}"),
             Self::PackagingModel(e) => write!(f, "{e}"),
+            Self::PersonalProtectiveEquipmentModel(e) => write!(f, "{e}"),
             Self::PhoneModel(e) => write!(f, "{e}"),
             Self::PhysicalAssetModel(e) => write!(f, "{e}"),
             Self::PipetteModel(e) => write!(f, "{e}"),
@@ -417,6 +424,7 @@ impl std::error::Error for AssetModelInsertErrorDAG {
             Self::FreezerModel(e) => Some(e),
             Self::OrganismModel(e) => Some(e),
             Self::PackagingModel(e) => Some(e),
+            Self::PersonalProtectiveEquipmentModel(e) => Some(e),
             Self::PhoneModel(e) => Some(e),
             Self::PhysicalAssetModel(e) => Some(e),
             Self::PipetteModel(e) => Some(e),
@@ -1008,6 +1016,19 @@ impl
         >,
     ) -> Self {
         AssetModelInsertErrorDAG::PackagingModel(error)
+    }
+}
+impl From<
+    web_common_traits::database::InsertError<
+        crate::codegen::structs_codegen::tables::insertables::PersonalProtectiveEquipmentModelAttribute,
+    >,
+> for AssetModelInsertErrorDAG {
+    fn from(
+        error: web_common_traits::database::InsertError<
+            crate::codegen::structs_codegen::tables::insertables::PersonalProtectiveEquipmentModelAttribute,
+        >,
+    ) -> Self {
+        AssetModelInsertErrorDAG::PersonalProtectiveEquipmentModel(error)
     }
 }
 impl

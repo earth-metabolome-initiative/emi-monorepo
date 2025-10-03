@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS ppe_reminder_procedure_templates;

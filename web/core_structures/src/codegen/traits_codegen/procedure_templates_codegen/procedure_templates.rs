@@ -22,6 +22,10 @@ impl web_common_traits::prelude::ProcedureTemplateRoot
                 crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure::new()
                     .into()
             }
+            "cleaning_procedure_templates" => {
+                crate::codegen::structs_codegen::tables::cleaning_procedures::CleaningProcedure::new()
+                    .into()
+            }
             "disposal_procedure_templates" => {
                 crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure::new()
                     .into()
@@ -56,6 +60,10 @@ impl web_common_traits::prelude::ProcedureTemplateRoot
             }
             "pouring_procedure_templates" => {
                 crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure::new()
+                    .into()
+            }
+            "ppe_reminder_procedure_templates" => {
+                crate::codegen::structs_codegen::tables::ppe_reminder_procedures::PpeReminderProcedure::new()
                     .into()
             }
             "procedure_templates" => {
@@ -107,6 +115,11 @@ impl web_common_traits::prelude::ProcedureTemplateRoot
                     crate::codegen::structs_codegen::tables::centrifuge_procedures::CentrifugeProcedure,
                 >()
             }
+            "cleaning_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::cleaning_procedures::CleaningProcedure,
+                >()
+            }
             "disposal_procedure_templates" => {
                 std::any::type_name::<
                     crate::codegen::structs_codegen::tables::disposal_procedures::DisposalProcedure,
@@ -150,6 +163,11 @@ impl web_common_traits::prelude::ProcedureTemplateRoot
             "pouring_procedure_templates" => {
                 std::any::type_name::<
                     crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
+                >()
+            }
+            "ppe_reminder_procedure_templates" => {
+                std::any::type_name::<
+                    crate::codegen::structs_codegen::tables::ppe_reminder_procedures::PpeReminderProcedure,
                 >()
             }
             "procedure_templates" => {

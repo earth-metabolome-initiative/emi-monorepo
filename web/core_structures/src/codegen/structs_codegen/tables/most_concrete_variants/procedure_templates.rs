@@ -14,37 +14,41 @@ pub use insert_error::ProcedureTemplateInsertErrorDAG;
 /// v1@{shape: rect, label: "ball_mill_procedure_templates"}
 /// v2@{shape: rect, label: "capping_procedure_templates"}
 /// v3@{shape: rect, label: "centrifuge_procedure_templates"}
-/// v4@{shape: rect, label: "disposal_procedure_templates"}
-/// v5@{shape: rect, label: "fractioning_procedure_templates"}
-/// v6@{shape: rect, label: "freeze_drying_procedure_templates"}
-/// v7@{shape: rect, label: "freezing_procedure_templates"}
-/// v8@{shape: rect, label: "geolocation_procedure_templates"}
-/// v9@{shape: rect, label: "harvesting_procedure_templates"}
-/// v10@{shape: rect, label: "packaging_procedure_templates"}
-/// v11@{shape: rect, label: "photograph_procedure_templates"}
-/// v12@{shape: rect, label: "pouring_procedure_templates"}
-/// v13@{shape: rect, label: "procedure_templates"}
-/// v14@{shape: rect, label: "storage_procedure_templates"}
-/// v15@{shape: rect, label: "supernatant_procedure_templates"}
-/// v16@{shape: rect, label: "tagging_procedure_templates"}
-/// v17@{shape: rect, label: "weighing_procedure_templates"}
-/// v0 --->|"`extends`"| v13
-/// v1 --->|"`extends`"| v13
-/// v2 --->|"`extends`"| v13
-/// v3 --->|"`extends`"| v13
-/// v4 --->|"`extends`"| v13
-/// v5 --->|"`extends`"| v13
-/// v6 --->|"`extends`"| v13
-/// v7 --->|"`extends`"| v13
-/// v8 --->|"`extends`"| v13
-/// v9 --->|"`extends`"| v13
-/// v10 --->|"`extends`"| v13
-/// v11 --->|"`extends`"| v13
-/// v12 --->|"`extends`"| v13
-/// v14 --->|"`extends`"| v13
-/// v15 --->|"`extends`"| v13
-/// v16 --->|"`extends`"| v13
-/// v17 --->|"`extends`"| v13
+/// v4@{shape: rect, label: "cleaning_procedure_templates"}
+/// v5@{shape: rect, label: "disposal_procedure_templates"}
+/// v6@{shape: rect, label: "fractioning_procedure_templates"}
+/// v7@{shape: rect, label: "freeze_drying_procedure_templates"}
+/// v8@{shape: rect, label: "freezing_procedure_templates"}
+/// v9@{shape: rect, label: "geolocation_procedure_templates"}
+/// v10@{shape: rect, label: "harvesting_procedure_templates"}
+/// v11@{shape: rect, label: "packaging_procedure_templates"}
+/// v12@{shape: rect, label: "photograph_procedure_templates"}
+/// v13@{shape: rect, label: "pouring_procedure_templates"}
+/// v14@{shape: rect, label: "ppe_reminder_procedure_templates"}
+/// v15@{shape: rect, label: "procedure_templates"}
+/// v16@{shape: rect, label: "storage_procedure_templates"}
+/// v17@{shape: rect, label: "supernatant_procedure_templates"}
+/// v18@{shape: rect, label: "tagging_procedure_templates"}
+/// v19@{shape: rect, label: "weighing_procedure_templates"}
+/// v0 --->|"`extends`"| v15
+/// v1 --->|"`extends`"| v15
+/// v2 --->|"`extends`"| v15
+/// v3 --->|"`extends`"| v15
+/// v4 --->|"`extends`"| v15
+/// v5 --->|"`extends`"| v15
+/// v6 --->|"`extends`"| v15
+/// v7 --->|"`extends`"| v15
+/// v8 --->|"`extends`"| v15
+/// v9 --->|"`extends`"| v15
+/// v10 --->|"`extends`"| v15
+/// v11 --->|"`extends`"| v15
+/// v12 --->|"`extends`"| v15
+/// v13 --->|"`extends`"| v15
+/// v14 --->|"`extends`"| v15
+/// v16 --->|"`extends`"| v15
+/// v17 --->|"`extends`"| v15
+/// v18 --->|"`extends`"| v15
+/// v19 --->|"`extends`"| v15
 /// ```
 pub enum ProcedureTemplateDAG {
     ///Variant representing the `aliquoting_procedure_templates` table.
@@ -62,6 +66,10 @@ pub enum ProcedureTemplateDAG {
     ///Variant representing the `centrifuge_procedure_templates` table.
     CentrifugeProcedureTemplate(
         crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate,
+    ),
+    ///Variant representing the `cleaning_procedure_templates` table.
+    CleaningProcedureTemplate(
+        crate::codegen::structs_codegen::tables::cleaning_procedure_templates::CleaningProcedureTemplate,
     ),
     ///Variant representing the `disposal_procedure_templates` table.
     DisposalProcedureTemplate(
@@ -98,6 +106,10 @@ pub enum ProcedureTemplateDAG {
     ///Variant representing the `pouring_procedure_templates` table.
     PouringProcedureTemplate(
         crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
+    ),
+    ///Variant representing the `ppe_reminder_procedure_templates` table.
+    PpeReminderProcedureTemplate(
+        crate::codegen::structs_codegen::tables::ppe_reminder_procedure_templates::PpeReminderProcedureTemplate,
     ),
     ///Variant representing the `procedure_templates` table.
     ProcedureTemplate(
@@ -196,6 +208,26 @@ for Option<
     fn from(value: ProcedureTemplateDAG) -> Self {
         match value {
             ProcedureTemplateDAG::CentrifugeProcedureTemplate(v) => Some(v),
+            _ => None,
+        }
+    }
+}
+impl From<
+    crate::codegen::structs_codegen::tables::cleaning_procedure_templates::CleaningProcedureTemplate,
+> for ProcedureTemplateDAG {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::cleaning_procedure_templates::CleaningProcedureTemplate,
+    ) -> Self {
+        ProcedureTemplateDAG::CleaningProcedureTemplate(value)
+    }
+}
+impl From<ProcedureTemplateDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::cleaning_procedure_templates::CleaningProcedureTemplate,
+> {
+    fn from(value: ProcedureTemplateDAG) -> Self {
+        match value {
+            ProcedureTemplateDAG::CleaningProcedureTemplate(v) => Some(v),
             _ => None,
         }
     }
@@ -380,6 +412,26 @@ for Option<
         }
     }
 }
+impl From<
+    crate::codegen::structs_codegen::tables::ppe_reminder_procedure_templates::PpeReminderProcedureTemplate,
+> for ProcedureTemplateDAG {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::ppe_reminder_procedure_templates::PpeReminderProcedureTemplate,
+    ) -> Self {
+        ProcedureTemplateDAG::PpeReminderProcedureTemplate(value)
+    }
+}
+impl From<ProcedureTemplateDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::ppe_reminder_procedure_templates::PpeReminderProcedureTemplate,
+> {
+    fn from(value: ProcedureTemplateDAG) -> Self {
+        match value {
+            ProcedureTemplateDAG::PpeReminderProcedureTemplate(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate>
     for ProcedureTemplateDAG
 {
@@ -492,6 +544,7 @@ impl web_common_traits::database::PrimaryKeyLike for ProcedureTemplateDAG {
             Self::BallMillProcedureTemplate(variant) => variant.primary_key(),
             Self::CappingProcedureTemplate(variant) => variant.primary_key(),
             Self::CentrifugeProcedureTemplate(variant) => variant.primary_key(),
+            Self::CleaningProcedureTemplate(variant) => variant.primary_key(),
             Self::DisposalProcedureTemplate(variant) => variant.primary_key(),
             Self::FractioningProcedureTemplate(variant) => variant.primary_key(),
             Self::FreezeDryingProcedureTemplate(variant) => variant.primary_key(),
@@ -501,6 +554,7 @@ impl web_common_traits::database::PrimaryKeyLike for ProcedureTemplateDAG {
             Self::PackagingProcedureTemplate(variant) => variant.primary_key(),
             Self::PhotographProcedureTemplate(variant) => variant.primary_key(),
             Self::PouringProcedureTemplate(variant) => variant.primary_key(),
+            Self::PpeReminderProcedureTemplate(variant) => variant.primary_key(),
             Self::ProcedureTemplate(variant) => variant.primary_key(),
             Self::StorageProcedureTemplate(variant) => variant.primary_key(),
             Self::SupernatantProcedureTemplate(variant) => variant.primary_key(),
@@ -522,6 +576,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::cleaning_procedure_templates::CleaningProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate: web_common_traits::database::Read<
@@ -549,6 +606,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::ppe_reminder_procedure_templates::PpeReminderProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate: web_common_traits::database::Read<
@@ -594,6 +654,12 @@ where
                 }
                 "centrifuge_procedure_templates" => {
                     <crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "cleaning_procedure_templates" => {
+                    <crate::codegen::structs_codegen::tables::cleaning_procedure_templates::CleaningProcedureTemplate as web_common_traits::database::Read<
                         C,
                     >>::read(*self.id(), conn)?
                         .into()
@@ -648,6 +714,12 @@ where
                 }
                 "pouring_procedure_templates" => {
                     <crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "ppe_reminder_procedure_templates" => {
+                    <crate::codegen::structs_codegen::tables::ppe_reminder_procedure_templates::PpeReminderProcedureTemplate as web_common_traits::database::Read<
                         C,
                     >>::read(*self.id(), conn)?
                         .into()

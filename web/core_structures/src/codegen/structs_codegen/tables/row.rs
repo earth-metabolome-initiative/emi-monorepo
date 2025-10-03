@@ -21,6 +21,8 @@ mod centrifuge_procedure_templates;
 mod centrifuge_procedures;
 mod centrifuges;
 mod cities;
+mod cleaning_procedure_templates;
+mod cleaning_procedures;
 mod colors;
 mod commercial_ball_mill_machine_lots;
 mod commercial_ball_mill_machine_models;
@@ -88,6 +90,7 @@ mod packaging_procedure_templates;
 mod packaging_procedures;
 mod parent_procedure_templates;
 mod permanence_categories;
+mod personal_protective_equipment_models;
 mod phone_models;
 mod photograph_procedure_templates;
 mod photograph_procedures;
@@ -101,6 +104,8 @@ mod positioning_device_models;
 mod positioning_devices;
 mod pouring_procedure_templates;
 mod pouring_procedures;
+mod ppe_reminder_procedure_templates;
+mod ppe_reminder_procedures;
 mod procedure_assets;
 mod procedure_template_asset_models;
 mod procedure_templates;
@@ -199,6 +204,12 @@ pub enum Row {
     ),
     Centrifuge(crate::codegen::structs_codegen::tables::centrifuges::Centrifuge),
     City(crate::codegen::structs_codegen::tables::cities::City),
+    CleaningProcedureTemplate(
+        crate::codegen::structs_codegen::tables::cleaning_procedure_templates::CleaningProcedureTemplate,
+    ),
+    CleaningProcedure(
+        crate::codegen::structs_codegen::tables::cleaning_procedures::CleaningProcedure,
+    ),
     Color(crate::codegen::structs_codegen::tables::colors::Color),
     CommercialBallMillMachineLot(
         crate::codegen::structs_codegen::tables::commercial_ball_mill_machine_lots::CommercialBallMillMachineLot,
@@ -375,6 +386,9 @@ pub enum Row {
     PermanenceCategory(
         crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory,
     ),
+    PersonalProtectiveEquipmentModel(
+        crate::codegen::structs_codegen::tables::personal_protective_equipment_models::PersonalProtectiveEquipmentModel,
+    ),
     PhoneModel(crate::codegen::structs_codegen::tables::phone_models::PhoneModel),
     PhotographProcedureTemplate(
         crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate,
@@ -405,6 +419,12 @@ pub enum Row {
     ),
     PouringProcedure(
         crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
+    ),
+    PpeReminderProcedureTemplate(
+        crate::codegen::structs_codegen::tables::ppe_reminder_procedure_templates::PpeReminderProcedureTemplate,
+    ),
+    PpeReminderProcedure(
+        crate::codegen::structs_codegen::tables::ppe_reminder_procedures::PpeReminderProcedure,
     ),
     ProcedureAsset(
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
@@ -551,6 +571,12 @@ impl Row {
             }
             Row::Centrifuge(centrifuges) => centrifuges.upsert(conn)?.map(Row::from),
             Row::City(cities) => cities.upsert(conn)?.map(Row::from),
+            Row::CleaningProcedureTemplate(cleaning_procedure_templates) => {
+                cleaning_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::CleaningProcedure(cleaning_procedures) => {
+                cleaning_procedures.upsert(conn)?.map(Row::from)
+            }
             Row::Color(colors) => colors.upsert(conn)?.map(Row::from),
             Row::CommercialBallMillMachineLot(commercial_ball_mill_machine_lots) => {
                 commercial_ball_mill_machine_lots.upsert(conn)?.map(Row::from)
@@ -717,6 +743,9 @@ impl Row {
             Row::PermanenceCategory(permanence_categories) => {
                 permanence_categories.upsert(conn)?.map(Row::from)
             }
+            Row::PersonalProtectiveEquipmentModel(personal_protective_equipment_models) => {
+                personal_protective_equipment_models.upsert(conn)?.map(Row::from)
+            }
             Row::PhoneModel(phone_models) => phone_models.upsert(conn)?.map(Row::from),
             Row::PhotographProcedureTemplate(photograph_procedure_templates) => {
                 photograph_procedure_templates.upsert(conn)?.map(Row::from)
@@ -745,6 +774,12 @@ impl Row {
             }
             Row::PouringProcedure(pouring_procedures) => {
                 pouring_procedures.upsert(conn)?.map(Row::from)
+            }
+            Row::PpeReminderProcedureTemplate(ppe_reminder_procedure_templates) => {
+                ppe_reminder_procedure_templates.upsert(conn)?.map(Row::from)
+            }
+            Row::PpeReminderProcedure(ppe_reminder_procedures) => {
+                ppe_reminder_procedures.upsert(conn)?.map(Row::from)
             }
             Row::ProcedureAsset(procedure_assets) => procedure_assets.upsert(conn)?.map(Row::from),
             Row::ProcedureTemplateAssetModel(procedure_template_asset_models) => {
@@ -868,6 +903,10 @@ impl web_common_traits::prelude::Row for Row {
             Row::CentrifugeProcedure(centrifuge_procedures) => centrifuge_procedures.primary_key(),
             Row::Centrifuge(centrifuges) => centrifuges.primary_key(),
             Row::City(cities) => cities.primary_key(),
+            Row::CleaningProcedureTemplate(cleaning_procedure_templates) => {
+                cleaning_procedure_templates.primary_key()
+            }
+            Row::CleaningProcedure(cleaning_procedures) => cleaning_procedures.primary_key(),
             Row::Color(colors) => colors.primary_key(),
             Row::CommercialBallMillMachineLot(commercial_ball_mill_machine_lots) => {
                 commercial_ball_mill_machine_lots.primary_key()
@@ -1008,6 +1047,9 @@ impl web_common_traits::prelude::Row for Row {
                 parent_procedure_templates.primary_key()
             }
             Row::PermanenceCategory(permanence_categories) => permanence_categories.primary_key(),
+            Row::PersonalProtectiveEquipmentModel(personal_protective_equipment_models) => {
+                personal_protective_equipment_models.primary_key()
+            }
             Row::PhoneModel(phone_models) => phone_models.primary_key(),
             Row::PhotographProcedureTemplate(photograph_procedure_templates) => {
                 photograph_procedure_templates.primary_key()
@@ -1027,6 +1069,12 @@ impl web_common_traits::prelude::Row for Row {
                 pouring_procedure_templates.primary_key()
             }
             Row::PouringProcedure(pouring_procedures) => pouring_procedures.primary_key(),
+            Row::PpeReminderProcedureTemplate(ppe_reminder_procedure_templates) => {
+                ppe_reminder_procedure_templates.primary_key()
+            }
+            Row::PpeReminderProcedure(ppe_reminder_procedures) => {
+                ppe_reminder_procedures.primary_key()
+            }
             Row::ProcedureAsset(procedure_assets) => procedure_assets.primary_key(),
             Row::ProcedureTemplateAssetModel(procedure_template_asset_models) => {
                 procedure_template_asset_models.primary_key()

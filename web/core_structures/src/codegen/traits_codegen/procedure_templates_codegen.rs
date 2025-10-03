@@ -2,6 +2,7 @@ mod aliquoting_procedure_templates;
 mod ball_mill_procedure_templates;
 mod capping_procedure_templates;
 mod centrifuge_procedure_templates;
+mod cleaning_procedure_templates;
 mod disposal_procedure_templates;
 mod fractioning_procedure_templates;
 mod freeze_drying_procedure_templates;
@@ -11,6 +12,7 @@ mod harvesting_procedure_templates;
 mod packaging_procedure_templates;
 mod photograph_procedure_templates;
 mod pouring_procedure_templates;
+mod ppe_reminder_procedure_templates;
 mod procedure_templates;
 mod storage_procedure_templates;
 mod supernatant_procedure_templates;
@@ -52,6 +54,9 @@ where
                 Self::CentrifugeProcedureTemplate(value) => {
                     value.procedure_template_asset_models(conn)?
                 }
+                Self::CleaningProcedureTemplate(value) => {
+                    value.procedure_template_asset_models(conn)?
+                }
                 Self::DisposalProcedureTemplate(value) => {
                     value.procedure_template_asset_models(conn)?
                 }
@@ -77,6 +82,9 @@ where
                     value.procedure_template_asset_models(conn)?
                 }
                 Self::PouringProcedureTemplate(value) => {
+                    value.procedure_template_asset_models(conn)?
+                }
+                Self::PpeReminderProcedureTemplate(value) => {
                     value.procedure_template_asset_models(conn)?
                 }
                 Self::StorageProcedureTemplate(value) => {

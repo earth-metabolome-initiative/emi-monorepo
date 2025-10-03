@@ -24,6 +24,8 @@ pub enum TablePrimaryKey {
     CentrifugeProcedure(::rosetta_uuid::Uuid),
     Centrifuge(::rosetta_uuid::Uuid),
     City(i32),
+    CleaningProcedureTemplate(i32),
+    CleaningProcedure(::rosetta_uuid::Uuid),
     Color(i16),
     CommercialBallMillMachineLot(i32),
     CommercialBallMillMachineModel(i32),
@@ -90,6 +92,7 @@ pub enum TablePrimaryKey {
     PackagingProcedure(::rosetta_uuid::Uuid),
     ParentProcedureTemplate((i32, i32)),
     PermanenceCategory(i16),
+    PersonalProtectiveEquipmentModel(i32),
     PhoneModel(i32),
     PhotographProcedureTemplate(i32),
     PhotographProcedure(::rosetta_uuid::Uuid),
@@ -103,6 +106,8 @@ pub enum TablePrimaryKey {
     PositioningDevice(::rosetta_uuid::Uuid),
     PouringProcedureTemplate(i32),
     PouringProcedure(::rosetta_uuid::Uuid),
+    PpeReminderProcedureTemplate(i32),
+    PpeReminderProcedure(::rosetta_uuid::Uuid),
     ProcedureAsset(::rosetta_uuid::Uuid),
     ProcedureTemplateAssetModel(i32),
     ProcedureTemplate(i32),
@@ -211,6 +216,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
                 crate::codegen::tables::table_names::TableName::Centrifuge
             }
             TablePrimaryKey::City(_) => crate::codegen::tables::table_names::TableName::City,
+            TablePrimaryKey::CleaningProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::CleaningProcedureTemplate
+            }
+            TablePrimaryKey::CleaningProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::CleaningProcedure
+            }
             TablePrimaryKey::Color(_) => crate::codegen::tables::table_names::TableName::Color,
             TablePrimaryKey::CommercialBallMillMachineLot(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialBallMillMachineLot
@@ -403,6 +414,9 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             TablePrimaryKey::PermanenceCategory(_) => {
                 crate::codegen::tables::table_names::TableName::PermanenceCategory
             }
+            TablePrimaryKey::PersonalProtectiveEquipmentModel(_) => {
+                crate::codegen::tables::table_names::TableName::PersonalProtectiveEquipmentModel
+            }
             TablePrimaryKey::PhoneModel(_) => {
                 crate::codegen::tables::table_names::TableName::PhoneModel
             }
@@ -439,6 +453,12 @@ impl web_common_traits::prelude::Tabular for TablePrimaryKey {
             }
             TablePrimaryKey::PouringProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::PouringProcedure
+            }
+            TablePrimaryKey::PpeReminderProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::PpeReminderProcedureTemplate
+            }
+            TablePrimaryKey::PpeReminderProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::PpeReminderProcedure
             }
             TablePrimaryKey::ProcedureAsset(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureAsset

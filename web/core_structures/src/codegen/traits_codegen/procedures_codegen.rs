@@ -2,6 +2,7 @@ mod aliquoting_procedures;
 mod ball_mill_procedures;
 mod capping_procedures;
 mod centrifuge_procedures;
+mod cleaning_procedures;
 mod disposal_procedures;
 mod fractioning_procedures;
 mod freeze_drying_procedures;
@@ -11,6 +12,7 @@ mod harvesting_procedures;
 mod packaging_procedures;
 mod photograph_procedures;
 mod pouring_procedures;
+mod ppe_reminder_procedures;
 mod procedures;
 mod storage_procedures;
 mod supernatant_procedures;
@@ -46,6 +48,9 @@ impl web_common_traits::prelude::ProcedureLike
             Self::CentrifugeProcedure(procedure) => {
                 procedure.procedure_template_asset_models_and_procedure_assets()
             }
+            Self::CleaningProcedure(procedure) => {
+                procedure.procedure_template_asset_models_and_procedure_assets()
+            }
             Self::DisposalProcedure(procedure) => {
                 procedure.procedure_template_asset_models_and_procedure_assets()
             }
@@ -71,6 +76,9 @@ impl web_common_traits::prelude::ProcedureLike
                 procedure.procedure_template_asset_models_and_procedure_assets()
             }
             Self::PouringProcedure(procedure) => {
+                procedure.procedure_template_asset_models_and_procedure_assets()
+            }
+            Self::PpeReminderProcedure(procedure) => {
                 procedure.procedure_template_asset_models_and_procedure_assets()
             }
             Self::Procedure(procedure) => {
@@ -135,6 +143,12 @@ impl web_common_traits::prelude::ProcedureBuilderLike
                     ),
                 ) => builder.complete_with(parents, template, template_graph)?.into(),
                 (
+                    Self::CleaningProcedure(builder),
+                    crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG::CleaningProcedureTemplate(
+                        template,
+                    ),
+                ) => builder.complete_with(parents, template, template_graph)?.into(),
+                (
                     Self::DisposalProcedure(builder),
                     crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG::DisposalProcedureTemplate(
                         template,
@@ -185,6 +199,12 @@ impl web_common_traits::prelude::ProcedureBuilderLike
                 (
                     Self::PouringProcedure(builder),
                     crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG::PouringProcedureTemplate(
+                        template,
+                    ),
+                ) => builder.complete_with(parents, template, template_graph)?.into(),
+                (
+                    Self::PpeReminderProcedure(builder),
+                    crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureTemplateDAG::PpeReminderProcedureTemplate(
                         template,
                     ),
                 ) => builder.complete_with(parents, template, template_graph)?.into(),

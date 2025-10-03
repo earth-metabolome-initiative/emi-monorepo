@@ -24,6 +24,8 @@ pub enum TableName {
     CentrifugeProcedure,
     Centrifuge,
     City,
+    CleaningProcedureTemplate,
+    CleaningProcedure,
     Color,
     CommercialBallMillMachineLot,
     CommercialBallMillMachineModel,
@@ -90,6 +92,7 @@ pub enum TableName {
     PackagingProcedure,
     ParentProcedureTemplate,
     PermanenceCategory,
+    PersonalProtectiveEquipmentModel,
     PhoneModel,
     PhotographProcedureTemplate,
     PhotographProcedure,
@@ -103,6 +106,8 @@ pub enum TableName {
     PositioningDevice,
     PouringProcedureTemplate,
     PouringProcedure,
+    PpeReminderProcedureTemplate,
+    PpeReminderProcedure,
     ProcedureAsset,
     ProcedureTemplateAssetModel,
     ProcedureTemplate,
@@ -176,6 +181,8 @@ impl core::str::FromStr for TableName {
             "centrifuge_procedures" => Ok(TableName::CentrifugeProcedure),
             "centrifuges" => Ok(TableName::Centrifuge),
             "cities" => Ok(TableName::City),
+            "cleaning_procedure_templates" => Ok(TableName::CleaningProcedureTemplate),
+            "cleaning_procedures" => Ok(TableName::CleaningProcedure),
             "colors" => Ok(TableName::Color),
             "commercial_ball_mill_machine_lots" => Ok(TableName::CommercialBallMillMachineLot),
             "commercial_ball_mill_machine_models" => Ok(TableName::CommercialBallMillMachineModel),
@@ -248,6 +255,9 @@ impl core::str::FromStr for TableName {
             "packaging_procedures" => Ok(TableName::PackagingProcedure),
             "parent_procedure_templates" => Ok(TableName::ParentProcedureTemplate),
             "permanence_categories" => Ok(TableName::PermanenceCategory),
+            "personal_protective_equipment_models" => {
+                Ok(TableName::PersonalProtectiveEquipmentModel)
+            }
             "phone_models" => Ok(TableName::PhoneModel),
             "photograph_procedure_templates" => Ok(TableName::PhotographProcedureTemplate),
             "photograph_procedures" => Ok(TableName::PhotographProcedure),
@@ -261,6 +271,8 @@ impl core::str::FromStr for TableName {
             "positioning_devices" => Ok(TableName::PositioningDevice),
             "pouring_procedure_templates" => Ok(TableName::PouringProcedureTemplate),
             "pouring_procedures" => Ok(TableName::PouringProcedure),
+            "ppe_reminder_procedure_templates" => Ok(TableName::PpeReminderProcedureTemplate),
+            "ppe_reminder_procedures" => Ok(TableName::PpeReminderProcedure),
             "procedure_assets" => Ok(TableName::ProcedureAsset),
             "procedure_template_asset_models" => Ok(TableName::ProcedureTemplateAssetModel),
             "procedure_templates" => Ok(TableName::ProcedureTemplate),
@@ -343,6 +355,10 @@ impl core::fmt::Display for TableName {
             TableName::CentrifugeProcedure => write!(f, "centrifuge_procedures"),
             TableName::Centrifuge => write!(f, "centrifuges"),
             TableName::City => write!(f, "cities"),
+            TableName::CleaningProcedureTemplate => {
+                write!(f, "cleaning_procedure_templates")
+            }
+            TableName::CleaningProcedure => write!(f, "cleaning_procedures"),
             TableName::Color => write!(f, "colors"),
             TableName::CommercialBallMillMachineLot => {
                 write!(f, "commercial_ball_mill_machine_lots")
@@ -453,6 +469,9 @@ impl core::fmt::Display for TableName {
             TableName::PackagingProcedure => write!(f, "packaging_procedures"),
             TableName::ParentProcedureTemplate => write!(f, "parent_procedure_templates"),
             TableName::PermanenceCategory => write!(f, "permanence_categories"),
+            TableName::PersonalProtectiveEquipmentModel => {
+                write!(f, "personal_protective_equipment_models")
+            }
             TableName::PhoneModel => write!(f, "phone_models"),
             TableName::PhotographProcedureTemplate => {
                 write!(f, "photograph_procedure_templates")
@@ -470,6 +489,10 @@ impl core::fmt::Display for TableName {
                 write!(f, "pouring_procedure_templates")
             }
             TableName::PouringProcedure => write!(f, "pouring_procedures"),
+            TableName::PpeReminderProcedureTemplate => {
+                write!(f, "ppe_reminder_procedure_templates")
+            }
+            TableName::PpeReminderProcedure => write!(f, "ppe_reminder_procedures"),
             TableName::ProcedureAsset => write!(f, "procedure_assets"),
             TableName::ProcedureTemplateAssetModel => {
                 write!(f, "procedure_template_asset_models")

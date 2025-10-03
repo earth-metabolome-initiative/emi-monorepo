@@ -104,6 +104,16 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::City(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::City).collect::<Vec<_>>()
             }
+            super::Rows::CleaningProcedureTemplate(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CleaningProcedureTemplate)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::CleaningProcedure(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::CleaningProcedure)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::Color(rows) => {
                 rows.into_iter().map(crate::codegen::tables::row::Row::Color).collect::<Vec<_>>()
             }
@@ -424,6 +434,11 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
                     .map(crate::codegen::tables::row::Row::PermanenceCategory)
                     .collect::<Vec<_>>()
             }
+            super::Rows::PersonalProtectiveEquipmentModel(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PersonalProtectiveEquipmentModel)
+                    .collect::<Vec<_>>()
+            }
             super::Rows::PhoneModel(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::PhoneModel)
@@ -485,6 +500,16 @@ impl From<super::Rows> for Vec<crate::codegen::tables::row::Row> {
             super::Rows::PouringProcedure(rows) => {
                 rows.into_iter()
                     .map(crate::codegen::tables::row::Row::PouringProcedure)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::PpeReminderProcedureTemplate(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PpeReminderProcedureTemplate)
+                    .collect::<Vec<_>>()
+            }
+            super::Rows::PpeReminderProcedure(rows) => {
+                rows.into_iter()
+                    .map(crate::codegen::tables::row::Row::PpeReminderProcedure)
                     .collect::<Vec<_>>()
             }
             super::Rows::ProcedureAsset(rows) => {

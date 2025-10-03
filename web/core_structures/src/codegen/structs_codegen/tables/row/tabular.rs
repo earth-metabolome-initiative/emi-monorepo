@@ -53,6 +53,12 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::Centrifuge(_) => crate::codegen::tables::table_names::TableName::Centrifuge,
             super::Row::City(_) => crate::codegen::tables::table_names::TableName::City,
+            super::Row::CleaningProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::CleaningProcedureTemplate
+            }
+            super::Row::CleaningProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::CleaningProcedure
+            }
             super::Row::Color(_) => crate::codegen::tables::table_names::TableName::Color,
             super::Row::CommercialBallMillMachineLot(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialBallMillMachineLot
@@ -239,6 +245,9 @@ impl web_common_traits::prelude::Tabular for super::Row {
             super::Row::PermanenceCategory(_) => {
                 crate::codegen::tables::table_names::TableName::PermanenceCategory
             }
+            super::Row::PersonalProtectiveEquipmentModel(_) => {
+                crate::codegen::tables::table_names::TableName::PersonalProtectiveEquipmentModel
+            }
             super::Row::PhoneModel(_) => crate::codegen::tables::table_names::TableName::PhoneModel,
             super::Row::PhotographProcedureTemplate(_) => {
                 crate::codegen::tables::table_names::TableName::PhotographProcedureTemplate
@@ -271,6 +280,12 @@ impl web_common_traits::prelude::Tabular for super::Row {
             }
             super::Row::PouringProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::PouringProcedure
+            }
+            super::Row::PpeReminderProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::PpeReminderProcedureTemplate
+            }
+            super::Row::PpeReminderProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::PpeReminderProcedure
             }
             super::Row::ProcedureAsset(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureAsset

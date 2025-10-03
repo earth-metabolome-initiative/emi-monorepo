@@ -57,6 +57,12 @@ impl web_common_traits::prelude::Tabular for super::Rows {
                 crate::codegen::tables::table_names::TableName::Centrifuge
             }
             super::Rows::City(_) => crate::codegen::tables::table_names::TableName::City,
+            super::Rows::CleaningProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::CleaningProcedureTemplate
+            }
+            super::Rows::CleaningProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::CleaningProcedure
+            }
             super::Rows::Color(_) => crate::codegen::tables::table_names::TableName::Color,
             super::Rows::CommercialBallMillMachineLot(_) => {
                 crate::codegen::tables::table_names::TableName::CommercialBallMillMachineLot
@@ -243,6 +249,9 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             super::Rows::PermanenceCategory(_) => {
                 crate::codegen::tables::table_names::TableName::PermanenceCategory
             }
+            super::Rows::PersonalProtectiveEquipmentModel(_) => {
+                crate::codegen::tables::table_names::TableName::PersonalProtectiveEquipmentModel
+            }
             super::Rows::PhoneModel(_) => {
                 crate::codegen::tables::table_names::TableName::PhoneModel
             }
@@ -279,6 +288,12 @@ impl web_common_traits::prelude::Tabular for super::Rows {
             }
             super::Rows::PouringProcedure(_) => {
                 crate::codegen::tables::table_names::TableName::PouringProcedure
+            }
+            super::Rows::PpeReminderProcedureTemplate(_) => {
+                crate::codegen::tables::table_names::TableName::PpeReminderProcedureTemplate
+            }
+            super::Rows::PpeReminderProcedure(_) => {
+                crate::codegen::tables::table_names::TableName::PpeReminderProcedure
             }
             super::Rows::ProcedureAsset(_) => {
                 crate::codegen::tables::table_names::TableName::ProcedureAsset

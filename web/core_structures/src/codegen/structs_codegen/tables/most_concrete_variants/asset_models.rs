@@ -49,23 +49,24 @@ pub use insert_error::AssetModelInsertErrorDAG;
 /// v37@{shape: rect, label: "freezer_models"}
 /// v38@{shape: rect, label: "organism_models"}
 /// v39@{shape: rect, label: "packaging_models"}
-/// v40@{shape: rect, label: "phone_models"}
-/// v41@{shape: rect, label: "physical_asset_models"}
-/// v42@{shape: rect, label: "pipette_models"}
-/// v43@{shape: rect, label: "pipette_tip_models"}
-/// v44@{shape: rect, label: "positioning_device_models"}
-/// v45@{shape: rect, label: "reagent_models"}
-/// v46@{shape: rect, label: "sample_models"}
-/// v47@{shape: rect, label: "sample_source_models"}
-/// v48@{shape: rect, label: "soil_models"}
-/// v49@{shape: rect, label: "volume_measuring_device_models"}
-/// v50@{shape: rect, label: "volumetric_container_models"}
-/// v51@{shape: rect, label: "weighing_device_models"}
-/// v1 --->|"`extends`"| v41
-/// v2 --->|"`extends`"| v41
-/// v3 --->|"`extends`"| v41
-/// v4 --->|"`extends`"| v41
-/// v5 --->|"`extends`"| v41
+/// v40@{shape: rect, label: "personal_protective_equipment_models"}
+/// v41@{shape: rect, label: "phone_models"}
+/// v42@{shape: rect, label: "physical_asset_models"}
+/// v43@{shape: rect, label: "pipette_models"}
+/// v44@{shape: rect, label: "pipette_tip_models"}
+/// v45@{shape: rect, label: "positioning_device_models"}
+/// v46@{shape: rect, label: "reagent_models"}
+/// v47@{shape: rect, label: "sample_models"}
+/// v48@{shape: rect, label: "sample_source_models"}
+/// v49@{shape: rect, label: "soil_models"}
+/// v50@{shape: rect, label: "volume_measuring_device_models"}
+/// v51@{shape: rect, label: "volumetric_container_models"}
+/// v52@{shape: rect, label: "weighing_device_models"}
+/// v1 --->|"`extends`"| v42
+/// v2 --->|"`extends`"| v42
+/// v3 --->|"`extends`"| v42
+/// v4 --->|"`extends`"| v42
+/// v5 --->|"`extends`"| v42
 /// v6 --->|"`extends`"| v28
 /// v6 --->|"`extends`"| v1
 /// v7 --->|"`extends`"| v1
@@ -99,46 +100,47 @@ pub use insert_error::AssetModelInsertErrorDAG;
 /// v21 --->|"`extends`"| v39
 /// v21 --->|"`extends`"| v29
 /// v22 --->|"`extends`"| v28
-/// v22 --->|"`extends`"| v42
-/// v23 --->|"`extends`"| v42
+/// v22 --->|"`extends`"| v43
+/// v23 --->|"`extends`"| v43
 /// v23 --->|"`extends`"| v29
 /// v24 --->|"`extends`"| v28
-/// v24 --->|"`extends`"| v43
-/// v25 --->|"`extends`"| v43
+/// v24 --->|"`extends`"| v44
+/// v25 --->|"`extends`"| v44
 /// v25 --->|"`extends`"| v29
 /// v26 --->|"`extends`"| v28
-/// v26 --->|"`extends`"| v44
-/// v27 --->|"`extends`"| v44
+/// v26 --->|"`extends`"| v45
+/// v27 --->|"`extends`"| v45
 /// v27 --->|"`extends`"| v29
-/// v28 --->|"`extends`"| v41
+/// v28 --->|"`extends`"| v42
 /// v29 --->|"`extends`"| v0
 /// v30 --->|"`extends`"| v28
-/// v30 --->|"`extends`"| v49
-/// v31 --->|"`extends`"| v49
+/// v30 --->|"`extends`"| v50
+/// v31 --->|"`extends`"| v50
 /// v31 --->|"`extends`"| v29
 /// v32 --->|"`extends`"| v28
-/// v32 --->|"`extends`"| v51
-/// v33 --->|"`extends`"| v51
+/// v32 --->|"`extends`"| v52
+/// v33 --->|"`extends`"| v52
 /// v33 --->|"`extends`"| v29
-/// v34 --->|"`extends`"| v41
+/// v34 --->|"`extends`"| v42
 /// v35 --->|"`extends`"| v0
-/// v36 --->|"`extends`"| v41
-/// v37 --->|"`extends`"| v41
-/// v38 --->|"`extends`"| v47
-/// v39 --->|"`extends`"| v41
-/// v40 --->|"`extends`"| v3
-/// v40 --->|"`extends`"| v44
-/// v41 --->|"`extends`"| v0
-/// v42 --->|"`extends`"| v41
-/// v43 --->|"`extends`"| v41
-/// v44 --->|"`extends`"| v41
-/// v45 --->|"`extends`"| v0
-/// v46 --->|"`extends`"| v41
-/// v47 --->|"`extends`"| v41
-/// v48 --->|"`extends`"| v47
-/// v49 --->|"`extends`"| v41
-/// v50 --->|"`extends`"| v34
-/// v51 --->|"`extends`"| v41
+/// v36 --->|"`extends`"| v42
+/// v37 --->|"`extends`"| v42
+/// v38 --->|"`extends`"| v48
+/// v39 --->|"`extends`"| v42
+/// v40 --->|"`extends`"| v42
+/// v41 --->|"`extends`"| v3
+/// v41 --->|"`extends`"| v45
+/// v42 --->|"`extends`"| v0
+/// v43 --->|"`extends`"| v42
+/// v44 --->|"`extends`"| v42
+/// v45 --->|"`extends`"| v42
+/// v46 --->|"`extends`"| v0
+/// v47 --->|"`extends`"| v42
+/// v48 --->|"`extends`"| v42
+/// v49 --->|"`extends`"| v48
+/// v50 --->|"`extends`"| v42
+/// v51 --->|"`extends`"| v34
+/// v52 --->|"`extends`"| v42
 /// ```
 pub enum AssetModelDAG {
     ///Variant representing the `asset_models` table.
@@ -290,6 +292,10 @@ pub enum AssetModelDAG {
     ///Variant representing the `packaging_models` table.
     PackagingModel(
         crate::codegen::structs_codegen::tables::packaging_models::PackagingModel,
+    ),
+    ///Variant representing the `personal_protective_equipment_models` table.
+    PersonalProtectiveEquipmentModel(
+        crate::codegen::structs_codegen::tables::personal_protective_equipment_models::PersonalProtectiveEquipmentModel,
     ),
     ///Variant representing the `phone_models` table.
     PhoneModel(crate::codegen::structs_codegen::tables::phone_models::PhoneModel),
@@ -1102,6 +1108,26 @@ impl From<AssetModelDAG>
         }
     }
 }
+impl From<
+    crate::codegen::structs_codegen::tables::personal_protective_equipment_models::PersonalProtectiveEquipmentModel,
+> for AssetModelDAG {
+    fn from(
+        value: crate::codegen::structs_codegen::tables::personal_protective_equipment_models::PersonalProtectiveEquipmentModel,
+    ) -> Self {
+        AssetModelDAG::PersonalProtectiveEquipmentModel(value)
+    }
+}
+impl From<AssetModelDAG>
+for Option<
+    crate::codegen::structs_codegen::tables::personal_protective_equipment_models::PersonalProtectiveEquipmentModel,
+> {
+    fn from(value: AssetModelDAG) -> Self {
+        match value {
+            AssetModelDAG::PersonalProtectiveEquipmentModel(v) => Some(v),
+            _ => None,
+        }
+    }
+}
 impl From<crate::codegen::structs_codegen::tables::phone_models::PhoneModel> for AssetModelDAG {
     fn from(value: crate::codegen::structs_codegen::tables::phone_models::PhoneModel) -> Self {
         AssetModelDAG::PhoneModel(value)
@@ -1364,6 +1390,7 @@ impl web_common_traits::database::PrimaryKeyLike for AssetModelDAG {
             Self::FreezerModel(variant) => variant.primary_key(),
             Self::OrganismModel(variant) => variant.primary_key(),
             Self::PackagingModel(variant) => variant.primary_key(),
+            Self::PersonalProtectiveEquipmentModel(variant) => variant.primary_key(),
             Self::PhoneModel(variant) => variant.primary_key(),
             Self::PhysicalAssetModel(variant) => variant.primary_key(),
             Self::PipetteModel(variant) => variant.primary_key(),
@@ -1500,6 +1527,9 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::packaging_models::PackagingModel: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::personal_protective_equipment_models::PersonalProtectiveEquipmentModel: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::phone_models::PhoneModel: web_common_traits::database::Read<
@@ -1777,6 +1807,12 @@ where
                 }
                 "packaging_models" => {
                     <crate::codegen::structs_codegen::tables::packaging_models::PackagingModel as web_common_traits::database::Read<
+                        C,
+                    >>::read(*self.id(), conn)?
+                        .into()
+                }
+                "personal_protective_equipment_models" => {
+                    <crate::codegen::structs_codegen::tables::personal_protective_equipment_models::PersonalProtectiveEquipmentModel as web_common_traits::database::Read<
                         C,
                     >>::read(*self.id(), conn)?
                         .into()

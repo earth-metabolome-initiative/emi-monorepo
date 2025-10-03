@@ -60,6 +60,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
                 crate::codegen::tables::rows::Rows::from(centrifuges)
             }
             super::Row::City(cities) => crate::codegen::tables::rows::Rows::from(cities),
+            super::Row::CleaningProcedureTemplate(cleaning_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(cleaning_procedure_templates)
+            }
+            super::Row::CleaningProcedure(cleaning_procedures) => {
+                crate::codegen::tables::rows::Rows::from(cleaning_procedures)
+            }
             super::Row::Color(colors) => crate::codegen::tables::rows::Rows::from(colors),
             super::Row::CommercialBallMillMachineLot(commercial_ball_mill_machine_lots) => {
                 crate::codegen::tables::rows::Rows::from(commercial_ball_mill_machine_lots)
@@ -250,6 +256,9 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::PermanenceCategory(permanence_categories) => {
                 crate::codegen::tables::rows::Rows::from(permanence_categories)
             }
+            super::Row::PersonalProtectiveEquipmentModel(personal_protective_equipment_models) => {
+                crate::codegen::tables::rows::Rows::from(personal_protective_equipment_models)
+            }
             super::Row::PhoneModel(phone_models) => {
                 crate::codegen::tables::rows::Rows::from(phone_models)
             }
@@ -286,6 +295,12 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             }
             super::Row::PouringProcedure(pouring_procedures) => {
                 crate::codegen::tables::rows::Rows::from(pouring_procedures)
+            }
+            super::Row::PpeReminderProcedureTemplate(ppe_reminder_procedure_templates) => {
+                crate::codegen::tables::rows::Rows::from(ppe_reminder_procedure_templates)
+            }
+            super::Row::PpeReminderProcedure(ppe_reminder_procedures) => {
+                crate::codegen::tables::rows::Rows::from(ppe_reminder_procedures)
             }
             super::Row::ProcedureAsset(procedure_assets) => {
                 crate::codegen::tables::rows::Rows::from(procedure_assets)

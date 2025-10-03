@@ -69,6 +69,12 @@ where
     crate::codegen::structs_codegen::tables::cities::City: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::cleaning_procedure_templates::CleaningProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::cleaning_procedures::CleaningProcedure: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::colors::Color: web_common_traits::database::Read<
         C,
     >,
@@ -267,6 +273,9 @@ where
     crate::codegen::structs_codegen::tables::permanence_categories::PermanenceCategory: web_common_traits::database::Read<
         C,
     >,
+    crate::codegen::structs_codegen::tables::personal_protective_equipment_models::PersonalProtectiveEquipmentModel: web_common_traits::database::Read<
+        C,
+    >,
     crate::codegen::structs_codegen::tables::phone_models::PhoneModel: web_common_traits::database::Read<
         C,
     >,
@@ -304,6 +313,12 @@ where
         C,
     >,
     crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::ppe_reminder_procedure_templates::PpeReminderProcedureTemplate: web_common_traits::database::Read<
+        C,
+    >,
+    crate::codegen::structs_codegen::tables::ppe_reminder_procedures::PpeReminderProcedure: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
@@ -649,6 +664,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::cities::City::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CleaningProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::cleaning_procedure_templates::CleaningProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::CleaningProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::cleaning_procedures::CleaningProcedure::read(
                             primary_key,
                             conn,
                         )?
@@ -1248,6 +1281,15 @@ where
                         )?
                         .into()
                 }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PersonalProtectiveEquipmentModel(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::personal_protective_equipment_models::PersonalProtectiveEquipmentModel::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhoneModel(
                     primary_key,
                 ) => {
@@ -1360,6 +1402,24 @@ where
                     primary_key,
                 ) => {
                     crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PpeReminderProcedureTemplate(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::ppe_reminder_procedure_templates::PpeReminderProcedureTemplate::read(
+                            primary_key,
+                            conn,
+                        )?
+                        .into()
+                }
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PpeReminderProcedure(
+                    primary_key,
+                ) => {
+                    crate::codegen::structs_codegen::tables::ppe_reminder_procedures::PpeReminderProcedure::read(
                             primary_key,
                             conn,
                         )?
