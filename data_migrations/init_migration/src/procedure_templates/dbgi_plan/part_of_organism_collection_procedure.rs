@@ -1,11 +1,13 @@
 //! Submodule defining the Ethanol 70 percent procedure creation.
 
 use core_structures::{
-    HarvestingProcedureTemplate, PackagingProcedureTemplate, PhotographProcedureTemplate,
-    ProcedureTemplate, ProcedureTemplateAssetModel, StorageProcedureTemplate, User,
+    CleaningProcedureTemplate, HarvestingProcedureTemplate, PackagingProcedureTemplate,
+    PhotographProcedureTemplate, PpeReminderProcedureTemplate, ProcedureTemplate,
+    ProcedureTemplateAssetModel, StorageProcedureTemplate, User,
     tables::insertables::{
-        HarvestingProcedureTemplateSettable, PackagingProcedureTemplateSettable,
-        PhotographProcedureTemplateSettable, ProcedureTemplateAssetModelSettable,
+        CleaningProcedureTemplateSettable, HarvestingProcedureTemplateSettable,
+        PackagingProcedureTemplateSettable, PhotographProcedureTemplateSettable,
+        PpeReminderProcedureTemplateSettable, ProcedureTemplateAssetModelSettable,
         ProcedureTemplateSettable, StorageProcedureTemplateSettable,
     },
     traits::AppendProcedureTemplate,
@@ -17,9 +19,12 @@ use crate::{
     procedure_template_asset_models::{
         coffee_wrapper::coffee_wrapper_builder, conical_tubes::cct_builder,
         conical_tubes_box::cct_box_builder, organism::sample_builder,
-        photograph::photograph_builder,
+        photograph::photograph_builder, ppe::glove_model_builder, tools::scalpel_model_builder,
     },
-    procedure_templates::dbgi_plan::organism_observation_procedure::organism_observation_procedure,
+    procedure_templates::{
+        collection_preparation_procedures::ethanol_70_percent_procedure,
+        dbgi_plan::organism_observation_procedure::organism_observation_procedure,
+    },
 };
 
 /// Initializes the part of organism collection procedure template in the
@@ -48,6 +53,7 @@ pub(crate) fn part_of_organism_collection(
     }
 
     let (_, organism, phone) = organism_observation_procedure(user, conn)?;
+    let (_, bottle) = ethanol_70_percent_procedure(user, conn)?;
 
     let collection = ProcedureTemplate::new()
         .name(name)?
@@ -58,19 +64,33 @@ pub(crate) fn part_of_organism_collection(
         .insert(user.id, conn)?;
 
     // Remind the user to wear gloves
-    let gloves_reminder = ProcedureTemplate::new()
+    let gloves_reminder = PpeReminderProcedureTemplate::new()
+        .procedure_template_ppe_asset_model(glove_model_builder(user, conn)?)?
         .name("Wear gloves")?
         .description("Please wear gloves to avoid contamination and protect yourself.")?
         .created_by(user)?
         .insert(user.id, conn)?;
+    let gloves_model = gloves_reminder.procedure_template_ppe_asset_model(conn)?;
 
-    // Remind the user to sterilize / clean the scalpel and gloves with ethanol 70
+    // Remind the user to sterilize / clean the gloves with ethanol 70
     // percent
-    let sterilization_reminder = ProcedureTemplate::new()
-        .name("Sterilize scalpel and gloves")?
+    let glove_cleaning_step = CleaningProcedureTemplate::new()
+        .name("Sterilize gloves")?
+        .description("Please sterilize the gloves with ethanol 70 percent to avoid contamination.")?
+        .procedure_template_cleaned_model(&gloves_model)?
+        .procedure_template_cleaned_with_model(&bottle)?
+        .liters(0.05)?
+        .created_by(user)?
+        .insert(user.id, conn)?;
+
+    let scalpel_cleaning_step = CleaningProcedureTemplate::new()
+        .name("Sterilize scalpel")?
         .description(
-            "Please sterilize the scalpel and gloves with ethanol 70 percent to avoid contamination.",
+            "Please sterilize the scalpel with ethanol 70 percent to avoid contamination.",
         )?
+        .procedure_template_cleaned_model(scalpel_model_builder(user, conn)?)?
+        .procedure_template_cleaned_with_model(&bottle)?
+        .liters(0.05)?
         .created_by(user)?
         .insert(user.id, conn)?;
 
@@ -140,7 +160,8 @@ pub(crate) fn part_of_organism_collection(
     collection.extend(
         &[
             gloves_reminder.into(),
-            sterilization_reminder.into(),
+            glove_cleaning_step.into(),
+            scalpel_cleaning_step.into(),
             sample_harvesting.into(),
             coffee_filter_wrapping.into(),
             place_in_tube.into(),

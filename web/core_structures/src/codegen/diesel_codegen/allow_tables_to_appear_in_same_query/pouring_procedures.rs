@@ -1,7 +1,8 @@
 use crate::codegen::diesel_codegen::tables::{
-    pouring_procedure_templates::pouring_procedure_templates,
-    pouring_procedures::pouring_procedures,
+    physical_assets::physical_assets, pouring_procedures::pouring_procedures,
 };
+diesel::allow_tables_to_appear_in_same_query!(pouring_procedures, physical_assets);
+use crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates;
 diesel::allow_tables_to_appear_in_same_query!(pouring_procedures, pouring_procedure_templates);
 use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
 diesel::allow_tables_to_appear_in_same_query!(pouring_procedures, procedure_assets);

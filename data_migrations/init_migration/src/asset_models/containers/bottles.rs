@@ -23,10 +23,7 @@ use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn bottle_1l(
-    user: &User,
-    conn: &mut PgConnection,
-) -> anyhow::Result<VolumetricContainerModel> {
+pub fn bottle_1l(user: &User, conn: &mut PgConnection) -> anyhow::Result<VolumetricContainerModel> {
     let name = "Bottle (1L)";
 
     if let Some(existing_bottle) = VolumetricContainerModel::from_name(name, conn).optional()? {

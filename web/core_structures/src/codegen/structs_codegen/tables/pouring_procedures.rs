@@ -15,6 +15,18 @@
         foreign_key = measured_with
     )
 )]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
+        foreign_key = poured_from
+    )
+)]
+#[diesel(
+    belongs_to(
+        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        foreign_key = poured_into
+    )
+)]
 #[diesel(primary_key(procedure))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures
@@ -22,7 +34,7 @@
 pub struct PouringProcedure {
     pub procedure: ::rosetta_uuid::Uuid,
     pub procedure_template: i32,
-    pub poured_from: ::rosetta_uuid::Uuid,
+    pub poured_from: Option<::rosetta_uuid::Uuid>,
     pub procedure_template_poured_from_model: i32,
     pub procedure_poured_from: ::rosetta_uuid::Uuid,
     pub measured_with: Option<::rosetta_uuid::Uuid>,
@@ -103,18 +115,23 @@ impl PouringProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        Option<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
             web_common_traits::database::Read<C>,
     {
+        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
-            self.poured_from,
+        let Some(poured_from) = self.poured_from else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(
+            poured_from,
             conn,
         )
+        .optional()
     }
     pub fn poured_into<C: diesel::connection::LoadConnection>(
         &self,
@@ -225,11 +242,15 @@ impl PouringProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
         diesel::result::Error,
     > {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(poured_from) = self.poured_from else {
+            return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
@@ -237,12 +258,13 @@ impl PouringProcedure {
                     .eq(&self.procedure_poured_from)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.poured_from),
+                            .eq(poured_from),
                     ),
             )
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
+            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn pouring_procedures_procedure_poured_from_procedure_templat_fkey(
@@ -476,84 +498,6 @@ impl PouringProcedure {
             .first::<
                 crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate,
             >(conn)
-    }
-    pub fn from_poured_from<C>(
-        poured_from: ::rosetta_uuid::Uuid,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures::poured_from as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures::poured_from as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures::procedure,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures::poured_from as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures::procedure,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures;
-        Self::table()
-            .filter(pouring_procedures::poured_from.eq(poured_from))
-            .order_by(pouring_procedures::procedure.asc())
-            .load::<Self>(conn)
-    }
-    pub fn from_poured_into<C>(
-        poured_into: ::rosetta_uuid::Uuid,
-        conn: &mut C,
-    ) -> Result<Vec<Self>, diesel::result::Error>
-    where
-        C: diesel::connection::LoadConnection,
-        <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures::poured_into as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >,
-        <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures::poured_into as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output: diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures::procedure,
-            >,
-        >,
-        <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures::poured_into as diesel::expression_methods::EqAll<
-                ::rosetta_uuid::Uuid,
-            >>::Output,
-        >>::Output as diesel::query_dsl::methods::OrderDsl<
-            diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures::procedure,
-            >,
-        >>::Output: diesel::RunQueryDsl<C>
-            + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
-    {
-        use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
-
-        use crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures;
-        Self::table()
-            .filter(pouring_procedures::poured_into.eq(poured_into))
-            .order_by(pouring_procedures::procedure.asc())
-            .load::<Self>(conn)
     }
     pub fn from_procedure_measured_with<C>(
         procedure_measured_with: ::rosetta_uuid::Uuid,

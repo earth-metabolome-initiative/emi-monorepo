@@ -1,22 +1,24 @@
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, core::fmt::Debug)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum ReagentModelExtensionAttribute {
-    AssetModel(crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute),
+    PhysicalAssetModel(
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+    ),
 }
 impl core::fmt::Display for ReagentModelExtensionAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::AssetModel(e) => write!(f, "reagent_models({e})"),
+            Self::PhysicalAssetModel(e) => write!(f, "reagent_models({e})"),
         }
     }
 }
-impl From<crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute>
+impl From<crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute>
     for ReagentModelExtensionAttribute
 {
     fn from(
-        attribute: crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
-        Self::AssetModel(attribute)
+        Self::PhysicalAssetModel(attribute)
     }
 }
 impl From<common_traits::builder::EmptyTuple> for ReagentModelExtensionAttribute {
@@ -60,11 +62,11 @@ impl web_common_traits::database::HasTableType for ReagentModelAttribute {
 }
 impl
     web_common_traits::database::FromExtension<
-        crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+        crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     > for ReagentModelAttribute
 {
     fn from_extension(
-        attribute: crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+        attribute: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
     ) -> Self {
         ReagentModelAttribute::Extension(From::from(attribute))
     }
@@ -117,6 +119,7 @@ impl InsertableReagentModel {}
 /// ```rust,ignore
 /// use core_structures::ReagentModel;
 /// use core_structures::tables::insertables::AssetModelSettable;
+/// use core_structures::tables::insertables::PhysicalAssetModelSettable;
 /// use core_structures::tables::insertables::ReagentModelSettable;
 /// use web_common_traits::database::Insertable;
 /// use web_common_traits::database::InsertableVariant;
@@ -140,14 +143,19 @@ impl InsertableReagentModel {}
 ///    .insert(user.id, conn)?;
 /// ```
 pub struct InsertableReagentModelBuilder<
-    AssetModel = crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
+    PhysicalAssetModel
+        = crate::codegen::structs_codegen::tables::insertables::InsertablePhysicalAssetModelBuilder<
+            crate::codegen::structs_codegen::tables::insertables::InsertableAssetModelBuilder,
+        >,
 > {
     pub(crate) purity: Option<f32>,
     pub(crate) cas_code: Option<::cas_codes::CAS>,
     pub(crate) molecular_formula: Option<::molecular_formulas::MolecularFormula>,
-    pub(crate) id: AssetModel,
+    pub(crate) id: PhysicalAssetModel,
 }
-impl<AssetModel> diesel::associations::HasTable for InsertableReagentModelBuilder<AssetModel> {
+impl<PhysicalAssetModel> diesel::associations::HasTable
+    for InsertableReagentModelBuilder<PhysicalAssetModel>
+{
     type Table = crate::codegen::diesel_codegen::tables::reagent_models::reagent_models::table;
     fn table() -> Self::Table {
         crate::codegen::diesel_codegen::tables::reagent_models::reagent_models::table
@@ -160,12 +168,12 @@ impl From<InsertableReagentModelBuilder>
         Self::Builder(builder)
     }
 }
-impl<AssetModel> common_traits::builder::IsCompleteBuilder
+impl<PhysicalAssetModel> common_traits::builder::IsCompleteBuilder
     for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder<
-        AssetModel,
+        PhysicalAssetModel,
     >
 where
-    AssetModel: common_traits::builder::IsCompleteBuilder,
+    PhysicalAssetModel: common_traits::builder::IsCompleteBuilder,
 {
     fn is_complete(&self) -> bool {
         self.id.is_complete()
@@ -249,7 +257,7 @@ pub trait ReagentModelSettable: Sized {
         validation_errors::SingleFieldError:
             From<<MF as TryInto<::molecular_formulas::MolecularFormula>>::Error>;
 }
-impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetModel>
+impl<PhysicalAssetModel> ReagentModelSettable for InsertableReagentModelBuilder<PhysicalAssetModel>
 where
     Self: common_traits::builder::Attributed<
             Attribute = crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute,
@@ -316,16 +324,21 @@ where
     }
 }
 impl<
-    AssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
+    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
             Error = web_common_traits::database::InsertError<
-                crate::codegen::structs_codegen::tables::insertables::AssetModelAttribute,
+                crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
             >,
         >,
 > crate::codegen::structs_codegen::tables::insertables::AssetModelSettable
-    for InsertableReagentModelBuilder<AssetModel>
+    for InsertableReagentModelBuilder<PhysicalAssetModel>
 where
     Self: common_traits::builder::Attributed<
             Attribute = crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute,
+        >,
+    Self: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute,
+            >,
         >,
 {
     type Error = web_common_traits::database::InsertError<
@@ -338,7 +351,7 @@ where
         N: TryInto<String>,
         validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
-        self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.id,
                 name,
             )
@@ -357,7 +370,7 @@ where
         D: TryInto<String>,
         validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
-        self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.id,
                 description,
             )
@@ -371,21 +384,36 @@ where
     }
     #[inline]
     /// Sets the value of the `public.asset_models.parent_model` column.
-    fn parent_model<PM>(mut self, parent_model: PM) -> Result<Self, Self::Error>
+    ///
+    /// # Implementation notes
+    /// This method also set the values of other columns, due to
+    /// same-as relationships or inferred values.
+    ///
+    /// ## Mermaid illustration
+    ///
+    /// ```mermaid
+    /// flowchart BT
+    /// classDef column-of-interest stroke: #f0746c,fill: #f49f9a
+    /// classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
+    /// subgraph v2 ["`asset_models`"]
+    ///    v0@{shape: rounded, label: "parent_model"}
+    /// class v0 column-of-interest
+    /// end
+    /// subgraph v3 ["`physical_asset_models`"]
+    ///    v1@{shape: rounded, label: "parent_model"}
+    /// class v1 directly-involved-column
+    /// end
+    /// v1 --->|"`ancestral same as`"| v0
+    /// v3 --->|"`extends`"| v2
+    /// ```
+    fn parent_model<PM>(self, parent_model: PM) -> Result<Self, Self::Error>
     where
         PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::parent_model(
-                self.id,
-                parent_model,
-            )
-            .map_err(|e| {
-                e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
-                        attribute.into(),
-                    ))
-            })?;
-        Ok(self)
+        <Self as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
+            self,
+            parent_model,
+        )
     }
     #[inline]
     /// Sets the value of the `public.asset_models.created_by` column.
@@ -393,7 +421,7 @@ where
     where
         CB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_by(
                 self.id,
                 created_by,
             )
@@ -413,7 +441,7 @@ where
         validation_errors::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
-        self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
                 self.id,
                 created_at,
             )
@@ -431,7 +459,7 @@ where
     where
         UB: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_by(
                 self.id,
                 updated_by,
             )
@@ -451,7 +479,7 @@ where
         validation_errors::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
-        self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(
                 self.id,
                 updated_at,
             )
@@ -464,19 +492,55 @@ where
         Ok(self)
     }
 }
-impl<AssetModel> web_common_traits::database::MostConcreteTable
-    for InsertableReagentModelBuilder<AssetModel>
+impl<
+    PhysicalAssetModel: crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable<
+            Error = web_common_traits::database::InsertError<
+                crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelAttribute,
+            >,
+        >,
+> crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable
+    for InsertableReagentModelBuilder<PhysicalAssetModel>
 where
-    AssetModel: web_common_traits::database::MostConcreteTable,
+    Self: common_traits::builder::Attributed<
+            Attribute = crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute,
+        >,
+{
+    type Error = web_common_traits::database::InsertError<
+        <Self as common_traits::builder::Attributed>::Attribute,
+    >;
+    #[inline]
+    /// Sets the value of the `public.physical_asset_models.parent_model`
+    /// column.
+    fn parent_model<PM>(mut self, parent_model: PM) -> Result<Self, Self::Error>
+    where
+        PM: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = i32>,
+    {
+        self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
+                self.id,
+                parent_model,
+            )
+            .map_err(|e| {
+                e
+                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                        attribute.into(),
+                    ))
+            })?;
+        Ok(self)
+    }
+}
+impl<PhysicalAssetModel> web_common_traits::database::MostConcreteTable
+    for InsertableReagentModelBuilder<PhysicalAssetModel>
+where
+    PhysicalAssetModel: web_common_traits::database::MostConcreteTable,
 {
     fn set_most_concrete_table(&mut self, table_name: &str) {
         self.id.set_most_concrete_table(table_name);
     }
 }
-impl<AssetModel> web_common_traits::prelude::SetPrimaryKey
-    for InsertableReagentModelBuilder<AssetModel>
+impl<PhysicalAssetModel> web_common_traits::prelude::SetPrimaryKey
+    for InsertableReagentModelBuilder<PhysicalAssetModel>
 where
-    AssetModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
+    PhysicalAssetModel: web_common_traits::prelude::SetPrimaryKey<PrimaryKey = i32>,
 {
     type PrimaryKey = i32;
     fn set_primary_key(mut self, primary_key: Self::PrimaryKey) -> Self {
@@ -484,8 +548,8 @@ where
         self
     }
 }
-impl<AssetModel, C> web_common_traits::database::TryInsertGeneric<C>
-    for InsertableReagentModelBuilder<AssetModel>
+impl<PhysicalAssetModel, C> web_common_traits::database::TryInsertGeneric<C>
+    for InsertableReagentModelBuilder<PhysicalAssetModel>
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
             C,

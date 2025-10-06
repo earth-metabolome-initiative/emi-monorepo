@@ -5,7 +5,7 @@ pub struct PouringProcedureTemplateForeignKeys {
         crate::codegen::structs_codegen::tables::volume_measuring_device_models::VolumeMeasuringDeviceModel,
     >,
     pub poured_from_model: Option<
-        crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
     >,
     pub poured_into_model: Option<
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel,
@@ -42,7 +42,7 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
         connector
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
+                    crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
                         self.poured_from_model,
                     ),
                 ),
@@ -105,6 +105,30 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::PhysicalAssetModel(
+                    physical_asset_models,
+                ),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.poured_from_model == physical_asset_models.id {
+                    foreign_keys.poured_from_model = Some(physical_asset_models);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::PhysicalAssetModel(
+                    physical_asset_models,
+                ),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.poured_from_model == physical_asset_models.id {
+                    foreign_keys.poured_from_model = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::ProcedureTemplateAssetModel(
                     procedure_template_asset_models,
@@ -217,10 +241,6 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.poured_from_model == volumetric_container_models.id {
-                    foreign_keys.poured_from_model = Some(volumetric_container_models);
-                    updated = true;
-                }
                 if self.poured_into_model == volumetric_container_models.id {
                     foreign_keys.poured_into_model = Some(volumetric_container_models);
                     updated = true;
@@ -232,10 +252,6 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.poured_from_model == volumetric_container_models.id {
-                    foreign_keys.poured_from_model = None;
-                    updated = true;
-                }
                 if self.poured_into_model == volumetric_container_models.id {
                     foreign_keys.poured_into_model = None;
                     updated = true;

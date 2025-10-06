@@ -9,3 +9,4 @@ pub mod vial_caps;
 pub mod vial_inserts;
 pub mod vials;
 pub mod wrappers;
+pub use bottles::bottle_1l;

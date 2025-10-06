@@ -141,12 +141,10 @@ where
                 procedure_poured_from,
                 conn,
             )?;
-            if let Some(asset) = procedure_assets.asset {
-                self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable>::poured_from(
-                    self,
-                    asset,
-                )?;
-            }
+            self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable>::poured_from(
+                self,
+                procedure_assets.asset,
+            )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable>::procedure_template_poured_from_model(
                 self,
                 procedure_assets.procedure_template_asset_model,
@@ -191,13 +189,6 @@ where
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     crate::codegen::structs_codegen::tables::insertables::PouringProcedureAttribute::ProcedureTemplate,
-                ),
-            )?;
-        let poured_from = self
-            .poured_from
-            .ok_or(
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    crate::codegen::structs_codegen::tables::insertables::PouringProcedureAttribute::PouredFrom,
                 ),
             )?;
         let procedure_template_poured_from_model = self
@@ -304,7 +295,7 @@ where
         Ok(Self::InsertableVariant {
             procedure,
             procedure_template,
-            poured_from,
+            poured_from: self.poured_from,
             procedure_template_poured_from_model,
             procedure_poured_from,
             measured_with: self.measured_with,

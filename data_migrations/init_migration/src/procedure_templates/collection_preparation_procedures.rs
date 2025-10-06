@@ -2,6 +2,6 @@
 //! database.
 
 mod diluted_ethanol_procedure;
-pub(crate) use diluted_ethanol_procedure::ethanol_70_percent;
+pub use diluted_ethanol_procedure::ethanol_70_percent_procedure;
 mod sample_extraction_solvent_procedures;
 pub(crate) use sample_extraction_solvent_procedures::sample_extraction_solvent_procedure;

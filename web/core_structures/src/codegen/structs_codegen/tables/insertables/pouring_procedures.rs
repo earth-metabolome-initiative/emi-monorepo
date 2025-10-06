@@ -153,7 +153,7 @@ impl core::fmt::Display for PouringProcedureAttribute {
 pub struct InsertablePouringProcedure {
     pub(crate) procedure: ::rosetta_uuid::Uuid,
     pub(crate) procedure_template: i32,
-    pub(crate) poured_from: ::rosetta_uuid::Uuid,
+    pub(crate) poured_from: Option<::rosetta_uuid::Uuid>,
     pub(crate) procedure_template_poured_from_model: i32,
     pub(crate) procedure_poured_from: ::rosetta_uuid::Uuid,
     pub(crate) measured_with: Option<::rosetta_uuid::Uuid>,
@@ -193,18 +193,23 @@ impl InsertablePouringProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        Option<crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset>,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer:
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset:
             web_common_traits::database::Read<C>,
     {
+        use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer::read(
-            self.poured_from,
+        let Some(poured_from) = self.poured_from else {
+            return Ok(None);
+        };
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset::read(
+            poured_from,
             conn,
         )
+        .optional()
     }
     pub fn poured_into<C: diesel::connection::LoadConnection>(
         &self,
@@ -315,11 +320,15 @@ impl InsertablePouringProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        Option<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
         diesel::result::Error,
     > {
         use diesel::{
-            BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
+            BoolExpressionMethods, ExpressionMethods, OptionalExtension, QueryDsl, RunQueryDsl,
+            associations::HasTable,
+        };
+        let Some(poured_from) = self.poured_from else {
+            return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
             .filter(
@@ -327,12 +336,13 @@ impl InsertablePouringProcedure {
                     .eq(&self.procedure_poured_from)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
-                            .eq(&self.poured_from),
+                            .eq(poured_from),
                     ),
             )
             .first::<
                 crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
             >(conn)
+            .optional()
     }
     #[cfg(feature = "postgres")]
     pub fn pouring_procedures_procedure_poured_from_procedure_templat_fkey(
@@ -658,7 +668,6 @@ where
     fn is_complete(&self) -> bool {
         self.procedure.is_complete()
             && self.procedure_template.is_some()
-            && (self.poured_from.is_some() || self.procedure_poured_from.is_complete())
             && (self.procedure_template_poured_from_model.is_some()
                 || self.procedure_template.is_some()
                 || self.procedure_poured_from.is_complete())
@@ -722,7 +731,7 @@ pub trait PouringProcedureSettable: Sized {
     /// * If the provided value does not pass schema-defined validation.
     fn poured_from<PF>(self, poured_from: PF) -> Result<Self, Self::Error>
     where
-        PF: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
+        PF: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
     /// `public.pouring_procedures.procedure_template_poured_from_model` column.
     ///
@@ -1052,11 +1061,11 @@ where
     ///```
     fn poured_from<PF>(mut self, poured_from: PF) -> Result<Self, Self::Error>
     where
-        PF: web_common_traits::database::PrimaryKeyLike<
+        PF: web_common_traits::database::MaybePrimaryKeyLike<
             PrimaryKey = ::rosetta_uuid::Uuid,
         >,
     {
-        let poured_from = <PF as web_common_traits::database::PrimaryKeyLike>::primary_key(
+        let poured_from = <PF as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
             &poured_from,
         );
         if let web_common_traits::database::IdOrBuilder::Builder(
@@ -1076,7 +1085,7 @@ where
                 })?
                 .into();
         }
-        self.poured_from = Some(poured_from);
+        self.poured_from = poured_from;
         Ok(self)
     }
     ///Sets the value of the `public.pouring_procedures.procedure_template_poured_from_model` column.

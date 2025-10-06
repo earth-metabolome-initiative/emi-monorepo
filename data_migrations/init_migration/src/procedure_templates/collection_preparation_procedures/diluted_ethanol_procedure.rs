@@ -1,8 +1,18 @@
 //! Submodule defining the Ethanol 70 percent procedure creation.
 
-use core_structures::{ProcedureTemplate, User, tables::insertables::ProcedureTemplateSettable};
+use core_structures::{
+    PouringProcedureTemplate, ProcedureTemplate, ProcedureTemplateAssetModel, User,
+    tables::insertables::{PouringProcedureTemplateSettable, ProcedureTemplateSettable},
+    traits::AppendProcedureTemplate,
+};
 use diesel::OptionalExtension;
-use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable, PrimaryKeyLike};
+
+use crate::procedure_template_asset_models::{
+    containers::bottle_1l_builder,
+    reagents::{absolute_ethanol_model_builder, distilled_water_model_builder},
+    volume_measuring_device::volume_measuring_device_model_builder,
+};
 
 /// Initializes the DBGI Collection preparation procedure template in the
 /// database.
@@ -16,21 +26,53 @@ use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 ///
 /// * If the connection fails to insert the procedure template.
 /// * If the procedure template building fails.
-pub(crate) fn ethanol_70_percent(
+pub fn ethanol_70_percent_procedure(
     user: &User,
     conn: &mut diesel::PgConnection,
-) -> anyhow::Result<ProcedureTemplate> {
+) -> anyhow::Result<(ProcedureTemplate, ProcedureTemplateAssetModel)> {
     const E70_ETHANOL: &str = "Ethanol 70 percent";
+    const ETHANOL_BOTTLE: &str = "Ethanol bottle";
 
     if let Some(procedure) = ProcedureTemplate::from_name(E70_ETHANOL, conn).optional()? {
-        return Ok(procedure);
+        let bottle = ProcedureTemplateAssetModel::from_name_and_procedure_template(
+            ETHANOL_BOTTLE,
+            procedure.primary_key(),
+            conn,
+        )?;
+        return Ok((procedure, bottle));
     }
 
-    Ok(ProcedureTemplate::new()
-        .name(E70_ETHANOL)?
-        .description(
-			"procedure template for Ethanol 70 percent Solvent preparation, used in various cleaning procedures.",
-        )?
+    let procedure = ProcedureTemplate::new()
+    .name(E70_ETHANOL)?
+    .description(
+        "procedure template for Ethanol 70 percent Solvent preparation, used in various cleaning procedures.",
+    )?
+    .created_by(user)?
+    .insert(user.id, conn)?;
+
+    let ethanol_step = PouringProcedureTemplate::new()
+        .name("Pour ethanol")?
+        .description("Pour ethanol in the container.")?
+        .procedure_template_measured_with_model(volume_measuring_device_model_builder(user, conn)?)?
+        .procedure_template_poured_from_model(absolute_ethanol_model_builder(user, conn)?)?
+        .procedure_template_poured_into_model(bottle_1l_builder(user, conn)?)?
+        .liters(0.7)?
         .created_by(user)?
-        .insert(user.id, conn)?)
+        .insert(user.id, conn)?;
+    let measured_with = ethanol_step.procedure_template_measured_with_model(conn)?;
+    let bottle = ethanol_step.procedure_template_poured_into_model(conn)?;
+
+    let distilled_water_step = PouringProcedureTemplate::new()
+        .name("Pour water")?
+        .description("Pour water in the container.")?
+        .procedure_template_measured_with_model(&measured_with)?
+        .procedure_template_poured_from_model(distilled_water_model_builder(user, conn)?)?
+        .procedure_template_poured_into_model(&bottle)?
+        .liters(0.3)?
+        .created_by(user)?
+        .insert(user.id, conn)?;
+
+    procedure.extend(&[ethanol_step.into(), distilled_water_step.into()], user, conn)?;
+
+    Ok((procedure, bottle))
 }

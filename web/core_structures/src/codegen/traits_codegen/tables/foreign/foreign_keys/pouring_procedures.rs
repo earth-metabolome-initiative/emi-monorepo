@@ -5,7 +5,7 @@ pub struct PouringProcedureForeignKeys {
         crate::codegen::structs_codegen::tables::volume_measuring_devices::VolumeMeasuringDevice,
     >,
     pub poured_from: Option<
-        crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
+        crate::codegen::structs_codegen::tables::physical_assets::PhysicalAsset,
     >,
     pub poured_into: Option<
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
@@ -51,11 +51,13 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
             ));
         }
-        connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
-                self.poured_from,
-            ),
-        ));
+        if let Some(poured_from) = self.poured_from {
+            connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
+                crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAsset(
+                    poured_from,
+                ),
+            ));
+        }
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainer(
                 self.poured_into,
@@ -111,7 +113,7 @@ impl web_common_traits::prelude::HasForeignKeys
     }
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         (foreign_keys.measured_with.is_some() || self.measured_with.is_some())
-            && foreign_keys.poured_from.is_some()
+            && (foreign_keys.poured_from.is_some() || self.poured_from.is_some())
             && foreign_keys.poured_into.is_some()
             && foreign_keys.procedure.is_some()
             && foreign_keys.procedure_measured_with.is_some()
@@ -130,6 +132,26 @@ impl web_common_traits::prelude::HasForeignKeys
     ) -> bool {
         let mut updated = false;
         match (row, crud) {
+            (
+                crate::codegen::tables::row::Row::PhysicalAsset(physical_assets),
+                web_common_traits::crud::CRUD::Read
+                | web_common_traits::crud::CRUD::Create
+                | web_common_traits::crud::CRUD::Update,
+            ) => {
+                if self.poured_from.is_some_and(|poured_from| poured_from == physical_assets.id) {
+                    foreign_keys.poured_from = Some(physical_assets);
+                    updated = true;
+                }
+            }
+            (
+                crate::codegen::tables::row::Row::PhysicalAsset(physical_assets),
+                web_common_traits::crud::CRUD::Delete,
+            ) => {
+                if self.poured_from.is_some_and(|poured_from| poured_from == physical_assets.id) {
+                    foreign_keys.poured_from = None;
+                    updated = true;
+                }
+            }
             (
                 crate::codegen::tables::row::Row::PouringProcedureTemplate(
                     pouring_procedure_templates,
@@ -287,10 +309,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.poured_from == volumetric_containers.id {
-                    foreign_keys.poured_from = Some(volumetric_containers);
-                    updated = true;
-                }
                 if self.poured_into == volumetric_containers.id {
                     foreign_keys.poured_into = Some(volumetric_containers);
                     updated = true;
@@ -300,10 +318,6 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::VolumetricContainer(volumetric_containers),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.poured_from == volumetric_containers.id {
-                    foreign_keys.poured_from = None;
-                    updated = true;
-                }
                 if self.poured_into == volumetric_containers.id {
                     foreign_keys.poured_into = None;
                     updated = true;

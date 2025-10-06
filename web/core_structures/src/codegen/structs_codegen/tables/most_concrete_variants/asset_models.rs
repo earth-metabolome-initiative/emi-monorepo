@@ -134,7 +134,7 @@ pub use insert_error::AssetModelInsertErrorDAG;
 /// v43 --->|"`extends`"| v42
 /// v44 --->|"`extends`"| v42
 /// v45 --->|"`extends`"| v42
-/// v46 --->|"`extends`"| v0
+/// v46 --->|"`extends`"| v42
 /// v47 --->|"`extends`"| v42
 /// v48 --->|"`extends`"| v42
 /// v49 --->|"`extends`"| v48

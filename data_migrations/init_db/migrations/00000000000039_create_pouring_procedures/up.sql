@@ -5,8 +5,8 @@ CREATE TABLE IF NOT EXISTS pouring_procedure_templates (
 	measured_with_model INTEGER NOT NULL REFERENCES volume_measuring_device_models(id),
 	-- The associated procedure asset model for the measuring device.
 	procedure_template_measured_with_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
-	-- The source container from which the liquid is poured.
-	poured_from_model INTEGER NOT NULL REFERENCES volumetric_container_models(id),
+	-- The source of the liquid being poured.
+	poured_from_model INTEGER NOT NULL REFERENCES physical_asset_models(id),
 	-- The associated procedure asset model for the source container. It may be associated
 	-- to any type of other procedure templates (e.g., fractioning, packaging, etc.).
 	procedure_template_poured_from_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
@@ -55,7 +55,7 @@ CREATE TABLE IF NOT EXISTS pouring_procedures (
 	-- The procedure template of the extended `procedure`.
 	procedure_template INTEGER NOT NULL REFERENCES pouring_procedure_templates(procedure_template),
 	-- The container from which the liquid is poured.
-	poured_from UUID NOT NULL REFERENCES volumetric_containers(id),
+	poured_from UUID REFERENCES physical_assets(id),
 	-- The procedure template asset model associated to the `poured_from`.
 	procedure_template_poured_from_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure asset associated to the `poured_from`.

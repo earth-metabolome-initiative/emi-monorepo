@@ -1,15 +1,14 @@
 //! Submodule defining partial builders for procedure template `asset_models`
-//! related to volume measuring devices.
+//! related to containers
 
 use core_structures::{User, tables::insertables::InsertableProcedureTemplateAssetModelBuilder};
 use diesel::PgConnection;
 
 use crate::{
-    asset_models::instruments::volume_measuring_device::volume_measuring_device_model,
-    procedure_template_asset_models::default_pmt::default_pmt,
+    asset_models::containers::bottle_1l, procedure_template_asset_models::default_pmt::default_pmt,
 };
 
-/// Returns a partial builder for a volume measuring device procedure template
+/// Returns a partial builder for a 1L bottle trackable.
 ///
 /// # Arguments
 ///
@@ -19,9 +18,9 @@ use crate::{
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn volume_measuring_device_model_builder(
+pub(crate) fn bottle_1l_builder(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<InsertableProcedureTemplateAssetModelBuilder> {
-    default_pmt(&volume_measuring_device_model(user, conn)?, conn)
+    default_pmt(&bottle_1l(user, conn)?, conn)
 }

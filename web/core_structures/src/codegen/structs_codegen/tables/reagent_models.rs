@@ -41,6 +41,14 @@ where
 }
 impl
     web_common_traits::prelude::ExtensionTable<
+        crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel,
+    > for ReagentModel
+where
+    for<'a> &'a Self: diesel::Identifiable<Id = &'a i32>,
+{
+}
+impl
+    web_common_traits::prelude::ExtensionTable<
         crate::codegen::structs_codegen::tables::reagent_models::ReagentModel,
     > for ReagentModel
 where
@@ -87,6 +95,28 @@ impl ReagentModel {
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
+    pub fn from_parent_model(
+        parent_model: i32,
+        conn: &mut diesel::PgConnection,
+    ) -> Result<Vec<Self>, diesel::result::Error> {
+        use diesel::{
+            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
+            associations::HasTable,
+        };
+
+        use crate::codegen::diesel_codegen::tables::{
+            physical_asset_models::physical_asset_models, reagent_models::reagent_models,
+        };
+        Self::table()
+            .inner_join(
+                physical_asset_models::table.on(reagent_models::id.eq(physical_asset_models::id)),
+            )
+            .filter(physical_asset_models::parent_model.eq(parent_model))
+            .order_by(reagent_models::id.asc())
+            .select(Self::as_select())
+            .load::<Self>(conn)
+    }
+    #[cfg(feature = "postgres")]
     pub fn from_name(
         name: &str,
         conn: &mut diesel::PgConnection,
@@ -122,26 +152,6 @@ impl ReagentModel {
         Self::table()
             .inner_join(asset_models::table.on(reagent_models::id.eq(asset_models::id)))
             .filter(asset_models::description.eq(description))
-            .order_by(reagent_models::id.asc())
-            .select(Self::as_select())
-            .load::<Self>(conn)
-    }
-    #[cfg(feature = "postgres")]
-    pub fn from_parent_model(
-        parent_model: i32,
-        conn: &mut diesel::PgConnection,
-    ) -> Result<Vec<Self>, diesel::result::Error> {
-        use diesel::{
-            ExpressionMethods, JoinOnDsl, QueryDsl, RunQueryDsl, SelectableHelper,
-            associations::HasTable,
-        };
-
-        use crate::codegen::diesel_codegen::tables::{
-            asset_models::asset_models, reagent_models::reagent_models,
-        };
-        Self::table()
-            .inner_join(asset_models::table.on(reagent_models::id.eq(asset_models::id)))
-            .filter(asset_models::parent_model.eq(parent_model))
             .order_by(reagent_models::id.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

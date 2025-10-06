@@ -28,7 +28,7 @@ use crate::{
         freeze_dryer::freeze_dryer_builder, freezer::freezer_builder,
         pipette_tips::pipette_tips_1000ul_builder, pipettes::pipette_1000ul_builder,
         safelock::safelock_builder, vial_caps::sealed_cap_vial_1_5ml_builder,
-        volume_measuring_device::volume_measuring_device_builder,
+        volume_measuring_device::volume_measuring_device_model_builder,
         weighing_device::weighing_device_builder,
     },
     procedure_templates::sample_extraction_solvent_procedure,
@@ -116,7 +116,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .liters(1e-3)?
         .procedure_template_poured_into_model(safelock)?
         .procedure_template_poured_from_model(&solvent_ptam)?
-        .procedure_template_measured_with_model(volume_measuring_device_builder(user, conn)?)?
+        .procedure_template_measured_with_model(volume_measuring_device_model_builder(user, conn)?)?
         .insert(user.id, conn)?;
 
     let second_ball_mill_procedure = BallMillProcedureTemplate::new()

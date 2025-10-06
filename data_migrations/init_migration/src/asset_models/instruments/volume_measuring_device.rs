@@ -1,5 +1,5 @@
-//! Submodule creating the instrument commercial product model for the Pipette
-//! 200 instrument.
+//! Submodule creating the instrument commercial product model for the Measuring
+//! devices model.
 
 use core_structures::{User, VolumeMeasuringDeviceModel, tables::insertables::AssetModelSettable};
 use diesel::{OptionalExtension, PgConnection};
@@ -19,7 +19,7 @@ use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub(crate) fn volume_measuring_device(
+pub(crate) fn volume_measuring_device_model(
     user: &User,
     conn: &mut PgConnection,
 ) -> anyhow::Result<VolumeMeasuringDeviceModel> {

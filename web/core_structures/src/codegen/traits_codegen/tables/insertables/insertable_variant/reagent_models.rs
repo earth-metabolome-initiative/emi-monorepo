@@ -1,6 +1,6 @@
-impl<AssetModel> web_common_traits::database::DispatchableInsertVariantMetadata
+impl<PhysicalAssetModel> web_common_traits::database::DispatchableInsertVariantMetadata
     for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder<
-        AssetModel,
+        PhysicalAssetModel,
     >
 {
     type Row = crate::codegen::structs_codegen::tables::reagent_models::ReagentModel;
@@ -8,18 +8,18 @@ impl<AssetModel> web_common_traits::database::DispatchableInsertVariantMetadata
         crate::codegen::structs_codegen::tables::insertables::ReagentModelAttribute,
     >;
 }
-impl<AssetModel> web_common_traits::database::InsertableVariantMetadata
+impl<PhysicalAssetModel> web_common_traits::database::InsertableVariantMetadata
     for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder<
-        AssetModel,
+        PhysicalAssetModel,
     >
 {
     type InsertableVariant =
         crate::codegen::structs_codegen::tables::insertables::InsertableReagentModel;
 }
 #[cfg(feature = "backend")]
-impl<AssetModel> web_common_traits::database::BackendInsertableVariant
+impl<PhysicalAssetModel> web_common_traits::database::BackendInsertableVariant
     for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder<
-        AssetModel,
+        PhysicalAssetModel,
     >
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<diesel::PgConnection>,
@@ -27,10 +27,10 @@ where
 }
 impl<
     C: diesel::connection::LoadConnection,
-    AssetModel,
+    PhysicalAssetModel,
 > web_common_traits::database::DispatchableInsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder<
-    AssetModel,
+    PhysicalAssetModel,
 >
 where
     diesel::query_builder::InsertStatement<
@@ -70,10 +70,10 @@ where
 }
 impl<
     C: diesel::connection::LoadConnection,
-    AssetModel,
+    PhysicalAssetModel,
 > web_common_traits::database::InsertableVariant<C>
 for crate::codegen::structs_codegen::tables::insertables::InsertableReagentModelBuilder<
-    AssetModel,
+    PhysicalAssetModel,
 >
 where
     diesel::query_builder::InsertStatement<
@@ -87,9 +87,12 @@ where
         crate::codegen::structs_codegen::tables::reagent_models::ReagentModel,
     >,
     Self::Error: web_common_traits::database::FromExtension<
-        <AssetModel as web_common_traits::database::TryInsertGeneric<C>>::Error,
+        <PhysicalAssetModel as web_common_traits::database::TryInsertGeneric<C>>::Error,
     >,
-    AssetModel: web_common_traits::database::TryInsertGeneric<C, PrimaryKey = i32>,
+    PhysicalAssetModel: web_common_traits::database::TryInsertGeneric<
+        C,
+        PrimaryKey = i32,
+    >,
 {
     fn try_insert(
         self,
