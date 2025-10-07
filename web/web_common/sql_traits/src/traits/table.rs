@@ -1,9 +1,13 @@
 //! Submodule providing a trait for describing SQL Table-like entities.
 
-use crate::traits::{CheckConstraintLike, ColumnLike, DatabaseLike, UniqueIndexLike};
+use std::hash::Hash;
+
+use crate::traits::{
+    CheckConstraintLike, ColumnLike, DatabaseLike, ForeignKeyLike, UniqueIndexLike,
+};
 
 /// A trait for types that can be treated as SQL tables.
-pub trait TableLike {
+pub trait TableLike: Hash {
     /// The database type the table belongs to.
     type Database: DatabaseLike<Table = Self, Column = Self::Column>;
     /// The column type of the table.
@@ -12,6 +16,8 @@ pub trait TableLike {
     type CheckConstraint: CheckConstraintLike;
     /// The unique index type of the table.
     type UniqueIndex: UniqueIndexLike;
+    /// The foreign key type of the table.
+    type ForeignKey: ForeignKeyLike<Table = Self, Column = Self::Column, Database = Self::Database>;
 
     /// Returns the name of the table.
     fn table_name(&self) -> &str;
@@ -29,4 +35,7 @@ pub trait TableLike {
     /// Iterates over the unique indexes of the table using the provided
     /// schema.
     fn unique_indexes(&self, database: &Self::Database) -> impl Iterator<Item = Self::UniqueIndex>;
+
+    /// Iterates over the foreign keys of the table using the provided schema.
+    fn foreign_keys(&self, database: &Self::Database) -> impl Iterator<Item = Self::ForeignKey>;
 }

@@ -2,7 +2,7 @@
 //! [`CreateTable`](sqlparser::ast::CreateTable) struct.
 
 use ::sqlparser::ast::{CreateTable, Ident};
-use sqlparser::ast::{CheckConstraint, ColumnDef, UniqueConstraint};
+use sqlparser::ast::{CheckConstraint, ColumnDef, ForeignKeyConstraint, UniqueConstraint};
 
 use crate::{impls::SqlParserDatabase, traits::TableLike};
 
@@ -11,6 +11,7 @@ impl TableLike for CreateTable {
     type Column = ColumnDef;
     type CheckConstraint = CheckConstraint;
     type UniqueIndex = UniqueConstraint;
+    type ForeignKey = ForeignKeyConstraint;
 
     fn table_name(&self) -> &str {
         let object_name_parts = &self.name.0;
@@ -49,5 +50,43 @@ impl TableLike for CreateTable {
                 None
             }
         })
+    }
+
+    fn foreign_keys(&self, _database: &Self::Database) -> impl Iterator<Item = Self::ForeignKey> {
+        self.constraints
+            .iter()
+            .filter_map(move |constraint| {
+                if let sqlparser::ast::TableConstraint::ForeignKey(fk_constraint) = constraint {
+                    Some(fk_constraint.clone())
+                } else {
+                    None
+                }
+            })
+            .chain(self.columns.iter().filter_map(|col| {
+                col.options.iter().find_map(|opt| {
+                    if let sqlparser::ast::ColumnOption::ForeignKey {
+                        foreign_table,
+                        referred_columns,
+                        on_delete,
+                        on_update,
+                        characteristics,
+                    } = opt.option.clone()
+                    {
+                        let fk = ForeignKeyConstraint {
+                            name: None,
+                            index_name: None,
+                            columns: vec![col.name.clone()],
+                            foreign_table,
+                            referred_columns,
+                            on_delete,
+                            on_update,
+                            characteristics,
+                        };
+                        Some(fk)
+                    } else {
+                        None
+                    }
+                })
+            }))
     }
 }

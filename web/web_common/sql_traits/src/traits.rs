@@ -10,3 +10,5 @@ pub mod check_constraint;
 pub use check_constraint::CheckConstraintLike;
 pub mod unique_index;
 pub use unique_index::UniqueIndexLike;
+pub mod foreign_key;
+pub use foreign_key::ForeignKeyLike;

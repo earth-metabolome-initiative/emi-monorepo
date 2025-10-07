@@ -6,3 +6,5 @@ mod unique_check_constraint;
 pub use unique_check_constraint::UniqueCheckConstraint;
 mod unique_unique_index;
 pub use unique_unique_index::UniqueUniqueIndex;
+mod unique_foreign_key;
+pub use unique_foreign_key::UniqueForeignKey;

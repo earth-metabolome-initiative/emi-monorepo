@@ -8,3 +8,4 @@ mod create_table;
 pub mod database;
 mod unique_constraint;
 pub use database::SqlParserDatabase;
+mod foreign_key_constraint;
