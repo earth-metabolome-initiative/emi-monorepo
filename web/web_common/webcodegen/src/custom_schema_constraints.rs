@@ -15,7 +15,5 @@ pub use duplicated_check_constraint::DuplicatedCheckConstraint;
 pub use duplicated_unique_index::DuplicatedUniqueIndexConstraint;
 pub use has_specific_type::HasSpecificTypeConstraint;
 pub use is_foreign_key_column_constraint::IsForeignKeyConstraint;
-pub use lowercase_column_constraint::LowercaseColumnConstraint;
-pub use lowercase_table_constraint::LowercaseTableConstraint;
 pub use not_null_column_constraint::NotNullColumnConstraint;
 pub use word_deprecation_constraint::WordDeprecationConstraint;

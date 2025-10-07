@@ -63,7 +63,8 @@ members = [
   "web/web_common/pg_cached",
   "web/web_common/pg_relations",
   "web/web_common/pg_constraints",
-  "web/web_common/sql_constraints", "web/web_common/sql_traits",
+  "web/web_common/sql_constraints",
+  "web/web_common/sql_traits",
 ]
 
 [workspace.dependencies]
