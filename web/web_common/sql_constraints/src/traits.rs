@@ -8,3 +8,5 @@ mod constrainer;
 pub use constrainer::{Constrainer, GenericConstrainer};
 mod constraint_failure_information;
 pub use constraint_failure_information::ConstraintFailureInformation;
+mod foreign_key_constraint;
+pub use foreign_key_constraint::ForeignKeyConstraint;

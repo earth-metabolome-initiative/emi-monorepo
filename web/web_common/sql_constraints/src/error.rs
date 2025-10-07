@@ -13,6 +13,8 @@ pub enum Error {
     Table(Box<dyn ConstraintFailureInformation>),
     /// Error indicating that a column constraint was violated.
     Column(Box<dyn ConstraintFailureInformation>),
+    /// Error indicating that a foreign key constraint was violated.
+    ForeignKey(Box<dyn ConstraintFailureInformation>),
 }
 
 impl std::fmt::Display for Error {
@@ -20,6 +22,7 @@ impl std::fmt::Display for Error {
         match self {
             Error::Table(info) => write!(f, "Table constraint violation: {info}"),
             Error::Column(info) => write!(f, "Column constraint violation: {info}"),
+            Error::ForeignKey(info) => write!(f, "Foreign key constraint violation: {info}"),
         }
     }
 }

@@ -12,11 +12,8 @@ impl ForeignKeyLike for ForeignKeyConstraint {
     type Table = CreateTable;
     type Database = SqlParserDatabase;
 
-    fn host_table<'db>(&self, database: &'db Self::Database) -> &'db Self::Table {
-        database
-            .tables()
-            .find(|table| table.foreign_keys(database).any(|fk| &fk == self))
-            .expect("Host table not found for foreign key")
+    fn foreign_key_name(&self) -> Option<&str> {
+        self.name.as_ref().map(|s| s.value.as_str())
     }
 
     fn referenced_table<'db>(&self, database: &'db Self::Database) -> &'db Self::Table {
@@ -27,8 +24,11 @@ impl ForeignKeyLike for ForeignKeyConstraint {
         )
     }
 
-    fn host_columns(&self, database: &Self::Database) -> impl Iterator<Item = Self::Column> {
-        let host_table = self.host_table(database);
+    fn host_columns(
+        &self,
+        database: &Self::Database,
+        host_table: &Self::Table,
+    ) -> impl Iterator<Item = Self::Column> {
         self.columns.iter().filter_map(move |col_name| {
             host_table.columns(database).find(|col| &col.name == col_name)
         })

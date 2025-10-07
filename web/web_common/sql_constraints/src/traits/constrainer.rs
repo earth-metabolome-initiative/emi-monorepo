@@ -3,21 +3,23 @@
 
 use crate::{
     error::Error,
-    traits::{ColumnConstraint, TableConstraint},
+    traits::{ColumnConstraint, ForeignKeyConstraint, TableConstraint},
 };
 
 mod generic_constrainer;
 pub use generic_constrainer::GenericConstrainer;
-use sql_traits::traits::{ColumnLike, DatabaseLike, TableLike};
+use sql_traits::traits::{ColumnLike, DatabaseLike, ForeignKeyLike, TableLike};
 
 /// Trait for types that define a constrainer object.
 pub trait Constrainer: Default {
     /// Associated table type for the constrainer.
-    type Table: TableLike<Database = Self::Database, Column = Self::Column>;
+    type Table: TableLike<Database = Self::Database, Column = Self::Column, ForeignKey = Self::ForeignKey>;
     /// Associated column type for the constrainer.
     type Column: ColumnLike;
+    /// Associated foreign key type for the constrainer.
+    type ForeignKey: ForeignKeyLike<Table = Self::Table, Column = Self::Column, Database = Self::Database>;
     /// Associated database type for the constrainer.
-    type Database: DatabaseLike<Table = Self::Table, Column = Self::Column>;
+    type Database: DatabaseLike<Table = Self::Table, Column = Self::Column, ForeignKey = Self::ForeignKey>;
 
     /// Registers a table constraint to be applied to a table.
     fn register_table_constraint(
@@ -31,6 +33,18 @@ pub trait Constrainer: Default {
         constraint: Box<dyn ColumnConstraint<Column = Self::Column>>,
     );
 
+    /// Registers a foreign key constraint to be applied to a foreign key.
+    fn register_foreign_key_constraint(
+        &mut self,
+        constraint: Box<
+            dyn ForeignKeyConstraint<
+                    ForeignKey = Self::ForeignKey,
+                    Database = Self::Database,
+                    Table = Self::Table,
+                >,
+        >,
+    );
+
     /// Returns an iterator over all registered table constraints.
     fn table_constraints(
         &self,
@@ -40,6 +54,17 @@ pub trait Constrainer: Default {
     fn column_constraints(
         &self,
     ) -> impl Iterator<Item = &dyn ColumnConstraint<Column = Self::Column>>;
+
+    /// Returns an iterator over all registered foreign key constraints.
+    fn foreign_key_constraints(
+        &self,
+    ) -> impl Iterator<
+        Item = &dyn ForeignKeyConstraint<
+            ForeignKey = Self::ForeignKey,
+            Database = Self::Database,
+            Table = Self::Table,
+        >,
+    >;
 
     /// Encounters a table and applies all registered table constraints to it.
     fn encounter_table(&self, database: &Self::Database, table: &Self::Table) -> Result<(), Error> {
@@ -52,6 +77,19 @@ pub trait Constrainer: Default {
         self.column_constraints().try_for_each(|constraint| constraint.validate_column(column))
     }
 
+    /// Encounters a foreign key and applies all registered foreign key
+    /// constraints to it.
+    fn encounter_foreign_key(
+        &self,
+        database: &Self::Database,
+        host_table: &Self::Table,
+        foreign_key: &Self::ForeignKey,
+    ) -> Result<(), Error> {
+        self.foreign_key_constraints().try_for_each(|constraint| {
+            constraint.validate_foreign_key(database, host_table, foreign_key)
+        })
+    }
+
     /// Validates the provided schema by applying all registered constraints to
     /// its DB entities.
     fn validate_schema(&self, database: &Self::Database) -> Result<(), Error> {
@@ -59,6 +97,9 @@ pub trait Constrainer: Default {
             self.encounter_table(database, table)?;
             for column in table.columns(database) {
                 self.encounter_column(&column)?;
+            }
+            for foreign_key in table.foreign_keys(database) {
+                self.encounter_foreign_key(database, table, &foreign_key)?;
             }
         }
         Ok(())

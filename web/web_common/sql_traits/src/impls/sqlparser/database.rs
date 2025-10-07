@@ -1,7 +1,7 @@
 //! Submodule implementing the [`DatabaseLike`] trait.
 use std::path::Path;
 
-use sqlparser::ast::{ColumnDef, CreateTable, Statement};
+use sqlparser::ast::{ColumnDef, CreateTable, ForeignKeyConstraint, Statement};
 
 use crate::traits::DatabaseLike;
 
@@ -59,6 +59,7 @@ impl SqlParserDatabase {
 impl DatabaseLike for SqlParserDatabase {
     type Table = CreateTable;
     type Column = ColumnDef;
+    type ForeignKey = ForeignKeyConstraint;
 
     fn tables(&self) -> impl Iterator<Item = &Self::Table> {
         self.tables.iter()

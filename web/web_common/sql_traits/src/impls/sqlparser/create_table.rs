@@ -2,7 +2,7 @@
 //! [`CreateTable`](sqlparser::ast::CreateTable) struct.
 
 use ::sqlparser::ast::{CreateTable, Ident};
-use sqlparser::ast::{CheckConstraint, ColumnDef, ForeignKeyConstraint, UniqueConstraint};
+use sqlparser::ast::{CheckConstraint, ColumnDef, Expr, ForeignKeyConstraint, UniqueConstraint};
 
 use crate::{impls::SqlParserDatabase, traits::TableLike};
 
@@ -24,6 +24,43 @@ impl TableLike for CreateTable {
 
     fn columns(&self, _database: &Self::Database) -> impl Iterator<Item = Self::Column> {
         self.columns.clone().into_iter()
+    }
+
+    fn primary_key_columns(
+        &self,
+        _database: &Self::Database,
+    ) -> impl Iterator<Item = Self::Column> {
+        for constraint in &self.constraints {
+            if let sqlparser::ast::TableConstraint::PrimaryKey(pk_constraint) = constraint {
+                for col_name in &pk_constraint.columns {
+                    let column_name = match &col_name.column.expr {
+                        Expr::Identifier(ident) => ident,
+                        _ => {
+                            unreachable!(
+                                "Unexpected expression in primary key column: {:?}",
+                                col_name
+                            )
+                        }
+                    };
+                    let mut primary_key_columns = Vec::new();
+                    if let Some(column) = self.columns.iter().find(|col| &col.name == column_name) {
+                        primary_key_columns.push(column.clone());
+                    }
+                    return primary_key_columns.into_iter();
+                }
+            }
+        }
+
+        for column in &self.columns {
+            for option in &column.options {
+                if let sqlparser::ast::ColumnOption::Unique { is_primary: true, .. } = option.option
+                {
+                    return vec![column.clone()].into_iter();
+                }
+            }
+        }
+
+        Vec::new().into_iter()
     }
 
     fn unique_indexes(

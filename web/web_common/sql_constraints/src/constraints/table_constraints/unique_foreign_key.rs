@@ -84,9 +84,7 @@ impl<DB: DatabaseLike> TableConstraint for UniqueForeignKey<DB> {
             .iter()
             .map(|c| {
                 let mut hasher = DefaultHasher::new();
-                let host_table = c.host_table(database);
-                host_table.hash(&mut hasher);
-                for host_col in c.host_columns(database) {
+                for host_col in c.host_columns(database, table) {
                     host_col.hash(&mut hasher);
                 }
                 let referenced_table = c.referenced_table(database);
