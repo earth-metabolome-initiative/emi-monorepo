@@ -6,3 +6,5 @@ pub mod table;
 pub use column::ColumnLike;
 pub use database::DatabaseLike;
 pub use table::TableLike;
+pub mod check_constraint;
+pub use check_constraint::CheckConstraintLike;

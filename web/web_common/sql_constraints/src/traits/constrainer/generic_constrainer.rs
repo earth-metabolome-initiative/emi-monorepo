@@ -1,37 +1,43 @@
 //! Submodule defining a generic constrainer for SQL constraints.
 
-use sql_traits::traits::{ColumnLike, TableLike};
+use sql_traits::traits::DatabaseLike;
 
 use crate::traits::Constrainer;
 
 /// A generic constrainer that holds and applies table constraints.
-pub struct GenericConstrainer<T, C> {
+pub struct GenericConstrainer<DB: DatabaseLike> {
     /// The registered table constraints.
-    table_constraints: Vec<Box<dyn crate::traits::TableConstraint<Table = T>>>,
+    table_constraints:
+        Vec<Box<dyn crate::traits::TableConstraint<Table = DB::Table, Database = DB>>>,
     /// The registered column constraints.
-    column_constraints: Vec<Box<dyn crate::traits::ColumnConstraint<Column = C>>>,
+    column_constraints: Vec<Box<dyn crate::traits::ColumnConstraint<Column = DB::Column>>>,
 }
 
-impl<T, C> Default for GenericConstrainer<T, C> {
+impl<DB: DatabaseLike> Default for GenericConstrainer<DB> {
     fn default() -> Self {
         Self { table_constraints: Vec::new(), column_constraints: Vec::new() }
     }
 }
 
-impl<T: TableLike, C: ColumnLike> Constrainer for GenericConstrainer<T, C> {
-    type Table = T;
-    type Column = C;
+impl<DB: DatabaseLike> Constrainer for GenericConstrainer<DB> {
+    type Table = DB::Table;
+    type Column = DB::Column;
+    type Database = DB;
 
     fn register_table_constraint(
         &mut self,
-        constraint: Box<dyn crate::traits::TableConstraint<Table = Self::Table>>,
+        constraint: Box<
+            dyn crate::traits::TableConstraint<Table = Self::Table, Database = Self::Database>,
+        >,
     ) {
         self.table_constraints.push(constraint);
     }
 
     fn table_constraints(
         &self,
-    ) -> impl Iterator<Item = &dyn crate::traits::TableConstraint<Table = Self::Table>> {
+    ) -> impl Iterator<
+        Item = &dyn crate::traits::TableConstraint<Table = Self::Table, Database = Self::Database>,
+    > {
         self.table_constraints.iter().map(|c| c.as_ref())
     }
 

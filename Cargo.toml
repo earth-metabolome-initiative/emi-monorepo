@@ -93,7 +93,7 @@ bytes = "1.10.0"
 rayon = "1.10.0"
 bincode = { version = "2", features = ["serde"] }
 # sqlparser = "0.58.0"
-sqlparser = { git = "https://github.com/LucaCappelletti94/sqlparser-rs", branch = "sqlite-trigger" }
+sqlparser = { git = "https://github.com/LucaCappelletti94/sqlparser-rs", branch = "future-main" }
 arbitrary = { version = "1", features = ["derive"] }
 diesel = { version = "2.3.1", features = [
   "extras",

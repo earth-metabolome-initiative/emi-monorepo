@@ -2,7 +2,7 @@
 //! that column names are lowercase.
 
 use common_traits::builder::Builder;
-use sql_traits::traits::{ColumnLike, TableLike};
+use sql_traits::traits::{ColumnLike, DatabaseLike};
 
 use crate::{
     error::ConstraintErrorInfo,
@@ -18,9 +18,8 @@ use crate::{
 ///
 /// ```rust
 /// use sql_constraints::prelude::*;
-/// use sqlparser::ast::{CreateTable, ColumnDef};
 ///
-/// let constrainer: GenericConstrainer<CreateTable, ColumnDef> = LowercaseColumnName::default().into();
+/// let constrainer: GenericConstrainer<SqlParserDatabase> = LowercaseColumnName::default().into();
 ///
 /// let invalid_schema = SqlParserDatabase::from_sql("CREATE TABLE mytable (Id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
@@ -36,10 +35,8 @@ impl<C> Default for LowercaseColumnName<C> {
     }
 }
 
-impl<C: ColumnLike + 'static, T: TableLike> From<LowercaseColumnName<C>>
-    for GenericConstrainer<T, C>
-{
-    fn from(constraint: LowercaseColumnName<C>) -> Self {
+impl<DB: DatabaseLike + 'static> From<LowercaseColumnName<DB::Column>> for GenericConstrainer<DB> {
+    fn from(constraint: LowercaseColumnName<DB::Column>) -> Self {
         let mut constrainer = GenericConstrainer::default();
         constrainer.register_column_constraint(Box::new(constraint));
         constrainer

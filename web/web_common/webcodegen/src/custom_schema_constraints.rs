@@ -5,8 +5,6 @@ mod duplicated_check_constraint;
 mod duplicated_unique_index;
 mod has_specific_type;
 mod is_foreign_key_column_constraint;
-mod lowercase_column_constraint;
-mod lowercase_table_constraint;
 mod not_null_column_constraint;
 mod word_deprecation_constraint;
 

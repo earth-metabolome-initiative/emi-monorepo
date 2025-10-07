@@ -2,7 +2,7 @@
 //! table names are lowercase.
 
 use common_traits::builder::Builder;
-use sql_traits::traits::{ColumnLike, TableLike};
+use sql_traits::traits::{DatabaseLike, TableLike};
 
 use crate::{
     error::ConstraintErrorInfo,
@@ -18,9 +18,8 @@ use crate::{
 ///
 /// ```rust
 /// use sql_constraints::prelude::*;
-/// use sqlparser::ast::{CreateTable, ColumnDef};
 ///
-/// let constrainer: GenericConstrainer<CreateTable, ColumnDef> = LowercaseTableName::default().into();
+/// let constrainer: GenericConstrainer<SqlParserDatabase> = LowercaseTableName::default().into();
 ///
 /// let invalid_schema = SqlParserDatabase::from_sql("CREATE TABLE MyTable (id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
@@ -28,24 +27,25 @@ use crate::{
 /// let valid_schema = SqlParserDatabase::from_sql("CREATE TABLE mytable (id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 /// ```
-pub struct LowercaseTableName<T>(std::marker::PhantomData<T>);
+pub struct LowercaseTableName<DB>(std::marker::PhantomData<DB>);
 
-impl<T> Default for LowercaseTableName<T> {
+impl<DB> Default for LowercaseTableName<DB> {
     fn default() -> Self {
         Self(std::marker::PhantomData)
     }
 }
 
-impl<T: TableLike + 'static, C: ColumnLike> From<LowercaseTableName<T>> for GenericConstrainer<T, C> {
-    fn from(constraint: LowercaseTableName<T>) -> Self {
+impl<DB: DatabaseLike + 'static> From<LowercaseTableName<DB>> for GenericConstrainer<DB> {
+    fn from(constraint: LowercaseTableName<DB>) -> Self {
         let mut constrainer = GenericConstrainer::default();
         constrainer.register_table_constraint(Box::new(constraint));
         constrainer
     }
 }
 
-impl<T: TableLike> TableConstraint for LowercaseTableName<T> {
-    type Table = T;
+impl<DB: DatabaseLike> TableConstraint for LowercaseTableName<DB> {
+    type Table = DB::Table;
+    type Database = DB;
     fn table_error_information(
         &self,
         context: &Self::Table,
@@ -64,7 +64,11 @@ impl<T: TableLike> TableConstraint for LowercaseTableName<T> {
             .into()
     }
 
-    fn validate_table(&self, table: &Self::Table) -> Result<(), crate::error::Error> {
+    fn validate_table(
+        &self,
+        _database: &Self::Database,
+        table: &Self::Table,
+    ) -> Result<(), crate::error::Error> {
         if table.table_name().chars().all(|c| !c.is_alphabetic() || c.is_lowercase()) {
             Ok(())
         } else {
