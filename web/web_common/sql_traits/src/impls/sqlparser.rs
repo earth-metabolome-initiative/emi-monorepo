@@ -6,4 +6,5 @@ mod check_constraint;
 mod column_def;
 mod create_table;
 pub mod database;
+mod unique_constraint;
 pub use database::SqlParserDatabase;

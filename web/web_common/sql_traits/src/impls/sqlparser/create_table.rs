@@ -2,7 +2,7 @@
 //! [`CreateTable`](sqlparser::ast::CreateTable) struct.
 
 use ::sqlparser::ast::{CreateTable, Ident};
-use sqlparser::ast::{CheckConstraint, ColumnDef};
+use sqlparser::ast::{CheckConstraint, ColumnDef, UniqueConstraint};
 
 use crate::{impls::SqlParserDatabase, traits::TableLike};
 
@@ -10,6 +10,7 @@ impl TableLike for CreateTable {
     type Database = SqlParserDatabase;
     type Column = ColumnDef;
     type CheckConstraint = CheckConstraint;
+    type UniqueIndex = UniqueConstraint;
 
     fn table_name(&self) -> &str {
         let object_name_parts = &self.name.0;
@@ -22,6 +23,19 @@ impl TableLike for CreateTable {
 
     fn columns(&self, _database: &Self::Database) -> impl Iterator<Item = Self::Column> {
         self.columns.clone().into_iter()
+    }
+
+    fn unique_indexes(
+        &self,
+        _database: &Self::Database,
+    ) -> impl Iterator<Item = Self::UniqueIndex> {
+        self.constraints.iter().filter_map(move |constraint| {
+            if let sqlparser::ast::TableConstraint::Unique(unique_constraint) = constraint {
+                Some(unique_constraint.clone())
+            } else {
+                None
+            }
+        })
     }
 
     fn check_constraints(

@@ -8,3 +8,5 @@ pub use database::DatabaseLike;
 pub use table::TableLike;
 pub mod check_constraint;
 pub use check_constraint::CheckConstraintLike;
+pub mod unique_index;
+pub use unique_index::UniqueIndexLike;
