@@ -53,6 +53,7 @@ members = [
   "web/web_common/reference_docker",
   "web/web_common/rosetta_url",
   "web/web_common/sqlite_migration_generator",
+  "web/web_common/sql_doc",
   "web/web_common/validation_errors",
   "web/web_common/webcodegen",
   "web/web_common/web_common_traits",
