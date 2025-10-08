@@ -2,6 +2,4 @@
 //! comments from `.sql` files for use in documentation
 
 /// Struct for providing the Table Documentation Methods
-pub struct TableDocumentation {
-    
-}
+pub struct TableDocumentation {}
