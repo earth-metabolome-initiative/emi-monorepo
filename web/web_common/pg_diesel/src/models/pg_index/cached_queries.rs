@@ -3,13 +3,13 @@
 
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl,
-    SelectableHelper,
+    SelectableHelper, prelude::QueryableByName, sql_types::Oid,
 };
 
 use crate::models::{Column, PgIndex, Table};
 
 #[pg_cached::oid_auto_cached]
-pub(super) fn columns(
+pub(crate) fn columns(
     index: &PgIndex,
     conn: &mut PgConnection,
 ) -> Result<Vec<Column>, diesel::result::Error> {
@@ -33,7 +33,7 @@ pub(super) fn columns(
 }
 
 #[pg_cached::oid_auto_cached]
-pub(super) fn table(
+pub(crate) fn table(
     index: &PgIndex,
     conn: &mut PgConnection,
 ) -> Result<crate::models::Table, diesel::result::Error> {
@@ -44,4 +44,29 @@ pub(super) fn table(
         .filter(pg_class::oid.eq(index.indrelid))
         .select(Table::as_select())
         .first(conn)?)
+}
+
+#[derive(QueryableByName, Debug)]
+struct IndexExpr {
+    #[diesel(sql_type = diesel::sql_types::Text)]
+    expr: String,
+}
+
+#[pg_cached::oid_auto_cached]
+/// Returns the string expressions for the index, if any.
+pub(crate) fn expression(
+    index: &PgIndex,
+    conn: &mut PgConnection,
+) -> Result<String, diesel::result::Error> {
+    Ok(diesel::sql_query(
+        r#"
+        SELECT
+            pg_get_expr(i.indexprs, i.indrelid) as expr
+        FROM pg_index i
+        WHERE i.indexrelid = $1
+        "#,
+    )
+    .bind::<Oid, _>(index.indexrelid)
+    .get_result::<IndexExpr>(conn)?
+    .expr)
 }

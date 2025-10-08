@@ -9,7 +9,7 @@ use diesel::{
 use crate::models::{Column, KeyColumnUsage, ReferentialConstraint, Table};
 
 #[pg_cached::auto_cached]
-pub(super) fn referential_constraint(
+pub(crate) fn referential_constraint(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
 ) -> Result<ReferentialConstraint, diesel::result::Error> {
@@ -25,7 +25,7 @@ pub(super) fn referential_constraint(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn foreign_columns(
+pub(crate) fn referenced_columns(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
 ) -> Result<Vec<Column>, diesel::result::Error> {
@@ -34,7 +34,7 @@ pub(super) fn foreign_columns(
     use crate::schema::{columns, constraint_column_usage};
 
     // Find the referential constraint for this key_column_usage
-    let referential_constraint = key_column_usage.referential_constraint(conn)?;
+    let referential_constraint = referential_constraint(key_column_usage, conn)?;
 
     // Find the columns in the referenced (unique) constraint
     Ok(constraint_column_usage::table
@@ -65,7 +65,7 @@ pub(super) fn foreign_columns(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn local_table(
+pub(crate) fn host_table(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
 ) -> Result<Table, diesel::result::Error> {
@@ -80,7 +80,7 @@ pub(super) fn local_table(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn local_columns(
+pub(crate) fn host_columns(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
 ) -> Result<Vec<Column>, diesel::result::Error> {
@@ -102,7 +102,7 @@ pub(super) fn local_columns(
 }
 
 #[pg_cached::auto_cached]
-/// Returns the foreign table associated with this key column usage
+/// Returns the referenced table associated with this key column usage
 ///
 /// # Arguments
 ///
@@ -110,14 +110,14 @@ pub(super) fn local_columns(
 ///
 /// # Errors
 ///
-/// * If an error occurs while loading the foreign table from the database
-pub(super) fn foreign_table(
+/// * If an error occurs while loading the referenced table from the database
+pub(crate) fn referenced_table(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
 ) -> Result<Table, diesel::result::Error> {
     use crate::schema::{constraint_table_usage, tables};
 
-    let constraint = key_column_usage.referential_constraint(conn)?;
+    let constraint = referential_constraint(key_column_usage, conn)?;
 
     Ok(constraint_table_usage::table
         .inner_join(

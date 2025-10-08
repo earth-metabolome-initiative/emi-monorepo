@@ -7,4 +7,12 @@ impl ColumnLike for crate::models::Column {
     fn column_name(&self) -> &str {
         &self.column_name
     }
+
+    fn data_type(&self) -> String {
+        self.data_type_str().to_owned()
+    }
+
+    fn is_nullable(&self) -> bool {
+        self.__is_nullable == "YES"
+    }
 }

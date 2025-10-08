@@ -8,7 +8,7 @@ use diesel::{
 use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgIndex, PgTrigger, Table};
 
 #[pg_cached::auto_cached]
-pub(super) fn load_all_tables(
+pub(crate) fn load_all_tables(
     table_catalog: &str,
     table_schema: &str,
     conn: &mut PgConnection,
@@ -24,7 +24,7 @@ pub(super) fn load_all_tables(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn load_table(
+pub(crate) fn load_table(
     conn: &mut PgConnection,
     table_name: &str,
     table_schema: &str,
@@ -39,7 +39,7 @@ pub(super) fn load_table(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn columns(
+pub(crate) fn columns(
     table: &Table,
     conn: &mut PgConnection,
 ) -> Result<Vec<Column>, diesel::result::Error> {
@@ -53,7 +53,7 @@ pub(super) fn columns(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn primary_key_columns(
+pub(crate) fn primary_key_columns(
     table: &Table,
     conn: &mut PgConnection,
 ) -> Result<Vec<Column>, diesel::result::Error> {
@@ -110,7 +110,7 @@ pub(super) fn primary_key_columns(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn foreign_keys(
+pub(crate) fn foreign_keys(
     table: &Table,
     conn: &mut PgConnection,
 ) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
@@ -143,7 +143,7 @@ pub(super) fn foreign_keys(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn unique_indices(
+pub(crate) fn unique_indices(
     table: &Table,
     conn: &mut PgConnection,
 ) -> Result<Vec<PgIndex>, diesel::result::Error> {
@@ -163,7 +163,7 @@ pub(super) fn unique_indices(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn indices(
+pub(crate) fn indices(
     table: &Table,
     conn: &mut PgConnection,
 ) -> Result<Vec<PgIndex>, diesel::result::Error> {
@@ -182,7 +182,7 @@ pub(super) fn indices(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn triggers(
+pub(crate) fn triggers(
     table: &Table,
     conn: &mut PgConnection,
 ) -> Result<Vec<PgTrigger>, diesel::result::Error> {
@@ -197,7 +197,7 @@ pub(super) fn triggers(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn check_constraints(
+pub(crate) fn check_constraints(
     table: &Table,
     conn: &mut PgConnection,
 ) -> Result<Vec<CheckConstraint>, diesel::result::Error> {
@@ -220,7 +220,7 @@ pub(super) fn check_constraints(
 }
 
 #[pg_cached::auto_cached]
-pub(super) fn column_by_name(
+pub(crate) fn column_by_name(
     table: &Table,
     column_name: &str,
     conn: &mut PgConnection,

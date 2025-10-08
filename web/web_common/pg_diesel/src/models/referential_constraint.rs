@@ -24,3 +24,20 @@ pub struct ReferentialConstraint {
     /// Delete rule
     pub delete_rule: String,
 }
+
+impl ReferentialConstraint {
+    /// Returns true if the referential constraint has an ON DELETE CASCADE rule
+    pub fn on_delete_cascade(&self) -> bool {
+        self.delete_rule.eq_ignore_ascii_case("CASCADE")
+    }
+
+    /// Returns the match kind of the referential constraint
+    pub fn match_kind(&self) -> sqlparser::ast::MatchKind {
+        match self.match_option.to_uppercase().as_str() {
+            "FULL" => sqlparser::ast::MatchKind::Full,
+            "PARTIAL" => sqlparser::ast::MatchKind::Partial,
+            "SIMPLE" => sqlparser::ast::MatchKind::Simple,
+            other => unreachable!("Unexpected match option: {other}"),
+        }
+    }
+}

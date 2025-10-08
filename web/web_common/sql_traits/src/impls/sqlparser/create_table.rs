@@ -22,6 +22,21 @@ impl TableLike for CreateTable {
         }
     }
 
+    fn table_schema(&self) -> Option<&str> {
+        let object_name_parts = &self.name.0;
+        if object_name_parts.len() > 1 {
+            let schema_part = &object_name_parts[object_name_parts.len() - 2];
+            match schema_part {
+                sqlparser::ast::ObjectNamePart::Identifier(Ident { value, .. }) => {
+                    Some(value.as_str())
+                }
+                _ => panic!("Unexpected object name part in CreateTable: {:?}", schema_part),
+            }
+        } else {
+            None
+        }
+    }
+
     fn columns(&self, _database: &Self::Database) -> impl Iterator<Item = Self::Column> {
         self.columns.clone().into_iter()
     }
@@ -63,7 +78,7 @@ impl TableLike for CreateTable {
         Vec::new().into_iter()
     }
 
-    fn unique_indexes(
+    fn unique_indices(
         &self,
         _database: &Self::Database,
     ) -> impl Iterator<Item = Self::UniqueIndex> {
@@ -101,25 +116,10 @@ impl TableLike for CreateTable {
             })
             .chain(self.columns.iter().filter_map(|col| {
                 col.options.iter().find_map(|opt| {
-                    if let sqlparser::ast::ColumnOption::ForeignKey {
-                        foreign_table,
-                        referred_columns,
-                        on_delete,
-                        on_update,
-                        characteristics,
-                    } = opt.option.clone()
+                    if let sqlparser::ast::ColumnOption::ForeignKey(foreign_key_constraint) =
+                        opt.option.clone()
                     {
-                        let fk = ForeignKeyConstraint {
-                            name: None,
-                            index_name: None,
-                            columns: vec![col.name.clone()],
-                            foreign_table,
-                            referred_columns,
-                            on_delete,
-                            on_update,
-                            characteristics,
-                        };
-                        Some(fk)
+                        Some(foreign_key_constraint)
                     } else {
                         None
                     }

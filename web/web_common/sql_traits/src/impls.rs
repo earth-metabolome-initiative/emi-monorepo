@@ -2,5 +2,4 @@
 //! module.
 
 mod sqlparser;
-#[cfg(feature = "sqlparser")]
 pub use sqlparser::SqlParserDatabase;

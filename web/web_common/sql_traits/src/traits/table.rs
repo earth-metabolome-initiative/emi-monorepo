@@ -15,12 +15,15 @@ pub trait TableLike: Hash + Ord + Eq {
     /// The check constraint type of the table.
     type CheckConstraint: CheckConstraintLike;
     /// The unique index type of the table.
-    type UniqueIndex: UniqueIndexLike;
+    type UniqueIndex: UniqueIndexLike<Table = Self, Database = Self::Database>;
     /// The foreign key type of the table.
     type ForeignKey: ForeignKeyLike<Table = Self, Column = Self::Column, Database = Self::Database>;
 
     /// Returns the name of the table.
     fn table_name(&self) -> &str;
+
+    /// The schema name of the table, if it has one.
+    fn table_schema(&self) -> Option<&str>;
 
     /// Iterates over the columns of the column using the provided schema.
     fn columns(&self, database: &Self::Database) -> impl Iterator<Item = Self::Column>;
@@ -74,10 +77,34 @@ pub trait TableLike: Hash + Ord + Eq {
 
     /// Iterates over the unique indexes of the table using the provided
     /// schema.
-    fn unique_indexes(&self, database: &Self::Database) -> impl Iterator<Item = Self::UniqueIndex>;
+    fn unique_indices(&self, database: &Self::Database) -> impl Iterator<Item = Self::UniqueIndex>;
 
     /// Iterates over the foreign keys of the table using the provided schema.
     fn foreign_keys(&self, database: &Self::Database) -> impl Iterator<Item = Self::ForeignKey>;
+
+    /// Returns a vector with the (dedupliated) tables which are referenced by
+    /// the current table via foreign keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    fn referenced_tables<'db>(&'db self, database: &'db Self::Database) -> Vec<&'db Self>
+    where
+        Self: 'db,
+    {
+        let mut referenced_tables = Vec::new();
+
+        for foreign_key in self.foreign_keys(database) {
+            let referenced_table = foreign_key.referenced_table(database);
+            referenced_tables.push(referenced_table);
+        }
+
+        referenced_tables.sort_unstable();
+        referenced_tables.dedup();
+
+        referenced_tables
+    }
 
     /// Returns the tables which are extended by the current table via foreign
     /// keys.

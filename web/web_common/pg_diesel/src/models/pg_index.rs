@@ -1,6 +1,7 @@
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
 mod cached_queries;
+pub(crate) use cached_queries::*;
 
 use crate::models::{Column, Table};
 

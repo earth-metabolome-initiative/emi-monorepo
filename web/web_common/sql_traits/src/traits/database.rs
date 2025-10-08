@@ -13,4 +13,16 @@ pub trait DatabaseLike {
 
     /// Iterates over the tables defined in the schema.
     fn tables(&self) -> impl Iterator<Item = &Self::Table>;
+
+    /// Returns the table with the given (optional) schema and name.
+    ///
+    /// # Arguments
+    ///
+    /// * `schema` - Optional schema name of the table.
+    /// * `table_name` - Name of the table.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the table is not found in the database.
+    fn table(&self, schema: Option<&str>, table_name: &str) -> &Self::Table;
 }

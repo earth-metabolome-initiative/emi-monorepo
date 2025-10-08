@@ -4,11 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-sqlparser = { workspace = true, optional = true }
+sqlparser.workspace = true
 
 [lints]
 workspace = true
-
-[features]
-default = ["sqlparser"]
-sqlparser = ["dep:sqlparser"]

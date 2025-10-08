@@ -1,6 +1,6 @@
 //! Implement the [`ForeignKeyConstraint`] trait for the `sqlparser` crate's
 
-use sqlparser::ast::{ColumnDef, CreateTable, ForeignKeyConstraint};
+use sqlparser::ast::{ColumnDef, CreateTable, ForeignKeyConstraint, MatchKind};
 
 use crate::{
     impls::SqlParserDatabase,
@@ -22,6 +22,14 @@ impl ForeignKeyLike for ForeignKeyConstraint {
         database.tables().find(|table| table.table_name() == referenced_table_name).expect(
             &format!("Referenced table `{referenced_table_name}` not found for foreign key"),
         )
+    }
+
+    fn on_delete_cascade(&self, _database: &Self::Database) -> bool {
+        matches!(self.on_delete, Some(sqlparser::ast::ReferentialAction::Cascade))
+    }
+
+    fn match_kind(&self, _database: &Self::Database) -> MatchKind {
+        self.match_kind.clone().unwrap_or(MatchKind::Simple)
     }
 
     fn host_columns(

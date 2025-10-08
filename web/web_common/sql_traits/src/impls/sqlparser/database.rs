@@ -3,7 +3,7 @@ use std::path::Path;
 
 use sqlparser::ast::{ColumnDef, CreateTable, ForeignKeyConstraint, Statement};
 
-use crate::traits::DatabaseLike;
+use crate::traits::{DatabaseLike, table::TableLike};
 
 #[derive(Debug, Default)]
 /// Struct representing a SQL schema parsed using the `sqlparser` crate.
@@ -30,6 +30,11 @@ impl SqlParserDatabase {
                 schema.tables.extend(sub_schema.tables);
             }
         }
+
+        // We sort all tables by their schema and name to ensure a consistent order.
+        schema.tables.sort_by_key(|table| {
+            (table.table_schema().unwrap_or("").to_owned(), table.table_name().to_owned())
+        });
 
         Ok(schema)
     }
@@ -63,5 +68,17 @@ impl DatabaseLike for SqlParserDatabase {
 
     fn tables(&self) -> impl Iterator<Item = &Self::Table> {
         self.tables.iter()
+    }
+
+    fn table(&self, schema: Option<&str>, table_name: &str) -> &Self::Table {
+        // The tables are sorted by schema and name, so we can use binary search.
+        let key = (schema, table_name);
+        match self
+            .tables
+            .binary_search_by_key(&key, |table| (table.table_schema(), table.table_name()))
+        {
+            Ok(index) => &self.tables[index],
+            Err(_) => panic!("Table not found: {:?}.{:?}", schema, table_name),
+        }
     }
 }

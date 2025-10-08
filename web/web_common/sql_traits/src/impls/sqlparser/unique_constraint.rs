@@ -1,11 +1,29 @@
 //! Implement the [`UniqueConstraint`] trait for the `sqlparser` crate's
 
-use sqlparser::ast::UniqueConstraint;
+use sqlparser::{
+    ast::{CreateTable, Expr, UniqueConstraint},
+    parser::Parser,
+};
 
-use crate::traits::UniqueIndexLike;
+use crate::{impls::SqlParserDatabase, traits::UniqueIndexLike};
 
 impl UniqueIndexLike for UniqueConstraint {
-    fn clause(&self) -> String {
-        self.columns.iter().map(|ident| ident.column.to_string()).collect::<Vec<_>>().join(", ")
+    type Table = CreateTable;
+    type Database = SqlParserDatabase;
+
+    fn expression(&self, _database: &Self::Database) -> Expr {
+        let expression_string = format!(
+            "({})",
+            self.columns
+                .iter()
+                .map(|ident| ident.column.to_string())
+                .collect::<Vec<_>>()
+                .join(", ")
+        );
+        Parser::new(&sqlparser::dialect::GenericDialect {})
+            .try_with_sql(expression_string.as_str())
+            .expect("Failed to parse unique constraint expression")
+            .parse_expr()
+            .expect("No expression found in parsed unique constraint")
     }
 }

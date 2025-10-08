@@ -27,7 +27,7 @@ pub struct Column {
     /// Default expression of the column
     pub column_default: Option<String>,
     /// Indicates if the column is nullable ("YES" or "NO")
-    __is_nullable: String,
+    pub __is_nullable: String,
     /// Data type of the column
     data_type: String,
     /// Maximum length of the character data type
@@ -215,12 +215,6 @@ impl Column {
         self.data_type == "USER-DEFINED"
     }
 
-    #[must_use]
-    /// Returns whether the column is nullable
-    pub fn is_nullable(&self) -> bool {
-        self.__is_nullable == "YES"
-    }
-
     /// Returns the table which contains the current column.
     ///
     /// # Arguments
@@ -321,27 +315,6 @@ impl Column {
     /// * `conn` - A mutable reference to a `PgConnection`
     pub fn has_foreign_keys(&self, conn: &mut PgConnection) -> bool {
         self.foreign_keys(conn).is_ok_and(|keys| !keys.is_empty())
-    }
-
-    /// Returns whether the column is a foreign key with `ON DELETE CASCADE`
-    /// constraint.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    ///
-    /// # Returns
-    ///
-    /// A `bool` indicating whether the column is a foreign key with `ON DELETE
-    /// CASCADE` constraint
-    pub fn is_foreign_key_on_delete_cascade(&self, conn: &mut PgConnection) -> bool {
-        self.foreign_keys(conn).is_ok_and(|keys| {
-            keys.iter().any(|key| key.has_on_delete_cascade(conn).unwrap_or(false))
-        })
     }
 
     /// Returns whether the column is part of the table's primary key.

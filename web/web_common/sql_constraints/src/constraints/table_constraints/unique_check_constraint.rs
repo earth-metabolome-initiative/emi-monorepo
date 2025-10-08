@@ -76,9 +76,9 @@ impl<DB: DatabaseLike> TableConstraint for UniqueCheckConstraint<DB> {
         table: &Self::Table,
     ) -> Result<(), crate::error::Error> {
         let mut constraints = table.check_constraints(database).collect::<Vec<_>>();
-        constraints.sort_unstable_by_key(|c| c.clause());
+        constraints.sort_unstable_by_key(|c| c.expression());
         for window in constraints.windows(2) {
-            if window[0].clause() == window[1].clause() {
+            if window[0].expression() == window[1].expression() {
                 return Err(crate::error::Error::Table(self.table_error_information(table)));
             }
         }

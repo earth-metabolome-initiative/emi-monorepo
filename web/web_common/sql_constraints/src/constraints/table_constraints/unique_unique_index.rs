@@ -73,10 +73,10 @@ impl<DB: DatabaseLike> TableConstraint for UniqueUniqueIndex<DB> {
         database: &Self::Database,
         table: &Self::Table,
     ) -> Result<(), crate::error::Error> {
-        let mut constraints = table.unique_indexes(database).collect::<Vec<_>>();
-        constraints.sort_unstable_by_key(|c| c.clause());
+        let mut constraints = table.unique_indices(database).collect::<Vec<_>>();
+        constraints.sort_unstable_by_key(|c| c.expression(database));
         for window in constraints.windows(2) {
-            if window[0].clause() == window[1].clause() {
+            if window[0].expression(database) == window[1].expression(database) {
                 return Err(crate::error::Error::Table(self.table_error_information(table)));
             }
         }

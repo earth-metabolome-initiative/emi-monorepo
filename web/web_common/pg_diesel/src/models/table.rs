@@ -2,9 +2,10 @@ use std::fmt::Display;
 
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
-use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgIndex, PgTrigger};
+use crate::models::{CheckConstraint, Column, PgIndex, PgTrigger};
 
 mod cached_queries;
+pub(crate) use cached_queries::*;
 
 #[derive(
     Queryable, QueryableByName, PartialEq, Eq, PartialOrd, Ord, Selectable, Debug, Clone, Hash,
@@ -71,53 +72,6 @@ impl Table {
         self.table_type == "LOCAL TEMPORARY" || self.table_type == "GLOBAL TEMPORARY"
     }
 
-    /// Returns the foreign keys of the table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A vector of columns representing the foreign keys of the table.
-    ///
-    /// # Errors
-    ///
-    /// * If the foreign keys cannot be loaded from the database.
-    pub fn foreign_keys(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
-        cached_queries::foreign_keys(self, conn)
-    }
-
-    /// Returns the set of foreign tables of the table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A set of tables that are foreign to the current table.
-    ///
-    ///
-    /// # Errors
-    ///
-    /// * If the foreign tables cannot be loaded from the database.
-    pub fn foreign_tables(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<Table>, diesel::result::Error> {
-        let mut tables = Vec::new();
-        for foreign_key_constraint in self.foreign_keys(conn)? {
-            tables.push(foreign_key_constraint.foreign_table(conn)?);
-        }
-        tables.sort_unstable();
-        tables.dedup();
-        Ok(tables)
-    }
-
     /// Returns the indices for the table.
     ///
     /// # Arguments
@@ -132,7 +86,7 @@ impl Table {
     ///
     /// * If the indices cannot be loaded from the database.
     pub fn indices(&self, conn: &mut PgConnection) -> Result<Vec<PgIndex>, diesel::result::Error> {
-        cached_queries::indices(self, conn)
+        indices(self, conn)
     }
 
     /// Returns the UNIQUE constraint indices for the table.
@@ -152,7 +106,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<PgIndex>, diesel::result::Error> {
-        cached_queries::unique_indices(self, conn)
+        unique_indices(self, conn)
     }
 
     /// Returns all tables in the database.
@@ -175,7 +129,7 @@ impl Table {
         table_catalog: &str,
         table_schema: &str,
     ) -> Result<Vec<Self>, diesel::result::Error> {
-        cached_queries::load_all_tables(table_catalog, table_schema, conn)
+        load_all_tables(table_catalog, table_schema, conn)
     }
 
     /// Returns the table by name.
@@ -200,7 +154,7 @@ impl Table {
         table_catalog: &str,
         conn: &mut PgConnection,
     ) -> Result<Self, diesel::result::Error> {
-        cached_queries::load_table(conn, table_name, table_schema, table_catalog)
+        load_table(conn, table_name, table_schema, table_catalog)
     }
 
     /// Returns the columns of the table.
@@ -217,7 +171,7 @@ impl Table {
     ///
     /// * If the columns cannot be loaded from the database.
     pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
-        cached_queries::columns(self, conn)
+        columns(self, conn)
     }
 
     /// Returns the column by name.
@@ -239,7 +193,7 @@ impl Table {
         column_name: &str,
         conn: &mut PgConnection,
     ) -> Result<Column, diesel::result::Error> {
-        cached_queries::column_by_name(self, column_name, conn)
+        column_by_name(self, column_name, conn)
     }
 
     /// Returns whether the table has primary keys.
@@ -315,7 +269,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<Column>, diesel::result::Error> {
-        cached_queries::primary_key_columns(self, conn)
+        primary_key_columns(self, conn)
     }
 
     /// Returns whether the table has a composite primary key.
@@ -355,7 +309,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<CheckConstraint>, diesel::result::Error> {
-        cached_queries::check_constraints(self, conn)
+        check_constraints(self, conn)
     }
 
     /// Returns the list of Triggers associates to the current table.
@@ -375,7 +329,7 @@ impl Table {
         &self,
         conn: &mut PgConnection,
     ) -> Result<Vec<PgTrigger>, diesel::result::Error> {
-        cached_queries::triggers(self, conn)
+        triggers(self, conn)
     }
 }
 
