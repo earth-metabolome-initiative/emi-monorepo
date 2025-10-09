@@ -3,7 +3,7 @@
 use std::hash::Hash;
 
 /// A trait for types that can be treated as SQL columns.
-pub trait ColumnLike: Hash + Eq {
+pub trait ColumnLike: Hash + Eq + Ord {
     /// Returns the name of the column.
     fn column_name(&self) -> &str;
 

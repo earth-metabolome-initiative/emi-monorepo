@@ -57,6 +57,11 @@ impl SqlParserDatabase {
             }
         }
 
+        // We sort all tables by their schema and name to ensure a consistent order.
+        self.tables.sort_by_key(|table| {
+            (table.table_schema().unwrap_or("").to_owned(), table.table_name().to_owned())
+        });
+
         Ok(())
     }
 }

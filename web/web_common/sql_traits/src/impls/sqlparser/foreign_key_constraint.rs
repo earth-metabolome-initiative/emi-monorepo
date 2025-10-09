@@ -32,17 +32,26 @@ impl ForeignKeyLike for ForeignKeyConstraint {
         self.match_kind.clone().unwrap_or(MatchKind::Simple)
     }
 
-    fn host_columns(
-        &self,
-        database: &Self::Database,
-        host_table: &Self::Table,
-    ) -> impl Iterator<Item = Self::Column> {
+    fn host_columns<'db>(
+        &'db self,
+        database: &'db Self::Database,
+        host_table: &'db Self::Table,
+    ) -> impl Iterator<Item = &'db Self::Column>
+    where
+        Self: 'db,
+    {
         self.columns.iter().filter_map(move |col_name| {
             host_table.columns(database).find(|col| &col.name == col_name)
         })
     }
 
-    fn referenced_columns(&self, database: &Self::Database) -> impl Iterator<Item = Self::Column> {
+    fn referenced_columns<'db>(
+        &'db self,
+        database: &'db Self::Database,
+    ) -> impl Iterator<Item = &'db Self::Column>
+    where
+        Self: 'db,
+    {
         let referenced_table = self.referenced_table(database);
         self.referred_columns.iter().filter_map(move |col_name| {
             referenced_table.columns(database).find(|col| &col.name == col_name)

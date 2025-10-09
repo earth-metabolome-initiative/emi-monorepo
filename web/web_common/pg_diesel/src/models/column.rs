@@ -349,25 +349,4 @@ impl Column {
         let primary_key_columns = table.primary_key_columns(conn)?;
         Ok(primary_key_columns.len() == 1 && primary_key_columns.contains(self))
     }
-
-    /// Returns the foreign keys that are foreign primary keys.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    pub fn foreign_primary_keys(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<KeyColumnUsage>, diesel::result::Error> {
-        Ok(self
-            .foreign_keys(conn)?
-            .iter()
-            .filter(|key| key.is_foreign_primary_key(conn).unwrap_or(false))
-            .cloned()
-            .collect())
-    }
 }

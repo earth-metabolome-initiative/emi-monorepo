@@ -7,16 +7,8 @@ mod authored;
 pub use authored::Authored;
 mod most_concrete;
 pub use most_concrete::MostConcrete;
-
-pub(super) fn same_as_indices(
-    table: &Table,
-    conn: &mut PgConnection,
-) -> Result<Vec<PgIndex>, crate::error::Error> {
-    Ok(unique_indices(table, conn)?
-        .into_iter()
-        .filter(|pg_index| pg_index.is_same_as(conn).unwrap_or(false))
-        .collect())
-}
+mod same_as;
+pub use same_as::{SameAsIndexLike, SameAsTableLike};
 
 /// Returns the subset of the table's columns which define other
 /// columns' values via foreign key constraints.

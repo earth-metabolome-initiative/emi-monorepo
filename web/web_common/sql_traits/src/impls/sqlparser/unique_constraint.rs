@@ -1,7 +1,7 @@
 //! Implement the [`UniqueConstraint`] trait for the `sqlparser` crate's
 
 use sqlparser::{
-    ast::{CreateTable, Expr, UniqueConstraint},
+    ast::{ColumnDef, CreateTable, Expr, UniqueConstraint},
     parser::Parser,
 };
 
@@ -10,6 +10,7 @@ use crate::{impls::SqlParserDatabase, traits::UniqueIndexLike};
 impl UniqueIndexLike for UniqueConstraint {
     type Table = CreateTable;
     type Database = SqlParserDatabase;
+    type Column = ColumnDef;
 
     fn expression(&self, _database: &Self::Database) -> Expr {
         let expression_string = format!(

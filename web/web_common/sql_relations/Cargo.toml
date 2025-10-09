@@ -4,13 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-pg_diesel.workspace = true
-diesel.workspace = true
-serde = { workspace = true, optional = true }
+sql_traits.workspace = true
 
 [lints]
 workspace = true
-
-[features]
-default = ["serde"]
-serde = ["pg_diesel/serde", "dep:serde"]
