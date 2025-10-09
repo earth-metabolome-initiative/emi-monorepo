@@ -599,17 +599,122 @@ pub trait TableLike: Hash + Ord + Eq {
     ///   belongs.
     /// * `other` - The other table to check against.
     ///
-    /// # Errors
+    /// # Example
     ///
-    /// * If the foreign key constraint cannot be loaded from the database.
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = SqlParserDatabase::from_sql(
+    ///     r#"
+    /// CREATE TABLE grandparent_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES grandparent_table(id));
+    /// CREATE TABLE child_table (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES parent_table(id));
+    /// CREATE TABLE unrelated_table (id INT PRIMARY KEY, name TEXT);
+    /// "#,
+    /// )?;
+    /// let child_table = db.table(None, "child_table");
+    /// let parent_table = db.table(None, "parent_table");
+    /// let grandparent_table = db.table(None, "grandparent_table");
+    /// let unrelated_table = db.table(None, "unrelated_table");
+    /// assert!(
+    ///     child_table.shares_ancestors_with(&db, parent_table),
+    ///     "Child should share ancestors with parent"
+    /// );
+    /// assert!(
+    ///     child_table.shares_ancestors_with(&db, grandparent_table),
+    ///     "Child should share ancestors with grandparent"
+    /// );
+    /// assert!(
+    ///     !child_table.shares_ancestors_with(&db, unrelated_table),
+    ///     "Child should not share ancestors with unrelated"
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
     fn shares_ancestors_with(&self, database: &Self::Database, other: &Self) -> bool {
         let self_ancestors = self.ancestral_extended_tables(database);
         let other_ancestors = other.ancestral_extended_tables(database);
 
         self_ancestors.iter().any(|table| other_ancestors.contains(table))
+            || self == other
+            || self_ancestors.contains(&other)
+            || other_ancestors.contains(&self)
     }
 
     /// Returns whether the column is compatible with another column.
+    ///
+    /// # Implementation Note
+    /// Two columns are considered compatible if:
+    /// - They have the same data type.
+    /// - If they are foreign keys, they reference the same table or share an
+    ///   ancestor table.
+    ///
+    /// If both columns are not foreign keys, they are considered compatible if
+    /// they have the same data type.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    /// * `host_column` - The column in the current table to check.
+    /// * `other_table` - The other table to check against.
+    /// * `other_column` - The column in the other table to check.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = SqlParserDatabase::from_sql(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE another_referenced_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE host_table (id INT, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES referenced_table(id));
+    /// CREATE TABLE another_host_table (id INT, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES another_referenced_table(id));
+    /// CREATE TABLE compatible_table (id INT, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES referenced_table(id));
+    /// CREATE TABLE incompatible_table (id INT, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES another_referenced_table(id));
+    /// CREATE TABLE non_fk_table (id INT, name TEXT);
+    /// "#,
+    /// )?;
+    /// let host_table = db.table(None, "host_table");
+    /// let id_column = host_table.column_by_name("id", &db).expect("Column 'id' should exist");
+    /// let compatible_table = db.table(None, "compatible_table");
+    /// let compatible_id_column =
+    ///     compatible_table.column_by_name("id", &db).expect("Column 'id' should exist");
+    /// let incompatible_table = db.table(None, "incompatible_table");
+    /// let incompatible_id_column =
+    ///     incompatible_table.column_by_name("id", &db).expect("Column 'id' should exist");
+    /// let another_host_table = db.table(None, "another_host_table");
+    /// let another_id_column =
+    ///     another_host_table.column_by_name("id", &db).expect("Column 'id' should exist");
+    /// let non_fk_table = db.table(None, "non_fk_table");
+    /// let non_fk_id_column =
+    ///     non_fk_table.column_by_name("id", &db).expect("Column 'id' should exist");
+    /// assert!(
+    ///     host_table.is_compatible_with(&db, id_column, compatible_table, compatible_id_column),
+    ///     "Columns should be compatible as they reference the same table"
+    /// );
+    /// assert!(
+    ///     !host_table.is_compatible_with(&db, id_column, incompatible_table, incompatible_id_column),
+    ///     "Columns should not be compatible as they reference different tables"
+    /// );
+    /// assert!(
+    ///     !host_table.is_compatible_with(&db, id_column, another_host_table, another_id_column),
+    ///     "Columns should not be compatible as they reference different tables"
+    /// );
+    /// assert!(
+    ///     !host_table.is_compatible_with(&db, id_column, non_fk_table, non_fk_id_column),
+    ///     "Columns should not be compatible as one of them is not a foreign key"
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
     fn is_compatible_with(
         &self,
         database: &Self::Database,
