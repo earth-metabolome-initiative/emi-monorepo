@@ -9,7 +9,7 @@ pub trait SameAsIndexLike: UniqueIndexLike {
     /// Returns whether the index can be used to define a same-as relationship.
     fn is_same_as(&self, database: &Self::Database, table: &Self::Table) -> bool {
         // Next, we retrieve the columns associated with the index.
-        let columns = self.columns(database, table);
+        let columns = self.columns(database, table).collect::<Vec<_>>();
 
         // We expect that all of the columns in the primary key of the table are also in
         // the index.

@@ -159,3 +159,30 @@ pub(crate) fn is_partial_builder_constraint(
 
     Ok(Some((PartialBuilderKind::Discretional, keys_to_local_ancestors[0].clone())))
 }
+
+
+/// Returns the columns and foreign keys of the table which require partial
+/// builders.
+///
+/// # Arguments
+///
+/// * `conn` - The database connection.
+///
+/// # Errors
+///
+/// * If the columns cannot be loaded from the database.
+pub fn partial_builder_columns(
+    &self,
+    conn: &mut PgConnection,
+) -> Result<Vec<(Column, PartialBuilderKind, KeyColumnUsage, KeyColumnUsage)>, WebCodeGenError> {
+    Ok(self
+        .columns(conn)?
+        .as_ref()
+        .iter()
+        .filter_map(|column| {
+            let (partial_builder_kind, potential_same_as_constraint, foreign_key) =
+                column.requires_partial_builder(conn).ok().flatten()?;
+            Some((column.clone(), partial_builder_kind, potential_same_as_constraint, foreign_key))
+        })
+        .collect())
+}

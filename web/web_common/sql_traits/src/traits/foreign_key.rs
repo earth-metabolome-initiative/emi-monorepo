@@ -7,11 +7,11 @@ use crate::traits::{ColumnLike, DatabaseLike, TableLike};
 /// A foreign key constraint is a rule that specifies a relationship between
 /// two tables. This trait represents such a foreign key constraint in a
 /// database-agnostic way.
-pub trait ForeignKeyLike {
+pub trait ForeignKeyLike: Eq {
     /// The column type associated with the foreign key.
     type Column: ColumnLike;
     /// The table type associated with the foreign key.
-    type Table: TableLike<Column = Self::Column, Database = Self::Database>;
+    type Table: TableLike<Column = Self::Column, Database = Self::Database, ForeignKey = Self>;
     /// The database type associated with the foreign key.
     type Database: DatabaseLike<Table = Self::Table, Column = Self::Column>;
 
@@ -568,5 +568,55 @@ pub trait ForeignKeyLike {
         self.is_host_primary_key(database, host_table)
             && self.is_referenced_primary_key(database)
             && !self.is_self_referential(database, host_table)
+    }
+
+    /// Returns whether the key is a singleton foreign key, i.e. it is the only
+    /// foreign key to refer to a particular foreign table within the context
+    /// of its table of definition.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the foreign
+    ///   key belongs.
+    /// * `host_table` - A reference to the host table that contains the foreign
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = SqlParserDatabase::from_sql(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE host_table (
+    ///     id1 INT,
+    ///     id2 INT,
+    ///     FOREIGN KEY (id1) REFERENCES referenced_table(id),
+    ///     FOREIGN KEY (id2) REFERENCES referenced_table(id)
+    /// );
+    /// CREATE TABLE singleton_table (
+    ///     id INT,
+    ///     FOREIGN KEY (id) REFERENCES referenced_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let host_table = db.table(None, "host_table");
+    /// let singleton_table = db.table(None, "singleton_table");
+    /// let fks: Vec<_> = host_table.foreign_keys(&db).collect();
+    /// let fk1 = &fks[0];
+    /// let fk2 = &fks[1];
+    /// let singleton_fk = singleton_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// assert!(!fk1.is_singleton(&db, &host_table), "Not a singleton FK");
+    /// assert!(!fk2.is_singleton(&db, &host_table), "Not a singleton FK");
+    /// assert!(singleton_fk.is_singleton(&db, &singleton_table), "Should be a singleton FK");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn is_singleton(&self, database: &Self::Database, host_table: &Self::Table) -> bool {
+        let foreign_table = self.referenced_table(database);
+        host_table
+            .foreign_keys(database)
+            .all(|fk| fk == self || fk.referenced_table(database) != foreign_table)
     }
 }

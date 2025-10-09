@@ -12,8 +12,14 @@ pub trait SameAsTableLike: TableLike<UniqueIndex = <Self as SameAsTableLike>::Sa
     type SameAsIndex: SameAsIndexLike<Database = Self::Database, Table = Self>;
 
     /// Returns the indices on the table which can be used to define
-    fn same_as_indices(&self, database: &mut Self::Database) -> Vec<Self::SameAsIndex> {
-        self.unique_indices(database).filter(|index| index.is_same_as(database, self)).collect()
+    fn same_as_indices<'db>(
+        &'db self,
+        database: &'db Self::Database,
+    ) -> impl Iterator<Item = &'db Self::SameAsIndex>
+    where
+        Self: 'db,
+    {
+        self.unique_indices(database).filter(|index| index.is_same_as(database, self))
     }
 }
 

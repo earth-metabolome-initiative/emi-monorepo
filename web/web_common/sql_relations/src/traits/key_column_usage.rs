@@ -49,33 +49,7 @@ impl PartialBuilderKind {
 }
 
 
-    /// Returns whether the key is a singleton foreign key, i.e. it is the only
-    /// foreign key to refer to a particular foreign table within the context
-    /// of its table of definition.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    pub(crate) fn is_singleton(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<bool, crate::error::Error> {
-        if self.is_local_primary_key(conn)? {
-            return Ok(false);
-        }
-        if self.columns(conn)?.len() != 1 {
-            return Ok(false);
-        }
-        let foreign_table = self.foreign_table(conn)?;
-        let table = self.table(conn)?;
-        Ok(table.foreign_keys(conn)?.iter().all(|fk| {
-            fk == self || fk.foreign_table(conn).map(|t| t != foreign_table).unwrap_or(true)
-        }))
-    }
+    
 
 	pub fn is_extension(
     key_column_usage: &KeyColumnUsage,

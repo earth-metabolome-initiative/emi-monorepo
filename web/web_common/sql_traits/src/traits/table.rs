@@ -764,4 +764,67 @@ pub trait TableLike: Hash + Ord + Eq {
 
         local_referenced_tables.iter().any(|table| other_referenced_tables.contains(table))
     }
+
+    /// Returns the table singleton foreign keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = SqlParserDatabase::from_sql(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE host_table (id INT UNIQUE, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES referenced_table(id));
+    /// "#,
+    /// )?;
+    /// let host_table = db.table(None, "host_table");
+    /// let singleton_fks = host_table.singleton_foreign_keys(&db).collect::<Vec<_>>();
+    /// assert_eq!(singleton_fks.len(), 1);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn singleton_foreign_keys<'db>(
+        &'db self,
+        database: &'db Self::Database,
+    ) -> impl Iterator<Item = &'db Self::ForeignKey>
+    where
+        Self: 'db,
+    {
+        self.foreign_keys(database).filter(|fk| fk.is_singleton(database, self))
+    }
+
+    /// Returns whether the table has singleton foreign keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///  belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = SqlParserDatabase::from_sql(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE host_table (id INT UNIQUE, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES referenced_table(id));
+    /// "#,
+    /// )?;
+    /// let host_table = db.table(None, "host_table");
+    /// assert!(host_table.has_singleton_foreign_keys(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_singleton_foreign_keys(&self, database: &Self::Database) -> bool {
+        self.singleton_foreign_keys(database).next().is_some()
+    }
 }
