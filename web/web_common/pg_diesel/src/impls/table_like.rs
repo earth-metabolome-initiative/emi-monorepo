@@ -23,26 +23,53 @@ impl TableLike for crate::models::Table {
         Some(&self.table_schema)
     }
 
-    fn columns(&self, database: &Self::Database) -> impl Iterator<Item = Self::Column> {
-        database.table_metadata(self).columns().iter().cloned()
+    fn columns<'db>(
+        &'db self,
+        database: &'db Self::Database,
+    ) -> impl Iterator<Item = &'db Self::Column>
+    where
+        Self: 'db,
+    {
+        database.table_metadata(self).columns().iter()
     }
 
-    fn primary_key_columns(&self, database: &Self::Database) -> impl Iterator<Item = Self::Column> {
-        database.table_metadata(self).primary_key_columns().iter().cloned()
+    fn primary_key_columns<'db>(
+        &'db self,
+        database: &'db Self::Database,
+    ) -> impl Iterator<Item = &'db Self::Column>
+    where
+        Self: 'db,
+    {
+        database.table_metadata(self).primary_key_columns().iter()
     }
 
-    fn foreign_keys(&self, database: &Self::Database) -> impl Iterator<Item = Self::ForeignKey> {
-        database.table_metadata(self).foreign_keys().iter().cloned()
+    fn foreign_keys<'db>(
+        &'db self,
+        database: &'db Self::Database,
+    ) -> impl Iterator<Item = &'db Self::ForeignKey>
+    where
+        Self: 'db,
+    {
+        database.table_metadata(self).foreign_keys().iter()
     }
 
-    fn check_constraints(
-        &self,
-        database: &Self::Database,
-    ) -> impl Iterator<Item = Self::CheckConstraint> {
-        database.table_metadata(self).check_constraints().iter().cloned()
+    fn check_constraints<'db>(
+        &'db self,
+        database: &'db Self::Database,
+    ) -> impl Iterator<Item = &'db Self::CheckConstraint>
+    where
+        Self: 'db,
+    {
+        database.table_metadata(self).check_constraints().iter()
     }
 
-    fn unique_indices(&self, database: &Self::Database) -> impl Iterator<Item = Self::UniqueIndex> {
-        database.table_metadata(self).unique_indices().iter().cloned()
+    fn unique_indices<'db>(
+        &'db self,
+        database: &'db Self::Database,
+    ) -> impl Iterator<Item = &'db Self::UniqueIndex>
+    where
+        Self: 'db,
+    {
+        database.table_metadata(self).unique_indices().iter()
     }
 }

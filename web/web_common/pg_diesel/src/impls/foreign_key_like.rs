@@ -30,15 +30,24 @@ impl ForeignKeyLike for KeyColumnUsage {
         database.foreign_key_metadata(self).match_kind()
     }
 
-    fn host_columns(
-        &self,
-        database: &Self::Database,
-        _host_table: &Self::Table,
-    ) -> impl Iterator<Item = Self::Column> {
-        database.foreign_key_metadata(self).host_columns().iter().cloned()
+    fn host_columns<'db>(
+        &'db self,
+        database: &'db Self::Database,
+        _host_table: &'db Self::Table,
+    ) -> impl Iterator<Item = &'db Self::Column>
+    where
+        Self: 'db,
+    {
+        database.foreign_key_metadata(self).host_columns().iter()
     }
 
-    fn referenced_columns(&self, database: &Self::Database) -> impl Iterator<Item = Self::Column> {
-        database.foreign_key_metadata(self).referenced_columns().iter().cloned()
+    fn referenced_columns<'db>(
+        &'db self,
+        database: &'db Self::Database,
+    ) -> impl Iterator<Item = &'db Self::Column>
+    where
+        Self: 'db,
+    {
+        database.foreign_key_metadata(self).referenced_columns().iter()
     }
 }

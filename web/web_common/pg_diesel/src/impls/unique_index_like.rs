@@ -7,11 +7,12 @@ use sqlparser::ast::Expr;
 
 use crate::{
     PgDatabase,
-    models::{PgIndex, Table},
+    models::{Column, PgIndex, Table},
 };
 
 impl UniqueIndexLike for PgIndex {
     type Table = Table;
+    type Column = Column;
     type Database = PgDatabase;
 
     fn expression(&self, database: &Self::Database) -> Expr {
