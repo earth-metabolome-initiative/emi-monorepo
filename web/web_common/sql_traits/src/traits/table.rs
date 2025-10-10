@@ -15,9 +15,14 @@ pub trait TableLike: Hash + Ord + Eq {
     /// The check constraint type of the table.
     type CheckConstraint: CheckConstraintLike;
     /// The unique index type of the table.
-    type UniqueIndex: UniqueIndexLike<Table = Self, Database = Self::Database>;
+    type UniqueIndex: UniqueIndexLike<Table = Self, Database = Self::Database, Column = Self::Column>;
     /// The foreign key type of the table.
-    type ForeignKey: ForeignKeyLike<Table = Self, Column = Self::Column, Database = Self::Database>;
+    type ForeignKey: ForeignKeyLike<
+            Table = Self,
+            Column = Self::Column,
+            Database = Self::Database,
+            UniqueIndex = Self::UniqueIndex,
+        >;
 
     /// Returns the name of the table.
     ///
@@ -110,7 +115,7 @@ pub trait TableLike: Hash + Ord + Eq {
     where
         Self: 'db,
     {
-        self.columns(database).find(|col| col.column_name() == name)
+        TableLike::columns(self, database).find(|col| col.column_name() == name)
     }
 
     /// Iterates over the primary key columns of the table using the provided
@@ -591,6 +596,39 @@ pub trait TableLike: Hash + Ord + Eq {
         referenced_tables
     }
 
+    /// Returns whether the table is a descendant of another table, i.e., if it
+    /// extends the other table either directly or some other table which
+    /// extends the other table.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    /// * `other` - The other table to check against.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = SqlParserDatabase::from_sql(
+    ///     r#"
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE child_table (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES parent_table(id));
+    /// "#,
+    /// )?;
+    /// let child_table = db.table(None, "child_table");
+    /// let parent_table = db.table(None, "parent_table");
+    /// assert!(child_table.is_descendant_of(&db, parent_table));
+    /// assert!(!parent_table.is_descendant_of(&db, child_table));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn is_descendant_of(&self, database: &Self::Database, other: &Self) -> bool {
+        self.ancestral_extended_tables(database).contains(&other)
+    }
+
     /// Returns whether the table shares any ancestor with the given table.
     ///
     /// # Arguments
@@ -723,13 +761,13 @@ pub trait TableLike: Hash + Ord + Eq {
         other_column: &Self::Column,
     ) -> bool {
         debug_assert!(
-            self.columns(database).any(|col| col == host_column),
+            TableLike::columns(self, database).any(|col| col == host_column),
             "Local column {:?} does not belong to table {:?}",
             host_column.column_name(),
             self.table_name()
         );
         debug_assert!(
-            other_table.columns(database).any(|col| col == other_column),
+            TableLike::columns(other_table, database).any(|col| col == other_column),
             "Other column {:?} does not belong to table {:?}",
             other_column.column_name(),
             other_table.table_name()

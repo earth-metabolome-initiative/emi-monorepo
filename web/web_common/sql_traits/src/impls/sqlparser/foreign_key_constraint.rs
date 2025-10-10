@@ -1,6 +1,6 @@
 //! Implement the [`ForeignKeyConstraint`] trait for the `sqlparser` crate's
 
-use sqlparser::ast::{ColumnDef, CreateTable, ForeignKeyConstraint, MatchKind};
+use sqlparser::ast::{ColumnDef, CreateTable, ForeignKeyConstraint, MatchKind, UniqueConstraint};
 
 use crate::{
     impls::SqlParserDatabase,
@@ -11,6 +11,7 @@ impl ForeignKeyLike for ForeignKeyConstraint {
     type Column = ColumnDef;
     type Table = CreateTable;
     type Database = SqlParserDatabase;
+    type UniqueIndex = UniqueConstraint;
 
     fn foreign_key_name(&self) -> Option<&str> {
         self.name.as_ref().map(|s| s.value.as_str())

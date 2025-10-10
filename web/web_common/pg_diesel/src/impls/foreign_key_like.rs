@@ -6,13 +6,14 @@ use sql_traits::traits::ForeignKeyLike;
 
 use crate::{
     PgDatabase,
-    models::{Column, KeyColumnUsage, Table},
+    models::{Column, KeyColumnUsage, PgIndex, Table},
 };
 
 impl ForeignKeyLike for KeyColumnUsage {
     type Column = Column;
     type Table = Table;
     type Database = PgDatabase;
+    type UniqueIndex = PgIndex;
 
     fn foreign_key_name(&self) -> Option<&str> {
         Some(&self.constraint_name)

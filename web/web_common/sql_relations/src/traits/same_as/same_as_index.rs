@@ -1,12 +1,44 @@
 //! Submodule defining the `SameAsIndex` trait which characterizes whether an
 //! index can be used to define a same-as relationship.
 
-use sql_traits::traits::{ForeignKeyLike, TableLike, UniqueIndexLike};
+use sql_traits::traits::{TableLike, UniqueIndexLike};
 
 /// Trait characterizing whether an index can be used to define a same-as
 /// relationship, i.e. it is a unique index over a single column.
 pub trait SameAsIndexLike: UniqueIndexLike {
     /// Returns whether the index can be used to define a same-as relationship.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - The database context in which the index exists.
+    /// * `table` - The table to which the index belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_relations::prelude::*;
+    ///
+    /// let db = SqlParserDatabase::from_sql(
+    ///     r#"
+    /// CREATE TABLE with_same_as (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
+    /// CREATE TABLE no_same_as_one (id INT PRIMARY KEY, name TEXT, UNIQUE(name));
+    /// CREATE TABLE no_same_as_two (id INT PRIMARY KEY);
+    /// "#,
+    /// )?;
+    ///
+    /// let table_with_same_as = db.table(None, "with_same_as");
+    /// let same_as_indices = table_with_same_as.same_as_indices(&db).collect::<Vec<_>>();
+    /// assert_eq!(same_as_indices.len(), 1, "Expected exactly one same-as index");
+    ///
+    /// let table_no_same_as_one = db.table(None, "no_same_as_one");
+    /// assert_eq!(table_no_same_as_one.same_as_indices(&db).count(), 0, "Expected no same-as indices");
+    /// let table_no_same_as_two = db.table(None, "no_same_as_two");
+    /// assert_eq!(table_no_same_as_two.same_as_indices(&db).count(), 0, "Expected no same-as indices");
+    ///
+    /// # Ok(())
+    /// # }
+    /// ```
     fn is_same_as(&self, database: &Self::Database, table: &Self::Table) -> bool {
         // Next, we retrieve the columns associated with the index.
         let columns = self.columns(database, table).collect::<Vec<_>>();
@@ -17,44 +49,7 @@ pub trait SameAsIndexLike: UniqueIndexLike {
 
         // If any of the primary key columns are not in the index, it cannot be a
         // same-as index
-        if !primary_key_columns.iter().all(|pk_col| columns.contains(pk_col)) {
-            return false;
-        }
-
-        // There needs to be a foreign key constraint which includes all of the
-        // remaining columns in the index which refers to some other table's
-        // primary key.
-        let mut non_primary_key_columns =
-            columns.iter().filter(|col| !primary_key_columns.contains(col)).collect::<Vec<_>>();
-
-        if non_primary_key_columns.is_empty() {
-            return true;
-        }
-
-        non_primary_key_columns.sort_unstable();
-
-        // We search for a foreign key constraint that includes all of these columns,
-        // and that refers to a primary key of another table. If we find any
-        // foreign key which satisfies this condition, then we can conclude that
-        // the index is a same-as index.
-
-        for foreign_key in table.foreign_keys(database) {
-            // If the foreign key does not refer to a foreign's table primary key, it cannot
-            // be a same-as index.
-            if !foreign_key.is_referenced_primary_key(database) {
-                continue;
-            }
-            // If the foreign key does not include all of the non-primary key columns, it
-            // cannot be a same-as index.
-            let mut fk_columns = foreign_key.host_columns(database, table).collect::<Vec<_>>();
-            fk_columns.sort_unstable();
-
-            if non_primary_key_columns.iter().zip(fk_columns.iter()).all(|(a, b)| a == &b) {
-                return true;
-            }
-        }
-
-        false
+        primary_key_columns.iter().all(|pk_col| columns.contains(pk_col))
     }
 }
 

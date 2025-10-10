@@ -2,7 +2,7 @@
 
 use sqlparser::ast::MatchKind;
 
-use crate::traits::{ColumnLike, DatabaseLike, TableLike};
+use crate::traits::{ColumnLike, DatabaseLike, TableLike, UniqueIndexLike};
 
 /// A foreign key constraint is a rule that specifies a relationship between
 /// two tables. This trait represents such a foreign key constraint in a
@@ -11,7 +11,14 @@ pub trait ForeignKeyLike: Eq {
     /// The column type associated with the foreign key.
     type Column: ColumnLike;
     /// The table type associated with the foreign key.
-    type Table: TableLike<Column = Self::Column, Database = Self::Database, ForeignKey = Self>;
+    type Table: TableLike<
+            Column = Self::Column,
+            Database = Self::Database,
+            ForeignKey = Self,
+            UniqueIndex = Self::UniqueIndex,
+        >;
+    /// Unique index type associated with the foreign key.
+    type UniqueIndex: UniqueIndexLike<Database = Self::Database, Table = Self::Table, Column = Self::Column>;
     /// The database type associated with the foreign key.
     type Database: DatabaseLike<Table = Self::Table, Column = Self::Column>;
 
@@ -453,6 +460,63 @@ pub trait ForeignKeyLike: Eq {
 
         // We check that there are no remaining columns in either iterator.
         fk_columns.next().is_none() && pk_columns.next().is_none()
+    }
+
+    /// Returns the unique index in the referenced table that the foreign key
+    /// references, if any, as the foreign key might reference the primary key
+    /// of the referenced table.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the foreign
+    ///   key belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = SqlParserDatabase::from_sql(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE referenced_table_with_unique (id INT PRIMARY KEY, name TEXT, UNIQUE(name));
+    /// CREATE TABLE pk_ref_table (
+    ///     ref_id INT,
+    ///     FOREIGN KEY (ref_id) REFERENCES referenced_table(id)
+    /// );
+    /// CREATE TABLE non_pk_ref_table (
+    ///     ref_name TEXT,
+    ///     FOREIGN KEY (ref_name) REFERENCES referenced_table_with_unique(name)
+    /// );
+    /// "#,
+    /// )?;
+    /// let pk_ref_table = db.table(None, "pk_ref_table");
+    /// let non_pk_ref_table = db.table(None, "non_pk_ref_table");
+    /// let pk_ref_fk = pk_ref_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// let non_pk_ref_fk =
+    ///     non_pk_ref_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// assert!(pk_ref_fk.is_referenced_primary_key(&db));
+    /// assert!(!non_pk_ref_fk.is_referenced_primary_key(&db));
+    /// assert!(non_pk_ref_fk.is_referenced_unique_key(&db).is_some());
+    /// assert!(pk_ref_fk.is_referenced_unique_key(&db).is_none());
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn is_referenced_unique_key<'db>(
+        &self,
+        database: &'db Self::Database,
+    ) -> Option<&'db Self::UniqueIndex>
+    where
+        Self: 'db,
+    {
+        let referenced_table = self.referenced_table(database);
+        let fk_columns: Vec<_> = self.referenced_columns(database).collect();
+        referenced_table.unique_indices(database).find(|index| {
+            let index_columns: Vec<_> = index.columns(database, referenced_table).collect();
+            index_columns.len() == fk_columns.len()
+                && index_columns.iter().all(|col| fk_columns.contains(col))
+        })
     }
 
     /// Returns whether the foreign key locally matches the primary key of the
