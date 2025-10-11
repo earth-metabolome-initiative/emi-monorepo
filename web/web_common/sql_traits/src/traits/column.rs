@@ -2,8 +2,17 @@
 
 use std::hash::Hash;
 
+use crate::traits::{DatabaseLike, ForeignKeyLike, TableLike};
+
 /// A trait for types that can be treated as SQL columns.
 pub trait ColumnLike: Hash + Eq + Ord {
+    /// The type of the foreign keys associated with this column.
+    type ForeignKey: ForeignKeyLike<Column = Self, Database = Self::Database, Table = Self::Table>;
+    /// The type of the table that this column belongs to.
+    type Table: TableLike<Database = Self::Database, Column = Self, ForeignKey = Self::ForeignKey>;
+    /// The type of the database that this column belongs to.
+    type Database: DatabaseLike<Table = Self::Table, Column = Self, ForeignKey = Self::ForeignKey>;
+
     /// Returns the name of the column.
     ///
     /// # Example
@@ -33,9 +42,9 @@ pub trait ColumnLike: Hash + Eq + Ord {
     ///     "CREATE TABLE my_table (id INT, name TEXT, score DECIMAL(10,2));",
     /// )?;
     /// let table = db.table(None, "my_table");
-    /// let id_column = table.column_by_name("id", &db).expect("Column 'id' should exist");
-    /// let name_column = table.column_by_name("name", &db).expect("Column 'name' should exist");
-    /// let score_column = table.column_by_name("score", &db).expect("Column 'score' should exist");
+    /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
+    /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
+    /// let score_column = table.column("score", &db).expect("Column 'score' should exist");
     /// assert_eq!(id_column.data_type(), "INT");
     /// assert_eq!(name_column.data_type(), "TEXT");
     /// assert_eq!(score_column.data_type(), "DECIMAL(10,2)");
@@ -43,6 +52,59 @@ pub trait ColumnLike: Hash + Eq + Ord {
     /// # }
     /// ```
     fn data_type(&self) -> String;
+
+    /// Returns whether the data type of the column is generative, i.e., it
+    /// generates values automatically (e.g., SERIAL in PostgreSQL).
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = SqlParserDatabase::from_sql(
+    ///     "CREATE TABLE my_table (id SERIAL, name TEXT, age INT, bigg_id BIGSERIAL);",
+    /// )?;
+    /// let table = db.table(None, "my_table");
+    /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
+    /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
+    /// let age_column = table.column("age", &db).expect("Column 'age' should exist");
+    /// let bigg_id_column = table.column("bigg_id", &db).expect("Column 'bigg_id' should exist");
+    /// assert!(id_column.is_generative(), "id column should be generative");
+    /// assert!(!name_column.is_generative(), "name column should not be generative");
+    /// assert!(!age_column.is_generative(), "age column should not be generative");
+    /// assert!(bigg_id_column.is_generative(), "bigg_id column should be generative");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn is_generative(&self) -> bool;
+
+    /// Returns the normalized data type of the column as a string.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = SqlParserDatabase::from_sql(
+    ///     "CREATE TABLE my_table (id INT, serial_id SERIAL, bigg_id BIGSERIAL, small_id SMALLSERIAL, name TEXT);",
+    /// )?;
+    /// let table = db.table(None, "my_table");
+    /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
+    /// let serial_id_column = table.column("serial_id", &db).expect("Column 'serial_id' should exist");
+    /// let bigg_id_column = table.column("bigg_id", &db).expect("Column 'bigg_id' should exist");
+    /// let small_id_column = table.column("small_id", &db).expect("Column 'small_id' should exist");
+    /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
+    /// assert_eq!(id_column.normalized_data_type(), "INT");
+    /// assert_eq!(serial_id_column.normalized_data_type(), "INT");
+    /// assert_eq!(bigg_id_column.normalized_data_type(), "BIGINT");
+    /// assert_eq!(small_id_column.normalized_data_type(), "SMALLINT");
+    /// assert_eq!(name_column.normalized_data_type(), "TEXT");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn normalized_data_type(&self) -> String;
 
     /// Returns whether the column is nullable.
     ///
@@ -56,10 +118,10 @@ pub trait ColumnLike: Hash + Eq + Ord {
     ///     "CREATE TABLE my_table (id INT NOT NULL, name TEXT, optional_field INT);",
     /// )?;
     /// let table = db.table(None, "my_table");
-    /// let id_column = table.column_by_name("id", &db).expect("Column 'id' should exist");
-    /// let name_column = table.column_by_name("name", &db).expect("Column 'name' should exist");
+    /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
+    /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// let optional_column =
-    ///     table.column_by_name("optional_field", &db).expect("Column 'optional_field' should exist");
+    ///     table.column("optional_field", &db).expect("Column 'optional_field' should exist");
     /// assert!(!id_column.is_nullable(), "id column should not be nullable");
     /// assert!(name_column.is_nullable(), "name column should be nullable by default");
     /// assert!(optional_column.is_nullable(), "optional_field column should be nullable by default");
@@ -67,4 +129,25 @@ pub trait ColumnLike: Hash + Eq + Ord {
     /// # }
     /// ```
     fn is_nullable(&self) -> bool;
+
+    /// Returns the foreign keys associated with this column.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query foreign
+    ///   keys from.
+    /// * `table` - A reference to the table instance that this column belongs
+    ///   to.
+    fn foreign_keys<'db>(
+        &self,
+        database: &'db Self::Database,
+        table: &'db Self::Table,
+    ) -> impl Iterator<Item = &'db Self::ForeignKey>
+    where
+        Self: 'db,
+    {
+        table
+            .foreign_keys(database)
+            .filter(move |fk| fk.host_columns(database, table).any(|col| col == self))
+    }
 }

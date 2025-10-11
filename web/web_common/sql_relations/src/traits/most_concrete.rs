@@ -39,9 +39,7 @@ pub trait MostConcreteTableLike:
     where
         Self: 'db,
     {
-        if let Some(column) =
-            self.column_by_name(database.most_concrete_table_column_name(), database)
-        {
+        if let Some(column) = self.column(database.most_concrete_table_column_name(), database) {
             return Some(column);
         };
         if recursive {

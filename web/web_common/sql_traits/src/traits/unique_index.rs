@@ -127,6 +127,6 @@ pub trait UniqueIndexLike {
             Expr::Nested(inner) => collect_column_idents(*inner),
             _ => collect_column_idents(expr),
         };
-        column_idents.into_iter().filter_map(|ident| table.column_by_name(&ident.value, database))
+        column_idents.into_iter().filter_map(|ident| table.column(&ident.value, database))
     }
 }

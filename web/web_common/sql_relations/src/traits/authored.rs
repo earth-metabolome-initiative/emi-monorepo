@@ -42,7 +42,7 @@ pub trait AuthoredTableLike:
     where
         Self: 'db,
     {
-        if let Some(column) = self.column_by_name(database.created_by_column_name(), database) {
+        if let Some(column) = self.column(database.created_by_column_name(), database) {
             // We also check that the column actually references the users table.
             if self.referenced_tables_via_column(database, column).contains(&database.users_table())
             {
@@ -75,7 +75,7 @@ pub trait AuthoredTableLike:
     where
         Self: 'db,
     {
-        if let Some(column) = self.column_by_name(database.updated_by_column_name(), database) {
+        if let Some(column) = self.column(database.updated_by_column_name(), database) {
             // We also check that the column actually references the users table.
             if self.referenced_tables_via_column(database, column).contains(&database.users_table())
             {

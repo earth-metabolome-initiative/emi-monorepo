@@ -6,3 +6,5 @@ mod horizontal_same_as_foreign_key;
 pub use horizontal_same_as_foreign_key::HorizontalSameAsForeignKeyLike;
 mod horizontal_same_as_table;
 pub use horizontal_same_as_table::HorizontalSameAsTableLike;
+mod horizontal_same_as_column;
+pub use horizontal_same_as_column::HorizontalSameAsColumnLike;

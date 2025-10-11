@@ -1,43 +1,4 @@
 
-#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
-fn ancestral_same_as_reachable_set(
-    column: &Column,
-    conn: &mut PgConnection,
-) -> Result<HashSet<Column>, WebCodeGenError> {
-    let ancestral_same_as_columns = column.ancestral_same_as_columns(conn)?;
-    let mut reachable_set = ancestral_same_as_columns.iter().cloned().collect::<HashSet<_>>();
-    for column in &ancestral_same_as_columns {
-        let ancestral_same_as_columns = column.ancestral_same_as_reachable_set(conn)?;
-        reachable_set.extend(ancestral_same_as_columns);
-    }
-    Ok(reachable_set)
-}
-
-#[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
-fn associated_same_as_columns(
-    column: &Column,
-    include_local_primary_key: bool,
-    conn: &mut PgConnection,
-) -> Result<Vec<(Column, KeyColumnUsage)>, WebCodeGenError> {
-    column
-        .associated_same_as_constraints(include_local_primary_key, conn)?
-        .into_iter()
-        .map(|constraint| {
-            let local_columns = constraint.columns(conn)?;
-            let foreign_columns = constraint.foreign_columns(conn)?;
-            Ok((
-                local_columns
-                    .iter()
-                    .zip(foreign_columns.iter())
-                    .find_map(|(local_column, foreign_column)| {
-                        if local_column == column { Some(foreign_column.clone()) } else { None }
-                    })
-                    .unwrap(),
-                constraint,
-            ))
-        })
-        .collect()
-}
 
 #[cached(result = true, key = "String", convert = r#"{ format!("{column}") }"#)]
 fn all_ancestral_same_as_columns(

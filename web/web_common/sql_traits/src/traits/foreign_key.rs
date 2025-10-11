@@ -697,4 +697,64 @@ pub trait ForeignKeyLike: Eq {
             .foreign_keys(database)
             .all(|fk| fk == self || fk.referenced_table(database) != foreign_table)
     }
+
+    /// Returns the referenced column curresponding to the given host column in
+    /// the foreign key.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the foreign
+    ///   key belongs.
+    /// * `host_table` - A reference to the host table that contains the foreign
+    ///   key.
+    /// * `host_column` - The host column for which to find the corresponding
+    ///   referenced column.
+    ///
+    /// # Panics
+    ///
+    /// If the given host column is not part of the foreign key.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = SqlParserDatabase::from_sql(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
+    /// CREATE TABLE host_table (
+    ///     ref_id INT,
+    ///     ref_name TEXT,
+    ///     FOREIGN KEY (ref_id, ref_name) REFERENCES referenced_table(id, name)
+    /// );
+    /// "#,
+    /// )?;
+    /// let host_table = db.table(None, "host_table");
+    /// let foreign_key = host_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// let ref_id_col = host_table.column("ref_id", &db).expect("Should have ref_id column");
+    /// let ref_name_col = host_table.column("ref_name", &db).expect("Should have ref_name column");
+    /// let referenced_id_col =
+    ///     foreign_key.referenced_column_for_host_column(&db, &host_table, &ref_id_col);
+    /// let referenced_name_col =
+    ///     foreign_key.referenced_column_for_host_column(&db, &host_table, &ref_name_col);
+    /// assert_eq!(referenced_id_col.column_name(), "id");
+    /// assert_eq!(referenced_name_col.column_name(), "name");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn referenced_column_for_host_column<'db>(
+        &'db self,
+        database: &'db Self::Database,
+        host_table: &'db Self::Table,
+        host_column: &'db Self::Column,
+    ) -> &'db Self::Column
+    where
+        Self: 'db,
+    {
+        self.host_columns(database, host_table)
+            .zip(self.referenced_columns(database))
+            .find_map(|(hc, rc)| if hc == host_column { Some(rc) } else { None })
+            .expect("Host column is not part of the foreign key")
+    }
 }

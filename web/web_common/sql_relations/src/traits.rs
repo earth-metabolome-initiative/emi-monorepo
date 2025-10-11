@@ -7,7 +7,7 @@ mod most_concrete;
 pub use most_concrete::{InheritableDatabaseLike, MostConcreteTableLike};
 mod same_as;
 pub use same_as::{
-    HorizontalSameAsForeignKeyLike, HorizontalSameAsTableLike, SameAsIndexLike, SameAsTableLike,
-    TriangularSameAsForeignKeyLike, TriangularSameAsTableLike, VerticalSameAsForeignKeyLike,
-    VerticalSameAsTableLike,
+    HorizontalSameAsColumnLike, HorizontalSameAsForeignKeyLike, HorizontalSameAsTableLike,
+    SameAsIndexLike, SameAsTableLike, TriangularSameAsForeignKeyLike, TriangularSameAsTableLike,
+    VerticalSameAsColumnLike, VerticalSameAsForeignKeyLike, VerticalSameAsTableLike,
 };

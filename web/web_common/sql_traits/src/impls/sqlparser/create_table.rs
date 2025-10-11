@@ -67,7 +67,7 @@ impl TableLike for CreateTable {
                             )
                         }
                     };
-                    primary_key_columns.extend(self.column_by_name(&column_name.value, database));
+                    primary_key_columns.extend(self.column(&column_name.value, database));
                 }
                 return primary_key_columns.into_iter();
             }

@@ -100,14 +100,14 @@ pub trait TableLike: Hash + Ord + Eq {
     /// use sql_traits::prelude::*;
     /// let db = SqlParserDatabase::from_sql("CREATE TABLE my_table (id INT, name TEXT);")?;
     /// let table = db.table(None, "my_table");
-    /// let id_column = table.column_by_name("id", &db).expect("Column 'id' should exist");
+    /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// assert_eq!(id_column.column_name(), "id");
-    /// let non_existent_column = table.column_by_name("non_existent", &db);
+    /// let non_existent_column = table.column("non_existent", &db);
     /// assert!(non_existent_column.is_none());
     /// # Ok(())
     /// # }
     /// ```
-    fn column_by_name<'db>(
+    fn column<'db>(
         &'db self,
         name: &str,
         database: &'db Self::Database,
@@ -216,8 +216,8 @@ pub trait TableLike: Hash + Ord + Eq {
     /// "#,
     /// )?;
     /// let table = db.table(None, "my_table");
-    /// let id_column = table.column_by_name("id", &db).expect("Column 'id' should exist");
-    /// let name_column = table.column_by_name("name", &db).expect("Column 'name' should exist");
+    /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
+    /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// assert!(table.is_primary_key_column(&db, id_column));
     /// assert!(!table.is_primary_key_column(&db, name_column));
     /// # Ok(())
@@ -388,6 +388,32 @@ pub trait TableLike: Hash + Ord + Eq {
     ///   considered.
     ///
     /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = SqlParserDatabase::from_sql(
+    ///     r#"
+    /// CREATE TABLE grandparent_table (id INT PRIMARY KEY);
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY REFERENCES grandparent_table(id));
+    /// CREATE TABLE child_table (id INT PRIMARY KEY REFERENCES parent_table(id));
+    /// CREATE TABLE other_table (id INT PRIMARY KEY);
+    /// CREATE TABLE host_table (
+    ///     id INT PRIMARY KEY,
+    ///     parent_id INT REFERENCES parent_table(id),
+    ///     grandparent_id INT REFERENCES grandparent_table(id),
+    ///     other_id INT REFERENCES other_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    ///
+    /// let host_table = db.table(None, "host_table");
+    /// let child_table = db.table(None, "child_table");
+    /// let fks_to_ancestors = host_table.foreign_keys_to_ancestors_of(&db, child_table);
+    /// assert_eq!(fks_to_ancestors.count(), 2);
+    /// # Ok(())
+    /// # }
+    /// ```
     fn foreign_keys_to_ancestors_of<'db>(
         &'db self,
         database: &'db Self::Database,
@@ -589,10 +615,10 @@ pub trait TableLike: Hash + Ord + Eq {
     /// "#,
     /// )?;
     /// let host_table = db.table(None, "host_table");
-    /// let id_column = host_table.column_by_name("id", &db).expect("Column 'id' should exist");
+    /// let id_column = host_table.column("id", &db).expect("Column 'id' should exist");
     /// let referenced_tables = host_table.referenced_tables_via_column(&db, id_column);
     /// assert_eq!(referenced_tables.len(), 1);
-    /// let name_column = host_table.column_by_name("name", &db).expect("Column 'name' should exist");
+    /// let name_column = host_table.column("name", &db).expect("Column 'name' should exist");
     /// let no_referenced_tables = host_table.referenced_tables_via_column(&db, name_column);
     /// assert_eq!(no_referenced_tables.len(), 0);
     /// # Ok(())
@@ -607,10 +633,6 @@ pub trait TableLike: Hash + Ord + Eq {
         Self: 'db,
     {
         let mut referenced_tables = Vec::new();
-
-        if self.is_primary_key_column(database, column) {
-            referenced_tables.push(self);
-        }
 
         for fk in self.foreign_keys(database) {
             if fk.host_columns(database, self).all(|col| col == column)
@@ -749,22 +771,27 @@ pub trait TableLike: Hash + Ord + Eq {
     /// CREATE TABLE incompatible_table (id INT, name TEXT,
     ///     FOREIGN KEY (id) REFERENCES another_referenced_table(id));
     /// CREATE TABLE non_fk_table (id INT, name TEXT);
+    /// CREATE TABLE serial_table_one (id SERIAL PRIMARY KEY, name TEXT);
+    /// CREATE TABLE serial_table_two (id SERIAL PRIMARY KEY, name TEXT);
     /// "#,
     /// )?;
     /// let host_table = db.table(None, "host_table");
-    /// let id_column = host_table.column_by_name("id", &db).expect("Column 'id' should exist");
+    /// let id_column = host_table.column("id", &db).expect("Column 'id' should exist");
     /// let compatible_table = db.table(None, "compatible_table");
+    /// let serial_table_one = db.table(None, "serial_table_one");
+    /// let serial_id_column = serial_table_one.column("id", &db).expect("Column 'id' should exist");
+    /// let serial_table_two = db.table(None, "serial_table_two");
+    /// let serial_id_column_two =
+    ///     serial_table_two.column("id", &db).expect("Column 'id' should exist");
     /// let compatible_id_column =
-    ///     compatible_table.column_by_name("id", &db).expect("Column 'id' should exist");
+    ///     compatible_table.column("id", &db).expect("Column 'id' should exist");
     /// let incompatible_table = db.table(None, "incompatible_table");
     /// let incompatible_id_column =
-    ///     incompatible_table.column_by_name("id", &db).expect("Column 'id' should exist");
+    ///     incompatible_table.column("id", &db).expect("Column 'id' should exist");
     /// let another_host_table = db.table(None, "another_host_table");
-    /// let another_id_column =
-    ///     another_host_table.column_by_name("id", &db).expect("Column 'id' should exist");
+    /// let another_id_column = another_host_table.column("id", &db).expect("Column 'id' should exist");
     /// let non_fk_table = db.table(None, "non_fk_table");
-    /// let non_fk_id_column =
-    ///     non_fk_table.column_by_name("id", &db).expect("Column 'id' should exist");
+    /// let non_fk_id_column = non_fk_table.column("id", &db).expect("Column 'id' should exist");
     /// assert!(
     ///     host_table.is_compatible_with(&db, id_column, compatible_table, compatible_id_column),
     ///     "Columns should be compatible as they reference the same table"
@@ -780,6 +807,19 @@ pub trait TableLike: Hash + Ord + Eq {
     /// assert!(
     ///     !host_table.is_compatible_with(&db, id_column, non_fk_table, non_fk_id_column),
     ///     "Columns should not be compatible as one of them is not a foreign key"
+    /// );
+    /// assert!(
+    ///     !serial_table_one.is_compatible_with(
+    ///         &db,
+    ///         serial_id_column,
+    ///         serial_table_two,
+    ///         serial_id_column_two
+    ///     ),
+    ///     "Columns should not be compatible as both are generative"
+    /// );
+    /// assert!(
+    ///     serial_table_one.is_compatible_with(&db, serial_id_column, non_fk_table, non_fk_id_column),
+    ///     "Columns should be compatible as only one is generative and they have the same data type"
     /// );
     /// # Ok(())
     /// # }
@@ -804,7 +844,18 @@ pub trait TableLike: Hash + Ord + Eq {
             other_table.table_name()
         );
 
-        if host_column.data_type() != other_column.data_type() {
+        // If the two columns are the same, they are compatible.
+        if self == other_table && host_column == other_column {
+            return true;
+        }
+
+        // If both columns have generative data types, they are not compatible
+        // as the two values should never be the same.
+        if host_column.is_generative() && other_column.is_generative() {
+            return false;
+        }
+
+        if host_column.normalized_data_type() != other_column.normalized_data_type() {
             return false;
         }
 
