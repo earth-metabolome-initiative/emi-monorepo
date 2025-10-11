@@ -8,3 +8,5 @@ mod vertical_same_as;
 pub use vertical_same_as::{VerticalSameAsForeignKeyLike, VerticalSameAsTableLike};
 mod horizontal_same_as;
 pub use horizontal_same_as::{HorizontalSameAsForeignKeyLike, HorizontalSameAsTableLike};
+mod triangular_same_as;
+pub use triangular_same_as::{TriangularSameAsForeignKeyLike, TriangularSameAsTableLike};

@@ -145,16 +145,9 @@ impl TableLike for CreateTable {
     where
         Self: 'db,
     {
-        self.constraints
+        self.columns
             .iter()
-            .filter_map(move |constraint| {
-                if let sqlparser::ast::TableConstraint::ForeignKey(fk_constraint) = constraint {
-                    Some(fk_constraint)
-                } else {
-                    None
-                }
-            })
-            .chain(self.columns.iter().filter_map(|col| {
+            .filter_map(|col| {
                 col.options.iter().find_map(|opt| {
                     if let sqlparser::ast::ColumnOption::ForeignKey(foreign_key_constraint) =
                         &opt.option
@@ -164,6 +157,13 @@ impl TableLike for CreateTable {
                         None
                     }
                 })
+            })
+            .chain(self.constraints.iter().filter_map(move |constraint| {
+                if let sqlparser::ast::TableConstraint::ForeignKey(fk_constraint) = constraint {
+                    Some(fk_constraint)
+                } else {
+                    None
+                }
             }))
     }
 }

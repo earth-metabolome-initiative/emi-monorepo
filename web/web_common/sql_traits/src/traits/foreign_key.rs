@@ -449,13 +449,15 @@ pub trait ForeignKeyLike: Eq {
     /// ```
     fn is_referenced_primary_key(&self, database: &Self::Database) -> bool {
         let referenced_table = self.referenced_table(database);
-        let mut pk_columns = referenced_table.primary_key_columns(database);
-        let mut fk_columns = self.referenced_columns(database);
+        let mut pk_columns = referenced_table.primary_key_columns(database).peekable();
+        let mut fk_columns = self.referenced_columns(database).peekable();
 
-        while let (Some(fk_col), Some(pk_col)) = (fk_columns.next(), pk_columns.next()) {
+        while let (Some(fk_col), Some(pk_col)) = (fk_columns.peek(), pk_columns.peek()) {
             if fk_col != pk_col {
                 return false;
             }
+            fk_columns.next();
+            pk_columns.next();
         }
 
         // We check that there are no remaining columns in either iterator.
@@ -480,26 +482,33 @@ pub trait ForeignKeyLike: Eq {
     /// let db = SqlParserDatabase::from_sql(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
-    /// CREATE TABLE referenced_table_with_unique (id INT PRIMARY KEY, name TEXT, UNIQUE(name));
+    /// CREATE TABLE referenced_table_with_unique (id INT PRIMARY KEY, name TEXT, UNIQUE(name), UNIQUE(id, name));
     /// CREATE TABLE pk_ref_table (
     ///     ref_id INT,
     ///     FOREIGN KEY (ref_id) REFERENCES referenced_table(id)
     /// );
     /// CREATE TABLE non_pk_ref_table (
     ///     ref_name TEXT,
-    ///     FOREIGN KEY (ref_name) REFERENCES referenced_table_with_unique(name)
+    ///     referenced_table_with_unique_id INT,
+    ///     FOREIGN KEY (ref_name) REFERENCES referenced_table_with_unique(name),
+    ///     FOREIGN KEY (referenced_table_with_unique_id, ref_name) REFERENCES referenced_table_with_unique(id, name)
     /// );
     /// "#,
     /// )?;
     /// let pk_ref_table = db.table(None, "pk_ref_table");
     /// let non_pk_ref_table = db.table(None, "non_pk_ref_table");
     /// let pk_ref_fk = pk_ref_table.foreign_keys(&db).next().expect("Should have a foreign key");
-    /// let non_pk_ref_fk =
-    ///     non_pk_ref_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// let [non_pk_ref_fk, another_non_pk_ref_fk] =
+    ///     non_pk_ref_table.foreign_keys(&db).collect::<Vec<_>>()[..]
+    /// else {
+    ///     panic!("Should have two foreign keys");
+    /// };
     /// assert!(pk_ref_fk.is_referenced_primary_key(&db));
     /// assert!(!non_pk_ref_fk.is_referenced_primary_key(&db));
     /// assert!(non_pk_ref_fk.is_referenced_unique_key(&db).is_some());
     /// assert!(pk_ref_fk.is_referenced_unique_key(&db).is_none());
+    /// assert!(!another_non_pk_ref_fk.is_referenced_primary_key(&db));
+    /// assert!(another_non_pk_ref_fk.is_referenced_unique_key(&db).is_some());
     /// # Ok(())
     /// # }
     /// ```
@@ -511,11 +520,12 @@ pub trait ForeignKeyLike: Eq {
         Self: 'db,
     {
         let referenced_table = self.referenced_table(database);
-        let fk_columns: Vec<_> = self.referenced_columns(database).collect();
-        referenced_table.unique_indices(database).find(|index| {
-            let index_columns: Vec<_> = index.columns(database, referenced_table).collect();
-            index_columns.len() == fk_columns.len()
-                && index_columns.iter().all(|col| fk_columns.contains(col))
+        let referenced_columns: Vec<_> = self.referenced_columns(database).collect();
+        referenced_table.unique_indices(database).find(|index: &&Self::UniqueIndex| {
+            let index_columns: Vec<_> =
+                UniqueIndexLike::columns(*index, database, referenced_table).collect();
+            index_columns.len() == referenced_columns.len()
+                && index_columns.iter().all(|col| referenced_columns.contains(col))
         })
     }
 
@@ -528,13 +538,17 @@ pub trait ForeignKeyLike: Eq {
     /// * `host_table` - A reference to the host table that contains the foreign
     ///   key.
     fn is_host_primary_key(&self, database: &Self::Database, host_table: &Self::Table) -> bool {
-        let mut pk_columns = host_table.primary_key_columns(database);
-        let mut fk_columns = self.host_columns(database, host_table);
-        while let (Some(fk_col), Some(pk_col)) = (fk_columns.next(), pk_columns.next()) {
+        let mut pk_columns = host_table.primary_key_columns(database).peekable();
+        let mut fk_columns = self.host_columns(database, host_table).peekable();
+
+        while let (Some(fk_col), Some(pk_col)) = (fk_columns.peek(), pk_columns.peek()) {
             if fk_col != pk_col {
                 return false;
             }
+            fk_columns.next();
+            pk_columns.next();
         }
+
         // We check that there are no remaining columns in either iterator.
         fk_columns.next().is_none() && pk_columns.next().is_none()
     }

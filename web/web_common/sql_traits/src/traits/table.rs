@@ -377,6 +377,33 @@ pub trait TableLike: Hash + Ord + Eq {
     where
         Self: 'db;
 
+    /// Iterates over the foreign keys in the current table which refer to
+    /// ancestors of the provided table.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    /// belongs.
+    /// * `table` - A reference to the table whose ancestors are to be
+    ///   considered.
+    ///
+    /// # Example
+    fn foreign_keys_to_ancestors_of<'db>(
+        &'db self,
+        database: &'db Self::Database,
+        table: &'db Self,
+    ) -> impl Iterator<Item = &'db Self::ForeignKey>
+    where
+        Self: 'db,
+    {
+        let ancestors = table.ancestral_extended_tables(database);
+        self.foreign_keys(database).filter(move |fk| {
+            let referenced_table = fk.referenced_table(database);
+            ancestors.iter().any(|ancestor| ancestor == &referenced_table)
+                && fk.is_referenced_primary_key(database)
+        })
+    }
+
     /// Returns a vector with the (dedupliated) tables which are referenced by
     /// the current table via foreign keys.
     ///
@@ -437,8 +464,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// let db = SqlParserDatabase::from_sql(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
-    /// CREATE TABLE host_table (id INT PRIMARY KEY, name TEXT,
-    ///     FOREIGN KEY (id) REFERENCES referenced_table(id));
+    /// CREATE TABLE host_table (id INT PRIMARY KEY REFERENCES referenced_table(id), name TEXT);
     /// "#,
     /// )?;
     /// let host_table = db.table(None, "host_table");
@@ -472,9 +498,14 @@ pub trait TableLike: Hash + Ord + Eq {
     /// use sql_traits::prelude::*;
     /// let db = SqlParserDatabase::from_sql(
     ///     r#"
-    /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
-    /// CREATE TABLE host_table (id INT PRIMARY KEY, name TEXT,
-    ///     FOREIGN KEY (id) REFERENCES referenced_table(id));
+    /// CREATE TABLE extended_table (id INT PRIMARY KEY);
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
+    /// CREATE TABLE host_table (
+    ///     id INT PRIMARY KEY,
+    ///     other_id INT,
+    ///     FOREIGN KEY (other_id) REFERENCES referenced_table(id),
+    ///     FOREIGN KEY (id) REFERENCES extended_table(id)
+    /// );
     /// "#,
     /// )?;
     /// let host_table = db.table(None, "host_table");

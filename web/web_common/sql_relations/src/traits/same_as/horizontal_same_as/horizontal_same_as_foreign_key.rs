@@ -34,9 +34,16 @@ pub trait HorizontalSameAsForeignKeyLike: VerticalSameAsForeignKeyLike {
     /// "#,
     /// )?;
     /// let child_table = db.table(None, "child");
-    /// let mut foreign_keys = child_table.foreign_keys(&db);
-    /// let parent_fk = foreign_keys.next().expect("Expected parent foreign key");
-    /// let brother_fk = foreign_keys.next().expect("Expected brother foreign key");
+    /// let [extension_primary_key, parent_fk, brother_fk] =
+    ///     child_table.foreign_keys(&db).collect::<Vec<_>>()[..]
+    /// else {
+    ///     panic!("Expected exactly 3 foreign keys in child table");
+    /// };
+    ///
+    /// assert!(
+    ///     extension_primary_key.is_extension_foreign_key(&db, child_table),
+    ///     "Expected extension primary key"
+    /// );
     /// assert!(
     ///     !parent_fk.is_horizontal_same_as(&db, child_table),
     ///     "Expected parent foreign key to not be horizontal same-as"
