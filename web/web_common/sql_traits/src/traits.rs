@@ -12,3 +12,10 @@ pub mod unique_index;
 pub use unique_index::UniqueIndexLike;
 pub mod foreign_key;
 pub use foreign_key::ForeignKeyLike;
+
+/// Trait for associating a metadata struct to a given type.
+pub trait Metadata {
+    /// The associated metadata type.
+    type Meta;
+}
+

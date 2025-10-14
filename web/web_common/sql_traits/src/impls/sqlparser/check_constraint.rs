@@ -1,11 +1,11 @@
 //! Implement the [`CheckConstraint`] trait for the `sqlparser` crate's
 
-use sqlparser::ast::{CheckConstraint, Expr};
+use sqlparser::ast::{CheckConstraint, CreateTable, Expr};
 
-use crate::traits::CheckConstraintLike;
+use crate::{structs::TableAttribute, traits::CheckConstraintLike};
 
-impl CheckConstraintLike for CheckConstraint {
+impl<'db> CheckConstraintLike for TableAttribute<CreateTable, CheckConstraint> {
     fn expression(&self) -> Expr {
-        self.expr.as_ref().clone()
+        self.attribute().expr.as_ref().clone()
     }
 }

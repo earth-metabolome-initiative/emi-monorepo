@@ -2,12 +2,17 @@
 //! [`ForeignKeyLike`](sql_traits::prelude::ForeignKeyLike) trait for the
 //! [`KeyColumnUsage`] struct.
 
-use sql_traits::traits::ForeignKeyLike;
+use sql_traits::traits::{ForeignKeyLike, Metadata};
 
 use crate::{
     PgDatabase,
+    database::KeyColumnUsageMetadata,
     models::{Column, KeyColumnUsage, PgIndex, Table},
 };
+
+impl Metadata for KeyColumnUsage {
+    type Meta = KeyColumnUsageMetadata;
+}
 
 impl ForeignKeyLike for KeyColumnUsage {
     type Column = Column;
@@ -23,6 +28,13 @@ impl ForeignKeyLike for KeyColumnUsage {
         database.foreign_key_metadata(self).referenced_table()
     }
 
+    fn host_table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
+    where
+        Self: 'db,
+    {
+        database.foreign_key_metadata(self).host_table()
+    }
+
     fn on_delete_cascade(&self, database: &Self::Database) -> bool {
         database.foreign_key_metadata(self).on_delete_cascade()
     }
@@ -34,7 +46,6 @@ impl ForeignKeyLike for KeyColumnUsage {
     fn host_columns<'db>(
         &'db self,
         database: &'db Self::Database,
-        _host_table: &'db Self::Table,
     ) -> impl Iterator<Item = &'db Self::Column>
     where
         Self: 'db,

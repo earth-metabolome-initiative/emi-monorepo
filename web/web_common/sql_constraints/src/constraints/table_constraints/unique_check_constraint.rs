@@ -20,17 +20,17 @@ use crate::{
 /// ```rust
 /// use sql_constraints::prelude::*;
 ///
-/// let constrainer: GenericConstrainer<SqlParserDatabase> =
+/// let constrainer: GenericConstrainer<ParserDB> =
 ///     UniqueCheckConstraint::default().into();
 ///
-/// let invalid_schema = SqlParserDatabase::from_sql(
+/// let invalid_schema = ParserDB::from_sql(
 ///     "CREATE TABLE MyTable (id INT, CHECK (id > 0), CHECK (id > 0));",
 /// )
 /// .unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
 /// let valid_schema =
-///     SqlParserDatabase::from_sql("CREATE TABLE mytable (id INT, CHECK (id > 0));").unwrap();
+///     ParserDB::from_sql("CREATE TABLE mytable (id INT, CHECK (id > 0));").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 /// ```
 pub struct UniqueCheckConstraint<DB>(std::marker::PhantomData<DB>);

@@ -270,22 +270,6 @@ impl Column {
     }
 
     #[must_use]
-    /// Returns whether the column is automatically generated
-    ///
-    /// A column is automatically generated if:
-    /// - it is marked as `ALWAYS` generated
-    /// - it has a default value that starts with `nextval`
-    /// - it has a default value that starts with `CURRENT_TIMESTAMP`
-    /// - it is an identity column
-    /// - it is the extension primary key and its referenced primary key column
-    ///   is automatically generated.
-    pub fn is_always_automatically_generated(&self) -> bool {
-        self.is_generated == "ALWAYS"
-            || self.column_default.as_ref().is_some_and(|d| d.starts_with("nextval"))
-            || self.is_identity.as_ref().is_some_and(|i| i == "YES")
-    }
-
-    #[must_use]
     /// Returns whether the current column has a DEFAULT value
     pub fn has_default(&self) -> bool {
         self.column_default.is_some()
@@ -315,38 +299,5 @@ impl Column {
     /// * `conn` - A mutable reference to a `PgConnection`
     pub fn has_foreign_keys(&self, conn: &mut PgConnection) -> bool {
         self.foreign_keys(conn).is_ok_and(|keys| !keys.is_empty())
-    }
-
-    /// Returns whether the column is part of the table's primary key.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    pub fn is_part_of_primary_key(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<bool, diesel::result::Error> {
-        let table = self.table(conn)?;
-        let primary_key_columns = table.primary_key_columns(conn)?;
-        Ok(primary_key_columns.contains(self))
-    }
-
-    /// Returns whether the column coincides with the table primary key.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If an error occurs while querying the database
-    pub fn is_primary_key(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
-        let table = self.table(conn)?;
-        let primary_key_columns = table.primary_key_columns(conn)?;
-        Ok(primary_key_columns.len() == 1 && primary_key_columns.contains(self))
     }
 }

@@ -2,4 +2,3 @@
 //! module.
 
 mod sqlparser;
-pub use sqlparser::SqlParserDatabase;

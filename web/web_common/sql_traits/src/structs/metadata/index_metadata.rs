@@ -1,0 +1,33 @@
+//! Submodule defining a generic `IndexMetadata` struct.
+
+use std::rc::Rc;
+
+use sqlparser::ast::Expr;
+
+use crate::traits::UniqueIndexLike;
+
+/// Struct collecting metadata about a unique index.
+pub struct UniqueIndexMetadata<U: UniqueIndexLike> {
+    /// The expression defining the index.
+    expression: Expr,
+    /// The table on which the index is defined.
+    table: Rc<U::Table>,
+}
+
+impl<U: UniqueIndexLike> UniqueIndexMetadata<U> {
+    /// Creates a new `UniqueIndexMetadata` instance.
+    pub fn new(expression: Expr, table: Rc<U::Table>) -> Self {
+        Self { expression, table }
+    }
+
+    /// Returns a reference to the expression defining the index.
+    pub fn expression(&self) -> &Expr {
+        &self.expression
+    }
+
+    /// Returns a reference to the table on which the index is defined.
+    pub fn table(&self) -> &U::Table {
+        &self.table
+    }
+}
+

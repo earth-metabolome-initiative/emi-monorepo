@@ -13,6 +13,8 @@ pub struct KeyColumnUsageMetadata {
     referenced_table: Table,
     /// The columns in the referenced table that the foreign key points to.
     referenced_columns: Vec<Column>,
+    /// The table that contains the foreign key.
+    host_table: Table,
     /// The columns in the host table that are part of the foreign key.
     host_columns: Vec<Column>,
     /// The referential constraint associated with the foreign key.
@@ -46,6 +48,7 @@ impl KeyColumnUsageMetadata {
                 key_column_usage,
                 conn,
             )?,
+            host_table: crate::models::key_column_usage::host_table(key_column_usage, conn)?,
             host_columns: crate::models::key_column_usage::host_columns(key_column_usage, conn)?,
             referential_constraint: crate::models::key_column_usage::referential_constraint(
                 key_column_usage,
@@ -57,6 +60,11 @@ impl KeyColumnUsageMetadata {
     /// Returns a reference to the table that the foreign key references.
     pub fn referenced_table(&self) -> &Table {
         &self.referenced_table
+    }
+
+    /// Returns a reference to the table that contains the foreign key.
+    pub fn host_table(&self) -> &Table {
+        &self.host_table
     }
 
     /// Returns a reference to the columns in the referenced table that the

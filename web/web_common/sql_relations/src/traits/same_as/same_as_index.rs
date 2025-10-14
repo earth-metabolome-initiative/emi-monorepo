@@ -19,7 +19,7 @@ pub trait SameAsIndexLike: UniqueIndexLike {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_relations::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE with_same_as (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
     /// CREATE TABLE no_same_as_one (id INT PRIMARY KEY, name TEXT, UNIQUE(name));
@@ -39,13 +39,13 @@ pub trait SameAsIndexLike: UniqueIndexLike {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_same_as(&self, database: &Self::Database, table: &Self::Table) -> bool {
+    fn is_same_as(&self, database: &Self::Database) -> bool {
         // Next, we retrieve the columns associated with the index.
-        let columns = self.columns(database, table).collect::<Vec<_>>();
+        let columns = self.columns(database).collect::<Vec<_>>();
 
         // We expect that all of the columns in the primary key of the table are also in
         // the index.
-        let primary_key_columns = table.primary_key_columns(database).collect::<Vec<_>>();
+        let primary_key_columns = self.table(database).primary_key_columns(database).collect::<Vec<_>>();
 
         // If any of the primary key columns are not in the index, it cannot be a
         // same-as index

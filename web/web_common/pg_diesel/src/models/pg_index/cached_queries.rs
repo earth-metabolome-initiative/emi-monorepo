@@ -5,6 +5,7 @@ use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl,
     SelectableHelper, prelude::QueryableByName, sql_types::Oid,
 };
+use sqlparser::{ast::Expr, parser::Parser};
 
 use crate::models::{Column, PgIndex, Table};
 
@@ -57,8 +58,8 @@ struct IndexExpr {
 pub(crate) fn expression(
     index: &PgIndex,
     conn: &mut PgConnection,
-) -> Result<String, diesel::result::Error> {
-    Ok(diesel::sql_query(
+) -> Result<Expr, diesel::result::Error> {
+    let expression = diesel::sql_query(
         r#"
         SELECT
             pg_get_expr(i.indexprs, i.indrelid) as expr
@@ -68,5 +69,10 @@ pub(crate) fn expression(
     )
     .bind::<Oid, _>(index.indexrelid)
     .get_result::<IndexExpr>(conn)?
-    .expr)
+    .expr;
+    Ok(Parser::new(&sqlparser::dialect::PostgreSqlDialect {})
+        .try_with_sql(expression.as_str())
+        .expect("Failed to parse unique constraint expression")
+        .parse_expr()
+        .expect("No expression found in parsed unique constraint"))
 }

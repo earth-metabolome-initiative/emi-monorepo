@@ -2,7 +2,7 @@
 //! a [`PgDatabase`](crate::database::PgDatabase) instance from a PostgreSQL
 //! connection and relevant schema information.
 
-use std::fmt::Display;
+use std::{fmt::Display, rc::Rc};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -11,14 +11,7 @@ use common_traits::{
 use diesel::PgConnection;
 use sql_traits::traits::TableLike;
 
-use crate::{
-    PgDatabase,
-    database::{
-        KeyColumnUsageMetadata, pg_index_metadata::PgIndexMetadata, table_metadata::TableMetadata,
-    },
-    models::Table,
-    traits::oid::HasOid,
-};
+use crate::{PgDatabase, database::KeyColumnUsageMetadata, models::Table};
 
 #[derive(Default)]
 /// Builder for constructing a `PgDatabase` instance.
@@ -130,38 +123,39 @@ impl Builder for PgDatabaseBuilder<'_> {
 
         let mut tables = Vec::new();
         for table_schema in &table_schemas {
-            tables.extend(Table::load_all(connection, &table_catalog, table_schema)?);
+            tables.extend(
+                Table::load_all(connection, &table_catalog, table_schema)?.into_iter().map(Rc::new),
+            );
         }
 
         // We sort the tables by schema and name to enable efficient binary search
         // later.
         tables.sort_by_key(|table| {
-            (table.table_schema().unwrap_or("").to_owned(), table.table_name().to_owned())
+            (table.as_ref().table_schema().unwrap_or("").to_owned(), table.table_name().to_owned())
         });
 
         // For each table, we determine all of the foreign keys and for each foreign key
         // we determine which table it references.
         let mut foreign_keys = Vec::new();
-        let mut indices = Vec::new();
+        let mut unique_indices = Vec::new();
+        let mut columns = Vec::new();
         let mut tables_with_metadata = Vec::new();
         for table in tables {
-            let table_metadata = TableMetadata::new(&table, connection)?;
-            for fk in table_metadata.foreign_keys() {
+            let table_metadata = table.metadata(connection)?;
+            for column in table_metadata.column_rcs() {
+                columns.push((column.clone(), table.clone()));
+            }
+            for fk in table_metadata.foreign_key_rcs() {
                 let metadata = KeyColumnUsageMetadata::new(&fk, connection)?;
                 foreign_keys.push((fk.clone(), metadata));
             }
-            for index in table_metadata.unique_indices() {
-                let metadata = PgIndexMetadata::new(&index, connection)?;
-                indices.push((index.clone(), metadata));
+            for index in table_metadata.unique_index_rcs() {
+                let metadata = index.metadata(table.clone(), connection)?;
+                unique_indices.push((index.clone(), metadata));
             }
             tables_with_metadata.push((table, table_metadata));
         }
 
-        // We sort the foreign keys by their constraint name to enable efficient binary
-        // search later.
-        foreign_keys.sort_unstable_by_key(|(fk, _)| fk.clone());
-        indices.sort_unstable_by_key(|(idx, _)| idx.oid());
-
-        Ok(PgDatabase { tables: tables_with_metadata, foreign_keys, indices })
+        Ok(PgDatabase::new(tables_with_metadata, columns, unique_indices, foreign_keys))
     }
 }

@@ -82,11 +82,10 @@ pub trait Constrainer: Default {
     fn encounter_foreign_key(
         &self,
         database: &Self::Database,
-        host_table: &Self::Table,
         foreign_key: &Self::ForeignKey,
     ) -> Result<(), Error> {
         self.foreign_key_constraints().try_for_each(|constraint| {
-            constraint.validate_foreign_key(database, host_table, foreign_key)
+            constraint.validate_foreign_key(database, foreign_key)
         })
     }
 
@@ -99,7 +98,7 @@ pub trait Constrainer: Default {
                 self.encounter_column(&column)?;
             }
             for foreign_key in table.foreign_keys(database) {
-                self.encounter_foreign_key(database, table, &foreign_key)?;
+                self.encounter_foreign_key(database, &foreign_key)?;
             }
         }
         Ok(())

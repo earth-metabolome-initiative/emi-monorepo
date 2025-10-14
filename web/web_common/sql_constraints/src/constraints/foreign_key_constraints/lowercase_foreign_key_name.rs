@@ -20,15 +20,15 @@ use crate::{
 /// ```rust
 /// use sql_constraints::prelude::*;
 ///
-/// let constrainer: GenericConstrainer<SqlParserDatabase> = LowercaseForeignKeyName::default().into();
+/// let constrainer: GenericConstrainer<ParserDB> = LowercaseForeignKeyName::default().into();
 ///
-/// let invalid_schema = SqlParserDatabase::from_sql("CREATE TABLE mytable (id INT, CONSTRAINT Fk FOREIGN KEY (id) REFERENCES other_table (id));").unwrap();
+/// let invalid_schema = ParserDB::from_sql("CREATE TABLE mytable (id INT, CONSTRAINT Fk FOREIGN KEY (id) REFERENCES other_table (id));").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
-/// let valid_schema1 = SqlParserDatabase::from_sql("CREATE TABLE mytable (id INT, CONSTRAINT fk FOREIGN KEY (id) REFERENCES other_table (id));").unwrap();
+/// let valid_schema1 = ParserDB::from_sql("CREATE TABLE mytable (id INT, CONSTRAINT fk FOREIGN KEY (id) REFERENCES other_table (id));").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema1).is_ok());
 ///
-/// let valid_schema2 = SqlParserDatabase::from_sql("CREATE TABLE mytable (id INT, FOREIGN KEY (id) REFERENCES other_table (id));").unwrap();
+/// let valid_schema2 = ParserDB::from_sql("CREATE TABLE mytable (id INT, FOREIGN KEY (id) REFERENCES other_table (id));").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema2).is_ok());
 /// ```
 pub struct LowercaseForeignKeyName<C>(std::marker::PhantomData<C>);
@@ -55,7 +55,6 @@ impl<DB: DatabaseLike> ForeignKeyConstraint for LowercaseForeignKeyName<DB> {
     fn validate_foreign_key(
         &self,
         _database: &Self::Database,
-        _host_table: &Self::Table,
         foreign_key: &Self::ForeignKey,
     ) -> Result<(), crate::prelude::Error> {
         if let Some(name) = foreign_key.foreign_key_name() {

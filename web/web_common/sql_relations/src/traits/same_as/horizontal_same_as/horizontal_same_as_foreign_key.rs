@@ -13,14 +13,13 @@ pub trait HorizontalSameAsForeignKeyLike: VerticalSameAsForeignKeyLike {
     /// # Arguments
     ///
     /// * `database` - The database containing the tables.
-    /// * `host_table` - The table containing the foreign key.
     ///
     /// # Example
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_relations::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE parent (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
     /// CREATE TABLE brother (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
@@ -41,29 +40,27 @@ pub trait HorizontalSameAsForeignKeyLike: VerticalSameAsForeignKeyLike {
     /// };
     ///
     /// assert!(
-    ///     extension_primary_key.is_extension_foreign_key(&db, child_table),
+    ///     extension_primary_key.is_extension_foreign_key(&db),
     ///     "Expected extension primary key"
     /// );
     /// assert!(
-    ///     !parent_fk.is_horizontal_same_as(&db, child_table),
+    ///     !parent_fk.is_horizontal_same_as(&db),
     ///     "Expected parent foreign key to not be horizontal same-as"
     /// );
     /// assert!(
-    ///     brother_fk.is_horizontal_same_as(&db, child_table),
+    ///     brother_fk.is_horizontal_same_as(&db),
     ///     "Expected brother foreign key to be horizontal same-as"
     /// );
     /// # Ok(())
     /// # }
     /// ```
-    fn is_horizontal_same_as(&self, database: &Self::Database, host_table: &Self::Table) -> bool {
-        let referenced_table = self.referenced_table(database);
-
+    fn is_horizontal_same_as(&self, database: &Self::Database) -> bool {
         let Some(unique_index) = self.is_referenced_unique_key(database) else {
             return false;
         };
 
-        unique_index.is_same_as(database, &referenced_table)
-            && !self.is_vertical_same_as(database, host_table)
+        unique_index.is_same_as(database)
+            && !self.is_vertical_same_as(database)
     }
 }
 

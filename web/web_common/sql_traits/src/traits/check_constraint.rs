@@ -15,7 +15,7 @@ pub trait CheckConstraintLike {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"CREATE TABLE my_table (id INT CHECK (id > 0), name TEXT CHECK (length(name) > 0));"#,
     /// )?;
     /// let table = db.table(None, "my_table");

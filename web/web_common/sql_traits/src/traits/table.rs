@@ -3,11 +3,11 @@
 use std::hash::Hash;
 
 use crate::traits::{
-    CheckConstraintLike, ColumnLike, DatabaseLike, ForeignKeyLike, UniqueIndexLike,
+    CheckConstraintLike, ColumnLike, DatabaseLike, ForeignKeyLike, Metadata, UniqueIndexLike,
 };
 
 /// A trait for types that can be treated as SQL tables.
-pub trait TableLike: Hash + Ord + Eq {
+pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// The database type the table belongs to.
     type Database: DatabaseLike<Table = Self, Column = Self::Column, ForeignKey = Self::ForeignKey>;
     /// The column type of the table.
@@ -32,7 +32,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql("CREATE TABLE mytable (id INT);")?;
+    /// let db = ParserDB::try_from("CREATE TABLE mytable (id INT);")?;
     /// let table = db.table(None, "mytable");
     /// assert_eq!(table.table_name(), "mytable");
     /// # Ok(())
@@ -47,7 +47,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"CREATE TABLE my_schema.my_table_with_schema (id INT);
     /// CREATE TABLE my_table (id INT);"#,
     /// )?;
@@ -72,7 +72,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql("CREATE TABLE my_table (id INT, name TEXT);")?;
+    /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT);")?;
     /// let table = db.table(None, "my_table");
     /// let column_names: Vec<&str> = table.columns(&db).map(|col| col.column_name()).collect();
     /// assert_eq!(column_names, vec!["id", "name"]);
@@ -98,7 +98,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql("CREATE TABLE my_table (id INT, name TEXT);")?;
+    /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT);")?;
     /// let table = db.table(None, "my_table");
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// assert_eq!(id_column.column_name(), "id");
@@ -131,7 +131,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE my_composite_pk_table (id1 INT, id2 INT, name TEXT, PRIMARY KEY (id1, id2));
@@ -176,7 +176,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT);
     /// "#,
@@ -210,7 +210,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT);
     /// "#,
@@ -238,7 +238,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE my_no_pk_table (id INT, name TEXT);
@@ -265,7 +265,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE my_composite_pk_table (id1 INT, id2 INT, name TEXT, PRIMARY KEY (id1, id2));
@@ -295,7 +295,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE my_table (id INT CHECK (id > 0), name TEXT, CHECK (length(name) > 0));
     /// "#,
@@ -327,7 +327,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE my_table (id INT UNIQUE, name TEXT, UNIQUE (name));
     /// "#,
@@ -335,7 +335,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// let table = db.table(None, "my_table");
     /// let unique_indices: Vec<_> = table
     ///     .unique_indices(&db)
-    ///     .map(|ui| ui.columns(&db, &table).map(|col| col.column_name()).collect::<Vec<_>>())
+    ///     .map(|ui| ui.columns(&db).map(|col| col.column_name()).collect::<Vec<_>>())
     ///     .collect();
     /// assert_eq!(unique_indices, vec![vec!["id"], vec!["name"]]);
     /// # Ok(())
@@ -358,7 +358,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE host_table (id INT, name TEXT, FOREIGN KEY (id) REFERENCES referenced_table(id));
@@ -392,7 +392,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE grandparent_table (id INT PRIMARY KEY);
     /// CREATE TABLE parent_table (id INT PRIMARY KEY REFERENCES grandparent_table(id));
@@ -443,7 +443,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table1 (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE referenced_table2 (id INT PRIMARY KEY, name TEXT);
@@ -487,7 +487,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE host_table (id INT PRIMARY KEY REFERENCES referenced_table(id), name TEXT);
@@ -506,7 +506,7 @@ pub trait TableLike: Hash + Ord + Eq {
     where
         Self: 'db,
     {
-        self.foreign_keys(database).filter(|fk| fk.is_extension_foreign_key(database, self))
+        self.foreign_keys(database).filter(|fk| fk.is_extension_foreign_key(database))
     }
 
     /// Returns the tables which are extended by the current table via foreign
@@ -522,7 +522,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE extended_table (id INT PRIMARY KEY);
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
@@ -560,7 +560,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE grandparent_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE parent_table (id INT PRIMARY KEY, name TEXT,
@@ -607,7 +607,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE host_table (id INT, name TEXT,
@@ -635,7 +635,7 @@ pub trait TableLike: Hash + Ord + Eq {
         let mut referenced_tables = Vec::new();
 
         for fk in self.foreign_keys(database) {
-            if fk.host_columns(database, self).all(|col| col == column)
+            if fk.host_columns(database).all(|col| col == column)
                 && fk.is_referenced_primary_key(database)
             {
                 let referenced_table = fk.referenced_table(database);
@@ -664,7 +664,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE parent_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE child_table (id INT PRIMARY KEY, name TEXT,
@@ -695,7 +695,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE grandparent_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE parent_table (id INT PRIMARY KEY, name TEXT,
@@ -758,7 +758,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE another_referenced_table (id INT PRIMARY KEY, name TEXT);
@@ -897,7 +897,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE host_table (id INT UNIQUE, name TEXT,
@@ -917,7 +917,7 @@ pub trait TableLike: Hash + Ord + Eq {
     where
         Self: 'db,
     {
-        self.foreign_keys(database).filter(|fk| fk.is_singleton(database, self))
+        self.foreign_keys(database).filter(|fk| fk.is_singleton(database))
     }
 
     /// Returns whether the table has singleton foreign keys.
@@ -932,7 +932,7 @@ pub trait TableLike: Hash + Ord + Eq {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE host_table (id INT UNIQUE, name TEXT,

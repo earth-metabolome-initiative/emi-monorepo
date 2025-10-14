@@ -1,9 +1,9 @@
 //! Submodule providing the `VerticalSameAsColumnLike` trait for working
 //! with columns that have vertical same-as relationships.
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
-use sql_traits::traits::{ColumnLike, ForeignKeyLike};
+use sql_traits::traits::{ColumnLike, ForeignKeyLike, TableLike};
 
 use crate::traits::VerticalSameAsForeignKeyLike;
 /// Trait for tables which may include vertical same-as relationships.
@@ -20,8 +20,6 @@ pub trait VerticalSameAsColumnLike:
     /// # Arguments
     ///
     /// * `database` - The database containing the tables and foreign keys.
-    /// * `host_table` - The table that may contain vertical same-as foreign
-    ///   keys referencing this column.
     ///
     /// # Example
     ///
@@ -29,7 +27,7 @@ pub trait VerticalSameAsColumnLike:
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_relations::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     ///     CREATE TABLE parent (id INT PRIMARY KEY, name TEXT, age SMALLINT, UNIQUE(id, name), UNIQUE(id, age));
     ///     CREATE TABLE child (
@@ -44,20 +42,61 @@ pub trait VerticalSameAsColumnLike:
     /// let child_table = db.table(None, "child");
     /// let name_column = child_table.column("name", &db).expect("Column 'name' should exist");
     /// let age_column = child_table.column("age", &db).expect("Column 'age' should exist");
-    /// assert_eq!(name_column.vertical_same_as_foreign_keys(&db, child_table).count(), 1);
-    /// assert_eq!(age_column.vertical_same_as_foreign_keys(&db, child_table).count(), 1);
+    /// assert_eq!(name_column.vertical_same_as_foreign_keys(&db).count(), 1);
+    /// assert_eq!(age_column.vertical_same_as_foreign_keys(&db).count(), 1);
     /// # Ok(())
     /// # }
     /// ```
     fn vertical_same_as_foreign_keys<'db>(
         &'db self,
         database: &'db Self::Database,
-        host_table: &'db Self::Table,
     ) -> impl Iterator<Item = &'db Self::VerticalSameAsForeignKey> {
         use crate::traits::same_as::vertical_same_as::vertical_same_as_table::VerticalSameAsTableLike;
-        host_table
+        self.table(database)
             .vertical_same_as_foreign_keys(database)
-            .filter(move |fk| fk.host_columns(database, host_table).any(|col| col == self))
+            .filter(move |fk| fk.host_columns(database).any(|col| col == self))
+    }
+
+    /// Returns the set of columns that are directly vertically same-as this
+    /// column via vertical same-as foreign keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - The database containing the tables and foreign keys.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_relations::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    ///     CREATE TABLE parent (id INT PRIMARY KEY, name TEXT, age SMALLINT, UNIQUE(id, name), UNIQUE(id, age));
+    ///     CREATE TABLE child (
+    ///         id INT PRIMARY KEY REFERENCES parent(id),
+    ///         name TEXT,
+    ///         age SMALLINT,
+    ///         FOREIGN KEY (id, name) REFERENCES parent(id, name),
+    ///         FOREIGN KEY (id, age) REFERENCES parent(id, age)
+    ///     );
+    ///   "#,
+    /// )?;
+    /// let child_table = db.table(None, "child");
+    /// let name_column = child_table.column("name", &db).expect("Column 'name' should exist");
+    /// let age_column = child_table.column("age", &db).expect("Column 'age' should exist");
+    /// let parent_table = db.table(None, "parent");
+    /// let parent_name_column = parent_table.column("name", &db).expect("Column 'name' should exist");
+    /// let parent_age_column = parent_table.column("age", &db).expect("Column 'age' should exist");
+    /// assert_eq!(name_column.vertical_same_as_columns(&db), vec![parent_name_column]);
+    /// assert_eq!(age_column.vertical_same_as_columns(&db), vec![parent_age_column]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn vertical_same_as_columns<'db>(&'db self, database: &'db Self::Database) -> Vec<&'db Self> {
+        self.vertical_same_as_foreign_keys(database)
+            .map(|fk| fk.referenced_column_for_host_column(database, self))
+            .collect()
     }
 
     /// Returns the set of columns that are reachable from this column via
@@ -66,24 +105,160 @@ pub trait VerticalSameAsColumnLike:
     /// # Arguments
     ///
     /// * `database` - The database containing the tables and foreign keys.
-    /// * `host_table` - The table that may contain vertical same-as foreign
-    ///  keys referencing this column whose reachable set is being computed.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_relations::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    ///     CREATE TABLE grandparent (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
+    ///     CREATE TABLE parent (
+    ///         id INT PRIMARY KEY REFERENCES grandparent(id),
+    ///         parent_name TEXT,
+    ///         FOREIGN KEY (id, parent_name) REFERENCES grandparent(id, name)
+    ///     );
+    ///     CREATE TABLE child (
+    ///         id INT PRIMARY KEY REFERENCES parent(id),
+    ///         child_name TEXT,
+    ///         FOREIGN KEY (id, child_name) REFERENCES grandparent(id, name)
+    ///     );
+    ///   "#,
+    /// )?;
+    /// let child_table = db.table(None, "child");
+    /// let child_name_column =
+    ///     child_table.column("child_name", &db).expect("Column 'child_name' should exist");
+    /// let grandparent_table = db.table(None, "grandparent");
+    /// let grandparent_name_column =
+    ///     grandparent_table.column("name", &db).expect("Column 'name' should exist");
+    /// assert_eq!(
+    ///     child_name_column.vertical_same_as_reachable_set(&db).into_iter().collect::<Vec<_>>(),
+    ///     vec![grandparent_name_column]
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
     fn vertical_same_as_reachable_set<'db>(
         &'db self,
         database: &'db Self::Database,
-        host_table: &'db Self::Table,
     ) -> HashSet<&'db Self> {
         let mut reachable_set = HashSet::new();
-        for vertical_same_as_foreign_key in self.vertical_same_as_foreign_keys(database, host_table)
-        {
-            let same_as_column = vertical_same_as_foreign_key
-                .referenced_column_for_host_column(database, host_table, self);
-            let referenced_table = vertical_same_as_foreign_key.referenced_table(database);
-            reachable_set
-                .extend(same_as_column.vertical_same_as_reachable_set(database, referenced_table));
+        for vertical_same_as_foreign_key in self.vertical_same_as_foreign_keys(database) {
+            let same_as_column =
+                vertical_same_as_foreign_key.referenced_column_for_host_column(database, self);
+            reachable_set.extend(same_as_column.vertical_same_as_reachable_set(database));
             reachable_set.insert(same_as_column);
         }
         reachable_set
+    }
+
+    /// Returns all columns that are vertically same-as this column, including
+    /// those inferred via transitive relationships through ancestral tables.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - The database containing the tables and foreign keys.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_relations::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    ///     CREATE TABLE grandparent (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
+    ///     CREATE TABLE parent (
+    ///         id INT PRIMARY KEY REFERENCES grandparent(id),
+    ///         parent_name TEXT,
+    ///         FOREIGN KEY (id, parent_name) REFERENCES grandparent(id, name)
+    ///     );
+    ///     CREATE TABLE child (
+    ///         id INT PRIMARY KEY REFERENCES parent(id),
+    ///         child_name TEXT,
+    ///         FOREIGN KEY (id, child_name) REFERENCES grandparent(id, name)
+    ///     );
+    ///   "#,
+    /// )?;
+    /// let child_table = db.table(None, "child");
+    /// let child_name_column =
+    ///     child_table.column("child_name", &db).expect("Column 'child_name' should exist");
+    /// let parent_table = db.table(None, "parent");
+    /// let parent_name_column =
+    ///     parent_table.column("parent_name", &db).expect("Column 'parent_name' should exist");
+    /// let grandparent_table = db.table(None, "grandparent");
+    /// let grandparent_name_column =
+    ///     grandparent_table.column("name", &db).expect("Column 'name' should exist");
+    /// assert_eq!(child_name_column.dominant_vertical_same_as_columns(&db), vec![parent_name_column]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn dominant_vertical_same_as_columns<'db>(
+        &'db self,
+        database: &'db Self::Database,
+    ) -> Vec<&'db Self>
+    where
+        Self: 'db,
+    {
+        let mut reachable_set = self.vertical_same_as_reachable_set(database);
+        // The frontier contains the set of columns which so far can only be reached
+        // from the current column. Once a column in the frontier is found to be
+        // reachable from another column in the reachable set, it is marked as true
+        // and will not be used to expand the reachable set anymore.
+        let mut frontier: HashMap<&Self, bool> =
+            self.vertical_same_as_columns(database).into_iter().map(|c| (c, false)).collect();
+        let table = self.table(database);
+        let vertical_extension_tables = table.ancestral_extended_tables(database);
+        let mut changed = true;
+
+        while changed {
+            changed = false;
+            for ancestor in vertical_extension_tables.iter() {
+                for ancestor_column in ancestor.columns(database) {
+                    // If the ancestor node is already in the reachable set, skip it.
+                    if reachable_set.contains(ancestor_column) {
+                        continue;
+                    }
+
+                    let ancestor_reachable_set =
+                        ancestor_column.vertical_same_as_reachable_set(database);
+
+                    // We update the frontier to mark as true columns which we have now discovered
+                    // can be reached also from this ancestor column.
+                    for (frontier_column, is_reachable) in &mut frontier {
+                        if !*is_reachable && ancestor_reachable_set.contains(frontier_column) {
+                            *is_reachable = true;
+                            changed = true;
+                        }
+                    }
+
+                    // If the ancestor reachable set intersects with the current reachable
+                    // set, then the ancestor column is inferred to be vertically same-as
+                    // the current column. We then merge the ancestor reachable set into
+                    // the current reachable set, and add the ancestor column to the
+                    // frontier.
+                    if !reachable_set.is_disjoint(&ancestor_reachable_set) {
+                        reachable_set.insert(ancestor_column);
+                        frontier.insert(ancestor_column, false);
+                        reachable_set.extend(ancestor_reachable_set);
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        // We then consider as vertically same-as only those columns in the frontier
+        // which are still marked as false, meaning they could not be reached
+        // from any other column in the reachable set.
+        let mut vertical_same_as_columns = frontier
+            .into_iter()
+            .filter_map(|(column, is_reachable)| if is_reachable { None } else { Some(column) })
+            .collect::<Vec<_>>();
+        vertical_same_as_columns.sort_unstable();
+
+        vertical_same_as_columns
     }
 }
 

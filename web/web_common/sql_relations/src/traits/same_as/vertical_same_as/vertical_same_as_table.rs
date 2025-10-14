@@ -25,7 +25,7 @@ pub trait VerticalSameAsTableLike:
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_relations::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE parent (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
     /// CREATE TABLE brother (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
@@ -51,7 +51,7 @@ pub trait VerticalSameAsTableLike:
     where
         Self: 'db,
     {
-        self.foreign_keys(database).filter(|fk| fk.is_vertical_same_as(database, self))
+        self.foreign_keys(database).filter(|fk| fk.is_vertical_same_as(database))
     }
 }
 

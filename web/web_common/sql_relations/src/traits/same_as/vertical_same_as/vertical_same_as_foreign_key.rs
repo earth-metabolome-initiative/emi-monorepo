@@ -28,7 +28,7 @@ pub trait VerticalSameAsForeignKeyLike:
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_relations::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE parent (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
     /// CREATE TABLE brother (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
@@ -48,25 +48,26 @@ pub trait VerticalSameAsForeignKeyLike:
     ///     panic!("Expected exactly 3 foreign keys in child table");
     /// };
     /// assert!(
-    ///     extension_primary_key.is_extension_foreign_key(&db, child_table),
+    ///     extension_primary_key.is_extension_foreign_key(&db),
     ///     "Expected extension primary key"
     /// );
     /// assert!(
-    ///     parent_fk.is_vertical_same_as(&db, child_table),
+    ///     parent_fk.is_vertical_same_as(&db),
     ///     "Expected parent foreign key to be vertical same-as"
     /// );
     /// assert!(
-    ///     !brother_fk.is_vertical_same_as(&db, child_table),
+    ///     !brother_fk.is_vertical_same_as(&db),
     ///     "Expected brother foreign key to not be vertical same-as"
     /// );
     /// # Ok(())
     /// # }
     /// ```
-    fn is_vertical_same_as(&self, database: &Self::Database, host_table: &Self::Table) -> bool {
-        if !self.includes_host_primary_key(database, host_table) {
+    fn is_vertical_same_as(&self, database: &Self::Database) -> bool {
+        if !self.includes_host_primary_key(database) {
             return false;
         }
 
+        let host_table = self.host_table(database);
         let referenced_table = self.referenced_table(database);
 
         if !host_table.is_descendant_of(database, &referenced_table) {
@@ -77,7 +78,7 @@ pub trait VerticalSameAsForeignKeyLike:
             return false;
         };
 
-        unique_index.is_same_as(database, &referenced_table)
+        unique_index.is_same_as(database)
     }
 }
 

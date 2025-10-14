@@ -23,7 +23,7 @@ pub trait SameAsTableLike: TableLike<UniqueIndex = <Self as SameAsTableLike>::Sa
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_relations::prelude::*;
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE with_same_as (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
     /// CREATE TABLE no_same_as_one (id INT PRIMARY KEY, name TEXT, UNIQUE(name));
@@ -47,7 +47,7 @@ pub trait SameAsTableLike: TableLike<UniqueIndex = <Self as SameAsTableLike>::Sa
     where
         Self: 'db,
     {
-        self.unique_indices(database).filter(|index| index.is_same_as(database, self))
+        self.unique_indices(database).filter(|index| index.is_same_as(database))
     }
 }
 

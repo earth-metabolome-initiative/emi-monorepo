@@ -1,12 +1,16 @@
 //! Submodule implementing the [`TableLike`](sql_traits::prelude::TableLike)
 //! trait for the [`Table`] struct.
 
-use sql_traits::traits::TableLike;
+use sql_traits::{structs::TableMetadata, traits::{Metadata, TableLike}};
 
 use crate::{
     PgDatabase,
     models::{CheckConstraint, Column, KeyColumnUsage, PgIndex},
 };
+
+impl Metadata for crate::models::Table {
+    type Meta = TableMetadata<Self>;
+}
 
 impl TableLike for crate::models::Table {
     type Column = Column;
@@ -30,7 +34,7 @@ impl TableLike for crate::models::Table {
     where
         Self: 'db,
     {
-        database.table_metadata(self).columns().iter()
+        database.table_metadata(self).columns()
     }
 
     fn primary_key_columns<'db>(
@@ -40,7 +44,7 @@ impl TableLike for crate::models::Table {
     where
         Self: 'db,
     {
-        database.table_metadata(self).primary_key_columns().iter()
+        database.table_metadata(self).primary_key_columns()
     }
 
     fn foreign_keys<'db>(
@@ -50,7 +54,7 @@ impl TableLike for crate::models::Table {
     where
         Self: 'db,
     {
-        database.table_metadata(self).foreign_keys().iter()
+        database.table_metadata(self).foreign_keys()
     }
 
     fn check_constraints<'db>(
@@ -60,7 +64,7 @@ impl TableLike for crate::models::Table {
     where
         Self: 'db,
     {
-        database.table_metadata(self).check_constraints().iter()
+        database.table_metadata(self).check_constraints()
     }
 
     fn unique_indices<'db>(
@@ -70,6 +74,6 @@ impl TableLike for crate::models::Table {
     where
         Self: 'db,
     {
-        database.table_metadata(self).unique_indices().iter()
+        database.table_metadata(self).unique_indices()
     }
 }

@@ -1,30 +1,32 @@
 //! Implement the [`UniqueConstraint`] trait for the `sqlparser` crate's
 
-use sqlparser::{
-    ast::{ColumnDef, CreateTable, Expr, UniqueConstraint},
-    parser::Parser,
+use sqlparser::ast::{ColumnDef, CreateTable, Expr, UniqueConstraint};
+
+use crate::{
+    structs::{TableAttribute, generic_db::ParserDB, metadata::UniqueIndexMetadata},
+    traits::{Metadata, UniqueIndexLike},
 };
 
-use crate::{impls::SqlParserDatabase, traits::UniqueIndexLike};
+impl Metadata for TableAttribute<CreateTable, UniqueConstraint> {
+    type Meta = UniqueIndexMetadata<Self>;
+}
 
-impl UniqueIndexLike for UniqueConstraint {
+impl UniqueIndexLike for TableAttribute<CreateTable, UniqueConstraint> {
     type Table = CreateTable;
-    type Database = SqlParserDatabase;
-    type Column = ColumnDef;
+    type Database = ParserDB;
+    type Column = TableAttribute<CreateTable, ColumnDef>;
 
-    fn expression(&self, _database: &Self::Database) -> Expr {
-        let expression_string = format!(
-            "({})",
-            self.columns
-                .iter()
-                .map(|ident| ident.column.to_string())
-                .collect::<Vec<_>>()
-                .join(", ")
-        );
-        Parser::new(&sqlparser::dialect::GenericDialect {})
-            .try_with_sql(expression_string.as_str())
-            .expect("Failed to parse unique constraint expression")
-            .parse_expr()
-            .expect("No expression found in parsed unique constraint")
+    fn table<'db>(&'db self, _database: &'db Self::Database) -> &'db Self::Table
+    where
+        Self: 'db,
+    {
+        self.table()
+    }
+
+    fn expression<'db>(&'db self, database: &'db Self::Database) -> &'db Expr
+    where
+        Self: 'db,
+    {
+        database.index_metadata(self).expression()
     }
 }

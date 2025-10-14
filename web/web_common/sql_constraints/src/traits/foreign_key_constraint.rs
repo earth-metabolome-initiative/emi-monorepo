@@ -20,7 +20,6 @@ pub trait ForeignKeyConstraint {
     fn validate_foreign_key(
         &self,
         database: &Self::Database,
-        host_table: &Self::Table,
         foreign_key: &Self::ForeignKey,
     ) -> Result<(), Error>;
 }

@@ -22,19 +22,19 @@ use crate::{
 /// ```rust
 /// use sql_constraints::prelude::*;
 ///
-/// let constrainer: GenericConstrainer<SqlParserDatabase> = UniqueForeignKey::default().into();
+/// let constrainer: GenericConstrainer<ParserDB> = UniqueForeignKey::default().into();
 ///
 /// let invalid_schema =
-///     SqlParserDatabase::from_sql("CREATE TABLE MyTable (id INT PRIMARY KEY REFERENCES MyTable (id), FOREIGN KEY (id) REFERENCES MyTable (id));")
+///     ParserDB::from_sql("CREATE TABLE MyTable (id INT PRIMARY KEY REFERENCES MyTable (id), FOREIGN KEY (id) REFERENCES MyTable (id));")
 ///         .unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err(), "1) Foreign keys must be unique per table");
 ///
 /// let invalid_schema2 =
-///     SqlParserDatabase::from_sql("CREATE TABLE MyTable (id INT PRIMARY KEY, FOREIGN KEY (id) REFERENCES MyTable (id), FOREIGN KEY (id) REFERENCES MyTable (id));").unwrap();
+///     ParserDB::from_sql("CREATE TABLE MyTable (id INT PRIMARY KEY, FOREIGN KEY (id) REFERENCES MyTable (id), FOREIGN KEY (id) REFERENCES MyTable (id));").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema2).is_err(), "2) Foreign keys must be unique per table");
 ///
 /// let valid_schema =
-///     SqlParserDatabase::from_sql("CREATE TABLE mytable (id INT PRIMARY KEY, FOREIGN KEY (id) REFERENCES mytable (id));").unwrap();
+///     ParserDB::from_sql("CREATE TABLE mytable (id INT PRIMARY KEY, FOREIGN KEY (id) REFERENCES mytable (id));").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 /// ```
 pub struct UniqueForeignKey<DB>(std::marker::PhantomData<DB>);
@@ -84,7 +84,7 @@ impl<DB: DatabaseLike> TableConstraint for UniqueForeignKey<DB> {
             .iter()
             .map(|c| {
                 let mut hasher = DefaultHasher::new();
-                for host_col in c.host_columns(database, table) {
+                for host_col in c.host_columns(database) {
                     host_col.hash(&mut hasher);
                 }
                 let referenced_table = c.referenced_table(database);

@@ -2,10 +2,10 @@
 
 use std::hash::Hash;
 
-use crate::traits::{DatabaseLike, ForeignKeyLike, TableLike};
+use crate::traits::{DatabaseLike, ForeignKeyLike, Metadata, TableLike};
 
 /// A trait for types that can be treated as SQL columns.
-pub trait ColumnLike: Hash + Eq + Ord {
+pub trait ColumnLike: Hash + Eq + Ord + Metadata {
     /// The type of the foreign keys associated with this column.
     type ForeignKey: ForeignKeyLike<Column = Self, Database = Self::Database, Table = Self::Table>;
     /// The type of the table that this column belongs to.
@@ -21,7 +21,7 @@ pub trait ColumnLike: Hash + Eq + Ord {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql("CREATE TABLE my_table (id INT, name TEXT);")?;
+    /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT);")?;
     /// let table = db.table(None, "my_table");
     /// let columns: Vec<&str> = table.columns(&db).map(|col| col.column_name()).collect();
     /// assert_eq!(columns, vec!["id", "name"]);
@@ -38,9 +38,7 @@ pub trait ColumnLike: Hash + Eq + Ord {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
-    ///     "CREATE TABLE my_table (id INT, name TEXT, score DECIMAL(10,2));",
-    /// )?;
+    /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT, score DECIMAL(10,2));")?;
     /// let table = db.table(None, "my_table");
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
@@ -62,7 +60,7 @@ pub trait ColumnLike: Hash + Eq + Ord {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     "CREATE TABLE my_table (id SERIAL, name TEXT, age INT, bigg_id BIGSERIAL);",
     /// )?;
     /// let table = db.table(None, "my_table");
@@ -87,7 +85,7 @@ pub trait ColumnLike: Hash + Eq + Ord {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     "CREATE TABLE my_table (id INT, serial_id SERIAL, bigg_id BIGSERIAL, small_id SMALLSERIAL, name TEXT);",
     /// )?;
     /// let table = db.table(None, "my_table");
@@ -114,7 +112,7 @@ pub trait ColumnLike: Hash + Eq + Ord {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     "CREATE TABLE my_table (id INT NOT NULL, name TEXT, optional_field INT);",
     /// )?;
     /// let table = db.table(None, "my_table");
@@ -130,24 +128,31 @@ pub trait ColumnLike: Hash + Eq + Ord {
     /// ```
     fn is_nullable(&self) -> bool;
 
+    /// Returns the table that this column belongs to.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query the table
+    ///   from.
+    fn table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
+    where
+        Self: 'db;
+
     /// Returns the foreign keys associated with this column.
     ///
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to query foreign
     ///   keys from.
-    /// * `table` - A reference to the table instance that this column belongs
-    ///   to.
     fn foreign_keys<'db>(
-        &self,
+        &'db self,
         database: &'db Self::Database,
-        table: &'db Self::Table,
     ) -> impl Iterator<Item = &'db Self::ForeignKey>
     where
         Self: 'db,
     {
-        table
+        ColumnLike::table(self, database)
             .foreign_keys(database)
-            .filter(move |fk| fk.host_columns(database, table).any(|col| col == self))
+            .filter(move |fk| fk.host_columns(database).any(|col| col == self))
     }
 }

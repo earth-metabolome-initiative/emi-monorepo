@@ -1,8 +1,9 @@
 use std::fmt::Display;
 
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
+use sql_traits::structs::TableMetadata;
 
-use crate::models::{CheckConstraint, Column, PgIndex, PgTrigger};
+use crate::models::{CheckConstraint, Column, PgIndex, PgTrigger, column};
 
 mod cached_queries;
 pub(crate) use cached_queries::*;
@@ -48,6 +49,47 @@ impl Display for Table {
 }
 
 impl Table {
+    /// Initializes and returns the metadata for the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - The database connection.
+    ///
+    /// # Errors
+    ///
+    /// * If the metadata cannot be loaded from the database.
+    pub fn metadata(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<TableMetadata<Self>, diesel::result::Error> {
+        let mut metadata = TableMetadata::default();
+        for column in cached_queries::columns(self, conn)? {
+            let column = column::Column::from(column);
+            metadata.add_column(std::rc::Rc::new(column));
+        }
+        for check_constraint in cached_queries::check_constraints(self, conn)? {
+            metadata.add_check_constraint(std::rc::Rc::new(check_constraint));
+        }
+        for foreign_key in cached_queries::foreign_keys(self, conn)? {
+            metadata.add_foreign_key(std::rc::Rc::new(foreign_key));
+        }
+        for index in cached_queries::unique_indices(self, conn)? {
+            metadata.add_unique_index(std::rc::Rc::new(index));
+        }
+        let mut primary_key_columns = Vec::new();
+        for pk_column in cached_queries::primary_key_columns(self, conn)? {
+            primary_key_columns.extend(
+                metadata
+                    .column_rcs()
+                    .filter(|col: &&std::rc::Rc<Column>| col.as_ref() == &pk_column)
+                    .cloned(),
+            );
+        }
+        metadata.set_primary_key(primary_key_columns);
+
+        Ok(metadata)
+    }
+
     #[must_use]
     /// Returns whether the provided column is from the current table.
     ///
@@ -157,23 +199,6 @@ impl Table {
         load_table(conn, table_name, table_schema, table_catalog)
     }
 
-    /// Returns the columns of the table.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A vector of columns.
-    ///
-    /// # Errors
-    ///
-    /// * If the columns cannot be loaded from the database.
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
-        columns(self, conn)
-    }
-
     /// Returns the column by name.
     ///
     /// # Arguments
@@ -194,102 +219,6 @@ impl Table {
         conn: &mut PgConnection,
     ) -> Result<Column, diesel::result::Error> {
         column_by_name(self, column_name, conn)
-    }
-
-    /// Returns whether the table has primary keys.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A boolean indicating whether the table has primary keys.
-    ///
-    /// # Errors
-    ///
-    /// * If the primary key columns cannot be loaded from the database.
-    pub fn has_primary_keys(&self, conn: &mut PgConnection) -> Result<bool, diesel::result::Error> {
-        self.primary_key_columns(conn).map(|columns| !columns.is_empty())
-    }
-
-    /// Returns whether the table has columns that are NOT primary keys.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Errors
-    ///
-    /// * If the provided database connection is invalid.
-    pub fn has_non_primary_keys(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<bool, diesel::result::Error> {
-        self.non_primary_key_columns(conn).map(|columns| !columns.is_empty())
-    }
-
-    /// Returns the columns NOT composing the primary keys.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A vector of columns.
-    ///
-    /// # Errors
-    ///
-    /// * If the connection to the database fails.
-    pub fn non_primary_key_columns(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<Column>, diesel::result::Error> {
-        let mut columns = self.columns(conn)?;
-        let primary_key_columns = self.primary_key_columns(conn)?;
-        columns.retain(|column| !primary_key_columns.contains(column));
-        Ok(columns)
-    }
-
-    /// Returns the columns composing the primary keys.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A vector of columns.
-    ///
-    /// # Errors
-    ///
-    /// * If the primary key columns cannot be loaded from the database.
-    pub fn primary_key_columns(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<Vec<Column>, diesel::result::Error> {
-        primary_key_columns(self, conn)
-    }
-
-    /// Returns whether the table has a composite primary key.
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - The database connection.
-    ///
-    /// # Returns
-    ///
-    /// A boolean indicating whether the table has a composite primary key.
-    ///
-    /// # Errors
-    ///
-    /// * If the primary key columns cannot be loaded from the database.
-    pub fn has_composite_primary_key(
-        &self,
-        conn: &mut PgConnection,
-    ) -> Result<bool, diesel::result::Error> {
-        Ok(self.primary_key_columns(conn)?.len() > 1)
     }
 
     /// Returns the check constraints for the table.

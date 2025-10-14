@@ -20,15 +20,15 @@ use crate::{
 /// ```rust
 /// use sql_constraints::prelude::*;
 ///
-/// let constrainer: GenericConstrainer<SqlParserDatabase> = UniqueUniqueIndex::default().into();
+/// let constrainer: GenericConstrainer<ParserDB> = UniqueUniqueIndex::default().into();
 ///
 /// let invalid_schema =
-///     SqlParserDatabase::from_sql("CREATE TABLE MyTable (id INT, UNIQUE (id), UNIQUE (id));")
+///     ParserDB::from_sql("CREATE TABLE MyTable (id INT, UNIQUE (id), UNIQUE (id));")
 ///         .unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
 /// let valid_schema =
-///     SqlParserDatabase::from_sql("CREATE TABLE mytable (id INT, UNIQUE (id));").unwrap();
+///     ParserDB::from_sql("CREATE TABLE mytable (id INT, UNIQUE (id));").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 /// ```
 pub struct UniqueUniqueIndex<DB>(std::marker::PhantomData<DB>);

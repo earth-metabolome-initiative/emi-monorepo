@@ -19,12 +19,12 @@ use crate::{
 /// ```rust
 /// use sql_constraints::prelude::*;
 ///
-/// let constrainer: GenericConstrainer<SqlParserDatabase> = LowercaseTableName::default().into();
+/// let constrainer: GenericConstrainer<ParserDB> = LowercaseTableName::default().into();
 ///
-/// let invalid_schema = SqlParserDatabase::from_sql("CREATE TABLE MyTable (id INT);").unwrap();
+/// let invalid_schema = ParserDB::from_sql("CREATE TABLE MyTable (id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
-/// let valid_schema = SqlParserDatabase::from_sql("CREATE TABLE mytable (id INT);").unwrap();
+/// let valid_schema = ParserDB::from_sql("CREATE TABLE mytable (id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 /// ```
 pub struct LowercaseTableName<DB>(std::marker::PhantomData<DB>);

@@ -23,9 +23,9 @@ use crate::{
 /// ```rust
 /// use sql_constraints::prelude::*;
 ///
-/// let constrainer: GenericConstrainer<SqlParserDatabase> = CompatibleForeignKey::default().into();
+/// let constrainer: GenericConstrainer<ParserDB> = CompatibleForeignKey::default().into();
 ///
-/// let invalid_data_type = SqlParserDatabase::from_sql(
+/// let invalid_data_type = ParserDB::from_sql(
 ///     r#"
 /// CREATE TABLE mytable (id INT PRIMARY KEY);
 /// CREATE TABLE othertable (id SMALLINT, CONSTRAINT fk FOREIGN KEY (id) REFERENCES mytable (id));
@@ -34,7 +34,7 @@ use crate::{
 /// .unwrap();
 /// assert!(constrainer.validate_schema(&invalid_data_type).is_err());
 ///
-/// let invalid_extension_dag = SqlParserDatabase::from_sql(
+/// let invalid_extension_dag = ParserDB::from_sql(
 ///     r#"
 /// CREATE TABLE left_root (id INT PRIMARY KEY);
 /// CREATE TABLE right_root (id INT PRIMARY KEY);
@@ -51,7 +51,7 @@ use crate::{
 /// .unwrap();
 /// assert!(constrainer.validate_schema(&invalid_extension_dag).is_ok());
 ///
-/// let valid_schema2 = SqlParserDatabase::from_sql(r#"
+/// let valid_schema2 = ParserDB::from_sql(r#"
 /// CREATE TABLE root (id INT PRIMARY KEY);
 /// CREATE TABLE child1 (id INT PRIMARY KEY REFERENCES root (id));
 /// CREATE TABLE mytable (id INT PRIMARY KEY, other_id INT, CONSTRAINT fk FOREIGN KEY (other_id) REFERENCES child1 (id));
@@ -82,12 +82,12 @@ impl<DB: DatabaseLike> ForeignKeyConstraint for CompatibleForeignKey<DB> {
     fn validate_foreign_key(
         &self,
         database: &Self::Database,
-        host_table: &Self::Table,
         foreign_key: &Self::ForeignKey,
     ) -> Result<(), crate::prelude::Error> {
+        let host_table = foreign_key.host_table(database);
         let referenced_table = foreign_key.referenced_table(database);
         for (host_column, referenced_column) in foreign_key
-            .host_columns(database, host_table)
+            .host_columns(database)
             .zip(foreign_key.referenced_columns(database))
         {
             if !host_table.is_compatible_with(

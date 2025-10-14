@@ -19,7 +19,7 @@ pub trait DatabaseLike {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE table1 (id INT);
     /// CREATE TABLE table2 (name TEXT);
@@ -50,7 +50,7 @@ pub trait DatabaseLike {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE my_schema.my_table_with_schema (id INT);
     /// CREATE TABLE my_table (id INT);
@@ -66,5 +66,5 @@ pub trait DatabaseLike {
     /// # Ok(())
     /// # }
     /// ```
-    fn table(&self, schema: Option<&str>, table_name: &str) -> &Self::Table;
+    fn table(&self, database: Option<&str>, table_name: &str) -> &Self::Table;
 }

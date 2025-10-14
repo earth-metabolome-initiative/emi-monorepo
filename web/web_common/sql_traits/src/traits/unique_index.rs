@@ -3,12 +3,12 @@
 
 use sqlparser::ast::{Expr, Ident};
 
-use crate::traits::{ColumnLike, DatabaseLike, TableLike};
+use crate::traits::{ColumnLike, DatabaseLike, Metadata, TableLike};
 
-pub(crate) fn collect_column_idents(expr: Expr) -> Vec<Ident> {
+pub(crate) fn collect_column_idents(expr: &Expr) -> Vec<&Ident> {
     match expr {
         Expr::Identifier(ident) => vec![ident],
-        Expr::CompoundIdentifier(idents) => idents,
+        Expr::CompoundIdentifier(idents) => idents.iter().collect(),
         Expr::Tuple(exprs) => {
             let mut idents = Vec::new();
             for expr in exprs {
@@ -17,12 +17,12 @@ pub(crate) fn collect_column_idents(expr: Expr) -> Vec<Ident> {
             idents
         }
         Expr::BinaryOp { left, right, .. } => {
-            let mut cols = collect_column_idents(*left);
-            cols.extend(collect_column_idents(*right));
+            let mut cols = collect_column_idents(left);
+            cols.extend(collect_column_idents(right));
             cols
         }
-        Expr::UnaryOp { expr, .. } => collect_column_idents(*expr),
-        Expr::Nested(inner) => collect_column_idents(*inner),
+        Expr::UnaryOp { expr, .. } => collect_column_idents(expr),
+        Expr::Nested(inner) => collect_column_idents(inner),
         _ => unimplemented!("Unhandled expression type in unique index: {:?}", expr),
     }
 }
@@ -30,7 +30,7 @@ pub(crate) fn collect_column_idents(expr: Expr) -> Vec<Ident> {
 /// A unique index is a rule that specifies that the values in a column
 /// (or a group of columns) must be unique across all rows in a table.
 /// This trait represents such a unique index in a database-agnostic way.
-pub trait UniqueIndexLike {
+pub trait UniqueIndexLike: Metadata + Ord + Eq {
     /// The table type the unique index belongs to.
     type Table: TableLike<Database = Self::Database, UniqueIndex = Self, Column = Self::Column>;
     /// The column type the unique index belongs to.
@@ -46,9 +46,8 @@ pub trait UniqueIndexLike {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
-    ///     r#"CREATE TABLE my_table (id INT UNIQUE, name TEXT, UNIQUE (name));"#,
-    /// )?;
+    /// let db =
+    ///     ParserDB::try_from(r#"CREATE TABLE my_table (id INT UNIQUE, name TEXT, UNIQUE (name));"#)?;
     /// let table = db.table(None, "my_table");
     /// let unique_indices: Vec<_> = table.unique_indices(&db).collect();
     /// let expressions: Vec<String> =
@@ -57,7 +56,14 @@ pub trait UniqueIndexLike {
     /// # Ok(())
     /// # }
     /// ```
-    fn expression(&self, database: &Self::Database) -> Expr;
+    fn expression<'db>(&'db self, database: &'db Self::Database) -> &'db Expr
+    where
+        Self: 'db;
+
+    /// Returns a reference to the table this unique index belongs to.
+    fn table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
+    where
+        Self: 'db;
 
     /// Returns whether the unique index is defined using simply columns
     /// and no other expressions.
@@ -68,9 +74,8 @@ pub trait UniqueIndexLike {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
-    ///     r#"CREATE TABLE my_table (id INT UNIQUE, name TEXT, UNIQUE (name));"#,
-    /// )?;
+    /// let db =
+    ///     ParserDB::try_from(r#"CREATE TABLE my_table (id INT UNIQUE, name TEXT, UNIQUE (name));"#)?;
     /// let table = db.table(None, "my_table");
     /// let unique_indices: Vec<_> = table.unique_indices(&db).collect();
     /// let simple_flags: Vec<bool> = unique_indices.iter().map(|ui| ui.is_simple(&db)).collect();
@@ -84,7 +89,7 @@ pub trait UniqueIndexLike {
     fn is_simple(&self, database: &Self::Database) -> bool {
         let expr = self.expression(database);
         let inner_expr = match expr {
-            Expr::Nested(inner) => *inner,
+            Expr::Nested(inner) => inner,
             _ => expr,
         };
         matches!(inner_expr, Expr::Identifier(_) | Expr::CompoundIdentifier(_) | Expr::Tuple(_))
@@ -98,7 +103,7 @@ pub trait UniqueIndexLike {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"CREATE TABLE my_table (id INT, name TEXT, UNIQUE (id), UNIQUE (name, id));"#,
     /// )?;
     /// let table = db.table(None, "my_table");
@@ -106,9 +111,9 @@ pub trait UniqueIndexLike {
     /// let single_column_ui = &unique_indices[0];
     /// let multi_column_ui = &unique_indices[1];
     /// let single_columns: Vec<&str> =
-    ///     single_column_ui.columns(&db, &table).map(|col| col.column_name()).collect();
+    ///     single_column_ui.columns(&db).map(|col| col.column_name()).collect();
     /// let multi_columns: Vec<&str> =
-    ///     multi_column_ui.columns(&db, &table).map(|col| col.column_name()).collect();
+    ///     multi_column_ui.columns(&db).map(|col| col.column_name()).collect();
     /// assert_eq!(single_columns, vec!["id"]);
     /// assert_eq!(multi_columns, vec!["name", "id"]);
     /// # Ok(())
@@ -117,14 +122,14 @@ pub trait UniqueIndexLike {
     fn columns<'db>(
         &'db self,
         database: &'db Self::Database,
-        table: &'db Self::Table,
     ) -> impl Iterator<Item = &'db Self::Column>
     where
         Self: 'db,
     {
+        let table = <Self as UniqueIndexLike>::table(self, database);
         let expr = self.expression(database);
         let column_idents = match expr {
-            Expr::Nested(inner) => collect_column_idents(*inner),
+            Expr::Nested(inner) => collect_column_idents(inner),
             _ => collect_column_idents(expr),
         };
         column_idents.into_iter().filter_map(|ident| table.column(&ident.value, database))

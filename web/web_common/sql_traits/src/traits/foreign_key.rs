@@ -2,12 +2,12 @@
 
 use sqlparser::ast::MatchKind;
 
-use crate::traits::{ColumnLike, DatabaseLike, TableLike, UniqueIndexLike};
+use crate::traits::{ColumnLike, DatabaseLike, Metadata, TableLike, UniqueIndexLike};
 
 /// A foreign key constraint is a rule that specifies a relationship between
 /// two tables. This trait represents such a foreign key constraint in a
 /// database-agnostic way.
-pub trait ForeignKeyLike: Eq {
+pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// The column type associated with the foreign key.
     type Column: ColumnLike;
     /// The table type associated with the foreign key.
@@ -30,7 +30,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
     /// CREATE TABLE host_table (
@@ -59,7 +59,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
     /// CREATE TABLE host_table (
@@ -80,6 +80,16 @@ pub trait ForeignKeyLike: Eq {
     /// ```
     fn on_delete_cascade(&self, database: &Self::Database) -> bool;
 
+    /// Returns the host table that contains the foreign key.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the foreign
+    ///   key belongs.
+    fn host_table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
+    where
+        Self: 'db;
+
     /// Returns the referenced table that the foreign key points to.
     ///
     /// # Arguments
@@ -93,7 +103,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE host_table (
@@ -118,8 +128,6 @@ pub trait ForeignKeyLike: Eq {
     ///
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
-    /// * `host_table` - A reference to the host table that contains the foreign
-    ///   key.
     ///
     /// # Example
     ///
@@ -127,7 +135,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id1 INT, id2 INT, PRIMARY KEY (id1, id2));
     /// CREATE TABLE host_table (
@@ -140,7 +148,7 @@ pub trait ForeignKeyLike: Eq {
     /// let host_table = db.table(None, "host_table");
     /// let foreign_key = host_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// let host_column_names: Vec<&str> =
-    ///     foreign_key.host_columns(&db, &host_table).map(|col| col.column_name()).collect();
+    ///     foreign_key.host_columns(&db).map(|col| col.column_name()).collect();
     /// assert_eq!(host_column_names, vec!["ref_id1", "ref_id2"]);
     /// # Ok(())
     /// # }
@@ -148,7 +156,6 @@ pub trait ForeignKeyLike: Eq {
     fn host_columns<'db>(
         &'db self,
         database: &'db Self::Database,
-        host_table: &'db Self::Table,
     ) -> impl Iterator<Item = &'db Self::Column>
     where
         Self: 'db;
@@ -160,8 +167,6 @@ pub trait ForeignKeyLike: Eq {
     ///
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
-    /// * `host_table` - A reference to the host table that contains the foreign
-    ///   key.
     ///
     /// # Example
     ///
@@ -169,7 +174,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id1 INT, id2 INT, name TEXT, PRIMARY KEY (id1, id2));
     /// CREATE TABLE single_fk_table (
@@ -188,13 +193,13 @@ pub trait ForeignKeyLike: Eq {
     /// let single_fk = single_fk_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// let composite_fk =
     ///     composite_fk_table.foreign_keys(&db).next().expect("Should have a foreign key");
-    /// assert!(!single_fk.is_composite(&db, &single_fk_table));
-    /// assert!(composite_fk.is_composite(&db, &composite_fk_table));
+    /// assert!(!single_fk.is_composite(&db));
+    /// assert!(composite_fk.is_composite(&db));
     /// # Ok(())
     /// # }
     /// ```
-    fn is_composite(&self, database: &Self::Database, host_table: &Self::Table) -> bool {
-        self.host_columns(database, host_table).nth(1).is_some()
+    fn is_composite(&self, database: &Self::Database) -> bool {
+        self.host_columns(database).nth(1).is_some()
     }
 
     /// Returns the match kind of the foreign key.
@@ -206,7 +211,7 @@ pub trait ForeignKeyLike: Eq {
     /// use sql_traits::prelude::*;
     /// use sqlparser::ast::MatchKind;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
     /// CREATE TABLE host_table (
@@ -231,7 +236,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
     /// CREATE TABLE full_match_table (
@@ -269,8 +274,6 @@ pub trait ForeignKeyLike: Eq {
     ///
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
-    /// * `host_table` - A reference to the host table that contains the foreign
-    ///   key.
     ///
     /// # Example
     ///
@@ -278,7 +281,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
     /// CREATE TABLE nullable_fk_table (
@@ -304,24 +307,17 @@ pub trait ForeignKeyLike: Eq {
     ///     not_null_fk_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// let nullable_match_full_fk =
     ///     nullable_match_full_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// assert!(nullable_fk.is_nullable(&db), "Nullable FK without MATCH FULL should be nullable");
+    /// assert!(!not_null_fk.is_nullable(&db), "NOT NULL FK should not be nullable");
     /// assert!(
-    ///     nullable_fk.is_nullable(&db, &nullable_fk_table),
-    ///     "Nullable FK without MATCH FULL should be nullable"
-    /// );
-    /// assert!(
-    ///     !not_null_fk.is_nullable(&db, &not_null_fk_table),
-    ///     "NOT NULL FK should not be nullable"
-    /// );
-    /// assert!(
-    ///     !nullable_match_full_fk.is_nullable(&db, &nullable_match_full_table),
+    ///     !nullable_match_full_fk.is_nullable(&db),
     ///     "Nullable FK with MATCH FULL should not be nullable"
     /// );
     /// # Ok(())
     /// # }
     /// ```
-    fn is_nullable(&self, database: &Self::Database, host_table: &Self::Table) -> bool {
-        self.host_columns(database, host_table)
-            .any(|col: &Self::Column| ColumnLike::is_nullable(col))
+    fn is_nullable(&self, database: &Self::Database) -> bool {
+        self.host_columns(database).any(|col: &Self::Column| ColumnLike::is_nullable(col))
             && !self.match_full(database)
     }
 
@@ -339,7 +335,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id1 INT, id2 INT, name TEXT, PRIMARY KEY (id1, id2));
     /// CREATE TABLE host_table (
@@ -371,8 +367,6 @@ pub trait ForeignKeyLike: Eq {
     ///
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
-    /// * `host_table` - A reference to the host table that contains the foreign
-    ///   key.
     ///
     /// # Example
     ///
@@ -380,7 +374,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE self_ref_table (
     ///     id INT PRIMARY KEY,
@@ -400,14 +394,13 @@ pub trait ForeignKeyLike: Eq {
     /// let self_ref_fk = self_ref_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// let normal_ref_fk =
     ///     normal_ref_table.foreign_keys(&db).next().expect("Should have a foreign key");
-    /// assert!(self_ref_fk.is_self_referential(&db, &self_ref_table));
-    /// assert!(!normal_ref_fk.is_self_referential(&db, &normal_ref_table));
+    /// assert!(self_ref_fk.is_self_referential(&db));
+    /// assert!(!normal_ref_fk.is_self_referential(&db));
     /// # Ok(())
     /// # }
     /// ```
-    fn is_self_referential(&self, database: &Self::Database, host_table: &Self::Table) -> bool {
-        let referenced_table = self.referenced_table(database);
-        host_table == referenced_table
+    fn is_self_referential(&self, database: &Self::Database) -> bool {
+        self.host_table(database) == self.referenced_table(database)
     }
 
     /// Returns whether the foreign key references the primary key of the
@@ -424,7 +417,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE pk_ref_table (
@@ -479,7 +472,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE referenced_table_with_unique (id INT PRIMARY KEY, name TEXT, UNIQUE(name), UNIQUE(id, name));
@@ -522,8 +515,7 @@ pub trait ForeignKeyLike: Eq {
         let referenced_table = self.referenced_table(database);
         let referenced_columns: Vec<_> = self.referenced_columns(database).collect();
         referenced_table.unique_indices(database).find(|index: &&Self::UniqueIndex| {
-            let index_columns: Vec<_> =
-                UniqueIndexLike::columns(*index, database, referenced_table).collect();
+            let index_columns: Vec<_> = UniqueIndexLike::columns(*index, database).collect();
             index_columns.len() == referenced_columns.len()
                 && index_columns.iter().all(|col| referenced_columns.contains(col))
         })
@@ -535,11 +527,9 @@ pub trait ForeignKeyLike: Eq {
     /// # Arguments
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
-    /// * `host_table` - A reference to the host table that contains the foreign
-    ///   key.
-    fn is_host_primary_key(&self, database: &Self::Database, host_table: &Self::Table) -> bool {
-        let mut pk_columns = host_table.primary_key_columns(database).peekable();
-        let mut fk_columns = self.host_columns(database, host_table).peekable();
+    fn is_host_primary_key(&self, database: &Self::Database) -> bool {
+        let mut pk_columns = self.host_table(database).primary_key_columns(database).peekable();
+        let mut fk_columns = self.host_columns(database).peekable();
 
         while let (Some(fk_col), Some(pk_col)) = (fk_columns.peek(), pk_columns.peek()) {
             if fk_col != pk_col {
@@ -559,15 +549,9 @@ pub trait ForeignKeyLike: Eq {
     /// # Arguments
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
-    /// * `host_table` - A reference to the host table that contains the foreign
-    ///   key.
-    fn includes_host_primary_key(
-        &self,
-        database: &Self::Database,
-        host_table: &Self::Table,
-    ) -> bool {
-        let pk_columns: Vec<_> = host_table.primary_key_columns(database).collect();
-        let fk_columns: Vec<_> = self.host_columns(database, host_table).collect();
+    fn includes_host_primary_key(&self, database: &Self::Database) -> bool {
+        let pk_columns: Vec<_> = self.host_table(database).primary_key_columns(database).collect();
+        let fk_columns: Vec<_> = self.host_columns(database).collect();
         pk_columns.iter().all(|pk| fk_columns.contains(pk))
     }
 
@@ -592,8 +576,6 @@ pub trait ForeignKeyLike: Eq {
     ///
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
-    /// * `host_table` - A reference to the host table that contains the foreign
-    ///   key.
     ///
     /// # Example
     ///
@@ -601,7 +583,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE parent_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE extension_table (
@@ -626,26 +608,19 @@ pub trait ForeignKeyLike: Eq {
     /// let extension_fk = extension_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// let reference_fk = reference_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// let self_ref_fk = self_ref_table.foreign_keys(&db).next().expect("Should have a foreign key");
-    /// assert!(extension_fk.is_extension_foreign_key(&db, &extension_table), "Should be extension FK");
+    /// assert!(extension_fk.is_extension_foreign_key(&db), "Should be extension FK");
+    /// assert!(!reference_fk.is_extension_foreign_key(&db), "parent_id is not the primary key");
     /// assert!(
-    ///     !reference_fk.is_extension_foreign_key(&db, &reference_table),
-    ///     "parent_id is not the primary key"
-    /// );
-    /// assert!(
-    ///     !self_ref_fk.is_extension_foreign_key(&db, &self_ref_table),
+    ///     !self_ref_fk.is_extension_foreign_key(&db),
     ///     "Self-referential FK should not be extension FK"
     /// );
     /// # Ok(())
     /// # }
     /// ```
-    fn is_extension_foreign_key(
-        &self,
-        database: &Self::Database,
-        host_table: &Self::Table,
-    ) -> bool {
-        self.is_host_primary_key(database, host_table)
+    fn is_extension_foreign_key(&self, database: &Self::Database) -> bool {
+        self.is_host_primary_key(database)
             && self.is_referenced_primary_key(database)
-            && !self.is_self_referential(database, host_table)
+            && !self.is_self_referential(database)
     }
 
     /// Returns whether the key is a singleton foreign key, i.e. it is the only
@@ -656,7 +631,6 @@ pub trait ForeignKeyLike: Eq {
     ///
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
-    /// * `host_table` - A reference to the host table that contains the foreign
     ///
     /// # Example
     ///
@@ -664,7 +638,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
     /// CREATE TABLE host_table (
@@ -685,15 +659,15 @@ pub trait ForeignKeyLike: Eq {
     /// let fk1 = &fks[0];
     /// let fk2 = &fks[1];
     /// let singleton_fk = singleton_table.foreign_keys(&db).next().expect("Should have a foreign key");
-    /// assert!(!fk1.is_singleton(&db, &host_table), "Not a singleton FK");
-    /// assert!(!fk2.is_singleton(&db, &host_table), "Not a singleton FK");
-    /// assert!(singleton_fk.is_singleton(&db, &singleton_table), "Should be a singleton FK");
+    /// assert!(!fk1.is_singleton(&db), "Not a singleton FK");
+    /// assert!(!fk2.is_singleton(&db), "Not a singleton FK");
+    /// assert!(singleton_fk.is_singleton(&db), "Should be a singleton FK");
     /// # Ok(())
     /// # }
     /// ```
-    fn is_singleton(&self, database: &Self::Database, host_table: &Self::Table) -> bool {
+    fn is_singleton(&self, database: &Self::Database) -> bool {
         let foreign_table = self.referenced_table(database);
-        host_table
+        self.host_table(database)
             .foreign_keys(database)
             .all(|fk| fk == self || fk.referenced_table(database) != foreign_table)
     }
@@ -705,8 +679,6 @@ pub trait ForeignKeyLike: Eq {
     ///
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
-    /// * `host_table` - A reference to the host table that contains the foreign
-    ///   key.
     /// * `host_column` - The host column for which to find the corresponding
     ///   referenced column.
     ///
@@ -720,7 +692,7 @@ pub trait ForeignKeyLike: Eq {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
     /// CREATE TABLE host_table (
@@ -734,10 +706,8 @@ pub trait ForeignKeyLike: Eq {
     /// let foreign_key = host_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// let ref_id_col = host_table.column("ref_id", &db).expect("Should have ref_id column");
     /// let ref_name_col = host_table.column("ref_name", &db).expect("Should have ref_name column");
-    /// let referenced_id_col =
-    ///     foreign_key.referenced_column_for_host_column(&db, &host_table, &ref_id_col);
-    /// let referenced_name_col =
-    ///     foreign_key.referenced_column_for_host_column(&db, &host_table, &ref_name_col);
+    /// let referenced_id_col = foreign_key.referenced_column_for_host_column(&db, &ref_id_col);
+    /// let referenced_name_col = foreign_key.referenced_column_for_host_column(&db, &ref_name_col);
     /// assert_eq!(referenced_id_col.column_name(), "id");
     /// assert_eq!(referenced_name_col.column_name(), "name");
     /// # Ok(())
@@ -746,13 +716,12 @@ pub trait ForeignKeyLike: Eq {
     fn referenced_column_for_host_column<'db>(
         &'db self,
         database: &'db Self::Database,
-        host_table: &'db Self::Table,
         host_column: &'db Self::Column,
     ) -> &'db Self::Column
     where
         Self: 'db,
     {
-        self.host_columns(database, host_table)
+        self.host_columns(database)
             .zip(self.referenced_columns(database))
             .find_map(|(hc, rc)| if hc == host_column { Some(rc) } else { None })
             .expect("Host column is not part of the foreign key")

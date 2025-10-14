@@ -1,7 +1,10 @@
+use std::rc::Rc;
+
 use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
 
 mod cached_queries;
 pub(crate) use cached_queries::*;
+use sql_traits::structs::metadata::UniqueIndexMetadata;
 
 use crate::models::{Column, Table};
 
@@ -53,6 +56,25 @@ pub struct PgIndex {
 }
 
 impl PgIndex {
+    /// Returns the metadata for the index.
+    ///
+    /// # Arguments
+    ///
+    /// * `table` - A reference-counted pointer to the `Table` this index
+    ///   belongs to.
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while loading the metadata from the database
+    pub fn metadata(
+        &self,
+        table: Rc<Table>,
+        conn: &mut PgConnection,
+    ) -> Result<UniqueIndexMetadata<Self>, diesel::result::Error> {
+        Ok(UniqueIndexMetadata::new(expression(self, conn)?, table))
+    }
+
     /// Returns the table that this index belongs to.
     ///
     /// # Arguments

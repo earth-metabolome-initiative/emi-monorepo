@@ -33,7 +33,7 @@ pub trait HorizontalSameAsColumnLike:
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_relations::prelude::*;
     ///
-    /// let db = SqlParserDatabase::from_sql(
+    /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE right (id SERIAL PRIMARY KEY, name TEXT, age INT, UNIQUE(id, name), UNIQUE(id, age));
     /// CREATE TABLE left (
@@ -61,7 +61,7 @@ pub trait HorizontalSameAsColumnLike:
     ) -> impl Iterator<Item = &'db Self::HorizontalSameAsForeignKey> {
         use crate::traits::same_as::HorizontalSameAsTableLike;
         HorizontalSameAsTableLike::horizontal_same_as_foreign_keys(host_table, database)
-            .filter(move |fk| fk.host_columns(database, host_table).any(|col| col == self))
+            .filter(move |fk| fk.host_columns(database).any(|col| col == self))
     }
 
     /// Returns the set of columns that are reachable from this column via
@@ -82,7 +82,7 @@ pub trait HorizontalSameAsColumnLike:
             self.horizontal_same_as_foreign_keys(database, host_table)
         {
             let same_as_column = horizontal_same_as_foreign_key
-                .referenced_column_for_host_column(database, host_table, self);
+                .referenced_column_for_host_column(database, self);
             let referenced_table = horizontal_same_as_foreign_key.referenced_table(database);
             reachable_set.extend(
                 same_as_column.horizontal_same_as_reachable_set(database, referenced_table),

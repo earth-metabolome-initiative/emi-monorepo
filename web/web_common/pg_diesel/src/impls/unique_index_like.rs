@@ -2,7 +2,10 @@
 //! [`UniqueIndexLike`](sql_traits::prelude::UniqueIndexLike) trait for the
 //! [`PgIndex`] struct.
 
-use sql_traits::traits::UniqueIndexLike;
+use sql_traits::{
+    structs::metadata::UniqueIndexMetadata,
+    traits::{Metadata, UniqueIndexLike},
+};
 use sqlparser::ast::Expr;
 
 use crate::{
@@ -10,12 +13,26 @@ use crate::{
     models::{Column, PgIndex, Table},
 };
 
+impl Metadata for PgIndex {
+    type Meta = UniqueIndexMetadata<Self>;
+}
+
 impl UniqueIndexLike for PgIndex {
     type Table = Table;
     type Column = Column;
     type Database = PgDatabase;
 
-    fn expression(&self, database: &Self::Database) -> Expr {
-        database.index_metadata(self).expression().clone()
+    fn table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
+    where
+        Self: 'db,
+    {
+        database.index_metadata(self).table()
+    }
+
+    fn expression<'db>(&'db self, database: &'db Self::Database) -> &'db Expr
+    where
+        Self: 'db,
+    {
+        database.index_metadata(self).expression()
     }
 }
