@@ -1,6 +1,7 @@
 //! Submodule defining a schema for the translation between `PostgreSQL` and
 //! `SQLite`.
 
+use sql_traits::traits::DatabaseLike;
 use sqlparser::{
     ast::{
         BeginEndStatements, CreateFunction, CreateFunctionBody, CreateTable, DollarQuotedString,
@@ -11,38 +12,9 @@ use sqlparser::{
     tokenizer::{Token, TokenWithSpan, Word},
 };
 
-use crate::traits::table_like::TableLike;
-
 /// Trait to define a schema for the translation between `PostgreSQL` and
 /// `SQLite`.
-pub trait Schema {
-    /// Returns a reference to a table defined in the schema by its name, if it
-    /// exists.
-    ///
-    /// # Arguments
-    ///
-    /// * `name` - The name of the table to be searched.
-    fn table(&self, name: &str) -> Option<&CreateTable>;
-
-    /// Returns whether the table with the given name has a primary key column
-    /// of type `UUID`, if the table exists.
-    ///
-    /// # Arguments
-    ///
-    /// * `name` - The name of the table to be searched.
-    fn table_has_uuid_pk(&self, name: &str) -> Option<bool> {
-        let table = self.table(name)?;
-        Some(table.has_uuid_pk())
-    }
-
-    /// Returns a reference to a function defined in the schema by its name, if
-    /// it exists.
-    ///
-    /// # Arguments
-    ///
-    /// * `name` - The name of the function to be searched.
-    fn function(&self, name: &str) -> Option<&CreateFunction>;
-
+pub trait Schema: DatabaseLike<Table = CreateTable, Function = CreateFunction> {
     /// Returns a reference to the body of a function defined in the schema by
     /// its name, if it exists.
     ///
@@ -109,17 +81,6 @@ pub trait Schema {
             }
         }
     }
-
-    /// Adds a function to the schema.
-    ///
-    /// # Arguments
-    ///
-    /// * `function` - The function to be added.
-    fn add_function(&mut self, function: &CreateFunction);
-
-    /// Adds a table to the schema.
-    ///
-    /// # Arguments
-    /// * `table` - The table to be added.
-    fn add_table(&mut self, table: &CreateTable);
 }
+
+impl<S> Schema for S where S: DatabaseLike<Table = CreateTable, Function = CreateFunction> {}

@@ -1,6 +1,6 @@
 //! Submodule providing a trait for describing SQL Database-like entities.
 
-use crate::traits::{ColumnLike, ForeignKeyLike, TableLike};
+use crate::traits::{ColumnLike, ForeignKeyLike, FunctionLike, TableLike};
 
 /// A trait for types that can be treated as SQL databases.
 pub trait DatabaseLike {
@@ -10,6 +10,8 @@ pub trait DatabaseLike {
     type Column: ColumnLike;
     /// Type of the foreign keys in the schema.
     type ForeignKey: ForeignKeyLike<Table = Self::Table, Column = Self::Column, Database = Self>;
+    /// Type of the functions in the schema.
+    type Function: FunctionLike;
 
     /// Iterates over the tables defined in the schema.
     ///
@@ -32,6 +34,27 @@ pub trait DatabaseLike {
     /// # }
     /// ```
     fn tables(&self) -> impl Iterator<Item = &Self::Table>;
+
+    /// Iterates over the functions created in the database.
+    /// 
+    /// # Example
+    /// 
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// 
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE FUNCTION add_one(x INT) RETURNS INT AS 'SELECT x + 1;';
+    /// CREATE FUNCTION greet(name TEXT) RETURNS TEXT AS 'SELECT "Hello, " || name;';
+    /// "#,
+    /// )?;
+    /// let function_names: Vec<&str> = db.functions().map(|f| f.name()).collect();
+    /// assert_eq!(function_names, vec!["add_one", "greet"]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn functions(&self) -> impl Iterator<Item = &Self::Function>;
 
     /// Returns the table with the given (optional) schema and name.
     ///
@@ -66,5 +89,13 @@ pub trait DatabaseLike {
     /// # Ok(())
     /// # }
     /// ```
-    fn table(&self, database: Option<&str>, table_name: &str) -> &Self::Table;
+    fn table(&self, schema: Option<&str>, table_name: &str) -> &Self::Table;
+
+    /// Returns the function with the given name.
+    ///
+    /// # Arguments
+    /// 
+    /// * `name` - Name of the function.
+    /// 
+    fn function(&self, name: &str) -> Option<&Self::Function>;
 }

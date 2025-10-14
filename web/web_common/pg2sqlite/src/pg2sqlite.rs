@@ -1,19 +1,15 @@
 //! Submodule defining the main translator struct.
 
+use sql_traits::structs::ParserDB;
 use sqlparser::ast::Statement;
 
-use crate::{
-    options::Pg2SqliteOptions,
-    prelude::{PgSchema, Translator},
-};
+use crate::{options::Pg2SqliteOptions, prelude::Translator};
 
 #[derive(Debug, Clone, Default)]
 /// Struct to translate between a `PostgreSQL` entry and a `SQLite` entry.
 pub struct Pg2Sqlite {
     /// The set of `PostgreSQL` statements to be translated.
-    pub pg_statements: Vec<Statement>,
-    /// Inner schema.
-    inner_schema: PgSchema,
+    pg_statements: Vec<Statement>,
 }
 
 impl Pg2Sqlite {
@@ -128,12 +124,13 @@ impl Pg2Sqlite {
     ///
     /// * If the progress bar could not be created.
     pub fn translate(
-        mut self,
+        self,
         options: &Pg2SqliteOptions,
     ) -> Result<Vec<Statement>, crate::errors::Error> {
+        let schema = ParserDB::from(self.pg_statements.clone());
         self.pg_statements
             .iter()
-            .map(|statement| statement.translate(&mut self.inner_schema, options))
+            .map(|statement| statement.translate(&schema, options))
             .collect::<Result<Vec<Vec<Statement>>, crate::errors::Error>>()
             .map(|statements| statements.into_iter().flatten().collect())
     }

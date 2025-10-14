@@ -1,18 +1,19 @@
 //! Implementation of the [`Translator`] trait for the
 //! [`Statement`](sqlparser::ast::Statement) type.
 
+use sql_traits::structs::ParserDB;
 use sqlparser::ast::Statement;
 
-use crate::prelude::{Pg2SqliteOptions, PgSchema, Schema, Translator};
+use crate::prelude::{Pg2SqliteOptions, Translator};
 
 impl Translator for Statement {
-    type Schema = PgSchema;
+    type Schema = ParserDB;
     type Options = Pg2SqliteOptions;
     type SQLiteEntry = Vec<Statement>;
 
     fn translate(
         &self,
-        schema: &mut Self::Schema,
+        schema: &Self::Schema,
         options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         Ok(match self {
@@ -22,8 +23,7 @@ impl Translator for Statement {
             Self::CreateIndex(create_index) => {
                 create_index.translate(schema, options)?.map(Into::into).into_iter().collect()
             }
-            Self::CreateFunction(create_function) => {
-                schema.add_function(create_function);
+            Self::CreateFunction(_) => {
                 Vec::new()
             }
             Self::CreateTrigger(create_trigger) => {

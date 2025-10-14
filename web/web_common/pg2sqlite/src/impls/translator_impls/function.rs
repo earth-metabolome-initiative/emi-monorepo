@@ -1,9 +1,10 @@
 //! Implementation of the [`Translator`] trait for the
 //! [`Function`](sqlparser::ast::Function) type.
 
+use sql_traits::structs::ParserDB;
 use sqlparser::ast::{Function, Ident, ObjectName};
 
-use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
+use crate::prelude::{Pg2SqliteOptions, Translator};
 
 fn translate_function_name(name: &ObjectName) -> ObjectName {
     let original_name = name.to_string();
@@ -16,13 +17,13 @@ fn translate_function_name(name: &ObjectName) -> ObjectName {
 }
 
 impl Translator for Function {
-    type Schema = PgSchema;
+    type Schema = ParserDB;
     type Options = Pg2SqliteOptions;
     type SQLiteEntry = Self;
 
     fn translate(
         &self,
-        _schema: &mut Self::Schema,
+        _schema: &Self::Schema,
         _options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         Ok(Function {

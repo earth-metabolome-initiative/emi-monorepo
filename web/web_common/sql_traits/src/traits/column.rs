@@ -68,14 +68,14 @@ pub trait ColumnLike: Hash + Eq + Ord + Metadata {
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// let age_column = table.column("age", &db).expect("Column 'age' should exist");
     /// let bigg_id_column = table.column("bigg_id", &db).expect("Column 'bigg_id' should exist");
-    /// assert!(id_column.is_generative(), "id column should be generative");
-    /// assert!(!name_column.is_generative(), "name column should not be generative");
-    /// assert!(!age_column.is_generative(), "age column should not be generative");
-    /// assert!(bigg_id_column.is_generative(), "bigg_id column should be generative");
+    /// assert!(id_column.is_generated(), "id column should be generative");
+    /// assert!(!name_column.is_generated(), "name column should not be generative");
+    /// assert!(!age_column.is_generated(), "age column should not be generative");
+    /// assert!(bigg_id_column.is_generated(), "bigg_id column should be generative");
     /// # Ok(())
     /// # }
     /// ```
-    fn is_generative(&self) -> bool;
+    fn is_generated(&self) -> bool;
 
     /// Returns the normalized data type of the column as a string.
     ///

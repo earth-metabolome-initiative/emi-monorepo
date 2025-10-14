@@ -2,7 +2,7 @@
 
 use std::path::{Path, PathBuf};
 
-use sqlparser::ast::Statement;
+use sqlparser::ast::{ForeignKeyConstraint, Statement};
 
 use crate::{errors::Error, prelude::MigrationKind};
 
@@ -261,8 +261,10 @@ impl Migration {
                     .into_iter()
                     .flat_map(|column| column.options.into_iter())
                     .filter_map(|option| {
-                        if let sqlparser::ast::ColumnOption::ForeignKey { foreign_table, .. } =
-                            option.option
+                        if let sqlparser::ast::ColumnOption::ForeignKey(ForeignKeyConstraint {
+                            foreign_table,
+                            ..
+                        }) = option.option
                         {
                             Some(foreign_table.to_string())
                         } else {
@@ -270,9 +272,10 @@ impl Migration {
                         }
                     })
                     .chain(create_table.constraints.into_iter().filter_map(|constraint| {
-                        if let sqlparser::ast::TableConstraint::ForeignKey {
-                            foreign_table, ..
-                        } = constraint
+                        if let sqlparser::ast::TableConstraint::ForeignKey(ForeignKeyConstraint {
+                            foreign_table,
+                            ..
+                        }) = constraint
                         {
                             Some(foreign_table.to_string())
                         } else {

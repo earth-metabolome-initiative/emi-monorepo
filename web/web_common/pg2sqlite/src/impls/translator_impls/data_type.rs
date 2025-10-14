@@ -1,18 +1,19 @@
 //! Implementation of the [`Translator`] trait for the
 //! [`DataType`](sqlparser::ast::DataType) type.
 
-use sqlparser::ast::DataType;
+use sql_traits::structs::ParserDB;
+use sqlparser::ast::{DataType, ExactNumberInfo};
 
-use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
+use crate::prelude::{Pg2SqliteOptions, Translator};
 
 impl Translator for DataType {
-    type Schema = PgSchema;
+    type Schema = ParserDB;
     type Options = Pg2SqliteOptions;
     type SQLiteEntry = DataType;
 
     fn translate(
         &self,
-        _schema: &mut Self::Schema,
+        _schema: &Self::Schema,
         _options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         match self {
@@ -20,7 +21,7 @@ impl Translator for DataType {
             DataType::SmallInt(None) | DataType::Int(None) | DataType::Boolean | DataType::Bool => {
                 Ok(DataType::Integer(None))
             }
-            DataType::Float(None) => Ok(DataType::Real),
+            DataType::Float(ExactNumberInfo::None) => Ok(DataType::Real),
             DataType::Bytea => Ok(DataType::Blob(None)),
             DataType::Varchar(_) => Ok(DataType::Text),
             DataType::Uuid => {

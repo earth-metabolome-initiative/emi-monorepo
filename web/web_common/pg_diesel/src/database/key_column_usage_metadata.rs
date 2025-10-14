@@ -6,6 +6,7 @@ use diesel::PgConnection;
 
 use crate::models::{Column, KeyColumnUsage, ReferentialConstraint, Table};
 
+#[derive(Debug, Clone)]
 /// Struct collecting metadata about a foreign key represented by a
 /// [`KeyColumnUsage`](crate::models::KeyColumnUsage) entry.
 pub struct KeyColumnUsageMetadata {

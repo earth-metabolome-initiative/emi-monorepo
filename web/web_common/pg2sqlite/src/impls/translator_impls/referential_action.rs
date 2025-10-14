@@ -1,18 +1,19 @@
 //! Implementation of the [`Translator`] trait for the
 //! [`ReferentialAction`](sqlparser::ast::ReferentialAction) type.
 
+use sql_traits::structs::ParserDB;
 use sqlparser::ast::ReferentialAction;
 
-use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
+use crate::prelude::{Pg2SqliteOptions, Translator};
 
 impl Translator for ReferentialAction {
-    type Schema = PgSchema;
+    type Schema = ParserDB;
     type Options = Pg2SqliteOptions;
     type SQLiteEntry = ReferentialAction;
 
     fn translate(
         &self,
-        _schema: &mut Self::Schema,
+        _schema: &Self::Schema,
         _options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         match self {

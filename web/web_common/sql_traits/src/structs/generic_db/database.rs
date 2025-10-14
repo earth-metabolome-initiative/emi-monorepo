@@ -2,16 +2,18 @@
 
 use crate::{
     structs::GenericDB,
-    traits::{DatabaseLike, TableLike},
+    traits::{DatabaseLike, FunctionLike, TableLike},
 };
 
-impl<T> DatabaseLike for GenericDB<T>
+impl<T, F> DatabaseLike for GenericDB<T, F>
 where
     T: TableLike<Database = Self>,
+    F: FunctionLike,
 {
     type Table = T;
     type Column = <T as TableLike>::Column;
     type ForeignKey = <T as TableLike>::ForeignKey;
+    type Function = F;
 
     fn table(&self, schema: Option<&str>, table_name: &str) -> &Self::Table {
         // The tables are sorted by schema and name, so we can use binary search.
@@ -27,5 +29,16 @@ where
 
     fn tables(&self) -> impl Iterator<Item = &Self::Table> {
         self.tables.iter().map(|(table, _)| table.as_ref())
+    }
+
+    fn functions(&self) -> impl Iterator<Item = &Self::Function> {
+        self.functions.iter()
+    }
+
+    fn function(&self, name: &str) -> Option<&Self::Function> {
+        self.functions
+            .binary_search_by(|f| f.name().cmp(name))
+            .ok()
+            .map(|index| &self.functions[index])
     }
 }

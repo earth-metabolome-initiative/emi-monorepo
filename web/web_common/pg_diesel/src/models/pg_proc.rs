@@ -118,4 +118,21 @@ impl PgProc {
     pub fn extension(&self, conn: &mut PgConnection) -> Result<PgExtension, diesel::result::Error> {
         cached_queries::extension(self, conn)
     }
+
+    /// Loads all the functions from the `pg_proc` table, excluding procedures,
+    /// aggregates, non-strict functions, set-returning functions, and functions
+    /// returning "void".
+    ///
+    /// # Arguments
+    ///
+    /// * `conn` - A mutable reference to a `PgConnection`.
+    /// 
+    /// # Errors
+    /// 
+    /// * If the database query fails.
+    pub fn load_all(
+        conn: &mut PgConnection,
+    ) -> Result<Vec<PgProc>, diesel::result::Error> {
+        cached_queries::load_all(conn)
+    }
 }

@@ -25,7 +25,7 @@ pub trait Translator {
     /// * `crate::errors::Error` - If the translation fails.
     fn translate(
         &self,
-        schema: &mut Self::Schema,
+        schema: &Self::Schema,
         options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error>;
 }

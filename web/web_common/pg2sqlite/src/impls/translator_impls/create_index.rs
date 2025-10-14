@@ -1,21 +1,25 @@
 //! Implementation of the [`Translator`] trait for the
 //! [`CreateIndex`](sqlparser::ast::CreateIndex) type.
 
+use sql_traits::{
+    structs::ParserDB,
+    traits::{DatabaseLike, TableLike},
+};
 use sqlparser::ast::{CreateIndex, IndexType};
 
 use crate::{
-    prelude::{Pg2SqliteOptions, PgSchema, Translator},
-    traits::{Schema, translation_options::TranslationOptions},
+    prelude::{Pg2SqliteOptions, Translator},
+    traits::translation_options::TranslationOptions,
 };
 
 impl Translator for CreateIndex {
-    type Schema = PgSchema;
+    type Schema = ParserDB;
     type Options = Pg2SqliteOptions;
     type SQLiteEntry = Option<Self>;
 
     fn translate(
         &self,
-        schema: &mut Self::Schema,
+        schema: &Self::Schema,
         options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         // If the index is a GIN or GiST index, we need to translate it into a table
@@ -29,10 +33,16 @@ impl Translator for CreateIndex {
         // If the option to drop indexes without UUID primary key tables is set,
         // we need to check if the index is on a table with a UUID primary key.
         if options.should_drop_indexes_without_uuid_pk_tables() {
-            let table_name = self.table_name.to_string();
-            if !schema
-                .table_has_uuid_pk(&table_name)
-                .unwrap_or_else(|| panic!("Table `{table_name}` not found in schema"))
+            let table_name = match self.table_name.0.last() {
+                Some(sqlparser::ast::ObjectNamePart::Identifier(ident)) => ident.value.as_str(),
+                _ => {
+                    return Err(crate::errors::Error::UnknownPostgresFeature(
+                        "Unsupported table name format in index".to_string(),
+                    ));
+                }
+            };
+            let table = schema.table(None, table_name);
+            if !table.has_generated_primary_key(schema) && table.primary_key_type(schema).as_slice() == ["uuid"]
             {
                 // Drop the index by returning None.
                 return Ok(None);

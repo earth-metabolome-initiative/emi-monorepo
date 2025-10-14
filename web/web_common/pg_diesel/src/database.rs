@@ -4,7 +4,7 @@
 
 use sql_traits::structs::GenericDB;
 
-use crate::models::Table;
+use crate::models::{PgProc, Table};
 mod key_column_usage_metadata;
 pub use key_column_usage_metadata::KeyColumnUsageMetadata;
 
@@ -13,4 +13,4 @@ pub use builder::PgDatabaseBuilder;
 
 /// Struct representing a PostgreSQL database schema, implementing the
 /// [`DatabaseLike`](sql_traits::prelude::DatabaseLike) trait.
-pub type PgDatabase = GenericDB<Table>;
+pub type PgDatabase = GenericDB<Table, PgProc>;

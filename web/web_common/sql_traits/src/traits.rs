@@ -3,6 +3,8 @@
 pub mod column;
 pub mod database;
 pub mod table;
+use std::fmt::Debug;
+
 pub use column::ColumnLike;
 pub use database::DatabaseLike;
 pub use table::TableLike;
@@ -12,10 +14,12 @@ pub mod unique_index;
 pub use unique_index::UniqueIndexLike;
 pub mod foreign_key;
 pub use foreign_key::ForeignKeyLike;
+pub mod function_like;
+pub use function_like::FunctionLike;
 
 /// Trait for associating a metadata struct to a given type.
 pub trait Metadata {
     /// The associated metadata type.
-    type Meta;
+    type Meta: Clone + Debug;
 }
 

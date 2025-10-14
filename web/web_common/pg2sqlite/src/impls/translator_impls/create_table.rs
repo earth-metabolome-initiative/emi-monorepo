@@ -1,21 +1,19 @@
 //! Implementation of the [`Translator`] trait for the
 //! [`CreateTable`](sqlparser::ast::CreateTable) type.
 
+use sql_traits::structs::ParserDB;
 use sqlparser::ast::{CreateTable, TableConstraint};
 
-use crate::{
-    prelude::{Pg2SqliteOptions, PgSchema, Translator},
-    traits::schema::Schema,
-};
+use crate::prelude::{Pg2SqliteOptions, Translator};
 
 impl Translator for CreateTable {
-    type Schema = PgSchema;
+    type Schema = ParserDB;
     type Options = Pg2SqliteOptions;
     type SQLiteEntry = CreateTable;
 
     fn translate(
         &self,
-        schema: &mut Self::Schema,
+        schema: &Self::Schema,
         options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         let created_table = Self {
@@ -34,8 +32,6 @@ impl Translator for CreateTable {
                 .collect(),
             ..self.clone()
         };
-
-        schema.add_table(&created_table);
 
         Ok(created_table)
     }

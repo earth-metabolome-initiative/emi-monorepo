@@ -1,19 +1,19 @@
+use sql_traits::structs::ParserDB;
 use sqlparser::ast::{ConditionalStatements, CreateTrigger, DropTrigger, TriggerExecBodyType};
 
 use crate::{
     options::Pg2SqliteOptions,
-    prelude::PgSchema,
     traits::{schema::Schema, translator::Translator},
 };
 
 impl Translator for CreateTrigger {
-    type Schema = PgSchema;
+    type Schema = ParserDB;
     type Options = Pg2SqliteOptions;
     type SQLiteEntry = (Option<DropTrigger>, Self);
 
     fn translate(
         &self,
-        schema: &mut Self::Schema,
+        schema: &Self::Schema,
         options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         let CreateTrigger {
@@ -22,14 +22,13 @@ impl Translator for CreateTrigger {
             or_replace,
             is_constraint,
             name,
-            period_specified_before_table,
             period,
             events,
             table_name,
             referenced_table_name,
             referencing,
             trigger_object,
-            include_each,
+            period_before_table,
             condition,
             statements_as,
             exec_body,
@@ -97,14 +96,13 @@ impl Translator for CreateTrigger {
                 or_replace: false,
                 is_constraint,
                 name,
-                period_specified_before_table,
                 period,
                 events,
                 table_name,
                 referenced_table_name,
                 referencing,
                 trigger_object,
-                include_each,
+                period_before_table,
                 statements_as,
                 condition: condition
                     .as_ref()

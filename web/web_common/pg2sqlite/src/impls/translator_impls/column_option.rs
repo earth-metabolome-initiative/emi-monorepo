@@ -1,28 +1,26 @@
 //! Implementation of the [`Translator`] trait for the
 //! [`Column`](sqlparser::ast::Column) type.
 
-use sqlparser::ast::{ColumnOption, ColumnOptionDef, Expr};
+use sql_traits::structs::ParserDB;
+use sqlparser::ast::{ColumnOption, ColumnOptionDef, Expr, ForeignKeyConstraint};
 
-use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
+use crate::prelude::{Pg2SqliteOptions, Translator};
 
 impl Translator for ColumnOptionDef {
-    type Schema = PgSchema;
+    type Schema = ParserDB;
     type Options = Pg2SqliteOptions;
     type SQLiteEntry = Option<ColumnOptionDef>;
 
     fn translate(
         &self,
-        schema: &mut Self::Schema,
+        schema: &Self::Schema,
         options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         match &self.option {
-            ColumnOption::Unique { is_primary, characteristics } => {
+            ColumnOption::Unique(unique_constraint) => {
                 Ok(Some(ColumnOptionDef {
                     name: self.name.clone(),
-                    option: ColumnOption::Unique {
-                        is_primary: *is_primary,
-                        characteristics: *characteristics,
-                    },
+                    option: unique_constraint.clone().into(),
                 }))
             }
             ColumnOption::Default(expr) => {
@@ -61,16 +59,24 @@ impl Translator for ColumnOptionDef {
             }
             ColumnOption::NotNull => Ok(Some(self.clone())),
             ColumnOption::Check(_) => Ok(None),
-            ColumnOption::ForeignKey {
+            ColumnOption::ForeignKey(ForeignKeyConstraint {
+                name,
+                index_name,
+                columns,
+                match_kind,
                 foreign_table,
                 referred_columns,
                 on_delete,
                 on_update,
                 characteristics,
-            } => {
+            }) => {
                 Ok(Some(Self {
                     name: self.name.clone(),
-                    option: ColumnOption::ForeignKey {
+                    option: ForeignKeyConstraint {
+                        name: name.clone(),
+                        index_name: index_name.clone(),
+                        columns: columns.clone(),
+                        match_kind: match_kind.clone(),
                         foreign_table: foreign_table.clone(),
                         referred_columns: referred_columns.clone(),
                         on_delete: on_delete
@@ -82,7 +88,8 @@ impl Translator for ColumnOptionDef {
                         characteristics: characteristics
                             .map(|c| c.translate(schema, options))
                             .transpose()?,
-                    },
+                    }
+                    .into(),
                 }))
             }
             unimplemented => {

@@ -16,3 +16,16 @@ pub(super) fn extension(
         .select(PgExtension::as_select())
         .first::<PgExtension>(conn)?)
 }
+
+pub(super) fn load_all(conn: &mut PgConnection) -> Result<Vec<PgProc>, diesel::result::Error> {
+    use crate::schema::pg_proc;
+    Ok(pg_proc::table
+        .filter(pg_proc::prokind.ne_all(vec!["p", "a"])) // Exclude procedures and aggregates
+        .filter(pg_proc::proisstrict.eq(true)) // Exclude non-strict functions
+        .filter(pg_proc::proretset.eq(false)) // Exclude set-returning functions
+        .filter(pg_proc::prorettype.ne(0)) // Exclude functions returning "void"
+        .order_by(pg_proc::proname.asc())
+        .then_order_by(pg_proc::oid.asc())
+        .select(PgProc::as_select())
+        .load::<PgProc>(conn)?)
+}

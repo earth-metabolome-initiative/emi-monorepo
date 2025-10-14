@@ -1,18 +1,19 @@
 //! Implementation of the [`Translator`] trait for the
 //! [`Expr`](sqlparser::ast::Expr) type.
 
+use sql_traits::structs::ParserDB;
 use sqlparser::ast::Expr;
 
-use crate::prelude::{Pg2SqliteOptions, PgSchema, Translator};
+use crate::prelude::{Pg2SqliteOptions, Translator};
 
 impl Translator for Expr {
-    type Schema = PgSchema;
+    type Schema = ParserDB;
     type Options = Pg2SqliteOptions;
     type SQLiteEntry = Self;
 
     fn translate(
         &self,
-        schema: &mut Self::Schema,
+        schema: &Self::Schema,
         options: &Self::Options,
     ) -> Result<Self::SQLiteEntry, crate::errors::Error> {
         Ok(match self {

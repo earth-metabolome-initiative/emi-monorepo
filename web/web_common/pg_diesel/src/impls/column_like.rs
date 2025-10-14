@@ -30,7 +30,7 @@ impl ColumnLike for crate::models::Column {
         database.column_metadata(self).as_ref()
     }
 
-    fn is_generative(&self) -> bool {
+    fn is_generated(&self) -> bool {
         self.is_generated == "ALWAYS"
             || self.column_default.as_ref().is_some_and(|d| d.starts_with("nextval"))
             || self.is_identity.as_ref().is_some_and(|i| i == "YES")

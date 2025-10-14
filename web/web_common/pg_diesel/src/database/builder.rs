@@ -11,7 +11,11 @@ use common_traits::{
 use diesel::PgConnection;
 use sql_traits::traits::TableLike;
 
-use crate::{PgDatabase, database::KeyColumnUsageMetadata, models::Table};
+use crate::{
+    PgDatabase,
+    database::KeyColumnUsageMetadata,
+    models::{PgProc, Table},
+};
 
 #[derive(Default)]
 /// Builder for constructing a `PgDatabase` instance.
@@ -156,6 +160,8 @@ impl Builder for PgDatabaseBuilder<'_> {
             tables_with_metadata.push((table, table_metadata));
         }
 
-        Ok(PgDatabase::new(tables_with_metadata, columns, unique_indices, foreign_keys))
+        let functions = PgProc::load_all(connection)?;
+
+        Ok(PgDatabase::new(tables_with_metadata, columns, unique_indices, foreign_keys, functions))
     }
 }

@@ -6,6 +6,7 @@ use sqlparser::ast::Expr;
 
 use crate::traits::UniqueIndexLike;
 
+#[derive(Debug, Clone)]
 /// Struct collecting metadata about a unique index.
 pub struct UniqueIndexMetadata<U: UniqueIndexLike> {
     /// The expression defining the index.

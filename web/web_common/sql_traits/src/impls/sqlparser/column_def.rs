@@ -8,7 +8,7 @@ use crate::{
     traits::{ColumnLike, Metadata},
 };
 
-const GENERATIVE_TYPES: &[&str] = &["SERIAL", "BIGSERIAL", "SMALLSERIAL"];
+const GENERATED_TYPES: &[&str] = &["SERIAL", "BIGSERIAL", "SMALLSERIAL"];
 const NORMALIZED_TYPES: &[(&str, &str)] =
     &[("SERIAL", "INT"), ("INTEGER", "INT"), ("BIGSERIAL", "BIGINT"), ("SMALLSERIAL", "SMALLINT")];
 
@@ -29,8 +29,8 @@ impl ColumnLike for TableAttribute<CreateTable, ColumnDef> {
         self.attribute().data_type.to_string()
     }
 
-    fn is_generative(&self) -> bool {
-        GENERATIVE_TYPES.contains(&self.attribute().data_type.to_string().as_str())
+    fn is_generated(&self) -> bool {
+        GENERATED_TYPES.contains(&self.attribute().data_type.to_string().as_str())
     }
 
     fn normalized_data_type(&self) -> String {

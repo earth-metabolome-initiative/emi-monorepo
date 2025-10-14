@@ -196,6 +196,71 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
         pk_column
     }
 
+    /// Returns whether the primary key of the table is generated (i.e., auto-incrementing).
+    /// 
+    /// # Arguments
+    /// 
+    /// * `database` - A reference to the database instance to which the table
+    /// belongs.
+    /// 
+    /// # Example
+    /// 
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///    r#"
+    /// CREATE TABLE my_table (id SERIAL PRIMARY KEY, name TEXT);
+    /// CREATE TABLE my_no_gen_pk_table (id INT PRIMARY KEY, name TEXT);
+    /// "#,
+    /// )?;
+    /// let table = db.table(None, "my_table");
+    /// assert!(table.has_generated_primary_key(&db));
+    /// let no_gen_pk_table = db.table(None, "my_no_gen_pk_table");
+    /// assert!(!no_gen_pk_table.has_generated_primary_key(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_generated_primary_key(&self, database: &Self::Database) -> bool {
+        self.primary_key_columns(database)
+            .all(|col| col.is_generated())
+            && self.has_primary_key(database)
+    }
+
+    /// Returns a vector with the normalized data types of the primary key
+    /// 
+    /// # Arguments
+    /// 
+    /// * `database` - A reference to the database instance to which the table
+    /// belongs.
+    /// 
+    /// # Example
+    /// 
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// 
+    /// let db = ParserDB::try_from(
+    ///   r#"
+    /// CREATE TABLE my_table (id SERIAL PRIMARY KEY, name TEXT);
+    /// CREATE TABLE my_composite_pk_table (id1 INT, id2 BIGSERIAL, name TEXT, PRIMARY KEY (id1, id2));
+    /// "#,
+    /// )?;
+    /// let table = db.table(None, "my_table");
+    /// let pk_types = table.primary_key_type(&db);
+    /// assert_eq!(pk_types, vec!["INT"]);
+    /// let composite_pk_table = db.table(None, "my_composite_pk_table");
+    /// let composite_pk_types = composite_pk_table.primary_key_type(&db);
+    /// assert_eq!(composite_pk_types, vec!["INT", "BIGINT"]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn primary_key_type(&self, database: &Self::Database) -> Vec<String> {
+        self.primary_key_columns(database)
+            .map(|col| col.normalized_data_type())
+            .collect()
+    }
+
     /// Returns whether the provided column is the primary key column of the
     /// table.
     ///
@@ -851,7 +916,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
 
         // If both columns have generative data types, they are not compatible
         // as the two values should never be the same.
-        if host_column.is_generative() && other_column.is_generative() {
+        if host_column.is_generated() && other_column.is_generated() {
             return false;
         }
 
