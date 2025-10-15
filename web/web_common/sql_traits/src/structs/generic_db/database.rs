@@ -32,13 +32,13 @@ where
     }
 
     fn functions(&self) -> impl Iterator<Item = &Self::Function> {
-        self.functions.iter()
+        self.functions.iter().map(|(func, _)| func)
     }
 
     fn function(&self, name: &str) -> Option<&Self::Function> {
         self.functions
-            .binary_search_by(|f| f.name().cmp(name))
+            .binary_search_by(|(f, _)| f.name().cmp(name))
             .ok()
-            .map(|index| &self.functions[index])
+            .map(|index| &self.functions[index].0)
     }
 }

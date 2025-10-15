@@ -90,25 +90,7 @@ impl Table {
         Ok(metadata)
     }
 
-    #[must_use]
-    /// Returns whether the provided column is from the current table.
-    ///
-    /// # Arguments
-    ///
-    /// * `column` - The column to check.
-    pub fn has_column(&self, column: &Column) -> bool {
-        self.table_name == column.table_name
-            && self.table_schema == column.table_schema
-            && self.table_catalog == column.table_catalog
-    }
-
-    #[must_use]
-    /// Returns whether the table is a view.
-    pub fn is_view(&self) -> bool {
-        self.table_type == "VIEW"
-    }
-
-    #[must_use]
+        #[must_use]
     /// Returns whether the table is temporary.
     pub fn is_temporary(&self) -> bool {
         self.table_type == "LOCAL TEMPORARY" || self.table_type == "GLOBAL TEMPORARY"

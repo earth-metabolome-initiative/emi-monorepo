@@ -269,12 +269,6 @@ impl Column {
         self.column_default.as_ref().is_some_and(|d| d == "gen_random_uuid()")
     }
 
-    #[must_use]
-    /// Returns whether the current column has a DEFAULT value
-    pub fn has_default(&self) -> bool {
-        self.column_default.is_some()
-    }
-
     /// Returns the foreign table of the column if it is a foreign key.
     /// If the column is not a foreign key, returns `None`.
     ///

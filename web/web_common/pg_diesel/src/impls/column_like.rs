@@ -47,4 +47,8 @@ impl ColumnLike for crate::models::Column {
     fn is_nullable(&self) -> bool {
         self.__is_nullable == "YES"
     }
+
+    fn has_default(&self) -> bool {
+        self.column_default.is_some()
+    }
 }

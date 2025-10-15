@@ -51,6 +51,13 @@ impl ColumnLike for TableAttribute<CreateTable, ColumnDef> {
             .any(|opt| matches!(opt.option, sqlparser::ast::ColumnOption::NotNull))
     }
 
+    fn has_default(&self) -> bool {
+        self.attribute()
+            .options
+            .iter()
+            .any(|opt| matches!(opt.option, sqlparser::ast::ColumnOption::Default(_)))
+    }
+
     fn table<'a>(&'a self, _database: &'a Self::Database) -> &'a Self::Table
     where
         Self: 'a,

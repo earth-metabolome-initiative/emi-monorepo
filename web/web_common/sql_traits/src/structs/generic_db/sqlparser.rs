@@ -25,7 +25,7 @@ impl From<Vec<Statement>> for ParserDB {
         for statement in statements {
             match statement {
                 Statement::CreateFunction(create_function) => {
-                    functions.push(create_function);
+                    functions.push((create_function, ()));
                 }
                 Statement::CreateTable(create_table) => {
                     let create_table = Rc::new(create_table);

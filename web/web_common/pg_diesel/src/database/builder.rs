@@ -160,8 +160,18 @@ impl Builder for PgDatabaseBuilder<'_> {
             tables_with_metadata.push((table, table_metadata));
         }
 
-        let functions = PgProc::load_all(connection)?;
+        let mut functions_with_metadata = Vec::new();
+        for function in PgProc::load_all(connection)? {
+            let metadata = crate::database::PgProcMetadata::new(&function, connection)?;
+            functions_with_metadata.push((function, metadata));
+        }
 
-        Ok(PgDatabase::new(tables_with_metadata, columns, unique_indices, foreign_keys, functions))
+        Ok(PgDatabase::new(
+            tables_with_metadata,
+            columns,
+            unique_indices,
+            foreign_keys,
+            functions_with_metadata,
+        ))
     }
 }

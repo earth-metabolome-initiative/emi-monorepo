@@ -7,6 +7,8 @@ use sql_traits::structs::GenericDB;
 use crate::models::{PgProc, Table};
 mod key_column_usage_metadata;
 pub use key_column_usage_metadata::KeyColumnUsageMetadata;
+mod pg_proc_metadata;
+pub use pg_proc_metadata::PgProcMetadata;
 
 mod builder;
 pub use builder::PgDatabaseBuilder;

@@ -25,7 +25,7 @@ where
     /// List of foreign keys in the database.
     foreign_keys: Vec<(Rc<T::ForeignKey>, <T::ForeignKey as Metadata>::Meta)>,
     /// List of functions crated in the database.
-    functions: Vec<F>,
+    functions: Vec<(F, <F as Metadata>::Meta)>,
 }
 
 impl<T, F> GenericDB<T, F>
@@ -51,7 +51,7 @@ where
         mut columns: Vec<(Rc<T::Column>, <T::Column as Metadata>::Meta)>,
         mut unique_indices: Vec<(Rc<T::UniqueIndex>, <T::UniqueIndex as Metadata>::Meta)>,
         mut foreign_keys: Vec<(Rc<T::ForeignKey>, <T::ForeignKey as Metadata>::Meta)>,
-        mut functions: Vec<F>,
+        mut functions: Vec<(F, <F as Metadata>::Meta)>,
     ) -> Self {
         tables.sort_unstable_by_key(|(table, _)| {
             (table.table_schema().map(|s| s.to_string()), table.table_name().to_string())
@@ -60,7 +60,7 @@ where
         columns.sort_unstable_by(|(a, _), (b, _)| a.as_ref().cmp(b.as_ref()));
         unique_indices.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
         foreign_keys.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
-        functions.sort_unstable_by(|a, b| a.name().cmp(b.name()));
+        functions.sort_unstable_by(|(a, _), (b, _)| a.name().cmp(b.name()));
 
         Self { tables, columns, unique_indices, foreign_keys, functions }
     }
@@ -107,8 +107,20 @@ where
     /// * `name` - The name of the function to retrieve.
     pub fn function(&self, name: &str) -> Option<&F> {
         self.functions
-            .binary_search_by(|f| f.name().cmp(name))
+            .binary_search_by(|(f, _)| f.name().cmp(name))
             .ok()
-            .map(|index| &self.functions[index])
+            .map(|index| &self.functions[index].0)
+    }
+
+    /// Returns a reference to the metadata of the specified function.
+    ///
+    /// # Arguments
+    ///
+    /// * `function` - The function to retrieve metadata for.
+    pub fn function_metadata(&self, function: &F) -> &<F as Metadata>::Meta {
+        self.functions
+            .binary_search_by(|(f, _)| f.name().cmp(function.name()))
+            .map(|index| &self.functions[index].1)
+            .expect("Function not found in GenericDB")
     }
 }

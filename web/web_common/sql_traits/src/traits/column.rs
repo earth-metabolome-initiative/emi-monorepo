@@ -128,6 +128,29 @@ pub trait ColumnLike: Hash + Eq + Ord + Metadata {
     /// ```
     fn is_nullable(&self) -> bool;
 
+    /// Returns whether the column has a default value.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     "CREATE TABLE my_table (id INT DEFAULT 0, name TEXT, created_at TIMESTAMP DEFAULT NOW());",
+    /// )?;
+    /// let table = db.table(None, "my_table");
+    /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
+    /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
+    /// let created_at_column = table.column("created_at", &db).expect("Column 'created_at' should exist");
+    /// assert!(id_column.has_default(), "id column should have a default value");
+    /// assert!(!name_column.has_default(), "name column should not have a default value");
+    /// assert!(created_at_column.has_default(), "created_at column should have a default value");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_default(&self) -> bool;
+
     /// Returns the table that this column belongs to.
     ///
     /// # Arguments

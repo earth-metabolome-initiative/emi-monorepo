@@ -118,6 +118,41 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
         TableLike::columns(self, database).find(|col| col.column_name() == name)
     }
 
+    /// Returns whether the provided column belongs to this table.
+    ///
+    /// # Arguments
+    ///
+    /// * `column` - The column to check.
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE table1 (id INT, name TEXT);
+    /// CREATE TABLE table2 (id INT, description TEXT);
+    /// "#,
+    /// )?;
+    /// let table1 = db.table(None, "table1");
+    /// let table2 = db.table(None, "table2");
+    /// let table1_id = table1.column("id", &db).expect("Column 'id' should exist in table1");
+    /// let table2_id = table2.column("id", &db).expect("Column 'id' should exist in table2");
+    /// assert!(table1.has_column(table1_id, &db));
+    /// assert!(!table1.has_column(table2_id, &db));
+    /// assert!(table2.has_column(table2_id, &db));
+    /// assert!(!table2.has_column(table1_id, &db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_column(&self, column: &Self::Column, database: &Self::Database) -> bool {
+        TableLike::columns(self, database).any(|col| col == column)
+    }
+
     /// Iterates over the primary key columns of the table using the provided
     /// schema.
     ///
