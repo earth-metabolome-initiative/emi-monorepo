@@ -86,6 +86,29 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     ///
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
+    /// CREATE TABLE host_table (
+    ///     id INT,
+    ///     FOREIGN KEY (id) REFERENCES referenced_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let host_table = db.table(None, "host_table");
+    /// let foreign_key = host_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// let fk_host_table = foreign_key.host_table(&db);
+    /// assert_eq!(fk_host_table, host_table);
+    /// # Ok(())
+    /// # }
+    /// ```
     fn host_table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
     where
         Self: 'db;
@@ -525,8 +548,39 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// host table.
     ///
     /// # Arguments
+    ///
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
+    /// CREATE TABLE pk_host_table (
+    ///     id INT PRIMARY KEY,
+    ///     FOREIGN KEY (id) REFERENCES referenced_table(id)
+    /// );
+    /// CREATE TABLE non_pk_host_table (
+    ///     id INT PRIMARY KEY,
+    ///     ref_id INT,
+    ///     FOREIGN KEY (ref_id) REFERENCES referenced_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let pk_host_table = db.table(None, "pk_host_table");
+    /// let non_pk_host_table = db.table(None, "non_pk_host_table");
+    /// let pk_fk = pk_host_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// let non_pk_fk = non_pk_host_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// assert!(pk_fk.is_host_primary_key(&db));
+    /// assert!(!non_pk_fk.is_host_primary_key(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
     fn is_host_primary_key(&self, database: &Self::Database) -> bool {
         let mut pk_columns = self.host_table(database).primary_key_columns(database).peekable();
         let mut fk_columns = self.host_columns(database).peekable();
@@ -547,8 +601,40 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// match) all the primary key columns of the host table.
     ///
     /// # Arguments
+    ///
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
+    /// CREATE TABLE composite_pk_table (
+    ///     id INT,
+    ///     other_id INT,
+    ///     PRIMARY KEY (id, other_id),
+    ///     FOREIGN KEY (id) REFERENCES referenced_table(id)
+    /// );
+    /// CREATE TABLE single_pk_table (
+    ///     id INT PRIMARY KEY,
+    ///     FOREIGN KEY (id) REFERENCES referenced_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let composite_pk_table = db.table(None, "composite_pk_table");
+    /// let single_pk_table = db.table(None, "single_pk_table");
+    /// let composite_fk = composite_pk_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// let single_fk = single_pk_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// assert!(!composite_fk.includes_host_primary_key(&db), "FK does not include all PK columns");
+    /// assert!(single_fk.includes_host_primary_key(&db), "FK includes all PK columns");
+    /// # Ok(())
+    /// # }
+    /// ```
     fn includes_host_primary_key(&self, database: &Self::Database) -> bool {
         let pk_columns: Vec<_> = self.host_table(database).primary_key_columns(database).collect();
         let fk_columns: Vec<_> = self.host_columns(database).collect();
@@ -559,8 +645,39 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// match) all the primary key columns of the referenced table.
     ///
     /// # Arguments
+    ///
     /// * `database` - A reference to the database instance to which the foreign
     ///   key belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_composite_pk_table (id1 INT, id2 INT, name TEXT, PRIMARY KEY (id1, id2));
+    /// CREATE TABLE full_ref_table (
+    ///     ref_id1 INT,
+    ///     ref_id2 INT,
+    ///     FOREIGN KEY (ref_id1, ref_id2) REFERENCES referenced_composite_pk_table(id1, id2)
+    /// );
+    /// CREATE TABLE partial_ref_table (
+    ///     ref_id1 INT,
+    ///     FOREIGN KEY (ref_id1) REFERENCES referenced_composite_pk_table(id1)
+    /// );
+    /// "#,
+    /// )?;
+    /// let full_ref_table = db.table(None, "full_ref_table");
+    /// let partial_ref_table = db.table(None, "partial_ref_table");
+    /// let full_fk = full_ref_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// let partial_fk = partial_ref_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// assert!(full_fk.includes_referenced_primary_key(&db), "FK includes all referenced PK columns");
+    /// assert!(!partial_fk.includes_referenced_primary_key(&db), "FK does not include all referenced PK columns");
+    /// # Ok(())
+    /// # }
+    /// ```
     fn includes_referenced_primary_key(&self, database: &Self::Database) -> bool {
         let referenced_table = self.referenced_table(database);
         let pk_columns: Vec<_> = referenced_table.primary_key_columns(database).collect();

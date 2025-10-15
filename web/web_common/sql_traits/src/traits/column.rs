@@ -134,6 +134,21 @@ pub trait ColumnLike: Hash + Eq + Ord + Metadata {
     ///
     /// * `database` - A reference to the database instance to query the table
     ///   from.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT);")?;
+    /// let table = db.table(None, "my_table");
+    /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
+    /// let column_table = ColumnLike::table(id_column, &db);
+    /// assert_eq!(column_table.table_name(), "my_table");
+    /// # Ok(())
+    /// # }
+    /// ```
     fn table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
     where
         Self: 'db;
@@ -144,6 +159,33 @@ pub trait ColumnLike: Hash + Eq + Ord + Metadata {
     ///
     /// * `database` - A reference to the database instance to query foreign
     ///   keys from.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
+    /// CREATE TABLE host_table (
+    ///     id INT,
+    ///     name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES referenced_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let host_table = db.table(None, "host_table");
+    /// let id_column = host_table.column("id", &db).expect("Column 'id' should exist");
+    /// let name_column = host_table.column("name", &db).expect("Column 'name' should exist");
+    /// let id_fks = id_column.foreign_keys(&db).collect::<Vec<_>>();
+    /// let name_fks = name_column.foreign_keys(&db).collect::<Vec<_>>();
+    /// assert_eq!(id_fks.len(), 1);
+    /// assert_eq!(name_fks.len(), 0);
+    /// # Ok(())
+    /// # }
+    /// ```
     fn foreign_keys<'db>(
         &'db self,
         database: &'db Self::Database,

@@ -60,7 +60,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn table_schema(&self) -> Option<&str>;
 
-    /// Iterates over the columns of the column using the provided schema.
+    /// Iterates over the columns of the table using the provided schema.
     ///
     /// # Arguments
     ///
@@ -495,7 +495,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
         })
     }
 
-    /// Returns a vector with the (dedupliated) tables which are referenced by
+    /// Returns a vector with the (deduplicated) tables which are referenced by
     /// the current table via foreign keys.
     ///
     /// # Arguments

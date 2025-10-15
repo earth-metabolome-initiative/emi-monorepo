@@ -96,6 +96,24 @@ pub trait DatabaseLike {
     /// # Arguments
     /// 
     /// * `name` - Name of the function.
-    /// 
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE FUNCTION add_one(x INT) RETURNS INT AS 'SELECT x + 1;';
+    /// "#,
+    /// )?;
+    /// let add_one = db.function("add_one").expect("Function 'add_one' should exist");
+    /// assert_eq!(add_one.name(), "add_one");
+    /// let non_existent = db.function("non_existent");
+    /// assert!(non_existent.is_none());
+    /// # Ok(())
+    /// # }
+    /// ```
     fn function(&self, name: &str) -> Option<&Self::Function>;
 }

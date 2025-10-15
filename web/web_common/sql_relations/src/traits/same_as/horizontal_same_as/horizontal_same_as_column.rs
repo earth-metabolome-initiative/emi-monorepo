@@ -1,8 +1,6 @@
 //! Submodule providing the `HorizontalSameAsColumnLike` trait for working
 //! with columns that have horizontal same-as relationships.
 
-use std::collections::HashSet;
-
 use sql_traits::traits::{ColumnLike, ForeignKeyLike};
 
 use crate::traits::HorizontalSameAsForeignKeyLike;
@@ -62,34 +60,6 @@ pub trait HorizontalSameAsColumnLike:
         use crate::traits::same_as::HorizontalSameAsTableLike;
         HorizontalSameAsTableLike::horizontal_same_as_foreign_keys(host_table, database)
             .filter(move |fk| fk.host_columns(database).any(|col| col == self))
-    }
-
-    /// Returns the set of columns that are reachable from this column via
-    /// horizontal same-as foreign keys.
-    ///
-    /// # Arguments
-    ///
-    /// * `database` - The database containing the tables and foreign keys.
-    /// * `host_table` - The table that may contain horizontal same-as foreign
-    ///  keys referencing this column whose reachable set is being computed.
-    fn horizontal_same_as_reachable_set<'db>(
-        &'db self,
-        database: &'db Self::Database,
-        host_table: &'db Self::Table,
-    ) -> HashSet<&'db Self> {
-        let mut reachable_set = HashSet::new();
-        for horizontal_same_as_foreign_key in
-            self.horizontal_same_as_foreign_keys(database, host_table)
-        {
-            let same_as_column = horizontal_same_as_foreign_key
-                .referenced_column_for_host_column(database, self);
-            let referenced_table = horizontal_same_as_foreign_key.referenced_table(database);
-            reachable_set.extend(
-                same_as_column.horizontal_same_as_reachable_set(database, referenced_table),
-            );
-            reachable_set.insert(same_as_column);
-        }
-        reachable_set
     }
 }
 
