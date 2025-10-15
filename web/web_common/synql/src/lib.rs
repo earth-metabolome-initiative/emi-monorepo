@@ -1,6 +1,7 @@
 #![doc = include_str!("../README.md")]
 
 mod impls;
+mod traits;
 
 /// Returns the primary key type for the table.
 ///

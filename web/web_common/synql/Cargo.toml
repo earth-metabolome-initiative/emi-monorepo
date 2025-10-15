@@ -1,10 +1,11 @@
 [package]
-name = "pg_quote"
+name = "synql"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-pg_diesel.workspace = true
+sql_traits.workspace = true
+sql_relations.workspace = true
 syn.workspace = true
 
 [lints]
