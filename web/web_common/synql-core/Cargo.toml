@@ -1,0 +1,18 @@
+[package]
+name = "synql-core"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+sql_traits.workspace = true
+syn.workspace = true
+quote.workspace = true
+proc-macro2.workspace = true
+cached.workspace = true
+inflector.workspace = true
+snake_case_sanitizer.workspace = true
+common_traits.workspace = true
+enumflags2.workspace = true
+
+[lints]
+workspace = true

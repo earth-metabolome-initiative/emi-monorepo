@@ -62,7 +62,7 @@ members = [
   "web/web_common/pg_cached",
   "web/web_common/sql_relations",
   "web/web_common/sql_constraints",
-  "web/web_common/sql_traits",
+  "web/web_common/sql_traits", "web/web_common/synql-schema", "web/web_common/synql-core", "web/web_common/synql-models", "web/web_common/synql-builders",
 ]
 
 [workspace.dependencies]
@@ -83,6 +83,7 @@ url = "2.5.4"
 r2d2 = { version = ">= 0.8.2, < 0.9.0" }
 indicatif = "0.18.0"
 reqwest = { version = "0.12.12", features = ["stream", "json"] }
+scraper = { version = "0.24" }
 tokio = { version = "1.43.0", features = ["full"] }
 flate2 = "1.0.35"
 tar = "0.4.43"
@@ -90,6 +91,10 @@ infer = "0.19"
 csv = "1.3.1"
 bytes = "1.10.0"
 rayon = "1.10.0"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+urlencoding = "2.1"
+schemars = "1.0.4"
 bincode = { version = "2", features = ["serde"] }
 # sqlparser = "0.58.0"
 sqlparser = { git = "https://github.com/LucaCappelletti94/sqlparser-rs", branch = "future-main", features = [
@@ -203,6 +208,9 @@ pg_diesel = { path = "web/web_common/pg_diesel" }
 sql_traits = { path = "web/web_common/sql_traits" }
 sql_relations = { path = "web/web_common/sql_relations" }
 synql = { path = "web/web_common/synql" }
+synql-core = { path = "web/web_common/synql-core" }
+snake_case_sanitizer = { path = "utils/snake_case_sanitizer" }
+rmcp = {version="0.8.1", features = ["server", "transport-io"] }
 
 [workspace.lints.rust]
 missing_docs = "forbid"

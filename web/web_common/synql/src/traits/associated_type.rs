@@ -2,7 +2,7 @@
 //! Diesel/Rust type associated with a database object from the set of required
 //! crates, if any.
 
-use crate::RequiredType;
+use crate::ExternalType;
 
 /// Trait providing the associated Diesel/Rust type for a database object.
 pub trait AssociatedType {
@@ -11,7 +11,7 @@ pub trait AssociatedType {
     ///
     /// # Arguments
     ///
-    /// * `crates` - A slice of `RequiredCrate` instances representing the
+    /// * `crates` - A slice of `ExternalCrate` instances representing the
     ///   crates to check for the associated type.
     /// * `conn` - A mutable reference to a `PgConnection` to use for any
     ///   necessary database queries.
@@ -19,7 +19,7 @@ pub trait AssociatedType {
     /// # Returns
     fn associated_type<'required_crate>(
         &self,
-        crates: &'required_crate [crate::RequiredCrate],
+        crates: &'required_crate [crate::ExternalCrate],
         conn: &mut diesel::PgConnection,
-    ) -> Result<Option<&'required_crate RequiredType>, diesel::result::Error>;
+    ) -> Result<Option<&'required_crate ExternalType>, diesel::result::Error>;
 }

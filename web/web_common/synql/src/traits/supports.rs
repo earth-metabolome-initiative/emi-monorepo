@@ -12,7 +12,7 @@ pub trait Supports {
     fn supports(
         &self,
         supported_trait: Trait,
-        crates: &[crate::RequiredCrate],
+        crates: &[crate::ExternalCrate],
         conn: &mut diesel::PgConnection,
     ) -> Result<bool, diesel::result::Error>;
 }
@@ -24,7 +24,7 @@ where
     fn supports(
         &self,
         supported_trait: Trait,
-        crates: &[crate::RequiredCrate],
+        crates: &[crate::ExternalCrate],
         conn: &mut diesel::PgConnection,
     ) -> Result<bool, diesel::result::Error> {
         Ok(self.associated_type(crates, conn)?.map_or(false, |ty| ty.supports(supported_trait)))

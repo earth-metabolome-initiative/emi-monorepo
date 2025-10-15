@@ -1,16 +1,16 @@
 //! Submodule providing a struct defining the type required by some type found
 //! in the postgres database schema.
 
-use crate::required_type::builder::RequiredTypeBuilder;
-
 mod builder;
 mod traits_mask;
 pub use traits_mask::Trait;
 
+use crate::structs::external_type::builder::ExternalTypeBuilder;
+
 #[derive(Clone)]
 /// Struct defining the type required by some type found in the postgres
 /// database schema.
-pub struct RequiredType {
+pub struct ExternalType {
     /// The diesel type defined within the crate compatible with the given
     /// postgres type.
     diesel_type: syn::Type,
@@ -24,10 +24,10 @@ pub struct RequiredType {
     traits: traits_mask::TraitsMask,
 }
 
-impl RequiredType {
-    /// Inizializes a new `RequiredTypeBuilder`.
-    pub fn new() -> RequiredTypeBuilder {
-        RequiredTypeBuilder::default()
+impl ExternalType {
+    /// Inizializes a new `ExternalTypeBuilder`.
+    pub fn new() -> ExternalTypeBuilder {
+        ExternalTypeBuilder::default()
     }
 
     /// Returns the diesel type defined within the crate compatible with the
@@ -48,7 +48,7 @@ impl RequiredType {
         &self.postgres_types
     }
 
-    /// Returns whether the Rust type associated with the current `RequiredType`
+    /// Returns whether the Rust type associated with the current `ExternalType`
     /// supports the given trait.
     ///
     /// # Arguments
@@ -58,12 +58,14 @@ impl RequiredType {
         self.traits.supports(r#trait)
     }
 
-    /// Returns whether the current `RequiredType` is compatible with the given
+    /// Returns whether the current `ExternalType` is compatible with the given
     /// postgres type.
     ///
     /// # Arguments
     /// * `postgres_type` - The postgres type to check compatibility with.
     pub fn is_compatible_with(&self, postgres_type: &str) -> bool {
-        self.postgres_types.contains(&postgres_type)
+        self.postgres_types.iter().any(|t| {
+            t.eq_ignore_ascii_case(postgres_type)
+        })
     }
 }
