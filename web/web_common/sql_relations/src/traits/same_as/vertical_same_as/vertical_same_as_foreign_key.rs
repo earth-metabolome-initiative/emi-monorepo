@@ -47,10 +47,7 @@ pub trait VerticalSameAsForeignKeyLike:
     /// else {
     ///     panic!("Expected exactly 3 foreign keys in child table");
     /// };
-    /// assert!(
-    ///     extension_primary_key.is_extension_foreign_key(&db),
-    ///     "Expected extension primary key"
-    /// );
+    /// assert!(extension_primary_key.is_extension_foreign_key(&db), "Expected extension primary key");
     /// assert!(
     ///     parent_fk.is_vertical_same_as(&db),
     ///     "Expected parent foreign key to be vertical same-as"

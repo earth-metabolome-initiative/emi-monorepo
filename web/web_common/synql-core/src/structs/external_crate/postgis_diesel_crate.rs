@@ -24,6 +24,7 @@ impl ExternalCrate {
                 ExternalType::geometry(),
             ])
             .unwrap()
+            .version("3.0.1")
             .build()
             .expect("Failed to build ExternalCrate for postgis_diesel")
     }

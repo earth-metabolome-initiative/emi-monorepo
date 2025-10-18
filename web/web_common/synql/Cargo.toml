@@ -4,9 +4,17 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+common_traits.workspace = true
 sql_traits.workspace = true
 sql_relations.workspace = true
 syn.workspace = true
+synql-core.workspace = true
+synql-diesel-schema.workspace = true
+
+[dev-dependencies]
+graph.workspace = true
+tempfile.workspace = true
+insta.workspace = true
 
 [lints]
 workspace = true

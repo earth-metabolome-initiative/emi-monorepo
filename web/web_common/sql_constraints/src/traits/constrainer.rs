@@ -84,9 +84,8 @@ pub trait Constrainer: Default {
         database: &Self::Database,
         foreign_key: &Self::ForeignKey,
     ) -> Result<(), Error> {
-        self.foreign_key_constraints().try_for_each(|constraint| {
-            constraint.validate_foreign_key(database, foreign_key)
-        })
+        self.foreign_key_constraints()
+            .try_for_each(|constraint| constraint.validate_foreign_key(database, foreign_key))
     }
 
     /// Validates the provided schema by applying all registered constraints to

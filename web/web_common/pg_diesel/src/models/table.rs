@@ -1,9 +1,11 @@
 use std::fmt::Display;
 
-use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
-use sql_traits::structs::TableMetadata;
+use diesel::{OptionalExtension, PgConnection, Queryable, QueryableByName, Selectable};
 
-use crate::models::{CheckConstraint, Column, PgIndex, PgTrigger, column};
+use crate::{
+    model_metadata::TableMetadata,
+    models::{CheckConstraint, Column, PgIndex, PgTrigger, column},
+};
 
 mod cached_queries;
 pub(crate) use cached_queries::*;
@@ -61,36 +63,41 @@ impl Table {
     pub fn metadata(
         &self,
         conn: &mut PgConnection,
-    ) -> Result<TableMetadata<Self>, diesel::result::Error> {
-        let mut metadata = TableMetadata::default();
+    ) -> Result<TableMetadata, diesel::result::Error> {
+        let mut sql_metadata = sql_traits::structs::TableMetadata::default();
         for column in cached_queries::columns(self, conn)? {
             let column = column::Column::from(column);
-            metadata.add_column(std::rc::Rc::new(column));
+            sql_metadata.add_column(std::rc::Rc::new(column));
         }
         for check_constraint in cached_queries::check_constraints(self, conn)? {
-            metadata.add_check_constraint(std::rc::Rc::new(check_constraint));
+            sql_metadata.add_check_constraint(std::rc::Rc::new(check_constraint));
         }
         for foreign_key in cached_queries::foreign_keys(self, conn)? {
-            metadata.add_foreign_key(std::rc::Rc::new(foreign_key));
+            sql_metadata.add_foreign_key(std::rc::Rc::new(foreign_key));
         }
         for index in cached_queries::unique_indices(self, conn)? {
-            metadata.add_unique_index(std::rc::Rc::new(index));
+            sql_metadata.add_unique_index(std::rc::Rc::new(index));
         }
         let mut primary_key_columns = Vec::new();
         for pk_column in cached_queries::primary_key_columns(self, conn)? {
             primary_key_columns.extend(
-                metadata
+                sql_metadata
                     .column_rcs()
                     .filter(|col: &&std::rc::Rc<Column>| col.as_ref() == &pk_column)
                     .cloned(),
             );
         }
-        metadata.set_primary_key(primary_key_columns);
+        sql_metadata.set_primary_key(primary_key_columns);
+
+        let metadata = TableMetadata::new(
+            sql_metadata,
+            cached_queries::pg_description(self, conn).optional()?,
+        );
 
         Ok(metadata)
     }
 
-        #[must_use]
+    #[must_use]
     /// Returns whether the table is temporary.
     pub fn is_temporary(&self) -> bool {
         self.table_type == "LOCAL TEMPORARY" || self.table_type == "GLOBAL TEMPORARY"

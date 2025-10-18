@@ -34,13 +34,16 @@ pub enum Trait {
     PartialEq,
 }
 
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// Struct defining which traits are supported by some type found
 /// in the postgres database schema.
 pub(super) struct TraitsMask {
     /// The flags representing the supported traits.
     flags: BitFlags<Trait>,
 }
+
+unsafe impl Send for TraitsMask {}
+unsafe impl Sync for TraitsMask {}
 
 impl TraitsMask {
     /// Returns whether the current type supports the given trait.

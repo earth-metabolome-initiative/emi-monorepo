@@ -40,6 +40,11 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn table_name(&self) -> &str;
 
+    /// Returns the documentation of the table, if any.
+    fn table_doc<'db>(&'db self, database: &'db Self::Database) -> Option<&'db str>
+    where
+        Self: 'db;
+
     /// The schema name of the table, if it has one.
     ///
     /// # Example
@@ -231,20 +236,21 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
         pk_column
     }
 
-    /// Returns whether the primary key of the table is generated (i.e., auto-incrementing).
-    /// 
+    /// Returns whether the primary key of the table is generated (i.e.,
+    /// auto-incrementing).
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `database` - A reference to the database instance to which the table
     /// belongs.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     /// let db = ParserDB::try_from(
-    ///    r#"
+    ///     r#"
     /// CREATE TABLE my_table (id SERIAL PRIMARY KEY, name TEXT);
     /// CREATE TABLE my_no_gen_pk_table (id INT PRIMARY KEY, name TEXT);
     /// "#,
@@ -257,26 +263,25 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # }
     /// ```
     fn has_generated_primary_key(&self, database: &Self::Database) -> bool {
-        self.primary_key_columns(database)
-            .all(|col| col.is_generated())
+        self.primary_key_columns(database).all(|col| col.is_generated())
             && self.has_primary_key(database)
     }
 
     /// Returns a vector with the normalized data types of the primary key
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `database` - A reference to the database instance to which the table
     /// belongs.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// 
+    ///
     /// let db = ParserDB::try_from(
-    ///   r#"
+    ///     r#"
     /// CREATE TABLE my_table (id SERIAL PRIMARY KEY, name TEXT);
     /// CREATE TABLE my_composite_pk_table (id1 INT, id2 BIGSERIAL, name TEXT, PRIMARY KEY (id1, id2));
     /// "#,
@@ -291,9 +296,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # }
     /// ```
     fn primary_key_type(&self, database: &Self::Database) -> Vec<String> {
-        self.primary_key_columns(database)
-            .map(|col| col.normalized_data_type())
-            .collect()
+        self.primary_key_columns(database).map(|col| col.normalized_data_type()).collect()
     }
 
     /// Returns whether the provided column is the primary key column of the
@@ -1046,5 +1049,53 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn has_singleton_foreign_keys(&self, database: &Self::Database) -> bool {
         self.singleton_foreign_keys(database).next().is_some()
+    }
+
+    /// Returns whether the table depends directly or indirectly on another
+    /// table via foreign keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   and the other table belong.
+    /// * `other` - The other table to check against.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE grandparent_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES grandparent_table(id));
+    /// CREATE TABLE child_table (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES parent_table(id));
+    /// "#,
+    /// )?;
+    /// let child_table = db.table(None, "child_table");
+    /// let parent_table = db.table(None, "parent_table");
+    /// let grandparent_table = db.table(None, "grandparent_table");
+    /// assert!(child_table.depends_on(&db, parent_table));
+    /// assert!(child_table.depends_on(&db, grandparent_table));
+    /// assert!(!parent_table.depends_on(&db, child_table));
+    /// assert!(!grandparent_table.depends_on(&db, child_table));
+    /// assert!(parent_table.depends_on(&db, grandparent_table));
+    /// assert!(!grandparent_table.depends_on(&db, parent_table));
+    /// assert!(child_table.depends_on(&db, child_table));
+    /// assert!(parent_table.depends_on(&db, parent_table));
+    /// assert!(grandparent_table.depends_on(&db, grandparent_table));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn depends_on(&self, database: &Self::Database, other: &Self) -> bool {
+        if self == other {
+            return true;
+        }
+        self.foreign_keys(database).any(|fk| {
+            let referenced_table = fk.referenced_table(database);
+            referenced_table == other || referenced_table.depends_on(database, other)
+        })
     }
 }

@@ -50,6 +50,20 @@ table! {
 }
 
 table! {
+    /// `pg_catalog.pg_description` — table containing comments/descriptions for database objects.
+    pg_catalog.pg_description (objoid, classoid, objsubid) {
+        /// OID of the object being described.
+        objoid -> Oid,
+        /// OID of the system catalog the object belongs to.
+        classoid -> Oid,
+        /// Sub-ID of the object (0 if not applicable).
+        objsubid -> Int4,
+        /// Textual description/comment for the object.
+        description -> Nullable<Text>,
+    }
+}
+
+table! {
     /// `information_schema.tables` — view containing one row for each table or view
     /// in the current database that the current user has access to. Includes
     /// metadata such as schema, type, insertability, and user-defined type info.
@@ -1029,6 +1043,7 @@ allow_tables_to_appear_in_same_query!(
 allow_tables_to_appear_in_same_query!(
     columns,
     pg_type,
+    pg_description,
     pg_attribute,
     pg_class,
     pg_namespace,

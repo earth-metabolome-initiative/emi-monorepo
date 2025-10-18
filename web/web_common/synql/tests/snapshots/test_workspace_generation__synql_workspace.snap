@@ -1,0 +1,11 @@
+---
+source: web/web_common/synql/tests/test_workspace_generation.rs
+expression: normalized_output
+---
+[TEMP_DIR]/synql_workspace
+    /Cargo.toml
+    /users_schema
+        /Cargo.toml
+        /src
+            /lib.rs
+            /schema.rs

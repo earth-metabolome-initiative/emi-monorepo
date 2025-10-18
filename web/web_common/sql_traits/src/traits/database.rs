@@ -1,5 +1,12 @@
 //! Submodule providing a trait for describing SQL Database-like entities.
 
+use algebra::{
+    impls::CSR2D,
+    prelude::{Kahn, SquareCSR2D},
+};
+use common_traits::builder::Builder;
+use graph::{prelude::GenericEdgesBuilder, traits::EdgesBuilder};
+
 use crate::traits::{ColumnLike, ForeignKeyLike, FunctionLike, TableLike};
 
 /// A trait for types that can be treated as SQL databases.
@@ -12,6 +19,12 @@ pub trait DatabaseLike {
     type ForeignKey: ForeignKeyLike<Table = Self::Table, Column = Self::Column, Database = Self>;
     /// Type of the functions in the schema.
     type Function: FunctionLike;
+
+    /// Returns the name of the database.
+    fn catalog_name(&self) -> &str;
+
+    /// Returns the number of tables in the database.
+    fn number_of_tables(&self) -> usize;
 
     /// Iterates over the tables defined in the schema.
     ///
@@ -35,14 +48,58 @@ pub trait DatabaseLike {
     /// ```
     fn tables(&self) -> impl Iterator<Item = &Self::Table>;
 
+    /// Returns tables as a Kahn's ordering based on foreign key dependencies,
+    /// ignoring potential self-references which would create cycles.
+    fn table_dag(&self) -> Vec<&Self::Table> {
+        let tables = self.tables().collect::<Vec<&Self::Table>>();
+        let mut edges = tables
+            .iter()
+            .enumerate()
+            .flat_map(|(table_number, table)| {
+                let tables_ref = tables.as_slice();
+                table
+                    .foreign_keys(self)
+                    .filter_map(move |fk| {
+                        let referenced_table = fk.referenced_table(self);
+                        // We ignore self-references to avoid cycles in the DAG.
+                        if referenced_table == *table {
+                            return None;
+                        }
+                        tables_ref.binary_search(&referenced_table).ok()
+                    })
+                    .map(move |referenced_table_number| (table_number, referenced_table_number))
+            })
+            .collect::<Vec<(usize, usize)>>();
+
+        // There is no guarantee that the foreign keys in a table are ordered,
+        // so it is necessary to sort and deduplicate the edges.
+        edges.sort_unstable();
+        // Furthermore, there is no guarantee that there are no foreign keys
+        // referencing the same table, so we deduplicate the edges as well.
+        edges.dedup();
+
+        let dag: SquareCSR2D<CSR2D<usize, usize, usize>> = GenericEdgesBuilder::default()
+            .expected_shape(tables.len())
+            .edges(edges)
+            .build()
+            .expect("Failed to build table dependency DAG");
+        let dag_ordering = dag.kahn().expect("Failed to compute Kahn's ordering");
+
+        let mut ordered_tables = Vec::with_capacity(tables.len());
+        for table_index in dag_ordering {
+            ordered_tables.push(tables[table_index]);
+        }
+        ordered_tables
+    }
+
     /// Iterates over the functions created in the database.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// 
+    ///
     /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE FUNCTION add_one(x INT) RETURNS INT AS 'SELECT x + 1;';
@@ -94,7 +151,7 @@ pub trait DatabaseLike {
     /// Returns the function with the given name.
     ///
     /// # Arguments
-    /// 
+    ///
     /// * `name` - Name of the function.
     ///
     /// # Example

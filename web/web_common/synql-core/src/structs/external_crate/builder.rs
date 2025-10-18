@@ -7,7 +7,7 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 
-use crate::structs::{ExternalCrate, ExternalType};
+use crate::structs::{ExternalCrate, ExternalMacro, ExternalType};
 
 #[derive(Default)]
 /// Builder for the `ExternalCrate` struct.
@@ -16,6 +16,10 @@ pub struct ExternalCrateBuilder {
     name: Option<String>,
     /// The types provided by the crate.
     types: Vec<ExternalType>,
+    /// List of the macros defined within the crate.
+    macros: Vec<ExternalMacro>,
+    /// The version of the crate if it is a dependency.
+    version: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -25,6 +29,8 @@ pub enum ExternalCrateAttribute {
     Name,
     /// The types provided by the crate.
     Types,
+    /// The version of the crate if it is a dependency.
+    Version,
 }
 
 impl Display for ExternalCrateAttribute {
@@ -32,6 +38,7 @@ impl Display for ExternalCrateAttribute {
         match self {
             ExternalCrateAttribute::Name => write!(f, "name"),
             ExternalCrateAttribute::Types => write!(f, "types"),
+            ExternalCrateAttribute::Version => write!(f, "version"),
         }
     }
 }
@@ -47,6 +54,8 @@ pub enum ExternalCrateBuilderError {
     /// A type handling the same postgres type has already been added to the
     /// crate.
     DuplicatedPostgresType,
+    /// A macro with the same name has already been added to the crate.
+    DuplicatedMacro,
 }
 
 impl Display for ExternalCrateBuilderError {
@@ -59,6 +68,9 @@ impl Display for ExternalCrateBuilderError {
                     f,
                     "A type handling the same postgres type has already been added to the crate"
                 )
+            }
+            ExternalCrateBuilderError::DuplicatedMacro => {
+                write!(f, "A macro with the same name has already been added to the crate")
             }
         }
     }
@@ -117,6 +129,49 @@ impl ExternalCrateBuilder {
         }
         Ok(self)
     }
+
+    /// Sets whether the crate is a dependency.
+    pub fn version<S: ToString>(mut self, version: S) -> Self {
+        self.version = Some(version.to_string());
+        self
+    }
+
+    /// Adds a macro defined within the crate.
+    ///
+    /// # Arguments
+    /// * `external_macro` - The macro to add.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if a macro with the same name has already been added.
+    pub fn add_macro(
+        mut self,
+        external_macro: ExternalMacro,
+    ) -> Result<Self, ExternalCrateBuilderError> {
+        if self.macros.iter().any(|m| m.name() == external_macro.name()) {
+            return Err(ExternalCrateBuilderError::DuplicatedMacro);
+        }
+        self.macros.push(external_macro);
+        Ok(self)
+    }
+
+    /// Adds several macros defined within the crate.
+    ///
+    /// # Arguments
+    /// * `external_macros` - The macros to add.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if any macro with the same name has already been added.
+    pub fn add_macros<I>(mut self, external_macros: I) -> Result<Self, ExternalCrateBuilderError>
+    where
+        I: IntoIterator<Item = ExternalMacro>,
+    {
+        for external_macro in external_macros {
+            self = self.add_macro(external_macro)?;
+        }
+        Ok(self)
+    }
 }
 
 impl Attributed for ExternalCrateBuilder {
@@ -125,7 +180,7 @@ impl Attributed for ExternalCrateBuilder {
 
 impl IsCompleteBuilder for ExternalCrateBuilder {
     fn is_complete(&self) -> bool {
-        self.name.is_some() && !self.types.is_empty()
+        self.name.is_some()
     }
 }
 
@@ -136,11 +191,9 @@ impl Builder for ExternalCrateBuilder {
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(ExternalCrate {
             name: self.name.ok_or(BuilderError::IncompleteBuild(ExternalCrateAttribute::Name))?,
-            types: if self.types.is_empty() {
-                return Err(BuilderError::IncompleteBuild(ExternalCrateAttribute::Types));
-            } else {
-                self.types
-            },
+            types: self.types,
+            macros: self.macros,
+            version: self.version,
         })
     }
 }

@@ -4,7 +4,7 @@
 use quote::ToTokens;
 
 /// Enum representing the publicness of something.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum Publicness {
     /// Public (e.g., `pub`).
     Public,
@@ -25,5 +25,23 @@ impl ToTokens for Publicness {
             Publicness::Restricted => quote::quote! { pub(super) },
         };
         tokens.extend(token);
+    }
+}
+
+impl Publicness {
+    /// Returns true if the publicness is `Public`.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use synql_core::structs::Publicness;
+    ///
+    /// assert!(Publicness::Public.is_public());
+    /// assert!(!Publicness::Private.is_public());
+    /// assert!(!Publicness::Crate.is_public());
+    /// assert!(!Publicness::Restricted.is_public());
+    /// ```
+    pub fn is_public(&self) -> bool {
+        matches!(self, Publicness::Public)
     }
 }

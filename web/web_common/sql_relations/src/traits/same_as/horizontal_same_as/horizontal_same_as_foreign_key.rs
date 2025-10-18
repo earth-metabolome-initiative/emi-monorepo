@@ -39,10 +39,7 @@ pub trait HorizontalSameAsForeignKeyLike: VerticalSameAsForeignKeyLike {
     ///     panic!("Expected exactly 3 foreign keys in child table");
     /// };
     ///
-    /// assert!(
-    ///     extension_primary_key.is_extension_foreign_key(&db),
-    ///     "Expected extension primary key"
-    /// );
+    /// assert!(extension_primary_key.is_extension_foreign_key(&db), "Expected extension primary key");
     /// assert!(
     ///     !parent_fk.is_horizontal_same_as(&db),
     ///     "Expected parent foreign key to not be horizontal same-as"
@@ -59,8 +56,7 @@ pub trait HorizontalSameAsForeignKeyLike: VerticalSameAsForeignKeyLike {
             return false;
         };
 
-        unique_index.is_same_as(database)
-            && !self.is_vertical_same_as(database)
+        unique_index.is_same_as(database) && !self.is_vertical_same_as(database)
     }
 }
 

@@ -628,7 +628,8 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// )?;
     /// let composite_pk_table = db.table(None, "composite_pk_table");
     /// let single_pk_table = db.table(None, "single_pk_table");
-    /// let composite_fk = composite_pk_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// let composite_fk =
+    ///     composite_pk_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// let single_fk = single_pk_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// assert!(!composite_fk.includes_host_primary_key(&db), "FK does not include all PK columns");
     /// assert!(single_fk.includes_host_primary_key(&db), "FK includes all PK columns");
@@ -674,7 +675,10 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// let full_fk = full_ref_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// let partial_fk = partial_ref_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// assert!(full_fk.includes_referenced_primary_key(&db), "FK includes all referenced PK columns");
-    /// assert!(!partial_fk.includes_referenced_primary_key(&db), "FK does not include all referenced PK columns");
+    /// assert!(
+    ///     !partial_fk.includes_referenced_primary_key(&db),
+    ///     "FK does not include all referenced PK columns"
+    /// );
     /// # Ok(())
     /// # }
     /// ```

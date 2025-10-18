@@ -16,7 +16,8 @@ pub struct PgProcMetadata {
 }
 
 impl PgProcMetadata {
-    /// Creates a new `PgProcMetadata` instance from a `PgProc` and database connection.
+    /// Creates a new `PgProcMetadata` instance from a `PgProc` and database
+    /// connection.
     ///
     /// # Arguments
     ///
@@ -25,18 +26,13 @@ impl PgProcMetadata {
     ///
     /// # Errors
     ///
-    /// Returns an error if the type information cannot be retrieved from the database.
-    pub fn new(
-        pg_proc: &PgProc,
-        conn: &mut PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
+    /// Returns an error if the type information cannot be retrieved from the
+    /// database.
+    pub fn new(pg_proc: &PgProc, conn: &mut PgConnection) -> Result<Self, diesel::result::Error> {
         let argument_types = pg_proc.argument_types(conn)?;
 
-        let return_type = if pg_proc.prorettype == 0 {
-            None
-        } else {
-            Some(pg_proc.return_type(conn)?)
-        };
+        let return_type =
+            if pg_proc.prorettype == 0 { None } else { Some(pg_proc.return_type(conn)?) };
 
         Ok(Self { argument_types, return_type })
     }

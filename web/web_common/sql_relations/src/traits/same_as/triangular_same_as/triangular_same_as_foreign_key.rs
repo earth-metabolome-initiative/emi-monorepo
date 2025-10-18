@@ -132,9 +132,8 @@ pub trait TriangularSameAsForeignKeyLike: HorizontalSameAsForeignKeyLike {
     /// ).unwrap();
     /// let child_table = db.table(None, "child");
     /// // Check which foreign keys are triangular same-as relationships
-    /// let triangular_count = child_table.foreign_keys(&db)
-    ///     .filter(|fk| fk.is_triangular_same_as(&db))
-    ///     .count();
+    /// let triangular_count =
+    ///     child_table.foreign_keys(&db).filter(|fk| fk.is_triangular_same_as(&db)).count();
     /// // In this schema, we expect at least one triangular relationship
     /// assert!(triangular_count > 0 || triangular_count == 0); // Always passes, demonstrating the API
     /// ```
@@ -197,10 +196,7 @@ pub trait TriangularSameAsForeignKeyLike: HorizontalSameAsForeignKeyLike {
     ///     panic!("Expected exactly 7 foreign keys in child table");
     /// };
     ///
-    /// assert!(
-    ///     extension_primary_key.is_extension_foreign_key(&db),
-    ///     "Expected extension primary key"
-    /// );
+    /// assert!(extension_primary_key.is_extension_foreign_key(&db), "Expected extension primary key");
     ///
     /// let [grandparent_fk] = grandparent_hyphotenuse.foreign_keys(&db).collect::<Vec<_>>()[..] else {
     ///     panic!("Expected exactly 1 foreign key in grandparent_hyphotenuse table");

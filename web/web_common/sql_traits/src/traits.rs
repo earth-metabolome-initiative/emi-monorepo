@@ -22,4 +22,3 @@ pub trait Metadata {
     /// The associated metadata type.
     type Meta: Clone + Debug;
 }
-

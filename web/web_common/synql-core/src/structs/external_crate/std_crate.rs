@@ -2,24 +2,29 @@
 //! which initializes a `ExternalCrate` instance describing the `std` crate.
 
 use common_traits::builder::Builder;
+use lazy_static::lazy_static;
 
 use crate::structs::{ExternalCrate, ExternalType};
 
+lazy_static! {
+    pub static ref STD_CRATE: ExternalCrate = ExternalCrate::new()
+        .name("std".to_string())
+        .unwrap()
+        .add_types(vec![
+            ExternalType::string(),
+            ExternalType::vec_u8(),
+            ExternalType::ip_addr(),
+            ExternalType::mac_addr(),
+        ])
+        .unwrap()
+        .build()
+        .unwrap();
+}
+
 impl ExternalCrate {
     /// Initializes a `ExternalCrate` instance describing the `std` crate.
-    pub fn std() -> Self {
-        Self::new()
-            .name("std".to_string())
-            .unwrap()
-            .add_types(vec![
-                ExternalType::string(),
-                ExternalType::vec_u8(),
-                ExternalType::ip_addr(),
-                ExternalType::mac_addr(),
-            ])
-            .unwrap()
-            .build()
-            .unwrap()
+    pub fn std() -> &'static Self {
+        &STD_CRATE
     }
 }
 

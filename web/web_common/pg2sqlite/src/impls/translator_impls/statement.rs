@@ -23,9 +23,7 @@ impl Translator for Statement {
             Self::CreateIndex(create_index) => {
                 create_index.translate(schema, options)?.map(Into::into).into_iter().collect()
             }
-            Self::CreateFunction(_) => {
-                Vec::new()
-            }
+            Self::CreateFunction(_) => Vec::new(),
             Self::CreateTrigger(create_trigger) => {
                 let (maybe_drop_trigger, create_trigger) =
                     create_trigger.translate(schema, options)?;

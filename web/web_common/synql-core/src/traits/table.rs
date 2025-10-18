@@ -1,7 +1,8 @@
-//! Submodule defining and implementing the `TableSynLike` trait, which provides methods to
-//! facilitate the rust code generation starting from a SQL table
-//! representation, building on top of the [`TableLike`](sql_traits::traits::TableLike) trait
-//! and the traits from the [`sql_relations`](sql_relations) crate.
+//! Submodule defining and implementing the `TableSynLike` trait, which provides
+//! methods to facilitate the rust code generation starting from a SQL table
+//! representation, building on top of the
+//! [`TableLike`](sql_traits::traits::TableLike) trait and the traits from the
+//! [`sql_relations`](sql_relations) crate.
 
 use sql_traits::traits::TableLike;
 use syn::Ident;
@@ -43,10 +44,11 @@ pub trait TableSynLike: TableLike<Column = <Self as TableSynLike>::ColumnSyn> {
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use synql_core::prelude::*;
     /// let db = ParserDB::try_from(
-    /// 	r#"
+    ///     r#"
     /// 	CREATE TABLE my_table (id INT);
     /// 	CREATE TABLE MyTable (id INT);
-    /// "#)?;
+    /// "#,
+    /// )?;
     /// let table1 = db.table(None, "my_table");
     /// let table2 = db.table(None, "MyTable");
     /// assert!(table1.has_snake_case_table_name());

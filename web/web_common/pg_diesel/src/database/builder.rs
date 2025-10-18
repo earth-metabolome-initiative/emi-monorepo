@@ -9,7 +9,7 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 use diesel::PgConnection;
-use sql_traits::traits::TableLike;
+use sql_traits::{structs::generic_db::GenericDBBuilder, traits::TableLike};
 
 use crate::{
     PgDatabase,
@@ -93,6 +93,24 @@ impl<'conn> PgDatabaseBuilder<'conn> {
         self.connection = Some(connection);
         self
     }
+
+    /// Sets the catalog (database) name to filter by.
+    pub fn catalog(mut self, catalog: String) -> Self {
+        self.catalog = Some(catalog);
+        self
+    }
+
+    /// Adds a schema name to include.
+    pub fn add_schema(mut self, schema: String) -> Self {
+        self.schemas.push(schema);
+        self
+    }
+
+    /// Sets the schema names to include.
+    pub fn schemas(mut self, schemas: Vec<String>) -> Self {
+        self.schemas = schemas;
+        self
+    }
 }
 
 impl Attributed for PgDatabaseBuilder<'_> {
@@ -125,6 +143,8 @@ impl Builder for PgDatabaseBuilder<'_> {
             }
         };
 
+        let mut builder = GenericDBBuilder::new().catalog_name(table_catalog.clone());
+
         let mut tables = Vec::new();
         for table_schema in &table_schemas {
             tables.extend(
@@ -140,38 +160,32 @@ impl Builder for PgDatabaseBuilder<'_> {
 
         // For each table, we determine all of the foreign keys and for each foreign key
         // we determine which table it references.
-        let mut foreign_keys = Vec::new();
-        let mut unique_indices = Vec::new();
-        let mut columns = Vec::new();
-        let mut tables_with_metadata = Vec::new();
         for table in tables {
             let table_metadata = table.metadata(connection)?;
+
             for column in table_metadata.column_rcs() {
-                columns.push((column.clone(), table.clone()));
+                builder =
+                    builder.add_column(column.clone(), column.metadata(table.clone(), connection)?);
             }
+
             for fk in table_metadata.foreign_key_rcs() {
                 let metadata = KeyColumnUsageMetadata::new(&fk, connection)?;
-                foreign_keys.push((fk.clone(), metadata));
+                builder = builder.add_foreign_key(fk.clone(), metadata);
             }
+
             for index in table_metadata.unique_index_rcs() {
                 let metadata = index.metadata(table.clone(), connection)?;
-                unique_indices.push((index.clone(), metadata));
+                builder = builder.add_unique_index(index.clone(), metadata);
             }
-            tables_with_metadata.push((table, table_metadata));
+
+            builder = builder.add_table(table, table_metadata);
         }
 
-        let mut functions_with_metadata = Vec::new();
         for function in PgProc::load_all(connection)? {
             let metadata = crate::database::PgProcMetadata::new(&function, connection)?;
-            functions_with_metadata.push((function, metadata));
+            builder = builder.add_function(function, metadata);
         }
 
-        Ok(PgDatabase::new(
-            tables_with_metadata,
-            columns,
-            unique_indices,
-            foreign_keys,
-            functions_with_metadata,
-        ))
+        Ok(builder.build().expect("Failed to build PgDatabase: catalog_name should be set"))
     }
 }

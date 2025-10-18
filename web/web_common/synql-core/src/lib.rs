@@ -8,5 +8,6 @@ pub mod utils;
 pub mod prelude {
     pub use common_traits::builder::Builder;
     pub use sql_traits::prelude::*;
+
     pub use crate::{structs::*, traits::*};
 }

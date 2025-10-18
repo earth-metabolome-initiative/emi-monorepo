@@ -5,7 +5,9 @@ use diesel::{
     QueryDsl, RunQueryDsl, SelectableHelper,
 };
 
-use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgIndex, PgTrigger, Table};
+use crate::models::{
+    CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex, PgTrigger, Table,
+};
 
 #[pg_cached::auto_cached]
 pub(crate) fn load_all_tables(
@@ -232,4 +234,22 @@ pub(crate) fn column_by_name(
         .filter(columns::table_catalog.eq(&table.table_catalog))
         .filter(columns::column_name.eq(column_name))
         .first::<Column>(conn)?)
+}
+
+#[pg_cached::auto_cached]
+pub(super) fn pg_description(
+    table: &Table,
+    conn: &mut PgConnection,
+) -> Result<PgDescription, diesel::result::Error> {
+    use crate::schema::{pg_attribute, pg_class, pg_description, pg_namespace};
+
+    Ok(pg_description::table
+        .inner_join(pg_attribute::table.on(pg_description::objoid.eq(pg_attribute::attrelid)))
+        .inner_join(pg_class::table.on(pg_attribute::attrelid.eq(pg_class::oid)))
+        .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
+        .filter(pg_class::relname.eq(&table.table_name))
+        .filter(pg_namespace::nspname.eq(&table.table_schema))
+        .filter(pg_attribute::attname.eq(&table.table_name))
+        .select(PgDescription::as_select())
+        .first::<PgDescription>(conn)?)
 }

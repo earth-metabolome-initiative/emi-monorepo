@@ -86,9 +86,8 @@ impl<DB: DatabaseLike> ForeignKeyConstraint for CompatibleForeignKey<DB> {
     ) -> Result<(), crate::prelude::Error> {
         let host_table = foreign_key.host_table(database);
         let referenced_table = foreign_key.referenced_table(database);
-        for (host_column, referenced_column) in foreign_key
-            .host_columns(database)
-            .zip(foreign_key.referenced_columns(database))
+        for (host_column, referenced_column) in
+            foreign_key.host_columns(database).zip(foreign_key.referenced_columns(database))
         {
             if !host_table.is_compatible_with(
                 database,

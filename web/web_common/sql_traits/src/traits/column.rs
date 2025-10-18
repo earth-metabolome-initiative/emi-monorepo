@@ -30,6 +30,16 @@ pub trait ColumnLike: Hash + Eq + Ord + Metadata {
     /// ```
     fn column_name(&self) -> &str;
 
+    /// Returns the documentation of the column, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query the column
+    ///   documentation from.
+    fn column_doc<'db>(&'db self, database: &'db Self::Database) -> Option<&'db str>
+    where
+        Self: 'db;
+
     /// Returns the data type of the column as a string.
     ///
     /// # Example
@@ -142,7 +152,8 @@ pub trait ColumnLike: Hash + Eq + Ord + Metadata {
     /// let table = db.table(None, "my_table");
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
-    /// let created_at_column = table.column("created_at", &db).expect("Column 'created_at' should exist");
+    /// let created_at_column =
+    ///     table.column("created_at", &db).expect("Column 'created_at' should exist");
     /// assert!(id_column.has_default(), "id column should have a default value");
     /// assert!(!name_column.has_default(), "name column should not have a default value");
     /// assert!(created_at_column.has_default(), "created_at column should have a default value");

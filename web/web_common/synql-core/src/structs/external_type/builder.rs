@@ -7,7 +7,10 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 
-use crate::structs::{external_type::{traits_mask::TraitsMask, Trait}, ExternalType};
+use crate::structs::{
+    ExternalType,
+    external_type::{Trait, traits_mask::TraitsMask},
+};
 
 #[derive(Default)]
 /// Builder for the `ExternalType` struct.

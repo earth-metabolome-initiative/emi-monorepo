@@ -38,3 +38,9 @@ impl HasOid for crate::models::PgProc {
         self.oid
     }
 }
+
+impl HasOid for crate::models::PgDescription {
+    fn oid(&self) -> u32 {
+        self.objoid
+    }
+}

@@ -2,30 +2,43 @@
 
 use std::rc::Rc;
 
+use common_traits::prelude::Builder;
 use sqlparser::{
     ast::{ColumnDef, ColumnOption, CreateFunction, CreateTable, Expr, Statement, TableConstraint},
     parser::Parser,
 };
 
 use crate::{
-    structs::{GenericDB, TableAttribute, TableMetadata, metadata::UniqueIndexMetadata},
+    structs::{
+        GenericDB, TableAttribute, TableMetadata, generic_db::GenericDBBuilder,
+        metadata::UniqueIndexMetadata,
+    },
     traits::column::ColumnLike,
 };
 
 /// A type alias for a `GenericDB` specialized for `sqlparser`'s `CreateTable`.
 pub type ParserDB = GenericDB<CreateTable, CreateFunction>;
 
-impl From<Vec<Statement>> for ParserDB {
-    fn from(statements: Vec<Statement>) -> Self {
-        let mut tables = Vec::new();
-        let mut columns = Vec::new();
-        let mut unique_indices = Vec::new();
-        let mut foreign_keys = Vec::new();
-        let mut functions = Vec::new();
+impl ParserDB {
+    /// Creates a new `ParserDB` from a vector of SQL statements and a catalog
+    /// name.
+    ///
+    /// # Arguments
+    ///
+    /// * `statements` - A vector of SQL statements to parse.
+    /// * `catalog_name` - The name of the database catalog.
+    ///
+    /// # Panics
+    ///
+    /// Panics if a statement other than `CREATE TABLE` or `CREATE FUNCTION` is
+    /// encountered, or if the builder fails to build the database.
+    pub fn from_statements(statements: Vec<Statement>, catalog_name: String) -> Self {
+        let mut builder = GenericDBBuilder::new().catalog_name(catalog_name);
+
         for statement in statements {
             match statement {
                 Statement::CreateFunction(create_function) => {
-                    functions.push((create_function, ()));
+                    builder = builder.add_function(create_function, ());
                 }
                 Statement::CreateTable(create_table) => {
                     let create_table = Rc::new(create_table);
@@ -50,7 +63,7 @@ impl From<Vec<Statement>> for ParserDB {
                                         foreign_key.clone(),
                                     ));
                                     table_metadata.add_foreign_key(fk.clone());
-                                    foreign_keys.push((fk, ()));
+                                    builder = builder.add_foreign_key(fk, ());
                                 }
                                 ColumnOption::Unique(unique_constraint) => {
                                     let unique_index = Rc::new(TableAttribute::new(
@@ -78,7 +91,8 @@ impl From<Vec<Statement>> for ParserDB {
                                     let unique_index_metadata =
                                         UniqueIndexMetadata::new(expression, create_table.clone());
                                     table_metadata.add_unique_index(unique_index.clone());
-                                    unique_indices.push((unique_index, unique_index_metadata));
+                                    builder = builder
+                                        .add_unique_index(unique_index, unique_index_metadata);
                                 }
                                 ColumnOption::PrimaryKey(_) => {
                                     table_metadata.set_primary_key(vec![column_rc.clone()]);
@@ -86,7 +100,7 @@ impl From<Vec<Statement>> for ParserDB {
                                 _ => {}
                             }
                         }
-                        columns.push((column_rc, ()));
+                        builder = builder.add_column(column_rc, ());
                     }
 
                     for constraint in &create_table.constraints {
@@ -113,13 +127,14 @@ impl From<Vec<Statement>> for ParserDB {
                                 let unique_index_metadata =
                                     UniqueIndexMetadata::new(expression, create_table.clone());
                                 table_metadata.add_unique_index(unique_index.clone());
-                                unique_indices.push((unique_index, unique_index_metadata));
+                                builder =
+                                    builder.add_unique_index(unique_index, unique_index_metadata);
                             }
                             TableConstraint::ForeignKey(fk) => {
                                 let fk =
                                     Rc::new(TableAttribute::new(create_table.clone(), fk.clone()));
                                 table_metadata.add_foreign_key(fk.clone());
-                                foreign_keys.push((fk, ()));
+                                builder = builder.add_foreign_key(fk, ());
                             }
                             TableConstraint::Check(check) => {
                                 table_metadata.add_check_constraint(Rc::new(TableAttribute::new(
@@ -158,7 +173,7 @@ impl From<Vec<Statement>> for ParserDB {
                         }
                     }
 
-                    tables.push((create_table, table_metadata));
+                    builder = builder.add_table(create_table, table_metadata);
                 }
                 _ => {
                     unimplemented!(
@@ -168,7 +183,7 @@ impl From<Vec<Statement>> for ParserDB {
             }
         }
 
-        Self::new(tables, columns, unique_indices, foreign_keys, functions)
+        builder.build().expect("Failed to build ParserDB")
     }
 }
 
@@ -179,6 +194,6 @@ impl TryFrom<&str> for ParserDB {
         let dialect = sqlparser::dialect::GenericDialect {};
         let mut parser = sqlparser::parser::Parser::new(&dialect).try_with_sql(sql)?;
         let statements = parser.parse_statements()?;
-        Ok(Self::from(statements))
+        Ok(Self::from_statements(statements, "unknown_catalog".to_string()))
     }
 }

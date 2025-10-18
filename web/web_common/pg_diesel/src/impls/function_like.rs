@@ -4,7 +4,7 @@
 
 use sql_traits::traits::{FunctionLike, Metadata};
 
-use crate::{database::PgProcMetadata, models::PgProc, PgDatabase};
+use crate::{PgDatabase, database::PgProcMetadata, models::PgProc};
 
 impl Metadata for PgProc {
     type Meta = PgProcMetadata;
@@ -27,9 +27,6 @@ impl FunctionLike for PgProc {
     }
 
     fn return_type_name(&self, database: &Self::Database) -> Option<String> {
-        database
-            .function_metadata(self)
-            .return_type()
-            .map(|pg_type| pg_type.typname.clone())
+        database.function_metadata(self).return_type().map(|pg_type| pg_type.typname.clone())
     }
 }

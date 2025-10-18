@@ -15,6 +15,14 @@ where
     type ForeignKey = <T as TableLike>::ForeignKey;
     type Function = F;
 
+    fn catalog_name(&self) -> &str {
+        &self.catalog_name
+    }
+
+    fn number_of_tables(&self) -> usize {
+        self.tables.len()
+    }
+
     fn table(&self, schema: Option<&str>, table_name: &str) -> &Self::Table {
         // The tables are sorted by schema and name, so we can use binary search.
         let key = (schema, table_name);

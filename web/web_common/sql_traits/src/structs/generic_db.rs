@@ -1,10 +1,12 @@
 //! Generic database schema representations and utilities.
 
+mod builder;
 mod database;
 mod sqlparser;
 
 use std::rc::Rc;
 
+pub use builder::GenericDBBuilder;
 pub use sqlparser::ParserDB;
 
 use crate::traits::{FunctionLike, Metadata, TableLike};
@@ -16,6 +18,8 @@ where
     T: TableLike,
     F: FunctionLike,
 {
+    /// Catalog name of the database.
+    catalog_name: String,
     /// List of tables in the database.
     tables: Vec<(Rc<T>, T::Meta)>,
     /// List of columns in the database.
@@ -33,36 +37,9 @@ where
     T: TableLike,
     F: FunctionLike,
 {
-    /// Creates a new `GenericDB` instance.
-    ///
-    /// # Arguments
-    ///
-    /// * `tables` - A vector of tuples containing a reference-counted table and
-    ///   its metadata.
-    /// * `columns` - A vector of tuples containing a reference-counted column
-    ///   and its metadata.
-    /// * `unique_indices` - A vector of tuples containing a unique index and
-    ///   its metadata.
-    /// * `foreign_keys` - A vector of tuples containing a foreign key and its
-    ///   metadata.
-    /// * `functions` - A vector of functions created in the database.
-    pub fn new(
-        mut tables: Vec<(Rc<T>, T::Meta)>,
-        mut columns: Vec<(Rc<T::Column>, <T::Column as Metadata>::Meta)>,
-        mut unique_indices: Vec<(Rc<T::UniqueIndex>, <T::UniqueIndex as Metadata>::Meta)>,
-        mut foreign_keys: Vec<(Rc<T::ForeignKey>, <T::ForeignKey as Metadata>::Meta)>,
-        mut functions: Vec<(F, <F as Metadata>::Meta)>,
-    ) -> Self {
-        tables.sort_unstable_by_key(|(table, _)| {
-            (table.table_schema().map(|s| s.to_string()), table.table_name().to_string())
-        });
-
-        columns.sort_unstable_by(|(a, _), (b, _)| a.as_ref().cmp(b.as_ref()));
-        unique_indices.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
-        foreign_keys.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
-        functions.sort_unstable_by(|(a, _), (b, _)| a.name().cmp(b.name()));
-
-        Self { tables, columns, unique_indices, foreign_keys, functions }
+    /// Creates a new `GenericDBBuilder` instance.
+    pub fn new() -> GenericDBBuilder<T, F> {
+        GenericDBBuilder::default()
     }
 
     /// Returns a reference to the metadata of the specified table.
@@ -122,5 +99,10 @@ where
             .binary_search_by(|(f, _)| f.name().cmp(function.name()))
             .map(|index| &self.functions[index].1)
             .expect("Function not found in GenericDB")
+    }
+
+    /// Returns a reference to the catalog name.
+    pub fn catalog_name(&self) -> &str {
+        &self.catalog_name
     }
 }

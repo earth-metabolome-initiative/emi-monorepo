@@ -6,7 +6,8 @@ use diesel::{
 };
 
 use crate::models::{
-    CheckConstraint, Column, GeographyColumn, GeometryColumn, KeyColumnUsage, PgType, Table,
+    CheckConstraint, Column, GeographyColumn, GeometryColumn, KeyColumnUsage, PgDescription,
+    PgType, Table,
 };
 
 #[pg_cached::auto_cached]
@@ -153,4 +154,22 @@ pub(super) fn pg_type(
         .filter(pg_attribute::attname.eq(&column.column_name))
         .select(PgType::as_select())
         .first::<PgType>(conn)?)
+}
+
+#[pg_cached::auto_cached]
+pub(super) fn pg_description(
+    column: &Column,
+    conn: &mut PgConnection,
+) -> Result<PgDescription, diesel::result::Error> {
+    use crate::schema::{pg_attribute, pg_class, pg_description, pg_namespace};
+
+    Ok(pg_description::table
+        .inner_join(pg_attribute::table.on(pg_description::objoid.eq(pg_attribute::attrelid)))
+        .inner_join(pg_class::table.on(pg_attribute::attrelid.eq(pg_class::oid)))
+        .inner_join(pg_namespace::table.on(pg_class::relnamespace.eq(pg_namespace::oid)))
+        .filter(pg_class::relname.eq(&column.table_name))
+        .filter(pg_namespace::nspname.eq(&column.table_schema))
+        .filter(pg_attribute::attname.eq(&column.column_name))
+        .select(PgDescription::as_select())
+        .first::<PgDescription>(conn)?)
 }

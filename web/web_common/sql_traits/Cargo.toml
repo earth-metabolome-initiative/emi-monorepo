@@ -5,6 +5,9 @@ edition = "2024"
 
 [dependencies]
 sqlparser.workspace = true
+common_traits.workspace = true
+graph.workspace = true
+algebra.workspace = true
 
 [lints]
 workspace = true

@@ -6,3 +6,4 @@ pub mod models;
 pub mod schema;
 pub mod traits;
 pub use database::PgDatabase;
+pub mod model_metadata;

@@ -1,12 +1,11 @@
 //! Submodule implementing the [`TableLike`] trait for `sqlparser`'s
 //! [`CreateTable`](sqlparser::ast::CreateTable) struct.
 
-
 use ::sqlparser::ast::{CreateTable, Ident};
 use sqlparser::ast::{CheckConstraint, ColumnDef, ForeignKeyConstraint, UniqueConstraint};
 
 use crate::{
-    structs::{generic_db::ParserDB, metadata::TableAttribute, TableMetadata},
+    structs::{TableMetadata, generic_db::ParserDB, metadata::TableAttribute},
     traits::{Metadata, TableLike},
 };
 
@@ -28,6 +27,14 @@ impl TableLike for CreateTable {
             sqlparser::ast::ObjectNamePart::Identifier(Ident { value, .. }) => value.as_str(),
             _ => panic!("Unexpected object name part in CreateTable: {:?}", last_object_name_parts),
         }
+    }
+
+    fn table_doc<'db>(&'db self, _database: &'db Self::Database) -> Option<&'db str>
+    where
+        Self: 'db,
+    {
+        // TODO(@RPG-Alex): Extract documentation from SQL comments after merging PR <https://github.com/apache/datafusion-sqlparser-rs/pull/2069>
+        Some("Undocumented table")
     }
 
     fn table_schema(&self) -> Option<&str> {

@@ -1,11 +1,14 @@
-use std::fmt::Display;
+use std::{fmt::Display, rc::Rc};
 
-use diesel::{PgConnection, Queryable, QueryableByName, Selectable};
+use diesel::{OptionalExtension, PgConnection, Queryable, QueryableByName, Selectable};
 
 mod cached_queries;
 
 use super::check_constraint::CheckConstraint;
-use crate::models::{GeographyColumn, GeometryColumn, KeyColumnUsage, PgType, Table};
+use crate::{
+    model_metadata::ColumnMetadata,
+    models::{GeographyColumn, GeometryColumn, KeyColumnUsage, PgType, Table},
+};
 
 /// Struct defining the `information_schema.columns` table.
 #[derive(
@@ -87,6 +90,24 @@ impl AsRef<Column> for Column {
 }
 
 impl Column {
+    /// Returns the metadata of the column.
+    ///
+    /// # Arguments
+    ///
+    /// * `table` - The table the column belongs to.
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If an error occurs while querying the database
+    pub fn metadata(
+        &self,
+        table: Rc<Table>,
+        conn: &mut PgConnection,
+    ) -> Result<ColumnMetadata, diesel::result::Error> {
+        Ok(ColumnMetadata::new(table, cached_queries::pg_description(self, conn).optional()?))
+    }
+
     #[must_use]
     /// Returns the column as a nullable column
     pub fn into_nullable(self) -> Self {

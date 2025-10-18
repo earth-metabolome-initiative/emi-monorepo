@@ -1,5 +1,5 @@
-//! Submodule defining and implementing the `ColumnSyn` trait, which provide methods to
-//! facilitate the rust code generation starting from a SQL column
+//! Submodule defining and implementing the `ColumnSyn` trait, which provide
+//! methods to facilitate the rust code generation starting from a SQL column
 //! representation, building on top of the
 //! [`ColumnLike`](sql_traits::traits::ColumnLike) trait.
 
@@ -41,9 +41,7 @@ pub trait ColumnSynLike: ColumnLike {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use synql_core::prelude::*;
-    /// let db = ParserDB::try_from(
-    /// 	"CREATE TABLE my_table (my_column INT, MyColumn INT);"
-    /// )?;
+    /// let db = ParserDB::try_from("CREATE TABLE my_table (my_column INT, MyColumn INT);")?;
     /// let table = db.table(None, "my_table");
     /// let column1 = table.column("my_column", &db).unwrap();
     /// let column2 = table.column("MyColumn", &db).unwrap();
@@ -125,7 +123,13 @@ pub trait ColumnSynLike: ColumnLike {
     ) -> Option<Type> {
         let column_type = workspace.diesel_type(&self.normalized_data_type())?;
         if self.is_nullable() {
-            Some(syn::parse_str(&format!("diesel::sql_types::Nullable<{}>", column_type.to_token_stream())).unwrap())
+            Some(
+                syn::parse_str(&format!(
+                    "diesel::sql_types::Nullable<{}>",
+                    column_type.to_token_stream()
+                ))
+                .unwrap(),
+            )
         } else {
             Some(column_type.clone())
         }

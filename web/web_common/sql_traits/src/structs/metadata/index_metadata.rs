@@ -31,4 +31,3 @@ impl<U: UniqueIndexLike> UniqueIndexMetadata<U> {
         &self.table
     }
 }
-

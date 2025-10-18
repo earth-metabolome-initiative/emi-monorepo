@@ -1,17 +1,16 @@
 //! Submodule implementing the [`ColumnLike`](sql_traits::prelude::ColumnLike)
 //! trait for the [`Column`] struct.
 
-use std::rc::Rc;
-
 use sql_traits::traits::{ColumnLike, Metadata};
 
 use crate::{
     PgDatabase,
+    model_metadata::ColumnMetadata,
     models::{KeyColumnUsage, Table},
 };
 
 impl Metadata for crate::models::Column {
-    type Meta = Rc<Table>;
+    type Meta = ColumnMetadata;
 }
 
 impl ColumnLike for crate::models::Column {
@@ -23,11 +22,18 @@ impl ColumnLike for crate::models::Column {
         &self.column_name
     }
 
+    fn column_doc<'db>(&'db self, database: &'db Self::Database) -> Option<&'db str>
+    where
+        Self: 'db,
+    {
+        database.column_metadata(self).description().and_then(|desc| desc.description.as_deref())
+    }
+
     fn table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
     where
         Self: 'db,
     {
-        database.column_metadata(self).as_ref()
+        database.column_metadata(self).table()
     }
 
     fn is_generated(&self) -> bool {

@@ -20,13 +20,11 @@ use crate::{
 /// ```rust
 /// use sql_constraints::prelude::*;
 ///
-/// let constrainer: GenericConstrainer<ParserDB> =
-///     UniqueCheckConstraint::default().into();
+/// let constrainer: GenericConstrainer<ParserDB> = UniqueCheckConstraint::default().into();
 ///
-/// let invalid_schema = ParserDB::from_sql(
-///     "CREATE TABLE MyTable (id INT, CHECK (id > 0), CHECK (id > 0));",
-/// )
-/// .unwrap();
+/// let invalid_schema =
+///     ParserDB::from_sql("CREATE TABLE MyTable (id INT, CHECK (id > 0), CHECK (id > 0));")
+///         .unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
 /// let valid_schema =

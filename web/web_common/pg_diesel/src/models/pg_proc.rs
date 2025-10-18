@@ -126,13 +126,11 @@ impl PgProc {
     /// # Arguments
     ///
     /// * `conn` - A mutable reference to a `PgConnection`.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the database query fails.
-    pub fn load_all(
-        conn: &mut PgConnection,
-    ) -> Result<Vec<PgProc>, diesel::result::Error> {
+    pub fn load_all(conn: &mut PgConnection) -> Result<Vec<PgProc>, diesel::result::Error> {
         cached_queries::load_all(conn)
     }
 }

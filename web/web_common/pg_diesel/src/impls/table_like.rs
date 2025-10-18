@@ -1,15 +1,16 @@
 //! Submodule implementing the [`TableLike`](sql_traits::prelude::TableLike)
 //! trait for the [`Table`] struct.
 
-use sql_traits::{structs::TableMetadata, traits::{Metadata, TableLike}};
+use sql_traits::traits::{Metadata, TableLike};
 
 use crate::{
     PgDatabase,
+    model_metadata::TableMetadata,
     models::{CheckConstraint, Column, KeyColumnUsage, PgIndex},
 };
 
 impl Metadata for crate::models::Table {
-    type Meta = TableMetadata<Self>;
+    type Meta = TableMetadata;
 }
 
 impl TableLike for crate::models::Table {
@@ -25,6 +26,13 @@ impl TableLike for crate::models::Table {
 
     fn table_schema(&self) -> Option<&str> {
         Some(&self.table_schema)
+    }
+
+    fn table_doc<'db>(&'db self, database: &'db Self::Database) -> Option<&'db str>
+    where
+        Self: 'db,
+    {
+        database.table_metadata(self).description().and_then(|desc| desc.description.as_deref())
     }
 
     fn columns<'db>(
