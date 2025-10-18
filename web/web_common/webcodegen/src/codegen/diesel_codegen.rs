@@ -9,8 +9,6 @@ use syn::Ident;
 use super::Codegen;
 use crate::Table;
 
-mod allow_tables_to_appear_in_same_query;
-mod joinable;
 mod table;
 mod types;
 

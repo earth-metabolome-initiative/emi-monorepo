@@ -512,6 +512,39 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
         self.foreign_keys(database).next().is_some()
     }
 
+    /// Returns whether the table has non-self-referential foreign keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY);
+    /// CREATE TABLE child_table (id INT PRIMARY KEY, parent_id INT REFERENCES parent_table(id));
+    /// CREATE TABLE self_ref_table (id INT PRIMARY KEY, parent_id INT REFERENCES self_ref_table(id));
+    /// "#,
+    /// )?;
+    /// let child_table = db.table(None, "child_table");
+    /// assert!(child_table.has_non_self_referential_foreign_keys(&db));
+    /// let self_ref_table = db.table(None, "self_ref_table");
+    /// assert!(self_ref_table.has_non_self_referential_foreign_keys(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_non_self_referential_foreign_keys(&self, database: &Self::Database) -> bool {
+        self.foreign_keys(database)
+            .filter(move |fk| !fk.is_self_referential(database))
+            .next()
+            .is_some()
+    }
+
     /// Iterates over the foreign keys in the current table which refer to
     /// ancestors of the provided table.
     ///
@@ -1073,6 +1106,48 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
         self.foreign_keys(database).filter(|fk| fk.is_singleton(database))
     }
 
+    /// Returns the table singleton foreign keys which are not self-referential.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE host_table (
+    ///     id INT PRIMARY KEY,
+    ///     name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES referenced_table(id),
+    ///     FOREIGN KEY (id) REFERENCES host_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let host_table = db.table(None, "host_table");
+    /// let non_self_referential_singleton_fks =
+    ///     host_table.non_self_referential_singleton_foreign_keys(&db).collect::<Vec<_>>();
+    /// assert_eq!(non_self_referential_singleton_fks.len(), 1);
+    /// assert!(non_self_referential_singleton_fks[0].is_singleton(&db));
+    /// assert!(!non_self_referential_singleton_fks[0].is_self_referential(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn non_self_referential_singleton_foreign_keys<'db>(
+        &'db self,
+        database: &'db Self::Database,
+    ) -> impl Iterator<Item = &'db Self::ForeignKey>
+    where
+        Self: 'db,
+    {
+        self.singleton_foreign_keys(database).filter(move |fk| !fk.is_self_referential(database))
+    }
+
     /// Returns whether the table has singleton foreign keys.
     ///
     /// # Arguments
@@ -1099,6 +1174,41 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn has_singleton_foreign_keys(&self, database: &Self::Database) -> bool {
         self.singleton_foreign_keys(database).next().is_some()
+    }
+
+    /// Returns whether the table has non-self-referential singleton foreign
+    /// keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///  belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE host_table (
+    ///     id INT PRIMARY KEY,
+    ///     name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES referenced_table(id),
+    ///     FOREIGN KEY (id) REFERENCES host_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let referenced_table = db.table(None, "referenced_table");
+    /// assert!(!referenced_table.has_non_self_referential_singleton_foreign_keys(&db));
+    /// let host_table = db.table(None, "host_table");
+    /// assert!(host_table.has_non_self_referential_singleton_foreign_keys(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_non_self_referential_singleton_foreign_keys(&self, database: &Self::Database) -> bool {
+        self.non_self_referential_singleton_foreign_keys(database).next().is_some()
     }
 
     /// Returns whether the table depends directly or indirectly on another

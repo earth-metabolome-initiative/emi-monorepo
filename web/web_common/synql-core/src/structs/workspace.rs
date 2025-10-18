@@ -178,7 +178,6 @@ impl<'data> Workspace<'data> {
         std::fs::create_dir_all(self.path)?;
         // And we start writing each internal crate to disk.
         for internal_crate in &self.internal_crates {
-            println!("Writing crate {} to disk", internal_crate.name());
             internal_crate.write_to_disk(self)?;
         }
         Ok(())

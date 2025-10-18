@@ -64,7 +64,6 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             if self.skip_table(table) {
                 continue;
             }
-            println!("Generating schema for table `{}`", table.table_name());
             let schema = table.schema_macro(&workspace, self.database);
             let internal_token = schema.into();
             workspace.add_internal_crate(internal_token);

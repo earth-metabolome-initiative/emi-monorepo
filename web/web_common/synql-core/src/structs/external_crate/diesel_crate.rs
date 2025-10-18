@@ -18,6 +18,7 @@ lazy_static! {
                 .unwrap()
                 .build()
                 .unwrap(),
+            ExternalMacro::new().name("joinable".to_string()).unwrap().build().unwrap(),
         ])
         .unwrap()
         .build()
