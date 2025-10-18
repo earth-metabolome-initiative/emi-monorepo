@@ -123,6 +123,11 @@ impl<'data> ExternalMacroRef<'data> {
         self.crate_ref.name()
     }
 
+    /// Returns a reference to the name of the macro.
+    pub fn name(&self) -> &'data str {
+        self.macro_ref.name()
+    }
+
     /// Returns a reference to the external crate.
     pub fn external_crate(&self) -> &'data ExternalCrate {
         self.crate_ref
@@ -145,6 +150,11 @@ impl<'data> ExternalTraitRef<'data> {
     /// Returns a reference to the name of the crate.
     pub fn crate_name(&self) -> &'data str {
         self.crate_ref.name()
+    }
+
+    /// Returns a reference to the name of the trait.
+    pub fn name(&self) -> &'data str {
+        self.trait_ref.name()
     }
 
     /// Returns a reference to the external crate.

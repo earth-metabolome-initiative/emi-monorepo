@@ -67,7 +67,7 @@ pub trait DatabaseLike {
                         }
                         tables_ref.binary_search(&referenced_table).ok()
                     })
-                    .map(move |referenced_table_number| (table_number, referenced_table_number))
+                    .map(move |referenced_table_number| (referenced_table_number, table_number))
             })
             .collect::<Vec<(usize, usize)>>();
 

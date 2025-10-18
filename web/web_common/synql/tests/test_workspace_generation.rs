@@ -19,6 +19,11 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
 		    name TEXT NOT NULL,
 		    email TEXT UNIQUE NOT NULL
 		);
+        CREATE TABLE comments (
+		    id INT PRIMARY KEY,
+		    name TEXT NOT NULL,
+            user_id INT REFERENCES users(id)
+		);
 	"#,
     )?;
     let temp_dir = tempfile::tempdir().expect("Unable to create temporary directory");

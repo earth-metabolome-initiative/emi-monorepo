@@ -5,7 +5,7 @@ use syn::Ident;
 
 use crate::structs::{InternalCrate, Publicness, internal_data::DataVariantRef};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 /// Struct defining a struct model.
 pub struct InternalStruct<'data> {
     /// Attributes of the struct.

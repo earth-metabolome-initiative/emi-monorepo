@@ -2,11 +2,13 @@
 
 mod builder;
 
+use std::rc::Rc;
+
 pub use builder::InternalCrateBuilder;
 use quote::{ToTokens, quote};
 use syn::Ident;
 
-use crate::structs::{InternalModule, Workspace};
+use crate::structs::{InternalData, InternalModule, Workspace};
 
 #[derive(Debug, Clone)]
 /// Struct defining a crate model.
@@ -14,7 +16,7 @@ pub struct InternalCrate<'data> {
     /// Name of the crate.
     name: String,
     /// The root modules of the crate.
-    modules: Vec<InternalModule<'data>>,
+    modules: Vec<Rc<InternalModule<'data>>>,
     /// Crate documentation.
     documentation: String,
 }
@@ -89,6 +91,28 @@ impl<'data> InternalCrate<'data> {
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
+    }
+
+    /// Returns a reference to the internal data with the given name if it
+    /// exists in the crate.
+    pub fn internal_data(&self, name: &str) -> Option<&Rc<InternalData<'data>>> {
+        for module in &self.modules {
+            if let Some(data) = module.internal_data(name) {
+                return Some(data);
+            }
+        }
+        None
+    }
+
+    /// Returns a reference to the module with the given name if it exists in
+    /// the crate.
+    pub fn module(&self, name: &str) -> Option<&Rc<InternalModule<'data>>> {
+        for module in &self.modules {
+            if module.name() == name {
+                return Some(module);
+            }
+        }
+        None
     }
 
     /// Returns the external dependencies of the crate.

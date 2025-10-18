@@ -5,7 +5,7 @@ use syn::Ident;
 
 use crate::structs::internal_data::DataVariantRef;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 /// Struct defining a enum model.
 pub struct InternalEnum<'data> {
     /// Variants of the enum.
@@ -19,7 +19,7 @@ impl<'data> InternalEnum<'data> {
     }
 
     /// Returns the internal crate dependencies of the enum.
-    pub fn internal_dependencies(&self) -> Vec<&'data crate::structs::InternalCrate<'data>> {
+    pub fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
         let mut dependencies = Vec::new();
         for (_, ty) in &self.variants {
             dependencies.extend(ty.internal_dependencies());

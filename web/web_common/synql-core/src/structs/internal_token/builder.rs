@@ -7,10 +7,12 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 use proc_macro2::TokenStream;
+use quote::ToTokens;
 
 use crate::structs::{
     InternalToken, Publicness,
     external_crate::{ExternalMacroRef, ExternalTraitRef},
+    internal_data::{InternalDataRef, InternalModuleRef},
 };
 
 #[derive(Default)]
@@ -24,6 +26,11 @@ pub struct InternalTokenBuilder<'data> {
     external_macros: Vec<ExternalMacroRef<'data>>,
     /// External traits used in the token stream.
     external_traits: Vec<ExternalTraitRef<'data>>,
+    /// Internal data used in the token stream.
+    internal_data: Vec<InternalDataRef<'data>>,
+    /// Internal modules from other crates in the same workspace which are used
+    /// in the token stream.
+    internal_modules: Vec<InternalModuleRef<'data>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -33,6 +40,14 @@ pub enum InternalTokenAttribute {
     Publicness,
     /// The token stream.
     Stream,
+    /// External macros used in the token stream.
+    ExternalMacros,
+    /// External traits used in the token stream.
+    ExternalTraits,
+    /// Internal data used in the token stream.
+    InternalData,
+    /// Internal modules used in the token stream.
+    InternalModules,
 }
 
 /// Error enumeration which might occur when building a `InternalToken`.
@@ -44,6 +59,24 @@ pub enum InternalTokenBuilderError {
     DuplicateExternalMacro,
     /// Duplicate external trait detected.
     DuplicateExternalTrait,
+    /// Duplicate internal data detected.
+    DuplicateInternalData,
+    /// Duplicate internal module detected.
+    DuplicateInternalModule,
+    /// The provided external macro does not appear in the token stream.
+    ExternalMacroNotFound,
+    /// The provided external trait does not appear in the token stream.
+    ExternalTraitNotFound,
+    /// The provided internal data does not appear in the token stream.
+    InternalDataNotFound,
+    /// The provided internal module does not appear in the token stream.
+    InternalModuleNotFound,
+}
+
+impl From<BuilderError<InternalTokenAttribute>> for InternalTokenBuilderError {
+    fn from(value: BuilderError<InternalTokenAttribute>) -> Self {
+        InternalTokenBuilderError::Builder(value)
+    }
 }
 
 impl Display for InternalTokenBuilderError {
@@ -56,6 +89,24 @@ impl Display for InternalTokenBuilderError {
             InternalTokenBuilderError::DuplicateExternalTrait => {
                 write!(f, "Duplicate external trait detected")
             }
+            InternalTokenBuilderError::DuplicateInternalData => {
+                write!(f, "Duplicate internal data detected")
+            }
+            InternalTokenBuilderError::DuplicateInternalModule => {
+                write!(f, "Duplicate internal module detected")
+            }
+            InternalTokenBuilderError::ExternalMacroNotFound => {
+                write!(f, "External macro not found in token stream")
+            }
+            InternalTokenBuilderError::ExternalTraitNotFound => {
+                write!(f, "External trait not found in token stream")
+            }
+            InternalTokenBuilderError::InternalDataNotFound => {
+                write!(f, "Internal data not found in token stream")
+            }
+            InternalTokenBuilderError::InternalModuleNotFound => {
+                write!(f, "Internal module not found in token stream")
+            }
         }
     }
 }
@@ -64,8 +115,7 @@ impl core::error::Error for InternalTokenBuilderError {
     fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         match self {
             InternalTokenBuilderError::Builder(e) => Some(e),
-            InternalTokenBuilderError::DuplicateExternalMacro => None,
-            InternalTokenBuilderError::DuplicateExternalTrait => None,
+            _ => None,
         }
     }
 }
@@ -122,19 +172,16 @@ impl<'data> InternalTokenBuilder<'data> {
     /// # Errors
     ///
     /// Returns an error if any duplicate external macros are detected.
-    pub fn external_macros(
+    pub fn external_macros<I>(
         mut self,
-        external_macros: Vec<ExternalMacroRef<'data>>,
-    ) -> Result<Self, InternalTokenBuilderError> {
-        // Check for duplicates within the provided vector
-        for (i, macro1) in external_macros.iter().enumerate() {
-            for macro2 in external_macros.iter().skip(i + 1) {
-                if macro1 == macro2 {
-                    return Err(InternalTokenBuilderError::DuplicateExternalMacro);
-                }
-            }
+        external_macros: I,
+    ) -> Result<Self, InternalTokenBuilderError>
+    where
+        I: IntoIterator<Item = ExternalMacroRef<'data>>,
+    {
+        for external_macro in external_macros {
+            self = self.external_macro(external_macro)?;
         }
-        self.external_macros = external_macros;
         Ok(self)
     }
 
@@ -180,6 +227,60 @@ impl<'data> InternalTokenBuilder<'data> {
         self.external_traits = external_traits;
         Ok(self)
     }
+
+    /// Adds an internal data reference to the token stream.
+    ///
+    /// # Arguments
+    ///
+    /// * `internal_data` - The internal data reference.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the internal data is already present.
+    pub fn internal_data(
+        mut self,
+        internal_data: InternalDataRef<'data>,
+    ) -> Result<Self, InternalTokenBuilderError> {
+        if self.internal_data.contains(&internal_data) {
+            return Err(InternalTokenBuilderError::DuplicateInternalData);
+        }
+        self.internal_data.push(internal_data);
+        Ok(self)
+    }
+
+    /// Adds an internal module reference to the token stream.
+    ///
+    /// # Arguments
+    ///
+    /// * `internal_module` - The internal module reference.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the internal module is already present.
+    pub fn internal_module(
+        mut self,
+        internal_module: InternalModuleRef<'data>,
+    ) -> Result<Self, InternalTokenBuilderError> {
+        if self.internal_modules.contains(&internal_module) {
+            return Err(InternalTokenBuilderError::DuplicateInternalModule);
+        }
+        self.internal_modules.push(internal_module);
+        Ok(self)
+    }
+
+    /// Adds internal module references to the token stream.
+    pub fn internal_modules<I>(
+        mut self,
+        internal_modules: I,
+    ) -> Result<Self, InternalTokenBuilderError>
+    where
+        I: IntoIterator<Item = InternalModuleRef<'data>>,
+    {
+        for internal_module in internal_modules {
+            self = self.internal_module(internal_module)?;
+        }
+        Ok(self)
+    }
 }
 
 impl Display for InternalTokenAttribute {
@@ -187,6 +288,10 @@ impl Display for InternalTokenAttribute {
         match self {
             InternalTokenAttribute::Publicness => write!(f, "publicness"),
             InternalTokenAttribute::Stream => write!(f, "stream"),
+            InternalTokenAttribute::ExternalMacros => write!(f, "external_macros"),
+            InternalTokenAttribute::ExternalTraits => write!(f, "external_traits"),
+            InternalTokenAttribute::InternalData => write!(f, "internal_data"),
+            InternalTokenAttribute::InternalModules => write!(f, "internal_modules"),
         }
     }
 }
@@ -202,10 +307,35 @@ impl<'data> IsCompleteBuilder for InternalTokenBuilder<'data> {
 }
 
 impl<'data> Builder for InternalTokenBuilder<'data> {
-    type Error = BuilderError<InternalTokenAttribute>;
+    type Error = InternalTokenBuilderError;
     type Object = InternalToken<'data>;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
+        let string_token_stream = self.stream.to_token_stream().to_string();
+        for external_macro in &self.external_macros {
+            let macro_name = external_macro.name();
+            if !string_token_stream.contains(macro_name) {
+                return Err(InternalTokenBuilderError::ExternalMacroNotFound);
+            }
+        }
+        for external_trait in &self.external_traits {
+            let trait_name = external_trait.name();
+            if !string_token_stream.contains(trait_name) {
+                return Err(InternalTokenBuilderError::ExternalTraitNotFound);
+            }
+        }
+        for internal_data in &self.internal_data {
+            let data_name = internal_data.name();
+            if !string_token_stream.contains(data_name) {
+                return Err(InternalTokenBuilderError::InternalDataNotFound);
+            }
+        }
+        for internal_module in &self.internal_modules {
+            let module_name = internal_module.name();
+            if !string_token_stream.contains(module_name) {
+                return Err(InternalTokenBuilderError::InternalModuleNotFound);
+            }
+        }
         Ok(InternalToken {
             publicness: self
                 .publicness
@@ -215,6 +345,8 @@ impl<'data> Builder for InternalTokenBuilder<'data> {
                 .ok_or(BuilderError::IncompleteBuild(InternalTokenAttribute::Stream))?,
             external_macros: self.external_macros,
             external_traits: self.external_traits,
+            internal_data: self.internal_data,
+            internal_modules: self.internal_modules,
         })
     }
 }

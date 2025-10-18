@@ -480,6 +480,38 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     where
         Self: 'db;
 
+    /// Returns whether the table has any foreign keys.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE host_table_with_fk (id INT, name TEXT, FOREIGN KEY (id) REFERENCES referenced_table(id));
+    /// CREATE TABLE host_table_without_fk (id INT, name TEXT);
+    /// "#,
+    /// )?;
+    /// let referenced_table = db.table(None, "referenced_table");
+    /// assert!(!referenced_table.has_foreign_keys(&db));
+    /// let host_table_with_fk = db.table(None, "host_table_with_fk");
+    /// assert!(host_table_with_fk.has_foreign_keys(&db));
+    /// let host_table_without_fk = db.table(None, "host_table_without_fk");
+    /// assert!(!host_table_without_fk.has_foreign_keys(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_foreign_keys(&self, database: &Self::Database) -> bool {
+        self.foreign_keys(database).next().is_some()
+    }
+
     /// Iterates over the foreign keys in the current table which refer to
     /// ancestors of the provided table.
     ///
@@ -575,6 +607,24 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
         referenced_tables.sort_unstable();
         referenced_tables.dedup();
 
+        referenced_tables
+    }
+
+    /// Returns a vector with the (deduplicated) tables which are referenced by
+    /// the current table via foreign keys, and which are not the table itself.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    fn non_self_referenced_tables<'db>(&'db self, database: &'db Self::Database) -> Vec<&'db Self>
+    where
+        Self: 'db,
+    {
+        let mut referenced_tables = self.referenced_tables(database);
+        referenced_tables.retain(|&table| table != self);
         referenced_tables
     }
 

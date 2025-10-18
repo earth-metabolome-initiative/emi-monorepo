@@ -2,6 +2,8 @@
 
 mod builder;
 
+use std::rc::Rc;
+
 pub use builder::InternalModuleBuilder;
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
@@ -9,7 +11,7 @@ use syn::Ident;
 
 use crate::structs::{InternalCrate, InternalData, InternalToken, Publicness};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 /// Struct representing a rust module.
 pub struct InternalModule<'data> {
     /// Name of the module.
@@ -19,17 +21,11 @@ pub struct InternalModule<'data> {
     /// Publicness of the module.
     publicness: Publicness,
     /// Data structs defined within the module.
-    data: Vec<InternalData<'data>>,
+    data: Vec<Rc<InternalData<'data>>>,
     /// Internal token streams defined within the module.
     internal_tokens: Vec<InternalToken<'data>>,
     /// Module documentation.
     documentation: String,
-}
-
-impl PartialEq for InternalModule<'_> {
-    fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
-    }
 }
 
 impl<'data> InternalModule<'data> {
@@ -81,6 +77,9 @@ impl<'data> InternalModule<'data> {
         for data in &self.data {
             dependencies.extend(data.internal_dependencies());
         }
+        for token in &self.internal_tokens {
+            dependencies.extend(token.internal_dependencies());
+        }
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
@@ -101,6 +100,22 @@ impl<'data> InternalModule<'data> {
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
+    }
+
+    /// Returns a reference to the internal data with the given name if it
+    /// exists in the module.
+    pub fn internal_data(&self, name: &str) -> Option<&Rc<InternalData<'data>>> {
+        for data in &self.data {
+            if data.name() == name {
+                return Some(data);
+            }
+        }
+        for submodule in &self.submodules {
+            if let Some(data) = submodule.internal_data(name) {
+                return Some(data);
+            }
+        }
+        None
     }
 
     /// Writes the module to disk at the specified path.

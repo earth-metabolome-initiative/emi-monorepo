@@ -7,6 +7,12 @@ use crate::structs::schema_macro::SchemaMacro;
 
 /// Trait to create the `diesel` schema from a SQL schema.
 pub trait TableSchema: TableSynLike + Sized {
+    /// Returns the name of the crate which will contain the diesel schema for
+    /// the table.
+    fn table_schema_crate_name(&self) -> String {
+        format!("{}_schema", self.table_snake_name())
+    }
+
     /// Returns the `SchemaMacro` representing the diesel schema for the table.
     ///
     /// # Arguments

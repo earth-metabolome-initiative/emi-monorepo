@@ -1,15 +1,17 @@
 //! Submodule providing a struct which defines a data model.
 
+use std::rc::Rc;
+
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
 use syn::Ident;
 
 use crate::structs::{
-    ExternalCrate, InternalCrate, InternalEnum, InternalStruct, Publicness,
+    ExternalCrate, InternalCrate, InternalEnum, InternalModule, InternalStruct, Publicness,
     external_crate::ExternalTypeRef,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 /// Enum representing the variant of internal data (struct or enum).
 pub enum InternalDataVariant<'data> {
     /// Variant representing a struct.
@@ -28,7 +30,7 @@ impl<'data> InternalDataVariant<'data> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 /// Enum representing a variant of internal data, which may be defined within
 /// the workspace or come from an external crate.
 pub enum DataVariantRef<'data> {
@@ -40,7 +42,7 @@ pub enum DataVariantRef<'data> {
 
 impl<'data> DataVariantRef<'data> {
     /// Returns the internal crate dependencies of the variant.
-    pub fn internal_dependencies(&self) -> Vec<&'data InternalCrate<'data>> {
+    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
         match self {
             DataVariantRef::Internal(internal) => internal.internal_dependencies(),
             DataVariantRef::External(_) => vec![],
@@ -123,27 +125,44 @@ impl Ord for TraitVariantRef<'_> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 /// Struct representing a reference to internal data and its crate.
 pub struct InternalDataRef<'data> {
-    data: &'data InternalData<'data>,
-    internal_crate: &'data InternalCrate<'data>,
+    data: Rc<InternalData<'data>>,
+    internal_crate: Rc<InternalCrate<'data>>,
 }
 
 impl<'data> InternalDataRef<'data> {
+    pub(crate) fn new(
+        internal_crate: &Rc<InternalCrate<'data>>,
+        data: &Rc<InternalData<'data>>,
+    ) -> InternalDataRef<'data> {
+        InternalDataRef { data: data.clone(), internal_crate: internal_crate.clone() }
+    }
+
     /// Returns the internal data.
-    pub fn data(&self) -> &'data InternalData<'data> {
-        self.data
+    pub fn data(&self) -> &InternalData<'data> {
+        self.data.as_ref()
     }
 
     /// Returns the internal crate.
-    pub fn internal_crate(&self) -> &'data InternalCrate<'data> {
-        self.internal_crate
+    pub fn internal_crate(&self) -> &InternalCrate<'data> {
+        self.internal_crate.as_ref()
+    }
+
+    /// Returns the name of the internal data.
+    pub fn name(&self) -> &str {
+        self.data.name()
+    }
+
+    /// Returns the ident of the internal crate.
+    pub fn crate_ident(&self) -> Ident {
+        self.internal_crate.ident()
     }
 
     /// Returns the internal crate dependencies of the variant.
-    pub fn internal_dependencies(&self) -> Vec<&'data InternalCrate<'data>> {
-        vec![self.internal_crate]
+    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+        vec![self.internal_crate.as_ref()]
     }
 }
 
@@ -162,13 +181,55 @@ impl ToTokens for DataVariantRef<'_> {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
+/// Struct representing a reference to internal module and its crate.
+pub struct InternalModuleRef<'data> {
+    module: Rc<InternalModule<'data>>,
+    internal_crate: Rc<InternalCrate<'data>>,
+}
+
+impl<'data> InternalModuleRef<'data> {
+    /// Creates a new `InternalModuleRef`.
+    ///
+    /// # Arguments
+    ///
+    /// * `internal_crate` - A reference to the internal crate.
+    /// * `module` - A reference to the internal module.
+    pub fn new(
+        internal_crate: &Rc<InternalCrate<'data>>,
+        module: &Rc<InternalModule<'data>>,
+    ) -> InternalModuleRef<'data> {
+        InternalModuleRef { module: module.clone(), internal_crate: internal_crate.clone() }
+    }
+
+    /// Returns the internal module.
+    pub fn module(&self) -> &InternalModule<'data> {
+        self.module.as_ref()
+    }
+
+    /// Returns the internal crate.
+    pub fn internal_crate(&self) -> &InternalCrate<'data> {
+        self.internal_crate.as_ref()
+    }
+
+    /// Returns the name of the internal module.
+    pub fn name(&self) -> &str {
+        self.module.name()
+    }
+
+    /// Returns the ident of the internal crate.
+    pub fn crate_ident(&self) -> Ident {
+        self.internal_crate.ident()
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 /// Struct defining a data model.
 pub struct InternalData<'data> {
     /// Publicness of the data.
     publicness: Publicness,
     /// Name of the data.
-    ident: Ident,
+    name: String,
     /// The variant of the data (struct or enum).
     variant: InternalDataVariant<'data>,
     /// The traits implemented for the data.
@@ -186,9 +247,14 @@ impl<'data> InternalData<'data> {
         self.publicness.is_public()
     }
 
+    /// Returns the name of the data.
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
     /// Returns a reference to the name of the data.
-    pub fn ident(&self) -> &Ident {
-        &self.ident
+    pub fn ident(&self) -> Ident {
+        syn::Ident::new(&self.name, proc_macro2::Span::call_site())
     }
 
     /// Returns a reference to the variant of the data.
@@ -229,7 +295,7 @@ impl<'data> InternalData<'data> {
 impl<'data> ToTokens for InternalData<'data> {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let publicness = &self.publicness;
-        let ident = &self.ident;
+        let ident = self.ident();
         let variant = match &self.variant {
             InternalDataVariant::StructVariant(s) => {
                 quote::quote! {

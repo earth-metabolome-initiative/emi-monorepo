@@ -50,6 +50,7 @@ impl From<PathBuf> for DirectoryTree {
 
         nodes.push(path.clone());
         recursive_build_tree(&path, 0, &mut nodes, &mut edges);
+        edges.sort_unstable();
 
         let edges = GenericEdgesBuilder::default()
             .edges(edges)

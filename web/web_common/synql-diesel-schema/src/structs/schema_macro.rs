@@ -5,9 +5,11 @@ use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
 use synql_core::{
     prelude::{Builder, ColumnLike},
-    structs::{InternalCrate, InternalModule, InternalToken, Workspace},
+    structs::{InternalCrate, InternalModule, InternalModuleRef, InternalToken, Workspace},
     traits::{ColumnSynLike, TableSynLike},
 };
+
+use crate::traits::TableSchema;
 
 /// Struct representing a diesel schema.
 pub struct SchemaMacro<'data, 'table, T: TableSynLike> {
@@ -21,6 +23,18 @@ pub struct SchemaMacro<'data, 'table, T: TableSynLike> {
 
 impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for InternalModule<'data> {
     fn from(value: SchemaMacro<'data, 'table, T>) -> Self {
+        let mut macros =
+            vec![value.workspace.external_macro("table").expect("Failed to find the macro")];
+
+        if value.table.has_foreign_keys(value.database) {
+            let allow_tables_to_appear_in_same_query = value
+                .workspace
+                .external_macro("allow_tables_to_appear_in_same_query")
+                .expect("Failed to find the macro");
+
+            macros.push(allow_tables_to_appear_in_same_query);
+        }
+
         InternalModule::new()
             .name("schema")
             .expect("Invalid name")
@@ -30,10 +44,28 @@ impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for Int
             .internal_token(
                 InternalToken::new()
                     .public()
-                    .external_macro(
-                        value.workspace.external_macro("table").expect("Failed to find the macro"),
+                    .external_macros(macros)
+                    .expect("Failed to insert the macros")
+                    .internal_modules(
+                        value.table.non_self_referenced_tables(value.database).into_iter().map(
+                            |referenced_table| {
+                                let crate_ref = value
+                                    .workspace
+                                    .internal_crate(&referenced_table.table_schema_crate_name())
+                                    .expect(&format!(
+                                        "Failed to find the referenced table struct: {}",
+                                        referenced_table.table_name()
+                                    ));
+                                InternalModuleRef::new(
+                                    crate_ref,
+                                    crate_ref
+                                        .module("schema")
+                                        .expect("Failed to insert the module"),
+                                )
+                            },
+                        ),
                     )
-                    .expect("Failed to insert the macro")
+                    .expect("Failed to insert the module")
                     .stream(value.into_token_stream())
                     .build()
                     .unwrap(),
@@ -46,7 +78,7 @@ impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for Int
 impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for InternalCrate<'data> {
     fn from(value: SchemaMacro<'data, 'table, T>) -> Self {
         InternalCrate::new()
-            .name(format!("{}_schema", value.table.table_snake_name()))
+            .name(value.table.table_schema_crate_name())
             .expect("Invalid crate name")
             .documentation(format!(
                 "Diesel schema crate for the `{}` table.",
@@ -143,6 +175,22 @@ where
                     #(#columns),*
                 }
             }
-        })
+        });
+
+        for referenced_table in self.table.referenced_tables(self.database) {
+            let crate_ref = self
+                .workspace
+                .internal_crate(&referenced_table.table_schema_crate_name())
+                .expect(&format!(
+                    "Failed to find the referenced table struct: {}",
+                    referenced_table.table_name()
+                ));
+            let crate_ident = crate_ref.ident();
+            let referenced_table_name_ident = referenced_table.table_snake_ident();
+            tokens.extend(quote! {
+                use #crate_ident::schema::#referenced_table_name_ident;
+                diesel::allow_tables_to_appear_in_same_query!(#table_name_ident, #referenced_table_name_ident);
+            });
+        }
     }
 }

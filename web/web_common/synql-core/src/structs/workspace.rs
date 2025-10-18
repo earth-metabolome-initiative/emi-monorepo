@@ -46,8 +46,18 @@ impl<'data> Workspace<'data> {
     }
 
     /// Adds a new internal crate to the workspace.
-    pub fn internal_crate(&mut self, internal_crate: InternalCrate<'data>) {
+    pub fn add_internal_crate(&mut self, internal_crate: InternalCrate<'data>) {
         self.internal_crates.push(Rc::new(internal_crate));
+    }
+
+    /// Returns the internal crate with the given name, if any.
+    pub fn internal_crate(&self, name: &str) -> Option<&Rc<InternalCrate<'data>>> {
+        for internal_crate in &self.internal_crates {
+            if internal_crate.name() == name {
+                return Some(internal_crate);
+            }
+        }
+        None
     }
 
     /// Returns the external macro ref corresponding to the provided name, if

@@ -1,6 +1,6 @@
 //! Submodule defining a builder for the `InternalCrate` struct.
 
-use std::{error::Error, fmt::Display};
+use std::{error::Error, fmt::Display, rc::Rc};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -15,7 +15,7 @@ pub struct InternalCrateBuilder<'data> {
     /// Name of the crate.
     name: Option<String>,
     /// The root modules of the crate.
-    modules: Vec<InternalModule<'data>>,
+    modules: Vec<Rc<InternalModule<'data>>>,
     /// Crate documentation.
     documentation: Option<String>,
 }
@@ -118,10 +118,10 @@ impl<'data> InternalCrateBuilder<'data> {
         mut self,
         module: InternalModule<'data>,
     ) -> Result<Self, InternalCrateBuilderError> {
-        if self.modules.iter().any(|m| m.ident() == module.ident()) {
+        if self.modules.iter().any(|m| m.as_ref() == &module) {
             return Err(InternalCrateBuilderError::DuplicatedModuleName);
         }
-        self.modules.push(module);
+        self.modules.push(Rc::new(module));
         Ok(self)
     }
 

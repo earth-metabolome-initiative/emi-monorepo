@@ -11,7 +11,14 @@ lazy_static! {
         .name("diesel".to_string())
         .unwrap()
         .version("2.3.1")
-        .add_macro(ExternalMacro::new().name("table".to_string()).unwrap().build().unwrap(),)
+        .add_macros([
+            ExternalMacro::new().name("table".to_string()).unwrap().build().unwrap(),
+            ExternalMacro::new()
+                .name("allow_tables_to_appear_in_same_query".to_string())
+                .unwrap()
+                .build()
+                .unwrap(),
+        ])
         .unwrap()
         .build()
         .unwrap();

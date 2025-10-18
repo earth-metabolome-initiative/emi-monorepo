@@ -1,12 +1,11 @@
 //! Submodule defining a builder for the `InternalModule` struct.
 
-use std::{error::Error, fmt::Display};
+use std::{error::Error, fmt::Display, rc::Rc};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
-use proc_macro2::TokenStream;
 
 use crate::structs::{InternalData, InternalModule, InternalToken, Publicness};
 
@@ -20,7 +19,7 @@ pub struct InternalModuleBuilder<'data> {
     /// Publicness of the module.
     publicness: Option<Publicness>,
     /// Data structs defined within the module.
-    data: Vec<InternalData<'data>>,
+    data: Vec<Rc<InternalData<'data>>>,
     /// Other token streams defined within the module.
     internal_tokens: Vec<InternalToken<'data>>,
     /// Module documentation.
@@ -176,10 +175,10 @@ impl<'data> InternalModuleBuilder<'data> {
     /// # Arguments
     /// * `data` - The data struct to add.
     pub fn data(mut self, data: InternalData<'data>) -> Result<Self, InternalModuleBuilderError> {
-        if self.data.iter().any(|d| d.ident() == data.ident()) {
+        if self.data.iter().any(|d| d.as_ref() == &data) {
             return Err(InternalModuleBuilderError::DuplicatedDataName);
         }
-        self.data.push(data);
+        self.data.push(Rc::new(data));
         Ok(self)
     }
 
