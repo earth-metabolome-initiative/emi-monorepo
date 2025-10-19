@@ -1,23 +1,37 @@
 //! Submodule providing a struct which defines a data model.
 
+mod builder;
+
 use std::rc::Rc;
 
-use proc_macro2::TokenStream;
+pub use builder::InternalDataBuilder;
 use quote::{ToTokens, quote};
 use syn::Ident;
 
 use crate::structs::{
-    ExternalCrate, InternalCrate, InternalEnum, InternalModule, InternalStruct, Publicness,
-    external_crate::ExternalTypeRef,
+    Derive, ExternalCrate, InternalCrate, InternalEnum, InternalModule, InternalStruct, Publicness,
+    external_crate::ExternalTypeRef, external_trait::TraitVariantRef,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Enum representing the variant of internal data (struct or enum).
 pub enum InternalDataVariant<'data> {
     /// Variant representing a struct.
     StructVariant(InternalStruct<'data>),
     /// Variant representing an enum.
     EnumVariant(InternalEnum<'data>),
+}
+
+impl<'data> From<InternalStruct<'data>> for InternalDataVariant<'data> {
+    fn from(struct_variant: InternalStruct<'data>) -> Self {
+        InternalDataVariant::StructVariant(struct_variant)
+    }
+}
+
+impl<'data> From<InternalEnum<'data>> for InternalDataVariant<'data> {
+    fn from(enum_variant: InternalEnum<'data>) -> Self {
+        InternalDataVariant::EnumVariant(enum_variant)
+    }
 }
 
 impl<'data> InternalDataVariant<'data> {
@@ -30,7 +44,7 @@ impl<'data> InternalDataVariant<'data> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Enum representing a variant of internal data, which may be defined within
 /// the workspace or come from an external crate.
 pub enum DataVariantRef<'data> {
@@ -38,6 +52,18 @@ pub enum DataVariantRef<'data> {
     Internal(InternalDataRef<'data>),
     /// Variant representing data defined within an external crate.
     External(ExternalTypeRef<'data>),
+}
+
+impl<'data> From<InternalDataRef<'data>> for DataVariantRef<'data> {
+    fn from(internal: InternalDataRef<'data>) -> Self {
+        DataVariantRef::Internal(internal)
+    }
+}
+
+impl<'data> From<ExternalTypeRef<'data>> for DataVariantRef<'data> {
+    fn from(external: ExternalTypeRef<'data>) -> Self {
+        DataVariantRef::External(external)
+    }
 }
 
 impl<'data> DataVariantRef<'data> {
@@ -58,74 +84,7 @@ impl<'data> DataVariantRef<'data> {
     }
 }
 
-#[derive(Debug, Clone)]
-/// Enum representing a trait implemented for some internal data,
-/// which may be defined within the workspace or come from an external crate.
-pub enum TraitVariantRef<'data> {
-    /// Variant representing a trait defined within the workspace.
-    Internal(TokenStream, &'data InternalCrate<'data>),
-    /// Variant representing a trait defined within an external crate.
-    External(TokenStream, &'data ExternalCrate),
-}
-
-impl<'data> PartialEq for TraitVariantRef<'data> {
-    fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (
-                TraitVariantRef::Internal(stream_a, krate_a),
-                TraitVariantRef::Internal(stream_b, krate_b),
-            ) => krate_a == krate_b && stream_a.to_string() == stream_b.to_string(),
-            (
-                TraitVariantRef::External(stream_a, crate_a),
-                TraitVariantRef::External(stream_b, crate_b),
-            ) => crate_a == crate_b && stream_a.to_string() == stream_b.to_string(),
-            _ => false,
-        }
-    }
-}
-
-impl Eq for TraitVariantRef<'_> {}
-
-impl PartialOrd for TraitVariantRef<'_> {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for TraitVariantRef<'_> {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        match (self, other) {
-            (
-                TraitVariantRef::Internal(stream_a, krate_a),
-                TraitVariantRef::Internal(stream_b, krate_b),
-            ) => {
-                let crate_cmp = krate_a.name().cmp(krate_b.name());
-                if crate_cmp != std::cmp::Ordering::Equal {
-                    return crate_cmp;
-                }
-                stream_a.to_string().cmp(&stream_b.to_string())
-            }
-            (
-                TraitVariantRef::External(stream_a, crate_a),
-                TraitVariantRef::External(stream_b, crate_b),
-            ) => {
-                let crate_cmp = crate_a.name().cmp(crate_b.name());
-                if crate_cmp != std::cmp::Ordering::Equal {
-                    return crate_cmp;
-                }
-                stream_a.to_string().cmp(&stream_b.to_string())
-            }
-            (TraitVariantRef::Internal(_, _), TraitVariantRef::External(_, _)) => {
-                std::cmp::Ordering::Less
-            }
-            (TraitVariantRef::External(_, _), TraitVariantRef::Internal(_, _)) => {
-                std::cmp::Ordering::Greater
-            }
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a reference to internal data and its crate.
 pub struct InternalDataRef<'data> {
     data: Rc<InternalData<'data>>,
@@ -181,7 +140,7 @@ impl ToTokens for DataVariantRef<'_> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a reference to internal module and its crate.
 pub struct InternalModuleRef<'data> {
     module: Rc<InternalModule<'data>>,
@@ -223,20 +182,29 @@ impl<'data> InternalModuleRef<'data> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining a data model.
 pub struct InternalData<'data> {
     /// Publicness of the data.
     publicness: Publicness,
     /// Name of the data.
     name: String,
+    /// Documentation of the data.
+    documentation: Option<String>,
     /// The variant of the data (struct or enum).
     variant: InternalDataVariant<'data>,
     /// The traits implemented for the data.
     traits: Vec<TraitVariantRef<'data>>,
+    /// The derives applies to the data.
+    derives: Vec<Derive<'data>>,
 }
 
 impl<'data> InternalData<'data> {
+    /// Initializes a new `InternalDataBuilder`.
+    pub fn new() -> InternalDataBuilder<'data> {
+        InternalDataBuilder::default()
+    }
+
     /// Returns a reference to the publicness of the data.
     pub fn publicness(&self) -> &Publicness {
         &self.publicness
@@ -308,7 +276,18 @@ impl<'data> ToTokens for InternalData<'data> {
                 }
             }
         };
+        let documentation = match &self.documentation {
+            Some(doc) => {
+                quote::quote! {
+                    #[doc = #doc]
+                }
+            }
+            None => quote::quote! {},
+        };
+        let derives = &self.derives;
         let token = quote::quote! {
+            #(#derives)*
+            #documentation
             #publicness #variant
         };
         tokens.extend(token);

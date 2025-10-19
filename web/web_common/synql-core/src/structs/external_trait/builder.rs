@@ -14,6 +14,9 @@ use crate::structs::ExternalTrait;
 pub struct ExternalTraitBuilder {
     /// The name of the trait.
     name: Option<String>,
+    /// The [`syn::Path`](syn::Path) representing the trait
+    /// within the external crate.
+    path: Option<syn::Path>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -21,6 +24,9 @@ pub struct ExternalTraitBuilder {
 pub enum ExternalTraitAttribute {
     /// The name of the trait.
     Name,
+    /// The [`syn::Path`](syn::Path) representing the trait
+    /// within the external crate.
+    Path,
 }
 
 /// Error enumeration which might occur when building a `ExternalTrait`.
@@ -45,7 +51,7 @@ impl core::error::Error for ExternalTraitBuilderError {
     fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         match self {
             ExternalTraitBuilderError::Builder(e) => Some(e),
-            ExternalTraitBuilderError::InvalidName => None,
+            _ => None,
         }
     }
 }
@@ -67,12 +73,20 @@ impl ExternalTraitBuilder {
         self.name = Some(name);
         Ok(self)
     }
+
+    /// Sets the [`syn::Path`](syn::Path) representing the trait
+    /// within the external crate.
+    pub fn path(mut self, path: impl Into<syn::Path>) -> Self {
+        self.path = Some(path.into());
+        self
+    }
 }
 
 impl Display for ExternalTraitAttribute {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             ExternalTraitAttribute::Name => write!(f, "name"),
+            ExternalTraitAttribute::Path => write!(f, "path"),
         }
     }
 }
@@ -83,7 +97,7 @@ impl Attributed for ExternalTraitBuilder {
 
 impl IsCompleteBuilder for ExternalTraitBuilder {
     fn is_complete(&self) -> bool {
-        self.name.is_some()
+        self.name.is_some() && self.path.is_some()
     }
 }
 
@@ -94,6 +108,7 @@ impl Builder for ExternalTraitBuilder {
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(ExternalTrait {
             name: self.name.ok_or(BuilderError::IncompleteBuild(ExternalTraitAttribute::Name))?,
+            path: self.path.ok_or(BuilderError::IncompleteBuild(ExternalTraitAttribute::Path))?,
         })
     }
 }

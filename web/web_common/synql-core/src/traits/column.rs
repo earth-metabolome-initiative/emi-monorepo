@@ -3,12 +3,11 @@
 //! representation, building on top of the
 //! [`ColumnLike`](sql_traits::traits::ColumnLike) trait.
 
-use quote::ToTokens;
 use sql_traits::traits::ColumnLike;
 use syn::{Ident, Type};
 
 use crate::{
-    structs::Workspace,
+    structs::{ExternalTypeRef, Workspace},
     utils::{camel_case_name, is_reserved_rust_word, snake_case_name},
 };
 
@@ -115,24 +114,26 @@ pub trait ColumnSynLike: ColumnLike {
         Ident::new(&self.column_camel_name(), proc_macro2::Span::call_site())
     }
 
-    /// Returns the Diesel type of this column.
-    fn diesel_type<'workspace>(
+    /// Returns the type ref curresponding to the postgres type of this column.
+    ///
+    /// # Arguments
+    ///
+    /// * `workspace` - The workspace where the column is defined.
+    fn external_postgres_type<'workspace, 'data>(
         &self,
-        workspace: &'workspace Workspace,
+        workspace: &'workspace Workspace<'data>,
+    ) -> Option<ExternalTypeRef<'data>> {
+        workspace.external_postgres_type(&self.data_type())
+    }
+
+    /// Returns the Diesel type of this column.
+    fn diesel_type<'workspace, 'data>(
+        &self,
+        workspace: &'workspace Workspace<'data>,
         _database: &Self::Database,
-    ) -> Option<Type> {
-        let column_type = workspace.diesel_type(&self.normalized_data_type())?;
-        if self.is_nullable() {
-            Some(
-                syn::parse_str(&format!(
-                    "diesel::sql_types::Nullable<{}>",
-                    column_type.to_token_stream()
-                ))
-                .unwrap(),
-            )
-        } else {
-            Some(column_type.clone())
-        }
+    ) -> Option<&'data Type> {
+        let external_type = self.external_postgres_type(workspace)?;
+        Some(external_type.diesel_type())
     }
 }
 

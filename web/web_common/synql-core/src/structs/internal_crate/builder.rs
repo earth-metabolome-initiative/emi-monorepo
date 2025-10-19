@@ -87,7 +87,11 @@ impl<'data> InternalCrateBuilder<'data> {
     /// * `name` - The name of the crate.
     pub fn name<S: ToString>(mut self, name: S) -> Result<Self, InternalCrateBuilderError> {
         let name = name.to_string();
-        if name.trim().is_empty() || name.contains(' ') {
+        if name.trim().is_empty()
+            || name.contains(' ')
+            || !name.chars().all(|c| c.is_alphanumeric() || c == '_')
+            || !name.chars().all(|c| c.is_lowercase() || c == '_')
+        {
             return Err(InternalCrateBuilderError::InvalidName);
         }
         self.name = Some(name);

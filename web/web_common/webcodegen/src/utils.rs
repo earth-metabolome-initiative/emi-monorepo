@@ -2,7 +2,6 @@
 
 use cached::{UnboundCache, proc_macro::cached};
 use inflector::Inflector;
-use snake_case_sanitizer::Sanitizer as SnakeCaseSanizer;
 
 use crate::errors::WebCodeGenError;
 

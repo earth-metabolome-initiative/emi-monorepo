@@ -5,7 +5,7 @@ use syn::Ident;
 
 use crate::structs::internal_data::DataVariantRef;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining a enum model.
 pub struct InternalEnum<'data> {
     /// Variants of the enum.

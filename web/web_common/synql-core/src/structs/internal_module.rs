@@ -9,9 +9,9 @@ use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
 use syn::Ident;
 
-use crate::structs::{InternalCrate, InternalData, InternalToken, Publicness};
+use crate::structs::{InternalCrate, InternalData, InternalToken, InternalTrait, Publicness};
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a rust module.
 pub struct InternalModule<'data> {
     /// Name of the module.
@@ -22,6 +22,8 @@ pub struct InternalModule<'data> {
     publicness: Publicness,
     /// Data structs defined within the module.
     data: Vec<Rc<InternalData<'data>>>,
+    /// Internal trait defined within the module.
+    internal_traits: Vec<Rc<InternalTrait<'data>>>,
     /// Internal token streams defined within the module.
     internal_tokens: Vec<InternalToken<'data>>,
     /// Module documentation.
@@ -77,6 +79,9 @@ impl<'data> InternalModule<'data> {
         for data in &self.data {
             dependencies.extend(data.internal_dependencies());
         }
+        for internal_trait in &self.internal_traits {
+            dependencies.extend(internal_trait.internal_dependencies());
+        }
         for token in &self.internal_tokens {
             dependencies.extend(token.internal_dependencies());
         }
@@ -93,6 +98,9 @@ impl<'data> InternalModule<'data> {
         }
         for data in &self.data {
             dependencies.extend(data.external_dependencies());
+        }
+        for internal_trait in &self.internal_traits {
+            dependencies.extend(internal_trait.external_dependencies());
         }
         for token in &self.internal_tokens {
             dependencies.extend(token.external_dependencies());

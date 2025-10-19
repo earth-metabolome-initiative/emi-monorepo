@@ -9,7 +9,7 @@ use syn::Ident;
 
 use crate::{
     traits::ColumnSynLike,
-    utils::{camel_case_name, is_reserved_rust_word, snake_case_name},
+    utils::{camel_case_name, is_reserved_rust_word, singular_snake_name, snake_case_name},
 };
 
 /// Trait implemented by types that represent SQL tables and can be used to
@@ -34,6 +34,24 @@ pub trait TableSynLike: TableLike<Column = <Self as TableSynLike>::ColumnSyn> {
     /// ```
     fn table_snake_name(&self) -> String {
         snake_case_name(self.table_name())
+    }
+
+    /// Returns the singular snake-cased name of this table.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use synql_core::prelude::*;
+
+    /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
+    /// let table = db.table(None, "users");
+    /// assert_eq!(table.table_singular_snake_name(), "user");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn table_singular_snake_name(&self) -> String {
+        singular_snake_name(self.table_name())
     }
 
     /// Returns whether the table name is snake case.

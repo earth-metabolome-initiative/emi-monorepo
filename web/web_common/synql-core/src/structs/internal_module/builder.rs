@@ -7,7 +7,7 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 
-use crate::structs::{InternalData, InternalModule, InternalToken, Publicness};
+use crate::structs::{InternalData, InternalModule, InternalToken, InternalTrait, Publicness};
 
 #[derive(Default)]
 /// Builder for the `InternalModule` struct.
@@ -20,6 +20,8 @@ pub struct InternalModuleBuilder<'data> {
     publicness: Option<Publicness>,
     /// Data structs defined within the module.
     data: Vec<Rc<InternalData<'data>>>,
+    /// Internal traits defined within the module.
+    internal_traits: Vec<Rc<InternalTrait<'data>>>,
     /// Other token streams defined within the module.
     internal_tokens: Vec<InternalToken<'data>>,
     /// Module documentation.
@@ -37,6 +39,8 @@ pub enum InternalModuleAttribute {
     Publicness,
     /// Data structs defined within the module.
     Data,
+    /// Internal traits defined within the module.
+    InternalTraits,
     /// Other token streams defined within the module.
     OtherTokens,
     /// Module documentation.
@@ -50,6 +54,7 @@ impl Display for InternalModuleAttribute {
             InternalModuleAttribute::Submodules => write!(f, "submodules"),
             InternalModuleAttribute::Publicness => write!(f, "publicness"),
             InternalModuleAttribute::Data => write!(f, "data"),
+            InternalModuleAttribute::InternalTraits => write!(f, "internal_traits"),
             InternalModuleAttribute::OtherTokens => write!(f, "other_tokens"),
             InternalModuleAttribute::Documentation => write!(f, "documentation"),
         }
@@ -70,6 +75,9 @@ pub enum InternalModuleBuilderError {
     /// A data struct with the same name has already been added to the
     /// module.
     DuplicatedDataName,
+    /// An internal trait with the same name has already been added to the
+    /// module.
+    DuplicatedInternalTraitName,
     /// The documentation is invalid (empty or whitespace only).
     InvalidDocumentation,
 }
@@ -84,6 +92,12 @@ impl Display for InternalModuleBuilderError {
             }
             InternalModuleBuilderError::DuplicatedDataName => {
                 write!(f, "A data struct with the same name has already been added to the module")
+            }
+            InternalModuleBuilderError::DuplicatedInternalTraitName => {
+                write!(
+                    f,
+                    "An internal trait with the same name has already been added to the module"
+                )
             }
             InternalModuleBuilderError::InvalidDocumentation => {
                 write!(f, "Invalid module documentation (empty or whitespace only)")
@@ -111,6 +125,7 @@ impl<'data> InternalModuleBuilder<'data> {
         if name.trim().is_empty()
             || name.contains(' ')
             || !name.chars().all(|c| c.is_alphanumeric() || c == '_')
+            || !name.chars().all(|c| c.is_lowercase() || c == '_')
         {
             return Err(InternalModuleBuilderError::InvalidName);
         }
@@ -182,6 +197,21 @@ impl<'data> InternalModuleBuilder<'data> {
         Ok(self)
     }
 
+    /// Adds an internal trait to the module.
+    ///
+    /// # Arguments
+    /// * `internal_trait` - The internal trait to add.
+    pub fn internal_trait(
+        mut self,
+        internal_trait: InternalTrait<'data>,
+    ) -> Result<Self, InternalModuleBuilderError> {
+        if self.internal_traits.iter().any(|t| t.as_ref() == &internal_trait) {
+            return Err(InternalModuleBuilderError::DuplicatedInternalTraitName);
+        }
+        self.internal_traits.push(Rc::new(internal_trait));
+        Ok(self)
+    }
+
     /// Adds an internal token stream to the module.
     ///
     /// # Arguments
@@ -214,6 +244,7 @@ impl<'data> Builder for InternalModuleBuilder<'data> {
                 .publicness
                 .ok_or(BuilderError::IncompleteBuild(InternalModuleAttribute::Publicness))?,
             data: self.data,
+            internal_traits: self.internal_traits,
             internal_tokens: self.internal_tokens,
             documentation: self
                 .documentation

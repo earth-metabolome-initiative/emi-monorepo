@@ -43,6 +43,19 @@ pub(crate) fn snake_case_name(name: &str) -> String {
     create = "{ UnboundCache::new() }",
     convert = r#"{ name.to_owned() }"#
 )]
+pub(crate) fn singular_snake_name(name: &str) -> String {
+    let sanitizer = Sanitizer::default()
+        .include_defaults()
+        .remove_leading_underscores()
+        .remove_trailing_underscores();
+    sanitizer.to_snake_case(&singular_name(name)).unwrap_or_default()
+}
+
+#[cached(
+    ty = "UnboundCache<String, String>",
+    create = "{ UnboundCache::new() }",
+    convert = r#"{ name.to_owned() }"#
+)]
 pub(crate) fn camel_case_name(name: &str) -> String {
     let sanitizer = Sanitizer::default()
         .include_defaults()

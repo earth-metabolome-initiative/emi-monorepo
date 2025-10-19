@@ -4,11 +4,21 @@ expression: normalized_output
 ---
 [TEMP_DIR]/synql_workspace
     /Cargo.toml
+    /comment_model
+        /Cargo.toml
+        /src
+            /lib.rs
+            /model.rs
     /comments_schema
         /Cargo.toml
         /src
             /lib.rs
             /schema.rs
+    /user_model
+        /Cargo.toml
+        /src
+            /lib.rs
+            /model.rs
     /users_schema
         /Cargo.toml
         /src

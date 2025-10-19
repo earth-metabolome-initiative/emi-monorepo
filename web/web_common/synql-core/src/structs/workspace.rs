@@ -6,7 +6,10 @@ use std::{path::Path, rc::Rc};
 
 pub use builder::WorkspaceBuilder;
 
-use crate::structs::{ExternalCrate, InternalCrate, external_crate::ExternalMacroRef};
+use crate::structs::{
+    ExternalCrate, InternalCrate,
+    external_crate::{ExternalMacroRef, ExternalTypeRef},
+};
 
 /// Struct defining a Cargo workspace.
 pub struct Workspace<'data> {
@@ -74,30 +77,15 @@ impl<'data> Workspace<'data> {
         None
     }
 
-    /// Returns the diesel [`Type`](syn::Type) corresponding to the
-    /// provided postgres type.
+    /// Returns the external type ref corresponding to the provided name, if
+    /// any.
     ///
     /// # Arguments
-    ///
-    /// * `pg_type` - A string slice representing the postgres type.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// # use synql_core::prelude::*;
-    /// use quote::ToTokens;
-    /// let workspace = Workspace::new().name("my_workspace")?.version(0, 1, 0).core()?.build()?;
-    ///
-    /// let diesel_type = workspace.diesel_type("int4").expect("Type not found").clone();
-    /// assert_eq!(diesel_type.to_token_stream().to_string(), "diesel :: sql_types :: Integer");
-    /// # Ok(())
-    /// # }
-    /// ```
-    pub fn diesel_type(&self, pg_type: &str) -> Option<&syn::Type> {
+    /// * `postgres_type` - A string slice representing the postgres type.
+    pub fn external_postgres_type(&self, postgres_type: &str) -> Option<ExternalTypeRef<'data>> {
         for ext_crate in &self.external_crates {
-            if let Some(compatible_type) = ext_crate.compatible_type(pg_type) {
-                return Some(compatible_type.diesel_type());
+            if let Some(ext_type) = ext_crate.external_postgres_type(postgres_type) {
+                return Some(ext_type.clone());
             }
         }
         None
@@ -131,9 +119,8 @@ impl<'data> Workspace<'data> {
         // Add [workspace.dependencies] section
         for internal_crate in &self.internal_crates {
             let crate_name = internal_crate.name();
-            let crate_path = self.path.join(crate_name);
             let mut dep_table = toml_edit::InlineTable::new();
-            dep_table.insert("path", Value::from(crate_path.display().to_string()));
+            dep_table.insert("path", Value::from(crate_name));
             doc["workspace"]["dependencies"][crate_name] = toml_edit::value(dep_table);
         }
 

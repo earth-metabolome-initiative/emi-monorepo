@@ -7,7 +7,7 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 
-use crate::structs::{ExternalCrate, ExternalMacro, ExternalType};
+use crate::structs::{ExternalCrate, ExternalMacro, ExternalTrait, ExternalType};
 
 #[derive(Default)]
 /// Builder for the `ExternalCrate` struct.
@@ -18,6 +18,8 @@ pub struct ExternalCrateBuilder {
     types: Vec<ExternalType>,
     /// List of the macros defined within the crate.
     macros: Vec<ExternalMacro>,
+    /// List of the traits defined within the crate.
+    traits: Vec<ExternalTrait>,
     /// The version of the crate if it is a dependency.
     version: Option<String>,
 }
@@ -29,6 +31,10 @@ pub enum ExternalCrateAttribute {
     Name,
     /// The types provided by the crate.
     Types,
+    /// List of the macros defined within the crate.
+    Macros,
+    /// List of the traits defined within the crate.
+    Traits,
     /// The version of the crate if it is a dependency.
     Version,
 }
@@ -38,6 +44,8 @@ impl Display for ExternalCrateAttribute {
         match self {
             ExternalCrateAttribute::Name => write!(f, "name"),
             ExternalCrateAttribute::Types => write!(f, "types"),
+            ExternalCrateAttribute::Macros => write!(f, "macros"),
+            ExternalCrateAttribute::Traits => write!(f, "traits"),
             ExternalCrateAttribute::Version => write!(f, "version"),
         }
     }
@@ -56,6 +64,8 @@ pub enum ExternalCrateBuilderError {
     DuplicatedPostgresType,
     /// A macro with the same name has already been added to the crate.
     DuplicatedMacro,
+    /// A trait with the same name has already been added to the crate.
+    DuplicatedTrait,
 }
 
 impl Display for ExternalCrateBuilderError {
@@ -71,6 +81,9 @@ impl Display for ExternalCrateBuilderError {
             }
             ExternalCrateBuilderError::DuplicatedMacro => {
                 write!(f, "A macro with the same name has already been added to the crate")
+            }
+            ExternalCrateBuilderError::DuplicatedTrait => {
+                write!(f, "A trait with the same name has already been added to the crate")
             }
         }
     }
@@ -172,6 +185,43 @@ impl ExternalCrateBuilder {
         }
         Ok(self)
     }
+
+    /// Adds a trait defined within the crate.
+    ///
+    /// # Arguments
+    /// * `external_trait` - The trait to add.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if a trait with the same name has already been added.
+    pub fn add_trait(
+        mut self,
+        external_trait: ExternalTrait,
+    ) -> Result<Self, ExternalCrateBuilderError> {
+        if self.traits.iter().any(|t| t.name() == external_trait.name()) {
+            return Err(ExternalCrateBuilderError::DuplicatedTrait);
+        }
+        self.traits.push(external_trait);
+        Ok(self)
+    }
+
+    /// Adds several traits defined within the crate.
+    ///
+    /// # Arguments
+    /// * `external_traits` - The traits to add.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if any trait with the same name has already been added.
+    pub fn add_traits<I>(mut self, external_traits: I) -> Result<Self, ExternalCrateBuilderError>
+    where
+        I: IntoIterator<Item = ExternalTrait>,
+    {
+        for external_trait in external_traits {
+            self = self.add_trait(external_trait)?;
+        }
+        Ok(self)
+    }
 }
 
 impl Attributed for ExternalCrateBuilder {
@@ -193,6 +243,7 @@ impl Builder for ExternalCrateBuilder {
             name: self.name.ok_or(BuilderError::IncompleteBuild(ExternalCrateAttribute::Name))?,
             types: self.types,
             macros: self.macros,
+            traits: self.traits,
             version: self.version,
         })
     }

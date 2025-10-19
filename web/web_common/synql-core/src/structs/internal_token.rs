@@ -3,6 +3,8 @@
 
 mod builder;
 
+use std::hash::Hash;
+
 pub use builder::InternalTokenBuilder;
 use proc_macro2::TokenStream;
 use quote::ToTokens;
@@ -43,6 +45,54 @@ impl PartialEq for InternalToken<'_> {
 }
 
 impl Eq for InternalToken<'_> {}
+
+impl PartialOrd for InternalToken<'_> {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for InternalToken<'_> {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        let stream_cmp = self.stream.to_string().cmp(&other.stream.to_string());
+        if stream_cmp != std::cmp::Ordering::Equal {
+            return stream_cmp;
+        }
+
+        let publicness_cmp = self.publicness.cmp(&other.publicness);
+        if publicness_cmp != std::cmp::Ordering::Equal {
+            return publicness_cmp;
+        }
+
+        let external_macros_cmp = self.external_macros.cmp(&other.external_macros);
+        if external_macros_cmp != std::cmp::Ordering::Equal {
+            return external_macros_cmp;
+        }
+
+        let external_traits_cmp = self.external_traits.cmp(&other.external_traits);
+        if external_traits_cmp != std::cmp::Ordering::Equal {
+            return external_traits_cmp;
+        }
+
+        let internal_data_cmp = self.internal_data.cmp(&other.internal_data);
+        if internal_data_cmp != std::cmp::Ordering::Equal {
+            return internal_data_cmp;
+        }
+
+        self.internal_modules.cmp(&other.internal_modules)
+    }
+}
+
+impl Hash for InternalToken<'_> {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.stream.to_string().hash(state);
+        self.publicness.hash(state);
+        self.external_macros.hash(state);
+        self.external_traits.hash(state);
+        self.internal_data.hash(state);
+        self.internal_modules.hash(state);
+    }
+}
 
 impl<'data> InternalToken<'data> {
     /// Initializes a new `InternalTokenBuilder`.

@@ -2,7 +2,7 @@
 
 mod builder;
 
-use std::rc::Rc;
+use std::{path::Path, rc::Rc};
 
 pub use builder::InternalCrateBuilder;
 use quote::{ToTokens, quote};
@@ -10,7 +10,7 @@ use syn::Ident;
 
 use crate::structs::{InternalData, InternalModule, Workspace};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining a crate model.
 pub struct InternalCrate<'data> {
     /// Name of the crate.
@@ -20,26 +20,6 @@ pub struct InternalCrate<'data> {
     /// Crate documentation.
     documentation: String,
 }
-
-impl PartialEq for InternalCrate<'_> {
-    fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
-    }
-}
-
-impl PartialOrd for InternalCrate<'_> {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.name.cmp(&other.name))
-    }
-}
-
-impl Ord for InternalCrate<'_> {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.name.cmp(&other.name)
-    }
-}
-
-impl Eq for InternalCrate<'_> {}
 
 impl<'data> ToTokens for InternalCrate<'data> {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
@@ -147,10 +127,14 @@ impl<'data> InternalCrate<'data> {
         let internal_dependencies = self.internal_dependencies();
         for dep in internal_dependencies {
             let dep_name = dep.name();
-            let workspace_path = workspace.path().join(dep_name);
+
+            // We add as a prefix "../" to the path to indicate that the dependency is
+            // located in the parent directory of the current crate.
+            let crate_path = Path::new("..").join(dep_name);
+
             let mut dep_table = InlineTable::new();
             dep_table.insert("version", Value::from(format!("{major}.{minor}.{edit}")));
-            dep_table.insert("path", Value::from(workspace_path.display().to_string()));
+            dep_table.insert("path", Value::from(crate_path.display().to_string()));
             doc["dependencies"][dep_name] = toml_edit::value(dep_table);
         }
 
@@ -173,22 +157,6 @@ impl<'data> InternalCrate<'data> {
         // Write to file
         let mut buffer = std::fs::File::create(cargo_toml_path)?;
         write!(buffer, "{}", doc)
-    }
-
-    /// Writes the version of the current internal crate in TOML format for the
-    /// provided workspace.
-    pub fn write_version<B>(&self, workspace: &Workspace, buffer: &mut B) -> std::fmt::Result
-    where
-        B: std::fmt::Write,
-    {
-        let name = &self.name;
-        let (major, minor, edit) = workspace.version();
-        let workspace_path = workspace.path().join(name);
-        writeln!(
-            buffer,
-            "{name} = {{version = \"{major}.{minor}.{edit}\", path = \"{}\"}}",
-            workspace_path.display()
-        )
     }
 
     /// Writes the crate to disk at the provided path.

@@ -2,10 +2,11 @@
 //! type found in the postgres database schema.
 
 use enumflags2::{BitFlags, bitflags};
+use strum_macros::EnumIter;
 
 #[bitflags]
 #[repr(u16)]
-#[derive(Copy, Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq, EnumIter)]
 /// Enumeration of the traits which can be supported by some type found
 /// in the postgres database schema.
 ///

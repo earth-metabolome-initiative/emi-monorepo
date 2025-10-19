@@ -22,6 +22,8 @@ pub struct ExternalCrate {
     types: Vec<ExternalType>,
     /// List of the macros defined within the crate.
     macros: Vec<ExternalMacro>,
+    /// List of the traits defined within the crate.
+    traits: Vec<ExternalTrait>,
     /// Whether the crate is a dependency.
     version: Option<String>,
 }
@@ -68,6 +70,29 @@ impl ExternalCrate {
             .iter()
             .find(|m| m.name() == name)
             .map(|m| ExternalMacroRef { crate_ref: self, macro_ref: m })
+    }
+
+    /// Returns the external trait with the provided name, if any.
+    ///
+    /// # Arguments
+    /// * `name` - A string slice representing the name of the external trait.
+    pub fn external_trait(&self, name: &str) -> Option<ExternalTraitRef<'_>> {
+        self.traits
+            .iter()
+            .find(|t| t.name() == name)
+            .map(|t| ExternalTraitRef { crate_ref: self, trait_ref: t })
+    }
+
+    /// Returns the external type compatible with the provided postgres name, if
+    /// any.
+    ///
+    /// # Arguments
+    /// * `postgres_type` - The postgres type to find a compatible type for.
+    pub fn external_postgres_type(&self, postgres_type: &str) -> Option<ExternalTypeRef<'_>> {
+        self.types
+            .iter()
+            .find(|t| t.is_compatible_with(postgres_type))
+            .map(|t| ExternalTypeRef { crate_ref: self, type_ref: t })
     }
 }
 
