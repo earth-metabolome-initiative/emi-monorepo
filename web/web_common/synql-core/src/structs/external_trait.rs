@@ -7,7 +7,7 @@ use std::{fmt::Debug, hash::Hash};
 use builder::ExternalTraitBuilder;
 use quote::ToTokens;
 
-use crate::structs::{ExternalCrate, InternalCrate, InternalTrait};
+use crate::structs::{ExternalCrate, InternalCrate, InternalTrait, Trait};
 
 #[derive(Clone)]
 /// Struct defining a trait available in an external crate.
@@ -17,6 +17,21 @@ pub struct ExternalTrait {
     /// The [`syn::Path`](syn::Path) representing the trait
     /// within the external crate.
     path: syn::Path,
+}
+
+impl ToTokens for ExternalTrait {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let path = &self.path;
+        tokens.extend(quote::quote! {
+            #path
+        });
+    }
+}
+
+impl From<Trait> for ExternalTrait {
+    fn from(value: Trait) -> Self {
+        ExternalTrait { name: value.as_ref().to_owned(), path: value.path() }
+    }
 }
 
 impl Debug for ExternalTrait {
@@ -95,6 +110,22 @@ pub enum TraitVariantRef<'data> {
     External(ExternalTrait, &'data ExternalCrate),
 }
 
+impl From<Trait> for TraitVariantRef<'_> {
+    fn from(trait_variant: Trait) -> Self {
+        Self::External(trait_variant.into(), ExternalCrate::core())
+    }
+}
+
+impl TraitVariantRef<'_> {
+    /// Returns the name of the trait.
+    pub fn name(&self) -> &str {
+        match self {
+            TraitVariantRef::Internal(trait_def, _crate_def) => trait_def.name(),
+            TraitVariantRef::External(trait_def, _crate_def) => trait_def.name(),
+        }
+    }
+}
+
 impl ToTokens for TraitVariantRef<'_> {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         match self {
@@ -106,9 +137,8 @@ impl ToTokens for TraitVariantRef<'_> {
                 });
             }
             TraitVariantRef::External(trait_def, _crate_def) => {
-                let trait_path = trait_def.path();
                 tokens.extend(quote::quote! {
-                    #trait_path
+                    #trait_def
                 });
             }
         }

@@ -17,7 +17,7 @@ pub use publicness::Publicness;
 mod external_crate;
 pub use external_crate::{ExternalCrate, ExternalTypeRef};
 mod external_type;
-pub use external_type::ExternalType;
+pub use external_type::{ExternalType, Trait};
 mod external_macro;
 pub use external_macro::ExternalMacro;
 mod internal_token;

@@ -9,7 +9,7 @@ use quote::ToTokens;
 use syn::Ident;
 
 use crate::{
-    structs::{InternalCrate, Publicness, internal_data::DataVariantRef},
+    structs::{InternalCrate, Publicness, Trait, internal_data::DataVariantRef},
     utils::RESERVED_RUST_WORDS,
 };
 
@@ -76,6 +76,15 @@ impl<'data> InternalAttribute<'data> {
             DataVariantRef::External(external) => vec![external.external_crate()],
         }
     }
+
+    /// Returns whether the attribute's type supports the given trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `trait_variant` - The trait variant to check support for.
+    pub fn supports_trait(&self, trait_variant: Trait) -> bool {
+        self.ty.supports_trait(trait_variant)
+    }
 }
 
 impl ToTokens for InternalAttribute<'_> {
@@ -133,6 +142,15 @@ impl<'data> InternalStruct<'data> {
         deps.sort_unstable();
         deps.dedup();
         deps
+    }
+
+    /// Returns whether the struct supports the given trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `trait_variant` - The trait variant to check support for.
+    pub fn supports_trait(&self, trait_variant: Trait) -> bool {
+        self.attributes.iter().all(|attr| attr.supports_trait(trait_variant))
     }
 }
 

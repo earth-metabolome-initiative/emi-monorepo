@@ -10,7 +10,7 @@ use syn::Ident;
 
 use crate::structs::{
     Derive, ExternalCrate, InternalCrate, InternalEnum, InternalModule, InternalStruct, Publicness,
-    external_crate::ExternalTypeRef, external_trait::TraitVariantRef,
+    Trait, external_crate::ExternalTypeRef, external_trait::TraitVariantRef,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -40,6 +40,18 @@ impl<'data> InternalDataVariant<'data> {
         match self {
             InternalDataVariant::StructVariant(s) => s.internal_dependencies(),
             InternalDataVariant::EnumVariant(e) => e.internal_dependencies(),
+        }
+    }
+
+    /// Returns whether the underlying variant supports the given trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `trait_variant` - The trait variant to check support for.
+    pub fn supports_trait(&self, trait_variant: Trait) -> bool {
+        match self {
+            InternalDataVariant::StructVariant(s) => s.supports_trait(trait_variant),
+            InternalDataVariant::EnumVariant(e) => e.supports_trait(trait_variant),
         }
     }
 }
@@ -80,6 +92,20 @@ impl<'data> DataVariantRef<'data> {
         match self {
             DataVariantRef::Internal(_) => vec![],
             DataVariantRef::External(external) => vec![external.external_crate()],
+        }
+    }
+
+    /// Returns whether the underlying variant supports the given trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `trait_variant` - The trait variant to check support for.
+    pub fn supports_trait(&self, trait_variant: Trait) -> bool {
+        match self {
+            DataVariantRef::Internal(internal) => {
+                internal.data().variant().supports_trait(trait_variant)
+            }
+            DataVariantRef::External(external) => external.supports_trait(trait_variant),
         }
     }
 }

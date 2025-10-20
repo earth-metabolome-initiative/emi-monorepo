@@ -1,6 +1,9 @@
 //! Submodule providing the `Derive` struct which allows to represent derives
 //! applied to SynQL internal data.
 
+mod builder;
+
+pub use builder::DeriveBuilder;
 use quote::{ToTokens, quote};
 
 use crate::structs::{FeatureFlag, external_trait::TraitVariantRef};
@@ -12,6 +15,13 @@ pub struct Derive<'data> {
     features: Vec<FeatureFlag>,
     /// Traits implemented by the derive.
     traits: Vec<TraitVariantRef<'data>>,
+}
+
+impl<'data> Derive<'data> {
+    /// Initializes a new `DeriveBuilder`.
+    pub fn new() -> DeriveBuilder<'data> {
+        DeriveBuilder::default()
+    }
 }
 
 impl ToTokens for Derive<'_> {

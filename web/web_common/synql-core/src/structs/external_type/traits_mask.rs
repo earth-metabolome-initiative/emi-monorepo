@@ -35,6 +35,39 @@ pub enum Trait {
     PartialEq,
 }
 
+impl AsRef<str> for Trait {
+    fn as_ref(&self) -> &str {
+        match self {
+            Trait::Copy => "Copy",
+            Trait::Clone => "Clone",
+            Trait::Default => "Default",
+            Trait::Debug => "Debug",
+            Trait::Hash => "Hash",
+            Trait::Ord => "Ord",
+            Trait::PartialOrd => "PartialOrd",
+            Trait::Eq => "Eq",
+            Trait::PartialEq => "PartialEq",
+        }
+    }
+}
+
+impl Trait {
+    /// Returns the full path of the trait.
+    pub fn path(&self) -> syn::Path {
+        match self {
+            Trait::Copy => syn::parse_str("Copy").unwrap(),
+            Trait::Clone => syn::parse_str("Clone").unwrap(),
+            Trait::Default => syn::parse_str("Default").unwrap(),
+            Trait::Debug => syn::parse_str("::core::fmt::Debug").unwrap(),
+            Trait::Hash => syn::parse_str("::core::hash::Hash").unwrap(),
+            Trait::Ord => syn::parse_str("Ord").unwrap(),
+            Trait::PartialOrd => syn::parse_str("PartialOrd").unwrap(),
+            Trait::Eq => syn::parse_str("Eq").unwrap(),
+            Trait::PartialEq => syn::parse_str("PartialEq").unwrap(),
+        }
+    }
+}
+
 #[derive(Clone, Debug, Default, PartialEq, Eq, Hash, PartialOrd, Ord)]
 /// Struct defining which traits are supported by some type found
 /// in the postgres database schema.

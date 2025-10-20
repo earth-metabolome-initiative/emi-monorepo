@@ -6,9 +6,10 @@ use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
+use strum::IntoEnumIterator;
 
 use crate::structs::{
-    Derive, InternalData, InternalDataVariant, Publicness, external_trait::TraitVariantRef,
+    Derive, InternalData, InternalDataVariant, Publicness, Trait, external_trait::TraitVariantRef,
 };
 
 #[derive(Default)]
@@ -237,9 +238,26 @@ impl<'data> Builder for InternalDataBuilder<'data> {
     type Error = BuilderError<InternalDataAttribute>;
     type Object = InternalData<'data>;
 
-    fn build(self) -> Result<Self::Object, Self::Error> {
+    fn build(mut self) -> Result<Self::Object, Self::Error> {
         // We add the auto-derives depending on which traits are supported by all of the
         // data variants.
+        let variant =
+            self.variant.ok_or(BuilderError::IncompleteBuild(InternalDataAttribute::Variant))?;
+        let mut derive_builder = Derive::new();
+        for trait_variant in Trait::iter() {
+            // If the current trait variant is supported by the data variant, and it has not
+            // been already been added, we add it as an auto-derive.
+            if variant.supports_trait(trait_variant)
+                && !self.traits.iter().any(|t| t.name() == trait_variant.as_ref())
+            {
+                derive_builder = derive_builder
+                    .add_trait(trait_variant)
+                    .expect("It is not possible to double-add a trait here");
+            }
+        }
+        if let Ok(derive) = derive_builder.build() {
+            self.derives.push(derive);
+        }
 
         Ok(InternalData {
             publicness: self
@@ -247,9 +265,7 @@ impl<'data> Builder for InternalDataBuilder<'data> {
                 .ok_or(BuilderError::IncompleteBuild(InternalDataAttribute::Publicness))?,
             name: self.name.ok_or(BuilderError::IncompleteBuild(InternalDataAttribute::Name))?,
             documentation: self.documentation,
-            variant: self
-                .variant
-                .ok_or(BuilderError::IncompleteBuild(InternalDataAttribute::Variant))?,
+            variant: variant,
             traits: self.traits,
             derives: self.derives,
         })

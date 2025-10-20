@@ -3,7 +3,7 @@
 use quote::ToTokens;
 use syn::Ident;
 
-use crate::structs::internal_data::DataVariantRef;
+use crate::structs::{Trait, internal_data::DataVariantRef};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining a enum model.
@@ -38,6 +38,15 @@ impl<'data> InternalEnum<'data> {
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
+    }
+
+    /// Returns whether the enum supports the given trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `trait_variant` - The trait variant to check support for.
+    pub fn supports_trait(&self, trait_variant: Trait) -> bool {
+        self.variants.iter().all(|(_, ty)| ty.supports_trait(trait_variant))
     }
 }
 

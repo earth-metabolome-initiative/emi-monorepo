@@ -159,7 +159,16 @@ impl<'data> Workspace<'data> {
     pub fn write_to_disk(&self) -> std::io::Result<()> {
         // First, we eliminate all existing files in the workspace path.
         if self.path.exists() {
-            std::fs::remove_dir_all(self.path)?;
+            // We remove all contents of the directory.
+            for entry in std::fs::read_dir(self.path)? {
+                let entry = entry?;
+                let path = entry.path();
+                if path.is_dir() {
+                    std::fs::remove_dir_all(path)?;
+                } else {
+                    std::fs::remove_file(path)?;
+                }
+            }
         }
         // Then, we create the workspace directory.
         std::fs::create_dir_all(self.path)?;
