@@ -9,7 +9,8 @@ use common_traits::{
 use strum::IntoEnumIterator;
 
 use crate::structs::{
-    Derive, InternalData, InternalDataVariant, Publicness, Trait, external_trait::TraitVariantRef,
+    Decorator, Derive, InternalData, InternalDataVariant, Publicness, Trait,
+    external_trait::TraitVariantRef,
 };
 
 #[derive(Default)]
@@ -27,6 +28,8 @@ pub struct InternalDataBuilder<'data> {
     traits: Vec<TraitVariantRef<'data>>,
     /// The derives applied to the data.
     derives: Vec<Derive<'data>>,
+    /// The decorators applied to the data.
+    decorators: Vec<Decorator<'data>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -44,6 +47,8 @@ pub enum InternalDataAttribute {
     Traits,
     /// The derives applied to the data.
     Derives,
+    /// The decorators applied to the data.
+    Decorators,
 }
 
 impl Display for InternalDataAttribute {
@@ -55,6 +60,7 @@ impl Display for InternalDataAttribute {
             InternalDataAttribute::Variant => write!(f, "variant"),
             InternalDataAttribute::Traits => write!(f, "traits"),
             InternalDataAttribute::Derives => write!(f, "derives"),
+            InternalDataAttribute::Decorators => write!(f, "decorators"),
         }
     }
 }
@@ -73,6 +79,8 @@ pub enum InternalDataBuilderError {
     DuplicatedTrait,
     /// A derive with the same name has already been added.
     DuplicatedDerive,
+    /// A decorator with the same token has already been added.
+    DuplicatedDecorator,
 }
 
 impl Display for InternalDataBuilderError {
@@ -88,6 +96,9 @@ impl Display for InternalDataBuilderError {
             }
             InternalDataBuilderError::DuplicatedDerive => {
                 write!(f, "A derive with the same name has already been added")
+            }
+            InternalDataBuilderError::DuplicatedDecorator => {
+                write!(f, "A decorator with the same token has already been added")
             }
         }
     }
@@ -201,7 +212,7 @@ impl<'data> InternalDataBuilder<'data> {
     ///
     /// # Arguments
     /// * `derive` - The derive to add.
-    pub fn add_derive(mut self, derive: Derive<'data>) -> Result<Self, InternalDataBuilderError> {
+    pub fn derive(mut self, derive: Derive<'data>) -> Result<Self, InternalDataBuilderError> {
         if self.derives.iter().any(|d| d == &derive) {
             return Err(InternalDataBuilderError::DuplicatedDerive);
         }
@@ -213,12 +224,41 @@ impl<'data> InternalDataBuilder<'data> {
     ///
     /// # Arguments
     /// * `derives` - The derives to add.
-    pub fn add_derives<I>(mut self, derives: I) -> Result<Self, InternalDataBuilderError>
+    pub fn derives<I>(mut self, derives: I) -> Result<Self, InternalDataBuilderError>
     where
         I: IntoIterator<Item = Derive<'data>>,
     {
         for derive in derives {
-            self = self.add_derive(derive)?;
+            self = self.derive(derive)?;
+        }
+        Ok(self)
+    }
+
+    /// Adds a decorator to the data.
+    ///
+    /// # Arguments
+    /// * `decorator` - The decorator to add.
+    pub fn decorator(
+        mut self,
+        decorator: Decorator<'data>,
+    ) -> Result<Self, InternalDataBuilderError> {
+        if self.decorators.iter().any(|d| d == &decorator) {
+            return Err(InternalDataBuilderError::DuplicatedDecorator);
+        }
+        self.decorators.push(decorator);
+        Ok(self)
+    }
+
+    /// Adds multiple decorators to the data.
+    ///
+    /// # Arguments
+    /// * `decorators` - The decorators to add.
+    pub fn decorators<I>(mut self, decorators: I) -> Result<Self, InternalDataBuilderError>
+    where
+        I: IntoIterator<Item = Decorator<'data>>,
+    {
+        for decorator in decorators {
+            self = self.decorator(decorator)?;
         }
         Ok(self)
     }
@@ -268,6 +308,7 @@ impl<'data> Builder for InternalDataBuilder<'data> {
             variant: variant,
             traits: self.traits,
             derives: self.derives,
+            decorators: self.decorators,
         })
     }
 }

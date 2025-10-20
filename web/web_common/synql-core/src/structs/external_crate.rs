@@ -3,7 +3,7 @@
 
 use crate::structs::{
     ExternalMacro, ExternalTrait, ExternalType, Trait,
-    external_crate::builder::ExternalCrateBuilder,
+    external_crate::builder::ExternalCrateBuilder, external_trait::TraitVariantRef,
 };
 
 mod builder;
@@ -77,11 +77,11 @@ impl ExternalCrate {
     ///
     /// # Arguments
     /// * `name` - A string slice representing the name of the external trait.
-    pub fn external_trait(&self, name: &str) -> Option<ExternalTraitRef<'_>> {
+    pub fn external_trait(&self, name: &str) -> Option<TraitVariantRef<'_>> {
         self.traits
             .iter()
             .find(|t| t.name() == name)
-            .map(|t| ExternalTraitRef { crate_ref: self, trait_ref: t })
+            .map(|t| TraitVariantRef::External(t.clone(), self))
     }
 
     /// Returns the external type compatible with the provided postgres name, if

@@ -6,6 +6,8 @@ edition = "2024"
 [dependencies]
 sql_traits.workspace = true
 synql-core.workspace = true
+synql-diesel-schema.workspace = true
+quote.workspace = true
 
 [lints]
 workspace = true

@@ -9,8 +9,8 @@ use quote::{ToTokens, quote};
 use syn::Ident;
 
 use crate::structs::{
-    Derive, ExternalCrate, InternalCrate, InternalEnum, InternalModule, InternalStruct, Publicness,
-    Trait, external_crate::ExternalTypeRef, external_trait::TraitVariantRef,
+    Decorator, Derive, ExternalCrate, InternalCrate, InternalEnum, InternalModule, InternalStruct,
+    Publicness, Trait, external_crate::ExternalTypeRef, external_trait::TraitVariantRef,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -173,6 +173,16 @@ pub struct InternalModuleRef<'data> {
     internal_crate: Rc<InternalCrate<'data>>,
 }
 
+impl ToTokens for InternalModuleRef<'_> {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let path = self
+            .internal_crate
+            .module_path(self.module.as_ref())
+            .expect("Failed to get module path for internal module ref");
+        tokens.extend(quote! {#path});
+    }
+}
+
 impl<'data> InternalModuleRef<'data> {
     /// Creates a new `InternalModuleRef`.
     ///
@@ -223,6 +233,8 @@ pub struct InternalData<'data> {
     traits: Vec<TraitVariantRef<'data>>,
     /// The derives applies to the data.
     derives: Vec<Derive<'data>>,
+    /// The decorators applied to the data which are not derives.
+    decorators: Vec<Decorator<'data>>,
 }
 
 impl<'data> InternalData<'data> {
@@ -257,7 +269,7 @@ impl<'data> InternalData<'data> {
     }
 
     /// Returns the sorted unique internal crate dependencies of the data.
-    pub fn internal_dependencies(&self) -> Vec<&'data InternalCrate<'data>> {
+    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
         let mut crates = self
             .traits
             .iter()
@@ -265,6 +277,14 @@ impl<'data> InternalData<'data> {
                 if let TraitVariantRef::Internal(_, krate) = t { Some(*krate) } else { None }
             })
             .collect::<Vec<_>>();
+
+        for derive in &self.derives {
+            crates.extend(derive.internal_dependencies());
+        }
+
+        for decorator in &self.decorators {
+            crates.extend(decorator.internal_dependencies());
+        }
 
         crates.sort_unstable();
         crates.dedup();
@@ -280,6 +300,15 @@ impl<'data> InternalData<'data> {
                 if let TraitVariantRef::External(_, krate) = t { Some(*krate) } else { None }
             })
             .collect::<Vec<_>>();
+
+        for derive in &self.derives {
+            crates.extend(derive.external_dependencies());
+        }
+
+        for decorator in &self.decorators {
+            crates.extend(decorator.external_dependencies());
+        }
+
         crates.sort_unstable();
         crates.dedup();
         crates
@@ -311,8 +340,10 @@ impl<'data> ToTokens for InternalData<'data> {
             None => quote::quote! {},
         };
         let derives = &self.derives;
+        let decorators = &self.decorators;
         let token = quote::quote! {
             #(#derives)*
+            #(#decorators)*
             #documentation
             #publicness #variant
         };

@@ -76,8 +76,8 @@ impl ExternalTraitBuilder {
 
     /// Sets the [`syn::Path`](syn::Path) representing the trait
     /// within the external crate.
-    pub fn path(mut self, path: impl Into<syn::Path>) -> Self {
-        self.path = Some(path.into());
+    pub fn path(mut self, path: syn::Path) -> Self {
+        self.path = Some(path);
         self
     }
 }

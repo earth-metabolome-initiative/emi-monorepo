@@ -9,7 +9,10 @@ use syn::Ident;
 
 use crate::{
     traits::ColumnSynLike,
-    utils::{camel_case_name, is_reserved_rust_word, singular_snake_name, snake_case_name},
+    utils::{
+        camel_case_name, is_reserved_rust_word, singular_camel_case_name, singular_snake_name,
+        snake_case_name,
+    },
 };
 
 /// Trait implemented by types that represent SQL tables and can be used to
@@ -43,7 +46,7 @@ pub trait TableSynLike: TableLike<Column = <Self as TableSynLike>::ColumnSyn> {
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use synql_core::prelude::*;
-
+    ///
     /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
     /// let table = db.table(None, "users");
     /// assert_eq!(table.table_singular_snake_name(), "user");
@@ -101,6 +104,24 @@ pub trait TableSynLike: TableLike<Column = <Self as TableSynLike>::ColumnSyn> {
         }
     }
 
+    /// Returns the singular snake-cased ident of this table.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use synql_core::prelude::*;
+    ///
+    /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
+    /// let table = db.table(None, "users");
+    /// assert_eq!(table.table_singular_snake_ident().to_string(), "user");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn table_singular_snake_ident(&self) -> Ident {
+        Ident::new(&self.table_singular_snake_name(), proc_macro2::Span::call_site())
+    }
+
     /// Returns the camel-cased name of this table.
     ///
     /// # Example
@@ -119,6 +140,24 @@ pub trait TableSynLike: TableLike<Column = <Self as TableSynLike>::ColumnSyn> {
         camel_case_name(self.table_name())
     }
 
+    /// Returns the singular camel-cased name of this table.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use synql_core::prelude::*;
+    ///
+    /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
+    /// let table = db.table(None, "users");
+    /// assert_eq!(table.table_singular_camel_name(), "User");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn table_singular_camel_name(&self) -> String {
+        singular_camel_case_name(self.table_name())
+    }
+
     /// Returns the camel-cased ident of this table.
     ///
     /// # Example
@@ -133,7 +172,34 @@ pub trait TableSynLike: TableLike<Column = <Self as TableSynLike>::ColumnSyn> {
     /// # }
     /// ```
     fn table_camel_ident(&self) -> Ident {
-        Ident::new(&self.table_camel_name(), proc_macro2::Span::call_site())
+        let camel_name = self.table_camel_name();
+        if is_reserved_rust_word(&camel_name) {
+            Ident::new_raw(&camel_name, proc_macro2::Span::call_site())
+        } else {
+            Ident::new(&camel_name, proc_macro2::Span::call_site())
+        }
+    }
+
+    /// Returns the singular camel-cased ident of this table.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use synql_core::prelude::*;
+    /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
+    /// let table = db.table(None, "users");
+    /// assert_eq!(table.table_singular_camel_ident().to_string(), "User");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn table_singular_camel_ident(&self) -> Ident {
+        let camel_name = self.table_singular_camel_name();
+        if is_reserved_rust_word(&camel_name) {
+            Ident::new_raw(&camel_name, proc_macro2::Span::call_site())
+        } else {
+            Ident::new(&camel_name, proc_macro2::Span::call_site())
+        }
     }
 
     /// Iterates over the identifiers of the primary key columns of this table.

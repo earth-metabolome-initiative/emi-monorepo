@@ -8,7 +8,8 @@ pub use builder::WorkspaceBuilder;
 
 use crate::structs::{
     ExternalCrate, InternalCrate,
-    external_crate::{ExternalMacroRef, ExternalTypeRef},
+    external_crate::{ExternalMacroRef, ExternalTraitRef, ExternalTypeRef},
+    external_trait::TraitVariantRef,
 };
 
 /// Struct defining a Cargo workspace.
@@ -71,7 +72,21 @@ impl<'data> Workspace<'data> {
     pub fn external_macro(&self, name: &str) -> Option<ExternalMacroRef<'data>> {
         for ext_crate in &self.external_crates {
             if let Some(ext_macro) = ext_crate.external_macro(name) {
-                return Some(ext_macro.clone());
+                return Some(ext_macro);
+            }
+        }
+        None
+    }
+
+    /// Returns the external trait ref corresponding to the provided name, if
+    /// any.
+    ///
+    /// # Arguments
+    /// * `name` - A string slice representing the name of the external trait.
+    pub fn external_trait(&self, name: &str) -> Option<TraitVariantRef<'data>> {
+        for ext_crate in &self.external_crates {
+            if let Some(ext_trait) = ext_crate.external_trait(name) {
+                return Some(ext_trait);
             }
         }
         None
@@ -85,7 +100,7 @@ impl<'data> Workspace<'data> {
     pub fn external_postgres_type(&self, postgres_type: &str) -> Option<ExternalTypeRef<'data>> {
         for ext_crate in &self.external_crates {
             if let Some(ext_type) = ext_crate.external_postgres_type(postgres_type) {
-                return Some(ext_type.clone());
+                return Some(ext_type);
             }
         }
         None

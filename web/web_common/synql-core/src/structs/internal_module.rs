@@ -61,6 +61,29 @@ impl<'data> InternalModule<'data> {
         !self.submodules.is_empty()
     }
 
+    /// Returns the relative path to the provided sub-module within this module
+    /// if it exists.
+    ///
+    /// # Arguments
+    ///
+    /// * `module` - The sub-module to get the path for.
+    pub fn submodule_path(&self, module: &InternalModule<'data>) -> Option<syn::Path> {
+        if module == self {
+            return Some(syn::Path::from(self.ident()));
+        }
+        for submodule in &self.submodules {
+            if let Some(mut path) = submodule.submodule_path(module) {
+                let mut segments = syn::punctuated::Punctuated::new();
+                segments.push(syn::PathSegment::from(self.ident()));
+                segments.push(syn::PathSegment::from(path.segments.first().unwrap().ident.clone()));
+                segments.extend(path.segments.iter().skip(1).cloned());
+                path.segments = segments;
+                return Some(path);
+            }
+        }
+        None
+    }
+
     /// Returns whether the module contains public items (submodules, data,
     /// other tokens).
     pub fn contains_public_items(&self) -> bool {

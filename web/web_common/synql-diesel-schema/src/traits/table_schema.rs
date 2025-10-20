@@ -1,9 +1,15 @@
 //! Submodule defining the `TableSchema` trait which allows to generate the
 //! `diesel` schema from a SQL schema, based on `sql_traits`.
 
-use synql_core::{structs::Workspace, traits::TableSynLike};
+use synql_core::{
+    structs::{InternalModuleRef, Workspace},
+    traits::TableSynLike,
+};
 
 use crate::structs::schema_macro::SchemaMacro;
+
+/// Name of the module containing the diesel schema for a table.
+pub const TABLE_SCHEMA_MODULE_NAME: &str = "schema";
 
 /// Trait to create the `diesel` schema from a SQL schema.
 pub trait TableSchema: TableSynLike + Sized {
@@ -63,6 +69,15 @@ pub trait TableSchema: TableSynLike + Sized {
         Self: 'data,
     {
         SchemaMacro::new(self, workspace, database)
+    }
+
+    /// Returns a reference to the schema module ref for the table.
+    fn schema_module<'data>(
+        &self,
+        workspace: &Workspace<'data>,
+    ) -> Option<InternalModuleRef<'data>> {
+        let crate_ref = workspace.internal_crate(&self.table_schema_crate_name())?;
+        Some(InternalModuleRef::new(crate_ref, crate_ref.module(TABLE_SCHEMA_MODULE_NAME)?))
     }
 }
 

@@ -30,3 +30,5 @@ mod feature_flag;
 pub use feature_flag::FeatureFlag;
 mod internal_trait;
 pub use internal_trait::InternalTrait;
+mod decorator;
+pub use decorator::Decorator;

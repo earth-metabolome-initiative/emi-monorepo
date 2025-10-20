@@ -136,6 +136,12 @@ impl<'data> InternalTokenBuilder<'data> {
         self
     }
 
+    /// Set the stream as private.
+    pub fn private(mut self) -> Self {
+        self.publicness = Some(Publicness::Private);
+        self
+    }
+
     /// Sets the token stream.
     ///
     /// # Arguments

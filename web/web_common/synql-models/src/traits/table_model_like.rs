@@ -1,11 +1,12 @@
 //! Submodule providing the `TableModel` trait for SynQL table models.
 
 use synql_core::{structs::Workspace, traits::TableSynLike};
+use synql_diesel_schema::traits::TableSchema;
 
 use crate::{structs::TableModel, traits::column_model_like::ColumnModelLike};
 
 /// Trait representing a SynQL table model.
-pub trait TableModelLike: TableSynLike<ColumnSyn = <Self as TableModelLike>::ColumnModel> {
+pub trait TableModelLike: TableSchema<ColumnSyn = <Self as TableModelLike>::ColumnModel> {
     /// The column model associated with the table model.
     type ColumnModel: ColumnModelLike<Table = Self, Database = Self::Database>;
 

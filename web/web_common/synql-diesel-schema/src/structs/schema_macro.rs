@@ -6,11 +6,11 @@ use quote::{ToTokens, quote};
 use sql_traits::traits::ForeignKeyLike;
 use synql_core::{
     prelude::{Builder, ColumnLike},
-    structs::{InternalCrate, InternalModule, InternalModuleRef, InternalToken, Workspace},
+    structs::{InternalCrate, InternalModule, InternalToken, Workspace},
     traits::{ColumnSynLike, TableSynLike},
 };
 
-use crate::traits::TableSchema;
+use crate::traits::{TABLE_SCHEMA_MODULE_NAME, TableSchema};
 
 /// Struct representing a diesel schema.
 pub struct SchemaMacro<'data, 'table, T: TableSynLike> {
@@ -44,7 +44,7 @@ impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for Int
         }
 
         InternalModule::new()
-            .name("schema")
+            .name(TABLE_SCHEMA_MODULE_NAME)
             .expect("Invalid name")
             .public()
             .documentation(format!("Diesel schema for the `{}` table.", value.table.table_name()))
@@ -57,19 +57,9 @@ impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for Int
                     .internal_modules(
                         value.table.non_self_referenced_tables(value.database).into_iter().map(
                             |referenced_table| {
-                                let crate_ref = value
-                                    .workspace
-                                    .internal_crate(&referenced_table.table_schema_crate_name())
-                                    .expect(&format!(
-                                        "Failed to find the referenced table struct: {}",
-                                        referenced_table.table_name()
-                                    ));
-                                InternalModuleRef::new(
-                                    crate_ref,
-                                    crate_ref
-                                        .module("schema")
-                                        .expect("Failed to insert the module"),
-                                )
+                                referenced_table
+                                    .schema_module(value.workspace)
+                                    .expect("Failed to get the module ref")
                             },
                         ),
                     )

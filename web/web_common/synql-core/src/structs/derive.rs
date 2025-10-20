@@ -22,6 +22,34 @@ impl<'data> Derive<'data> {
     pub fn new() -> DeriveBuilder<'data> {
         DeriveBuilder::default()
     }
+
+    /// Returns the external crates required by the derive.
+    pub fn external_dependencies(&self) -> Vec<&'data crate::structs::ExternalCrate> {
+        let mut crates = self
+            .traits
+            .iter()
+            .filter_map(|t| {
+                if let TraitVariantRef::External(_, krate) = t { Some(*krate) } else { None }
+            })
+            .collect::<Vec<_>>();
+        crates.sort_unstable();
+        crates.dedup();
+        crates
+    }
+
+    /// Returns the internal crates required by the derive.
+    pub fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
+        let mut crates = self
+            .traits
+            .iter()
+            .filter_map(|t| {
+                if let TraitVariantRef::Internal(_, krate) = t { Some(*krate) } else { None }
+            })
+            .collect::<Vec<_>>();
+        crates.sort_unstable();
+        crates.dedup();
+        crates
+    }
 }
 
 impl ToTokens for Derive<'_> {

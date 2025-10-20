@@ -6,7 +6,7 @@ use std::{path::Path, rc::Rc};
 
 pub use builder::InternalCrateBuilder;
 use quote::{ToTokens, quote};
-use syn::Ident;
+use syn::{Ident, Token};
 
 use crate::structs::{InternalData, InternalModule, Workspace};
 
@@ -60,6 +60,23 @@ impl<'data> InternalCrate<'data> {
     /// Returns a reference to the ident of the crate.
     pub fn ident(&self) -> Ident {
         syn::Ident::new(&self.name, proc_macro2::Span::call_site())
+    }
+
+    /// Returns the path to the provided module within the crate, if it exists.
+    pub fn module_path(&self, module: &InternalModule<'data>) -> Option<syn::Path> {
+        let crate_ident = self.ident();
+        for m in &self.modules {
+            if let Some(path) = m.submodule_path(module) {
+                let full_path = syn::Path {
+                    leading_colon: Some(Token![::](proc_macro2::Span::call_site())),
+                    segments: std::iter::once(syn::PathSegment::from(crate_ident))
+                        .chain(path.segments.into_iter())
+                        .collect(),
+                };
+                return Some(full_path);
+            }
+        }
+        None
     }
 
     /// Returns the internal dependencies of the crate.
