@@ -1,10 +1,18 @@
-//! Struct collecting information about a
-//! [`KeyColumnUsage`](crate::models::KeyColumnUsage) entry's referenced table
-//! and columns.
+//! Metadata for foreign key relationships.
+//!
+//! This module provides [`KeyColumnUsageMetadata`], which encapsulates complete
+//! information about a foreign key relationship, including:
+//! - The referencing (host) table and columns
+//! - The referenced (target) table and columns
+//! - The referential constraint rules (ON DELETE, ON UPDATE, MATCH)
+//!
+//! This metadata is used by the [`PgDatabase`](crate::database::PgDatabase) to
+//! provide rich foreign key introspection through the `sql_traits` trait
+//! system.
 
-use diesel::PgConnection;
+use std::rc::Rc;
 
-use crate::models::{Column, KeyColumnUsage, ReferentialConstraint, Table};
+use crate::models::{Column, ReferentialConstraint, Table};
 
 #[derive(Debug, Clone)]
 /// Struct collecting metadata about a foreign key represented by a
@@ -15,7 +23,7 @@ pub struct KeyColumnUsageMetadata {
     /// The columns in the referenced table that the foreign key points to.
     referenced_columns: Vec<Column>,
     /// The table that contains the foreign key.
-    host_table: Table,
+    host_table: Rc<Table>,
     /// The columns in the host table that are part of the foreign key.
     host_columns: Vec<Column>,
     /// The referential constraint associated with the foreign key.
@@ -29,33 +37,28 @@ impl KeyColumnUsageMetadata {
     ///
     /// # Arguments
     ///
-    /// * `key_column_usage` - The `KeyColumnUsage` instance for which to create
-    ///   the metadata.
-    /// * `conn` - A mutable reference to a PostgreSQL connection.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`diesel::result::Error`] if the database query fails.
-    pub fn new(
-        key_column_usage: &KeyColumnUsage,
-        conn: &mut PgConnection,
-    ) -> Result<Self, diesel::result::Error> {
-        Ok(KeyColumnUsageMetadata {
-            referenced_table: crate::models::key_column_usage::referenced_table(
-                key_column_usage,
-                conn,
-            )?,
-            referenced_columns: crate::models::key_column_usage::referenced_columns(
-                key_column_usage,
-                conn,
-            )?,
-            host_table: crate::models::key_column_usage::host_table(key_column_usage, conn)?,
-            host_columns: crate::models::key_column_usage::host_columns(key_column_usage, conn)?,
-            referential_constraint: crate::models::key_column_usage::referential_constraint(
-                key_column_usage,
-                conn,
-            )?,
-        })
+    /// * `referenced_table` - The table that the foreign key references.
+    /// * `referenced_columns` - The columns in the referenced table that the
+    ///   foreign key points to.
+    /// * `host_table` - The table that contains the foreign key.
+    /// * `host_columns` - The columns in the host table that are part of the
+    ///   foreign key.
+    /// * `referential_constraint` - The referential constraint associated with
+    ///   the foreign key.
+    pub(crate) fn new(
+        referenced_table: Table,
+        referenced_columns: Vec<Column>,
+        host_table: Rc<Table>,
+        host_columns: Vec<Column>,
+        referential_constraint: ReferentialConstraint,
+    ) -> Self {
+        Self {
+            referenced_table,
+            referenced_columns,
+            host_table,
+            host_columns,
+            referential_constraint,
+        }
     }
 
     /// Returns a reference to the table that the foreign key references.

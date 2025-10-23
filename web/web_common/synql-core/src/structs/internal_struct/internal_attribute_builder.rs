@@ -22,6 +22,8 @@ pub struct InternalAttributeBuilder<'data> {
     name: Option<String>,
     /// Type of the attribute.
     ty: Option<DataVariantRef<'data>>,
+    /// Whether the attribute is nullable.
+    nullable: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -35,6 +37,8 @@ pub enum InternalAttributeAttribute {
     Name,
     /// Type of the attribute.
     Type,
+    /// Whether the attribute is nullable.
+    Nullable,
 }
 
 impl Display for InternalAttributeAttribute {
@@ -44,6 +48,7 @@ impl Display for InternalAttributeAttribute {
             InternalAttributeAttribute::Documentation => write!(f, "documentation"),
             InternalAttributeAttribute::Name => write!(f, "name"),
             InternalAttributeAttribute::Type => write!(f, "type"),
+            InternalAttributeAttribute::Nullable => write!(f, "nullable"),
         }
     }
 }
@@ -108,6 +113,15 @@ impl<'data> InternalAttributeBuilder<'data> {
     /// Sets the attribute as private.
     pub fn private(mut self) -> Self {
         self.pubness = Some(Publicness::Private);
+        self
+    }
+
+    /// Sets whether the attribute is nullable.
+    ///
+    /// # Arguments
+    /// * `nullable` - Whether the attribute is nullable.
+    pub fn nullable(mut self, nullable: bool) -> Self {
+        self.nullable = nullable;
         self
     }
 
@@ -177,6 +191,7 @@ impl<'data> Builder for InternalAttributeBuilder<'data> {
                 .name
                 .ok_or(BuilderError::IncompleteBuild(InternalAttributeAttribute::Name))?,
             ty: self.ty.ok_or(BuilderError::IncompleteBuild(InternalAttributeAttribute::Type))?,
+            nullable: self.nullable,
         })
     }
 }

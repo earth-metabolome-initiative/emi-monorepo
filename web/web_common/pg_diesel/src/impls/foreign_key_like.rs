@@ -1,6 +1,18 @@
-//! Submodule implementing the
-//! [`ForeignKeyLike`](sql_traits::prelude::ForeignKeyLike) trait for the
-//! [`KeyColumnUsage`] struct.
+//! Implementation of [`ForeignKeyLike`] for [`KeyColumnUsage`].
+//!
+//! This module implements the
+//! [`ForeignKeyLike`](sql_traits::prelude::ForeignKeyLike) trait
+//! for the [`KeyColumnUsage`] model from `information_schema.key_column_usage`,
+//! enabling generic introspection of foreign key relationships.
+//!
+//! The implementation provides access to:
+//! - Foreign key constraint name
+//! - Host (referencing) table and columns
+//! - Referenced (target) table and columns
+//! - Referential action rules (ON DELETE CASCADE, MATCH kind)
+//!
+//! Metadata is loaded from [`KeyColumnUsageMetadata`] which is constructed
+//! during database building.
 
 use sql_traits::traits::{ForeignKeyLike, Metadata};
 

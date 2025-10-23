@@ -5,7 +5,19 @@ use std::rc::Rc;
 use crate::models::{CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex};
 
 #[derive(Clone, Debug)]
-/// Metadata about a Postgres table.
+/// Rich metadata about a PostgreSQL table.
+///
+/// This struct wraps a table model with additional metadata loaded from related
+/// system catalog tables, including:
+/// - Columns belonging to the table
+/// - Check constraints defined on the table
+/// - Unique indexes (including primary key)
+/// - Foreign keys referencing other tables
+/// - Table description from `pg_catalog.pg_description`
+///
+/// This metadata is constructed during
+/// [`PgDatabase`](crate::database::PgDatabase) building and cached for
+/// efficient access via the [`TableLike`](sql_traits::traits::TableLike) trait.
 pub struct TableMetadata {
     /// The underlying table metadata.
     metadata: sql_traits::structs::TableMetadata<crate::models::Table>,

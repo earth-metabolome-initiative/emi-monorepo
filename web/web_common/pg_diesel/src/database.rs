@@ -13,6 +13,15 @@ pub use pg_proc_metadata::PgProcMetadata;
 mod builder;
 pub use builder::PgDatabaseBuilder;
 
-/// Struct representing a PostgreSQL database schema, implementing the
-/// [`DatabaseLike`](sql_traits::prelude::DatabaseLike) trait.
+/// Type alias representing a PostgreSQL database with loaded metadata.
+///
+/// This is a specialization of [`GenericDB`] configured for PostgreSQL, using:
+/// - [`Table`](crate::models::Table) from `information_schema.tables` as the
+///   table type
+/// - [`PgProc`](crate::models::PgProc) from `pg_catalog.pg_proc` as the
+///   function type
+///
+/// The `PgDatabase` implements
+/// [`DatabaseLike`](sql_traits::prelude::DatabaseLike), providing methods to
+/// iterate over tables, columns, foreign keys, and other database objects.
 pub type PgDatabase = GenericDB<Table, PgProc>;

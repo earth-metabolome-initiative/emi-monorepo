@@ -1,52 +1,28 @@
-//! Postgres metadata tables and utilities for Diesel ORM.
-mod check_constraint;
-mod column;
-mod constraint_column_usage;
-mod constraint_table_usage;
-mod domain_constraint;
-pub mod geography_columns;
-pub mod geometry_columns;
-pub(crate) mod key_column_usage;
-mod pg_attribute;
-mod pg_class;
-mod pg_constraint;
-mod pg_depend;
-mod pg_description;
-mod pg_enum;
-mod pg_extension;
-pub(crate) mod pg_index;
-mod pg_operator;
-mod pg_proc;
-mod pg_setting;
-mod pg_stat_statements;
-mod pg_trigger;
-mod pg_type;
-mod referential_constraint;
-pub(crate) mod table;
-mod table_constraint;
+//! Model structs representing rows from PostgreSQL system catalogs.
+//!
+//! This module provides Diesel-queryable structs for all major PostgreSQL
+//! metadata tables and views across three schemas:
+//!
+//! - [`information_schema`]: SQL-standard metadata views (portable across
+//!   databases)
+//! - [`pg_catalog`]: PostgreSQL-specific system catalog tables
+//! - [`public`]: PostGIS extension tables (geography and geometry columns)
+//!
+//! Each struct corresponds to a table or view in PostgreSQL and can be queried
+//! using Diesel. The structs implement `Queryable`, `QueryableByName`, and
+//! `Selectable`.
+//!
+//! ## Schema Organization
+//!
+//! The `information_schema` contains ANSI SQL standard views such as `tables`,
+//! `columns`, `constraints`, etc. The `pg_catalog` contains PostgreSQL-specific
+//! tables like `pg_class`, `pg_attribute`, `pg_proc`, and various statistics
+//! views. The `public` schema includes PostGIS extension tables for spatial
+//! column metadata.
 
-pub use check_constraint::CheckConstraint;
-pub use column::Column;
-pub use constraint_column_usage::ConstraintColumnUsage;
-pub use constraint_table_usage::ConstraintTableUsage;
-pub use domain_constraint::DomainConstraint;
-pub use geography_columns::GeographyColumn;
-pub use geometry_columns::GeometryColumn;
-pub use key_column_usage::KeyColumnUsage;
-pub use pg_attribute::PgAttribute;
-pub use pg_class::PGClass;
-pub use pg_constraint::PgConstraint;
-pub use pg_depend::PgDepend;
-pub use pg_description::PgDescription;
-pub use pg_enum::PgEnum;
-pub use pg_extension::PgExtension;
-pub use pg_index::PgIndex;
-pub use pg_operator::PgOperator;
-pub use pg_proc::PgProc;
-pub use pg_setting::PgSetting;
-pub use pg_stat_statements::PgStatStatement;
-pub use pg_trigger::PgTrigger;
-pub use pg_type::PgType;
-pub use referential_constraint::ReferentialConstraint;
-pub use table::Table;
-pub use table_constraint::TableConstraint;
+mod information_schema;
+mod pg_catalog;
+mod public;
+pub use information_schema::*;
+pub use pg_catalog::*;
+pub use public::*;

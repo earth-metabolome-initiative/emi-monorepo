@@ -112,7 +112,7 @@ pub trait ColumnLike: Hash + Eq + Ord + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn normalized_data_type(&self) -> String;
+    fn normalized_data_type(&self, database: &Self::Database) -> String;
 
     /// Returns whether the column is nullable.
     ///

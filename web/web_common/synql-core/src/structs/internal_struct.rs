@@ -9,7 +9,9 @@ use quote::ToTokens;
 use syn::Ident;
 
 use crate::{
-    structs::{InternalCrate, Publicness, Trait, internal_data::DataVariantRef},
+    structs::{
+        InternalCrate, Publicness, external_trait::TraitVariantRef, internal_data::DataVariantRef,
+    },
     utils::RESERVED_RUST_WORDS,
 };
 
@@ -24,6 +26,8 @@ pub struct InternalAttribute<'data> {
     name: String,
     /// Type of the attribute.
     ty: DataVariantRef<'data>,
+    /// Whether the attribute is nullable.
+    nullable: bool,
 }
 
 impl<'data> InternalAttribute<'data> {
@@ -61,6 +65,11 @@ impl<'data> InternalAttribute<'data> {
         &self.ty
     }
 
+    /// Returns whether the attribute is nullable.
+    pub fn is_nullable(&self) -> bool {
+        self.nullable
+    }
+
     /// Returns the internal crate dependencies of the attribute's type.
     pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
         match &self.ty {
@@ -70,7 +79,7 @@ impl<'data> InternalAttribute<'data> {
     }
 
     /// Returns the external crate dependencies of the attribute's type.
-    pub fn external_dependencies(&self) -> Vec<&'data crate::structs::ExternalCrate> {
+    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
         match &self.ty {
             DataVariantRef::Internal(_) => vec![],
             DataVariantRef::External(external) => vec![external.external_crate()],
@@ -81,9 +90,9 @@ impl<'data> InternalAttribute<'data> {
     ///
     /// # Arguments
     ///
-    /// * `trait_variant` - The trait variant to check support for.
-    pub fn supports_trait(&self, trait_variant: Trait) -> bool {
-        self.ty.supports_trait(trait_variant)
+    /// * `trait_ref` - The trait variant to check support for.
+    pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
+        self.ty.supports_trait(trait_ref)
     }
 }
 
@@ -100,9 +109,16 @@ impl ToTokens for InternalAttribute<'_> {
             None => quote::quote! {},
         };
         let ty = &self.ty;
+
+        let formatted_ty = if self.is_nullable() {
+            quote::quote! {Option<#ty>}
+        } else {
+            quote::quote! {#ty}
+        };
+
         let token = quote::quote! {
             #documentation
-            #pubness #ident: #ty
+            #pubness #ident: #formatted_ty
         };
         tokens.extend(token);
     }
@@ -136,8 +152,8 @@ impl<'data> InternalStruct<'data> {
     }
 
     /// Returns the sorted unique external crate dependencies of the variant.
-    pub fn external_dependencies(&self) -> Vec<&'data crate::structs::ExternalCrate> {
-        let mut deps: Vec<&'data crate::structs::ExternalCrate> =
+    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+        let mut deps: Vec<&crate::structs::ExternalCrate<'data>> =
             self.attributes.iter().flat_map(|attr| attr.external_dependencies()).collect();
         deps.sort_unstable();
         deps.dedup();
@@ -148,9 +164,9 @@ impl<'data> InternalStruct<'data> {
     ///
     /// # Arguments
     ///
-    /// * `trait_variant` - The trait variant to check support for.
-    pub fn supports_trait(&self, trait_variant: Trait) -> bool {
-        self.attributes.iter().all(|attr| attr.supports_trait(trait_variant))
+    /// * `trait_ref` - The trait variant to check support for.
+    pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
+        self.attributes.iter().all(|attr| attr.supports_trait(trait_ref))
     }
 }
 

@@ -25,7 +25,10 @@ pub trait ColumnModelLike: ColumnSynLike {
             .name(self.column_snake_name())
             .expect("Failed to set name")
             .public()
-            .ty(self.external_postgres_type(workspace).expect("Failed to find external type"));
+            .nullable(self.is_nullable())
+            .ty(self
+                .external_postgres_type(workspace, database)
+                .expect("Failed to find external type"));
         if let Some(documentation) = self.column_doc(database) {
             builder = builder.documentation(documentation).expect("Failed to set documentation");
         }

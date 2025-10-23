@@ -29,7 +29,7 @@ impl<'data> Decorator<'data> {
     }
 
     /// Returns the external crates required by the decorator.
-    pub fn external_dependencies(&self) -> Vec<&'data crate::structs::ExternalCrate> {
+    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
         self.token.external_dependencies()
     }
 }

@@ -1,6 +1,17 @@
-//! Submodule implementing the
-//! [`FunctionLike`](sql_traits::prelude::FunctionLike) trait for the
-//! [`PgProc`](crate::models::PgProc) struct.
+//! Implementation of [`FunctionLike`] for [`PgProc`].
+//!
+//! This module implements the
+//! [`FunctionLike`](sql_traits::prelude::FunctionLike) trait
+//! for the [`PgProc`](crate::models::PgProc) model from `pg_catalog.pg_proc`,
+//! enabling generic introspection of PostgreSQL functions and procedures.
+//!
+//! The implementation provides access to:
+//! - Function name
+//! - Argument type names (resolved from `pg_type`)
+//! - Return type name (resolved from `pg_type`)
+//!
+//! Type information is loaded from [`PgProcMetadata`] which resolves OIDs to
+//! type names.
 
 use sql_traits::traits::{FunctionLike, Metadata};
 

@@ -7,7 +7,7 @@ use std::{fmt::Debug, hash::Hash};
 use builder::ExternalTraitBuilder;
 use quote::ToTokens;
 
-use crate::structs::{ExternalCrate, InternalCrate, InternalTrait, Trait};
+use crate::structs::{InternalCrate, InternalTrait, Trait, external_crate::ExternalTraitRef};
 
 #[derive(Clone)]
 /// Struct defining a trait available in an external crate.
@@ -31,6 +31,24 @@ impl ToTokens for ExternalTrait {
 impl From<Trait> for ExternalTrait {
     fn from(value: Trait) -> Self {
         ExternalTrait { name: value.as_ref().to_owned(), path: value.path() }
+    }
+}
+
+impl TryFrom<&ExternalTrait> for Trait {
+    type Error = ();
+
+    fn try_from(value: &ExternalTrait) -> Result<Self, Self::Error> {
+        match value.name.as_str() {
+            "Clone" => Ok(Trait::Clone),
+            "Debug" => Ok(Trait::Debug),
+            "Default" => Ok(Trait::Default),
+            "PartialEq" => Ok(Trait::PartialEq),
+            "Eq" => Ok(Trait::Eq),
+            "PartialOrd" => Ok(Trait::PartialOrd),
+            "Ord" => Ok(Trait::Ord),
+            "Hash" => Ok(Trait::Hash),
+            _ => Err(()),
+        }
     }
 }
 
@@ -107,12 +125,18 @@ pub enum TraitVariantRef<'data> {
     /// Variant representing a trait defined within the workspace.
     Internal(InternalTrait<'data>, &'data InternalCrate<'data>),
     /// Variant representing a trait defined within an external crate.
-    External(ExternalTrait, &'data ExternalCrate),
+    External(ExternalTraitRef<'data>),
 }
 
-impl From<Trait> for TraitVariantRef<'_> {
-    fn from(trait_variant: Trait) -> Self {
-        Self::External(trait_variant.into(), ExternalCrate::core())
+impl<'data> From<ExternalTraitRef<'data>> for TraitVariantRef<'data> {
+    fn from(ext_trait_ref: ExternalTraitRef<'data>) -> Self {
+        Self::External(ext_trait_ref)
+    }
+}
+
+impl<'data> From<Trait> for TraitVariantRef<'data> {
+    fn from(trait_def: Trait) -> Self {
+        Self::External(trait_def.into())
     }
 }
 
@@ -121,7 +145,7 @@ impl TraitVariantRef<'_> {
     pub fn name(&self) -> &str {
         match self {
             TraitVariantRef::Internal(trait_def, _crate_def) => trait_def.name(),
-            TraitVariantRef::External(trait_def, _crate_def) => trait_def.name(),
+            TraitVariantRef::External(ext_trait_ref) => ext_trait_ref.name(),
         }
     }
 }
@@ -136,9 +160,9 @@ impl ToTokens for TraitVariantRef<'_> {
                     #crate_name::prelude::#trait_ident
                 });
             }
-            TraitVariantRef::External(trait_def, _crate_def) => {
+            TraitVariantRef::External(ext_trait_ref) => {
                 tokens.extend(quote::quote! {
-                    #trait_def
+                    #ext_trait_ref
                 });
             }
         }

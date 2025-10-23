@@ -113,7 +113,7 @@ impl<'data> InternalCrate<'data> {
     }
 
     /// Returns the external dependencies of the crate.
-    pub fn external_dependencies(&self) -> Vec<&'data crate::structs::ExternalCrate> {
+    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
         let mut dependencies = Vec::new();
         for module in &self.modules {
             dependencies.extend(module.external_dependencies());

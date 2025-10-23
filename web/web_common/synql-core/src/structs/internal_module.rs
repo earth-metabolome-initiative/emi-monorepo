@@ -114,7 +114,7 @@ impl<'data> InternalModule<'data> {
     }
 
     /// Returns the sorted unique external dependencies of the module.
-    pub fn external_dependencies(&self) -> Vec<&'data crate::structs::ExternalCrate> {
+    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
         let mut dependencies = Vec::new();
         for submodule in &self.submodules {
             dependencies.extend(submodule.external_dependencies());

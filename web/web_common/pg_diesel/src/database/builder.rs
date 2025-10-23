@@ -1,6 +1,41 @@
-//! Submodule providing a builder and its trait implementation for constructing
-//! a [`PgDatabase`](crate::database::PgDatabase) instance from a PostgreSQL
-//! connection and relevant schema information.
+//! Builder pattern for constructing a [`PgDatabase`] instance.
+//!
+//! This module provides [`PgDatabaseBuilder`], which implements a type-safe
+//! builder pattern for loading PostgreSQL metadata from system catalogs into a
+//! [`PgDatabase`] instance.
+//!
+//! ## Builder Pattern
+//!
+//! The builder requires three essential attributes:
+//! - A database connection ([`PgConnection`])
+//! - A catalog (database) name to query
+//! - One or more schema names to include
+//!
+//! ## Type Denylisting
+//!
+//! The builder supports denylisting PostgreSQL types that cannot be mapped to
+//! Diesel types (e.g., `anyarray`, `pg_ndistinct`). Denylisted types are
+//! excluded from column generation.
+//!
+//! ## Error Handling
+//!
+//! The builder can fail with [`PgDatabaseBuildError`] which wraps:
+//! - Builder errors (missing required attributes)
+//! - Diesel errors (database query failures)
+//! - Duplicate denylist type errors
+//!
+//! ## Example
+//!
+//! ```ignore
+//! use pg_diesel::database::PgDatabaseBuilder;
+//!
+//! let db = PgDatabaseBuilder::default()
+//!     .connection(&mut conn)
+//!     .catalog("my_database")
+//!     .schemas(vec!["public".to_owned(), "information_schema".to_owned()])
+//!     .denylist_types(["anyarray", "pg_ndistinct"])?
+//!     .build()?;
+//! ```
 
 use std::{fmt::Display, rc::Rc};
 
@@ -13,12 +48,39 @@ use sql_traits::{structs::generic_db::GenericDBBuilder, traits::TableLike};
 
 use crate::{
     PgDatabase,
-    database::KeyColumnUsageMetadata,
     models::{PgProc, Table},
 };
 
 #[derive(Default)]
-/// Builder for constructing a `PgDatabase` instance.
+/// Builder for constructing a [`PgDatabase`] instance from PostgreSQL metadata.
+///
+/// This builder follows the type-state pattern to ensure all required
+/// attributes are provided before building. It queries the PostgreSQL system
+/// catalogs to load complete metadata about tables, columns, constraints,
+/// indexes, and functions.
+///
+/// ## Required Attributes
+///
+/// - **connection**: A PostgreSQL database connection for querying metadata
+/// - **catalog**: The database name to query (typically the current database)
+/// - **schemas**: One or more schema names to include (e.g., "public",
+///   "pg_catalog")
+///
+/// ## Optional Attributes
+///
+/// - **denylist_types**: PostgreSQL type names to exclude from column
+///   generation
+///
+/// ## Usage
+///
+/// ```ignore
+/// let db = PgDatabaseBuilder::default()
+///     .connection(&mut conn)
+///     .catalog("mydb")
+///     .add_schema("public")
+///     .add_schema("information_schema")
+///     .build()?;
+/// ```
 pub struct PgDatabaseBuilder<'conn> {
     /// Connection to the PostgreSQL database.
     connection: Option<&'conn mut PgConnection>,
@@ -26,6 +88,8 @@ pub struct PgDatabaseBuilder<'conn> {
     catalog: Option<String>,
     /// The schema names to include.
     schemas: Vec<String>,
+    /// Types denylist.
+    denylist_types: Vec<String>,
 }
 
 #[derive(Debug)]
@@ -37,6 +101,8 @@ pub enum PgDatabaseAttribute {
     Catalog,
     /// The schema names to include.
     Schemas,
+    /// Types denylist.
+    DenylistTypes,
 }
 
 impl Display for PgDatabaseAttribute {
@@ -45,16 +111,26 @@ impl Display for PgDatabaseAttribute {
             PgDatabaseAttribute::Connection => write!(f, "connection"),
             PgDatabaseAttribute::Catalog => write!(f, "catalog"),
             PgDatabaseAttribute::Schemas => write!(f, "schemas"),
+            PgDatabaseAttribute::DenylistTypes => write!(f, "denylist_types"),
         }
     }
 }
 
 #[derive(Debug)]
+/// Errors that can occur when building a [`PgDatabase`] instance.
+///
+/// This error type encompasses all failure modes during database metadata
+/// loading:
+/// - Missing required builder attributes
+/// - Database query failures
+/// - Invalid denylist configurations
 pub enum PgDatabaseBuildError {
     /// An error occurred while building the `PgDatabase`.
     Builder(BuilderError<PgDatabaseAttribute>),
     /// An error occurred while querying the database schema.
     Diesel(diesel::result::Error),
+    /// A deny-listed type was inserted multiple times.
+    DuplicateDenylistedType(String),
 }
 
 impl Display for PgDatabaseBuildError {
@@ -62,6 +138,9 @@ impl Display for PgDatabaseBuildError {
         match self {
             PgDatabaseBuildError::Builder(err) => write!(f, "Builder error: {}", err),
             PgDatabaseBuildError::Diesel(err) => write!(f, "Diesel error: {}", err),
+            PgDatabaseBuildError::DuplicateDenylistedType(ty) => {
+                write!(f, "Duplicate deny-listed type: {}", ty)
+            }
         }
     }
 }
@@ -83,6 +162,7 @@ impl std::error::Error for PgDatabaseBuildError {
         match self {
             PgDatabaseBuildError::Builder(err) => Some(err),
             PgDatabaseBuildError::Diesel(err) => Some(err),
+            PgDatabaseBuildError::DuplicateDenylistedType(_) => None,
         }
     }
 }
@@ -95,14 +175,14 @@ impl<'conn> PgDatabaseBuilder<'conn> {
     }
 
     /// Sets the catalog (database) name to filter by.
-    pub fn catalog(mut self, catalog: String) -> Self {
-        self.catalog = Some(catalog);
+    pub fn catalog<S: ToString>(mut self, catalog: S) -> Self {
+        self.catalog = Some(catalog.to_string());
         self
     }
 
     /// Adds a schema name to include.
-    pub fn add_schema(mut self, schema: String) -> Self {
-        self.schemas.push(schema);
+    pub fn add_schema<S: ToString>(mut self, schema: S) -> Self {
+        self.schemas.push(schema.to_string());
         self
     }
 
@@ -110,6 +190,28 @@ impl<'conn> PgDatabaseBuilder<'conn> {
     pub fn schemas(mut self, schemas: Vec<String>) -> Self {
         self.schemas = schemas;
         self
+    }
+
+    /// Adds a type to the denylist.
+    pub fn denylist_type<S: ToString>(mut self, ty: S) -> Result<Self, PgDatabaseBuildError> {
+        let ty_str = ty.to_string();
+        if self.denylist_types.contains(&ty_str) {
+            return Err(PgDatabaseBuildError::DuplicateDenylistedType(ty_str));
+        }
+        self.denylist_types.push(ty_str);
+        Ok(self)
+    }
+
+    /// Adds multiple types to the denylist.
+    pub fn denylist_types<I, S>(mut self, types: I) -> Result<Self, PgDatabaseBuildError>
+    where
+        I: IntoIterator<Item = S>,
+        S: ToString,
+    {
+        for ty in types {
+            self = self.denylist_type(ty)?;
+        }
+        Ok(self)
     }
 }
 
@@ -161,7 +263,7 @@ impl Builder for PgDatabaseBuilder<'_> {
         // For each table, we determine all of the foreign keys and for each foreign key
         // we determine which table it references.
         for table in tables {
-            let table_metadata = table.metadata(connection)?;
+            let table_metadata = table.metadata(connection, &self.denylist_types)?;
 
             for column in table_metadata.column_rcs() {
                 builder =
@@ -169,13 +271,13 @@ impl Builder for PgDatabaseBuilder<'_> {
             }
 
             for fk in table_metadata.foreign_key_rcs() {
-                let metadata = KeyColumnUsageMetadata::new(&fk, connection)?;
-                builder = builder.add_foreign_key(fk.clone(), metadata);
+                builder =
+                    builder.add_foreign_key(fk.clone(), fk.metadata(table.clone(), connection)?);
             }
 
             for index in table_metadata.unique_index_rcs() {
-                let metadata = index.metadata(table.clone(), connection)?;
-                builder = builder.add_unique_index(index.clone(), metadata);
+                builder = builder
+                    .add_unique_index(index.clone(), index.metadata(table.clone(), connection)?);
             }
 
             builder = builder.add_table(table, table_metadata);

@@ -1,22 +1,32 @@
 //! Submodule defining the `TableModel` struct.
 
-use quote::quote;
+use quote::{ToTokens, quote};
 use synql_core::{
-    prelude::Builder,
+    prelude::{Builder, ForeignKeyLike},
     structs::{
         Decorator, Derive, InternalCrate, InternalData, InternalModule, InternalStruct,
         InternalToken,
     },
+    traits::ColumnSynLike,
 };
 
 use crate::traits::{TableModelLike, column_model_like::ColumnModelLike};
 
+#[derive(Debug)]
 /// Struct representing a SynQL table model.
 pub struct TableModel<'data, 'table, T: TableModelLike + ?Sized> {
     table: &'table T,
     workspace: &'table synql_core::structs::Workspace<'data>,
     database: &'table T::Database,
 }
+
+impl<'data, 'table, T: TableModelLike + ?Sized> Clone for TableModel<'data, 'table, T> {
+    fn clone(&self) -> Self {
+        Self { table: self.table, workspace: self.workspace, database: self.database }
+    }
+}
+
+impl<'data, 'table, T: TableModelLike + ?Sized> Copy for TableModel<'data, 'table, T> {}
 
 impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
     pub(crate) fn new(
@@ -27,21 +37,108 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
         Self { table, workspace, database }
     }
 
-    fn diesel_derives(&self) -> Vec<Derive<'data>> {
-        let mut derives = vec![];
+    fn diesel_derives(&self) -> Derive<'data> {
+        let mut traits = vec![
+            self.workspace.external_trait("Selectable").expect("Failed to get Selectable trait"),
+        ];
 
-        let selectable_trait =
-            self.workspace.external_trait("Selectable").expect("Failed to get Selectable trait");
+        if self.table.has_non_primary_key_columns(self.database) {
+            traits.push(
+                self.workspace
+                    .external_trait("AsChangeset")
+                    .expect("Failed to get AsChangeset trait"),
+            );
+        }
 
-        derives.push(
-            Derive::new()
-                .add_trait(selectable_trait)
-                .expect("Failed to add Selectable trait to derive")
+        if self.table.has_primary_key(self.database) {
+            traits.push(
+                self.workspace.external_trait("Queryable").expect("Failed to get Queryable trait"),
+            );
+            traits.push(
+                self.workspace
+                    .external_trait("Identifiable")
+                    .expect("Failed to get Identifiable trait"),
+            );
+        }
+
+        if self
+            .table
+            .singleton_foreign_keys(self.database)
+            .any(|fk| !fk.is_composite(self.database))
+        {
+            traits.push(
+                self.workspace
+                    .external_trait("Associations")
+                    .expect("Failed to get Associations trait"),
+            );
+        }
+
+        Derive::new()
+            .add_traits(traits)
+            .expect("Failed to add Selectable trait to derive")
+            .build()
+            .expect("Failed to build Selectable derive")
+    }
+
+    fn belongs_to_decorators(&self) -> Vec<Decorator<'data>> {
+        let mut decorators = Vec::new();
+
+        for foreign_key in self.table.singleton_foreign_keys(self.database) {
+            let columns = foreign_key.host_columns(self.database).collect::<Vec<_>>();
+            let [column] = columns.as_slice() else {
+                continue;
+            };
+            let column_ident = column.column_snake_ident();
+
+            let referenced_table = foreign_key.referenced_table(self.database);
+            let referenced_table_model = referenced_table
+                .model_ref(self.workspace)
+                .expect("Failed to get the referenced table model for belongs_to decorator");
+
+            let decorator = Decorator::new()
+                .token(
+                    InternalToken::new()
+                        .private()
+                        .stream(quote! {
+                            diesel(belongs_to(#referenced_table_model, foreign_key = #column_ident))
+                        })
+                        .internal_data(referenced_table_model)
+                        .unwrap()
+                        .build()
+                        .unwrap(),
+                )
+                .unwrap()
                 .build()
-                .expect("Failed to build Selectable derive"),
-        );
+                .unwrap();
 
-        derives
+            decorators.push(decorator);
+        }
+
+        decorators
+    }
+
+    fn primary_key_decorator(&self) -> Option<Decorator<'data>> {
+        if !self.table.has_primary_key(self.database) {
+            return None;
+        }
+
+        let pk_idents = self.table.primary_key_idents(self.database);
+
+        Some(
+            Decorator::new()
+                .token(
+                    InternalToken::new()
+                        .private()
+                        .stream(quote! {
+                            diesel(primary_key( #(#pk_idents),* ))
+                        })
+                        .build()
+                        .unwrap(),
+                )
+                .unwrap()
+                .build()
+                .unwrap(),
+        )
     }
 }
 
@@ -59,7 +156,7 @@ where
             .public()
             .name(table_model.table.table_singular_camel_name())
             .expect("Failed to set name")
-            .derives(table_model.diesel_derives())
+            .derive(table_model.diesel_derives())
             .expect("Failed to add derives")
             .decorator(
                 Decorator::new()
@@ -76,6 +173,10 @@ where
                     .build()
                     .unwrap(),
             )
+            .unwrap()
+            .decorators(table_model.belongs_to_decorators())
+            .unwrap()
+            .decorators(table_model.primary_key_decorator())
             .unwrap()
             .variant(
                 InternalStruct::new()
@@ -139,5 +240,15 @@ where
             .expect("Failed to add internal module to internal crate")
             .build()
             .expect("Failed to convert internal data into internal crate")
+    }
+}
+
+impl<'data, 'table, T> ToTokens for TableModel<'data, 'table, T>
+where
+    T: TableModelLike + ?Sized,
+{
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let internal_data: InternalData<'data> = InternalData::from(*self);
+        internal_data.to_tokens(tokens);
     }
 }

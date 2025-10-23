@@ -9,13 +9,13 @@ pub use builder::WorkspaceBuilder;
 use crate::structs::{
     ExternalCrate, InternalCrate,
     external_crate::{ExternalMacroRef, ExternalTraitRef, ExternalTypeRef},
-    external_trait::TraitVariantRef,
 };
 
+#[derive(Debug, Clone)]
 /// Struct defining a Cargo workspace.
 pub struct Workspace<'data> {
     /// External crates made available within the workspace.
-    external_crates: Vec<&'data ExternalCrate>,
+    external_crates: Vec<&'data ExternalCrate<'data>>,
     /// Name of the workspace.
     name: String,
     /// Path where the workspace is being created.
@@ -83,9 +83,9 @@ impl<'data> Workspace<'data> {
     ///
     /// # Arguments
     /// * `name` - A string slice representing the name of the external trait.
-    pub fn external_trait(&self, name: &str) -> Option<TraitVariantRef<'data>> {
+    pub fn external_trait(&self, name: &str) -> Option<ExternalTraitRef<'data>> {
         for ext_crate in &self.external_crates {
-            if let Some(ext_trait) = ext_crate.external_trait(name) {
+            if let Some(ext_trait) = ext_crate.external_trait_ref(name) {
                 return Some(ext_trait);
             }
         }
@@ -152,8 +152,28 @@ impl<'data> Workspace<'data> {
                 continue;
             }
             let dep_name = external_crate.name();
-            doc["workspace"]["dependencies"][dep_name] =
-                toml_edit::value(external_crate.version().as_deref().unwrap_or("*"));
+            let features = external_crate.features();
+
+            if features.is_empty() {
+                // Simple version string if no features
+                doc["workspace"]["dependencies"][dep_name] =
+                    toml_edit::value(external_crate.version().as_deref().unwrap_or("*"));
+            } else {
+                // Create table with version and features
+                let mut dep_table = toml_edit::InlineTable::new();
+                dep_table.insert(
+                    "version",
+                    Value::from(external_crate.version().as_deref().unwrap_or("*")),
+                );
+
+                let mut features_array = Array::new();
+                for feature in features {
+                    features_array.push(feature.as_str());
+                }
+                dep_table.insert("features", Value::from(features_array));
+
+                doc["workspace"]["dependencies"][dep_name] = toml_edit::value(dep_table);
+            }
         }
 
         // Add [workspace.lints] section

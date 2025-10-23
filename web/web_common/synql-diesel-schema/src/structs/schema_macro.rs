@@ -111,10 +111,10 @@ where
             let column_type =
                 column.diesel_type(self.workspace, self.database).unwrap_or_else(|| {
                     panic!(
-                        "Could not find diesel type {} for column '{}' of table '{}'",
-                        column.normalized_data_type(),
+                        "Could not find diesel type `{}` for column `{}.{}`",
+                        column.normalized_data_type(self.database),
+                        self.table.table_name(),
                         column.column_name(),
-                        self.table.table_name()
                     )
                 });
 
@@ -163,13 +163,18 @@ where
             Some(quote! {#[sql_name = #original_table_name]})
         };
 
+        let maybe_schema = if let Some(schema_name) = self.table.table_schema() {
+            Some(quote! {#schema_name.})
+        } else {
+            None
+        };
         let table_name_ident = self.table.table_snake_ident();
 
         tokens.extend(quote! {
             diesel::table! {
                 #documentation
                 #sql_name
-                #table_name_ident #primary_key {
+                #maybe_schema #table_name_ident #primary_key {
                     #(#columns),*
                 }
             }

@@ -122,18 +122,39 @@ pub trait ColumnSynLike: ColumnLike {
     fn external_postgres_type<'workspace, 'data>(
         &self,
         workspace: &'workspace Workspace<'data>,
+        database: &Self::Database,
     ) -> Option<ExternalTypeRef<'data>> {
-        workspace.external_postgres_type(&self.data_type())
+        workspace.external_postgres_type(&self.normalized_data_type(database))
     }
 
     /// Returns the Diesel type of this column.
     fn diesel_type<'workspace, 'data>(
         &self,
         workspace: &'workspace Workspace<'data>,
-        _database: &Self::Database,
-    ) -> Option<&'data Type> {
-        let external_type = self.external_postgres_type(workspace)?;
-        Some(external_type.diesel_type())
+        database: &Self::Database,
+    ) -> Option<Type> {
+        let external_type = self.external_postgres_type(workspace, database)?;
+        let diesel_type = external_type.diesel_type();
+        if self.is_nullable() {
+            Some(syn::parse_quote!(diesel::sql_types::Nullable<#diesel_type>))
+        } else {
+            Some(diesel_type.clone())
+        }
+    }
+
+    /// Returns the Rust type of this column.
+    fn rust_type<'workspace, 'data>(
+        &self,
+        workspace: &'workspace Workspace<'data>,
+        database: &Self::Database,
+    ) -> Option<Type> {
+        let external_type = self.external_postgres_type(workspace, database)?;
+        let rust_type = external_type.rust_type();
+        if self.is_nullable() {
+            Some(syn::parse_quote!(Option<#rust_type>))
+        } else {
+            Some(rust_type.clone())
+        }
     }
 }
 

@@ -48,7 +48,7 @@ impl<'data> InternalDataVariant<'data> {
     /// # Arguments
     ///
     /// * `trait_variant` - The trait variant to check support for.
-    pub fn supports_trait(&self, trait_variant: Trait) -> bool {
+    pub fn supports_trait(&self, trait_variant: &TraitVariantRef<'data>) -> bool {
         match self {
             InternalDataVariant::StructVariant(s) => s.supports_trait(trait_variant),
             InternalDataVariant::EnumVariant(e) => e.supports_trait(trait_variant),
@@ -88,7 +88,7 @@ impl<'data> DataVariantRef<'data> {
     }
 
     /// Returns the external crate dependencies of the variant.
-    pub fn external_dependencies(&self) -> Vec<&'data ExternalCrate> {
+    pub fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
         match self {
             DataVariantRef::Internal(_) => vec![],
             DataVariantRef::External(external) => vec![external.external_crate()],
@@ -99,13 +99,13 @@ impl<'data> DataVariantRef<'data> {
     ///
     /// # Arguments
     ///
-    /// * `trait_variant` - The trait variant to check support for.
-    pub fn supports_trait(&self, trait_variant: Trait) -> bool {
+    /// * `trait_ref` - The trait variant to check support for.
+    pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
         match self {
             DataVariantRef::Internal(internal) => {
-                internal.data().variant().supports_trait(trait_variant)
+                internal.data().variant().supports_trait(trait_ref)
             }
-            DataVariantRef::External(external) => external.supports_trait(trait_variant),
+            DataVariantRef::External(external) => external.supports_trait(trait_ref),
         }
     }
 }
@@ -118,7 +118,13 @@ pub struct InternalDataRef<'data> {
 }
 
 impl<'data> InternalDataRef<'data> {
-    pub(crate) fn new(
+    /// Creates a new `InternalDataRef`.
+    ///
+    /// # Arguments
+    ///
+    /// * `internal_crate` - A reference to the internal crate.
+    /// * `data` - A reference to the internal data.
+    pub fn new(
         internal_crate: &Rc<InternalCrate<'data>>,
         data: &Rc<InternalData<'data>>,
     ) -> InternalDataRef<'data> {
@@ -151,13 +157,19 @@ impl<'data> InternalDataRef<'data> {
     }
 }
 
+impl ToTokens for InternalDataRef<'_> {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let internal_crate_ident = self.internal_crate.ident();
+        let internal_data_ident = self.data.ident();
+        tokens.extend(quote! {#internal_crate_ident::prelude::#internal_data_ident});
+    }
+}
+
 impl ToTokens for DataVariantRef<'_> {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         match self {
             DataVariantRef::Internal(internal) => {
-                let internal_crate_ident = internal.internal_crate.ident();
-                let internal_data_ident = internal.data.ident();
-                tokens.extend(quote! {#internal_crate_ident::prelude::#internal_data_ident});
+                internal.to_tokens(tokens);
             }
             DataVariantRef::External(external) => {
                 external.rust_type().to_tokens(tokens);
@@ -292,12 +304,16 @@ impl<'data> InternalData<'data> {
     }
 
     /// Returns the sorted unique external crate dependencies of the data.
-    pub fn external_dependencies(&self) -> Vec<&'data ExternalCrate> {
+    pub fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
         let mut crates = self
             .traits
             .iter()
             .filter_map(|t| {
-                if let TraitVariantRef::External(_, krate) = t { Some(*krate) } else { None }
+                if let TraitVariantRef::External(ext_trait_ref) = t {
+                    Some(ext_trait_ref.external_crate())
+                } else {
+                    None
+                }
             })
             .collect::<Vec<_>>();
 

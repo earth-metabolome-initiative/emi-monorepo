@@ -1,5 +1,14 @@
-//! Submodule implementing the [`ColumnLike`](sql_traits::prelude::ColumnLike)
-//! trait for the [`Column`] struct.
+//! Implementation of [`ColumnLike`] for [`Column`].
+//!
+//! This module implements the [`ColumnLike`](sql_traits::prelude::ColumnLike)
+//! trait for the [`Column`] model from `information_schema.columns`, enabling
+//! generic introspection of table columns.
+//!
+//! The implementation provides access to:
+//! - Column name, data type, and nullability
+//! - Whether the column is generated or has a default value
+//! - The owning table (via the database metadata)
+//! - Associated documentation from `pg_catalog.pg_description`
 
 use sql_traits::traits::{ColumnLike, Metadata};
 
@@ -26,7 +35,7 @@ impl ColumnLike for crate::models::Column {
     where
         Self: 'db,
     {
-        database.column_metadata(self).description().and_then(|desc| desc.description.as_deref())
+        database.column_metadata(self).description().map(|desc| desc.description.as_str())
     }
 
     fn table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
@@ -46,8 +55,8 @@ impl ColumnLike for crate::models::Column {
         self.data_type_str().to_owned()
     }
 
-    fn normalized_data_type(&self) -> String {
-        self.data_type_str().to_owned()
+    fn normalized_data_type(&self, database: &Self::Database) -> String {
+        database.column_metadata(self).normalized_data_type()
     }
 
     fn is_nullable(&self) -> bool {

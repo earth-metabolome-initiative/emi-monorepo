@@ -6,7 +6,7 @@ use common_traits::builder::Builder;
 
 use crate::structs::{ExternalCrate, ExternalType};
 
-impl ExternalCrate {
+impl ExternalCrate<'static> {
     /// Initializes a `ExternalCrate` instance describing the `postgis_diesel`
     /// crate.
     pub fn postgis_diesel() -> Self {
@@ -30,7 +30,7 @@ impl ExternalCrate {
     }
 }
 
-impl ExternalType {
+impl<'data> ExternalType<'data> {
     fn point() -> Self {
         ExternalType::new()
             .postgres_type("point")

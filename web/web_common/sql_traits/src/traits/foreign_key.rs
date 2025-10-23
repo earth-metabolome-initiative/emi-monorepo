@@ -787,6 +787,9 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # }
     /// ```
     fn is_singleton(&self, database: &Self::Database) -> bool {
+        if self.is_self_referential(database) {
+            return false;
+        }
         let foreign_table = self.referenced_table(database);
         self.host_table(database)
             .foreign_keys(database)

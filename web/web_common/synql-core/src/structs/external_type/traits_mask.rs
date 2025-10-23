@@ -1,6 +1,8 @@
 //! Submodule providing a struct defining which traits are supported by some
 //! type found in the postgres database schema.
 
+use std::fmt::Display;
+
 use enumflags2::{BitFlags, bitflags};
 use strum_macros::EnumIter;
 
@@ -35,6 +37,12 @@ pub enum Trait {
     PartialEq,
 }
 
+impl Display for Trait {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.as_ref())
+    }
+}
+
 impl AsRef<str> for Trait {
     fn as_ref(&self) -> &str {
         match self {
@@ -58,8 +66,8 @@ impl Trait {
             Trait::Copy => syn::parse_str("Copy").unwrap(),
             Trait::Clone => syn::parse_str("Clone").unwrap(),
             Trait::Default => syn::parse_str("Default").unwrap(),
-            Trait::Debug => syn::parse_str("::core::fmt::Debug").unwrap(),
-            Trait::Hash => syn::parse_str("::core::hash::Hash").unwrap(),
+            Trait::Debug => syn::parse_str("Debug").unwrap(),
+            Trait::Hash => syn::parse_str("Hash").unwrap(),
             Trait::Ord => syn::parse_str("Ord").unwrap(),
             Trait::PartialOrd => syn::parse_str("PartialOrd").unwrap(),
             Trait::Eq => syn::parse_str("Eq").unwrap(),

@@ -1,5 +1,12 @@
-//! Struct collecting information about a
-//! [`PgProc`](crate::models::PgProc) entry's argument types and return type.
+//! Metadata for PostgreSQL functions and procedures.
+//!
+//! This module provides [`PgProcMetadata`], which encapsulates type information
+//! for a PostgreSQL function or procedure, including:
+//! - Argument types (from `pg_proc.proargtypes`)
+//! - Return type (from `pg_proc.prorettype`)
+//!
+//! This metadata is used by the [`PgDatabase`](crate::database::PgDatabase) to
+//! provide function introspection through the `sql_traits` trait system.
 
 use diesel::PgConnection;
 

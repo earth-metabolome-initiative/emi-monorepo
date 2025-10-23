@@ -1,0 +1,40 @@
+//! Submodule providing the `PgStatXactAllTable` struct representing a row of
+//! the `pg_stat_xact_all_tables` view in `PostgreSQL`.
+
+use diesel::{Queryable, QueryableByName, Selectable};
+
+/// Represents a row from the `pg_stat_xact_all_tables` view.
+///
+/// The `pg_stat_xact_all_tables` view shows statistics about accesses to all
+/// tables within the current transaction.
+///
+/// For more information, see the [PostgreSQL documentation](https://www.postgresql.org/docs/current/monitoring-stats.html#MONITORING-PG-STAT-ALL-TABLES-VIEW).
+#[derive(Queryable, QueryableByName, Selectable, Debug, PartialEq, Eq, Clone, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[diesel(table_name = crate::schema::pg_catalog::pg_stat_xact_all_tables::pg_stat_xact_all_tables)]
+pub struct PgStatXactAllTable {
+    /// Table OID.
+    pub relid: Option<u32>,
+    /// Schema name.
+    pub schemaname: Option<String>,
+    /// Table name.
+    pub relname: Option<String>,
+    /// Sequential scans in transaction.
+    pub seq_scan: Option<i64>,
+    /// Sequential tuples read in transaction.
+    pub seq_tup_read: Option<i64>,
+    /// Index scans in transaction.
+    pub idx_scan: Option<i64>,
+    /// Index tuples fetched in transaction.
+    pub idx_tup_fetch: Option<i64>,
+    /// Rows inserted in transaction.
+    pub n_tup_ins: Option<i64>,
+    /// Rows updated in transaction.
+    pub n_tup_upd: Option<i64>,
+    /// Rows deleted in transaction.
+    pub n_tup_del: Option<i64>,
+    /// HOT updates in transaction.
+    pub n_tup_hot_upd: Option<i64>,
+    /// New page updates in transaction.
+    pub n_tup_newpage_upd: Option<i64>,
+}

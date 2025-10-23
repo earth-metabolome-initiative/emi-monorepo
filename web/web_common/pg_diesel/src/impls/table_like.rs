@@ -1,5 +1,17 @@
-//! Submodule implementing the [`TableLike`](sql_traits::prelude::TableLike)
-//! trait for the [`Table`] struct.
+//! Implementation of [`TableLike`] for [`Table`].
+//!
+//! This module implements the [`TableLike`](sql_traits::prelude::TableLike)
+//! trait for the [`Table`] model from `information_schema.tables`, enabling
+//! generic introspection of database tables.
+//!
+//! The implementation provides access to:
+//! - Table name and schema
+//! - Table documentation from `pg_catalog.pg_description`
+//! - Columns, primary key columns
+//! - Foreign keys, check constraints, unique indexes
+//!
+//! All metadata is loaded from [`TableMetadata`] which is constructed during
+//! database building.
 
 use sql_traits::traits::{Metadata, TableLike};
 
@@ -32,7 +44,7 @@ impl TableLike for crate::models::Table {
     where
         Self: 'db,
     {
-        database.table_metadata(self).description().and_then(|desc| desc.description.as_deref())
+        database.table_metadata(self).description().map(|desc| desc.description.as_str())
     }
 
     fn columns<'db>(

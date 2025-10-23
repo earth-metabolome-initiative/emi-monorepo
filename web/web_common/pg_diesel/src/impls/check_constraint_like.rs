@@ -1,6 +1,12 @@
-//! Submodule implementing the
+//! Implementation of [`CheckConstraintLike`] for [`CheckConstraint`].
+//!
+//! This module implements the
 //! [`CheckConstraintLike`](sql_traits::prelude::CheckConstraintLike)
-//! trait for the [`CheckConstraint`] struct.
+//! trait for the [`CheckConstraint`] model, enabling generic introspection of
+//! check constraints.
+//!
+//! The implementation parses the check constraint expression from the
+//! `check_clause` field using the PostgreSQL SQL parser.
 
 use sql_traits::traits::CheckConstraintLike;
 use sqlparser::parser::Parser;

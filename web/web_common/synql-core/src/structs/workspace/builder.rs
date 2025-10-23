@@ -12,7 +12,7 @@ use crate::structs::{ExternalCrate, Workspace};
 /// Builder for the `Workspace` struct.
 pub struct WorkspaceBuilder<'data> {
     /// External crates made available within the workspace.
-    external_crates: Vec<&'data ExternalCrate>,
+    external_crates: Vec<&'data ExternalCrate<'data>>,
     /// Name of the workspace.
     name: Option<String>,
     /// Path where the workspace is being created.
@@ -154,9 +154,9 @@ impl<'data> WorkspaceBuilder<'data> {
     /// * `external_crate` - The external crate to add.
     pub fn external_crate(
         mut self,
-        external_crate: &'data ExternalCrate,
+        external_crate: &'data ExternalCrate<'data>,
     ) -> Result<Self, WorkspaceBuilderError> {
-        if self.external_crates.iter().any(|c| c.name() == external_crate.name()) {
+        if self.external_crates.contains(&external_crate) {
             return Err(WorkspaceBuilderError::DuplicatedCrateName);
         }
         self.external_crates.push(external_crate);
@@ -178,13 +178,18 @@ impl<'data> WorkspaceBuilder<'data> {
         self.external_crate(ExternalCrate::diesel())
     }
 
+    /// Adds the serde external crate to the workspace.
+    pub fn serde(self) -> Result<Self, WorkspaceBuilderError> {
+        self.external_crate(ExternalCrate::serde())
+    }
+
     /// Adds multiple external crates to the workspace.
     ///
     /// # Arguments
     /// * `external_crates` - The external crates to add.
     pub fn external_crates<I>(mut self, external_crates: I) -> Result<Self, WorkspaceBuilderError>
     where
-        I: IntoIterator<Item = &'data ExternalCrate>,
+        I: IntoIterator<Item = &'data ExternalCrate<'data>>,
     {
         for external_crate in external_crates {
             self = self.external_crate(external_crate)?;

@@ -8,12 +8,15 @@ use std::{fmt::Debug, hash::Hash};
 use quote::ToTokens;
 pub use traits_mask::Trait;
 
-use crate::structs::external_type::builder::ExternalTypeBuilder;
+use crate::structs::{
+    external_crate::ExternalTraitRef, external_trait::TraitVariantRef,
+    external_type::builder::ExternalTypeBuilder,
+};
 
 #[derive(Clone)]
 /// Struct defining the type required by some type found in the postgres
 /// database schema.
-pub struct ExternalType {
+pub struct ExternalType<'data> {
     /// The diesel type defined within the crate compatible with the given
     /// postgres type.
     diesel_type: syn::Type,
@@ -25,9 +28,11 @@ pub struct ExternalType {
     postgres_types: Vec<&'static str>,
     /// The traits supported by the current type.
     traits: traits_mask::TraitsMask,
+    /// External traits implemented by the type.
+    external_traits: Vec<ExternalTraitRef<'data>>,
 }
 
-impl PartialEq for ExternalType {
+impl PartialEq for ExternalType<'_> {
     fn eq(&self, other: &Self) -> bool {
         self.diesel_type.to_token_stream().to_string()
             == other.diesel_type.to_token_stream().to_string()
@@ -35,18 +40,19 @@ impl PartialEq for ExternalType {
                 == other.rust_type.to_token_stream().to_string()
             && self.postgres_types == other.postgres_types
             && self.traits == other.traits
+            && self.external_traits == other.external_traits
     }
 }
 
-impl Eq for ExternalType {}
+impl<'data> Eq for ExternalType<'data> {}
 
-impl PartialOrd for ExternalType {
+impl<'data> PartialOrd for ExternalType<'data> {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl Ord for ExternalType {
+impl<'data> Ord for ExternalType<'data> {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         let diesel_cmp = self
             .diesel_type
@@ -75,7 +81,7 @@ impl Ord for ExternalType {
     }
 }
 
-impl Hash for ExternalType {
+impl<'data> Hash for ExternalType<'data> {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.diesel_type.to_token_stream().to_string().hash(state);
         self.rust_type.to_token_stream().to_string().hash(state);
@@ -84,10 +90,10 @@ impl Hash for ExternalType {
     }
 }
 
-unsafe impl Send for ExternalType {}
-unsafe impl Sync for ExternalType {}
+unsafe impl<'data> Send for ExternalType<'data> {}
+unsafe impl<'data> Sync for ExternalType<'data> {}
 
-impl Debug for ExternalType {
+impl<'data> Debug for ExternalType<'data> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ExternalType")
             .field("diesel_type", &self.diesel_type.to_token_stream().to_string())
@@ -98,9 +104,9 @@ impl Debug for ExternalType {
     }
 }
 
-impl ExternalType {
+impl<'data> ExternalType<'data> {
     /// Inizializes a new `ExternalTypeBuilder`.
-    pub fn new() -> ExternalTypeBuilder {
+    pub fn new() -> ExternalTypeBuilder<'data> {
         ExternalTypeBuilder::default()
     }
 
@@ -127,9 +133,20 @@ impl ExternalType {
     ///
     /// # Arguments
     ///
-    /// * `trait` - The trait to check support for.
-    pub fn supports(&self, r#trait: Trait) -> bool {
-        self.traits.supports(r#trait)
+    /// * `trait_ref` - The trait to check support for.
+    pub fn supports(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
+        match trait_ref {
+            TraitVariantRef::External(ext_trait_ref) => {
+                if self.external_traits.contains(ext_trait_ref) {
+                    return true;
+                }
+                if let Ok(r#trait) = ext_trait_ref.external_trait().try_into() {
+                    return self.traits.supports(r#trait);
+                }
+            }
+            TraitVariantRef::Internal(_, _) => {}
+        }
+        false
     }
 
     /// Returns whether the current `ExternalType` is compatible with the given

@@ -1,9 +1,15 @@
 //! Submodule providing the `TableModel` trait for SynQL table models.
 
-use synql_core::{structs::Workspace, traits::TableSynLike};
+use synql_core::{
+    structs::{InternalDataRef, Workspace},
+    traits::TableSynLike,
+};
 use synql_diesel_schema::traits::TableSchema;
 
 use crate::{structs::TableModel, traits::column_model_like::ColumnModelLike};
+
+/// Name of the module containing the model for a table.
+pub const MODEL_MODULE_NAME: &str = "model";
 
 /// Trait representing a SynQL table model.
 pub trait TableModelLike: TableSchema<ColumnSyn = <Self as TableModelLike>::ColumnModel> {
@@ -35,6 +41,15 @@ pub trait TableModelLike: TableSchema<ColumnSyn = <Self as TableModelLike>::Colu
         Self: 'data,
     {
         TableModel::new(self, workspace, database)
+    }
+
+    /// Returns a reference to the model module ref for the table.
+    fn model_ref<'data>(&self, workspace: &Workspace<'data>) -> Option<InternalDataRef<'data>> {
+        let crate_ref = workspace.internal_crate(&self.table_model_crate_name())?;
+        Some(InternalDataRef::new(
+            crate_ref,
+            crate_ref.internal_data(&self.table_singular_camel_name())?,
+        ))
     }
 }
 

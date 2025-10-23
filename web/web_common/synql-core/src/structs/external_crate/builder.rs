@@ -11,17 +11,19 @@ use crate::structs::{ExternalCrate, ExternalMacro, ExternalTrait, ExternalType};
 
 #[derive(Default)]
 /// Builder for the `ExternalCrate` struct.
-pub struct ExternalCrateBuilder {
+pub struct ExternalCrateBuilder<'data> {
     /// The name of the crate.
     name: Option<String>,
     /// The types provided by the crate.
-    types: Vec<ExternalType>,
+    types: Vec<ExternalType<'data>>,
     /// List of the macros defined within the crate.
     macros: Vec<ExternalMacro>,
     /// List of the traits defined within the crate.
     traits: Vec<ExternalTrait>,
     /// The version of the crate if it is a dependency.
     version: Option<String>,
+    /// The feature flags required by the crate.
+    features: Vec<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -37,6 +39,8 @@ pub enum ExternalCrateAttribute {
     Traits,
     /// The version of the crate if it is a dependency.
     Version,
+    /// The feature flags required by the crate.
+    Features,
 }
 
 impl Display for ExternalCrateAttribute {
@@ -47,6 +51,7 @@ impl Display for ExternalCrateAttribute {
             ExternalCrateAttribute::Macros => write!(f, "macros"),
             ExternalCrateAttribute::Traits => write!(f, "traits"),
             ExternalCrateAttribute::Version => write!(f, "version"),
+            ExternalCrateAttribute::Features => write!(f, "features"),
         }
     }
 }
@@ -66,6 +71,8 @@ pub enum ExternalCrateBuilderError {
     DuplicatedMacro,
     /// A trait with the same name has already been added to the crate.
     DuplicatedTrait,
+    /// A feature with the same name has already been added.
+    DuplicatedFeature,
 }
 
 impl Display for ExternalCrateBuilderError {
@@ -85,6 +92,9 @@ impl Display for ExternalCrateBuilderError {
             ExternalCrateBuilderError::DuplicatedTrait => {
                 write!(f, "A trait with the same name has already been added to the crate")
             }
+            ExternalCrateBuilderError::DuplicatedFeature => {
+                write!(f, "A feature with the same name has already been added")
+            }
         }
     }
 }
@@ -98,7 +108,7 @@ impl Error for ExternalCrateBuilderError {
     }
 }
 
-impl ExternalCrateBuilder {
+impl<'data> ExternalCrateBuilder<'data> {
     /// Sets the name of the crate.
     ///
     /// # Arguments
@@ -118,7 +128,7 @@ impl ExternalCrateBuilder {
     /// * `required_type` - The type provided by the crate.
     pub fn add_type(
         mut self,
-        required_type: ExternalType,
+        required_type: ExternalType<'data>,
     ) -> Result<Self, ExternalCrateBuilderError> {
         for postgres_type in required_type.postgres_types() {
             if self.types.iter().any(|t| t.is_compatible_with(postgres_type)) {
@@ -135,7 +145,7 @@ impl ExternalCrateBuilder {
     /// * `required_types` - The types provided by the crate.
     pub fn add_types<I>(mut self, required_types: I) -> Result<Self, ExternalCrateBuilderError>
     where
-        I: IntoIterator<Item = ExternalType>,
+        I: IntoIterator<Item = ExternalType<'data>>,
     {
         for required_type in required_types {
             self = self.add_type(required_type)?;
@@ -222,21 +232,56 @@ impl ExternalCrateBuilder {
         }
         Ok(self)
     }
+
+    /// Adds a feature required by the crate.
+    ///
+    /// # Arguments
+    /// * `feature` - The feature to add.
+    ///
+    /// # Errors
+    /// Returns an error if a feature with the same name has already been added.
+    pub fn feature<S: ToString>(mut self, feature: S) -> Result<Self, ExternalCrateBuilderError> {
+        let feature = feature.to_string();
+        if self.features.contains(&feature) {
+            return Err(ExternalCrateBuilderError::DuplicatedFeature);
+        }
+        self.features.push(feature);
+        Ok(self)
+    }
+
+    /// Adds several features required by the crate.
+    ///
+    /// # Arguments
+    /// * `features` - The features to add.
+    ///
+    /// # Errors
+    /// Returns an error if any feature with the same name has already been
+    /// added.
+    pub fn features<I, S>(mut self, features: I) -> Result<Self, ExternalCrateBuilderError>
+    where
+        I: IntoIterator<Item = S>,
+        S: ToString,
+    {
+        for feature in features {
+            self = self.feature(feature)?;
+        }
+        Ok(self)
+    }
 }
 
-impl Attributed for ExternalCrateBuilder {
+impl Attributed for ExternalCrateBuilder<'_> {
     type Attribute = ExternalCrateAttribute;
 }
 
-impl IsCompleteBuilder for ExternalCrateBuilder {
+impl IsCompleteBuilder for ExternalCrateBuilder<'_> {
     fn is_complete(&self) -> bool {
         self.name.is_some()
     }
 }
 
-impl Builder for ExternalCrateBuilder {
+impl<'data> Builder for ExternalCrateBuilder<'data> {
     type Error = BuilderError<ExternalCrateAttribute>;
-    type Object = ExternalCrate;
+    type Object = ExternalCrate<'data>;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(ExternalCrate {
@@ -245,6 +290,7 @@ impl Builder for ExternalCrateBuilder {
             macros: self.macros,
             traits: self.traits,
             version: self.version,
+            features: self.features,
         })
     }
 }

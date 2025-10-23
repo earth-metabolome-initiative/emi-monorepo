@@ -24,12 +24,16 @@ impl<'data> Derive<'data> {
     }
 
     /// Returns the external crates required by the derive.
-    pub fn external_dependencies(&self) -> Vec<&'data crate::structs::ExternalCrate> {
+    pub fn external_dependencies(&self) -> Vec<&'data crate::structs::ExternalCrate<'data>> {
         let mut crates = self
             .traits
             .iter()
             .filter_map(|t| {
-                if let TraitVariantRef::External(_, krate) = t { Some(*krate) } else { None }
+                if let TraitVariantRef::External(ext_trait_ref) = t {
+                    Some(ext_trait_ref.external_crate())
+                } else {
+                    None
+                }
             })
             .collect::<Vec<_>>();
         crates.sort_unstable();

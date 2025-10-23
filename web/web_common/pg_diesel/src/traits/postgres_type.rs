@@ -1,13 +1,33 @@
-//! Submodule providing the [`PostgresType`] trait used throughout the
-//! `pg_diesel` crate which associates a postgres string type to DB objects.
+//! Trait for types that can resolve their PostgreSQL type information.
+//!
+//! This module defines the [`PostgresType`] trait for database objects that
+//! have an associated PostgreSQL data type. The trait provides a way to obtain
+//! complete [`PgType`] metadata, which is used for:
+//! - Diesel type mapping during schema generation
+//! - Type resolution in code generators
+//! - Understanding column types and their properties
 
 use diesel::PgConnection;
 
 use crate::models::PgType;
 
-/// Trait to be implemented by structs derived from database tables to indicate
-/// which diesel type should be used in the diesel schema to represent their
-/// type.
+/// Trait for database objects that can resolve their PostgreSQL type.
+///
+/// This trait provides a unified interface for obtaining [`PgType`]
+/// information, whether from a direct type reference or by querying the
+/// database.
+///
+/// ## Implementors
+///
+/// - [`PgType`]: Returns itself directly (no database query needed)
+/// - [`Column`](crate::models::Column): Queries `pg_catalog.pg_type` based on
+///   the column's type OID
+///
+/// ## Usage
+///
+/// The trait is used throughout the crate to resolve type names for Diesel
+/// schema generation and to understand the properties of column types (size,
+/// category, etc.).
 pub trait PostgresType {
     /// Returns the name of the postgres type associated to the current DB
     /// object.

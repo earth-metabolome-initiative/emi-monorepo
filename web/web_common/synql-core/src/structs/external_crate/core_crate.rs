@@ -2,26 +2,28 @@
 //! which initializes a `ExternalCrate` instance describing the `core` crate.
 
 use common_traits::builder::Builder;
+use strum::IntoEnumIterator;
 
-use crate::structs::ExternalCrate;
-
+use crate::structs::{ExternalCrate, Trait};
 mod numeric;
 
 use lazy_static::lazy_static;
 
 lazy_static! {
-    pub static ref CORE_CRATE: ExternalCrate = ExternalCrate::new()
+    pub static ref CORE_CRATE: ExternalCrate<'static> = ExternalCrate::new()
         .name("core".to_string())
         .unwrap()
         .add_types(numeric::all_types())
+        .unwrap()
+        .add_traits(Trait::iter().map(|t| t.into()))
         .unwrap()
         .build()
         .unwrap();
 }
 
-impl ExternalCrate {
+impl ExternalCrate<'_> {
     /// Initializes a `ExternalCrate` instance describing the `core` crate.
-    pub fn core() -> &'static Self {
+    pub fn core() -> &'static ExternalCrate<'static> {
         &CORE_CRATE
     }
 }

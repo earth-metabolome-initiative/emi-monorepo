@@ -7,11 +7,12 @@ use crate::structs::ExternalType;
 
 /// Returns a vector containing all the numeric types provided by the `core`
 /// crate.
-pub(super) fn all_types() -> [ExternalType; 7] {
+pub(super) fn all_types() -> [ExternalType<'static>; 8] {
     [
         ExternalType::i16(),
         ExternalType::i32(),
         ExternalType::u32(),
+        ExternalType::u64(),
         ExternalType::i64(),
         ExternalType::f32(),
         ExternalType::f64(),
@@ -19,7 +20,7 @@ pub(super) fn all_types() -> [ExternalType; 7] {
     ]
 }
 
-impl ExternalType {
+impl<'data> ExternalType<'data> {
     /// Returns a `ExternalType` instance describing the `i16` type from the
     /// `core` crate.
     fn i16() -> Self {
@@ -32,6 +33,8 @@ impl ExternalType {
             .supports_default()
             .supports_hash()
             .supports_ord()
+            .supports_serde()
+            .unwrap()
             .build()
             .unwrap()
     }
@@ -42,12 +45,14 @@ impl ExternalType {
         ExternalType::new()
             .diesel_type(syn::parse_str("diesel::sql_types::Integer").unwrap())
             .rust_type(syn::parse_str("i32").unwrap())
-            .postgres_types(["int4", "integer", "int"])
+            .postgres_types(["int4", "cardinal_number", "integer", "int"])
             .unwrap()
             .supports_copy()
             .supports_default()
             .supports_hash()
             .supports_ord()
+            .supports_serde()
+            .unwrap()
             .build()
             .unwrap()
     }
@@ -58,12 +63,32 @@ impl ExternalType {
         ExternalType::new()
             .diesel_type(syn::parse_str("diesel::sql_types::Oid").unwrap())
             .rust_type(syn::parse_str("u32").unwrap())
-            .postgres_types(["oid"])
+            .postgres_types(["oid", "regproc", "xid", "regtype"])
             .unwrap()
             .supports_copy()
             .supports_default()
             .supports_hash()
             .supports_ord()
+            .supports_serde()
+            .unwrap()
+            .build()
+            .unwrap()
+    }
+
+    /// Returns a `ExternalType` instance describing the `u64` type from the
+    /// `core` crate.
+    fn u64() -> Self {
+        ExternalType::new()
+            .diesel_type(syn::parse_str("diesel::sql_types::PgLsn").unwrap())
+            .rust_type(syn::parse_str("u64").unwrap())
+            .postgres_types(["pg_lsn"])
+            .unwrap()
+            .supports_copy()
+            .supports_default()
+            .supports_hash()
+            .supports_ord()
+            .supports_serde()
+            .unwrap()
             .build()
             .unwrap()
     }
@@ -80,6 +105,8 @@ impl ExternalType {
             .supports_default()
             .supports_hash()
             .supports_ord()
+            .supports_serde()
+            .unwrap()
             .build()
             .unwrap()
     }
@@ -96,6 +123,8 @@ impl ExternalType {
             .supports_default()
             .supports_partial_eq()
             .supports_partial_ord()
+            .supports_serde()
+            .unwrap()
             .build()
             .unwrap()
     }
@@ -112,6 +141,8 @@ impl ExternalType {
             .supports_default()
             .supports_partial_eq()
             .supports_partial_ord()
+            .supports_serde()
+            .unwrap()
             .build()
             .unwrap()
     }
@@ -128,6 +159,8 @@ impl ExternalType {
             .supports_default()
             .supports_hash()
             .supports_ord()
+            .supports_serde()
+            .unwrap()
             .build()
             .unwrap()
     }

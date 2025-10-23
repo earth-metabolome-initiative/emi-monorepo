@@ -11,7 +11,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// The database type the table belongs to.
     type Database: DatabaseLike<Table = Self, Column = Self::Column, ForeignKey = Self::ForeignKey>;
     /// The column type of the table.
-    type Column: ColumnLike;
+    type Column: ColumnLike<Database = Self::Database, Table = Self, ForeignKey = Self::ForeignKey>;
     /// The check constraint type of the table.
     type CheckConstraint: CheckConstraintLike;
     /// The unique index type of the table.
@@ -90,6 +90,29 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     ) -> impl Iterator<Item = &'db Self::Column>
     where
         Self: 'db;
+
+    /// Returns the number of columns in the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    /// belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT, age INT);")?;
+    /// let table = db.table(None, "my_table");
+    /// assert_eq!(table.number_of_columns(&db), 3);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn number_of_columns(&self, database: &Self::Database) -> usize {
+        self.columns(database).count()
+    }
 
     /// Returns the corresponding column by name, if it exists.
     ///
@@ -296,7 +319,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # }
     /// ```
     fn primary_key_type(&self, database: &Self::Database) -> Vec<String> {
-        self.primary_key_columns(database).map(|col| col.normalized_data_type()).collect()
+        self.primary_key_columns(database).map(|col| col.normalized_data_type(database)).collect()
     }
 
     /// Returns whether the provided column is the primary key column of the
@@ -356,6 +379,72 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn has_primary_key(&self, database: &Self::Database) -> bool {
         self.primary_key_columns(database).next().is_some()
+    }
+
+    /// Returns an iterator over the non-primary key columns of the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT, age INT);
+    /// "#,
+    /// )?;
+    /// let table = db.table(None, "my_table");
+    /// let non_pk_columns: Vec<&str> =
+    ///     table.non_primary_key_columns(&db).map(|col| col.column_name()).collect();
+    /// assert_eq!(non_pk_columns, vec!["name", "age"]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn non_primary_key_columns<'db>(
+        &'db self,
+        database: &'db Self::Database,
+    ) -> impl Iterator<Item = &'db Self::Column>
+    where
+        Self: 'db,
+    {
+        let primary_key_column_names: Vec<&Self::Column> =
+            self.primary_key_columns(database).collect();
+
+        self.columns(database).filter(move |col| !primary_key_column_names.contains(col))
+    }
+
+    /// Returns whether the table has non-primary key columns.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE my_pk_only_table (id INT PRIMARY KEY);
+    /// "#,
+    /// )?;
+    /// let table = db.table(None, "my_table");
+    /// assert!(table.has_non_primary_key_columns(&db));
+    /// let pk_only_table = db.table(None, "my_pk_only_table");
+    /// assert!(!pk_only_table.has_non_primary_key_columns(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_non_primary_key_columns(&self, database: &Self::Database) -> bool {
+        self.non_primary_key_columns(database).next().is_some()
     }
 
     /// Returns whether the table has a composite primary key.
@@ -1041,7 +1130,8 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
             return false;
         }
 
-        if host_column.normalized_data_type() != other_column.normalized_data_type() {
+        if host_column.normalized_data_type(database) != other_column.normalized_data_type(database)
+        {
             return false;
         }
 

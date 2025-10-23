@@ -9,7 +9,7 @@ use common_traits::{
 use strum::IntoEnumIterator;
 
 use crate::structs::{
-    Decorator, Derive, InternalData, InternalDataVariant, Publicness, Trait,
+    Decorator, Derive, ExternalCrate, InternalData, InternalDataVariant, Publicness, Trait,
     external_trait::TraitVariantRef,
 };
 
@@ -287,8 +287,8 @@ impl<'data> Builder for InternalDataBuilder<'data> {
         for trait_variant in Trait::iter() {
             // If the current trait variant is supported by the data variant, and it has not
             // been already been added, we add it as an auto-derive.
-            if variant.supports_trait(trait_variant)
-                && !self.traits.iter().any(|t| t.name() == trait_variant.as_ref())
+            if variant.supports_trait(&trait_variant.into())
+                && !self.traits.contains(&trait_variant.into())
             {
                 derive_builder = derive_builder
                     .add_trait(trait_variant)
@@ -296,6 +296,19 @@ impl<'data> Builder for InternalDataBuilder<'data> {
             }
         }
         if let Ok(derive) = derive_builder.build() {
+            self.derives.push(derive);
+        }
+
+        let mut serde_derive = Derive::new();
+        for serde_trait in ExternalCrate::serde().external_trait_refs() {
+            let serde_trait: TraitVariantRef<'data> = serde_trait.into();
+            if variant.supports_trait(&serde_trait) && !self.traits.contains(&serde_trait) {
+                serde_derive = serde_derive
+                    .add_trait(serde_trait)
+                    .expect("It is not possible to double-add a trait here");
+            }
+        }
+        if let Ok(derive) = serde_derive.build() {
             self.derives.push(derive);
         }
 

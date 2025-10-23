@@ -41,7 +41,7 @@ impl ColumnLike for TableAttribute<CreateTable, ColumnDef> {
         GENERATED_TYPES.contains(&self.attribute().data_type.to_string().as_str())
     }
 
-    fn normalized_data_type(&self) -> String {
+    fn normalized_data_type(&self, _database: &Self::Database) -> String {
         let data_type = self.attribute().data_type.to_string().to_uppercase();
         for (ty, normalized) in NORMALIZED_TYPES {
             if data_type == *ty {

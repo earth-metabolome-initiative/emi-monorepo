@@ -10,7 +10,6 @@ mod schema;
 mod sql_functions;
 mod syngen;
 mod traits;
-mod utils;
 
 pub use codegen::Codegen;
 pub use traits::{ColumnLike, TableLike};

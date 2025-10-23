@@ -8,13 +8,14 @@ use common_traits::{
 };
 
 use crate::structs::{
-    ExternalType,
+    ExternalCrate, ExternalType,
+    external_crate::ExternalTraitRef,
     external_type::{Trait, traits_mask::TraitsMask},
 };
 
 #[derive(Default)]
 /// Builder for the `ExternalType` struct.
-pub struct ExternalTypeBuilder {
+pub struct ExternalTypeBuilder<'data> {
     /// The diesel type defined within the crate compatible with the given
     /// postgres type.
     diesel_type: Option<syn::Type>,
@@ -26,6 +27,8 @@ pub struct ExternalTypeBuilder {
     postgres_types: Vec<&'static str>,
     /// Trait mask representing the traits supported by the current type.
     traits: TraitsMask,
+    /// External traits implemented by the type.
+    external_traits: Vec<ExternalTraitRef<'data>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -42,6 +45,8 @@ pub enum ExternalTypeAttribute {
     PostgresTypes,
     /// The trait mask representing the traits.
     Traits,
+    /// External traits implemented by the type.
+    ExternalTraits,
 }
 
 /// Error enumeration which might occur when building a `ExternalType`.
@@ -53,6 +58,8 @@ pub enum ExternalTypeBuilderError {
     DuplicatedPostgresType,
     /// If the provided postgres type is not lowercase.
     NotLowercasePostgresType,
+    /// An external trait with the same name has already been added.
+    DuplicatedExternalTrait,
 }
 
 impl Display for ExternalTypeBuilderError {
@@ -64,6 +71,9 @@ impl Display for ExternalTypeBuilderError {
             }
             ExternalTypeBuilderError::NotLowercasePostgresType => {
                 write!(f, "Provided a postgres type which is not lowercase")
+            }
+            ExternalTypeBuilderError::DuplicatedExternalTrait => {
+                write!(f, "An external trait with the same name has already been added")
             }
         }
     }
@@ -78,7 +88,7 @@ impl core::error::Error for ExternalTypeBuilderError {
     }
 }
 
-impl ExternalTypeBuilder {
+impl<'data> ExternalTypeBuilder<'data> {
     /// Sets the diesel type defined within the crate compatible with the given
     /// postgres type.
     pub fn diesel_type(mut self, diesel_type: syn::Type) -> Self {
@@ -170,6 +180,33 @@ impl ExternalTypeBuilder {
         self
     }
 
+    /// Sets that the current type supports [`Serialize`](serde::Serialize).
+    pub fn supports_serialize(self) -> Result<Self, ExternalTypeBuilderError> {
+        let serde = ExternalCrate::serde();
+        self.add_external_trait(
+            serde
+                .external_trait_ref("Serialize")
+                .expect("Serde must contain the `Serialize` trait"),
+        )
+    }
+
+    /// Sets that the current type supports [`Deserialize`](serde::Deserialize).
+    pub fn supports_deserialize(self) -> Result<Self, ExternalTypeBuilderError> {
+        let serde = ExternalCrate::serde();
+        self.add_external_trait(
+            serde
+                .external_trait_ref("Deserialize")
+                .expect("Serde must contain the `Deserialize` trait"),
+        )
+    }
+
+    /// Sets support for both [`Serialize`](serde::Serialize) and
+    /// [`Deserialize`](serde::Deserialize).
+    pub fn supports_serde(mut self) -> Result<Self, ExternalTypeBuilderError> {
+        self = self.supports_serialize()?;
+        self.supports_deserialize()
+    }
+
     /// Sets that the current type supports debug.
     pub fn supports_debug(mut self) -> Self {
         self.traits.set_supports(Trait::Debug);
@@ -194,6 +231,48 @@ impl ExternalTypeBuilder {
         }
         Ok(self)
     }
+
+    /// Adds an external trait implemented by the type.
+    ///
+    /// # Arguments
+    /// * `external_trait` - The external trait to add.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if an external trait with the same name has already
+    /// been added.
+    pub fn add_external_trait(
+        mut self,
+        external_trait: ExternalTraitRef<'data>,
+    ) -> Result<Self, ExternalTypeBuilderError> {
+        if self.external_traits.iter().any(|t| t == &external_trait) {
+            return Err(ExternalTypeBuilderError::DuplicatedExternalTrait);
+        }
+        self.external_traits.push(external_trait);
+        Ok(self)
+    }
+
+    /// Adds multiple external traits implemented by the type.
+    ///
+    /// # Arguments
+    /// * `external_traits` - The external traits to add.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if any external trait with the same name has already
+    /// been added.
+    pub fn add_external_traits<I>(
+        mut self,
+        external_traits: I,
+    ) -> Result<Self, ExternalTypeBuilderError>
+    where
+        I: IntoIterator<Item = ExternalTraitRef<'data>>,
+    {
+        for external_trait in external_traits {
+            self = self.add_external_trait(external_trait)?;
+        }
+        Ok(self)
+    }
 }
 
 impl Display for ExternalTypeAttribute {
@@ -203,23 +282,24 @@ impl Display for ExternalTypeAttribute {
             ExternalTypeAttribute::RustType => write!(f, "rust_type"),
             ExternalTypeAttribute::PostgresTypes => write!(f, "postgres_types"),
             ExternalTypeAttribute::Traits => write!(f, "traits"),
+            ExternalTypeAttribute::ExternalTraits => write!(f, "external_traits"),
         }
     }
 }
 
-impl Attributed for ExternalTypeBuilder {
+impl Attributed for ExternalTypeBuilder<'_> {
     type Attribute = ExternalTypeAttribute;
 }
 
-impl IsCompleteBuilder for ExternalTypeBuilder {
+impl IsCompleteBuilder for ExternalTypeBuilder<'_> {
     fn is_complete(&self) -> bool {
         self.diesel_type.is_some() && self.rust_type.is_some() && !self.postgres_types.is_empty()
     }
 }
 
-impl Builder for ExternalTypeBuilder {
+impl<'data> Builder for ExternalTypeBuilder<'data> {
     type Error = BuilderError<ExternalTypeAttribute>;
-    type Object = ExternalType;
+    type Object = ExternalType<'data>;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(ExternalType {
@@ -235,6 +315,7 @@ impl Builder for ExternalTypeBuilder {
                 self.postgres_types
             },
             traits: self.traits,
+            external_traits: self.external_traits,
         })
     }
 }

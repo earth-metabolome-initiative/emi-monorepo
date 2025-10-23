@@ -56,6 +56,8 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             .expect("Unable to register `std` crate")
             .diesel()
             .expect("Unable to register `diesel` crate")
+            .serde()
+            .expect("Unable to register `serde` crate")
             .version(self.version.0, self.version.1, self.version.2)
             .edition(self.edition)
             .build()

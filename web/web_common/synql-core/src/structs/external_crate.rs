@@ -1,37 +1,43 @@
 //! Submodule providing a struct defining the crate required by some type found
 //! in the postgres database schema.
 
+use quote::ToTokens;
+
 use crate::structs::{
     ExternalMacro, ExternalTrait, ExternalType, Trait,
     external_crate::builder::ExternalCrateBuilder, external_trait::TraitVariantRef,
 };
 
 mod builder;
+mod chrono_crate;
 mod core_crate;
 mod diesel_crate;
 mod postgis_diesel_crate;
+mod serde_crate;
 mod std_crate;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining the crate required by some type found in the postgres
 /// database schema.
-pub struct ExternalCrate {
+pub struct ExternalCrate<'data> {
     /// The name of the crate.
     name: String,
     /// List of postgres types and their corresponding diesel and rust types
     /// defined within the crate.
-    types: Vec<ExternalType>,
+    types: Vec<ExternalType<'data>>,
     /// List of the macros defined within the crate.
     macros: Vec<ExternalMacro>,
     /// List of the traits defined within the crate.
     traits: Vec<ExternalTrait>,
     /// Whether the crate is a dependency.
     version: Option<String>,
+    /// Feature flags required by the crate.
+    features: Vec<String>,
 }
 
-impl ExternalCrate {
+impl<'data> ExternalCrate<'data> {
     /// Inizializes a new `ExternalCrateBuilder`.
-    pub fn new() -> ExternalCrateBuilder {
+    pub fn new() -> ExternalCrateBuilder<'data> {
         ExternalCrateBuilder::default()
     }
 
@@ -62,6 +68,11 @@ impl ExternalCrate {
         self.version.as_deref()
     }
 
+    /// Returns the feature flags required by the crate.
+    pub fn features(&self) -> &[String] {
+        &self.features
+    }
+
     /// Returns the external macro with the provided name, if any.
     ///
     /// # Arguments
@@ -77,11 +88,22 @@ impl ExternalCrate {
     ///
     /// # Arguments
     /// * `name` - A string slice representing the name of the external trait.
-    pub fn external_trait(&self, name: &str) -> Option<TraitVariantRef<'_>> {
-        self.traits
-            .iter()
-            .find(|t| t.name() == name)
-            .map(|t| TraitVariantRef::External(t.clone(), self))
+    pub fn external_trait(&self, name: &str) -> Option<&ExternalTrait> {
+        self.traits.iter().find(|t| t.name() == name)
+    }
+
+    /// Returns an iterator over all external trait refs defined within the
+    /// crate.
+    pub fn external_trait_refs(&self) -> impl Iterator<Item = ExternalTraitRef<'_>> {
+        self.traits.iter().map(|t| ExternalTraitRef { crate_ref: self, trait_ref: t })
+    }
+
+    /// Returns the external trait ref with the provided name, if any.
+    ///
+    /// # Arguments
+    /// * `name` - A string slice representing the name of the external trait.
+    pub fn external_trait_ref(&self, name: &str) -> Option<ExternalTraitRef<'_>> {
+        self.external_trait(name).map(|t| ExternalTraitRef { crate_ref: self, trait_ref: t })
     }
 
     /// Returns the external type compatible with the provided postgres name, if
@@ -100,8 +122,8 @@ impl ExternalCrate {
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a reference to an external crate and one of its types.
 pub struct ExternalTypeRef<'data> {
-    crate_ref: &'data ExternalCrate,
-    type_ref: &'data ExternalType,
+    crate_ref: &'data ExternalCrate<'data>,
+    type_ref: &'data ExternalType<'data>,
 }
 
 impl<'data> ExternalTypeRef<'data> {
@@ -121,7 +143,7 @@ impl<'data> ExternalTypeRef<'data> {
     }
 
     /// Returns a reference to the external crate.
-    pub fn external_crate(&self) -> &'data ExternalCrate {
+    pub fn external_crate(&self) -> &'data ExternalCrate<'data> {
         self.crate_ref
     }
 
@@ -139,16 +161,16 @@ impl<'data> ExternalTypeRef<'data> {
     ///
     /// # Arguments
     ///
-    /// * `trait_variant` - The trait variant to check support for.
-    pub fn supports_trait(&self, trait_variant: Trait) -> bool {
-        self.type_ref.supports(trait_variant)
+    /// * `trait_ref` - The trait variant to check support for.
+    pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
+        self.type_ref.supports(trait_ref)
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a reference to an external crate and one of its macros.
 pub struct ExternalMacroRef<'data> {
-    crate_ref: &'data ExternalCrate,
+    crate_ref: &'data ExternalCrate<'data>,
     macro_ref: &'data ExternalMacro,
 }
 
@@ -164,7 +186,7 @@ impl<'data> ExternalMacroRef<'data> {
     }
 
     /// Returns a reference to the external crate.
-    pub fn external_crate(&self) -> &'data ExternalCrate {
+    pub fn external_crate(&self) -> &'data ExternalCrate<'data> {
         self.crate_ref
     }
 
@@ -177,8 +199,26 @@ impl<'data> ExternalMacroRef<'data> {
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a reference to an external crate and one of its traits.
 pub struct ExternalTraitRef<'data> {
-    crate_ref: &'data ExternalCrate,
+    crate_ref: &'data ExternalCrate<'data>,
     trait_ref: &'data ExternalTrait,
+}
+
+impl From<Trait> for ExternalTraitRef<'static> {
+    fn from(trait_def: Trait) -> Self {
+        let core = ExternalCrate::core();
+        Self {
+            crate_ref: core,
+            trait_ref: core
+                .external_trait(trait_def.as_ref())
+                .expect(&format!("Trait `{trait_def}` should exist")),
+        }
+    }
+}
+
+impl ToTokens for ExternalTraitRef<'_> {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        tokens.extend(self.trait_ref.path().to_token_stream());
+    }
 }
 
 impl<'data> ExternalTraitRef<'data> {
@@ -193,7 +233,7 @@ impl<'data> ExternalTraitRef<'data> {
     }
 
     /// Returns a reference to the external crate.
-    pub fn external_crate(&self) -> &'data ExternalCrate {
+    pub fn external_crate(&self) -> &'data ExternalCrate<'data> {
         self.crate_ref
     }
 

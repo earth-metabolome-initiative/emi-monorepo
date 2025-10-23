@@ -1,7 +1,19 @@
-# PG Diesel
+# pg_diesel
 
-Postgres metadata tables and utilities for Diesel ORM.
+Diesel models and schemas for PostgreSQL system catalogs (`pg_catalog`, `information_schema`).
+
+## What it does
+
+- Provides Diesel schemas for all PostgreSQL metadata tables
+- Includes models for querying system catalogs type-safely
+- Offers `PgDatabaseBuilder` for runtime database introspection
+- Implements `sql_traits` for generic metadata access
 
 ## Known limitations
 
-Some of the Postgres tables have more than 32 columns, which is the default number of columns that Diesel supports. While it is possible to increase this limit, it will increase compile times, therefore for now we are dropping a subset of the columns that we don't need. We are open to increasing this limit in the future if we find that we need some of those columns.
+Some PostgreSQL types are excluded because Diesel can't map them:
+
+- `anyarray` - polymorphic pseudo-type
+- `pg_ndistinct`, `pg_dependencies`, `pg_mcv_list`, `_pg_statistic` - internal statistics types
+
+Columns with these types are omitted from generated schemas.

@@ -3,7 +3,7 @@
 use quote::ToTokens;
 use syn::Ident;
 
-use crate::structs::{Trait, internal_data::DataVariantRef};
+use crate::structs::{Trait, external_trait::TraitVariantRef, internal_data::DataVariantRef};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining a enum model.
@@ -30,7 +30,7 @@ impl<'data> InternalEnum<'data> {
     }
 
     /// Returns the external crate dependencies of the enum.
-    pub fn external_dependencies(&self) -> Vec<&'data crate::structs::ExternalCrate> {
+    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
         let mut dependencies = Vec::new();
         for (_, ty) in &self.variants {
             dependencies.extend(ty.external_dependencies());
@@ -44,9 +44,9 @@ impl<'data> InternalEnum<'data> {
     ///
     /// # Arguments
     ///
-    /// * `trait_variant` - The trait variant to check support for.
-    pub fn supports_trait(&self, trait_variant: Trait) -> bool {
-        self.variants.iter().all(|(_, ty)| ty.supports_trait(trait_variant))
+    /// * `trait_ref` - The trait variant to check support for.
+    pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
+        self.variants.iter().all(|(_, ty)| ty.supports_trait(trait_ref))
     }
 }
 

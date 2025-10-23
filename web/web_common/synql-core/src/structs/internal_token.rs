@@ -106,7 +106,7 @@ impl<'data> InternalToken<'data> {
     }
 
     /// Returns the sorted unique external dependencies of the token stream.
-    pub fn external_dependencies(&self) -> Vec<&'data ExternalCrate> {
+    pub fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
         let mut dependencies = Vec::new();
         for ext_macro in &self.external_macros {
             dependencies.push(ext_macro.external_crate());
