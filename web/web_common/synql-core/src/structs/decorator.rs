@@ -6,7 +6,10 @@ mod builder;
 pub use builder::DecoratorBuilder;
 use quote::{ToTokens, quote};
 
-use crate::structs::{FeatureFlag, InternalToken};
+use crate::{
+    structs::{FeatureFlag, InternalToken},
+    traits::{ExternalDependencies, InternalDependencies},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// A decorator applied to SynQL internal data.
@@ -22,15 +25,17 @@ impl<'data> Decorator<'data> {
     pub fn new() -> DecoratorBuilder<'data> {
         DecoratorBuilder::default()
     }
+}
 
-    /// Returns the internal crates required by the decorator.
-    pub fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
-        self.token.internal_dependencies()
-    }
-
-    /// Returns the external crates required by the decorator.
-    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl<'data> ExternalDependencies<'data> for Decorator<'data> {
+    fn external_dependencies(&self) -> Vec<&super::ExternalCrate<'data>> {
         self.token.external_dependencies()
+    }
+}
+
+impl<'data> InternalDependencies<'data> for Decorator<'data> {
+    fn internal_dependencies(&self) -> Vec<&super::InternalCrate<'data>> {
+        self.token.internal_dependencies()
     }
 }
 

@@ -3,9 +3,16 @@
 mod builder;
 
 pub use builder::InternalTraitBuilder;
+use quote::ToTokens;
 use syn::Ident;
 
-use crate::structs::{InternalCrate, InternalToken, Publicness};
+use crate::{
+    structs::{
+        InternalCrate, Publicness,
+        internal_struct::{Method, WhereClause},
+    },
+    traits::{ExternalDependencies, InternalDependencies},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a rust trait.
@@ -14,10 +21,12 @@ pub struct InternalTrait<'data> {
     name: String,
     /// Publicness of the trait.
     publicness: Publicness,
-    /// Internal token streams defined within the trait.
-    internal_tokens: Vec<InternalToken<'data>>,
+    /// Method definitions.
+    methods: Vec<Method<'data>>,
     /// Trait documentation.
     documentation: String,
+    /// Where statements for the trait.
+    where_statements: Vec<WhereClause<'data>>,
 }
 
 impl<'data> InternalTrait<'data> {
@@ -45,26 +54,58 @@ impl<'data> InternalTrait<'data> {
     pub fn is_public(&self) -> bool {
         self.publicness.is_public()
     }
+}
 
-    /// Returns the sorted unique internal dependencies of the module.
-    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl<'data> InternalDependencies<'data> for InternalTrait<'data> {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
         let mut dependencies = Vec::new();
-        for token in &self.internal_tokens {
-            dependencies.extend(token.internal_dependencies());
+        for method in &self.methods {
+            dependencies.extend(method.internal_dependencies());
         }
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
     }
+}
 
-    /// Returns the sorted unique external dependencies of the module.
-    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl<'data> ExternalDependencies<'data> for InternalTrait<'data> {
+    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
         let mut dependencies = Vec::new();
-        for token in &self.internal_tokens {
-            dependencies.extend(token.external_dependencies());
+        for method in &self.methods {
+            dependencies.extend(method.external_dependencies());
         }
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
+    }
+}
+
+impl ToTokens for InternalTrait<'_> {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let publicness = &self.publicness;
+        let name = &self.ident();
+        let methods = &self.methods;
+        let where_clauses = &self.where_statements;
+
+        let where_clause_tokens = if where_clauses.is_empty() {
+            quote::quote! {}
+        } else {
+            let clauses = where_clauses.iter();
+            quote::quote! {
+                where #(#clauses),*
+            }
+        };
+
+        let documentation = &self.documentation;
+        let documentation = quote::quote! {
+            #[doc = #documentation]
+        };
+
+        tokens.extend(quote::quote! {
+            #documentation
+            #publicness trait #name #where_clause_tokens {
+                #(#methods)*
+            }
+        });
     }
 }

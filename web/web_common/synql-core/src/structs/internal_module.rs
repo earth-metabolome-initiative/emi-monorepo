@@ -9,7 +9,10 @@ use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
 use syn::Ident;
 
-use crate::structs::{InternalCrate, InternalData, InternalToken, InternalTrait, Publicness};
+use crate::{
+    structs::{InternalCrate, InternalData, InternalToken, InternalTrait, Publicness},
+    traits::{ExternalDependencies, InternalDependencies},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a rust module.
@@ -93,46 +96,6 @@ impl<'data> InternalModule<'data> {
                 || self.internal_tokens.iter().any(|t| t.is_public()))
     }
 
-    /// Returns the sorted unique internal dependencies of the module.
-    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
-        let mut dependencies = Vec::new();
-        for submodule in &self.submodules {
-            dependencies.extend(submodule.internal_dependencies());
-        }
-        for data in &self.data {
-            dependencies.extend(data.internal_dependencies());
-        }
-        for internal_trait in &self.internal_traits {
-            dependencies.extend(internal_trait.internal_dependencies());
-        }
-        for token in &self.internal_tokens {
-            dependencies.extend(token.internal_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
-    }
-
-    /// Returns the sorted unique external dependencies of the module.
-    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
-        let mut dependencies = Vec::new();
-        for submodule in &self.submodules {
-            dependencies.extend(submodule.external_dependencies());
-        }
-        for data in &self.data {
-            dependencies.extend(data.external_dependencies());
-        }
-        for internal_trait in &self.internal_traits {
-            dependencies.extend(internal_trait.external_dependencies());
-        }
-        for token in &self.internal_tokens {
-            dependencies.extend(token.external_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
-    }
-
     /// Returns a reference to the internal data with the given name if it
     /// exists in the module.
     pub fn internal_data(&self, name: &str) -> Option<&Rc<InternalData<'data>>> {
@@ -164,6 +127,48 @@ impl<'data> InternalModule<'data> {
             submodule.write_to_disk(&module_directory)?;
         }
         Ok(())
+    }
+}
+
+impl<'data> InternalDependencies<'data> for InternalModule<'data> {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+        let mut dependencies = Vec::new();
+        for submodule in &self.submodules {
+            dependencies.extend(submodule.internal_dependencies());
+        }
+        for data in &self.data {
+            dependencies.extend(data.internal_dependencies());
+        }
+        for internal_trait in &self.internal_traits {
+            dependencies.extend(internal_trait.internal_dependencies());
+        }
+        for token in &self.internal_tokens {
+            dependencies.extend(token.internal_dependencies());
+        }
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
+    }
+}
+
+impl<'data> ExternalDependencies<'data> for InternalModule<'data> {
+    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+        let mut dependencies = Vec::new();
+        for submodule in &self.submodules {
+            dependencies.extend(submodule.external_dependencies());
+        }
+        for data in &self.data {
+            dependencies.extend(data.external_dependencies());
+        }
+        for internal_trait in &self.internal_traits {
+            dependencies.extend(internal_trait.external_dependencies());
+        }
+        for token in &self.internal_tokens {
+            dependencies.extend(token.external_dependencies());
+        }
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
     }
 }
 

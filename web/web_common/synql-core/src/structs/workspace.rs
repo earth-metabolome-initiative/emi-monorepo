@@ -6,9 +6,12 @@ use std::{path::Path, rc::Rc};
 
 pub use builder::WorkspaceBuilder;
 
-use crate::structs::{
-    ExternalCrate, InternalCrate,
-    external_crate::{ExternalMacroRef, ExternalTraitRef, ExternalTypeRef},
+use crate::{
+    structs::{
+        ExternalCrate, InternalCrate,
+        external_crate::{ExternalMacroRef, ExternalTraitRef, ExternalTypeRef},
+    },
+    traits::ExternalDependencies,
 };
 
 #[derive(Debug, Clone)]

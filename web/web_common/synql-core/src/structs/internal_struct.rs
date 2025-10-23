@@ -2,9 +2,11 @@
 
 mod internal_attribute_builder;
 mod internal_struct_builder;
+mod method;
 
 pub use internal_attribute_builder::InternalAttributeBuilder;
 pub use internal_struct_builder::InternalStructBuilder;
+pub use method::{Argument, Method, WhereClause};
 use quote::ToTokens;
 use syn::Ident;
 
@@ -12,6 +14,7 @@ use crate::{
     structs::{
         InternalCrate, Publicness, external_trait::TraitVariantRef, internal_data::DataVariantRef,
     },
+    traits::{ExternalDependencies, InternalDependencies},
     utils::RESERVED_RUST_WORDS,
 };
 
@@ -70,22 +73,6 @@ impl<'data> InternalAttribute<'data> {
         self.nullable
     }
 
-    /// Returns the internal crate dependencies of the attribute's type.
-    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
-        match &self.ty {
-            DataVariantRef::Internal(internal) => internal.internal_dependencies(),
-            DataVariantRef::External(_) => vec![],
-        }
-    }
-
-    /// Returns the external crate dependencies of the attribute's type.
-    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
-        match &self.ty {
-            DataVariantRef::Internal(_) => vec![],
-            DataVariantRef::External(external) => vec![external.external_crate()],
-        }
-    }
-
     /// Returns whether the attribute's type supports the given trait.
     ///
     /// # Arguments
@@ -93,6 +80,18 @@ impl<'data> InternalAttribute<'data> {
     /// * `trait_ref` - The trait variant to check support for.
     pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
         self.ty.supports_trait(trait_ref)
+    }
+}
+
+impl<'data> InternalDependencies<'data> for InternalAttribute<'data> {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+        self.ty.internal_dependencies()
+    }
+}
+
+impl<'data> ExternalDependencies<'data> for InternalAttribute<'data> {
+    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+        self.ty.external_dependencies()
     }
 }
 
@@ -142,24 +141,6 @@ impl<'data> InternalStruct<'data> {
         &self.attributes
     }
 
-    /// Returns the sorted unique internal crate dependencies of the variant.
-    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
-        let mut deps: Vec<&InternalCrate<'data>> =
-            self.attributes.iter().flat_map(|attr| attr.internal_dependencies()).collect();
-        deps.sort_unstable();
-        deps.dedup();
-        deps
-    }
-
-    /// Returns the sorted unique external crate dependencies of the variant.
-    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
-        let mut deps: Vec<&crate::structs::ExternalCrate<'data>> =
-            self.attributes.iter().flat_map(|attr| attr.external_dependencies()).collect();
-        deps.sort_unstable();
-        deps.dedup();
-        deps
-    }
-
     /// Returns whether the struct supports the given trait.
     ///
     /// # Arguments
@@ -179,5 +160,25 @@ impl<'data> ToTokens for InternalStruct<'data> {
             }
         };
         tokens.extend(token);
+    }
+}
+
+impl<'data> InternalDependencies<'data> for InternalStruct<'data> {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+        let mut deps: Vec<&InternalCrate<'data>> =
+            self.attributes.iter().flat_map(|attr| attr.internal_dependencies()).collect();
+        deps.sort_unstable();
+        deps.dedup();
+        deps
+    }
+}
+
+impl<'data> ExternalDependencies<'data> for InternalStruct<'data> {
+    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+        let mut deps: Vec<&crate::structs::ExternalCrate<'data>> =
+            self.attributes.iter().flat_map(|attr| attr.external_dependencies()).collect();
+        deps.sort_unstable();
+        deps.dedup();
+        deps
     }
 }

@@ -8,7 +8,10 @@ pub use builder::InternalCrateBuilder;
 use quote::{ToTokens, quote};
 use syn::{Ident, Token};
 
-use crate::structs::{InternalData, InternalModule, Workspace};
+use crate::{
+    structs::{InternalData, InternalModule, Workspace},
+    traits::{ExternalDependencies, InternalDependencies},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining a crate model.
@@ -79,17 +82,6 @@ impl<'data> InternalCrate<'data> {
         None
     }
 
-    /// Returns the internal dependencies of the crate.
-    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
-        let mut dependencies = Vec::new();
-        for module in &self.modules {
-            dependencies.extend(module.internal_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
-    }
-
     /// Returns a reference to the internal data with the given name if it
     /// exists in the crate.
     pub fn internal_data(&self, name: &str) -> Option<&Rc<InternalData<'data>>> {
@@ -110,17 +102,6 @@ impl<'data> InternalCrate<'data> {
             }
         }
         None
-    }
-
-    /// Returns the external dependencies of the crate.
-    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
-        let mut dependencies = Vec::new();
-        for module in &self.modules {
-            dependencies.extend(module.external_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
     }
 
     /// Writes out the TOML metadata for the crate at the provided path.
@@ -196,5 +177,29 @@ impl<'data> InternalCrate<'data> {
             module.write_to_disk(&src_path)?;
         }
         Ok(())
+    }
+}
+
+impl<'data> InternalDependencies<'data> for InternalCrate<'data> {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+        let mut dependencies = Vec::new();
+        for module in &self.modules {
+            dependencies.extend(module.internal_dependencies());
+        }
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
+    }
+}
+
+impl<'data> ExternalDependencies<'data> for InternalCrate<'data> {
+    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+        let mut dependencies = Vec::new();
+        for module in &self.modules {
+            dependencies.extend(module.external_dependencies());
+        }
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
     }
 }

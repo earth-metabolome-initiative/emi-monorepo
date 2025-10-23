@@ -3,7 +3,10 @@
 use quote::ToTokens;
 use syn::Ident;
 
-use crate::structs::{Trait, external_trait::TraitVariantRef, internal_data::DataVariantRef};
+use crate::{
+    structs::{external_trait::TraitVariantRef, internal_data::DataVariantRef},
+    traits::{ExternalDependencies, InternalDependencies},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining a enum model.
@@ -12,14 +15,8 @@ pub struct InternalEnum<'data> {
     variants: Vec<(Ident, DataVariantRef<'data>)>,
 }
 
-impl<'data> InternalEnum<'data> {
-    /// Returns a reference to the variants of the enum.
-    pub fn variants(&self) -> &Vec<(Ident, DataVariantRef<'data>)> {
-        &self.variants
-    }
-
-    /// Returns the internal crate dependencies of the enum.
-    pub fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
+impl<'data> InternalDependencies<'data> for InternalEnum<'data> {
+    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
         let mut dependencies = Vec::new();
         for (_, ty) in &self.variants {
             dependencies.extend(ty.internal_dependencies());
@@ -28,9 +25,10 @@ impl<'data> InternalEnum<'data> {
         dependencies.dedup();
         dependencies
     }
+}
 
-    /// Returns the external crate dependencies of the enum.
-    pub fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl<'data> ExternalDependencies<'data> for InternalEnum<'data> {
+    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
         let mut dependencies = Vec::new();
         for (_, ty) in &self.variants {
             dependencies.extend(ty.external_dependencies());
@@ -38,6 +36,13 @@ impl<'data> InternalEnum<'data> {
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
+    }
+}
+
+impl<'data> InternalEnum<'data> {
+    /// Returns a reference to the variants of the enum.
+    pub fn variants(&self) -> &Vec<(Ident, DataVariantRef<'data>)> {
+        &self.variants
     }
 
     /// Returns whether the enum supports the given trait.

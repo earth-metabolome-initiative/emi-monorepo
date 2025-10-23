@@ -9,10 +9,13 @@ pub use builder::InternalTokenBuilder;
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 
-use crate::structs::{
-    ExternalCrate, InternalCrate, Publicness,
-    external_crate::{ExternalMacroRef, ExternalTraitRef},
-    internal_data::{InternalDataRef, InternalModuleRef},
+use crate::{
+    structs::{
+        ExternalCrate, InternalCrate, Publicness,
+        external_crate::{ExternalMacroRef, ExternalTraitRef},
+        internal_data::{InternalDataRef, InternalModuleRef},
+    },
+    traits::{ExternalDependencies, InternalDependencies},
 };
 
 #[derive(Debug, Clone)]
@@ -104,23 +107,16 @@ impl<'data> InternalToken<'data> {
     pub fn is_public(&self) -> bool {
         self.publicness.is_public()
     }
+}
 
-    /// Returns the sorted unique external dependencies of the token stream.
-    pub fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
-        let mut dependencies = Vec::new();
-        for ext_macro in &self.external_macros {
-            dependencies.push(ext_macro.external_crate());
-        }
-        for ext_trait in &self.external_traits {
-            dependencies.push(ext_trait.external_crate());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+impl ToTokens for InternalToken<'_> {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        self.stream.to_tokens(tokens);
     }
+}
 
-    /// Returns the sorted unique internal dependencies of the token stream.
-    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl<'data> InternalDependencies<'data> for InternalToken<'data> {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
         let mut dependencies = Vec::new();
         for data in &self.internal_data {
             dependencies.extend(data.internal_dependencies());
@@ -134,8 +130,17 @@ impl<'data> InternalToken<'data> {
     }
 }
 
-impl ToTokens for InternalToken<'_> {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
-        self.stream.to_tokens(tokens);
+impl<'data> ExternalDependencies<'data> for InternalToken<'data> {
+    fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
+        let mut dependencies = Vec::new();
+        for ext_macro in &self.external_macros {
+            dependencies.push(ext_macro.external_crate());
+        }
+        for ext_trait in &self.external_traits {
+            dependencies.push(ext_trait.external_crate());
+        }
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
     }
 }

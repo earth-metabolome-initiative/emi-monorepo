@@ -6,7 +6,10 @@ mod builder;
 pub use builder::DeriveBuilder;
 use quote::{ToTokens, quote};
 
-use crate::structs::{FeatureFlag, external_trait::TraitVariantRef};
+use crate::{
+    structs::{FeatureFlag, external_trait::TraitVariantRef},
+    traits::{ExternalDependencies, InternalDependencies},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a derive applied to SynQL internal data.
@@ -22,9 +25,10 @@ impl<'data> Derive<'data> {
     pub fn new() -> DeriveBuilder<'data> {
         DeriveBuilder::default()
     }
+}
 
-    /// Returns the external crates required by the derive.
-    pub fn external_dependencies(&self) -> Vec<&'data crate::structs::ExternalCrate<'data>> {
+impl<'data> ExternalDependencies<'data> for Derive<'data> {
+    fn external_dependencies(&self) -> Vec<&super::ExternalCrate<'data>> {
         let mut crates = self
             .traits
             .iter()
@@ -40,9 +44,10 @@ impl<'data> Derive<'data> {
         crates.dedup();
         crates
     }
+}
 
-    /// Returns the internal crates required by the derive.
-    pub fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
+impl<'data> InternalDependencies<'data> for Derive<'data> {
+    fn internal_dependencies(&self) -> Vec<&super::InternalCrate<'data>> {
         let mut crates = self
             .traits
             .iter()

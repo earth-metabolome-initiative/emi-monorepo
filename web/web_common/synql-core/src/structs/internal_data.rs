@@ -2,15 +2,19 @@
 
 mod builder;
 
-use std::rc::Rc;
+use std::{fmt::Debug, rc::Rc};
 
 pub use builder::InternalDataBuilder;
 use quote::{ToTokens, quote};
-use syn::Ident;
+use syn::{Ident, Lifetime};
 
-use crate::structs::{
-    Decorator, Derive, ExternalCrate, InternalCrate, InternalEnum, InternalModule, InternalStruct,
-    Publicness, Trait, external_crate::ExternalTypeRef, external_trait::TraitVariantRef,
+use crate::{
+    structs::{
+        Decorator, Derive, ExternalCrate, InternalCrate, InternalEnum, InternalModule,
+        InternalStruct, Publicness, external_crate::ExternalTypeRef,
+        external_trait::TraitVariantRef,
+    },
+    traits::{ExternalDependencies, InternalDependencies},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -56,7 +60,7 @@ impl<'data> InternalDataVariant<'data> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Enum representing a variant of internal data, which may be defined within
 /// the workspace or come from an external crate.
 pub enum DataVariantRef<'data> {
@@ -64,6 +68,26 @@ pub enum DataVariantRef<'data> {
     Internal(InternalDataRef<'data>),
     /// Variant representing data defined within an external crate.
     External(ExternalTypeRef<'data>),
+    /// A reference to a data variant ref.
+    Reference(Option<Lifetime>, Box<DataVariantRef<'data>>),
+    /// A mutable reference to a data variant ref.
+    MutableReference(Option<Lifetime>, Box<DataVariantRef<'data>>),
+    /// A generic type parameter.
+    Generic(Ident),
+}
+
+impl Debug for DataVariantRef<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            DataVariantRef::Internal(internal) => write!(f, "Internal({internal:?})"),
+            DataVariantRef::External(external) => write!(f, "External({external:?})"),
+            DataVariantRef::Reference(_, inner) => write!(f, "Reference({inner:?})"),
+            DataVariantRef::MutableReference(_, inner) => {
+                write!(f, "MutableReference({inner:?})")
+            }
+            DataVariantRef::Generic(ident) => write!(f, "Generic({ident})"),
+        }
+    }
 }
 
 impl<'data> From<InternalDataRef<'data>> for DataVariantRef<'data> {
@@ -78,23 +102,31 @@ impl<'data> From<ExternalTypeRef<'data>> for DataVariantRef<'data> {
     }
 }
 
-impl<'data> DataVariantRef<'data> {
-    /// Returns the internal crate dependencies of the variant.
-    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl<'data> InternalDependencies<'data> for DataVariantRef<'data> {
+    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
         match self {
             DataVariantRef::Internal(internal) => internal.internal_dependencies(),
             DataVariantRef::External(_) => vec![],
+            DataVariantRef::Reference(_, inner) => inner.internal_dependencies(),
+            DataVariantRef::MutableReference(_, inner) => inner.internal_dependencies(),
+            DataVariantRef::Generic(_) => vec![],
         }
     }
+}
 
-    /// Returns the external crate dependencies of the variant.
-    pub fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
+impl<'data> crate::traits::ExternalDependencies<'data> for DataVariantRef<'data> {
+    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
         match self {
             DataVariantRef::Internal(_) => vec![],
             DataVariantRef::External(external) => vec![external.external_crate()],
+            DataVariantRef::Reference(_, inner) => inner.external_dependencies(),
+            DataVariantRef::MutableReference(_, inner) => inner.external_dependencies(),
+            DataVariantRef::Generic(_) => vec![],
         }
     }
+}
 
+impl<'data> DataVariantRef<'data> {
     /// Returns whether the underlying variant supports the given trait.
     ///
     /// # Arguments
@@ -106,7 +138,20 @@ impl<'data> DataVariantRef<'data> {
                 internal.data().variant().supports_trait(trait_ref)
             }
             DataVariantRef::External(external) => external.supports_trait(trait_ref),
+            DataVariantRef::Reference(_lifetime, inner) => inner.supports_trait(trait_ref),
+            DataVariantRef::MutableReference(_lifetime, inner) => inner.supports_trait(trait_ref),
+            DataVariantRef::Generic(_) => false,
         }
+    }
+
+    /// Returns whether the variant is a mutable reference.
+    pub fn is_mutable_reference(&self) -> bool {
+        matches!(self, DataVariantRef::MutableReference(_, _))
+    }
+
+    /// Returns whether the variant is a reference.
+    pub fn is_reference(&self) -> bool {
+        matches!(self, DataVariantRef::Reference(_, _))
     }
 }
 
@@ -173,6 +218,17 @@ impl ToTokens for DataVariantRef<'_> {
             }
             DataVariantRef::External(external) => {
                 external.rust_type().to_tokens(tokens);
+            }
+            DataVariantRef::Reference(lifetime, inner) => {
+                tokens.extend(quote! {& #lifetime });
+                inner.to_tokens(tokens);
+            }
+            DataVariantRef::MutableReference(lifetime, inner) => {
+                tokens.extend(quote! {&mut #lifetime });
+                inner.to_tokens(tokens);
+            }
+            DataVariantRef::Generic(ident) => {
+                ident.to_tokens(tokens);
             }
         }
     }
@@ -279,56 +335,6 @@ impl<'data> InternalData<'data> {
     pub fn variant(&self) -> &InternalDataVariant<'data> {
         &self.variant
     }
-
-    /// Returns the sorted unique internal crate dependencies of the data.
-    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
-        let mut crates = self
-            .traits
-            .iter()
-            .filter_map(|t| {
-                if let TraitVariantRef::Internal(_, krate) = t { Some(*krate) } else { None }
-            })
-            .collect::<Vec<_>>();
-
-        for derive in &self.derives {
-            crates.extend(derive.internal_dependencies());
-        }
-
-        for decorator in &self.decorators {
-            crates.extend(decorator.internal_dependencies());
-        }
-
-        crates.sort_unstable();
-        crates.dedup();
-        crates
-    }
-
-    /// Returns the sorted unique external crate dependencies of the data.
-    pub fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
-        let mut crates = self
-            .traits
-            .iter()
-            .filter_map(|t| {
-                if let TraitVariantRef::External(ext_trait_ref) = t {
-                    Some(ext_trait_ref.external_crate())
-                } else {
-                    None
-                }
-            })
-            .collect::<Vec<_>>();
-
-        for derive in &self.derives {
-            crates.extend(derive.external_dependencies());
-        }
-
-        for decorator in &self.decorators {
-            crates.extend(decorator.external_dependencies());
-        }
-
-        crates.sort_unstable();
-        crates.dedup();
-        crates
-    }
 }
 
 impl<'data> ToTokens for InternalData<'data> {
@@ -364,5 +370,57 @@ impl<'data> ToTokens for InternalData<'data> {
             #publicness #variant
         };
         tokens.extend(token);
+    }
+}
+
+impl<'data> ExternalDependencies<'data> for InternalData<'data> {
+    fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
+        let mut crates = self
+            .traits
+            .iter()
+            .filter_map(|t| {
+                if let TraitVariantRef::External(ext_trait_ref) = t {
+                    Some(ext_trait_ref.external_crate())
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>();
+
+        for derive in &self.derives {
+            crates.extend(derive.external_dependencies());
+        }
+
+        for decorator in &self.decorators {
+            crates.extend(decorator.external_dependencies());
+        }
+
+        crates.sort_unstable();
+        crates.dedup();
+        crates
+    }
+}
+
+impl<'data> InternalDependencies<'data> for InternalData<'data> {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+        let mut crates = self
+            .traits
+            .iter()
+            .filter_map(|t| {
+                if let TraitVariantRef::Internal(_, krate) = t { Some(*krate) } else { None }
+            })
+            .collect::<Vec<_>>();
+
+        for derive in &self.derives {
+            crates.extend(derive.internal_dependencies());
+        }
+
+        for decorator in &self.decorators {
+            crates.extend(decorator.internal_dependencies());
+        }
+
+        crates.sort_unstable();
+        crates.dedup();
+        crates
     }
 }

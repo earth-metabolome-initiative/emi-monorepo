@@ -6,8 +6,9 @@ use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
+use quote::ToTokens;
 
-use crate::structs::{InternalToken, InternalTrait, Publicness};
+use crate::structs::{InternalTrait, Publicness, WhereClause, internal_struct::Method};
 
 #[derive(Default)]
 /// Builder for the `InternalTrait` struct.
@@ -17,9 +18,11 @@ pub struct InternalTraitBuilder<'data> {
     /// Publicness of the trait.
     publicness: Option<Publicness>,
     /// Internal token streams defined within the trait.
-    internal_tokens: Vec<InternalToken<'data>>,
+    methods: Vec<Method<'data>>,
     /// Trait documentation.
     documentation: Option<String>,
+    /// Where statements for the trait.
+    where_statements: Vec<WhereClause<'data>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -33,6 +36,8 @@ pub enum InternalTraitAttribute {
     InternalTokens,
     /// Trait documentation.
     Documentation,
+    /// Where statements for the trait.
+    WhereClauses,
 }
 
 impl Display for InternalTraitAttribute {
@@ -40,13 +45,14 @@ impl Display for InternalTraitAttribute {
         match self {
             InternalTraitAttribute::Name => write!(f, "name"),
             InternalTraitAttribute::Publicness => write!(f, "publicness"),
-            InternalTraitAttribute::InternalTokens => write!(f, "internal_tokens"),
+            InternalTraitAttribute::InternalTokens => write!(f, "methods"),
             InternalTraitAttribute::Documentation => write!(f, "documentation"),
+            InternalTraitAttribute::WhereClauses => write!(f, "where clauses"),
         }
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Enumeration of errors that can occur during the building of an
 /// `InternalTrait`.
 pub enum InternalTraitBuilderError {
@@ -56,6 +62,10 @@ pub enum InternalTraitBuilderError {
     InvalidName,
     /// The documentation is invalid (empty or whitespace only).
     InvalidDocumentation,
+    /// Duplicate method names found.
+    DuplicateMethodName(String),
+    /// Duplicate where clause found.
+    DuplicateWhereClause(String),
 }
 
 impl Display for InternalTraitBuilderError {
@@ -65,6 +75,12 @@ impl Display for InternalTraitBuilderError {
             InternalTraitBuilderError::InvalidName => write!(f, "Invalid trait name"),
             InternalTraitBuilderError::InvalidDocumentation => {
                 write!(f, "Invalid trait documentation (empty or whitespace only)")
+            }
+            InternalTraitBuilderError::DuplicateMethodName(name) => {
+                write!(f, "Duplicate method name found in trait: {}", name)
+            }
+            InternalTraitBuilderError::DuplicateWhereClause(clause) => {
+                write!(f, "Duplicate where clause found in trait: {}", clause)
             }
         }
     }
@@ -136,10 +152,30 @@ impl<'data> InternalTraitBuilder<'data> {
     /// Adds an internal token stream to the trait.
     ///
     /// # Arguments
-    /// * `internal_token` - The internal token stream to add.
-    pub fn internal_token(mut self, internal_token: InternalToken<'data>) -> Self {
-        self.internal_tokens.push(internal_token);
-        self
+    /// * `method` - The internal token stream to add.
+    pub fn method(mut self, method: Method<'data>) -> Result<Self, InternalTraitBuilderError> {
+        if self.methods.iter().any(|m| m.name() == method.name()) {
+            return Err(InternalTraitBuilderError::DuplicateMethodName(method.name().to_string()));
+        }
+        self.methods.push(method);
+        Ok(self)
+    }
+
+    /// Adds a where clause to the trait.
+    ///
+    /// # Arguments
+    /// * `where_clause` - The where clause to add.
+    pub fn where_clause(
+        mut self,
+        where_clause: WhereClause<'data>,
+    ) -> Result<Self, InternalTraitBuilderError> {
+        if self.where_statements.contains(&where_clause) {
+            return Err(InternalTraitBuilderError::DuplicateWhereClause(
+                where_clause.to_token_stream().to_string(),
+            ));
+        }
+        self.where_statements.push(where_clause);
+        Ok(self)
     }
 }
 
@@ -163,10 +199,11 @@ impl<'data> Builder for InternalTraitBuilder<'data> {
             publicness: self
                 .publicness
                 .ok_or(BuilderError::IncompleteBuild(InternalTraitAttribute::Publicness))?,
-            internal_tokens: self.internal_tokens,
+            methods: self.methods,
             documentation: self
                 .documentation
                 .ok_or(BuilderError::IncompleteBuild(InternalTraitAttribute::Documentation))?,
+            where_statements: self.where_statements,
         })
     }
 }
