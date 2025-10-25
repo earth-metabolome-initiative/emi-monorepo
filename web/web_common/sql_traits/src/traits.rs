@@ -22,3 +22,7 @@ pub trait Metadata {
     /// The associated metadata type.
     type Meta: Clone + Debug;
 }
+
+impl<M: Metadata> Metadata for &M {
+    type Meta = M::Meta;
+}

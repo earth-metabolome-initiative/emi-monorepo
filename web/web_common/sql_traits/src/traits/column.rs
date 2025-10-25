@@ -104,11 +104,11 @@ pub trait ColumnLike: Hash + Eq + Ord + Metadata {
     /// let bigg_id_column = table.column("bigg_id", &db).expect("Column 'bigg_id' should exist");
     /// let small_id_column = table.column("small_id", &db).expect("Column 'small_id' should exist");
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
-    /// assert_eq!(id_column.normalized_data_type(), "INT");
-    /// assert_eq!(serial_id_column.normalized_data_type(), "INT");
-    /// assert_eq!(bigg_id_column.normalized_data_type(), "BIGINT");
-    /// assert_eq!(small_id_column.normalized_data_type(), "SMALLINT");
-    /// assert_eq!(name_column.normalized_data_type(), "TEXT");
+    /// assert_eq!(id_column.normalized_data_type(&db), "INT");
+    /// assert_eq!(serial_id_column.normalized_data_type(&db), "INT");
+    /// assert_eq!(bigg_id_column.normalized_data_type(&db), "BIGINT");
+    /// assert_eq!(small_id_column.normalized_data_type(&db), "SMALLINT");
+    /// assert_eq!(name_column.normalized_data_type(&db), "TEXT");
     /// # Ok(())
     /// # }
     /// ```

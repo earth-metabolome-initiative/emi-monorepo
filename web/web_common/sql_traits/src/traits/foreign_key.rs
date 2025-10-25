@@ -183,6 +183,92 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     where
         Self: 'db;
 
+    /// Returns whether the current foreign key is the only key in the
+    /// host table which employs the same set of host columns.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the foreign
+    /// key belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE grandparent_table (id INT PRIMARY KEY);
+    /// CREATE TABLE parent_table (id INT, FOREIGN KEY (id) REFERENCES grandparent_table(id));
+    /// CREATE TABLE host_table (
+    ///   id INT,
+    ///   FOREIGN KEY (id) REFERENCES parent_table(id),
+    ///   FOREIGN KEY (id) REFERENCES grandparent_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let host_table = db.table(None, "host_table");
+    /// let host_columns = host_table.foreign_keys(&db).collect::<Vec<_>>();
+    /// let [first_fk, second_fk] = host_columns.as_slice() else {
+    ///     panic!("Expected two foreign keys");
+    /// };
+    /// assert!(first_fk.shares_host_tables(&db), "First foreign key should share host columns");
+    /// assert!(second_fk.shares_host_tables(&db), "Second foreign key should share host columns");
+    /// let parent_table = db.table(None, "parent_table");
+    /// let parent_fk = parent_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// assert!(!parent_fk.shares_host_tables(&db), "Parent foreign key should not share host columns");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn shares_host_tables(&self, database: &Self::Database) -> bool {
+        let mut host_columns: Vec<_> = self.host_columns(database).collect();
+        host_columns.sort_unstable();
+        let host_table = self.host_table(database);
+        for fk in host_table.foreign_keys(database.borrow()).map(Borrow::borrow) {
+            if fk == self {
+                continue;
+            }
+            let mut fk_host_columns: Vec<_> = fk.host_columns(database.borrow()).collect();
+            fk_host_columns.sort_unstable();
+            if fk_host_columns == host_columns {
+                return true;
+            }
+        }
+        false
+    }
+
+    /// Returns the number of host columns in the foreign key.
+    ///
+    /// # Arguments
+    /// * `database` - A reference to the database instance to which the foreign
+    /// key belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id1 INT, id2 INT, PRIMARY KEY (id1, id2));
+    /// CREATE TABLE host_table (
+    ///     ref_id1 INT,
+    ///     ref_id2 INT,
+    ///     FOREIGN KEY (ref_id1, ref_id2) REFERENCES referenced_table(id1, id2)
+    /// );
+    /// "#,
+    /// )?;
+    /// let host_table = db.table(None, "host_table");
+    /// let foreign_key = host_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// assert_eq!(foreign_key.number_of_host_columns(&db), 2);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn number_of_host_columns(&self, database: &Self::Database) -> usize {
+        self.host_columns(database).count()
+    }
+
     /// Returns whether the foreign key is composite (i.e., consists of more
     /// than one column).
     ///

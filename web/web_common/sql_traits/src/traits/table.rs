@@ -623,7 +623,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// let child_table = db.table(None, "child_table");
     /// assert!(child_table.has_non_self_referential_foreign_keys(&db));
     /// let self_ref_table = db.table(None, "self_ref_table");
-    /// assert!(self_ref_table.has_non_self_referential_foreign_keys(&db));
+    /// assert!(!self_ref_table.has_non_self_referential_foreign_keys(&db));
     /// # Ok(())
     /// # }
     /// ```
