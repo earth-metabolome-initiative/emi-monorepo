@@ -27,6 +27,8 @@ pub struct InternalTrait<'data> {
     documentation: String,
     /// Where statements for the trait.
     where_statements: Vec<WhereClause<'data>>,
+    /// Generics for the trait.
+    generics: Vec<Ident>,
 }
 
 impl<'data> InternalTrait<'data> {
@@ -101,9 +103,16 @@ impl ToTokens for InternalTrait<'_> {
             #[doc = #documentation]
         };
 
+        let formatted_generics = if self.generics.is_empty() {
+            quote::quote! {}
+        } else {
+            let generics = &self.generics;
+            quote::quote! { <#(#generics),*> }
+        };
+
         tokens.extend(quote::quote! {
             #documentation
-            #publicness trait #name #where_clause_tokens {
+            #publicness trait #name #formatted_generics #where_clause_tokens {
                 #(#methods)*
             }
         });

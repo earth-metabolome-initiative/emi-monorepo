@@ -16,49 +16,48 @@
 
 use sql_traits::traits::{ForeignKeyLike, Metadata};
 
-use crate::{
-    PgDatabase,
-    database::KeyColumnUsageMetadata,
-    models::{Column, KeyColumnUsage, PgIndex, Table},
-};
+use crate::{PgDatabase, database::KeyColumnUsageMetadata, models::KeyColumnUsage};
 
 impl Metadata for KeyColumnUsage {
     type Meta = KeyColumnUsageMetadata;
 }
 
 impl ForeignKeyLike for KeyColumnUsage {
-    type Column = Column;
-    type Table = Table;
-    type Database = PgDatabase;
-    type UniqueIndex = PgIndex;
+    type DB = PgDatabase;
 
     fn foreign_key_name(&self) -> Option<&str> {
         Some(&self.constraint_name)
     }
 
-    fn referenced_table<'db>(&self, database: &'db Self::Database) -> &'db Self::Table {
+    fn referenced_table<'db>(
+        &self,
+        database: &'db Self::DB,
+    ) -> &'db <Self::DB as sql_traits::traits::DatabaseLike>::Table {
         database.foreign_key_metadata(self).referenced_table()
     }
 
-    fn host_table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
+    fn host_table<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> &'db <Self::DB as sql_traits::traits::DatabaseLike>::Table
     where
         Self: 'db,
     {
         database.foreign_key_metadata(self).host_table()
     }
 
-    fn on_delete_cascade(&self, database: &Self::Database) -> bool {
+    fn on_delete_cascade(&self, database: &Self::DB) -> bool {
         database.foreign_key_metadata(self).on_delete_cascade()
     }
 
-    fn match_kind(&self, database: &Self::Database) -> sqlparser::ast::MatchKind {
+    fn match_kind(&self, database: &Self::DB) -> sqlparser::ast::MatchKind {
         database.foreign_key_metadata(self).match_kind()
     }
 
     fn host_columns<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::Column>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::traits::DatabaseLike>::Column>
     where
         Self: 'db,
     {
@@ -67,8 +66,8 @@ impl ForeignKeyLike for KeyColumnUsage {
 
     fn referenced_columns<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::Column>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::traits::DatabaseLike>::Column>
     where
         Self: 'db,
     {

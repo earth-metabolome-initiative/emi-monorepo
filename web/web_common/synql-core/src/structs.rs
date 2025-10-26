@@ -11,7 +11,9 @@ pub use internal_module::InternalModule;
 mod internal_enum;
 pub use internal_enum::InternalEnum;
 mod internal_data;
-pub use internal_data::{InternalData, InternalDataRef, InternalDataVariant, InternalModuleRef};
+pub use internal_data::{
+    DataVariantRef, InternalData, InternalDataRef, InternalDataVariant, InternalModuleRef,
+};
 mod publicness;
 pub use publicness::Publicness;
 mod external_crate;

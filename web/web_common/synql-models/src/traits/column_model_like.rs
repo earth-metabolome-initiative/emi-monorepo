@@ -18,7 +18,7 @@ pub trait ColumnModelLike: ColumnSynLike {
     /// * `workspace` - The workspace where the column is defined.
     fn attribute<'data>(
         &self,
-        database: &Self::Database,
+        database: &Self::DB,
         workspace: &Workspace<'data>,
     ) -> InternalAttribute<'data> {
         let mut builder = InternalAttribute::new()

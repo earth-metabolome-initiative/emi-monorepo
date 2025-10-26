@@ -1,9 +1,11 @@
 //! Submodule definining the `UniqueIndexLike` trait for SQL unique
 //! indexes.
 
+use std::fmt::Debug;
+
 use sqlparser::ast::{Expr, Ident};
 
-use crate::traits::{ColumnLike, DatabaseLike, Metadata, TableLike};
+use crate::traits::{DatabaseLike, Metadata, TableLike};
 
 pub(crate) fn collect_column_idents(expr: &Expr) -> Vec<&Ident> {
     match expr {
@@ -30,13 +32,9 @@ pub(crate) fn collect_column_idents(expr: &Expr) -> Vec<&Ident> {
 /// A unique index is a rule that specifies that the values in a column
 /// (or a group of columns) must be unique across all rows in a table.
 /// This trait represents such a unique index in a database-agnostic way.
-pub trait UniqueIndexLike: Metadata + Ord + Eq {
-    /// The table type the unique index belongs to.
-    type Table: TableLike<Database = Self::Database, UniqueIndex = Self, Column = Self::Column>;
-    /// The column type the unique index belongs to.
-    type Column: ColumnLike;
+pub trait UniqueIndexLike: Metadata + Ord + Eq + Debug + Clone {
     /// The database type the unique index belongs to.
-    type Database: DatabaseLike<Table = Self::Table, Column = Self::Column>;
+    type DB: DatabaseLike<UniqueIndex = Self>;
 
     /// Returns the expression of the unique index as an SQL AST node.
     ///
@@ -56,12 +54,12 @@ pub trait UniqueIndexLike: Metadata + Ord + Eq {
     /// # Ok(())
     /// # }
     /// ```
-    fn expression<'db>(&'db self, database: &'db Self::Database) -> &'db Expr
+    fn expression<'db>(&'db self, database: &'db Self::DB) -> &'db Expr
     where
         Self: 'db;
 
     /// Returns a reference to the table this unique index belongs to.
-    fn table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
+    fn table<'db>(&'db self, database: &'db Self::DB) -> &'db <Self::DB as DatabaseLike>::Table
     where
         Self: 'db;
 
@@ -86,7 +84,7 @@ pub trait UniqueIndexLike: Metadata + Ord + Eq {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_simple(&self, database: &Self::Database) -> bool {
+    fn is_simple(&self, database: &Self::DB) -> bool {
         let expr = self.expression(database);
         let inner_expr = match expr {
             Expr::Nested(inner) => inner,
@@ -121,8 +119,8 @@ pub trait UniqueIndexLike: Metadata + Ord + Eq {
     /// ```
     fn columns<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::Column>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>
     where
         Self: 'db,
     {

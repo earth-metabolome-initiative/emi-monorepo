@@ -1,28 +1,21 @@
 //! Submodule providing a trait for describing SQL Table-like entities.
 
-use std::hash::Hash;
+use std::{borrow::Borrow, fmt::Debug, hash::Hash};
 
-use crate::traits::{
-    CheckConstraintLike, ColumnLike, DatabaseLike, ForeignKeyLike, Metadata, UniqueIndexLike,
-};
+use crate::traits::{ColumnLike, DatabaseLike, ForeignKeyLike, Metadata};
 
 /// A trait for types that can be treated as SQL tables.
-pub trait TableLike: Hash + Ord + Eq + Metadata {
+pub trait TableLike:
+    Debug
+    + Clone
+    + Hash
+    + Ord
+    + Eq
+    + Metadata
+    + Borrow<<<Self as TableLike>::DB as DatabaseLike>::Table>
+{
     /// The database type the table belongs to.
-    type Database: DatabaseLike<Table = Self, Column = Self::Column, ForeignKey = Self::ForeignKey>;
-    /// The column type of the table.
-    type Column: ColumnLike<Database = Self::Database, Table = Self, ForeignKey = Self::ForeignKey>;
-    /// The check constraint type of the table.
-    type CheckConstraint: CheckConstraintLike;
-    /// The unique index type of the table.
-    type UniqueIndex: UniqueIndexLike<Table = Self, Database = Self::Database, Column = Self::Column>;
-    /// The foreign key type of the table.
-    type ForeignKey: ForeignKeyLike<
-            Table = Self,
-            Column = Self::Column,
-            Database = Self::Database,
-            UniqueIndex = Self::UniqueIndex,
-        >;
+    type DB: DatabaseLike<Table: Borrow<Self>>;
 
     /// Returns the name of the table.
     ///
@@ -41,7 +34,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     fn table_name(&self) -> &str;
 
     /// Returns the documentation of the table, if any.
-    fn table_doc<'db>(&'db self, database: &'db Self::Database) -> Option<&'db str>
+    fn table_doc<'db>(&'db self, database: &'db Self::DB) -> Option<&'db str>
     where
         Self: 'db;
 
@@ -86,8 +79,8 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn columns<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::Column>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>
     where
         Self: 'db;
 
@@ -110,7 +103,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn number_of_columns(&self, database: &Self::Database) -> usize {
+    fn number_of_columns(&self, database: &Self::DB) -> usize {
         self.columns(database).count()
     }
 
@@ -138,8 +131,8 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     fn column<'db>(
         &'db self,
         name: &str,
-        database: &'db Self::Database,
-    ) -> Option<&'db Self::Column>
+        database: &'db Self::DB,
+    ) -> Option<&'db <Self::DB as DatabaseLike>::Column>
     where
         Self: 'db,
     {
@@ -177,7 +170,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn has_column(&self, column: &Self::Column, database: &Self::Database) -> bool {
+    fn has_column(&self, column: &<Self::DB as DatabaseLike>::Column, database: &Self::DB) -> bool {
         TableLike::columns(self, database).any(|col| col == column)
     }
 
@@ -218,8 +211,8 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn primary_key_columns<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::Column>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>
     where
         Self: 'db;
 
@@ -250,7 +243,10 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn primary_key_column<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Column {
+    fn primary_key_column<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> &'db <Self::DB as DatabaseLike>::Column {
         let mut pk_columns = self.primary_key_columns(database);
         let pk_column = pk_columns.next().expect("Table has no primary key column");
         if pk_columns.next().is_some() {
@@ -285,7 +281,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn has_generated_primary_key(&self, database: &Self::Database) -> bool {
+    fn has_generated_primary_key(&self, database: &Self::DB) -> bool {
         self.primary_key_columns(database).all(|col| col.is_generated())
             && self.has_primary_key(database)
     }
@@ -318,7 +314,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn primary_key_type(&self, database: &Self::Database) -> Vec<String> {
+    fn primary_key_type(&self, database: &Self::DB) -> Vec<String> {
         self.primary_key_columns(database).map(|col| col.normalized_data_type(database)).collect()
     }
 
@@ -349,7 +345,11 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_primary_key_column(&self, database: &Self::Database, column: &Self::Column) -> bool {
+    fn is_primary_key_column(
+        &self,
+        database: &Self::DB,
+        column: &<Self::DB as DatabaseLike>::Column,
+    ) -> bool {
         self.primary_key_columns(database).all(|col| col == column)
             && self.has_primary_key(database)
     }
@@ -377,7 +377,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn has_primary_key(&self, database: &Self::Database) -> bool {
+    fn has_primary_key(&self, database: &Self::DB) -> bool {
         self.primary_key_columns(database).next().is_some()
     }
 
@@ -407,12 +407,12 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn non_primary_key_columns<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::Column>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>
     where
         Self: 'db,
     {
-        let primary_key_column_names: Vec<&Self::Column> =
+        let primary_key_column_names: Vec<&<Self::DB as DatabaseLike>::Column> =
             self.primary_key_columns(database).collect();
 
         self.columns(database).filter(move |col| !primary_key_column_names.contains(col))
@@ -443,7 +443,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn has_non_primary_key_columns(&self, database: &Self::Database) -> bool {
+    fn has_non_primary_key_columns(&self, database: &Self::DB) -> bool {
         self.non_primary_key_columns(database).next().is_some()
     }
 
@@ -470,7 +470,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn has_composite_primary_key(&self, database: &Self::Database) -> bool {
+    fn has_composite_primary_key(&self, database: &Self::DB) -> bool {
         self.primary_key_columns(database).nth(1).is_some()
     }
 
@@ -501,8 +501,8 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn check_constraints<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::CheckConstraint>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::CheckConstraint>
     where
         Self: 'db;
 
@@ -535,8 +535,8 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn unique_indices<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::UniqueIndex>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::UniqueIndex>
     where
         Self: 'db;
 
@@ -564,8 +564,8 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn foreign_keys<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::ForeignKey>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey>
     where
         Self: 'db;
 
@@ -597,7 +597,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn has_foreign_keys(&self, database: &Self::Database) -> bool {
+    fn has_foreign_keys(&self, database: &Self::DB) -> bool {
         self.foreign_keys(database).next().is_some()
     }
 
@@ -627,7 +627,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn has_non_self_referential_foreign_keys(&self, database: &Self::Database) -> bool {
+    fn has_non_self_referential_foreign_keys(&self, database: &Self::DB) -> bool {
         self.foreign_keys(database)
             .filter(move |fk| !fk.is_self_referential(database))
             .next()
@@ -673,15 +673,15 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn foreign_keys_to_ancestors_of<'db>(
         &'db self,
-        database: &'db Self::Database,
+        database: &'db Self::DB,
         table: &'db Self,
-    ) -> impl Iterator<Item = &'db Self::ForeignKey>
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey>
     where
         Self: 'db,
     {
         let ancestors = table.ancestral_extended_tables(database);
         self.foreign_keys(database).filter(move |fk| {
-            let referenced_table = fk.referenced_table(database);
+            let referenced_table = fk.referenced_table(database).borrow();
             ancestors.iter().any(|ancestor| ancestor == &referenced_table)
                 && fk.is_referenced_primary_key(database)
         })
@@ -715,15 +715,14 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn referenced_tables<'db>(&'db self, database: &'db Self::Database) -> Vec<&'db Self>
+    fn referenced_tables<'db>(&'db self, database: &'db Self::DB) -> Vec<&'db Self>
     where
         Self: 'db,
     {
         let mut referenced_tables = Vec::new();
 
         for foreign_key in self.foreign_keys(database) {
-            let referenced_table = foreign_key.referenced_table(database);
-            referenced_tables.push(referenced_table);
+            referenced_tables.push(foreign_key.referenced_table(database).borrow());
         }
 
         referenced_tables.sort_unstable();
@@ -741,7 +740,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     ///   belongs.
     ///
     /// # Example
-    fn non_self_referenced_tables<'db>(&'db self, database: &'db Self::Database) -> Vec<&'db Self>
+    fn non_self_referenced_tables<'db>(&'db self, database: &'db Self::DB) -> Vec<&'db Self>
     where
         Self: 'db,
     {
@@ -776,8 +775,8 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn extension_foreign_keys<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::ForeignKey>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey>
     where
         Self: 'db,
     {
@@ -815,11 +814,13 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn extended_tables<'db>(&'db self, database: &'db Self::Database) -> Vec<&'db Self>
+    fn extended_tables<'db>(&'db self, database: &'db Self::DB) -> Vec<&'db Self>
     where
         Self: 'db,
     {
-        self.extension_foreign_keys(database).map(|fk| fk.referenced_table(database)).collect()
+        self.extension_foreign_keys(database)
+            .map(|fk| fk.referenced_table(database).borrow())
+            .collect()
     }
 
     /// Returns the unique tables which are extended by either the current
@@ -850,7 +851,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn ancestral_extended_tables<'db>(&'db self, database: &'db Self::Database) -> Vec<&'db Self>
+    fn ancestral_extended_tables<'db>(&'db self, database: &'db Self::DB) -> Vec<&'db Self>
     where
         Self: 'db,
     {
@@ -901,8 +902,8 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn referenced_tables_via_column<'db>(
         &'db self,
-        database: &'db Self::Database,
-        column: &Self::Column,
+        database: &'db Self::DB,
+        column: &<Self::DB as DatabaseLike>::Column,
     ) -> Vec<&'db Self>
     where
         Self: 'db,
@@ -913,8 +914,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
             if fk.host_columns(database).all(|col| col == column)
                 && fk.is_referenced_primary_key(database)
             {
-                let referenced_table = fk.referenced_table(database);
-                referenced_tables.push(referenced_table);
+                referenced_tables.push(fk.referenced_table(database).borrow());
             }
         }
 
@@ -953,7 +953,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_descendant_of(&self, database: &Self::Database, other: &Self) -> bool {
+    fn is_descendant_of(&self, database: &Self::DB, other: &Self) -> bool {
         self.ancestral_extended_tables(database).contains(&other)
     }
 
@@ -999,7 +999,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn shares_ancestors_with(&self, database: &Self::Database, other: &Self) -> bool {
+    fn shares_ancestors_with(&self, database: &Self::DB, other: &Self) -> bool {
         let self_ancestors = self.ancestral_extended_tables(database);
         let other_ancestors = other.ancestral_extended_tables(database);
 
@@ -1007,158 +1007,6 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
             || self == other
             || self_ancestors.contains(&other)
             || other_ancestors.contains(&self)
-    }
-
-    /// Returns whether the column is compatible with another column.
-    ///
-    /// # Implementation Note
-    /// Two columns are considered compatible if:
-    /// - They have the same data type.
-    /// - If they are foreign keys, they reference the same table or share an
-    ///   ancestor table.
-    ///
-    /// If both columns are not foreign keys, they are considered compatible if
-    /// they have the same data type.
-    ///
-    /// # Arguments
-    ///
-    /// * `database` - A reference to the database instance to which the table
-    ///   belongs.
-    /// * `host_column` - The column in the current table to check.
-    /// * `other_table` - The other table to check against.
-    /// * `other_column` - The column in the other table to check.
-    ///
-    /// # Example
-    ///
-    /// ```rust
-    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use sql_traits::prelude::*;
-    /// let db = ParserDB::try_from(
-    ///     r#"
-    /// CREATE TABLE referenced_table (id INT PRIMARY KEY, name TEXT);
-    /// CREATE TABLE another_referenced_table (id INT PRIMARY KEY, name TEXT);
-    /// CREATE TABLE host_table (id INT, name TEXT,
-    ///     FOREIGN KEY (id) REFERENCES referenced_table(id));
-    /// CREATE TABLE another_host_table (id INT, name TEXT,
-    ///     FOREIGN KEY (id) REFERENCES another_referenced_table(id));
-    /// CREATE TABLE compatible_table (id INT, name TEXT,
-    ///     FOREIGN KEY (id) REFERENCES referenced_table(id));
-    /// CREATE TABLE incompatible_table (id INT, name TEXT,
-    ///     FOREIGN KEY (id) REFERENCES another_referenced_table(id));
-    /// CREATE TABLE non_fk_table (id INT, name TEXT);
-    /// CREATE TABLE serial_table_one (id SERIAL PRIMARY KEY, name TEXT);
-    /// CREATE TABLE serial_table_two (id SERIAL PRIMARY KEY, name TEXT);
-    /// "#,
-    /// )?;
-    /// let host_table = db.table(None, "host_table");
-    /// let id_column = host_table.column("id", &db).expect("Column 'id' should exist");
-    /// let compatible_table = db.table(None, "compatible_table");
-    /// let serial_table_one = db.table(None, "serial_table_one");
-    /// let serial_id_column = serial_table_one.column("id", &db).expect("Column 'id' should exist");
-    /// let serial_table_two = db.table(None, "serial_table_two");
-    /// let serial_id_column_two =
-    ///     serial_table_two.column("id", &db).expect("Column 'id' should exist");
-    /// let compatible_id_column =
-    ///     compatible_table.column("id", &db).expect("Column 'id' should exist");
-    /// let incompatible_table = db.table(None, "incompatible_table");
-    /// let incompatible_id_column =
-    ///     incompatible_table.column("id", &db).expect("Column 'id' should exist");
-    /// let another_host_table = db.table(None, "another_host_table");
-    /// let another_id_column = another_host_table.column("id", &db).expect("Column 'id' should exist");
-    /// let non_fk_table = db.table(None, "non_fk_table");
-    /// let non_fk_id_column = non_fk_table.column("id", &db).expect("Column 'id' should exist");
-    /// assert!(
-    ///     host_table.is_compatible_with(&db, id_column, compatible_table, compatible_id_column),
-    ///     "Columns should be compatible as they reference the same table"
-    /// );
-    /// assert!(
-    ///     !host_table.is_compatible_with(&db, id_column, incompatible_table, incompatible_id_column),
-    ///     "Columns should not be compatible as they reference different tables"
-    /// );
-    /// assert!(
-    ///     !host_table.is_compatible_with(&db, id_column, another_host_table, another_id_column),
-    ///     "Columns should not be compatible as they reference different tables"
-    /// );
-    /// assert!(
-    ///     !host_table.is_compatible_with(&db, id_column, non_fk_table, non_fk_id_column),
-    ///     "Columns should not be compatible as one of them is not a foreign key"
-    /// );
-    /// assert!(
-    ///     !serial_table_one.is_compatible_with(
-    ///         &db,
-    ///         serial_id_column,
-    ///         serial_table_two,
-    ///         serial_id_column_two
-    ///     ),
-    ///     "Columns should not be compatible as both are generative"
-    /// );
-    /// assert!(
-    ///     serial_table_one.is_compatible_with(&db, serial_id_column, non_fk_table, non_fk_id_column),
-    ///     "Columns should be compatible as only one is generative and they have the same data type"
-    /// );
-    /// # Ok(())
-    /// # }
-    /// ```
-    fn is_compatible_with(
-        &self,
-        database: &Self::Database,
-        host_column: &Self::Column,
-        other_table: &Self,
-        other_column: &Self::Column,
-    ) -> bool {
-        debug_assert!(
-            TableLike::columns(self, database).any(|col| col == host_column),
-            "Local column {:?} does not belong to table {:?}",
-            host_column.column_name(),
-            self.table_name()
-        );
-        debug_assert!(
-            TableLike::columns(other_table, database).any(|col| col == other_column),
-            "Other column {:?} does not belong to table {:?}",
-            other_column.column_name(),
-            other_table.table_name()
-        );
-
-        // If the two columns are the same, they are compatible.
-        if self == other_table && host_column == other_column {
-            return true;
-        }
-
-        // If both columns have generative data types, they are not compatible
-        // as the two values should never be the same.
-        if host_column.is_generated() && other_column.is_generated() {
-            return false;
-        }
-
-        if host_column.normalized_data_type(database) != other_column.normalized_data_type(database)
-        {
-            return false;
-        }
-
-        let mut local_referenced_tables = self.referenced_tables_via_column(database, host_column);
-        let mut other_referenced_tables =
-            other_table.referenced_tables_via_column(database, other_column);
-
-        if local_referenced_tables.is_empty() && other_referenced_tables.is_empty() {
-            // If both columns are not foreign keys, they are compatible.
-            return true;
-        }
-
-        // We determine the set of ancestors of the referenced tables.
-        let local_referenced_ancestors = local_referenced_tables
-            .iter()
-            .flat_map(|table| table.ancestral_extended_tables(database))
-            .collect::<Vec<_>>();
-        let other_referenced_ancestors = other_referenced_tables
-            .iter()
-            .flat_map(|table| table.ancestral_extended_tables(database))
-            .collect::<Vec<_>>();
-
-        // We extend the referenced tables with their ancestors.
-        local_referenced_tables.extend(local_referenced_ancestors);
-        other_referenced_tables.extend(other_referenced_ancestors);
-
-        local_referenced_tables.iter().any(|table| other_referenced_tables.contains(table))
     }
 
     /// Returns the table singleton foreign keys.
@@ -1188,8 +1036,8 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn singleton_foreign_keys<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::ForeignKey>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey>
     where
         Self: 'db,
     {
@@ -1230,8 +1078,8 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// ```
     fn non_self_referential_singleton_foreign_keys<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::ForeignKey>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey>
     where
         Self: 'db,
     {
@@ -1262,7 +1110,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn has_singleton_foreign_keys(&self, database: &Self::Database) -> bool {
+    fn has_singleton_foreign_keys(&self, database: &Self::DB) -> bool {
         self.singleton_foreign_keys(database).next().is_some()
     }
 
@@ -1297,7 +1145,7 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn has_non_self_referential_singleton_foreign_keys(&self, database: &Self::Database) -> bool {
+    fn has_non_self_referential_singleton_foreign_keys(&self, database: &Self::DB) -> bool {
         self.non_self_referential_singleton_foreign_keys(database).next().is_some()
     }
 
@@ -1339,13 +1187,86 @@ pub trait TableLike: Hash + Ord + Eq + Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn depends_on(&self, database: &Self::Database, other: &Self) -> bool {
+    fn depends_on(&self, database: &Self::DB, other: &Self) -> bool {
         if self == other {
             return true;
         }
         self.foreign_keys(database).any(|fk| {
-            let referenced_table = fk.referenced_table(database);
+            let referenced_table: &Self = fk.referenced_table(database).borrow();
             referenced_table == other || referenced_table.depends_on(database, other)
         })
+    }
+}
+
+impl<T: TableLike> TableLike for &T
+where
+    Self: Borrow<<<T as TableLike>::DB as DatabaseLike>::Table>,
+    for<'a> <T::DB as DatabaseLike>::Table: Borrow<&'a T>,
+{
+    type DB = T::DB;
+
+    fn table_name(&self) -> &str {
+        T::table_name(self)
+    }
+
+    fn table_doc<'db>(&'db self, database: &'db Self::DB) -> Option<&'db str>
+    where
+        Self: 'db,
+    {
+        T::table_doc(self, database)
+    }
+
+    fn table_schema(&self) -> Option<&str> {
+        T::table_schema(self)
+    }
+
+    fn columns<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>
+    where
+        Self: 'db,
+    {
+        T::columns(self, database)
+    }
+
+    fn primary_key_columns<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>
+    where
+        Self: 'db,
+    {
+        T::primary_key_columns(self, database)
+    }
+
+    fn check_constraints<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::CheckConstraint>
+    where
+        Self: 'db,
+    {
+        T::check_constraints(self, database)
+    }
+
+    fn unique_indices<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::UniqueIndex>
+    where
+        Self: 'db,
+    {
+        T::unique_indices(self, database)
+    }
+
+    fn foreign_keys<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey>
+    where
+        Self: 'db,
+    {
+        T::foreign_keys(self, database)
     }
 }

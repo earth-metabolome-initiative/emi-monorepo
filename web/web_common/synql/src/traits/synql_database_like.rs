@@ -5,15 +5,15 @@ use synql_diesel_schema::traits::TableSchema;
 use synql_models::traits::TableModelLike;
 
 /// Trait representing a database that can be used with `SynQL`.
-pub trait SynQLDatabaseLike: DatabaseLike<Table = <Self as SynQLDatabaseLike>::SynQLTable> {
-    /// Table which can be used with `SynQL`.
-    type SynQLTable: TableSchema<Database = Self> + TableModelLike<Database = Self>;
+pub trait SynQLDatabaseLike: DatabaseLike
+where
+    <Self as DatabaseLike>::Table: TableSchema + TableModelLike,
+{
 }
 
 impl<DB> SynQLDatabaseLike for DB
 where
     DB: DatabaseLike,
-    DB::Table: TableSchema<Database = DB> + TableModelLike<Database = DB>,
+    DB::Table: TableSchema + TableModelLike,
 {
-    type SynQLTable = DB::Table;
 }

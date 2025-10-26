@@ -1,18 +1,15 @@
 //! Submodule providing the `HorizontalSameAsTableLike` trait for working
 //! with tables that have horizontal same-as relationships.
 
-use sql_traits::traits::TableLike;
+use sql_traits::traits::{DatabaseLike, TableLike};
 
 use crate::traits::HorizontalSameAsForeignKeyLike;
 
 /// Trait for tables which may include horizontal same-as relationships.
-pub trait HorizontalSameAsTableLike:
-    TableLike<ForeignKey = <Self as HorizontalSameAsTableLike>::HorizontalSameAsForeignKey>
+pub trait HorizontalSameAsTableLike: TableLike
+where
+    <Self::DB as DatabaseLike>::ForeignKey: HorizontalSameAsForeignKeyLike<DB = Self::DB>,
 {
-    /// The type of the foreign keys in this table that may be horizontal
-    /// same-as relationships.
-    type HorizontalSameAsForeignKey: HorizontalSameAsForeignKeyLike<Database = Self::Database, Table = Self>;
-
     /// Returns an iterator over the foreign keys of this table that
     /// represent horizontal same-as relationships.
     ///
@@ -51,8 +48,8 @@ pub trait HorizontalSameAsTableLike:
     /// ```
     fn horizontal_same_as_foreign_keys<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::HorizontalSameAsForeignKey>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey>
     where
         Self: 'db,
     {
@@ -63,7 +60,6 @@ pub trait HorizontalSameAsTableLike:
 impl<T> HorizontalSameAsTableLike for T
 where
     T: TableLike,
-    T::ForeignKey: HorizontalSameAsForeignKeyLike,
+    <T::DB as DatabaseLike>::ForeignKey: HorizontalSameAsForeignKeyLike<DB = T::DB>,
 {
-    type HorizontalSameAsForeignKey = T::ForeignKey;
 }

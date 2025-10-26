@@ -21,10 +21,10 @@ use crate::{
 ///
 /// let constrainer: GenericConstrainer<ParserDB> = LowercaseColumnName::default().into();
 ///
-/// let invalid_schema = ParserDB::from_sql("CREATE TABLE mytable (Id INT);").unwrap();
+/// let invalid_schema = ParserDB::try_from("CREATE TABLE mytable (Id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
-/// let valid_schema = ParserDB::from_sql("CREATE TABLE mytable (id INT);").unwrap();
+/// let valid_schema = ParserDB::try_from("CREATE TABLE mytable (id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 /// ```
 pub struct LowercaseColumnName<C>(std::marker::PhantomData<C>);

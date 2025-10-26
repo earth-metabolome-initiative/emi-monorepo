@@ -66,7 +66,9 @@ members = [
   "web/web_common/synql-diesel-schema",
   "web/web_common/synql-core",
   "web/web_common/synql-models",
-  "web/web_common/synql-builders", "web/web_common/synql_relations",
+  "web/web_common/synql-builders",
+  "web/web_common/synql-relations",
+  "web/web_common/diesel-queries",
 ]
 
 [workspace.dependencies]
@@ -105,7 +107,7 @@ sqlparser = { git = "https://github.com/LucaCappelletti94/sqlparser-rs", branch 
   "serde",
 ] }
 arbitrary = { version = "1", features = ["derive"] }
-diesel = { version = "2.3.1", features = [
+diesel = { version = "2.3.3", features = [
   "extras",
   "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
 ] }
@@ -216,6 +218,7 @@ synql-core = { path = "web/web_common/synql-core" }
 synql-diesel-schema = { path = "web/web_common/synql-diesel-schema" }
 synql-models = { path = "web/web_common/synql-models" }
 synql-builders = { path = "web/web_common/synql-builders" }
+synql-relations = { path = "web/web_common/synql-relations" }
 snake_case_sanitizer = { path = "utils/snake_case_sanitizer" }
 rmcp = { version = "0.8.1", features = ["server", "transport-io"] }
 tempfile = "3.6.0"

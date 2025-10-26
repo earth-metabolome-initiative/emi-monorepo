@@ -17,7 +17,7 @@ use crate::traits::{TableModelLike, column_model_like::ColumnModelLike};
 pub struct TableModel<'data, 'table, T: TableModelLike + ?Sized> {
     table: &'table T,
     workspace: &'table synql_core::structs::Workspace<'data>,
-    database: &'table T::Database,
+    database: &'table T::DB,
 }
 
 impl<'data, 'table, T: TableModelLike + ?Sized> Clone for TableModel<'data, 'table, T> {
@@ -32,7 +32,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
     pub(crate) fn new(
         table: &'table T,
         workspace: &'table synql_core::structs::Workspace<'data>,
-        database: &'table T::Database,
+        database: &'table T::DB,
     ) -> Self {
         Self { table, workspace, database }
     }

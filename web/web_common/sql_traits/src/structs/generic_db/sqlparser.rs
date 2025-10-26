@@ -4,7 +4,10 @@ use std::rc::Rc;
 
 use common_traits::prelude::Builder;
 use sqlparser::{
-    ast::{ColumnDef, ColumnOption, CreateFunction, CreateTable, Expr, Statement, TableConstraint},
+    ast::{
+        CheckConstraint, ColumnDef, ColumnOption, CreateFunction, CreateTable, Expr,
+        ForeignKeyConstraint, Statement, TableConstraint, UniqueConstraint,
+    },
     parser::Parser,
 };
 
@@ -17,7 +20,14 @@ use crate::{
 };
 
 /// A type alias for a `GenericDB` specialized for `sqlparser`'s `CreateTable`.
-pub type ParserDB = GenericDB<CreateTable, CreateFunction>;
+pub type ParserDB = GenericDB<
+    CreateTable,
+    TableAttribute<CreateTable, ColumnDef>,
+    TableAttribute<CreateTable, UniqueConstraint>,
+    TableAttribute<CreateTable, ForeignKeyConstraint>,
+    CreateFunction,
+    TableAttribute<CreateTable, CheckConstraint>,
+>;
 
 impl ParserDB {
     /// Creates a new `ParserDB` from a vector of SQL statements and a catalog
@@ -38,7 +48,7 @@ impl ParserDB {
         for statement in statements {
             match statement {
                 Statement::CreateFunction(create_function) => {
-                    builder = builder.add_function(create_function, ());
+                    builder = builder.add_function(Rc::new(create_function), ());
                 }
                 Statement::CreateTable(create_table) => {
                     let create_table = Rc::new(create_table);

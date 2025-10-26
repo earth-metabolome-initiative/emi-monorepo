@@ -2,18 +2,27 @@
 
 use crate::{
     structs::GenericDB,
-    traits::{DatabaseLike, FunctionLike, TableLike},
+    traits::{
+        CheckConstraintLike, ColumnLike, DatabaseLike, ForeignKeyLike, FunctionLike, TableLike,
+        UniqueIndexLike,
+    },
 };
 
-impl<T, F> DatabaseLike for GenericDB<T, F>
+impl<T, C, U, F, Func, Ch> DatabaseLike for GenericDB<T, C, U, F, Func, Ch>
 where
-    T: TableLike<Database = Self>,
-    F: FunctionLike,
+    T: TableLike<DB = Self>,
+    C: ColumnLike<DB = Self>,
+    U: UniqueIndexLike<DB = Self>,
+    F: ForeignKeyLike<DB = Self>,
+    Func: FunctionLike<DB = Self>,
+    Ch: CheckConstraintLike,
 {
     type Table = T;
-    type Column = <T as TableLike>::Column;
-    type ForeignKey = <T as TableLike>::ForeignKey;
-    type Function = F;
+    type Column = C;
+    type ForeignKey = F;
+    type Function = Func;
+    type UniqueIndex = U;
+    type CheckConstraint = Ch;
 
     fn catalog_name(&self) -> &str {
         &self.catalog_name
@@ -40,13 +49,13 @@ where
     }
 
     fn functions(&self) -> impl Iterator<Item = &Self::Function> {
-        self.functions.iter().map(|(func, _)| func)
+        self.functions.iter().map(|(func, _)| func.as_ref())
     }
 
     fn function(&self, name: &str) -> Option<&Self::Function> {
         self.functions
             .binary_search_by(|(f, _)| f.name().cmp(name))
             .ok()
-            .map(|index| &self.functions[index].0)
+            .map(|index| self.functions[index].0.as_ref())
     }
 }

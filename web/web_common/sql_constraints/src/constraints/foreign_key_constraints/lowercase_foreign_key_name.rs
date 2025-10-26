@@ -22,13 +22,13 @@ use crate::{
 ///
 /// let constrainer: GenericConstrainer<ParserDB> = LowercaseForeignKeyName::default().into();
 ///
-/// let invalid_schema = ParserDB::from_sql("CREATE TABLE mytable (id INT, CONSTRAINT Fk FOREIGN KEY (id) REFERENCES other_table (id));").unwrap();
+/// let invalid_schema = ParserDB::try_from("CREATE TABLE mytable (id INT, CONSTRAINT Fk FOREIGN KEY (id) REFERENCES other_table (id));").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
-/// let valid_schema1 = ParserDB::from_sql("CREATE TABLE mytable (id INT, CONSTRAINT fk FOREIGN KEY (id) REFERENCES other_table (id));").unwrap();
+/// let valid_schema1 = ParserDB::try_from("CREATE TABLE mytable (id INT, CONSTRAINT fk FOREIGN KEY (id) REFERENCES other_table (id));").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema1).is_ok());
 ///
-/// let valid_schema2 = ParserDB::from_sql("CREATE TABLE mytable (id INT, FOREIGN KEY (id) REFERENCES other_table (id));").unwrap();
+/// let valid_schema2 = ParserDB::try_from("CREATE TABLE mytable (id INT, FOREIGN KEY (id) REFERENCES other_table (id));").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema2).is_ok());
 /// ```
 pub struct LowercaseForeignKeyName<C>(std::marker::PhantomData<C>);
@@ -48,14 +48,12 @@ impl<DB: DatabaseLike + 'static> From<LowercaseForeignKeyName<DB>> for GenericCo
 }
 
 impl<DB: DatabaseLike> ForeignKeyConstraint for LowercaseForeignKeyName<DB> {
-    type ForeignKey = DB::ForeignKey;
     type Database = DB;
-    type Table = DB::Table;
 
     fn validate_foreign_key(
         &self,
         _database: &Self::Database,
-        foreign_key: &Self::ForeignKey,
+        foreign_key: &<Self::Database as DatabaseLike>::ForeignKey,
     ) -> Result<(), crate::prelude::Error> {
         if let Some(name) = foreign_key.foreign_key_name() {
             if name.chars().any(|c| c.is_uppercase()) {

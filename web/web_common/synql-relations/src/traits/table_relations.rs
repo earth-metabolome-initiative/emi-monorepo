@@ -1,15 +1,16 @@
 //! Submodule providing the `TableRelationsLike` trait for SynQL table models.
 
 use syn::Ident;
-use synql_core::{
-    structs::{InternalDataRef, Workspace},
-    traits::TableSynLike,
-};
+use synql_core::structs::{InternalDataRef, Workspace};
+use synql_models::traits::TableModelLike;
 
 use crate::structs::TableRelations;
 
+/// Name of the module containing the trait for a table.
+pub const TRAIT_MODULE_NAME: &str = "relations";
+
 /// Trait representing a SynQL table model.
-pub trait TableRelationsLike: TableSynLike {
+pub trait TableRelationsLike: TableModelLike {
     /// Returns the name of the crate which will contain the trait
     /// `{TableName}Relations`.
     fn table_relations_crate_name(&self) -> String {
@@ -39,7 +40,7 @@ pub trait TableRelationsLike: TableSynLike {
     fn relations_trait<'table, 'data>(
         &'table self,
         workspace: &'table Workspace<'data>,
-        database: &'table Self::Database,
+        database: &'table Self::DB,
     ) -> TableRelations<'data, 'table, Self>
     where
         Self: 'data,
@@ -60,4 +61,4 @@ pub trait TableRelationsLike: TableSynLike {
     }
 }
 
-impl<T: TableSynLike> TableRelationsLike for T {}
+impl<T: TableModelLike> TableRelationsLike for T {}

@@ -39,7 +39,7 @@ pub trait SameAsIndexLike: UniqueIndexLike {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_same_as(&self, database: &Self::Database) -> bool {
+    fn is_same_as(&self, database: &Self::DB) -> bool {
         // Next, we retrieve the columns associated with the index.
         let columns = self.columns(database).collect::<Vec<_>>();
 

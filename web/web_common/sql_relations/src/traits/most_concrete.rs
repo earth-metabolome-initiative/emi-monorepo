@@ -14,10 +14,10 @@ pub trait InheritableDatabaseLike: DatabaseLike {
 /// i.e. a column indicating the most concrete table in an inheritance
 /// hierarchy.
 pub trait MostConcreteTableLike:
-    TableLike<Database = <Self as MostConcreteTableLike>::InheritableDatabase>
+    TableLike<DB = <Self as MostConcreteTableLike>::InheritableDatabase>
 {
     /// Type of the database the table belongs to.
-    type InheritableDatabase: InheritableDatabaseLike<Table = Self, Column = Self::Column>;
+    type InheritableDatabase: InheritableDatabaseLike<Table = Self>;
 
     /// Returns the column which indicates the most concrete table in an
     /// inheritance hierarchy, if any.
@@ -35,7 +35,7 @@ pub trait MostConcreteTableLike:
         &'db self,
         database: &'db Self::InheritableDatabase,
         recursive: bool,
-    ) -> Option<&'db Self::Column>
+    ) -> Option<&'db <Self::InheritableDatabase as DatabaseLike>::Column>
     where
         Self: 'db,
     {
@@ -56,7 +56,7 @@ pub trait MostConcreteTableLike:
 impl<T> MostConcreteTableLike for T
 where
     T: TableLike,
-    T::Database: InheritableDatabaseLike<Table = T, Column = T::Column>,
+    T::DB: InheritableDatabaseLike<Table = T>,
 {
-    type InheritableDatabase = T::Database;
+    type InheritableDatabase = T::DB;
 }

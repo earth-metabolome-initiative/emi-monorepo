@@ -2,11 +2,10 @@
 //! [`CreateTable`](sqlparser::ast::CreateTable) struct.
 
 use ::sqlparser::ast::{CreateTable, Ident};
-use sqlparser::ast::{CheckConstraint, ColumnDef, ForeignKeyConstraint, UniqueConstraint};
 
 use crate::{
-    structs::{TableMetadata, generic_db::ParserDB, metadata::TableAttribute},
-    traits::{Metadata, TableLike},
+    structs::{TableMetadata, generic_db::ParserDB},
+    traits::{DatabaseLike, Metadata, TableLike},
 };
 
 impl Metadata for CreateTable {
@@ -14,11 +13,7 @@ impl Metadata for CreateTable {
 }
 
 impl TableLike for CreateTable {
-    type Database = ParserDB;
-    type Column = TableAttribute<CreateTable, ColumnDef>;
-    type CheckConstraint = TableAttribute<CreateTable, CheckConstraint>;
-    type UniqueIndex = TableAttribute<CreateTable, UniqueConstraint>;
-    type ForeignKey = TableAttribute<CreateTable, ForeignKeyConstraint>;
+    type DB = ParserDB;
 
     fn table_name(&self) -> &str {
         let object_name_parts = &self.name.0;
@@ -29,7 +24,7 @@ impl TableLike for CreateTable {
         }
     }
 
-    fn table_doc<'db>(&'db self, _database: &'db Self::Database) -> Option<&'db str>
+    fn table_doc<'db>(&'db self, _database: &'db Self::DB) -> Option<&'db str>
     where
         Self: 'db,
     {
@@ -54,8 +49,8 @@ impl TableLike for CreateTable {
 
     fn columns<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::Column>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>
     where
         Self: 'db,
     {
@@ -64,8 +59,8 @@ impl TableLike for CreateTable {
 
     fn primary_key_columns<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::Column>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>
     where
         Self: 'db,
     {
@@ -74,8 +69,8 @@ impl TableLike for CreateTable {
 
     fn unique_indices<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::UniqueIndex>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::UniqueIndex>
     where
         Self: 'db,
     {
@@ -84,8 +79,8 @@ impl TableLike for CreateTable {
 
     fn check_constraints<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::CheckConstraint>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::CheckConstraint>
     where
         Self: 'db,
     {
@@ -94,8 +89,8 @@ impl TableLike for CreateTable {
 
     fn foreign_keys<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::ForeignKey>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey>
     where
         Self: 'db,
     {

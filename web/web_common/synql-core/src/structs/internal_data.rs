@@ -2,7 +2,10 @@
 
 mod builder;
 
-use std::{fmt::Debug, rc::Rc};
+use std::{
+    fmt::{Debug, Display},
+    rc::Rc,
+};
 
 pub use builder::InternalDataBuilder;
 use quote::{ToTokens, quote};
@@ -127,6 +130,11 @@ impl<'data> crate::traits::ExternalDependencies<'data> for DataVariantRef<'data>
 }
 
 impl<'data> DataVariantRef<'data> {
+    /// Creates a new generic `DataVariantRef`.
+    pub fn generic(ident: Ident) -> DataVariantRef<'data> {
+        DataVariantRef::Generic(ident)
+    }
+
     /// Returns whether the underlying variant supports the given trait.
     ///
     /// # Arguments
@@ -199,6 +207,14 @@ impl<'data> InternalDataRef<'data> {
     /// Returns the internal crate dependencies of the variant.
     pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
         vec![self.internal_crate.as_ref()]
+    }
+}
+
+impl Display for InternalDataRef<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let internal_crate_name = self.internal_crate.name();
+        let internal_data_name = self.data.name();
+        write!(f, "{internal_crate_name}::prelude::{internal_data_name}")
     }
 }
 

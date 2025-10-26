@@ -1,21 +1,16 @@
 //! Submodule providing the `HorizontalSameAsColumnLike` trait for working
 //! with columns that have horizontal same-as relationships.
 
-use sql_traits::traits::{ColumnLike, ForeignKeyLike};
+use std::borrow::Borrow;
+
+use sql_traits::traits::{ColumnLike, DatabaseLike, ForeignKeyLike};
 
 use crate::traits::HorizontalSameAsForeignKeyLike;
 /// Trait for tables which may include horizontal same-as relationships.
-pub trait HorizontalSameAsColumnLike:
-    ColumnLike<ForeignKey = <Self as HorizontalSameAsColumnLike>::HorizontalSameAsForeignKey>
+pub trait HorizontalSameAsColumnLike: ColumnLike
+where
+    <Self::DB as DatabaseLike>::ForeignKey: HorizontalSameAsForeignKeyLike<DB = Self::DB>,
 {
-    /// The type of the foreign keys in this table that may be horizontal
-    /// same-as relationships.
-    type HorizontalSameAsForeignKey: HorizontalSameAsForeignKeyLike<
-            Database = Self::Database,
-            Table = Self::Table,
-            Column = Self,
-        >;
-
     /// Returns an iterator over the horizontal same-as foreign keys in the host
     /// table that reference this column.
     ///
@@ -54,20 +49,19 @@ pub trait HorizontalSameAsColumnLike:
     /// ```
     fn horizontal_same_as_foreign_keys<'db>(
         &'db self,
-        database: &'db Self::Database,
-        host_table: &'db Self::Table,
-    ) -> impl Iterator<Item = &'db Self::HorizontalSameAsForeignKey> {
+        database: &'db Self::DB,
+        host_table: &'db <Self::DB as DatabaseLike>::Table,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey> {
         use crate::traits::same_as::HorizontalSameAsTableLike;
-        HorizontalSameAsTableLike::horizontal_same_as_foreign_keys(host_table, database)
-            .filter(move |fk| fk.host_columns(database).any(|col| col == self))
+        HorizontalSameAsTableLike::horizontal_same_as_foreign_keys(host_table, database).filter(
+            move |fk| fk.host_columns(database).map(Borrow::borrow).any(|col: &Self| col == self),
+        )
     }
 }
 
 impl<T> HorizontalSameAsColumnLike for T
 where
     T: ColumnLike,
-    T::ForeignKey:
-        HorizontalSameAsForeignKeyLike<Database = T::Database, Table = T::Table, Column = T>,
+    <T::DB as DatabaseLike>::ForeignKey: HorizontalSameAsForeignKeyLike<DB = T::DB>,
 {
-    type HorizontalSameAsForeignKey = T::ForeignKey;
 }

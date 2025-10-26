@@ -22,13 +22,13 @@ impl Metadata for PgProc {
 }
 
 impl FunctionLike for PgProc {
-    type Database = PgDatabase;
+    type DB = PgDatabase;
 
     fn name(&self) -> &str {
         &self.proname
     }
 
-    fn argument_type_names(&self, database: &Self::Database) -> Vec<String> {
+    fn argument_type_names(&self, database: &Self::DB) -> Vec<String> {
         database
             .function_metadata(self)
             .argument_types()
@@ -37,7 +37,7 @@ impl FunctionLike for PgProc {
             .collect()
     }
 
-    fn return_type_name(&self, database: &Self::Database) -> Option<String> {
+    fn return_type_name(&self, database: &Self::DB) -> Option<String> {
         database.function_metadata(self).return_type().map(|pg_type| pg_type.typname.clone())
     }
 }

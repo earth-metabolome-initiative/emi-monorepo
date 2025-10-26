@@ -4,11 +4,11 @@
 //! [`TableLike`](sql_traits::traits::TableLike) trait and the traits from the
 //! [`sql_relations`](sql_relations) crate.
 
-use sql_traits::traits::TableLike;
+use sql_traits::traits::{DatabaseLike, TableLike};
 use syn::Ident;
 
 use crate::{
-    traits::ColumnSynLike,
+    traits::{ColumnSynLike, ForeignKeySynLike},
     utils::{
         camel_case_name, is_reserved_rust_word, singular_camel_case_name, singular_snake_name,
         snake_case_name,
@@ -17,10 +17,11 @@ use crate::{
 
 /// Trait implemented by types that represent SQL tables and can be used to
 /// generate Rust code for them.
-pub trait TableSynLike: TableLike<Column = <Self as TableSynLike>::ColumnSyn> {
-    /// The type of columns associated with this table.
-    type ColumnSyn: ColumnSynLike<Database = Self::Database>;
-
+pub trait TableSynLike: TableLike
+where
+    <Self::DB as DatabaseLike>::Column: ColumnSynLike,
+    <Self::DB as DatabaseLike>::ForeignKey: ForeignKeySynLike,
+{
     /// Returns the snake-cased name of this table.
     ///
     /// # Example
@@ -205,7 +206,7 @@ pub trait TableSynLike: TableLike<Column = <Self as TableSynLike>::ColumnSyn> {
     /// Iterates over the identifiers of the primary key columns of this table.
     fn primary_key_idents<'db>(
         &'db self,
-        database: &'db Self::Database,
+        database: &'db Self::DB,
     ) -> impl Iterator<Item = Ident> + 'db {
         self.primary_key_columns(database).map(move |col| col.column_snake_ident())
     }
@@ -213,7 +214,7 @@ pub trait TableSynLike: TableLike<Column = <Self as TableSynLike>::ColumnSyn> {
 
 impl<T: TableLike> TableSynLike for T
 where
-    T::Column: ColumnSynLike<Database = T::Database>,
+    <T::DB as DatabaseLike>::Column: ColumnSynLike,
+    <T::DB as DatabaseLike>::ForeignKey: ForeignKeySynLike,
 {
-    type ColumnSyn = T::Column;
 }

@@ -25,7 +25,7 @@ use crate::{
 ///
 /// let constrainer: GenericConstrainer<ParserDB> = CompatibleForeignKey::default().into();
 ///
-/// let invalid_data_type = ParserDB::from_sql(
+/// let invalid_data_type = ParserDB::try_from(
 ///     r#"
 /// CREATE TABLE mytable (id INT PRIMARY KEY);
 /// CREATE TABLE othertable (id SMALLINT, CONSTRAINT fk FOREIGN KEY (id) REFERENCES mytable (id));
@@ -34,10 +34,11 @@ use crate::{
 /// .unwrap();
 /// assert!(constrainer.validate_schema(&invalid_data_type).is_err());
 ///
-/// let invalid_extension_dag = ParserDB::from_sql(
+/// let extension_dag = ParserDB::try_from(
 ///     r#"
-/// CREATE TABLE left_root (id INT PRIMARY KEY);
-/// CREATE TABLE right_root (id INT PRIMARY KEY);
+/// CREATE TABLE root (id SERIAL PRIMARY KEY);
+/// CREATE TABLE left_root (id INT PRIMARY KEY REFERENCES root (id));
+/// CREATE TABLE right_root (id INT PRIMARY KEY REFERENCES root (id));
 /// CREATE TABLE left_child (id INT PRIMARY KEY REFERENCES left_root (id));
 /// CREATE TABLE right_child (id INT PRIMARY KEY REFERENCES right_root (id));
 /// CREATE TABLE mytable (
@@ -49,13 +50,18 @@ use crate::{
 /// "#,
 /// )
 /// .unwrap();
-/// assert!(constrainer.validate_schema(&invalid_extension_dag).is_ok());
+/// assert!(constrainer.validate_schema(&extension_dag).is_ok());
 ///
-/// let valid_schema2 = ParserDB::from_sql(r#"
+/// let valid_schema2 = ParserDB::try_from(
+///     r#"
 /// CREATE TABLE root (id INT PRIMARY KEY);
-/// CREATE TABLE child1 (id INT PRIMARY KEY REFERENCES root (id));
-/// CREATE TABLE mytable (id INT PRIMARY KEY, other_id INT, CONSTRAINT fk FOREIGN KEY (other_id) REFERENCES child1 (id));
-/// "#).unwrap();
+/// CREATE TABLE child (id INT PRIMARY KEY REFERENCES root (id));
+/// CREATE TABLE mytable (id INT PRIMARY KEY, other_id INT REFERENCES child (id));
+/// "#,
+/// )
+/// .unwrap();
+///
+/// constrainer.validate_schema(&valid_schema2).unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema2).is_ok());
 /// ```
 pub struct CompatibleForeignKey<C>(std::marker::PhantomData<C>);
@@ -75,26 +81,19 @@ impl<DB: DatabaseLike + 'static> From<CompatibleForeignKey<DB>> for GenericConst
 }
 
 impl<DB: DatabaseLike> ForeignKeyConstraint for CompatibleForeignKey<DB> {
-    type ForeignKey = DB::ForeignKey;
     type Database = DB;
-    type Table = DB::Table;
 
     fn validate_foreign_key(
         &self,
         database: &Self::Database,
-        foreign_key: &Self::ForeignKey,
+        foreign_key: &<Self::Database as DatabaseLike>::ForeignKey,
     ) -> Result<(), crate::prelude::Error> {
         let host_table = foreign_key.host_table(database);
         let referenced_table = foreign_key.referenced_table(database);
         for (host_column, referenced_column) in
             foreign_key.host_columns(database).zip(foreign_key.referenced_columns(database))
         {
-            if !host_table.is_compatible_with(
-                database,
-                &host_column,
-                referenced_table,
-                &referenced_column,
-            ) {
+            if !host_column.is_compatible_with(database, &referenced_column) {
                 return Err(crate::error::Error::ForeignKey(
                     ConstraintErrorInfo::new()
                         .constraint("CompatibleForeignKey")

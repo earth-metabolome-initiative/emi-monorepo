@@ -2,19 +2,16 @@
 //! determining whether a foreign key relationship is an vertical same-as
 //! relationship.
 
-use sql_traits::traits::{ForeignKeyLike, TableLike};
+use sql_traits::traits::{DatabaseLike, ForeignKeyLike, TableLike};
 
 use crate::traits::same_as::same_as_index::SameAsIndexLike;
 
 /// Trait for foreign keys that can be checked for being vertical same-as
 /// relationships.
-pub trait VerticalSameAsForeignKeyLike:
-    ForeignKeyLike<UniqueIndex = <Self as VerticalSameAsForeignKeyLike>::SameAsIndex>
+pub trait VerticalSameAsForeignKeyLike: ForeignKeyLike
+where
+    <Self::DB as DatabaseLike>::UniqueIndex: SameAsIndexLike<DB = Self::DB>,
 {
-    /// The type of the same-as unique index, if this foreign key is an
-    /// vertical same-as relationship.
-    type SameAsIndex: SameAsIndexLike<Database = Self::Database, Table = Self::Table>;
-
     /// Returns whether this key column usage is an vertical same-as
     /// constraint.
     ///
@@ -59,7 +56,7 @@ pub trait VerticalSameAsForeignKeyLike:
     /// # Ok(())
     /// # }
     /// ```
-    fn is_vertical_same_as(&self, database: &Self::Database) -> bool {
+    fn is_vertical_same_as(&self, database: &Self::DB) -> bool {
         if !self.includes_host_primary_key(database) {
             return false;
         }
@@ -82,7 +79,6 @@ pub trait VerticalSameAsForeignKeyLike:
 impl<T> VerticalSameAsForeignKeyLike for T
 where
     T: ForeignKeyLike,
-    T::UniqueIndex: SameAsIndexLike,
+    <T::DB as DatabaseLike>::UniqueIndex: SameAsIndexLike<DB = T::DB>,
 {
-    type SameAsIndex = T::UniqueIndex;
 }

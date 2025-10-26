@@ -9,33 +9,45 @@ use common_traits::{
 
 use crate::{
     structs::GenericDB,
-    traits::{FunctionLike, Metadata, TableLike},
+    traits::{
+        CheckConstraintLike, ColumnLike, ForeignKeyLike, FunctionLike, TableLike, UniqueIndexLike,
+    },
 };
 
 /// Builder for constructing a `GenericDB` instance.
-pub struct GenericDBBuilder<T, F>
+pub struct GenericDBBuilder<T, C, U, F, Func, Ch>
 where
     T: TableLike,
-    F: FunctionLike,
+    C: ColumnLike,
+    U: UniqueIndexLike,
+    F: ForeignKeyLike,
+    Func: FunctionLike,
+    Ch: CheckConstraintLike,
 {
     /// Catalog name of the database.
     catalog_name: Option<String>,
     /// List of tables in the database.
     tables: Vec<(Rc<T>, T::Meta)>,
     /// List of columns in the database.
-    columns: Vec<(Rc<T::Column>, <T::Column as Metadata>::Meta)>,
+    columns: Vec<(Rc<C>, C::Meta)>,
     /// List of unique indices in the database.
-    unique_indices: Vec<(Rc<T::UniqueIndex>, <T::UniqueIndex as Metadata>::Meta)>,
+    unique_indices: Vec<(Rc<U>, U::Meta)>,
     /// List of foreign keys in the database.
-    foreign_keys: Vec<(Rc<T::ForeignKey>, <T::ForeignKey as Metadata>::Meta)>,
+    foreign_keys: Vec<(Rc<F>, F::Meta)>,
     /// List of functions created in the database.
-    functions: Vec<(F, <F as Metadata>::Meta)>,
+    functions: Vec<(Rc<Func>, Func::Meta)>,
+    /// Phantom data for check constraints.
+    _check_constraints: std::marker::PhantomData<Ch>,
 }
 
-impl<T, F> Default for GenericDBBuilder<T, F>
+impl<T, C, U, F, Func, Ch> Default for GenericDBBuilder<T, C, U, F, Func, Ch>
 where
     T: TableLike,
-    F: FunctionLike,
+    C: ColumnLike,
+    U: UniqueIndexLike,
+    F: ForeignKeyLike,
+    Func: FunctionLike,
+    Ch: CheckConstraintLike,
 {
     fn default() -> Self {
         Self {
@@ -45,6 +57,7 @@ where
             unique_indices: Vec::new(),
             foreign_keys: Vec::new(),
             functions: Vec::new(),
+            _check_constraints: std::marker::PhantomData,
         }
     }
 }
@@ -64,10 +77,14 @@ impl Display for GenericDBAttribute {
     }
 }
 
-impl<T, F> GenericDBBuilder<T, F>
+impl<T, C, U, F, Func, Ch> GenericDBBuilder<T, C, U, F, Func, Ch>
 where
     T: TableLike,
-    F: FunctionLike,
+    C: ColumnLike,
+    U: UniqueIndexLike,
+    F: ForeignKeyLike,
+    Func: FunctionLike,
+    Ch: CheckConstraintLike,
 {
     /// Creates a new `GenericDBBuilder` instance.
     pub fn new() -> Self {
@@ -93,30 +110,19 @@ where
     }
 
     /// Adds a column with its metadata to the builder.
-    pub fn add_column(
-        mut self,
-        column: Rc<T::Column>,
-        metadata: <T::Column as Metadata>::Meta,
-    ) -> Self {
+    pub fn add_column(mut self, column: Rc<C>, metadata: C::Meta) -> Self {
         self.columns.push((column, metadata));
         self
     }
 
     /// Adds multiple columns with their metadata to the builder.
-    pub fn add_columns(
-        mut self,
-        columns: impl IntoIterator<Item = (Rc<T::Column>, <T::Column as Metadata>::Meta)>,
-    ) -> Self {
+    pub fn add_columns(mut self, columns: impl IntoIterator<Item = (Rc<C>, C::Meta)>) -> Self {
         self.columns.extend(columns);
         self
     }
 
     /// Adds a unique index with its metadata to the builder.
-    pub fn add_unique_index(
-        mut self,
-        index: Rc<T::UniqueIndex>,
-        metadata: <T::UniqueIndex as Metadata>::Meta,
-    ) -> Self {
+    pub fn add_unique_index(mut self, index: Rc<U>, metadata: U::Meta) -> Self {
         self.unique_indices.push((index, metadata));
         self
     }
@@ -124,33 +130,26 @@ where
     /// Adds multiple unique indices with their metadata to the builder.
     pub fn add_unique_indices(
         mut self,
-        indices: impl IntoIterator<Item = (Rc<T::UniqueIndex>, <T::UniqueIndex as Metadata>::Meta)>,
+        indices: impl IntoIterator<Item = (Rc<U>, U::Meta)>,
     ) -> Self {
         self.unique_indices.extend(indices);
         self
     }
 
     /// Adds a foreign key with its metadata to the builder.
-    pub fn add_foreign_key(
-        mut self,
-        key: Rc<T::ForeignKey>,
-        metadata: <T::ForeignKey as Metadata>::Meta,
-    ) -> Self {
+    pub fn add_foreign_key(mut self, key: Rc<F>, metadata: F::Meta) -> Self {
         self.foreign_keys.push((key, metadata));
         self
     }
 
     /// Adds multiple foreign keys with their metadata to the builder.
-    pub fn add_foreign_keys(
-        mut self,
-        keys: impl IntoIterator<Item = (Rc<T::ForeignKey>, <T::ForeignKey as Metadata>::Meta)>,
-    ) -> Self {
+    pub fn add_foreign_keys(mut self, keys: impl IntoIterator<Item = (Rc<F>, F::Meta)>) -> Self {
         self.foreign_keys.extend(keys);
         self
     }
 
     /// Adds a function with its metadata to the builder.
-    pub fn add_function(mut self, function: F, metadata: <F as Metadata>::Meta) -> Self {
+    pub fn add_function(mut self, function: Rc<Func>, metadata: Func::Meta) -> Self {
         self.functions.push((function, metadata));
         self
     }
@@ -158,38 +157,50 @@ where
     /// Adds multiple functions with their metadata to the builder.
     pub fn add_functions(
         mut self,
-        functions: impl IntoIterator<Item = (F, <F as Metadata>::Meta)>,
+        functions: impl IntoIterator<Item = (Rc<Func>, Func::Meta)>,
     ) -> Self {
         self.functions.extend(functions);
         self
     }
 }
 
-impl<T, F> Attributed for GenericDBBuilder<T, F>
+impl<T, C, U, F, Func, Ch> Attributed for GenericDBBuilder<T, C, U, F, Func, Ch>
 where
     T: TableLike,
-    F: FunctionLike,
+    C: ColumnLike,
+    U: UniqueIndexLike,
+    F: ForeignKeyLike,
+    Func: FunctionLike,
+    Ch: CheckConstraintLike,
 {
     type Attribute = GenericDBAttribute;
 }
 
-impl<T, F> IsCompleteBuilder for GenericDBBuilder<T, F>
+impl<T, C, U, F, Func, Ch> IsCompleteBuilder for GenericDBBuilder<T, C, U, F, Func, Ch>
 where
     T: TableLike,
-    F: FunctionLike,
+    C: ColumnLike,
+    U: UniqueIndexLike,
+    F: ForeignKeyLike,
+    Func: FunctionLike,
+    Ch: CheckConstraintLike,
 {
     fn is_complete(&self) -> bool {
         self.catalog_name.is_some()
     }
 }
 
-impl<T, F> Builder for GenericDBBuilder<T, F>
+impl<T, C, U, F, Func, Ch> Builder for GenericDBBuilder<T, C, U, F, Func, Ch>
 where
     T: TableLike,
-    F: FunctionLike,
+    C: ColumnLike,
+    U: UniqueIndexLike,
+    F: ForeignKeyLike,
+    Func: FunctionLike,
+    Ch: CheckConstraintLike,
 {
     type Error = BuilderError<GenericDBAttribute>;
-    type Object = GenericDB<T, F>;
+    type Object = GenericDB<T, C, U, F, Func, Ch>;
 
     fn build(mut self) -> Result<Self::Object, Self::Error> {
         let catalog_name = self
@@ -212,6 +223,7 @@ where
             unique_indices: self.unique_indices,
             foreign_keys: self.foreign_keys,
             functions: self.functions,
+            _check_constraints: std::marker::PhantomData,
         })
     }
 }

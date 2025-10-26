@@ -122,7 +122,7 @@ pub trait ColumnSynLike: ColumnLike {
     fn external_postgres_type<'workspace, 'data>(
         &self,
         workspace: &'workspace Workspace<'data>,
-        database: &Self::Database,
+        database: &Self::DB,
     ) -> Option<ExternalTypeRef<'data>> {
         workspace.external_postgres_type(&self.normalized_data_type(database))
     }
@@ -131,7 +131,7 @@ pub trait ColumnSynLike: ColumnLike {
     fn diesel_type<'workspace, 'data>(
         &self,
         workspace: &'workspace Workspace<'data>,
-        database: &Self::Database,
+        database: &Self::DB,
     ) -> Option<Type> {
         let external_type = self.external_postgres_type(workspace, database)?;
         let diesel_type = external_type.diesel_type();
@@ -146,7 +146,7 @@ pub trait ColumnSynLike: ColumnLike {
     fn rust_type<'workspace, 'data>(
         &self,
         workspace: &'workspace Workspace<'data>,
-        database: &Self::Database,
+        database: &Self::DB,
     ) -> Option<Type> {
         let external_type = self.external_postgres_type(workspace, database)?;
         let rust_type = external_type.rust_type();

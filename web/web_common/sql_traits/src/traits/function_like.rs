@@ -1,11 +1,13 @@
 //! Submodule providing a trait for describing SQL Function-like entities.
 
+use std::{fmt::Debug, hash::Hash};
+
 use crate::traits::{DatabaseLike, Metadata};
 
 /// A trait for describing SQL Function-like entities.
-pub trait FunctionLike: Metadata {
+pub trait FunctionLike: Metadata + Debug + Clone + Hash + Ord + Eq {
     /// The associated database type.
-    type Database: DatabaseLike<Function = Self>;
+    type DB: DatabaseLike<Function = Self>;
 
     /// The name of the function.
     ///
@@ -48,7 +50,7 @@ pub trait FunctionLike: Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn argument_type_names(&self, database: &Self::Database) -> Vec<String>;
+    fn argument_type_names(&self, database: &Self::DB) -> Vec<String>;
 
     /// Returns the return type name of the function as a string.
     ///
@@ -74,5 +76,5 @@ pub trait FunctionLike: Metadata {
     /// # Ok(())
     /// # }
     /// ```
-    fn return_type_name(&self, database: &Self::Database) -> Option<String>;
+    fn return_type_name(&self, database: &Self::DB) -> Option<String>;
 }

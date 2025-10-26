@@ -1,19 +1,19 @@
 //! Submodule providing the `VerticalSameAsColumnLike` trait for working
 //! with columns that have vertical same-as relationships.
 
-use std::collections::{HashMap, HashSet};
+use std::{
+    borrow::Borrow,
+    collections::{HashMap, HashSet},
+};
 
-use sql_traits::traits::{ColumnLike, ForeignKeyLike, TableLike};
+use sql_traits::traits::{ColumnLike, DatabaseLike, ForeignKeyLike, TableLike};
 
 use crate::traits::VerticalSameAsForeignKeyLike;
 /// Trait for tables which may include vertical same-as relationships.
-pub trait VerticalSameAsColumnLike:
-    ColumnLike<ForeignKey = <Self as VerticalSameAsColumnLike>::VerticalSameAsForeignKey>
+pub trait VerticalSameAsColumnLike: ColumnLike
+where
+    <Self::DB as DatabaseLike>::ForeignKey: VerticalSameAsForeignKeyLike<DB = Self::DB>,
 {
-    /// The type of the foreign keys in this table that may be vertical same-as
-    /// relationships.
-    type VerticalSameAsForeignKey: VerticalSameAsForeignKeyLike<Database = Self::Database, Table = Self::Table, Column = Self>;
-
     /// Returns an iterator over the vertical same-as foreign keys in the host
     /// table that reference this column.
     ///
@@ -49,12 +49,12 @@ pub trait VerticalSameAsColumnLike:
     /// ```
     fn vertical_same_as_foreign_keys<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::VerticalSameAsForeignKey> {
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey> {
         use crate::traits::same_as::vertical_same_as::vertical_same_as_table::VerticalSameAsTableLike;
-        self.table(database)
-            .vertical_same_as_foreign_keys(database)
-            .filter(move |fk| fk.host_columns(database).any(|col| col == self))
+        self.table(database).vertical_same_as_foreign_keys(database).filter(move |fk| {
+            fk.host_columns(database).map(Borrow::borrow).any(|col: &Self| col == self)
+        })
     }
 
     /// Returns the set of columns that are directly vertically same-as this
@@ -93,9 +93,12 @@ pub trait VerticalSameAsColumnLike:
     /// # Ok(())
     /// # }
     /// ```
-    fn vertical_same_as_columns<'db>(&'db self, database: &'db Self::Database) -> Vec<&'db Self> {
+    fn vertical_same_as_columns<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> Vec<&'db <Self::DB as DatabaseLike>::Column> {
         self.vertical_same_as_foreign_keys(database)
-            .map(|fk| fk.referenced_column_for_host_column(database, self))
+            .map(|fk| fk.referenced_column_for_host_column(database, self.borrow()))
             .collect()
     }
 
@@ -142,12 +145,14 @@ pub trait VerticalSameAsColumnLike:
     /// ```
     fn vertical_same_as_reachable_set<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> HashSet<&'db Self> {
+        database: &'db Self::DB,
+    ) -> HashSet<&'db <Self::DB as DatabaseLike>::Column> {
         let mut reachable_set = HashSet::new();
-        for vertical_same_as_foreign_key in self.vertical_same_as_foreign_keys(database) {
-            let same_as_column =
-                vertical_same_as_foreign_key.referenced_column_for_host_column(database, self);
+        for vertical_same_as_foreign_key in
+            self.vertical_same_as_foreign_keys(database).map(Borrow::borrow)
+        {
+            let same_as_column = vertical_same_as_foreign_key
+                .referenced_column_for_host_column(database, self.borrow());
             reachable_set.extend(same_as_column.vertical_same_as_reachable_set(database));
             reachable_set.insert(same_as_column);
         }
@@ -195,35 +200,42 @@ pub trait VerticalSameAsColumnLike:
     /// # Ok(())
     /// # }
     /// ```
-    fn dominant_vertical_same_as_columns<'db>(
-        &'db self,
-        database: &'db Self::Database,
-    ) -> Vec<&'db Self>
+    fn dominant_vertical_same_as_columns<'db>(&'db self, database: &'db Self::DB) -> Vec<&'db Self>
     where
         Self: 'db,
     {
-        let mut reachable_set = self.vertical_same_as_reachable_set(database);
+        let mut reachable_set: HashSet<&Self> =
+            self.vertical_same_as_reachable_set(database).into_iter().map(Borrow::borrow).collect();
         // The frontier contains the set of columns which so far can only be reached
         // from the current column. Once a column in the frontier is found to be
         // reachable from another column in the reachable set, it is marked as true
         // and will not be used to expand the reachable set anymore.
-        let mut frontier: HashMap<&Self, bool> =
-            self.vertical_same_as_columns(database).into_iter().map(|c| (c, false)).collect();
-        let table = self.table(database);
-        let vertical_extension_tables = table.ancestral_extended_tables(database);
+        let mut frontier: HashMap<&Self, bool> = self
+            .vertical_same_as_columns(database)
+            .into_iter()
+            .map(Borrow::borrow)
+            .map(|c| (c, false))
+            .collect();
+        let table: &<Self::DB as DatabaseLike>::Table = self.table(database);
+        let vertical_extension_tables: Vec<&<Self::DB as DatabaseLike>::Table> =
+            table.ancestral_extended_tables(database);
         let mut changed = true;
 
         while changed {
             changed = false;
             for ancestor in vertical_extension_tables.iter() {
                 for ancestor_column in ancestor.columns(database) {
+                    let ancestor_column: &Self = ancestor_column.borrow();
                     // If the ancestor node is already in the reachable set, skip it.
                     if reachable_set.contains(ancestor_column) {
                         continue;
                     }
 
-                    let ancestor_reachable_set =
-                        ancestor_column.vertical_same_as_reachable_set(database);
+                    let ancestor_reachable_set: HashSet<&Self> = ancestor_column
+                        .vertical_same_as_reachable_set(database)
+                        .into_iter()
+                        .map(Borrow::borrow)
+                        .collect();
 
                     // We update the frontier to mark as true columns which we have now discovered
                     // can be reached also from this ancestor column.
@@ -265,8 +277,6 @@ pub trait VerticalSameAsColumnLike:
 impl<T> VerticalSameAsColumnLike for T
 where
     T: ColumnLike,
-    T::ForeignKey:
-        VerticalSameAsForeignKeyLike<Database = T::Database, Table = T::Table, Column = T>,
+    <T::DB as DatabaseLike>::ForeignKey: VerticalSameAsForeignKeyLike<DB = T::DB>,
 {
-    type VerticalSameAsForeignKey = T::ForeignKey;
 }

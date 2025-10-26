@@ -20,11 +20,9 @@ pub trait AuthoredDatabaseLike: DatabaseLike {
 /// Trait characterizing whether a table has an author column,
 /// i.e. a column indicating who created a row in this table,
 /// and related columns.
-pub trait AuthoredTableLike:
-    TableLike<Database = <Self as AuthoredTableLike>::AuthoredDatabase>
-{
+pub trait AuthoredTableLike: TableLike<DB = <Self as AuthoredTableLike>::AuthoredDatabase> {
     /// Type of the database the table belongs to.
-    type AuthoredDatabase: AuthoredDatabaseLike<Table = Self, Column = Self::Column>;
+    type AuthoredDatabase: AuthoredDatabaseLike<Table = Self>;
 
     /// Returns the column which indicates who created a row in this table, if
     /// any.
@@ -38,7 +36,7 @@ pub trait AuthoredTableLike:
         &'db self,
         database: &'db Self::AuthoredDatabase,
         recursive: bool,
-    ) -> Option<&'db Self::Column>
+    ) -> Option<&'db <Self::AuthoredDatabase as DatabaseLike>::Column>
     where
         Self: 'db,
     {
@@ -71,7 +69,7 @@ pub trait AuthoredTableLike:
         &'db self,
         database: &'db Self::AuthoredDatabase,
         recursive: bool,
-    ) -> Option<&'db Self::Column>
+    ) -> Option<&'db <Self::AuthoredDatabase as DatabaseLike>::Column>
     where
         Self: 'db,
     {

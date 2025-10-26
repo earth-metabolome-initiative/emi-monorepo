@@ -15,22 +15,14 @@
 
 use sql_traits::traits::{Metadata, TableLike};
 
-use crate::{
-    PgDatabase,
-    model_metadata::TableMetadata,
-    models::{CheckConstraint, Column, KeyColumnUsage, PgIndex},
-};
+use crate::{PgDatabase, model_metadata::TableMetadata};
 
 impl Metadata for crate::models::Table {
     type Meta = TableMetadata;
 }
 
 impl TableLike for crate::models::Table {
-    type Column = Column;
-    type CheckConstraint = CheckConstraint;
-    type ForeignKey = KeyColumnUsage;
-    type UniqueIndex = PgIndex;
-    type Database = PgDatabase;
+    type DB = PgDatabase;
 
     fn table_name(&self) -> &str {
         &self.table_name
@@ -40,7 +32,7 @@ impl TableLike for crate::models::Table {
         Some(&self.table_schema)
     }
 
-    fn table_doc<'db>(&'db self, database: &'db Self::Database) -> Option<&'db str>
+    fn table_doc<'db>(&'db self, database: &'db Self::DB) -> Option<&'db str>
     where
         Self: 'db,
     {
@@ -49,8 +41,8 @@ impl TableLike for crate::models::Table {
 
     fn columns<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::Column>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::traits::DatabaseLike>::Column>
     where
         Self: 'db,
     {
@@ -59,8 +51,8 @@ impl TableLike for crate::models::Table {
 
     fn primary_key_columns<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::Column>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::traits::DatabaseLike>::Column>
     where
         Self: 'db,
     {
@@ -69,8 +61,8 @@ impl TableLike for crate::models::Table {
 
     fn foreign_keys<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::ForeignKey>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::traits::DatabaseLike>::ForeignKey>
     where
         Self: 'db,
     {
@@ -79,8 +71,8 @@ impl TableLike for crate::models::Table {
 
     fn check_constraints<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::CheckConstraint>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::traits::DatabaseLike>::CheckConstraint>
     where
         Self: 'db,
     {
@@ -89,8 +81,8 @@ impl TableLike for crate::models::Table {
 
     fn unique_indices<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::UniqueIndex>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::traits::DatabaseLike>::UniqueIndex>
     where
         Self: 'db,
     {

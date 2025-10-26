@@ -1,6 +1,8 @@
 //! Submodule providing the `Argument` struct which represents a rust method
 //! argument.
 
+mod builder;
+pub use builder::{ArgumentAttribute, ArgumentBuilder, ArgumentBuilderError};
 use quote::ToTokens;
 
 use crate::{
@@ -19,6 +21,20 @@ pub struct Argument<'data> {
     mutable: bool,
     /// Documentation of the argument.
     documentation: Option<String>,
+}
+
+impl Argument<'_> {
+    /// Returns the name of the argument.
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+}
+
+impl<'data> Argument<'data> {
+    /// Initializes a new `ArgumentBuilder`.
+    pub fn new() -> ArgumentBuilder<'data> {
+        ArgumentBuilder::default()
+    }
 }
 
 impl ToTokens for Argument<'_> {

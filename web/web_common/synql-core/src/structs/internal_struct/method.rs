@@ -1,11 +1,13 @@
 //! Submodule providing the `Method` struct which represents a rust method.
 
 mod argument;
+mod builder;
 mod where_clause;
-pub use argument::Argument;
+pub use argument::{Argument, ArgumentAttribute, ArgumentBuilder, ArgumentBuilderError};
+pub use builder::{MethodAttribute, MethodBuilder, MethodBuilderError};
 use quote::ToTokens;
 use syn::Ident;
-pub use where_clause::WhereClause;
+pub use where_clause::{WhereClause, WhereClauseAttribute, WhereClauseBuilder};
 
 use crate::{
     structs::{InternalToken, Publicness, internal_data::DataVariantRef},
@@ -39,6 +41,13 @@ impl Method<'_> {
     /// Returns the name of the method.
     pub fn name(&self) -> &str {
         &self.name
+    }
+}
+
+impl<'data> Method<'data> {
+    /// Initializes a new `MethodBuilder`.
+    pub fn new() -> MethodBuilder<'data> {
+        MethodBuilder::default()
     }
 }
 

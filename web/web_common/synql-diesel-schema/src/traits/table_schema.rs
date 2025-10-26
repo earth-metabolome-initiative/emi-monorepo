@@ -63,7 +63,7 @@ pub trait TableSchema: TableSynLike + Sized {
     fn schema_macro<'data, 'table>(
         &'table self,
         workspace: &'table Workspace<'data>,
-        database: &'table Self::Database,
+        database: &'table Self::DB,
     ) -> SchemaMacro<'data, 'table, Self>
     where
         Self: 'data,

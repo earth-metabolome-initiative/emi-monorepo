@@ -4,7 +4,7 @@ use std::rc::Rc;
 
 use sqlparser::ast::Expr;
 
-use crate::traits::UniqueIndexLike;
+use crate::traits::{DatabaseLike, UniqueIndexLike};
 
 #[derive(Debug, Clone)]
 /// Struct collecting metadata about a unique index.
@@ -12,12 +12,12 @@ pub struct UniqueIndexMetadata<U: UniqueIndexLike> {
     /// The expression defining the index.
     expression: Expr,
     /// The table on which the index is defined.
-    table: Rc<U::Table>,
+    table: Rc<<U::DB as DatabaseLike>::Table>,
 }
 
 impl<U: UniqueIndexLike> UniqueIndexMetadata<U> {
     /// Creates a new `UniqueIndexMetadata` instance.
-    pub fn new(expression: Expr, table: Rc<U::Table>) -> Self {
+    pub fn new(expression: Expr, table: Rc<<U::DB as DatabaseLike>::Table>) -> Self {
         Self { expression, table }
     }
 
@@ -27,7 +27,7 @@ impl<U: UniqueIndexLike> UniqueIndexMetadata<U> {
     }
 
     /// Returns a reference to the table on which the index is defined.
-    pub fn table(&self) -> &U::Table {
+    pub fn table(&self) -> &<U::DB as DatabaseLike>::Table {
         &self.table
     }
 }

@@ -1,5 +1,7 @@
 //! Submodule defining a `WhereClause` struct.
 
+mod builder;
+pub use builder::{WhereClauseAttribute, WhereClauseBuilder};
 use quote::ToTokens;
 
 use crate::structs::InternalToken;
@@ -11,6 +13,13 @@ pub struct WhereClause<'data> {
     left: InternalToken<'data>,
     /// Right-hand side of the where clause.
     right: InternalToken<'data>,
+}
+
+impl<'data> WhereClause<'data> {
+    /// Initializes a new `WhereClauseBuilder`.
+    pub fn new() -> WhereClauseBuilder<'data> {
+        WhereClauseBuilder::default()
+    }
 }
 
 impl ToTokens for WhereClause<'_> {

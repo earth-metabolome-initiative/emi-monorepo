@@ -1,5 +1,7 @@
 //! Submodule providing a trait for describing SQL Database-like entities.
 
+use std::{borrow::Borrow, fmt::Debug};
+
 use algebra::{
     impls::CSR2D,
     prelude::{Kahn, SquareCSR2D},
@@ -7,18 +9,24 @@ use algebra::{
 use common_traits::builder::Builder;
 use graph::{prelude::GenericEdgesBuilder, traits::EdgesBuilder};
 
-use crate::traits::{ColumnLike, ForeignKeyLike, FunctionLike, TableLike};
+use crate::traits::{
+    CheckConstraintLike, ColumnLike, ForeignKeyLike, FunctionLike, TableLike, UniqueIndexLike,
+};
 
 /// A trait for types that can be treated as SQL databases.
-pub trait DatabaseLike {
+pub trait DatabaseLike: Clone + Debug {
     /// Type of the tables in the schema.
-    type Table: TableLike<Column = Self::Column, Database = Self, ForeignKey = Self::ForeignKey>;
+    type Table: TableLike<DB = Self>;
     /// Type of the columns in the schema.
-    type Column: ColumnLike;
+    type Column: ColumnLike<DB = Self>;
     /// Type of the foreign keys in the schema.
-    type ForeignKey: ForeignKeyLike<Table = Self::Table, Column = Self::Column, Database = Self>;
+    type ForeignKey: ForeignKeyLike<DB = Self>;
     /// Type of the functions in the schema.
     type Function: FunctionLike;
+    /// Type of the unique indexes in the schema.
+    type UniqueIndex: UniqueIndexLike<DB = Self>;
+    /// Type of the check constraints in the schema.
+    type CheckConstraint: CheckConstraintLike;
 
     /// Returns the name of the database.
     fn catalog_name(&self) -> &str;
@@ -59,8 +67,9 @@ pub trait DatabaseLike {
                 let tables_ref = tables.as_slice();
                 table
                     .foreign_keys(self)
+                    .map(Borrow::borrow)
                     .filter_map(move |fk| {
-                        let referenced_table = fk.referenced_table(self);
+                        let referenced_table = fk.referenced_table(self).borrow();
                         // We ignore self-references to avoid cycles in the DAG.
                         if referenced_table == *table {
                             return None;

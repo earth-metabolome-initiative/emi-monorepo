@@ -8,3 +8,5 @@ mod external_dependencies;
 pub use external_dependencies::ExternalDependencies;
 mod internal_dependencies;
 pub use internal_dependencies::InternalDependencies;
+mod foreign_key;
+pub use foreign_key::ForeignKeySynLike;

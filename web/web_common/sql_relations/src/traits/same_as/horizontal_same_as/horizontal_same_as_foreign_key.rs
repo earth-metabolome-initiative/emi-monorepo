@@ -51,7 +51,7 @@ pub trait HorizontalSameAsForeignKeyLike: VerticalSameAsForeignKeyLike {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_horizontal_same_as(&self, database: &Self::Database) -> bool {
+    fn is_horizontal_same_as(&self, database: &Self::DB) -> bool {
         let Some(unique_index) = self.is_referenced_unique_key(database) else {
             return false;
         };

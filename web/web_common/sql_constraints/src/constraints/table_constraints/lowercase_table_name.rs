@@ -21,10 +21,10 @@ use crate::{
 ///
 /// let constrainer: GenericConstrainer<ParserDB> = LowercaseTableName::default().into();
 ///
-/// let invalid_schema = ParserDB::from_sql("CREATE TABLE MyTable (id INT);").unwrap();
+/// let invalid_schema = ParserDB::try_from("CREATE TABLE MyTable (id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
-/// let valid_schema = ParserDB::from_sql("CREATE TABLE mytable (id INT);").unwrap();
+/// let valid_schema = ParserDB::try_from("CREATE TABLE mytable (id INT);").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 /// ```
 pub struct LowercaseTableName<DB>(std::marker::PhantomData<DB>);
@@ -44,11 +44,11 @@ impl<DB: DatabaseLike + 'static> From<LowercaseTableName<DB>> for GenericConstra
 }
 
 impl<DB: DatabaseLike> TableConstraint for LowercaseTableName<DB> {
-    type Table = DB::Table;
     type Database = DB;
+
     fn table_error_information(
         &self,
-        context: &Self::Table,
+        context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         ConstraintErrorInfo::new()
             .constraint("LowercaseTableName")
@@ -67,7 +67,7 @@ impl<DB: DatabaseLike> TableConstraint for LowercaseTableName<DB> {
     fn validate_table(
         &self,
         _database: &Self::Database,
-        table: &Self::Table,
+        table: &<Self::Database as DatabaseLike>::Table,
     ) -> Result<(), crate::error::Error> {
         if table.table_name().chars().all(|c| !c.is_alphabetic() || c.is_lowercase()) {
             Ok(())

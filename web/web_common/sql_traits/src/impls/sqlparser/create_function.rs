@@ -13,7 +13,7 @@ impl Metadata for CreateFunction {
 }
 
 impl FunctionLike for CreateFunction {
-    type Database = ParserDB;
+    type DB = ParserDB;
 
     fn name(&self) -> &str {
         match self.name.0.last() {
@@ -23,7 +23,7 @@ impl FunctionLike for CreateFunction {
         }
     }
 
-    fn argument_type_names(&self, _database: &Self::Database) -> Vec<String> {
+    fn argument_type_names(&self, _database: &Self::DB) -> Vec<String> {
         let Some(args_list) = &self.args else {
             return Vec::new();
         };
@@ -34,7 +34,7 @@ impl FunctionLike for CreateFunction {
         args
     }
 
-    fn return_type_name(&self, _database: &Self::Database) -> Option<String> {
+    fn return_type_name(&self, _database: &Self::DB) -> Option<String> {
         self.return_type.as_ref().map(|rt| rt.to_string())
     }
 }

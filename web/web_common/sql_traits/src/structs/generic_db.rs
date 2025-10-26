@@ -4,41 +4,95 @@ mod builder;
 mod database;
 mod sqlparser;
 
-use std::rc::Rc;
+use std::{fmt::Debug, rc::Rc};
 
 pub use builder::GenericDBBuilder;
 pub use sqlparser::ParserDB;
 
-use crate::traits::{FunctionLike, Metadata, TableLike};
+use crate::traits::{
+    CheckConstraintLike, ColumnLike, ForeignKeyLike, FunctionLike, TableLike, UniqueIndexLike,
+};
 
-#[derive(Debug, Clone)]
 /// A generic representation of a database schema.
-pub struct GenericDB<T, F>
+pub struct GenericDB<T, C, U, F, Func, Ch>
 where
     T: TableLike,
-    F: FunctionLike,
+    C: ColumnLike,
+    U: UniqueIndexLike,
+    F: ForeignKeyLike,
+    Func: FunctionLike,
+    Ch: CheckConstraintLike,
 {
     /// Catalog name of the database.
     catalog_name: String,
     /// List of tables in the database.
     tables: Vec<(Rc<T>, T::Meta)>,
     /// List of columns in the database.
-    columns: Vec<(Rc<T::Column>, <T::Column as Metadata>::Meta)>,
+    columns: Vec<(Rc<C>, C::Meta)>,
     /// List of unique indices in the database.
-    unique_indices: Vec<(Rc<T::UniqueIndex>, <T::UniqueIndex as Metadata>::Meta)>,
+    unique_indices: Vec<(Rc<U>, U::Meta)>,
     /// List of foreign keys in the database.
-    foreign_keys: Vec<(Rc<T::ForeignKey>, <T::ForeignKey as Metadata>::Meta)>,
-    /// List of functions crated in the database.
-    functions: Vec<(F, <F as Metadata>::Meta)>,
+    foreign_keys: Vec<(Rc<F>, F::Meta)>,
+    /// List of functions created in the database.
+    functions: Vec<(Rc<Func>, Func::Meta)>,
+    /// Phantom data for check constraints.
+    _check_constraints: std::marker::PhantomData<Ch>,
 }
 
-impl<T, F> GenericDB<T, F>
+impl<T, C, U, F, Func, Ch> Debug for GenericDB<T, C, U, F, Func, Ch>
 where
     T: TableLike,
-    F: FunctionLike,
+    C: ColumnLike,
+    U: UniqueIndexLike,
+    F: ForeignKeyLike,
+    Func: FunctionLike,
+    Ch: CheckConstraintLike,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("GenericDB")
+            .field("catalog_name", &self.catalog_name)
+            .field("tables", &self.tables.len())
+            .field("columns", &self.columns.len())
+            .field("unique_indices", &self.unique_indices.len())
+            .field("foreign_keys", &self.foreign_keys.len())
+            .field("functions", &self.functions.len())
+            .finish()
+    }
+}
+
+impl<T, C, U, F, Func, Ch> Clone for GenericDB<T, C, U, F, Func, Ch>
+where
+    T: TableLike,
+    C: ColumnLike,
+    U: UniqueIndexLike,
+    F: ForeignKeyLike,
+    Func: FunctionLike,
+    Ch: CheckConstraintLike,
+{
+    fn clone(&self) -> Self {
+        Self {
+            catalog_name: self.catalog_name.clone(),
+            tables: self.tables.clone(),
+            columns: self.columns.clone(),
+            unique_indices: self.unique_indices.clone(),
+            foreign_keys: self.foreign_keys.clone(),
+            functions: self.functions.clone(),
+            _check_constraints: std::marker::PhantomData,
+        }
+    }
+}
+
+impl<T, C, U, F, Func, Ch> GenericDB<T, C, U, F, Func, Ch>
+where
+    T: TableLike,
+    C: ColumnLike,
+    U: UniqueIndexLike,
+    F: ForeignKeyLike,
+    Func: FunctionLike,
+    Ch: CheckConstraintLike,
 {
     /// Creates a new `GenericDBBuilder` instance.
-    pub fn new() -> GenericDBBuilder<T, F> {
+    pub fn new() -> GenericDBBuilder<T, C, U, F, Func, Ch> {
         GenericDBBuilder::default()
     }
 
@@ -54,7 +108,7 @@ where
     }
 
     /// Returns a reference to the metadata of the specified column.
-    pub fn column_metadata(&self, column: &T::Column) -> &<T::Column as Metadata>::Meta {
+    pub fn column_metadata(&self, column: &C) -> &C::Meta {
         self.columns
             .binary_search_by(|(c, _)| c.as_ref().cmp(column))
             .map(|index| &self.columns[index].1)
@@ -62,7 +116,7 @@ where
     }
 
     /// Returns a reference to the metadata of the specified unique index.
-    pub fn index_metadata(&self, index: &T::UniqueIndex) -> &<T::UniqueIndex as Metadata>::Meta {
+    pub fn index_metadata(&self, index: &U) -> &U::Meta {
         self.unique_indices
             .binary_search_by(|(i, _)| i.as_ref().cmp(index))
             .map(|index| &self.unique_indices[index].1)
@@ -70,7 +124,7 @@ where
     }
 
     /// Returns a reference to the metadata of the specified foreign key.
-    pub fn foreign_key_metadata(&self, key: &T::ForeignKey) -> &<T::ForeignKey as Metadata>::Meta {
+    pub fn foreign_key_metadata(&self, key: &F) -> &F::Meta {
         self.foreign_keys
             .binary_search_by(|(k, _)| k.as_ref().cmp(key))
             .map(|index| &self.foreign_keys[index].1)
@@ -82,11 +136,11 @@ where
     /// # Arguments
     ///
     /// * `name` - The name of the function to retrieve.
-    pub fn function(&self, name: &str) -> Option<&F> {
+    pub fn function(&self, name: &str) -> Option<&Func> {
         self.functions
             .binary_search_by(|(f, _)| f.name().cmp(name))
             .ok()
-            .map(|index| &self.functions[index].0)
+            .map(|index| self.functions[index].0.as_ref())
     }
 
     /// Returns a reference to the metadata of the specified function.
@@ -94,7 +148,7 @@ where
     /// # Arguments
     ///
     /// * `function` - The function to retrieve metadata for.
-    pub fn function_metadata(&self, function: &F) -> &<F as Metadata>::Meta {
+    pub fn function_metadata(&self, function: &Func) -> &Func::Meta {
         self.functions
             .binary_search_by(|(f, _)| f.name().cmp(function.name()))
             .map(|index| &self.functions[index].1)

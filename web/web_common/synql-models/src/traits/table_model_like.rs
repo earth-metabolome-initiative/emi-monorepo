@@ -1,5 +1,6 @@
 //! Submodule providing the `TableModel` trait for SynQL table models.
 
+use sql_traits::traits::DatabaseLike;
 use synql_core::{
     structs::{InternalDataRef, Workspace},
     traits::TableSynLike,
@@ -12,10 +13,10 @@ use crate::{structs::TableModel, traits::column_model_like::ColumnModelLike};
 pub const MODEL_MODULE_NAME: &str = "model";
 
 /// Trait representing a SynQL table model.
-pub trait TableModelLike: TableSchema<ColumnSyn = <Self as TableModelLike>::ColumnModel> {
-    /// The column model associated with the table model.
-    type ColumnModel: ColumnModelLike<Table = Self, Database = Self::Database>;
-
+pub trait TableModelLike: TableSchema
+where
+    <Self::DB as DatabaseLike>::Column: ColumnModelLike,
+{
     /// Returns the name of the crate which will contain the diesel model for
     /// the table.
     fn table_model_crate_name(&self) -> String {
@@ -35,7 +36,7 @@ pub trait TableModelLike: TableSchema<ColumnSyn = <Self as TableModelLike>::Colu
     fn model<'table, 'data>(
         &'table self,
         workspace: &'table Workspace<'data>,
-        database: &'table Self::Database,
+        database: &'table Self::DB,
     ) -> TableModel<'data, 'table, Self>
     where
         Self: 'data,
@@ -53,9 +54,7 @@ pub trait TableModelLike: TableSchema<ColumnSyn = <Self as TableModelLike>::Colu
     }
 }
 
-impl<T: TableSynLike> TableModelLike for T
-where
-    T::ColumnSyn: ColumnModelLike<Table = T>,
+impl<T: TableSynLike> TableModelLike for T where
+    <T::DB as sql_traits::traits::DatabaseLike>::Column: ColumnModelLike
 {
-    type ColumnModel = T::ColumnSyn;
 }

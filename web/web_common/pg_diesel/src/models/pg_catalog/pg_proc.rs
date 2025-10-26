@@ -132,3 +132,28 @@ impl PgProc {
         cached_queries::load_all(conn)
     }
 }
+
+// Manual implementations of Eq, Ord, PartialOrd, and Hash
+// These are required because PgProc contains f32 fields (procost, prorows)
+// which don't implement these traits. We use the OID as the primary key for
+// ordering and hashing since it uniquely identifies a function.
+
+impl Eq for PgProc {}
+
+impl Ord for PgProc {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.oid.cmp(&other.oid)
+    }
+}
+
+impl PartialOrd for PgProc {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl std::hash::Hash for PgProc {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.oid.hash(state);
+    }
+}

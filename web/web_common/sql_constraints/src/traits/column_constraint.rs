@@ -7,8 +7,7 @@ use crate::error::Error;
 
 /// Trait for types that define a column constraint object.
 pub trait ColumnConstraint {
-    /// The associated type for the column-like object that this constraint
-    /// applies to.
+    /// The column type that this constraint applies to.
     type Column: ColumnLike;
 
     /// Returns information about the failure of this constraint.

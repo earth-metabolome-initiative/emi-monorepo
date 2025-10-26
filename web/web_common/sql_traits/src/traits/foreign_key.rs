@@ -1,5 +1,7 @@
 //! Submodule definining the `ForeignKeyLike` trait for SQL referenced keys.
 
+use std::{borrow::Borrow, fmt::Debug};
+
 use sqlparser::ast::MatchKind;
 
 use crate::traits::{ColumnLike, DatabaseLike, Metadata, TableLike, UniqueIndexLike};
@@ -7,20 +9,16 @@ use crate::traits::{ColumnLike, DatabaseLike, Metadata, TableLike, UniqueIndexLi
 /// A foreign key constraint is a rule that specifies a relationship between
 /// two tables. This trait represents such a foreign key constraint in a
 /// database-agnostic way.
-pub trait ForeignKeyLike: Eq + Metadata + Ord {
-    /// The column type associated with the foreign key.
-    type Column: ColumnLike;
-    /// The table type associated with the foreign key.
-    type Table: TableLike<
-            Column = Self::Column,
-            Database = Self::Database,
-            ForeignKey = Self,
-            UniqueIndex = Self::UniqueIndex,
-        >;
-    /// Unique index type associated with the foreign key.
-    type UniqueIndex: UniqueIndexLike<Database = Self::Database, Table = Self::Table, Column = Self::Column>;
+pub trait ForeignKeyLike:
+    Debug
+    + Clone
+    + Eq
+    + Metadata
+    + Ord
+    + Borrow<<<Self as ForeignKeyLike>::DB as DatabaseLike>::ForeignKey>
+{
     /// The database type associated with the foreign key.
-    type Database: DatabaseLike<Table = Self::Table, Column = Self::Column>;
+    type DB: DatabaseLike<ForeignKey: Borrow<Self>>;
 
     /// Returns the name of the foreign key, if it has one.
     ///
@@ -78,7 +76,7 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn on_delete_cascade(&self, database: &Self::Database) -> bool;
+    fn on_delete_cascade(&self, database: &Self::DB) -> bool;
 
     /// Returns the host table that contains the foreign key.
     ///
@@ -109,7 +107,10 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn host_table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
+    fn host_table<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> &'db <Self::DB as DatabaseLike>::Table
     where
         Self: 'db;
 
@@ -142,7 +143,10 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn referenced_table<'db>(&self, database: &'db Self::Database) -> &'db Self::Table;
+    fn referenced_table<'db>(
+        &self,
+        database: &'db Self::DB,
+    ) -> &'db <Self::DB as DatabaseLike>::Table;
 
     /// Returns an iterator over the columns in the host table that are part of
     /// the foreign key.
@@ -178,8 +182,8 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// ```
     fn host_columns<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::Column>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>
     where
         Self: 'db;
 
@@ -221,15 +225,16 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn shares_host_tables(&self, database: &Self::Database) -> bool {
+    fn shares_host_tables(&self, database: &Self::DB) -> bool {
         let mut host_columns: Vec<_> = self.host_columns(database).collect();
         host_columns.sort_unstable();
         let host_table = self.host_table(database);
-        for fk in host_table.foreign_keys(database.borrow()).map(Borrow::borrow) {
+        for fk in host_table.foreign_keys(database) {
+            let fk: &Self = fk.borrow();
             if fk == self {
                 continue;
             }
-            let mut fk_host_columns: Vec<_> = fk.host_columns(database.borrow()).collect();
+            let mut fk_host_columns: Vec<_> = fk.host_columns(database).collect();
             fk_host_columns.sort_unstable();
             if fk_host_columns == host_columns {
                 return true;
@@ -265,7 +270,7 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn number_of_host_columns(&self, database: &Self::Database) -> usize {
+    fn number_of_host_columns(&self, database: &Self::DB) -> usize {
         self.host_columns(database).count()
     }
 
@@ -307,7 +312,7 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_composite(&self, database: &Self::Database) -> bool {
+    fn is_composite(&self, database: &Self::DB) -> bool {
         self.host_columns(database).nth(1).is_some()
     }
 
@@ -335,7 +340,7 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn match_kind(&self, database: &Self::Database) -> MatchKind;
+    fn match_kind(&self, database: &Self::DB) -> MatchKind;
 
     /// Returns whether the foreign key is labelled with a `MATCH FULL` clause.
     ///
@@ -368,7 +373,7 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn match_full(&self, database: &Self::Database) -> bool {
+    fn match_full(&self, database: &Self::DB) -> bool {
         matches!(self.match_kind(database), MatchKind::Full)
     }
 
@@ -425,8 +430,9 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_nullable(&self, database: &Self::Database) -> bool {
-        self.host_columns(database).any(|col: &Self::Column| ColumnLike::is_nullable(col))
+    fn is_nullable(&self, database: &Self::DB) -> bool {
+        self.host_columns(database)
+            .any(|col: &<Self::DB as DatabaseLike>::Column| ColumnLike::is_nullable(col))
             && !self.match_full(database)
     }
 
@@ -464,8 +470,8 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// ```
     fn referenced_columns<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::Column>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>
     where
         Self: 'db;
 
@@ -508,7 +514,7 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_self_referential(&self, database: &Self::Database) -> bool {
+    fn is_self_referential(&self, database: &Self::DB) -> bool {
         self.host_table(database) == self.referenced_table(database)
     }
 
@@ -549,7 +555,7 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_referenced_primary_key(&self, database: &Self::Database) -> bool {
+    fn is_referenced_primary_key(&self, database: &Self::DB) -> bool {
         let referenced_table = self.referenced_table(database);
         let mut pk_columns = referenced_table.primary_key_columns(database).peekable();
         let mut fk_columns = self.referenced_columns(database).peekable();
@@ -616,18 +622,20 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// ```
     fn is_referenced_unique_key<'db>(
         &self,
-        database: &'db Self::Database,
-    ) -> Option<&'db Self::UniqueIndex>
+        database: &'db Self::DB,
+    ) -> Option<&'db <Self::DB as DatabaseLike>::UniqueIndex>
     where
         Self: 'db,
     {
         let referenced_table = self.referenced_table(database);
         let referenced_columns: Vec<_> = self.referenced_columns(database).collect();
-        referenced_table.unique_indices(database).find(|index: &&Self::UniqueIndex| {
-            let index_columns: Vec<_> = UniqueIndexLike::columns(*index, database).collect();
-            index_columns.len() == referenced_columns.len()
-                && index_columns.iter().all(|col| referenced_columns.contains(col))
-        })
+        referenced_table.unique_indices(database).find(
+            |index: &&<Self::DB as DatabaseLike>::UniqueIndex| {
+                let index_columns: Vec<_> = UniqueIndexLike::columns(*index, database).collect();
+                index_columns.len() == referenced_columns.len()
+                    && index_columns.iter().all(|col| referenced_columns.contains(col))
+            },
+        )
     }
 
     /// Returns whether the foreign key locally matches the primary key of the
@@ -667,7 +675,7 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_host_primary_key(&self, database: &Self::Database) -> bool {
+    fn is_host_primary_key(&self, database: &Self::DB) -> bool {
         let mut pk_columns = self.host_table(database).primary_key_columns(database).peekable();
         let mut fk_columns = self.host_columns(database).peekable();
 
@@ -722,7 +730,7 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn includes_host_primary_key(&self, database: &Self::Database) -> bool {
+    fn includes_host_primary_key(&self, database: &Self::DB) -> bool {
         let pk_columns: Vec<_> = self.host_table(database).primary_key_columns(database).collect();
         let fk_columns: Vec<_> = self.host_columns(database).collect();
         pk_columns.iter().all(|pk| fk_columns.contains(pk))
@@ -768,7 +776,7 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn includes_referenced_primary_key(&self, database: &Self::Database) -> bool {
+    fn includes_referenced_primary_key(&self, database: &Self::DB) -> bool {
         let referenced_table = self.referenced_table(database);
         let pk_columns: Vec<_> = referenced_table.primary_key_columns(database).collect();
         let fk_columns: Vec<_> = self.referenced_columns(database).collect();
@@ -824,7 +832,7 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_extension_foreign_key(&self, database: &Self::Database) -> bool {
+    fn is_extension_foreign_key(&self, database: &Self::DB) -> bool {
         self.is_host_primary_key(database)
             && self.is_referenced_primary_key(database)
             && !self.is_self_referential(database)
@@ -872,14 +880,15 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// # Ok(())
     /// # }
     /// ```
-    fn is_singleton(&self, database: &Self::Database) -> bool {
+    fn is_singleton(&self, database: &Self::DB) -> bool {
         if self.is_self_referential(database) {
             return false;
         }
         let foreign_table = self.referenced_table(database);
         self.host_table(database)
             .foreign_keys(database)
-            .all(|fk| fk == self || fk.referenced_table(database) != foreign_table)
+            .map(Borrow::borrow)
+            .all(|fk: &Self| fk == self || fk.referenced_table(database) != foreign_table)
     }
 
     /// Returns the referenced column curresponding to the given host column in
@@ -925,9 +934,9 @@ pub trait ForeignKeyLike: Eq + Metadata + Ord {
     /// ```
     fn referenced_column_for_host_column<'db>(
         &'db self,
-        database: &'db Self::Database,
-        host_column: &'db Self::Column,
-    ) -> &'db Self::Column
+        database: &'db Self::DB,
+        host_column: &'db <Self::DB as DatabaseLike>::Column,
+    ) -> &'db <Self::DB as DatabaseLike>::Column
     where
         Self: 'db,
     {

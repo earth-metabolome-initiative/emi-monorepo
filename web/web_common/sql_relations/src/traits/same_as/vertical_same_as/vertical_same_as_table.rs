@@ -1,18 +1,15 @@
 //! Submodule providing the `VerticalSameAsTableLike` trait for working
 //! with tables that have vertical same-as relationships.
 
-use sql_traits::traits::TableLike;
+use sql_traits::traits::{DatabaseLike, TableLike};
 
 use crate::traits::VerticalSameAsForeignKeyLike;
 
 /// Trait for tables which may include vertical same-as relationships.
-pub trait VerticalSameAsTableLike:
-    TableLike<ForeignKey = <Self as VerticalSameAsTableLike>::VerticalSameAsForeignKey>
+pub trait VerticalSameAsTableLike: TableLike
+where
+    <Self::DB as DatabaseLike>::ForeignKey: VerticalSameAsForeignKeyLike<DB = Self::DB>,
 {
-    /// The type of the foreign keys in this table that may be vertical same-as
-    /// relationships.
-    type VerticalSameAsForeignKey: VerticalSameAsForeignKeyLike<Database = Self::Database, Table = Self>;
-
     /// Returns an iterator over the foreign keys of this table that
     /// represent vertical same-as relationships.
     ///
@@ -46,8 +43,8 @@ pub trait VerticalSameAsTableLike:
     /// ```
     fn vertical_same_as_foreign_keys<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::VerticalSameAsForeignKey>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey>
     where
         Self: 'db,
     {
@@ -58,7 +55,6 @@ pub trait VerticalSameAsTableLike:
 impl<T> VerticalSameAsTableLike for T
 where
     T: TableLike,
-    T::ForeignKey: VerticalSameAsForeignKeyLike,
+    <T::DB as DatabaseLike>::ForeignKey: VerticalSameAsForeignKeyLike<DB = T::DB>,
 {
-    type VerticalSameAsForeignKey = T::ForeignKey;
 }

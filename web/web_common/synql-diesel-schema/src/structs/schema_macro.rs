@@ -19,7 +19,7 @@ pub struct SchemaMacro<'data, 'table, T: TableSynLike> {
     /// The workspace where the table is defined.
     workspace: &'table Workspace<'data>,
     /// The database connection to use to query the table schema.
-    database: &'table T::Database,
+    database: &'table T::DB,
 }
 
 impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for InternalModule<'data> {
@@ -94,7 +94,7 @@ impl<'data, 'table, T: TableSynLike> SchemaMacro<'data, 'table, T> {
     pub(crate) fn new(
         table: &'table T,
         workspace: &'table Workspace<'data>,
-        database: &'table T::Database,
+        database: &'table T::DB,
     ) -> Self {
         Self { table, workspace, database }
     }

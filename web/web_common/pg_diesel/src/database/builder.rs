@@ -285,7 +285,7 @@ impl Builder for PgDatabaseBuilder<'_> {
 
         for function in PgProc::load_all(connection)? {
             let metadata = crate::database::PgProcMetadata::new(&function, connection)?;
-            builder = builder.add_function(function, metadata);
+            builder = builder.add_function(std::rc::Rc::new(function), metadata);
         }
 
         Ok(builder.build().expect("Failed to build PgDatabase: catalog_name should be set"))

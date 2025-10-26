@@ -1,18 +1,15 @@
 //! Submodule providing the `TriangularSameAsTableLike` trait for working
 //! with tables that have triangular same-as relationships.
 
-use sql_traits::traits::TableLike;
+use sql_traits::traits::{DatabaseLike, TableLike};
 
 use crate::traits::TriangularSameAsForeignKeyLike;
 
 /// Trait for tables which may include triangular same-as relationships.
-pub trait TriangularSameAsTableLike:
-    TableLike<ForeignKey = <Self as TriangularSameAsTableLike>::TriangularSameAsForeignKey>
+pub trait TriangularSameAsTableLike: TableLike
+where
+    <Self::DB as DatabaseLike>::ForeignKey: TriangularSameAsForeignKeyLike<DB = Self::DB>,
 {
-    /// The type of the foreign keys in this table that may be triangular
-    /// same-as relationships.
-    type TriangularSameAsForeignKey: TriangularSameAsForeignKeyLike<Database = Self::Database, Table = Self>;
-
     /// Returns an iterator over the foreign keys of this table that
     /// represent triangular same-as relationships.
     ///
@@ -49,8 +46,8 @@ pub trait TriangularSameAsTableLike:
     /// ```
     fn triangular_same_as_foreign_keys<'db>(
         &'db self,
-        database: &'db Self::Database,
-    ) -> impl Iterator<Item = &'db Self::TriangularSameAsForeignKey>
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey>
     where
         Self: 'db,
     {
@@ -61,7 +58,6 @@ pub trait TriangularSameAsTableLike:
 impl<T> TriangularSameAsTableLike for T
 where
     T: TableLike,
-    T::ForeignKey: TriangularSameAsForeignKeyLike,
+    <T::DB as DatabaseLike>::ForeignKey: TriangularSameAsForeignKeyLike<DB = T::DB>,
 {
-    type TriangularSameAsForeignKey = T::ForeignKey;
 }

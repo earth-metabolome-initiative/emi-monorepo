@@ -2,7 +2,9 @@
 //! determining whether a foreign key relationship is a triangular same-as
 //! relationship.
 
-use sql_traits::traits::TableLike;
+use std::borrow::Borrow;
+
+use sql_traits::traits::{DatabaseLike, TableLike};
 
 use crate::traits::{
     HorizontalSameAsForeignKeyLike, same_as::horizontal_same_as::HorizontalSameAsTableLike,
@@ -137,7 +139,7 @@ pub trait TriangularSameAsForeignKeyLike: HorizontalSameAsForeignKeyLike {
     /// // In this schema, we expect at least one triangular relationship
     /// assert!(triangular_count > 0 || triangular_count == 0); // Always passes, demonstrating the API
     /// ```
-    fn is_triangular_same_as<'db>(&self, database: &'db Self::Database) -> bool {
+    fn is_triangular_same_as<'db>(&self, database: &'db Self::DB) -> bool {
         self.triangular_same_as(database).is_some()
     }
 
@@ -254,10 +256,7 @@ pub trait TriangularSameAsForeignKeyLike: HorizontalSameAsForeignKeyLike {
     /// Ok(())
     /// # }
     /// ```
-    fn triangular_same_as<'db>(
-        &'db self,
-        database: &'db Self::Database,
-    ) -> Option<Triangular<'db, Self>>
+    fn triangular_same_as<'db>(&'db self, database: &'db Self::DB) -> Option<Triangular<'db, Self>>
     where
         Self: 'db,
     {
@@ -278,8 +277,10 @@ pub trait TriangularSameAsForeignKeyLike: HorizontalSameAsForeignKeyLike {
 
         // At this point, we need to identify foreign keys in the
         // foreign table which point to ancestors of the current table.
-        let hypothenuses_same_as =
-            foreign_table.foreign_keys_to_ancestors_of(database, host_table).collect::<Vec<_>>();
+        let hypothenuses_same_as: Vec<&Self> = foreign_table
+            .foreign_keys_to_ancestors_of(database, host_table)
+            .map(Borrow::borrow)
+            .collect();
 
         if hypothenuses_same_as.is_empty() {
             return None;
@@ -296,6 +297,7 @@ pub trait TriangularSameAsForeignKeyLike: HorizontalSameAsForeignKeyLike {
         // any of the columns pointing to ancestors of the host table described
         // in constraints to ancestors of the host table which we determined above.
         for horizontal_same_as in host_table.horizontal_same_as_foreign_keys(database) {
+            let horizontal_same_as: &Self = horizontal_same_as.borrow();
             // We retrieve the local columns of the foreign key we are checking.
             let fk_local_columns = horizontal_same_as.host_columns(database).collect::<Vec<_>>();
             // If all of the columns involved in the current constraint are
@@ -319,10 +321,9 @@ pub trait TriangularSameAsForeignKeyLike: HorizontalSameAsForeignKeyLike {
             // referenced columns contain all of the columns in a
             // `columns_to_local_ancestors`.
             for hypothenuse_same_as in &hypothenuses_same_as {
-                if hypothenuse_same_as
-                    .host_columns(database)
-                    .all(|c: &Self::Column| fk_referenced_columns.contains(&c))
-                {
+                if hypothenuse_same_as.host_columns(database).all(
+                    |c: &<Self::DB as DatabaseLike>::Column| fk_referenced_columns.contains(&c),
+                ) {
                     return Some(Triangular {
                         horizontal_same_as: Some(horizontal_same_as),
                         hypothenuse_same_as,

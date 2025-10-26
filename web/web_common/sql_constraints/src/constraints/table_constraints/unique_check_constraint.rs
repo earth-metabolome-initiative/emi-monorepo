@@ -23,12 +23,12 @@ use crate::{
 /// let constrainer: GenericConstrainer<ParserDB> = UniqueCheckConstraint::default().into();
 ///
 /// let invalid_schema =
-///     ParserDB::from_sql("CREATE TABLE MyTable (id INT, CHECK (id > 0), CHECK (id > 0));")
+///     ParserDB::try_from("CREATE TABLE MyTable (id INT, CHECK (id > 0), CHECK (id > 0));")
 ///         .unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
 /// let valid_schema =
-///     ParserDB::from_sql("CREATE TABLE mytable (id INT, CHECK (id > 0));").unwrap();
+///     ParserDB::try_from("CREATE TABLE mytable (id INT, CHECK (id > 0));").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 /// ```
 pub struct UniqueCheckConstraint<DB>(std::marker::PhantomData<DB>);
@@ -48,11 +48,11 @@ impl<DB: DatabaseLike + 'static> From<UniqueCheckConstraint<DB>> for GenericCons
 }
 
 impl<DB: DatabaseLike> TableConstraint for UniqueCheckConstraint<DB> {
-    type Table = DB::Table;
     type Database = DB;
+
     fn table_error_information(
         &self,
-        context: &Self::Table,
+        context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         ConstraintErrorInfo::new()
             .constraint("UniqueCheckConstraint")
@@ -71,7 +71,7 @@ impl<DB: DatabaseLike> TableConstraint for UniqueCheckConstraint<DB> {
     fn validate_table(
         &self,
         database: &Self::Database,
-        table: &Self::Table,
+        table: &<Self::Database as DatabaseLike>::Table,
     ) -> Result<(), crate::error::Error> {
         let mut constraints = table.check_constraints(database).collect::<Vec<_>>();
         constraints.sort_unstable_by_key(|c| c.expression());

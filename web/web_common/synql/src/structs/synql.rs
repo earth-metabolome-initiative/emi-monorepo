@@ -6,6 +6,7 @@ use std::path::Path;
 use synql_core::structs::Workspace;
 use synql_diesel_schema::prelude::*;
 use synql_models::traits::TableModelLike;
+use synql_relations::prelude::*;
 
 mod builder;
 pub use builder::SynQLBuilder;
@@ -69,6 +70,7 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             }
             workspace.add_internal_crate(table.schema_macro(&workspace, self.database).into());
             workspace.add_internal_crate(table.model(&workspace, self.database).into());
+            workspace.add_internal_crate(table.relations_trait(&workspace, self.database).into());
         }
 
         workspace.write_to_disk()?;

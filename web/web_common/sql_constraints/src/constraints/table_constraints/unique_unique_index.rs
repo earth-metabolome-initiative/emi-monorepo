@@ -23,10 +23,10 @@ use crate::{
 /// let constrainer: GenericConstrainer<ParserDB> = UniqueUniqueIndex::default().into();
 ///
 /// let invalid_schema =
-///     ParserDB::from_sql("CREATE TABLE MyTable (id INT, UNIQUE (id), UNIQUE (id));").unwrap();
+///     ParserDB::try_from("CREATE TABLE MyTable (id INT, UNIQUE (id), UNIQUE (id));").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
-/// let valid_schema = ParserDB::from_sql("CREATE TABLE mytable (id INT, UNIQUE (id));").unwrap();
+/// let valid_schema = ParserDB::try_from("CREATE TABLE mytable (id INT, UNIQUE (id));").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 /// ```
 pub struct UniqueUniqueIndex<DB>(std::marker::PhantomData<DB>);
@@ -46,11 +46,11 @@ impl<DB: DatabaseLike + 'static> From<UniqueUniqueIndex<DB>> for GenericConstrai
 }
 
 impl<DB: DatabaseLike> TableConstraint for UniqueUniqueIndex<DB> {
-    type Table = DB::Table;
     type Database = DB;
+
     fn table_error_information(
         &self,
-        context: &Self::Table,
+        context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         ConstraintErrorInfo::new()
             .constraint("UniqueUniqueIndex")
@@ -69,7 +69,7 @@ impl<DB: DatabaseLike> TableConstraint for UniqueUniqueIndex<DB> {
     fn validate_table(
         &self,
         database: &Self::Database,
-        table: &Self::Table,
+        table: &<Self::Database as DatabaseLike>::Table,
     ) -> Result<(), crate::error::Error> {
         let mut constraints = table.unique_indices(database).collect::<Vec<_>>();
         constraints.sort_unstable_by_key(|c| c.expression(database));

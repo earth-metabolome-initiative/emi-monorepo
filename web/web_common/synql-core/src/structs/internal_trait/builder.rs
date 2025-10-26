@@ -23,6 +23,8 @@ pub struct InternalTraitBuilder<'data> {
     documentation: Option<String>,
     /// Where statements for the trait.
     where_statements: Vec<WhereClause<'data>>,
+    /// Generics for the trait.
+    generics: Vec<syn::Ident>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -38,6 +40,8 @@ pub enum InternalTraitAttribute {
     Documentation,
     /// Where statements for the trait.
     WhereClauses,
+    /// Generics for the trait.
+    Generics,
 }
 
 impl Display for InternalTraitAttribute {
@@ -47,7 +51,8 @@ impl Display for InternalTraitAttribute {
             InternalTraitAttribute::Publicness => write!(f, "publicness"),
             InternalTraitAttribute::InternalTokens => write!(f, "methods"),
             InternalTraitAttribute::Documentation => write!(f, "documentation"),
-            InternalTraitAttribute::WhereClauses => write!(f, "where clauses"),
+            InternalTraitAttribute::WhereClauses => write!(f, "where_clauses"),
+            InternalTraitAttribute::Generics => write!(f, "generics"),
         }
     }
 }
@@ -66,6 +71,8 @@ pub enum InternalTraitBuilderError {
     DuplicateMethodName(String),
     /// Duplicate where clause found.
     DuplicateWhereClause(String),
+    /// Duplicate generic found.
+    DuplicateGeneric(String),
 }
 
 impl Display for InternalTraitBuilderError {
@@ -81,6 +88,9 @@ impl Display for InternalTraitBuilderError {
             }
             InternalTraitBuilderError::DuplicateWhereClause(clause) => {
                 write!(f, "Duplicate where clause found in trait: {}", clause)
+            }
+            InternalTraitBuilderError::DuplicateGeneric(generic) => {
+                write!(f, "Duplicate generic found in trait: {}", generic)
             }
         }
     }
@@ -149,15 +159,55 @@ impl<'data> InternalTraitBuilder<'data> {
         Ok(self)
     }
 
-    /// Adds an internal token stream to the trait.
+    /// Adds a method to the trait.
     ///
     /// # Arguments
-    /// * `method` - The internal token stream to add.
+    /// * `method` - The method to add.
     pub fn method(mut self, method: Method<'data>) -> Result<Self, InternalTraitBuilderError> {
         if self.methods.iter().any(|m| m.name() == method.name()) {
             return Err(InternalTraitBuilderError::DuplicateMethodName(method.name().to_string()));
         }
         self.methods.push(method);
+        Ok(self)
+    }
+
+    /// Adds several methods to the trait.
+    ///
+    /// # Arguments
+    /// * `methods` - The methods to add.
+    pub fn methods<I>(mut self, methods: I) -> Result<Self, InternalTraitBuilderError>
+    where
+        I: IntoIterator<Item = Method<'data>>,
+    {
+        for method in methods {
+            self = self.method(method)?;
+        }
+        Ok(self)
+    }
+
+    /// Adds a generic to the trait.
+    ///
+    /// # Arguments
+    /// * `generic` - The generic to add.
+    pub fn generic(mut self, generic: syn::Ident) -> Result<Self, InternalTraitBuilderError> {
+        if self.generics.contains(&generic) {
+            return Err(InternalTraitBuilderError::DuplicateGeneric(generic.to_string()));
+        }
+        self.generics.push(generic);
+        Ok(self)
+    }
+
+    /// Adds several generics to the trait.
+    ///
+    /// # Arguments
+    /// * `generics` - The generics to add.
+    pub fn generics<I>(mut self, generics: I) -> Result<Self, InternalTraitBuilderError>
+    where
+        I: IntoIterator<Item = syn::Ident>,
+    {
+        for generic in generics {
+            self = self.generic(generic)?;
+        }
         Ok(self)
     }
 
@@ -204,6 +254,7 @@ impl<'data> Builder for InternalTraitBuilder<'data> {
                 .documentation
                 .ok_or(BuilderError::IncompleteBuild(InternalTraitAttribute::Documentation))?,
             where_statements: self.where_statements,
+            generics: self.generics,
         })
     }
 }

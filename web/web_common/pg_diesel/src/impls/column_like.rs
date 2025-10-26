@@ -12,33 +12,30 @@
 
 use sql_traits::traits::{ColumnLike, Metadata};
 
-use crate::{
-    PgDatabase,
-    model_metadata::ColumnMetadata,
-    models::{KeyColumnUsage, Table},
-};
+use crate::{PgDatabase, model_metadata::ColumnMetadata};
 
 impl Metadata for crate::models::Column {
     type Meta = ColumnMetadata;
 }
 
 impl ColumnLike for crate::models::Column {
-    type Database = PgDatabase;
-    type ForeignKey = KeyColumnUsage;
-    type Table = Table;
+    type DB = PgDatabase;
 
     fn column_name(&self) -> &str {
         &self.column_name
     }
 
-    fn column_doc<'db>(&'db self, database: &'db Self::Database) -> Option<&'db str>
+    fn column_doc<'db>(&'db self, database: &'db Self::DB) -> Option<&'db str>
     where
         Self: 'db,
     {
         database.column_metadata(self).description().map(|desc| desc.description.as_str())
     }
 
-    fn table<'db>(&'db self, database: &'db Self::Database) -> &'db Self::Table
+    fn table<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> &'db <Self::DB as sql_traits::traits::DatabaseLike>::Table
     where
         Self: 'db,
     {
@@ -55,7 +52,7 @@ impl ColumnLike for crate::models::Column {
         self.data_type_str().to_owned()
     }
 
-    fn normalized_data_type(&self, database: &Self::Database) -> String {
+    fn normalized_data_type(&self, database: &Self::DB) -> String {
         database.column_metadata(self).normalized_data_type()
     }
 

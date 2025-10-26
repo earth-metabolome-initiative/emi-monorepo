@@ -25,16 +25,16 @@ use crate::{
 /// let constrainer: GenericConstrainer<ParserDB> = UniqueForeignKey::default().into();
 ///
 /// let invalid_schema =
-///     ParserDB::from_sql("CREATE TABLE MyTable (id INT PRIMARY KEY REFERENCES MyTable (id), FOREIGN KEY (id) REFERENCES MyTable (id));")
+///     ParserDB::try_from("CREATE TABLE MyTable (id INT PRIMARY KEY REFERENCES MyTable (id), FOREIGN KEY (id) REFERENCES MyTable (id));")
 ///         .unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err(), "1) Foreign keys must be unique per table");
 ///
 /// let invalid_schema2 =
-///     ParserDB::from_sql("CREATE TABLE MyTable (id INT PRIMARY KEY, FOREIGN KEY (id) REFERENCES MyTable (id), FOREIGN KEY (id) REFERENCES MyTable (id));").unwrap();
+///     ParserDB::try_from("CREATE TABLE MyTable (id INT PRIMARY KEY, FOREIGN KEY (id) REFERENCES MyTable (id), FOREIGN KEY (id) REFERENCES MyTable (id));").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema2).is_err(), "2) Foreign keys must be unique per table");
 ///
 /// let valid_schema =
-///     ParserDB::from_sql("CREATE TABLE mytable (id INT PRIMARY KEY, FOREIGN KEY (id) REFERENCES mytable (id));").unwrap();
+///     ParserDB::try_from("CREATE TABLE mytable (id INT PRIMARY KEY, FOREIGN KEY (id) REFERENCES mytable (id));").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 /// ```
 pub struct UniqueForeignKey<DB>(std::marker::PhantomData<DB>);
@@ -54,11 +54,11 @@ impl<DB: DatabaseLike + 'static> From<UniqueForeignKey<DB>> for GenericConstrain
 }
 
 impl<DB: DatabaseLike> TableConstraint for UniqueForeignKey<DB> {
-    type Table = DB::Table;
     type Database = DB;
+
     fn table_error_information(
         &self,
-        context: &Self::Table,
+        context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         ConstraintErrorInfo::new()
             .constraint("UniqueForeignKey")
@@ -77,7 +77,7 @@ impl<DB: DatabaseLike> TableConstraint for UniqueForeignKey<DB> {
     fn validate_table(
         &self,
         database: &Self::Database,
-        table: &Self::Table,
+        table: &<Self::Database as DatabaseLike>::Table,
     ) -> Result<(), crate::error::Error> {
         let constraints = table.foreign_keys(database).collect::<Vec<_>>();
         let mut signatures = constraints
