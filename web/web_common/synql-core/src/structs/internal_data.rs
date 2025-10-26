@@ -157,25 +157,28 @@ impl<'data> DataVariantRef<'data> {
     /// * `trait_ref` - The trait variant to check support for.
     pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
         match self {
-            DataVariantRef::Internal(internal) => {
-                internal.data().variant().supports_trait(trait_ref)
-            }
-            DataVariantRef::External(external) => external.supports_trait(trait_ref),
-            DataVariantRef::Reference(_lifetime, inner) => inner.supports_trait(trait_ref),
-            DataVariantRef::MutableReference(_lifetime, inner) => inner.supports_trait(trait_ref),
-            DataVariantRef::Generic(_) => false,
-            DataVariantRef::Result(_, _) => false,
+            Self::Internal(internal) => internal.data().variant().supports_trait(trait_ref),
+            Self::External(external) => external.supports_trait(trait_ref),
+            Self::Reference(_lifetime, inner) => inner.supports_trait(trait_ref),
+            Self::MutableReference(_lifetime, inner) => inner.supports_trait(trait_ref),
+            Self::Generic(_) => false,
+            Self::Result(_, _) => false,
         }
     }
 
     /// Returns whether the variant is a mutable reference.
     pub fn is_mutable_reference(&self) -> bool {
-        matches!(self, DataVariantRef::MutableReference(_, _))
+        matches!(self, Self::MutableReference(_, _))
     }
 
     /// Returns whether the variant is a reference.
     pub fn is_reference(&self) -> bool {
-        matches!(self, DataVariantRef::Reference(_, _))
+        matches!(self, Self::Reference(_, _))
+    }
+
+    /// Returns whether it is a `Result` variant.
+    pub fn is_result(&self) -> bool {
+        matches!(self, Self::Result(_, _))
     }
 }
 
