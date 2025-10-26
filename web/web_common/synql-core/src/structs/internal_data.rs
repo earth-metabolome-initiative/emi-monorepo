@@ -77,6 +77,8 @@ pub enum DataVariantRef<'data> {
     MutableReference(Option<Lifetime>, Box<DataVariantRef<'data>>),
     /// A generic type parameter.
     Generic(Ident),
+    /// A result type.
+    Result(Box<DataVariantRef<'data>>, Box<DataVariantRef<'data>>),
 }
 
 impl Debug for DataVariantRef<'_> {
@@ -89,6 +91,9 @@ impl Debug for DataVariantRef<'_> {
                 write!(f, "MutableReference({inner:?})")
             }
             DataVariantRef::Generic(ident) => write!(f, "Generic({ident})"),
+            DataVariantRef::Result(left, right) => {
+                write!(f, "Result({left:?}, {right:?})")
+            }
         }
     }
 }
@@ -113,6 +118,11 @@ impl<'data> InternalDependencies<'data> for DataVariantRef<'data> {
             DataVariantRef::Reference(_, inner) => inner.internal_dependencies(),
             DataVariantRef::MutableReference(_, inner) => inner.internal_dependencies(),
             DataVariantRef::Generic(_) => vec![],
+            DataVariantRef::Result(left, right) => {
+                let mut crates = left.internal_dependencies();
+                crates.extend(right.internal_dependencies());
+                crates
+            }
         }
     }
 }
@@ -125,6 +135,11 @@ impl<'data> crate::traits::ExternalDependencies<'data> for DataVariantRef<'data>
             DataVariantRef::Reference(_, inner) => inner.external_dependencies(),
             DataVariantRef::MutableReference(_, inner) => inner.external_dependencies(),
             DataVariantRef::Generic(_) => vec![],
+            DataVariantRef::Result(left, right) => {
+                let mut crates = left.external_dependencies();
+                crates.extend(right.external_dependencies());
+                crates
+            }
         }
     }
 }
@@ -149,6 +164,7 @@ impl<'data> DataVariantRef<'data> {
             DataVariantRef::Reference(_lifetime, inner) => inner.supports_trait(trait_ref),
             DataVariantRef::MutableReference(_lifetime, inner) => inner.supports_trait(trait_ref),
             DataVariantRef::Generic(_) => false,
+            DataVariantRef::Result(_, _) => false,
         }
     }
 
@@ -245,6 +261,9 @@ impl ToTokens for DataVariantRef<'_> {
             }
             DataVariantRef::Generic(ident) => {
                 ident.to_tokens(tokens);
+            }
+            DataVariantRef::Result(left, right) => {
+                tokens.extend(quote! {Result<#left, #right>});
             }
         }
     }
