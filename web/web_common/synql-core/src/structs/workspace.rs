@@ -154,29 +154,29 @@ impl<'data> Workspace<'data> {
             if !external_crate.is_dependency() {
                 continue;
             }
+            let mut dep_table = toml_edit::InlineTable::new();
             let dep_name = external_crate.name();
-            let features = external_crate.features();
 
-            if features.is_empty() {
-                // Simple version string if no features
-                doc["workspace"]["dependencies"][dep_name] =
-                    toml_edit::value(external_crate.version().as_deref().unwrap_or("*"));
-            } else {
-                // Create table with version and features
-                let mut dep_table = toml_edit::InlineTable::new();
+            // Create table with version and features
+            if let Some(version) = external_crate.version() {
                 dep_table.insert(
                     "version",
-                    Value::from(external_crate.version().as_deref().unwrap_or("*")),
+                    Value::from(version),
                 );
-
-                let mut features_array = Array::new();
-                for feature in features {
-                    features_array.push(feature.as_str());
-                }
-                dep_table.insert("features", Value::from(features_array));
-
-                doc["workspace"]["dependencies"][dep_name] = toml_edit::value(dep_table);
             }
+
+            if let Some((repository, branch)) = external_crate.git() {
+                dep_table.insert("git", Value::from(repository));
+                dep_table.insert("branch", Value::from(branch));
+            }
+
+            let mut features_array = Array::new();
+            for feature in external_crate.features() {
+                features_array.push(feature.as_str());
+            }
+            dep_table.insert("features", Value::from(features_array));
+
+            doc["workspace"]["dependencies"][dep_name] = toml_edit::value(dep_table);
         }
 
         // Add [workspace.lints] section

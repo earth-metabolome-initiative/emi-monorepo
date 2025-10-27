@@ -220,6 +220,18 @@ impl<'data> InternalModuleBuilder<'data> {
         self.internal_tokens.push(internal_token);
         self
     }
+
+    /// Adds multiple internal token streams to the module.
+    ///
+    /// # Arguments
+    /// * `internal_tokens` - The internal token streams to add.
+    pub fn internal_tokens<I>(mut self, internal_tokens: I) -> Self
+    where
+        I: IntoIterator<Item = InternalToken<'data>>,
+    {
+        self.internal_tokens.extend(internal_tokens);
+        self
+    }
 }
 
 impl Attributed for InternalModuleBuilder<'_> {

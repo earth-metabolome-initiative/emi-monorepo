@@ -22,6 +22,8 @@ pub struct ExternalCrateBuilder<'data> {
     traits: Vec<ExternalTrait>,
     /// The version of the crate if it is a dependency.
     version: Option<String>,
+    /// Git to the crate, if it is a GitHub dependency.
+    git: Option<(String, String)>,
     /// The feature flags required by the crate.
     features: Vec<String>,
 }
@@ -159,6 +161,12 @@ impl<'data> ExternalCrateBuilder<'data> {
         self
     }
 
+    /// Sets the git to the crate, if it is a local dependency.
+    pub fn git<S: ToString>(mut self, repository: S, branch: S) -> Self {
+        self.git = Some((repository.to_string(), branch.to_string()));
+        self
+    }
+
     /// Adds a macro defined within the crate.
     ///
     /// # Arguments
@@ -291,6 +299,7 @@ impl<'data> Builder for ExternalCrateBuilder<'data> {
             traits: self.traits,
             version: self.version,
             features: self.features,
+            git: self.git,
         })
     }
 }

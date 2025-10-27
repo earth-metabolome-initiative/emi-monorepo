@@ -140,6 +140,80 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
                 .unwrap(),
         )
     }
+
+    fn extension_of_impls(&self) -> Vec<InternalToken<'data>> {
+        let extension_of_trait =
+            self.workspace.external_trait("ExtensionOf").expect("Failed to get ExtensionOf trait");
+        let read_trait = self.workspace.external_trait("Read").expect("Failed to get Read trait");
+        let identifiable_trait = self
+            .workspace
+            .external_trait("Identifiable")
+            .expect("Failed to get Identifiable trait");
+        let table_model = self.table.table_singular_camel_ident();
+
+        let mut extension_of_impls = vec![
+            InternalToken::new()
+                .private()
+                .stream(quote! {
+                    impl<C> #extension_of_trait<#table_model, C> for #table_model {
+                        type ExtendedType<'data> = &'data Self
+                        where
+                            Self: 'data;
+
+                        fn extension_of(
+                            &self,
+                            _connection: &mut C,
+                        ) -> Result<Self::ExtendedType<'_>, diesel::result::Error> {
+                            Ok(self)
+                        }
+                    }
+                })
+                .external_trait(extension_of_trait.clone())
+                .unwrap()
+                .build()
+                .unwrap(),
+        ];
+
+        for extended_table in self.table.ancestral_extended_tables(self.database) {
+            let extended_table_model = extended_table
+                .model_ref(self.workspace)
+                .expect("Failed to get the extended table model for ExtensionOf impl");
+
+            extension_of_impls.push(
+                InternalToken::new()
+                    .private()
+                    .stream(quote! {
+                        impl<C> #extension_of_trait<#extended_table_model, C> for #table_model
+                        where
+                            #extended_table_model: #read_trait<C>,
+                        {
+                            type ExtendedType<'data> = #extended_table_model
+                            where
+                                Self: 'data;
+
+                            fn extension_of(
+                                &self,
+                                connection: &mut C,
+                            ) -> Result<Self::ExtendedType<'_>, diesel::result::Error> {
+                                use #identifiable_trait;
+                                use #read_trait;
+                                #extended_table_model::read(self.id(), connection)
+                            }
+                        }
+                    })
+                    .external_traits([
+                        extension_of_trait.clone(),
+                        read_trait.clone(),
+                        identifiable_trait.clone(),
+                    ])
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            );
+        }
+
+        extension_of_impls
+    }
 }
 
 impl<'data, 'table, T> From<TableModel<'data, 'table, T>> for InternalData<'data>
@@ -215,6 +289,7 @@ where
             ))
             .expect("Failed to set the module documentation")
             .public()
+            .internal_tokens(table_model.extension_of_impls())
             .data(table_model.into())
             .expect("Failed to add the internal data to module")
             .build()

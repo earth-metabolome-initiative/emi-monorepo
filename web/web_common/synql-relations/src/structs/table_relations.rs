@@ -108,6 +108,10 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
             .expect("Failed to get the model ref for the referenced table of the foreign key");
         let read_trait =
             self.workspace.external_trait("Read").expect("Failed to get Read trait from workspace");
+        let optional_trait = self
+            .workspace
+            .external_trait("OptionalExtension")
+            .expect("Failed to get OptionalExtension trait from workspace");
 
         let (connection_argument, method_builder) = self.init_method_builders(foreign_key);
         let connection_generic = connection_argument.arg_type().dereference();
@@ -152,7 +156,7 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
         };
 
         let (maybe_use_optional, optional) = if !foreign_key.is_always_enforced(self.database) {
-            (Some(quote! {use diesel::OptionalExtension;}), Some(quote! {.optional()}))
+            (Some(quote! {use #optional_trait;}), Some(quote! {.optional()}))
         } else {
             (None, None)
         };
@@ -181,8 +185,13 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
                         use #read_trait;
                         #maybe_use_optional
                         #(#optional_host_columns_retrieval)*
-                        #referenced_table_model::read(#formatted_host_columns, #connection_ident)#optional
+                        #referenced_table_model::read(
+                            #formatted_host_columns,
+                            #connection_ident
+                        )#optional
                     })
+                    .external_traits([read_trait, optional_trait])
+                    .unwrap()
                     .build()
                     .unwrap(),
             )

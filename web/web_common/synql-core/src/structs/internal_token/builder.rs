@@ -218,19 +218,15 @@ impl<'data> InternalTokenBuilder<'data> {
     /// # Errors
     ///
     /// Returns an error if any duplicate external traits are detected.
-    pub fn external_traits(
+    pub fn external_traits<I>(
         mut self,
-        external_traits: Vec<ExternalTraitRef<'data>>,
-    ) -> Result<Self, InternalTokenBuilderError> {
-        // Check for duplicates within the provided vector
-        for (i, trait1) in external_traits.iter().enumerate() {
-            for trait2 in external_traits.iter().skip(i + 1) {
-                if trait1 == trait2 {
-                    return Err(InternalTokenBuilderError::DuplicateExternalTrait);
-                }
-            }
+        external_traits: I,
+    ) -> Result<Self, InternalTokenBuilderError> where 
+        I: IntoIterator<Item = ExternalTraitRef<'data>>,
+    {
+        for external_trait in external_traits {
+            self = self.external_trait(external_trait)?;
         }
-        self.external_traits = external_traits;
         Ok(self)
     }
 

@@ -107,6 +107,9 @@ impl<'data> InternalDependencies<'data> for Method<'data> {
         for arg in &self.arguments {
             dependencies.extend(arg.internal_dependencies());
         }
+        for where_clause in &self.where_clauses {
+            dependencies.extend(where_clause.internal_dependencies());
+        }
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
@@ -121,6 +124,9 @@ impl<'data> ExternalDependencies<'data> for Method<'data> {
         }
         for arg in &self.arguments {
             dependencies.extend(arg.external_dependencies());
+        }
+        for where_clause in &self.where_clauses {
+            dependencies.extend(where_clause.external_dependencies());
         }
         dependencies.sort_unstable();
         dependencies.dedup();

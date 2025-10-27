@@ -69,6 +69,12 @@ lazy_static! {
                 .path(syn::parse_quote!(diesel::Associations))
                 .build()
                 .unwrap(),
+            ExternalTrait::new()
+                .name("OptionalExtension")
+                .unwrap()
+                .path(syn::parse_quote!(diesel::OptionalExtension))
+                .build()
+                .unwrap(),
         ])
         .unwrap()
         .build()

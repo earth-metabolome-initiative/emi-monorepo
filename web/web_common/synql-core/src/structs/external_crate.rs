@@ -33,6 +33,8 @@ pub struct ExternalCrate<'data> {
     traits: Vec<ExternalTrait>,
     /// Whether the crate is a dependency.
     version: Option<String>,
+    /// Git to the crate, if it is a local dependency.
+    git: Option<(String, String)>,
     /// Feature flags required by the crate.
     features: Vec<String>,
 }
@@ -62,12 +64,17 @@ impl<'data> ExternalCrate<'data> {
 
     /// Returns whether the crate is a dependency.
     pub fn is_dependency(&self) -> bool {
-        self.version.is_some()
+        self.version.is_some() || self.git.is_some()
     }
 
     /// Returns the version of the crate if it is a dependency.
     pub fn version(&self) -> Option<&str> {
         self.version.as_deref()
+    }
+
+    /// Returns the git repository and branch of the crate if it is a dependency.
+    pub fn git(&self) -> Option<(&str, &str)> {
+        self.git.as_ref().map(|(repo, branch)| (repo.as_str(), branch.as_str()))
     }
 
     /// Returns the feature flags required by the crate.
@@ -170,6 +177,11 @@ impl<'data> ExternalTypeRef<'data> {
     /// Returns the version of the crate if it is a dependency.
     pub fn version(&self) -> Option<&'data str> {
         self.crate_ref.version()
+    }
+
+    /// Returns the git repository and branch of the crate if it is a dependency.
+    pub fn git(&self) -> Option<(&'data str, &'data str)> {
+        self.crate_ref.git()
     }
 
     /// Returns whether the type supports the given trait.

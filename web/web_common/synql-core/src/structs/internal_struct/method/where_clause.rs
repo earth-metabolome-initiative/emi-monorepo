@@ -4,7 +4,10 @@ mod builder;
 pub use builder::{WhereClauseAttribute, WhereClauseBuilder};
 use quote::ToTokens;
 
-use crate::structs::InternalToken;
+use crate::{
+    structs::{ExternalCrate, InternalCrate, InternalToken},
+    traits::{ExternalDependencies, InternalDependencies},
+};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a where clause in a method or type definition.
@@ -19,6 +22,22 @@ impl<'data> WhereClause<'data> {
     /// Initializes a new `WhereClauseBuilder`.
     pub fn new() -> WhereClauseBuilder<'data> {
         WhereClauseBuilder::default()
+    }
+}
+
+impl<'data> InternalDependencies<'data> for WhereClause<'data> {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+        let mut deps = self.left.internal_dependencies();
+        deps.extend(self.right.internal_dependencies());
+        deps
+    }
+}
+
+impl<'data> ExternalDependencies<'data> for WhereClause<'data> {
+    fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
+        let mut deps = self.left.external_dependencies();
+        deps.extend(self.right.external_dependencies());
+        deps
     }
 }
 

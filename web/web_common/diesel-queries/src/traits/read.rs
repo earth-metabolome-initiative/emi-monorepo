@@ -2,10 +2,14 @@
 
 use diesel::{
     Identifiable, QueryDsl, RunQueryDsl,
+    associations::HasTable,
     query_dsl::methods::{FindDsl, LimitDsl, LoadQuery},
 };
 /// The `Read` trait
-pub trait Read<C>: Sized + Identifiable {
+pub trait Read<C>: Sized
+where
+    for<'a> &'a Self: Identifiable,
+{
     /// Loads the row in a table.
     ///
     /// # Arguments
@@ -16,18 +20,24 @@ pub trait Read<C>: Sized + Identifiable {
     /// # Errors
     ///
     /// * Returns an error if loading the row fails.
-    fn read(primary_key: Self::Id, conn: &mut C) -> Result<Self, diesel::result::Error>;
+    fn read(
+        primary_key: <&Self as Identifiable>::Id,
+        conn: &mut C,
+    ) -> Result<Self, diesel::result::Error>;
 }
 
 impl<C, T> Read<C> for T
 where
-    T: Identifiable,
-    T::Table: FindDsl<<T as Identifiable>::Id>,
-    <T::Table as FindDsl<<T as Identifiable>::Id>>::Output: LimitDsl + RunQueryDsl<C>,
-    <<T::Table as FindDsl<<T as Identifiable>::Id>>::Output as LimitDsl>::Output:
-        for<'a> LoadQuery<'a, C, T>,
+    for<'a> &'a T: Identifiable,
+    for<'a> <&'a T as HasTable>::Table: FindDsl<<&'a T as Identifiable>::Id>,
+    for<'a> <<&'a T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output: LimitDsl + RunQueryDsl<C>,
+    for<'a> <<<&'a T as HasTable>::Table as FindDsl<<&'a T as Identifiable>::Id>>::Output as LimitDsl>::Output:
+        LoadQuery<'a, C, T>,
 {
-    fn read(primary_key: Self::Id, conn: &mut C) -> Result<Self, diesel::result::Error> {
-        RunQueryDsl::first(QueryDsl::find(T::table(), primary_key), conn)
+    fn read(
+        primary_key: <&Self as Identifiable>::Id,
+        conn: &mut C,
+    ) -> Result<Self, diesel::result::Error> {
+        RunQueryDsl::first(QueryDsl::find(<&T as HasTable>::table(), primary_key), conn)
     }
 }
