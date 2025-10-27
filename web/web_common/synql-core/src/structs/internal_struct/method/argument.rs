@@ -7,7 +7,7 @@ use quote::ToTokens;
 
 use crate::{
     structs::internal_data::DataVariantRef,
-    traits::{ExternalDependencies, InternalDependencies},
+    traits::{ExternalDependencies, InternalDependencies}, utils::RESERVED_RUST_WORDS,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -27,6 +27,20 @@ impl Argument<'_> {
     /// Returns the name of the argument.
     pub fn name(&self) -> &str {
         &self.name
+    }
+
+    /// Returns the type of the argument.
+    pub fn arg_type(&self) -> &DataVariantRef<'_> {
+        &self.arg_type
+    }
+
+    /// Returns the ident of the argument.
+    pub fn ident(&self) -> syn::Ident {
+        if RESERVED_RUST_WORDS.contains(&self.name()) {
+            syn::Ident::new_raw(&self.name, proc_macro2::Span::call_site())
+        } else {
+            syn::Ident::new(&self.name, proc_macro2::Span::call_site())
+        }
     }
 }
 

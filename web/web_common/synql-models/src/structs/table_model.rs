@@ -102,7 +102,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
                         .stream(quote! {
                             diesel(belongs_to(#referenced_table_model, foreign_key = #column_ident))
                         })
-                        .internal_data(referenced_table_model)
+                        .data(referenced_table_model.into())
                         .unwrap()
                         .build()
                         .unwrap(),

@@ -33,6 +33,8 @@ pub struct MethodBuilder<'data> {
     generics: Vec<Ident>,
     /// Where clauses of the method.
     where_clauses: Vec<WhereClause<'data>>,
+    /// Error documentation of the method.
+    error_documentation: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -56,6 +58,8 @@ pub enum MethodAttribute {
     Generics,
     /// Where clauses of the method.
     WhereClauses,
+    /// Error documentation of the method.
+    ErrorDocumentation,
 }
 
 impl Display for MethodAttribute {
@@ -70,6 +74,7 @@ impl Display for MethodAttribute {
             MethodAttribute::Documentation => write!(f, "documentation"),
             MethodAttribute::Generics => write!(f, "generics"),
             MethodAttribute::WhereClauses => write!(f, "where_clauses"),
+            MethodAttribute::ErrorDocumentation => write!(f, "error_documentation"),
         }
     }
 }
@@ -90,6 +95,12 @@ pub enum MethodBuilderError {
     DuplicatedWhereClause,
     /// A generic with the same name has already been added.
     DuplicatedGeneric,
+}
+
+impl From<BuilderError<MethodAttribute>> for MethodBuilderError {
+    fn from(err: BuilderError<MethodAttribute>) -> Self {
+        MethodBuilderError::Builder(err)
+    }
 }
 
 impl Display for MethodBuilderError {
@@ -289,6 +300,15 @@ impl<'data> MethodBuilder<'data> {
         }
         Ok(self)
     }
+
+    /// Sets the error documentation of the method.
+    ///
+    /// # Arguments
+    /// * `error_documentation` - The error documentation of the method.
+    pub fn error_documentation<S: ToString>(mut self, error_documentation: S) -> Self {
+        self.error_documentation = Some(error_documentation.to_string());
+        self
+    }
 }
 
 impl Attributed for MethodBuilder<'_> {
@@ -302,10 +322,22 @@ impl IsCompleteBuilder for MethodBuilder<'_> {
 }
 
 impl<'data> Builder for MethodBuilder<'data> {
-    type Error = BuilderError<MethodAttribute>;
+    type Error = MethodBuilderError;
     type Object = Method<'data>;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
+        if self.return_type.as_ref().map_or(false, |rt| rt.is_result())
+            && self.error_documentation.is_none()
+        {
+            return Err(BuilderError::IncompleteBuild(MethodAttribute::ErrorDocumentation).into());
+        } else if self.return_type.as_ref().map_or(true, |rt| !rt.is_result())
+            && self.error_documentation.is_some()
+        {
+            return Err(
+                BuilderError::UnexpectedAttribute(MethodAttribute::ErrorDocumentation).into()
+            );
+        }
+
         Ok(Method {
             arguments: self.arguments,
             name: self.name.ok_or(BuilderError::IncompleteBuild(MethodAttribute::Name))?,
@@ -320,6 +352,7 @@ impl<'data> Builder for MethodBuilder<'data> {
                 .ok_or(BuilderError::IncompleteBuild(MethodAttribute::Documentation))?,
             generics: self.generics,
             where_clauses: self.where_clauses,
+            error_documentation: self.error_documentation,
         })
     }
 }

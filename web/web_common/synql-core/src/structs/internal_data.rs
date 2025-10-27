@@ -8,13 +8,14 @@ use std::{
 };
 
 pub use builder::InternalDataBuilder;
+use common_traits::prelude::Builder;
 use quote::{ToTokens, quote};
 use syn::{Ident, Lifetime};
 
 use crate::{
     structs::{
         Decorator, Derive, ExternalCrate, InternalCrate, InternalEnum, InternalModule,
-        InternalStruct, Publicness, external_crate::ExternalTypeRef,
+        InternalStruct, InternalToken, Publicness, external_crate::ExternalTypeRef,
         external_trait::TraitVariantRef,
     },
     traits::{ExternalDependencies, InternalDependencies},
@@ -79,6 +80,10 @@ pub enum DataVariantRef<'data> {
     Generic(Ident),
     /// A result type.
     Result(Box<DataVariantRef<'data>>, Box<DataVariantRef<'data>>),
+    /// A option type.
+    Option(Box<DataVariantRef<'data>>),
+    /// A self type, of which sometimes it is known what it is.
+    SelfType(Option<Box<DataVariantRef<'data>>>),
 }
 
 impl Debug for DataVariantRef<'_> {
@@ -93,6 +98,12 @@ impl Debug for DataVariantRef<'_> {
             DataVariantRef::Generic(ident) => write!(f, "Generic({ident})"),
             DataVariantRef::Result(left, right) => {
                 write!(f, "Result({left:?}, {right:?})")
+            }
+            DataVariantRef::Option(inner) => {
+                write!(f, "Option({inner:?})")
+            }
+            DataVariantRef::SelfType(inner) => {
+                write!(f, "Self<{inner:?}>")
             }
         }
     }
@@ -123,6 +134,8 @@ impl<'data> InternalDependencies<'data> for DataVariantRef<'data> {
                 crates.extend(right.internal_dependencies());
                 crates
             }
+            DataVariantRef::Option(inner) => inner.internal_dependencies(),
+            DataVariantRef::SelfType(inner) => inner.internal_dependencies(),
         }
     }
 }
@@ -140,6 +153,8 @@ impl<'data> crate::traits::ExternalDependencies<'data> for DataVariantRef<'data>
                 crates.extend(right.external_dependencies());
                 crates
             }
+            DataVariantRef::Option(inner) => inner.external_dependencies(),
+            DataVariantRef::SelfType(inner) => inner.external_dependencies(),
         }
     }
 }
@@ -148,6 +163,26 @@ impl<'data> DataVariantRef<'data> {
     /// Creates a new generic `DataVariantRef`.
     pub fn generic(ident: Ident) -> DataVariantRef<'data> {
         DataVariantRef::Generic(ident)
+    }
+
+    /// Returns a reference variant of the data variant.
+    pub fn reference(&self, lifetime: Option<Lifetime>) -> DataVariantRef<'data> {
+        DataVariantRef::Reference(lifetime, Box::new(self.clone()))
+    }
+
+    /// Returns a mutable reference variant of the data variant.
+    pub fn mutable_reference(&self, lifetime: Option<Lifetime>) -> DataVariantRef<'data> {
+        DataVariantRef::MutableReference(lifetime, Box::new(self.clone()))
+    }
+
+    /// Returns the dereferenced variant if it is a reference or mutable
+    /// reference, otherwise returns itself.
+    pub fn dereference(&self) -> &DataVariantRef<'data> {
+        match self {
+            DataVariantRef::Reference(_, inner) => inner.as_ref(),
+            DataVariantRef::MutableReference(_, inner) => inner.as_ref(),
+            _ => self,
+        }
     }
 
     /// Returns whether the underlying variant supports the given trait.
@@ -163,6 +198,13 @@ impl<'data> DataVariantRef<'data> {
             Self::MutableReference(_lifetime, inner) => inner.supports_trait(trait_ref),
             Self::Generic(_) => false,
             Self::Result(_, _) => false,
+            Self::Option(inner) => inner.supports_trait(trait_ref),
+            Self::SelfType(inner) => {
+                match inner {
+                    Some(inner_variant) => inner_variant.supports_trait(trait_ref),
+                    None => false,
+                }
+            }
         }
     }
 
@@ -180,6 +222,48 @@ impl<'data> DataVariantRef<'data> {
     pub fn is_result(&self) -> bool {
         matches!(self, Self::Result(_, _))
     }
+
+    /// Creates a new `Result` variant from the given left and right variants.
+    ///
+    /// # Arguments
+    /// * `left` - The left variant of the `Result`.
+    /// * `right` - The right variant of the `Result`.
+    pub fn result(
+        ok_variant: DataVariantRef<'data>,
+        err_variant: DataVariantRef<'data>,
+    ) -> DataVariantRef<'data> {
+        DataVariantRef::Result(Box::new(ok_variant), Box::new(err_variant))
+    }
+
+    /// Creates a new `Option` variant from the given inner variant.
+    ///
+    /// # Arguments
+    ///
+    /// * `inner` - The inner variant of the `Option`.
+    pub fn option(inner: DataVariantRef<'data>) -> DataVariantRef<'data> {
+        DataVariantRef::Option(Box::new(inner))
+    }
+
+    /// Creates a new `Self` type variant with the optional inner variant.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `inner` - The optional inner variant of the `Self` type.
+    pub fn self_type(inner: Option<DataVariantRef<'data>>) -> DataVariantRef<'data> {
+        DataVariantRef::SelfType(inner.map(Box::new))
+    }
+
+    /// Creates a new Result with `diesel::result::Error` as the error type.
+    ///
+    /// # Arguments
+    /// * `ok_variant` - The ok variant of the Result.
+    pub fn diesel_result(ok_variant: DataVariantRef<'data>) -> DataVariantRef<'data> {
+        let diesel = ExternalCrate::diesel();
+        let err_variant = diesel
+            .external_type(&syn::parse_quote!(diesel::result::Error))
+            .expect("Failed to get diesel::result::Error external type");
+        Self::result(ok_variant, err_variant.into())
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -187,6 +271,18 @@ impl<'data> DataVariantRef<'data> {
 pub struct InternalDataRef<'data> {
     data: Rc<InternalData<'data>>,
     internal_crate: Rc<InternalCrate<'data>>,
+}
+
+impl<'data> From<InternalDataRef<'data>> for InternalToken<'data> {
+    fn from(value: InternalDataRef<'data>) -> Self {
+        InternalToken::new()
+            .public()
+            .stream(value.to_token_stream())
+            .data(value.into())
+            .unwrap()
+            .build()
+            .unwrap()
+    }
 }
 
 impl<'data> InternalDataRef<'data> {
@@ -226,6 +322,12 @@ impl<'data> InternalDataRef<'data> {
     /// Returns the internal crate dependencies of the variant.
     pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
         vec![self.internal_crate.as_ref()]
+    }
+
+    /// Returns the markdown formatted documentation path of the internal data
+    /// type.
+    pub fn documentation_path(&self) -> String {
+        format!("[`{}`]({self})", self.name())
     }
 }
 
@@ -267,6 +369,12 @@ impl ToTokens for DataVariantRef<'_> {
             }
             DataVariantRef::Result(left, right) => {
                 tokens.extend(quote! {Result<#left, #right>});
+            }
+            DataVariantRef::Option(inner) => {
+                tokens.extend(quote! {Option<#inner>});
+            }
+            DataVariantRef::SelfType(_) => {
+                tokens.extend(quote! {Self});
             }
         }
     }

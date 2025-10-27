@@ -316,6 +316,25 @@ pub trait ForeignKeyLike:
         self.host_columns(database).nth(1).is_some()
     }
 
+    /// Returns the formatted human readable representation of the foreign key.
+    fn documentation_repr(&self, database: &Self::DB) -> String {
+        let host_table = self.host_table(database);
+        let referenced_table = self.referenced_table(database);
+        self.host_columns(database)
+            .zip(self.referenced_columns(database))
+            .map(|(host_col, ref_col)| {
+                format!(
+                    "`{}.{}` -> `{}.{}`",
+                    host_table.table_name(),
+                    host_col.column_name(),
+                    referenced_table.table_name(),
+                    ref_col.column_name()
+                )
+            })
+            .collect::<Vec<_>>()
+            .join(", ")
+    }
+
     /// Returns the match kind of the foreign key.
     ///
     /// # Example
@@ -377,7 +396,56 @@ pub trait ForeignKeyLike:
         matches!(self.match_kind(database), MatchKind::Full)
     }
 
-    /// Returns whether the foreign key can be potentially not enforced.
+    /// Returns whether the foreign key includes any host columns that are
+    /// nullable.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the foreign
+    ///   key belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
+    /// CREATE TABLE nullable_host_table (
+    ///    id INT,
+    ///   FOREIGN KEY (id) REFERENCES referenced_table(id)
+    /// );
+    /// CREATE TABLE not_null_host_table (
+    ///   id INT NOT NULL,
+    /// FOREIGN KEY (id) REFERENCES referenced_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let nullable_host_table = db.table(None, "nullable_host_table");
+    /// let not_null_host_table = db.table(None, "not_null_host_table");
+    /// let nullable_fk =
+    ///     nullable_host_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// let not_null_fk =
+    ///     not_null_host_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// assert!(
+    ///     nullable_fk.has_nullable_host_columns(&db),
+    ///     "FK with nullable host columns should return true"
+    /// );
+    /// assert!(
+    ///     !not_null_fk.has_nullable_host_columns(&db),
+    ///     "FK with NOT NULL host columns should return false"
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_nullable_host_columns(&self, database: &Self::DB) -> bool {
+        self.host_columns(database)
+            .any(|col: &<Self::DB as DatabaseLike>::Column| ColumnLike::is_nullable(col))
+    }
+
+    /// Returns whether the foreign key is always enforced, i.e., it cannot be violated.
     ///
     /// # Implementation note
     ///
@@ -421,19 +489,17 @@ pub trait ForeignKeyLike:
     ///     not_null_fk_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// let nullable_match_full_fk =
     ///     nullable_match_full_table.foreign_keys(&db).next().expect("Should have a foreign key");
-    /// assert!(nullable_fk.is_nullable(&db), "Nullable FK without MATCH FULL should be nullable");
-    /// assert!(!not_null_fk.is_nullable(&db), "NOT NULL FK should not be nullable");
+    /// assert!(!nullable_fk.is_always_enforced(&db), "Nullable FK without MATCH FULL should be nullable");
+    /// assert!(not_null_fk.is_always_enforced(&db), "NOT NULL FK should not be nullable");
     /// assert!(
-    ///     !nullable_match_full_fk.is_nullable(&db),
+    ///     nullable_match_full_fk.is_always_enforced(&db),
     ///     "Nullable FK with MATCH FULL should not be nullable"
     /// );
     /// # Ok(())
     /// # }
     /// ```
-    fn is_nullable(&self, database: &Self::DB) -> bool {
-        self.host_columns(database)
-            .any(|col: &<Self::DB as DatabaseLike>::Column| ColumnLike::is_nullable(col))
-            && !self.match_full(database)
+    fn is_always_enforced(&self, database: &Self::DB) -> bool {
+        !self.has_nullable_host_columns(database) || self.match_full(database)
     }
 
     /// Returns an iterator over the columns in the referenced table that are

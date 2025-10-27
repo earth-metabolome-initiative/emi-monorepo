@@ -10,3 +10,18 @@ pub trait ExternalDependencies<'data> {
     /// the object.
     fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>>;
 }
+
+impl<'data, T: ExternalDependencies<'data>> ExternalDependencies<'data> for Option<T> {
+    fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
+        match self {
+            Some(inner) => inner.external_dependencies(),
+            None => vec![],
+        }
+    }
+}
+
+impl<'data, T: ExternalDependencies<'data>> ExternalDependencies<'data> for Box<T> {
+    fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
+        self.as_ref().external_dependencies()
+    }
+}

@@ -5,7 +5,9 @@ pub use internal_crate::InternalCrate;
 mod workspace;
 pub use workspace::Workspace;
 mod internal_struct;
-pub use internal_struct::{Argument, InternalAttribute, InternalStruct, Method, WhereClause};
+pub use internal_struct::{
+    Argument, InternalAttribute, InternalStruct, Method, MethodBuilder, WhereClause,
+};
 mod internal_module;
 pub use internal_module::InternalModule;
 mod internal_enum;

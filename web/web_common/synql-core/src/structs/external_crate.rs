@@ -2,6 +2,7 @@
 //! in the postgres database schema.
 
 use quote::ToTokens;
+use syn::Type;
 
 use crate::structs::{
     ExternalMacro, ExternalTrait, ExternalType, Trait,
@@ -12,6 +13,7 @@ mod builder;
 mod chrono_crate;
 mod core_crate;
 mod diesel_crate;
+mod diesel_queries_crate;
 mod postgis_diesel_crate;
 mod serde_crate;
 mod std_crate;
@@ -71,6 +73,19 @@ impl<'data> ExternalCrate<'data> {
     /// Returns the feature flags required by the crate.
     pub fn features(&self) -> &[String] {
         &self.features
+    }
+
+    /// Returns the external type with the provided name, if any.
+    ///
+    /// # Arguments
+    /// * `name` - A string slice representing the name of the external type.
+    pub fn external_type(&self, ident: &Type) -> Option<ExternalTypeRef<'_>> {
+        self.types
+            .iter()
+            .find(|t| {
+                t.rust_type().to_token_stream().to_string() == ident.to_token_stream().to_string()
+            })
+            .map(|t| ExternalTypeRef { crate_ref: self, type_ref: t })
     }
 
     /// Returns the external macro with the provided name, if any.
@@ -164,6 +179,11 @@ impl<'data> ExternalTypeRef<'data> {
     /// * `trait_ref` - The trait variant to check support for.
     pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
         self.type_ref.supports(trait_ref)
+    }
+
+    /// Returns whether the type supports the `Copy` trait in Rust.
+    pub fn supports_copy(&self) -> bool {
+        self.type_ref.supports(&Trait::Copy.into())
     }
 }
 

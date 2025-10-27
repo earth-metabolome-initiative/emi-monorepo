@@ -31,6 +31,8 @@ pub struct Method<'data> {
     return_type: Option<DataVariantRef<'data>>,
     /// Documentation of the method.
     documentation: String,
+    /// Error documentation of the method.
+    error_documentation: Option<String>,
     /// Generics of the method.
     generics: Vec<Ident>,
     /// Where clauses of the method.

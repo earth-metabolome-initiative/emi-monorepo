@@ -9,6 +9,11 @@ expression: normalized_output
         /src
             /lib.rs
             /model.rs
+    /comment_relations
+        /Cargo.toml
+        /src
+            /lib.rs
+            /relations.rs
     /comments_schema
         /Cargo.toml
         /src
@@ -19,6 +24,11 @@ expression: normalized_output
         /src
             /lib.rs
             /model.rs
+    /user_relations
+        /Cargo.toml
+        /src
+            /lib.rs
+            /relations.rs
     /users_schema
         /Cargo.toml
         /src

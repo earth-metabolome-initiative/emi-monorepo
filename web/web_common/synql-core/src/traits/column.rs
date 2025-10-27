@@ -156,6 +156,23 @@ pub trait ColumnSynLike: ColumnLike {
             Some(rust_type.clone())
         }
     }
+
+    /// Returns whether the column type supports the `Copy` trait in Rust.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - The database connection to use to query the column type.
+    /// * `workspace` - The workspace where the column is defined.
+    fn supports_copy<'workspace, 'data>(
+        &self,
+        database: &Self::DB,
+        workspace: &'workspace Workspace<'data>,
+    ) -> bool {
+        match self.external_postgres_type(workspace, database) {
+            Some(external_type) => external_type.supports_copy(),
+            None => return false,
+        }
+    }
 }
 
 impl<T: ColumnLike> ColumnSynLike for T {}

@@ -6,7 +6,7 @@ mod method;
 
 pub use internal_attribute_builder::InternalAttributeBuilder;
 pub use internal_struct_builder::InternalStructBuilder;
-pub use method::{Argument, Method, WhereClause};
+pub use method::{Argument, Method, MethodBuilder, WhereClause};
 use quote::ToTokens;
 use syn::Ident;
 

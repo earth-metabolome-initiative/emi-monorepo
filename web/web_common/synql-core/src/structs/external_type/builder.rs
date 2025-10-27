@@ -309,11 +309,7 @@ impl<'data> Builder for ExternalTypeBuilder<'data> {
             rust_type: self
                 .rust_type
                 .ok_or(BuilderError::IncompleteBuild(ExternalTypeAttribute::RustType))?,
-            postgres_types: if self.postgres_types.is_empty() {
-                return Err(BuilderError::IncompleteBuild(ExternalTypeAttribute::PostgresTypes));
-            } else {
-                self.postgres_types
-            },
+            postgres_types: self.postgres_types,
             traits: self.traits,
             external_traits: self.external_traits,
         })

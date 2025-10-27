@@ -11,9 +11,9 @@ use quote::ToTokens;
 
 use crate::{
     structs::{
-        ExternalCrate, InternalCrate, Publicness,
+        DataVariantRef, ExternalCrate, InternalCrate, Publicness,
         external_crate::{ExternalMacroRef, ExternalTraitRef},
-        internal_data::{InternalDataRef, InternalModuleRef},
+        internal_data::InternalModuleRef,
     },
     traits::{ExternalDependencies, InternalDependencies},
 };
@@ -29,8 +29,8 @@ pub struct InternalToken<'data> {
     external_macros: Vec<ExternalMacroRef<'data>>,
     /// External traits used in the token stream.
     external_traits: Vec<ExternalTraitRef<'data>>,
-    /// Internal data used in the token stream.
-    internal_data: Vec<InternalDataRef<'data>>,
+    /// Data used in the token stream.
+    data: Vec<DataVariantRef<'data>>,
     /// Internal modules from other crates in the same workspace which are used
     /// in the token stream.
     internal_modules: Vec<InternalModuleRef<'data>>,
@@ -42,7 +42,7 @@ impl PartialEq for InternalToken<'_> {
             && self.publicness == other.publicness
             && self.external_macros == other.external_macros
             && self.external_traits == other.external_traits
-            && self.internal_data == other.internal_data
+            && self.data == other.data
             && self.internal_modules == other.internal_modules
     }
 }
@@ -77,7 +77,7 @@ impl Ord for InternalToken<'_> {
             return external_traits_cmp;
         }
 
-        let internal_data_cmp = self.internal_data.cmp(&other.internal_data);
+        let internal_data_cmp = self.data.cmp(&other.data);
         if internal_data_cmp != std::cmp::Ordering::Equal {
             return internal_data_cmp;
         }
@@ -92,7 +92,7 @@ impl Hash for InternalToken<'_> {
         self.publicness.hash(state);
         self.external_macros.hash(state);
         self.external_traits.hash(state);
-        self.internal_data.hash(state);
+        self.data.hash(state);
         self.internal_modules.hash(state);
     }
 }
@@ -118,7 +118,7 @@ impl ToTokens for InternalToken<'_> {
 impl<'data> InternalDependencies<'data> for InternalToken<'data> {
     fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
         let mut dependencies = Vec::new();
-        for data in &self.internal_data {
+        for data in &self.data {
             dependencies.extend(data.internal_dependencies());
         }
         for module in &self.internal_modules {

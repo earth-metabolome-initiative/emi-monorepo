@@ -188,7 +188,8 @@ impl ToTokens for InternalModule<'_> {
             }
         });
         let data = &self.data;
-        let internal_tokens = self.internal_tokens.iter().map(|t| t.to_token_stream());
+        let internal_tokens = &self.internal_tokens;
+        let internal_traits = &self.internal_traits;
         let documentation = &self.documentation;
         tokens.extend(quote! {
             #![doc = #documentation]
@@ -197,6 +198,7 @@ impl ToTokens for InternalModule<'_> {
 
             #(#data)*
 
+            #(#internal_traits)*
             #(#internal_tokens)*
         })
     }

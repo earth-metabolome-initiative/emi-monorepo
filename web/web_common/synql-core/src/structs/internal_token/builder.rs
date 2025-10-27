@@ -10,9 +10,9 @@ use proc_macro2::TokenStream;
 use quote::ToTokens;
 
 use crate::structs::{
-    InternalToken, Publicness,
+    DataVariantRef, InternalToken, Publicness,
     external_crate::{ExternalMacroRef, ExternalTraitRef},
-    internal_data::{InternalDataRef, InternalModuleRef},
+    internal_data::InternalModuleRef,
 };
 
 #[derive(Default)]
@@ -26,8 +26,8 @@ pub struct InternalTokenBuilder<'data> {
     external_macros: Vec<ExternalMacroRef<'data>>,
     /// External traits used in the token stream.
     external_traits: Vec<ExternalTraitRef<'data>>,
-    /// Internal data used in the token stream.
-    internal_data: Vec<InternalDataRef<'data>>,
+    /// Data used in the token stream.
+    data: Vec<DataVariantRef<'data>>,
     /// Internal modules from other crates in the same workspace which are used
     /// in the token stream.
     internal_modules: Vec<InternalModuleRef<'data>>,
@@ -238,19 +238,16 @@ impl<'data> InternalTokenBuilder<'data> {
     ///
     /// # Arguments
     ///
-    /// * `internal_data` - The internal data reference.
+    /// * `data` - The internal data reference.
     ///
     /// # Errors
     ///
     /// * Returns an error if the internal data is already present.
-    pub fn internal_data(
-        mut self,
-        internal_data: InternalDataRef<'data>,
-    ) -> Result<Self, InternalTokenBuilderError> {
-        if self.internal_data.contains(&internal_data) {
+    pub fn data(mut self, data: DataVariantRef<'data>) -> Result<Self, InternalTokenBuilderError> {
+        if self.data.contains(&data) {
             return Err(InternalTokenBuilderError::DuplicateInternalData);
         }
-        self.internal_data.push(internal_data);
+        self.data.push(data);
         Ok(self)
     }
 
@@ -330,9 +327,8 @@ impl<'data> Builder for InternalTokenBuilder<'data> {
                 return Err(InternalTokenBuilderError::ExternalTraitNotFound);
             }
         }
-        for internal_data in &self.internal_data {
-            let data_name = internal_data.name();
-            if !string_token_stream.contains(data_name) {
+        for data in &self.data {
+            if !string_token_stream.contains(&data.to_token_stream().to_string()) {
                 return Err(InternalTokenBuilderError::InternalDataNotFound);
             }
         }
@@ -351,7 +347,7 @@ impl<'data> Builder for InternalTokenBuilder<'data> {
                 .ok_or(BuilderError::IncompleteBuild(InternalTokenAttribute::Stream))?,
             external_macros: self.external_macros,
             external_traits: self.external_traits,
-            internal_data: self.internal_data,
+            data: self.data,
             internal_modules: self.internal_modules,
         })
     }

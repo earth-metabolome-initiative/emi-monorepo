@@ -21,47 +21,52 @@ lazy_static! {
             ExternalMacro::new().name("joinable").unwrap().build().unwrap(),
         ])
         .unwrap()
-        .add_type(
+        .add_types([
             ExternalType::new()
-                .diesel_type(syn::parse_str("diesel::sql_types::Interval").unwrap())
-                .rust_type(syn::parse_str("diesel::pg::data_types::PgInterval").unwrap())
+                .diesel_type(syn::parse_quote!(diesel::sql_types::Interval))
+                .rust_type(syn::parse_quote!(diesel::pg::data_types::PgInterval))
                 .postgres_type("interval")
                 .unwrap()
                 .supports_copy()
                 .supports_eq()
                 .build()
-                .unwrap()
-        )
+                .unwrap(),
+            ExternalType::new()
+                .diesel_type(syn::parse_quote!(diesel::result::Error))
+                .rust_type(syn::parse_quote!(diesel::result::Error))
+                .build()
+                .unwrap(),
+        ])
         .unwrap()
         .add_traits([
             ExternalTrait::new()
                 .name("Queryable")
                 .unwrap()
-                .path(syn::parse_str("diesel::Queryable").unwrap())
+                .path(syn::parse_quote!(diesel::Queryable))
                 .build()
                 .unwrap(),
             ExternalTrait::new()
                 .name("Selectable")
                 .unwrap()
-                .path(syn::parse_str("diesel::Selectable").unwrap())
+                .path(syn::parse_quote!(diesel::Selectable))
                 .build()
                 .unwrap(),
             ExternalTrait::new()
                 .name("AsChangeset")
                 .unwrap()
-                .path(syn::parse_str("diesel::AsChangeset").unwrap())
+                .path(syn::parse_quote!(diesel::AsChangeset))
                 .build()
                 .unwrap(),
             ExternalTrait::new()
                 .name("Identifiable")
                 .unwrap()
-                .path(syn::parse_str("diesel::Identifiable").unwrap())
+                .path(syn::parse_quote!(diesel::Identifiable))
                 .build()
                 .unwrap(),
             ExternalTrait::new()
                 .name("Associations")
                 .unwrap()
-                .path(syn::parse_str("diesel::Associations").unwrap())
+                .path(syn::parse_quote!(diesel::Associations))
                 .build()
                 .unwrap(),
         ])
