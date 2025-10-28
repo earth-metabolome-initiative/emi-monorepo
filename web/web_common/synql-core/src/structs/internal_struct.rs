@@ -29,8 +29,6 @@ pub struct InternalAttribute<'data> {
     name: String,
     /// Type of the attribute.
     ty: DataVariantRef<'data>,
-    /// Whether the attribute is nullable.
-    nullable: bool,
 }
 
 impl<'data> InternalAttribute<'data> {
@@ -66,11 +64,6 @@ impl<'data> InternalAttribute<'data> {
     /// Returns the type of the attribute.
     pub fn ty(&self) -> &DataVariantRef<'data> {
         &self.ty
-    }
-
-    /// Returns whether the attribute is nullable.
-    pub fn is_nullable(&self) -> bool {
-        self.nullable
     }
 
     /// Returns whether the attribute's type supports the given trait.
@@ -109,15 +102,9 @@ impl ToTokens for InternalAttribute<'_> {
         };
         let ty = &self.ty;
 
-        let formatted_ty = if self.is_nullable() {
-            quote::quote! {Option<#ty>}
-        } else {
-            quote::quote! {#ty}
-        };
-
         let token = quote::quote! {
             #documentation
-            #pubness #ident: #formatted_ty
+            #pubness #ident: #ty
         };
         tokens.extend(token);
     }

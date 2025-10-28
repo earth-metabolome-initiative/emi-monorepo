@@ -135,7 +135,7 @@ pub trait ColumnSynLike: ColumnLike {
     ) -> Option<Type> {
         let external_type = self.external_postgres_type(workspace, database)?;
         let diesel_type = external_type.diesel_type();
-        if self.is_nullable() {
+        if self.is_nullable(database) {
             Some(syn::parse_quote!(diesel::sql_types::Nullable<#diesel_type>))
         } else {
             Some(diesel_type.clone())
@@ -150,7 +150,7 @@ pub trait ColumnSynLike: ColumnLike {
     ) -> Option<Type> {
         let external_type = self.external_postgres_type(workspace, database)?;
         let rust_type = external_type.rust_type();
-        if self.is_nullable() {
+        if self.is_nullable(database) {
             Some(syn::parse_quote!(Option<#rust_type>))
         } else {
             Some(rust_type.clone())

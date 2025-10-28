@@ -18,6 +18,7 @@ pub struct SynQLBuilder<'a, DB: SynQLDatabaseLike> {
     version: (u8, u8, u8),
     edition: u16,
     generate_workspace_toml: bool,
+    generate_rustfmt: bool,
 }
 
 impl<'a, DB: SynQLDatabaseLike> Default for SynQLBuilder<'a, DB> {
@@ -29,6 +30,7 @@ impl<'a, DB: SynQLDatabaseLike> Default for SynQLBuilder<'a, DB> {
             version: (0, 1, 0),
             edition: 2024,
             generate_workspace_toml: false,
+            generate_rustfmt: false,
         }
     }
 }
@@ -48,6 +50,8 @@ pub enum SynQLAttribute {
     Edition,
     /// Whether to also generate the workspace TOML.
     GenerateWorkspaceToml,
+    /// Whether to also generate the rustfmt configuration file.
+    GenerateRustfmt,
 }
 
 impl Display for SynQLAttribute {
@@ -59,6 +63,7 @@ impl Display for SynQLAttribute {
             SynQLAttribute::Version => write!(f, "version"),
             SynQLAttribute::Edition => write!(f, "edition"),
             SynQLAttribute::GenerateWorkspaceToml => write!(f, "generate_workspace_toml"),
+            SynQLAttribute::GenerateRustfmt => write!(f, "generate_rustfmt"),
         }
     }
 }
@@ -110,6 +115,12 @@ impl<'a, DB: SynQLDatabaseLike> SynQLBuilder<'a, DB> {
         self.generate_workspace_toml = true;
         self
     }
+
+    /// Sets to generate the rustfmt configuration file.
+    pub fn generate_rustfmt(mut self) -> Self {
+        self.generate_rustfmt = true;
+        self
+    }
 }
 
 impl<'a, DB: SynQLDatabaseLike> Attributed for SynQLBuilder<'a, DB> {
@@ -138,6 +149,7 @@ impl<'a, DB: SynQLDatabaseLike> Builder for SynQLBuilder<'a, DB> {
             version: self.version,
             edition: self.edition,
             generate_workspace_toml: self.generate_workspace_toml,
+            generate_rustfmt: self.generate_rustfmt,
         })
     }
 }

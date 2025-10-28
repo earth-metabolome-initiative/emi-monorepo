@@ -223,6 +223,13 @@ impl<'data> DataVariantRef<'data> {
         matches!(self, Self::Result(_, _))
     }
 
+    /// Returns whether it is a `Self` type variant.
+    pub fn is_self_type(&self) -> bool {
+        matches!(self, Self::SelfType(_))
+            || matches!(self, Self::Reference(_, inner) if inner.is_self_type())
+            || matches!(self, Self::MutableReference(_, inner) if inner.is_self_type())
+    }
+
     /// Creates a new `Result` variant from the given left and right variants.
     ///
     /// # Arguments
@@ -240,14 +247,14 @@ impl<'data> DataVariantRef<'data> {
     /// # Arguments
     ///
     /// * `inner` - The inner variant of the `Option`.
-    pub fn option(inner: DataVariantRef<'data>) -> DataVariantRef<'data> {
-        DataVariantRef::Option(Box::new(inner))
+    pub fn optional(&self) -> DataVariantRef<'data> {
+        DataVariantRef::Option(Box::new(self.clone()))
     }
 
     /// Creates a new `Self` type variant with the optional inner variant.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `inner` - The optional inner variant of the `Self` type.
     pub fn self_type(inner: Option<DataVariantRef<'data>>) -> DataVariantRef<'data> {
         DataVariantRef::SelfType(inner.map(Box::new))

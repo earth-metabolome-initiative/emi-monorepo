@@ -2,7 +2,7 @@
 
 use synql_core::{
     prelude::Builder,
-    structs::{InternalAttribute, Workspace},
+    structs::{DataVariantRef, InternalAttribute, Workspace},
     traits::ColumnSynLike,
 };
 
@@ -21,14 +21,18 @@ pub trait ColumnModelLike: ColumnSynLike {
         database: &Self::DB,
         workspace: &Workspace<'data>,
     ) -> InternalAttribute<'data> {
+        let mut attribute_type: DataVariantRef<'data> =
+            self.external_postgres_type(workspace, database).expect("Failed to find external type").into();
+        if self.is_nullable(database) {
+            attribute_type = attribute_type.optional();
+        }
+
         let mut builder = InternalAttribute::new()
             .name(self.column_snake_name())
             .expect("Failed to set name")
             .public()
-            .nullable(self.is_nullable())
-            .ty(self
-                .external_postgres_type(workspace, database)
-                .expect("Failed to find external type"));
+            .ty(attribute_type);
+        
         if let Some(documentation) = self.column_doc(database) {
             builder = builder.documentation(documentation).expect("Failed to set documentation");
         }

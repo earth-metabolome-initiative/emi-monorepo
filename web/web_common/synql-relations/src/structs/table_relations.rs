@@ -7,8 +7,8 @@ use syn::Ident;
 use synql_core::{
     prelude::{Builder, ColumnLike, DatabaseLike, ForeignKeyLike},
     structs::{
-        Argument, DataVariantRef, InternalCrate, InternalModule, InternalToken, InternalTrait,
-        Method, MethodBuilder, WhereClause,
+        Argument, DataVariantRef, ExternalTraitRef, InternalCrate, InternalDataRef, InternalModule,
+        InternalToken, InternalTrait, Method, MethodBuilder, WhereClause,
     },
     traits::{ColumnSynLike, ForeignKeySynLike},
 };
@@ -47,6 +47,20 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
         Self { table, workspace, database }
     }
 
+    /// Returns a reference to the `ExtensionOf` trait.
+    fn extension_of_trait(&self) -> ExternalTraitRef<'data> {
+        self.workspace
+            .external_trait("ExtensionOf")
+            .expect("Failed to get ExtensionOf trait from workspace")
+    }
+
+    /// Returns a reference to the `ModelRef` of the current table.
+    fn model_ref(&self) -> InternalDataRef<'data> {
+        self.table
+            .model_ref(self.workspace)
+            .expect("Failed to get the model ref for the table relations")
+    }
+
     fn init_method_builders(
         &self,
         foreign_key: &<T::DB as DatabaseLike>::ForeignKey,
@@ -61,6 +75,8 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
             .name("connection")
             .expect("Failed to set the method argument name")
             .arg_type(connection_generic.mutable_reference(None))
+            .documentation("Diesel connection to the DB.")
+            .unwrap()
             .build()
             .expect("Failed to build the method argument for the connection");
 
@@ -92,7 +108,7 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
                     if foreign_key.is_always_enforced(self.database) {
                         referenced_table_model.into()
                     } else {
-                        DataVariantRef::option(referenced_table_model.into())
+                        DataVariantRef::optional(&referenced_table_model.into())
                     },
                 )),
         )
@@ -120,32 +136,15 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
         let mut host_column_idents = Vec::new();
         for host_column in foreign_key.host_columns(self.database) {
             let host_column_ident = host_column.column_snake_ident();
-            match (
-                host_column.supports_copy(self.database, self.workspace),
-                host_column.is_nullable(),
-            ) {
-                (true, false) => {
-                    host_column_idents.push(quote! { self.#host_column_ident });
-                }
-                (true, true) => {
-                    host_column_idents.push(quote! { #host_column_ident });
-                    optional_host_columns_retrieval.push(quote! {
-                        let Some(#host_column_ident) = self.#host_column_ident else {
-                            return Ok(None),
-                        };
-                    });
-                }
-                (false, false) => {
-                    host_column_idents.push(quote! { self.#host_column_ident.clone() });
-                }
-                (false, true) => {
-                    host_column_idents.push(quote! { #host_column_ident });
-                    optional_host_columns_retrieval.push(quote! {
-                        let #host_column_ident = self.#host_column_ident.clone() else {
-                            return Ok(None);
-                        };
-                    });
-                }
+            if host_column.is_nullable(self.database) {
+                host_column_idents.push(quote! { #host_column_ident });
+                optional_host_columns_retrieval.push(quote! {
+                    let Some(ref #host_column_ident) = borrowed_ancestor.#host_column_ident else {
+                        return Ok(None);
+                    };
+                });
+            } else {
+                host_column_idents.push(quote! { borrowed_ancestor.#host_column_ident.as_ref() });
             }
         }
 
@@ -182,8 +181,11 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
                 InternalToken::new()
                     .private()
                     .stream(quote::quote! {
+                        use std::borrow::Borrow;
                         use #read_trait;
                         #maybe_use_optional
+                        let ancestor = self.ancestor(#connection_ident)?;
+                        let borrowed_ancestor = ancestor.borrow();
                         #(#optional_host_columns_retrieval)*
                         #referenced_table_model::read(
                             #formatted_host_columns,
@@ -205,6 +207,8 @@ where
     T: TableRelationsLike + ?Sized,
 {
     fn from(table_relation: TableRelations<'data, 'table, T>) -> Self {
+        let extension_of = table_relation.extension_of_trait();
+        let model_ref = table_relation.model_ref();
         InternalTrait::new()
             .public()
             .name(table_relation.table.table_relations_trait_name())
@@ -215,6 +219,18 @@ where
             ))
             .expect("Failed to set the internal trait documentation")
             .generic(syn::parse_quote! {C})
+            .unwrap()
+            .super_trait(
+                InternalToken::new()
+                    .private()
+                    .stream(quote! {#extension_of<#model_ref, C>})
+                    .external_trait(extension_of)
+                    .unwrap()
+                    .data(model_ref.into())
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
             .unwrap()
             .methods(table_relation.table.foreign_keys(table_relation.database).map(
                 |fk: &<T::DB as DatabaseLike>::ForeignKey| {
@@ -241,6 +257,9 @@ where
             .model_ref(table_relation.workspace)
             .expect("Failed to get the model ref for the table relations");
 
+        let internal_trait: InternalTrait<'data> = InternalTrait::from(table_relation);
+        let auto_blanket = internal_trait.auto_blanket().expect("Failed to generate auto blanket");
+
         InternalModule::new()
             .public()
             .name(TRAIT_MODULE_NAME)
@@ -253,8 +272,9 @@ where
             ))
             .expect("Failed to set the module documentation")
             .public()
-            .internal_trait(table_relation.into())
+            .internal_trait(internal_trait)
             .expect("Failed to add the internal data to module")
+            .internal_token(auto_blanket)
             .build()
             .expect("Failed to convert internal data into internal module")
     }

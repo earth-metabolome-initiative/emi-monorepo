@@ -56,7 +56,7 @@ impl ColumnLike for crate::models::Column {
         database.column_metadata(self).normalized_data_type()
     }
 
-    fn is_nullable(&self) -> bool {
+    fn is_nullable(&self, _database: &Self::DB) -> bool {
         self.__is_nullable == "YES"
     }
 

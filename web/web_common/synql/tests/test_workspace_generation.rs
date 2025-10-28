@@ -34,6 +34,7 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
         .database(&db)
         .path(workspace_path.as_path())
         .generate_workspace_toml()
+        .generate_rustfmt()
         .build()
         .expect("Unable to build SynQL instance");
     synql.generate().expect("Unable to generate workspace");
@@ -71,6 +72,15 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("cargo test stdout: {}", String::from_utf8_lossy(&output.stdout));
         eprintln!("cargo test stderr: {}", String::from_utf8_lossy(&output.stderr));
         panic!("cargo test failed for generated workspace");
+    }
+
+    // Runs the `cargo fmt` command in the specified directory.
+    let output = Command::new("cargo").arg("fmt").current_dir(&workspace_path).output()?;
+
+    if !output.status.success() {
+        eprintln!("cargo fmt stdout: {}", String::from_utf8_lossy(&output.stdout));
+        eprintln!("cargo fmt stderr: {}", String::from_utf8_lossy(&output.stderr));
+        panic!("cargo fmt failed for generated workspace");
     }
 
     Ok(())

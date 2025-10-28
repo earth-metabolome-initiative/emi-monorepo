@@ -140,7 +140,10 @@ impl Attributed for ArgumentBuilder<'_> {
 
 impl IsCompleteBuilder for ArgumentBuilder<'_> {
     fn is_complete(&self) -> bool {
-        self.name.is_some() && self.arg_type.is_some()
+        self.name.is_some()
+            && self.arg_type.is_some()
+            && (self.arg_type.as_ref().map_or(true, |ty| ty.is_self_type())
+                || self.documentation.is_some())
     }
 }
 
@@ -149,11 +152,16 @@ impl<'data> Builder for ArgumentBuilder<'data> {
     type Object = Argument<'data>;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
+        let arg_type =
+            self.arg_type.ok_or(BuilderError::IncompleteBuild(ArgumentAttribute::ArgType))?;
+        // Unless the argument is "self", the documentation must be set.
+        if !arg_type.is_self_type() && self.documentation.is_none() {
+            return Err(BuilderError::IncompleteBuild(ArgumentAttribute::Documentation));
+        }
+
         Ok(Argument {
             name: self.name.ok_or(BuilderError::IncompleteBuild(ArgumentAttribute::Name))?,
-            arg_type: self
-                .arg_type
-                .ok_or(BuilderError::IncompleteBuild(ArgumentAttribute::ArgType))?,
+            arg_type,
             mutable: self.mutable,
             documentation: self.documentation,
         })

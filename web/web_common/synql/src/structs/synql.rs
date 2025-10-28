@@ -28,6 +28,8 @@ pub struct SynQL<'a, DB: SynQLDatabaseLike> {
     edition: u16,
     /// Whether to also generate the workspace TOML.
     generate_workspace_toml: bool,
+    /// Whether to also generate the rustfmt configuration file.
+    generate_rustfmt: bool,
 }
 
 impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
@@ -77,6 +79,10 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
 
         if self.generate_workspace_toml {
             workspace.write_toml()?;
+        }
+
+        if self.generate_rustfmt {
+            workspace.write_rustfmt()?;
         }
 
         Ok(())

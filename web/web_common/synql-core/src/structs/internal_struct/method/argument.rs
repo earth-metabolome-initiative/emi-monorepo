@@ -7,7 +7,8 @@ use quote::ToTokens;
 
 use crate::{
     structs::internal_data::DataVariantRef,
-    traits::{ExternalDependencies, InternalDependencies}, utils::RESERVED_RUST_WORDS,
+    traits::{ExternalDependencies, InternalDependencies},
+    utils::RESERVED_RUST_WORDS,
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -29,9 +30,19 @@ impl Argument<'_> {
         &self.name
     }
 
+    /// Returns the documentation of the argument.
+    pub fn documentation(&self) -> Option<&str> {
+        self.documentation.as_deref()
+    }
+
     /// Returns the type of the argument.
     pub fn arg_type(&self) -> &DataVariantRef<'_> {
         &self.arg_type
+    }
+
+    /// Returns whether the argument is a self argument.
+    pub fn is_self(&self) -> bool {
+        self.name == "self" && self.arg_type().is_self_type()
     }
 
     /// Returns the ident of the argument.
@@ -53,7 +64,7 @@ impl<'data> Argument<'data> {
 
 impl ToTokens for Argument<'_> {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        if self.name == "self" {
+        if self.is_self() {
             if self.arg_type.is_reference() {
                 tokens.extend(quote::quote! { &self });
             } else if self.arg_type.is_mutable_reference() {

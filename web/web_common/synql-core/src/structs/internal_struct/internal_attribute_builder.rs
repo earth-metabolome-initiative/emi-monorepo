@@ -22,8 +22,6 @@ pub struct InternalAttributeBuilder<'data> {
     name: Option<String>,
     /// Type of the attribute.
     ty: Option<DataVariantRef<'data>>,
-    /// Whether the attribute is nullable.
-    nullable: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -116,15 +114,6 @@ impl<'data> InternalAttributeBuilder<'data> {
         self
     }
 
-    /// Sets whether the attribute is nullable.
-    ///
-    /// # Arguments
-    /// * `nullable` - Whether the attribute is nullable.
-    pub fn nullable(mut self, nullable: bool) -> Self {
-        self.nullable = nullable;
-        self
-    }
-
     /// Sets the documentation of the attribute.
     ///
     /// # Arguments
@@ -191,7 +180,6 @@ impl<'data> Builder for InternalAttributeBuilder<'data> {
                 .name
                 .ok_or(BuilderError::IncompleteBuild(InternalAttributeAttribute::Name))?,
             ty: self.ty.ok_or(BuilderError::IncompleteBuild(InternalAttributeAttribute::Type))?,
-            nullable: self.nullable,
         })
     }
 }

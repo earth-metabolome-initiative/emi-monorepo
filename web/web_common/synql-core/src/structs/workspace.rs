@@ -109,6 +109,33 @@ impl<'data> Workspace<'data> {
         None
     }
 
+    /// Writes the formatting rules for the workspace.
+    pub fn write_rustfmt(&self) -> std::io::Result<()> {
+        use toml_edit::{DocumentMut, Item};
+        use std::io::Write;
+        let mut doc = DocumentMut::new();
+
+        doc["edition"] = Item::from(self.edition.to_string());
+        doc["max_width"] = Item::from(100);
+        doc["use_small_heuristics"] = Item::from("Max");
+        doc["reorder_imports"] = Item::from(true);
+        doc["group_imports"] = Item::from("StdExternalCrate");
+        doc["imports_granularity"] = Item::from("Crate");
+        doc["reorder_modules"] = Item::from(true);
+        doc["wrap_comments"] = Item::from(true);
+        doc["format_code_in_doc_comments"] = Item::from(true);
+        doc["comment_width"] = Item::from(80);
+        doc["normalize_comments"] = Item::from(true);
+        doc["normalize_doc_attributes"] = Item::from(true);
+        doc["force_multiline_blocks"] = Item::from(true);
+        doc["fn_single_line"] = Item::from(false);
+        doc["where_single_line"] = Item::from(false);
+
+        let rustfmt_path = self.path.join("rustfmt.toml");
+        let mut buffer = std::fs::File::create(rustfmt_path)?;
+        write!(buffer, "{}", doc)
+    }
+
     /// Writes the workspace TOML.
     pub fn write_toml(&self) -> std::io::Result<()> {
         use std::io::Write;
@@ -159,10 +186,7 @@ impl<'data> Workspace<'data> {
 
             // Create table with version and features
             if let Some(version) = external_crate.version() {
-                dep_table.insert(
-                    "version",
-                    Value::from(version),
-                );
+                dep_table.insert("version", Value::from(version));
             }
 
             if let Some((repository, branch)) = external_crate.git() {

@@ -164,13 +164,13 @@ pub trait ColumnLike:
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// let optional_column =
     ///     table.column("optional_field", &db).expect("Column 'optional_field' should exist");
-    /// assert!(!id_column.is_nullable(), "id column should not be nullable");
-    /// assert!(name_column.is_nullable(), "name column should be nullable by default");
-    /// assert!(optional_column.is_nullable(), "optional_field column should be nullable by default");
+    /// assert!(!id_column.is_nullable(&db), "id column should not be nullable");
+    /// assert!(name_column.is_nullable(&db), "name column should be nullable by default");
+    /// assert!(optional_column.is_nullable(&db), "optional_field column should be nullable by default");
     /// # Ok(())
     /// # }
     /// ```
-    fn is_nullable(&self) -> bool;
+    fn is_nullable(&self, database: &Self::DB) -> bool;
 
     /// Returns whether the column has a default value.
     ///

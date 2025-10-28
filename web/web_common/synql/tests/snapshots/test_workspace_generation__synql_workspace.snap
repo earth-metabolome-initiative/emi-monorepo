@@ -19,6 +19,7 @@ expression: normalized_output
         /src
             /lib.rs
             /schema.rs
+    /rustfmt.toml
     /user_model
         /Cargo.toml
         /src

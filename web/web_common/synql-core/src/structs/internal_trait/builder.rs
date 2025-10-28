@@ -8,7 +8,7 @@ use common_traits::{
 };
 use quote::ToTokens;
 
-use crate::structs::{InternalTrait, Publicness, WhereClause, internal_struct::Method};
+use crate::structs::{InternalToken, InternalTrait, Publicness, WhereClause, internal_struct::Method};
 
 #[derive(Default)]
 /// Builder for the `InternalTrait` struct.
@@ -25,6 +25,8 @@ pub struct InternalTraitBuilder<'data> {
     where_statements: Vec<WhereClause<'data>>,
     /// Generics for the trait.
     generics: Vec<syn::Ident>,
+    /// Super traits for the trait.
+    super_traits: Vec<InternalToken<'data>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -42,6 +44,8 @@ pub enum InternalTraitAttribute {
     WhereClauses,
     /// Generics for the trait.
     Generics,
+    /// Super traits for the trait.
+    SuperTraits,
 }
 
 impl Display for InternalTraitAttribute {
@@ -53,6 +57,7 @@ impl Display for InternalTraitAttribute {
             InternalTraitAttribute::Documentation => write!(f, "documentation"),
             InternalTraitAttribute::WhereClauses => write!(f, "where_clauses"),
             InternalTraitAttribute::Generics => write!(f, "generics"),
+            InternalTraitAttribute::SuperTraits => write!(f, "super_traits"),
         }
     }
 }
@@ -73,6 +78,8 @@ pub enum InternalTraitBuilderError {
     DuplicateWhereClause(String),
     /// Duplicate generic found.
     DuplicateGeneric(String),
+    /// Duplicate super trait found.
+    DuplicateSuperTrait(String),
 }
 
 impl Display for InternalTraitBuilderError {
@@ -91,6 +98,9 @@ impl Display for InternalTraitBuilderError {
             }
             InternalTraitBuilderError::DuplicateGeneric(generic) => {
                 write!(f, "Duplicate generic found in trait: {}", generic)
+            }
+            InternalTraitBuilderError::DuplicateSuperTrait(trait_name) => {
+                write!(f, "Duplicate super trait found in trait: {}", trait_name)
             }
         }
     }
@@ -227,6 +237,54 @@ impl<'data> InternalTraitBuilder<'data> {
         self.where_statements.push(where_clause);
         Ok(self)
     }
+
+    /// Adds several where clauses to the trait.
+    ///
+    /// # Arguments
+    /// * `where_clauses` - The where clauses to add.
+    pub fn where_clauses<I>(
+        mut self,
+        where_clauses: I,
+    ) -> Result<Self, InternalTraitBuilderError>
+    where
+        I: IntoIterator<Item = WhereClause<'data>>,
+    {
+        for where_clause in where_clauses {
+            self = self.where_clause(where_clause)?;
+        }
+        Ok(self)
+    }
+
+    /// Adds a super trait to the trait.
+    ///
+    /// # Arguments
+    /// * `super_trait` - The super trait to add.
+    pub fn super_trait(mut self, super_trait: InternalToken<'data>) -> Result<Self, InternalTraitBuilderError> {
+        if self.super_traits.contains(&super_trait) {
+            return Err(InternalTraitBuilderError::DuplicateSuperTrait(
+                super_trait.to_token_stream().to_string(),
+            ));
+        }
+        self.super_traits.push(super_trait);
+        Ok(self)
+    }
+
+    /// Adds several super traits to the trait.
+    ///
+    /// # Arguments
+    /// * `super_traits` - The super traits to add.
+    pub fn super_traits<I>(
+        mut self,
+        super_traits: I,
+    ) -> Result<Self, InternalTraitBuilderError>
+    where
+        I: IntoIterator<Item = InternalToken<'data>>,
+    {
+        for super_trait in super_traits {
+            self = self.super_trait(super_trait)?;
+        }
+        Ok(self)
+    }
 }
 
 impl Attributed for InternalTraitBuilder<'_> {
@@ -255,6 +313,7 @@ impl<'data> Builder for InternalTraitBuilder<'data> {
                 .ok_or(BuilderError::IncompleteBuild(InternalTraitAttribute::Documentation))?,
             where_statements: self.where_statements,
             generics: self.generics,
+            super_traits: self.super_traits,
         })
     }
 }

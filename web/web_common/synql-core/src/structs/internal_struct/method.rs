@@ -3,11 +3,11 @@
 mod argument;
 mod builder;
 mod where_clause;
-pub use argument::{Argument, ArgumentAttribute, ArgumentBuilder, ArgumentBuilderError};
-pub use builder::{MethodAttribute, MethodBuilder, MethodBuilderError};
+pub use argument::Argument;
+pub use builder::MethodBuilder;
 use quote::ToTokens;
 use syn::Ident;
-pub use where_clause::{WhereClause, WhereClauseAttribute, WhereClauseBuilder};
+pub use where_clause::WhereClause;
 
 use crate::{
     structs::{InternalToken, Publicness, internal_data::DataVariantRef},
@@ -44,12 +44,33 @@ impl Method<'_> {
     pub fn name(&self) -> &str {
         &self.name
     }
+
+    /// Returns whether the method has a body.
+    pub fn has_body(&self) -> bool {
+        self.body.is_some()
+    }
 }
 
 impl<'data> Method<'data> {
     /// Initializes a new `MethodBuilder`.
     pub fn new() -> MethodBuilder<'data> {
         MethodBuilder::default()
+    }
+
+    /// Returns an iterator over the non-self arguments of the method.
+    pub fn non_self_arguments(&self) -> impl Iterator<Item = &Argument<'data>> {
+        self.arguments.iter().filter(|arg| !arg.is_self())
+    }
+
+    /// Returns whether the method has non-self arguments.
+    pub fn has_non_self_arguments(&self) -> bool {
+        self.non_self_arguments().next().is_some()
+    }
+
+    /// Returns whether the method can fail, (i.e. has a return type of
+    /// `Result`).
+    pub fn can_fail(&self) -> bool {
+        self.return_type.as_ref().map_or(false, |ret_type| ret_type.is_result())
     }
 }
 
@@ -92,7 +113,28 @@ impl ToTokens for Method<'_> {
             quote::quote! { where #(#where_tokens),* }
         };
 
+        let mut documentation = vec![self.documentation.clone()];
+
+        if self.has_non_self_arguments() {
+            documentation.push(String::default());
+            documentation.push("# Arguments".to_string());
+            for arg in self.non_self_arguments() {
+                documentation.push(format!(
+                    " * `{}` - {}",
+                    arg.name(),
+                    arg.documentation().unwrap_or_default()
+                ));
+            }
+        }
+
+        if let Some(error_doc) = &self.error_documentation {
+            documentation.push(String::default());
+            documentation.push("# Errors".to_string());
+            documentation.push(error_doc.clone());
+        }
+
         tokens.extend(quote::quote! {
+            #(#[doc = #documentation])*
 			#pubness_tokens #async_tokens fn #name_ident #formatted_generics (#(#arguments_tokens),*) #return_type_tokens #formatted_where #formatted_body
 		});
     }

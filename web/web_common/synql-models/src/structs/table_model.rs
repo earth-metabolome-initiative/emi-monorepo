@@ -160,7 +160,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
                         where
                             Self: 'data;
 
-                        fn extension_of(
+                        fn ancestor(
                             &self,
                             _connection: &mut C,
                         ) -> Result<Self::ExtendedType<'_>, diesel::result::Error> {
@@ -191,7 +191,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
                             where
                                 Self: 'data;
 
-                            fn extension_of(
+                            fn ancestor(
                                 &self,
                                 connection: &mut C,
                             ) -> Result<Self::ExtendedType<'_>, diesel::result::Error> {

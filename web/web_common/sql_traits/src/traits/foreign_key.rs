@@ -442,7 +442,7 @@ pub trait ForeignKeyLike:
     /// ```
     fn has_nullable_host_columns(&self, database: &Self::DB) -> bool {
         self.host_columns(database)
-            .any(|col: &<Self::DB as DatabaseLike>::Column| ColumnLike::is_nullable(col))
+            .any(|col: &<Self::DB as DatabaseLike>::Column| ColumnLike::is_nullable(col, database))
     }
 
     /// Returns whether the foreign key is always enforced, i.e., it cannot be violated.

@@ -19,7 +19,7 @@ pub use internal_data::{
 mod publicness;
 pub use publicness::Publicness;
 mod external_crate;
-pub use external_crate::{ExternalCrate, ExternalTypeRef};
+pub use external_crate::{ExternalCrate, ExternalTypeRef, ExternalTraitRef};
 mod external_type;
 pub use external_type::{ExternalType, Trait};
 mod external_macro;

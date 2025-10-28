@@ -49,12 +49,13 @@ impl ColumnLike for TableAttribute<CreateTable, ColumnDef> {
         data_type
     }
 
-    fn is_nullable(&self) -> bool {
+    fn is_nullable(&self, database: &Self::DB) -> bool {
         !self
             .attribute()
             .options
             .iter()
             .any(|opt| matches!(opt.option, sqlparser::ast::ColumnOption::NotNull))
+            && !self.is_primary_key(database)
     }
 
     fn has_default(&self) -> bool {
