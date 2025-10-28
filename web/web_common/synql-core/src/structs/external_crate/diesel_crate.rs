@@ -64,6 +64,12 @@ lazy_static! {
                 .build()
                 .unwrap(),
             ExternalTrait::new()
+                .name("Insertable")
+                .unwrap()
+                .path(syn::parse_quote!(diesel::Insertable))
+                .build()
+                .unwrap(),
+            ExternalTrait::new()
                 .name("Associations")
                 .unwrap()
                 .path(syn::parse_quote!(diesel::Associations))
