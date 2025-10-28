@@ -50,6 +50,14 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
             );
         }
 
+        if !self.table.has_generated_columns(self.database) {
+            traits.push(
+                self.workspace
+                    .external_trait("Insertable")
+                    .expect("Failed to get Insertable trait"),
+            );
+        }
+
         if self.table.has_primary_key(self.database) {
             traits.push(
                 self.workspace.external_trait("Queryable").expect("Failed to get Queryable trait"),

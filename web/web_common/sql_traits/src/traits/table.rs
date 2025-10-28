@@ -84,6 +84,37 @@ pub trait TableLike:
     where
         Self: 'db;
 
+    /// Returns whether any of the columns of the table are generated.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `database` - A reference to the database instance to which the table
+    /// belongs.
+    /// 
+    /// # Example
+    /// 
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// 
+    /// let db = ParserDB::try_from(
+    ///    r#"
+    /// CREATE TABLE my_table (id SERIAL PRIMARY KEY, name TEXT);
+    /// CREATE TABLE my_other_table (id INT PRIMARY KEY, name TEXT);
+    /// "#,
+    /// )?;
+    /// 
+    /// let table = db.table(None, "my_table");
+    /// assert!(table.has_generated_columns(&db));
+    /// let other_table = db.table(None, "my_other_table");
+    /// assert!(!other_table.has_generated_columns(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_generated_columns(&self, database: &Self::DB) -> bool {
+        self.columns(database).any(|col| col.is_generated())
+    }
+
     /// Returns the number of columns in the table.
     ///
     /// # Arguments

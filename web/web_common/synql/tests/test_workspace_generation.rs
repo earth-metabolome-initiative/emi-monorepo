@@ -15,12 +15,12 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
     let db = ParserDB::try_from(
         r#"
 		CREATE TABLE users (
-		    id INT PRIMARY KEY,
+		    id SERIAL PRIMARY KEY,
 		    name TEXT NOT NULL,
 		    email TEXT UNIQUE NOT NULL
 		);
         CREATE TABLE comments (
-		    id INT PRIMARY KEY,
+		    id SERIAL PRIMARY KEY,
 		    name TEXT NOT NULL,
             user_id INT REFERENCES users(id)
 		);
