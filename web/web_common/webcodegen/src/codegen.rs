@@ -6,7 +6,6 @@ use diesel::PgConnection;
 use prettyplease::unparse;
 use proc_macro2::TokenStream;
 use syn::File;
-mod diesel_codegen;
 mod structs_codegen;
 mod syntaxes;
 mod traits_codegen;
