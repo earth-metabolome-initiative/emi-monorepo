@@ -8,7 +8,9 @@ use common_traits::{
 };
 use quote::ToTokens;
 
-use crate::structs::{InternalToken, InternalTrait, Publicness, WhereClause, internal_struct::Method};
+use crate::structs::{
+    InternalToken, InternalTrait, Publicness, WhereClause, internal_struct::Method,
+};
 
 #[derive(Default)]
 /// Builder for the `InternalTrait` struct.
@@ -242,10 +244,7 @@ impl<'data> InternalTraitBuilder<'data> {
     ///
     /// # Arguments
     /// * `where_clauses` - The where clauses to add.
-    pub fn where_clauses<I>(
-        mut self,
-        where_clauses: I,
-    ) -> Result<Self, InternalTraitBuilderError>
+    pub fn where_clauses<I>(mut self, where_clauses: I) -> Result<Self, InternalTraitBuilderError>
     where
         I: IntoIterator<Item = WhereClause<'data>>,
     {
@@ -259,7 +258,10 @@ impl<'data> InternalTraitBuilder<'data> {
     ///
     /// # Arguments
     /// * `super_trait` - The super trait to add.
-    pub fn super_trait(mut self, super_trait: InternalToken<'data>) -> Result<Self, InternalTraitBuilderError> {
+    pub fn super_trait(
+        mut self,
+        super_trait: InternalToken<'data>,
+    ) -> Result<Self, InternalTraitBuilderError> {
         if self.super_traits.contains(&super_trait) {
             return Err(InternalTraitBuilderError::DuplicateSuperTrait(
                 super_trait.to_token_stream().to_string(),
@@ -273,10 +275,7 @@ impl<'data> InternalTraitBuilder<'data> {
     ///
     /// # Arguments
     /// * `super_traits` - The super traits to add.
-    pub fn super_traits<I>(
-        mut self,
-        super_traits: I,
-    ) -> Result<Self, InternalTraitBuilderError>
+    pub fn super_traits<I>(mut self, super_traits: I) -> Result<Self, InternalTraitBuilderError>
     where
         I: IntoIterator<Item = InternalToken<'data>>,
     {

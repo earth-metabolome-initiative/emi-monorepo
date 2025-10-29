@@ -4,6 +4,11 @@ expression: normalized_output
 ---
 [TEMP_DIR]/synql_workspace
     /Cargo.toml
+    /comment_attributes
+        /Cargo.toml
+        /src
+            /attributes.rs
+            /lib.rs
     /comment_insertable
         /Cargo.toml
         /src
@@ -25,6 +30,11 @@ expression: normalized_output
             /lib.rs
             /schema.rs
     /rustfmt.toml
+    /user_attributes
+        /Cargo.toml
+        /src
+            /attributes.rs
+            /lib.rs
     /user_insertable
         /Cargo.toml
         /src

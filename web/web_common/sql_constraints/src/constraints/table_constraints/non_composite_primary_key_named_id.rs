@@ -23,14 +23,19 @@ use crate::{
 ///
 /// let constrainer: GenericConstrainer<ParserDB> = NonCompositePrimaryKeyNamedId::default().into();
 ///
-/// let invalid_schema = ParserDB::try_from("CREATE TABLE mytable (pk INT PRIMARY KEY, name TEXT);").unwrap();
+/// let invalid_schema =
+///     ParserDB::try_from("CREATE TABLE mytable (pk INT PRIMARY KEY, name TEXT);").unwrap();
 /// assert!(constrainer.validate_schema(&invalid_schema).is_err());
 ///
-/// let valid_schema = ParserDB::try_from("CREATE TABLE mytable (id INT PRIMARY KEY, name TEXT);").unwrap();
+/// let valid_schema =
+///     ParserDB::try_from("CREATE TABLE mytable (id INT PRIMARY KEY, name TEXT);").unwrap();
 /// assert!(constrainer.validate_schema(&valid_schema).is_ok());
 ///
 /// // Composite primary keys are allowed to have any name
-/// let valid_composite_schema = ParserDB::try_from("CREATE TABLE mytable (pk1 INT, pk2 INT, name TEXT, PRIMARY KEY (pk1, pk2));").unwrap();
+/// let valid_composite_schema = ParserDB::try_from(
+///     "CREATE TABLE mytable (pk1 INT, pk2 INT, name TEXT, PRIMARY KEY (pk1, pk2));",
+/// )
+/// .unwrap();
 /// assert!(constrainer.validate_schema(&valid_composite_schema).is_ok());
 /// ```
 pub struct NonCompositePrimaryKeyNamedId<DB>(std::marker::PhantomData<DB>);
@@ -41,7 +46,9 @@ impl<DB> Default for NonCompositePrimaryKeyNamedId<DB> {
     }
 }
 
-impl<DB: DatabaseLike + 'static> From<NonCompositePrimaryKeyNamedId<DB>> for GenericConstrainer<DB> {
+impl<DB: DatabaseLike + 'static> From<NonCompositePrimaryKeyNamedId<DB>>
+    for GenericConstrainer<DB>
+{
     fn from(constraint: NonCompositePrimaryKeyNamedId<DB>) -> Self {
         let mut constrainer = GenericConstrainer::default();
         constrainer.register_table_constraint(Box::new(constraint));
@@ -79,12 +86,12 @@ impl<DB: DatabaseLike> TableConstraint for NonCompositePrimaryKeyNamedId<DB> {
         table: &<Self::Database as DatabaseLike>::Table,
     ) -> Result<(), crate::error::Error> {
         let pk_columns: Vec<_> = table.primary_key_columns(database).collect();
-        
+
         // If there's no primary key or it's composite, the constraint doesn't apply
         if pk_columns.is_empty() || pk_columns.len() > 1 {
             return Ok(());
         }
-        
+
         // Single primary key column must be named "id"
         let pk_column = pk_columns[0];
         if pk_column.column_name() == "id" {

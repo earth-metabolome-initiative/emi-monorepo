@@ -270,7 +270,8 @@ where
                     )
                     .expect("Failed to set attributes")
                     .build()
-                    .expect("Failed to build struct variant"),
+                    .expect("Failed to build struct variant")
+                    .into(),
             );
 
         if let Some(documentation) = table_model.table.table_doc(table_model.database) {

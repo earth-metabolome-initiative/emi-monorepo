@@ -10,8 +10,6 @@ pub trait ExtensionOf<Extended, C> {
         Self: 'data;
 
     /// Returns the extended object.
-    fn ancestor(
-        &self,
-        connection: &mut C,
-    ) -> Result<Self::ExtendedType<'_>, diesel::result::Error>;
+    fn ancestor(&self, connection: &mut C)
+    -> Result<Self::ExtendedType<'_>, diesel::result::Error>;
 }

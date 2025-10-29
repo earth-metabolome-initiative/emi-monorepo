@@ -11,7 +11,7 @@ pub use internal_struct::{
 mod internal_module;
 pub use internal_module::InternalModule;
 mod internal_enum;
-pub use internal_enum::InternalEnum;
+pub use internal_enum::{InternalEnum, InternalVariant};
 mod internal_data;
 pub use internal_data::{
     DataVariantRef, InternalData, InternalDataRef, InternalDataVariant, InternalModuleRef,
@@ -19,7 +19,7 @@ pub use internal_data::{
 mod publicness;
 pub use publicness::Publicness;
 mod external_crate;
-pub use external_crate::{ExternalCrate, ExternalTypeRef, ExternalTraitRef};
+pub use external_crate::{ExternalCrate, ExternalTraitRef, ExternalTypeRef};
 mod external_type;
 pub use external_type::{ExternalType, Trait};
 mod external_macro;

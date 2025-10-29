@@ -171,11 +171,8 @@ impl<'data> InternalDataBuilder<'data> {
     ///
     /// # Arguments
     /// * `variant` - The variant of the data (struct or enum).
-    pub fn variant<V>(mut self, variant: V) -> Self
-    where
-        V: Into<InternalDataVariant<'data>>,
-    {
-        self.variant = Some(variant.into());
+    pub fn variant(mut self, variant: InternalDataVariant<'data>) -> Self {
+        self.variant = Some(variant);
         self
     }
 

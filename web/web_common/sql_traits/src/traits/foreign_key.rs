@@ -445,7 +445,8 @@ pub trait ForeignKeyLike:
             .any(|col: &<Self::DB as DatabaseLike>::Column| ColumnLike::is_nullable(col, database))
     }
 
-    /// Returns whether the foreign key is always enforced, i.e., it cannot be violated.
+    /// Returns whether the foreign key is always enforced, i.e., it cannot be
+    /// violated.
     ///
     /// # Implementation note
     ///
@@ -489,7 +490,10 @@ pub trait ForeignKeyLike:
     ///     not_null_fk_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// let nullable_match_full_fk =
     ///     nullable_match_full_table.foreign_keys(&db).next().expect("Should have a foreign key");
-    /// assert!(!nullable_fk.is_always_enforced(&db), "Nullable FK without MATCH FULL should be nullable");
+    /// assert!(
+    ///     !nullable_fk.is_always_enforced(&db),
+    ///     "Nullable FK without MATCH FULL should be nullable"
+    /// );
     /// assert!(not_null_fk.is_always_enforced(&db), "NOT NULL FK should not be nullable");
     /// assert!(
     ///     nullable_match_full_fk.is_always_enforced(&db),

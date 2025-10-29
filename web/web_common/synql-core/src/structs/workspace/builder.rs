@@ -180,8 +180,7 @@ impl<'data> WorkspaceBuilder<'data> {
 
     /// Adds the `diesel-queries` external crate to the workspace.
     pub fn diesel_queries(self) -> Result<Self, WorkspaceBuilderError> {
-        self.external_crate(ExternalCrate::diesel_queries())?
-            .diesel()
+        self.external_crate(ExternalCrate::diesel_queries())?.diesel()
     }
 
     /// Adds the serde external crate to the workspace.

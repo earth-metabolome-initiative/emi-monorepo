@@ -116,6 +116,24 @@ impl ExternalTrait {
     pub fn path(&self) -> &syn::Path {
         &self.path
     }
+
+    /// Returns whether the trait is implemented for typeless enums.
+    pub fn implemented_for_typeless_enum(&self) -> bool {
+        let Ok(trait_variant) = Trait::try_from(self) else {
+            return false;
+        };
+        matches!(
+            trait_variant,
+            Trait::Clone
+                | Trait::Debug
+                | Trait::Copy
+                | Trait::PartialEq
+                | Trait::Eq
+                | Trait::Hash
+                | Trait::PartialOrd
+                | Trait::Ord
+        )
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -146,6 +164,16 @@ impl TraitVariantRef<'_> {
         match self {
             TraitVariantRef::Internal(trait_def, _crate_def) => trait_def.name(),
             TraitVariantRef::External(ext_trait_ref) => ext_trait_ref.name(),
+        }
+    }
+
+    /// Returns whether the trait is implemented for typeless enums.
+    pub fn implemented_for_typeless_enum(&self) -> bool {
+        match self {
+            TraitVariantRef::Internal(_, _) => false,
+            TraitVariantRef::External(ext_trait_ref) => {
+                ext_trait_ref.implemented_for_typeless_enum()
+            }
         }
     }
 }

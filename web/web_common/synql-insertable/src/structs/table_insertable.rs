@@ -113,7 +113,8 @@ impl<'data, 'table, T: TableInsertableLike + ?Sized> TableInsertable<'data, 'tab
                 .attributes(attributes)
                 .expect("Failed to set attributes")
                 .build()
-                .expect("Failed to build struct variant"),
+                .expect("Failed to build struct variant")
+                .into(),
         );
 
         data_builder.build().expect("Failed to build insertable data")

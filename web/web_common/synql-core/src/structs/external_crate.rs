@@ -72,7 +72,8 @@ impl<'data> ExternalCrate<'data> {
         self.version.as_deref()
     }
 
-    /// Returns the git repository and branch of the crate if it is a dependency.
+    /// Returns the git repository and branch of the crate if it is a
+    /// dependency.
     pub fn git(&self) -> Option<(&str, &str)> {
         self.git.as_ref().map(|(repo, branch)| (repo.as_str(), branch.as_str()))
     }
@@ -179,7 +180,8 @@ impl<'data> ExternalTypeRef<'data> {
         self.crate_ref.version()
     }
 
-    /// Returns the git repository and branch of the crate if it is a dependency.
+    /// Returns the git repository and branch of the crate if it is a
+    /// dependency.
     pub fn git(&self) -> Option<(&'data str, &'data str)> {
         self.crate_ref.git()
     }
@@ -272,5 +274,10 @@ impl<'data> ExternalTraitRef<'data> {
     /// Returns a reference to the external trait.
     pub fn external_trait(&self) -> &'data ExternalTrait {
         self.trait_ref
+    }
+
+    /// Returns whether the trait is implemented for typeless enums.
+    pub fn implemented_for_typeless_enum(&self) -> bool {
+        self.trait_ref.implemented_for_typeless_enum()
     }
 }

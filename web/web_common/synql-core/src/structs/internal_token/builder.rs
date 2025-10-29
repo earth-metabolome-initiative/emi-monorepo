@@ -221,7 +221,8 @@ impl<'data> InternalTokenBuilder<'data> {
     pub fn external_traits<I>(
         mut self,
         external_traits: I,
-    ) -> Result<Self, InternalTokenBuilderError> where 
+    ) -> Result<Self, InternalTokenBuilderError>
+    where
         I: IntoIterator<Item = ExternalTraitRef<'data>>,
     {
         for external_trait in external_traits {

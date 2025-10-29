@@ -111,8 +111,9 @@ impl<'data> Workspace<'data> {
 
     /// Writes the formatting rules for the workspace.
     pub fn write_rustfmt(&self) -> std::io::Result<()> {
-        use toml_edit::{DocumentMut, Item};
         use std::io::Write;
+
+        use toml_edit::{DocumentMut, Item};
         let mut doc = DocumentMut::new();
 
         doc["edition"] = Item::from(self.edition.to_string());

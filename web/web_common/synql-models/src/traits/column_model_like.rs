@@ -21,8 +21,10 @@ pub trait ColumnModelLike: ColumnSynLike {
         database: &Self::DB,
         workspace: &Workspace<'data>,
     ) -> InternalAttribute<'data> {
-        let mut attribute_type: DataVariantRef<'data> =
-            self.external_postgres_type(workspace, database).expect("Failed to find external type").into();
+        let mut attribute_type: DataVariantRef<'data> = self
+            .external_postgres_type(workspace, database)
+            .expect("Failed to find external type")
+            .into();
         if self.is_nullable(database) {
             attribute_type = attribute_type.optional();
         }
@@ -32,7 +34,7 @@ pub trait ColumnModelLike: ColumnSynLike {
             .expect("Failed to set name")
             .public()
             .ty(attribute_type);
-        
+
         if let Some(documentation) = self.column_doc(database) {
             builder = builder.documentation(documentation).expect("Failed to set documentation");
         }
