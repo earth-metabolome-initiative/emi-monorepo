@@ -43,6 +43,7 @@ impl TryFrom<&ExternalTrait> for Trait {
     fn try_from(value: &ExternalTrait) -> Result<Self, Self::Error> {
         match value.name.as_str() {
             "Clone" => Ok(Trait::Clone),
+            "Copy" => Ok(Trait::Copy),
             "Debug" => Ok(Trait::Debug),
             "Default" => Ok(Trait::Default),
             "PartialEq" => Ok(Trait::PartialEq),
@@ -122,6 +123,16 @@ impl ExternalTrait {
 
     /// Returns whether the trait is implemented for typeless enums.
     pub fn implemented_for_typeless_enum(&self) -> bool {
+        if self.path.to_token_stream().to_string() == quote::quote! { serde::Serialize }.to_string()
+        {
+            return true;
+        }
+        if self.path.to_token_stream().to_string()
+            == quote::quote! { serde::Deserialize }.to_string()
+        {
+            return true;
+        }
+
         let Ok(trait_variant) = Trait::try_from(self) else {
             return false;
         };
