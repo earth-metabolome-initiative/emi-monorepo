@@ -9,8 +9,8 @@ use common_traits::{
 use strum::IntoEnumIterator;
 
 use crate::structs::{
-    Decorator, Derive, ExternalCrate, InternalData, InternalDataVariant, InternalToken, Publicness,
-    Trait, external_trait::TraitVariantRef,
+    Decorator, Derive, Documentation, ExternalCrate, InternalData, InternalDataVariant,
+    InternalToken, Publicness, Trait, external_trait::TraitVariantRef,
 };
 
 #[derive(Default)]
@@ -21,7 +21,7 @@ pub struct InternalDataBuilder<'data> {
     /// Name of the data.
     name: Option<String>,
     /// Documentation of the data.
-    documentation: Option<String>,
+    documentation: Option<Documentation<'data>>,
     /// The variant of the data (struct or enum).
     variant: Option<InternalDataVariant<'data>>,
     /// The traits implemented for the data.
@@ -73,8 +73,6 @@ pub enum InternalDataBuilderError {
     Builder(BuilderError<InternalDataAttribute>),
     /// The name of the data is invalid.
     InvalidName,
-    /// The documentation of the data is invalid.
-    InvalidDocumentation,
     /// A trait with the same name has already been added.
     DuplicatedTrait,
     /// A derive with the same name has already been added.
@@ -88,9 +86,6 @@ impl Display for InternalDataBuilderError {
         match self {
             InternalDataBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             InternalDataBuilderError::InvalidName => write!(f, "Invalid data name"),
-            InternalDataBuilderError::InvalidDocumentation => {
-                write!(f, "Invalid data documentation")
-            }
             InternalDataBuilderError::DuplicatedTrait => {
                 write!(f, "A trait with the same name has already been added")
             }
@@ -134,16 +129,9 @@ impl<'data> InternalDataBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the data.
-    pub fn documentation<S: ToString>(
-        mut self,
-        documentation: S,
-    ) -> Result<Self, InternalDataBuilderError> {
-        let documentation = documentation.to_string();
-        if documentation.trim().is_empty() {
-            return Err(InternalDataBuilderError::InvalidDocumentation);
-        }
+    pub fn documentation(mut self, documentation: Documentation<'data>) -> Self {
         self.documentation = Some(documentation);
-        Ok(self)
+        self
     }
 
     /// Sets the publicness of the data.
@@ -267,7 +255,10 @@ impl Attributed for InternalDataBuilder<'_> {
 
 impl IsCompleteBuilder for InternalDataBuilder<'_> {
     fn is_complete(&self) -> bool {
-        self.publicness.is_some() && self.name.is_some() && self.variant.is_some()
+        self.publicness.is_some()
+            && self.name.is_some()
+            && self.variant.is_some()
+            && self.documentation.is_some()
     }
 }
 
@@ -316,7 +307,9 @@ impl<'data> Builder for InternalDataBuilder<'data> {
                 .publicness
                 .ok_or(BuilderError::IncompleteBuild(InternalDataAttribute::Publicness))?,
             name: self.name.ok_or(BuilderError::IncompleteBuild(InternalDataAttribute::Name))?,
-            documentation: self.documentation,
+            documentation: self
+                .documentation
+                .ok_or(BuilderError::IncompleteBuild(InternalDataAttribute::Documentation))?,
             variant: variant,
             traits: self.traits,
             derives: self.derives,

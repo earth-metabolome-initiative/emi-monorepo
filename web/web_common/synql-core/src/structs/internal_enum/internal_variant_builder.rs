@@ -8,7 +8,9 @@ use common_traits::{
 };
 use syn::Ident;
 
-use crate::structs::{internal_data::DataVariantRef, internal_enum::InternalVariant};
+use crate::structs::{
+    Documentation, internal_data::DataVariantRef, internal_enum::InternalVariant,
+};
 
 #[derive(Default)]
 /// Builder for the `InternalVariant` struct.
@@ -16,7 +18,7 @@ pub struct InternalVariantBuilder<'data> {
     /// Name of the variant.
     name: Option<Ident>,
     /// Documentation comment of the variant.
-    doc: Option<String>,
+    doc: Option<Documentation<'data>>,
     /// Type of the variant.
     ty: Option<DataVariantRef<'data>>,
 }
@@ -48,8 +50,6 @@ impl Display for InternalVariantAttribute {
 pub enum InternalVariantBuilderError {
     /// An error occurred during the building process.
     Builder(BuilderError<InternalVariantAttribute>),
-    /// The provided documentation comment is empty.
-    EmptyDoc,
 }
 
 impl From<BuilderError<InternalVariantAttribute>> for InternalVariantBuilderError {
@@ -62,7 +62,6 @@ impl Display for InternalVariantBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             InternalVariantBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
-            InternalVariantBuilderError::EmptyDoc => write!(f, "Empty documentation comment"),
         }
     }
 }
@@ -71,7 +70,6 @@ impl Error for InternalVariantBuilderError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             InternalVariantBuilderError::Builder(e) => Some(e),
-            _ => None,
         }
     }
 }
@@ -102,12 +100,9 @@ impl<'data> InternalVariantBuilder<'data> {
     ///
     /// # Arguments
     /// * `doc` - The documentation comment of the variant.
-    pub fn doc(mut self, doc: String) -> Result<Self, InternalVariantBuilderError> {
-        if doc.trim().is_empty() {
-            return Err(InternalVariantBuilderError::EmptyDoc);
-        }
+    pub fn doc(mut self, doc: Documentation<'data>) -> Self {
         self.doc = Some(doc);
-        Ok(self)
+        self
     }
 }
 

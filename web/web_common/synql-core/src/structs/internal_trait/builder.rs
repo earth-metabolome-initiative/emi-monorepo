@@ -9,7 +9,7 @@ use common_traits::{
 use quote::ToTokens;
 
 use crate::structs::{
-    InternalToken, InternalTrait, Publicness, WhereClause, internal_struct::Method,
+    Documentation, InternalToken, InternalTrait, Publicness, WhereClause, internal_struct::Method,
 };
 
 #[derive(Default)]
@@ -22,7 +22,7 @@ pub struct InternalTraitBuilder<'data> {
     /// Internal token streams defined within the trait.
     methods: Vec<Method<'data>>,
     /// Trait documentation.
-    documentation: Option<String>,
+    documentation: Option<Documentation<'data>>,
     /// Where statements for the trait.
     where_statements: Vec<WhereClause<'data>>,
     /// Generics for the trait.
@@ -72,8 +72,6 @@ pub enum InternalTraitBuilderError {
     Builder(BuilderError<InternalTraitAttribute>),
     /// The name of the trait is invalid.
     InvalidName,
-    /// The documentation is invalid (empty or whitespace only).
-    InvalidDocumentation,
     /// Duplicate method names found.
     DuplicateMethodName(String),
     /// Duplicate where clause found.
@@ -89,9 +87,6 @@ impl Display for InternalTraitBuilderError {
         match self {
             InternalTraitBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             InternalTraitBuilderError::InvalidName => write!(f, "Invalid trait name"),
-            InternalTraitBuilderError::InvalidDocumentation => {
-                write!(f, "Invalid trait documentation (empty or whitespace only)")
-            }
             InternalTraitBuilderError::DuplicateMethodName(name) => {
                 write!(f, "Duplicate method name found in trait: {}", name)
             }
@@ -159,16 +154,9 @@ impl<'data> InternalTraitBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the trait.
-    pub fn documentation<S: ToString>(
-        mut self,
-        documentation: S,
-    ) -> Result<Self, InternalTraitBuilderError> {
-        let documentation = documentation.to_string();
-        if documentation.trim().is_empty() {
-            return Err(InternalTraitBuilderError::InvalidDocumentation);
-        }
+    pub fn documentation(mut self, documentation: Documentation<'data>) -> Self {
         self.documentation = Some(documentation);
-        Ok(self)
+        self
     }
 
     /// Adds a method to the trait.

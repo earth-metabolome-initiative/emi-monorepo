@@ -4,8 +4,8 @@ use quote::{ToTokens, quote};
 use synql_core::{
     prelude::{Builder, ForeignKeyLike},
     structs::{
-        Decorator, Derive, InternalCrate, InternalData, InternalModule, InternalStruct,
-        InternalToken,
+        Decorator, Derive, Documentation, InternalCrate, InternalData, InternalModule,
+        InternalStruct, InternalToken,
     },
     traits::ColumnSynLike,
 };
@@ -232,7 +232,7 @@ where
             .schema_module(table_model.workspace)
             .expect("Failed to get the table schema module");
         let snake_case_ident = table_model.table.table_snake_ident();
-        let mut builder = InternalData::new()
+        InternalData::new()
             .public()
             .name(table_model.table.table_singular_camel_name())
             .expect("Failed to set name")
@@ -258,6 +258,18 @@ where
             .unwrap()
             .decorators(table_model.primary_key_decorator())
             .unwrap()
+            .documentation(
+                Documentation::new()
+                    .documentation(table_model.table.table_doc(table_model.database).expect(
+                        &format!(
+                            "Failed to get documentation for table {}",
+                            table_model.table.table_name(),
+                        ),
+                    ))
+                    .unwrap()
+                    .build()
+                    .expect("Failed to build documentation"),
+            )
             .variant(
                 InternalStruct::new()
                     .attributes(
@@ -270,13 +282,9 @@ where
                     .build()
                     .expect("Failed to build struct variant")
                     .into(),
-            );
-
-        if let Some(documentation) = table_model.table.table_doc(table_model.database) {
-            builder = builder.documentation(documentation).expect("Failed to set documentation");
-        }
-
-        builder.build().expect("Failed to build table model")
+            )
+            .build()
+            .expect("Failed to build table model")
     }
 }
 
@@ -289,12 +297,17 @@ where
             .public()
             .name("model")
             .expect("Failed to set the module name")
-            .documentation(format!(
-                "Submodule providing the [`{}`] data model for the `{}` table.",
-                table_model.table.table_singular_camel_name(),
-                table_model.table.table_name()
-            ))
-            .expect("Failed to set the module documentation")
+            .documentation(
+                Documentation::new()
+                    .documentation(format!(
+                        "Submodule providing the [`{}`] data model for the `{}` table.",
+                        table_model.table.table_singular_camel_name(),
+                        table_model.table.table_name()
+                    ))
+                    .unwrap()
+                    .build()
+                    .expect("Failed to build documentation"),
+            )
             .public()
             .internal_tokens(table_model.extension_of_impls())
             .data(table_model.into())
@@ -312,12 +325,17 @@ where
         InternalCrate::new()
             .name(table_model.table.table_model_crate_name())
             .expect("Failed to set the crate name")
-            .documentation(format!(
-                "Crate providing the [`{}`] data model for the `{}` table.",
-                table_model.table.table_singular_camel_name(),
-                table_model.table.table_name()
-            ))
-            .expect("Failed to set the crate documentation")
+            .documentation(
+                Documentation::new()
+                    .documentation(format!(
+                        "Crate providing the [`{}`] data model for the `{}` table.",
+                        table_model.table.table_singular_camel_name(),
+                        table_model.table.table_name()
+                    ))
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
             .module(table_model.into())
             .expect("Failed to add internal module to internal crate")
             .build()

@@ -1,8 +1,10 @@
 //! Submodule defining the `TableSchema` trait which allows to generate the
 //! `diesel` schema from a SQL schema, based on `sql_traits`.
 
+use std::rc::Rc;
+
 use synql_core::{
-    structs::{InternalModuleRef, Workspace},
+    structs::{InternalCrate, InternalModuleRef, Workspace},
     traits::TableSynLike,
 };
 
@@ -76,8 +78,42 @@ pub trait TableSchema: TableSynLike + Sized {
         &self,
         workspace: &Workspace<'data>,
     ) -> Option<InternalModuleRef<'data>> {
-        let crate_ref = workspace.internal_crate(&self.table_schema_crate_name())?;
-        Some(InternalModuleRef::new(crate_ref, crate_ref.module(TABLE_SCHEMA_MODULE_NAME)?))
+        let crate_ref = self.table_schema_ref(workspace)?;
+        Some(InternalModuleRef::new(&crate_ref, crate_ref.module(TABLE_SCHEMA_MODULE_NAME)?))
+    }
+
+    /// Returns a reference to the schema crate ref for the table.
+    fn table_schema_ref<'data>(
+        &self,
+        workspace: &Workspace<'data>,
+    ) -> Option<Rc<InternalCrate<'data>>> {
+        workspace.internal_crate(&self.table_schema_crate_name()).cloned()
+    }
+
+    /// Returns the Markdown formatted documentation path for the table schema
+    /// module.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// # use synql_diesel_schema::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     "CREATE TABLE my_table (id INT PRIMARY KEY NOT NULL, name TEXT NOT NULL);",
+    /// )?;
+    /// let table = db.table(None, "my_table");
+    /// let doc_path = table.table_schema_doc_path();
+    /// assert_eq!(doc_path, "[`my_table`](my_table_schema::schema::my_table)");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn table_schema_doc_path(&self) -> String {
+        format!(
+            "[`{}`]({}::{TABLE_SCHEMA_MODULE_NAME}::{})",
+            self.table_snake_name(),
+            self.table_schema_crate_name(),
+            self.table_snake_name()
+        )
     }
 }
 

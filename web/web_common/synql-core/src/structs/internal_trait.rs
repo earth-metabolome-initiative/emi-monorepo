@@ -10,7 +10,7 @@ use syn::Ident;
 
 use crate::{
     structs::{
-        InternalCrate, InternalToken, Publicness,
+        Documentation, InternalCrate, InternalToken, Publicness,
         internal_struct::{Method, WhereClause},
     },
     traits::{ExternalDependencies, InternalDependencies},
@@ -26,7 +26,7 @@ pub struct InternalTrait<'data> {
     /// Method definitions.
     methods: Vec<Method<'data>>,
     /// Trait documentation.
-    documentation: String,
+    documentation: Documentation<'data>,
     /// Where statements for the trait.
     where_statements: Vec<WhereClause<'data>>,
     /// Generics for the trait.
@@ -148,6 +148,7 @@ impl<'data> InternalDependencies<'data> for InternalTrait<'data> {
         for super_trait in &self.super_traits {
             dependencies.extend(super_trait.internal_dependencies());
         }
+        dependencies.extend(self.documentation.internal_dependencies());
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
@@ -169,6 +170,7 @@ impl<'data> ExternalDependencies<'data> for InternalTrait<'data> {
         for super_trait in &self.super_traits {
             dependencies.extend(super_trait.external_dependencies());
         }
+        dependencies.extend(self.documentation.external_dependencies());
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
@@ -183,7 +185,7 @@ impl ToTokens for InternalTrait<'_> {
 
         let where_clause_tokens = self.formatted_where_constraints(false);
 
-        let documentation = &self.documentation;
+        let documentation = self.documentation.documentation();
         let documentation = quote::quote! {
             #[doc = #documentation]
         };

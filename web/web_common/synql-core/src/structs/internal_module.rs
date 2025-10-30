@@ -10,7 +10,9 @@ use quote::{ToTokens, quote};
 use syn::Ident;
 
 use crate::{
-    structs::{InternalCrate, InternalData, InternalToken, InternalTrait, Publicness},
+    structs::{
+        InternalCrate, InternalData, InternalToken, InternalTrait, ModuleDocumentation, Publicness,
+    },
     traits::{ExternalDependencies, InternalDependencies},
 };
 
@@ -30,7 +32,7 @@ pub struct InternalModule<'data> {
     /// Internal token streams defined within the module.
     internal_tokens: Vec<InternalToken<'data>>,
     /// Module documentation.
-    documentation: String,
+    documentation: ModuleDocumentation<'data>,
 }
 
 impl<'data> InternalModule<'data> {
@@ -145,6 +147,7 @@ impl<'data> InternalDependencies<'data> for InternalModule<'data> {
         for token in &self.internal_tokens {
             dependencies.extend(token.internal_dependencies());
         }
+        dependencies.extend(self.documentation.internal_dependencies());
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
@@ -166,6 +169,7 @@ impl<'data> ExternalDependencies<'data> for InternalModule<'data> {
         for token in &self.internal_tokens {
             dependencies.extend(token.external_dependencies());
         }
+        dependencies.extend(self.documentation.external_dependencies());
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
@@ -192,7 +196,7 @@ impl ToTokens for InternalModule<'_> {
         let internal_traits = &self.internal_traits;
         let documentation = &self.documentation;
         tokens.extend(quote! {
-            #![doc = #documentation]
+            #documentation
             #(#submodules)*
             #(#uses)*
 

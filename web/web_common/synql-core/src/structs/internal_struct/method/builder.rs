@@ -9,7 +9,8 @@ use common_traits::{
 use syn::Ident;
 
 use crate::structs::{
-    Argument, InternalToken, Method, Publicness, WhereClause, internal_data::DataVariantRef,
+    Argument, Documentation, InternalToken, Method, Publicness, WhereClause,
+    internal_data::DataVariantRef,
 };
 
 #[derive(Default)]
@@ -28,13 +29,13 @@ pub struct MethodBuilder<'data> {
     /// The return type of the method.
     return_type: Option<DataVariantRef<'data>>,
     /// Documentation of the method.
-    documentation: Option<String>,
+    documentation: Option<Documentation<'data>>,
     /// Generics of the method.
     generics: Vec<Ident>,
     /// Where clauses of the method.
     where_clauses: Vec<WhereClause<'data>>,
     /// Error documentation of the method.
-    error_documentation: Option<String>,
+    error_documentation: Option<Documentation<'data>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -87,8 +88,6 @@ pub enum MethodBuilderError {
     Builder(BuilderError<MethodAttribute>),
     /// The name of the method is invalid.
     InvalidName,
-    /// The documentation of the method is invalid.
-    InvalidDocumentation,
     /// An argument with the same name has already been added.
     DuplicatedArgument,
     /// A where clause with the same left-hand side has already been added.
@@ -108,9 +107,6 @@ impl Display for MethodBuilderError {
         match self {
             MethodBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             MethodBuilderError::InvalidName => write!(f, "Invalid method name"),
-            MethodBuilderError::InvalidDocumentation => {
-                write!(f, "Invalid method documentation")
-            }
             MethodBuilderError::DuplicatedArgument => {
                 write!(f, "An argument with the same name has already been added")
             }
@@ -154,16 +150,9 @@ impl<'data> MethodBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the method.
-    pub fn documentation<S: ToString>(
-        mut self,
-        documentation: S,
-    ) -> Result<Self, MethodBuilderError> {
-        let documentation = documentation.to_string();
-        if documentation.trim().is_empty() {
-            return Err(MethodBuilderError::InvalidDocumentation);
-        }
+    pub fn documentation(mut self, documentation: Documentation<'data>) -> Self {
         self.documentation = Some(documentation);
-        Ok(self)
+        self
     }
 
     /// Sets the publicness of the method.
@@ -305,8 +294,8 @@ impl<'data> MethodBuilder<'data> {
     ///
     /// # Arguments
     /// * `error_documentation` - The error documentation of the method.
-    pub fn error_documentation<S: ToString>(mut self, error_documentation: S) -> Self {
-        self.error_documentation = Some(error_documentation.to_string());
+    pub fn error_documentation(mut self, error_documentation: Documentation<'data>) -> Self {
+        self.error_documentation = Some(error_documentation);
         self
     }
 }

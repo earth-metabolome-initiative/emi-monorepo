@@ -8,7 +8,7 @@ use common_traits::{
 };
 
 use crate::structs::{
-    Publicness, internal_data::DataVariantRef, internal_struct::InternalAttribute,
+    Documentation, Publicness, internal_data::DataVariantRef, internal_struct::InternalAttribute,
 };
 
 #[derive(Default)]
@@ -17,7 +17,7 @@ pub struct InternalAttributeBuilder<'data> {
     /// Publicness of the attribute.
     pubness: Option<Publicness>,
     /// The documentation of the attribute.
-    documentation: Option<String>,
+    documentation: Option<Documentation<'data>>,
     /// Name of the attribute.
     name: Option<String>,
     /// Type of the attribute.
@@ -59,8 +59,6 @@ pub enum InternalAttributeBuilderError {
     Builder(BuilderError<InternalAttributeAttribute>),
     /// The name of the attribute is invalid.
     InvalidName,
-    /// The documentation is invalid (empty or whitespace only).
-    InvalidDocumentation,
 }
 
 impl From<BuilderError<InternalAttributeAttribute>> for InternalAttributeBuilderError {
@@ -75,9 +73,6 @@ impl Display for InternalAttributeBuilderError {
             InternalAttributeBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             InternalAttributeBuilderError::InvalidName => {
                 write!(f, "Invalid attribute name (empty or whitespace only)")
-            }
-            InternalAttributeBuilderError::InvalidDocumentation => {
-                write!(f, "Invalid attribute documentation (empty or whitespace only)")
             }
         }
     }
@@ -118,16 +113,9 @@ impl<'data> InternalAttributeBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the attribute.
-    pub fn documentation<S: ToString>(
-        mut self,
-        documentation: S,
-    ) -> Result<Self, InternalAttributeBuilderError> {
-        let documentation = documentation.to_string();
-        if documentation.trim().is_empty() {
-            return Err(InternalAttributeBuilderError::InvalidDocumentation);
-        }
+    pub fn documentation(mut self, documentation: Documentation<'data>) -> Self {
         self.documentation = Some(documentation);
-        Ok(self)
+        self
     }
 
     /// Sets the name of the attribute.
@@ -162,7 +150,10 @@ impl Attributed for InternalAttributeBuilder<'_> {
 
 impl IsCompleteBuilder for InternalAttributeBuilder<'_> {
     fn is_complete(&self) -> bool {
-        self.pubness.is_some() && self.name.is_some() && self.ty.is_some()
+        self.pubness.is_some()
+            && self.documentation.is_some()
+            && self.name.is_some()
+            && self.ty.is_some()
     }
 }
 
@@ -175,7 +166,9 @@ impl<'data> Builder for InternalAttributeBuilder<'data> {
             pubness: self
                 .pubness
                 .ok_or(BuilderError::IncompleteBuild(InternalAttributeAttribute::Pubness))?,
-            documentation: self.documentation,
+            documentation: self
+                .documentation
+                .ok_or(BuilderError::IncompleteBuild(InternalAttributeAttribute::Documentation))?,
             name: self
                 .name
                 .ok_or(BuilderError::IncompleteBuild(InternalAttributeAttribute::Name))?,

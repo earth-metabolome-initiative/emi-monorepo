@@ -6,7 +6,7 @@ use quote::{ToTokens, quote};
 use sql_traits::traits::ForeignKeyLike;
 use synql_core::{
     prelude::{Builder, ColumnLike},
-    structs::{InternalCrate, InternalModule, InternalToken, Workspace},
+    structs::{Documentation, InternalCrate, InternalModule, InternalToken, Workspace},
     traits::{ColumnSynLike, TableSynLike},
 };
 
@@ -47,8 +47,7 @@ impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for Int
             .name(TABLE_SCHEMA_MODULE_NAME)
             .expect("Invalid name")
             .public()
-            .documentation(format!("Diesel schema for the `{}` table.", value.table.table_name()))
-            .expect("Invalid documentation")
+            .documentation(Documentation::new().documentation(format!("Diesel schema for the `{}` table.", value.table.table_name())).unwrap().build().unwrap())
             .internal_token(
                 InternalToken::new()
                     .public()
@@ -82,11 +81,16 @@ impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for Int
         InternalCrate::new()
             .name(value.table.table_schema_crate_name())
             .expect("Invalid crate name")
-            .documentation(format!(
-                "Diesel schema crate for the `{}` table.",
-                value.table.table_name()
-            ))
-            .expect("Invalid documentation")
+            .documentation(
+                Documentation::new()
+                    .documentation(format!(
+                        "Diesel schema crate for the `{}` table.",
+                        value.table.table_name()
+                    ))
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
             .module(value.into())
             .expect("Invalid module")
             .build()

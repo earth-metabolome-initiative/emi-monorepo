@@ -7,7 +7,9 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 
-use crate::structs::{InternalData, InternalModule, InternalToken, InternalTrait, Publicness};
+use crate::structs::{
+    InternalData, InternalModule, InternalToken, InternalTrait, ModuleDocumentation, Publicness,
+};
 
 #[derive(Default)]
 /// Builder for the `InternalModule` struct.
@@ -25,7 +27,7 @@ pub struct InternalModuleBuilder<'data> {
     /// Other token streams defined within the module.
     internal_tokens: Vec<InternalToken<'data>>,
     /// Module documentation.
-    documentation: Option<String>,
+    documentation: Option<ModuleDocumentation<'data>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -78,8 +80,6 @@ pub enum InternalModuleBuilderError {
     /// An internal trait with the same name has already been added to the
     /// module.
     DuplicatedInternalTraitName,
-    /// The documentation is invalid (empty or whitespace only).
-    InvalidDocumentation,
 }
 
 impl Display for InternalModuleBuilderError {
@@ -98,9 +98,6 @@ impl Display for InternalModuleBuilderError {
                     f,
                     "An internal trait with the same name has already been added to the module"
                 )
-            }
-            InternalModuleBuilderError::InvalidDocumentation => {
-                write!(f, "Invalid module documentation (empty or whitespace only)")
             }
         }
     }
@@ -158,16 +155,9 @@ impl<'data> InternalModuleBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the module.
-    pub fn documentation<S: ToString>(
-        mut self,
-        documentation: S,
-    ) -> Result<Self, InternalModuleBuilderError> {
-        let documentation = documentation.to_string();
-        if documentation.trim().is_empty() {
-            return Err(InternalModuleBuilderError::InvalidDocumentation);
-        }
-        self.documentation = Some(documentation);
-        Ok(self)
+    pub fn documentation(mut self, documentation: impl Into<ModuleDocumentation<'data>>) -> Self {
+        self.documentation = Some(documentation.into());
+        self
     }
 
     /// Adds a submodule to the module.

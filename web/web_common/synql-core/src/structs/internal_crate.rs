@@ -9,7 +9,7 @@ use quote::{ToTokens, quote};
 use syn::{Ident, Token};
 
 use crate::{
-    structs::{InternalData, InternalModule, Workspace},
+    structs::{InternalData, InternalModule, ModuleDocumentation, Workspace},
     traits::{ExternalDependencies, InternalDependencies},
 };
 
@@ -21,7 +21,7 @@ pub struct InternalCrate<'data> {
     /// The root modules of the crate.
     modules: Vec<Rc<InternalModule<'data>>>,
     /// Crate documentation.
-    documentation: String,
+    documentation: ModuleDocumentation<'data>,
 }
 
 impl<'data> ToTokens for InternalCrate<'data> {
@@ -37,7 +37,7 @@ impl<'data> ToTokens for InternalCrate<'data> {
         let module_exports = self.modules.iter().filter(|m| m.is_public()).map(|m| m.ident());
         let documentation = &self.documentation;
         tokens.extend(quote! {
-            #![doc = #documentation]
+            #documentation
 
             #(#modules)*
 
@@ -186,6 +186,7 @@ impl<'data> InternalDependencies<'data> for InternalCrate<'data> {
         for module in &self.modules {
             dependencies.extend(module.internal_dependencies());
         }
+        dependencies.extend(self.documentation.internal_dependencies());
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
@@ -198,6 +199,7 @@ impl<'data> ExternalDependencies<'data> for InternalCrate<'data> {
         for module in &self.modules {
             dependencies.extend(module.external_dependencies());
         }
+        dependencies.extend(self.documentation.external_dependencies());
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies

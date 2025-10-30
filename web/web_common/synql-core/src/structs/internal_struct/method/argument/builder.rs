@@ -7,7 +7,7 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 
-use crate::structs::{Argument, internal_data::DataVariantRef};
+use crate::structs::{Argument, Documentation, internal_data::DataVariantRef};
 
 #[derive(Default)]
 /// Builder for the `Argument` struct.
@@ -19,7 +19,7 @@ pub struct ArgumentBuilder<'data> {
     /// Whether the argument is mutable.
     mutable: bool,
     /// Documentation of the argument.
-    documentation: Option<String>,
+    documentation: Option<Documentation<'data>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -54,8 +54,6 @@ pub enum ArgumentBuilderError {
     Builder(BuilderError<ArgumentAttribute>),
     /// The name of the argument is invalid.
     InvalidName,
-    /// The documentation of the argument is invalid.
-    InvalidDocumentation,
 }
 
 impl Display for ArgumentBuilderError {
@@ -63,9 +61,6 @@ impl Display for ArgumentBuilderError {
         match self {
             ArgumentBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             ArgumentBuilderError::InvalidName => write!(f, "Invalid argument name"),
-            ArgumentBuilderError::InvalidDocumentation => {
-                write!(f, "Invalid argument documentation")
-            }
         }
     }
 }
@@ -121,16 +116,9 @@ impl<'data> ArgumentBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the argument.
-    pub fn documentation<S: ToString>(
-        mut self,
-        documentation: S,
-    ) -> Result<Self, ArgumentBuilderError> {
-        let documentation = documentation.to_string();
-        if documentation.trim().is_empty() {
-            return Err(ArgumentBuilderError::InvalidDocumentation);
-        }
+    pub fn documentation(mut self, documentation: Documentation<'data>) -> Self {
         self.documentation = Some(documentation);
-        Ok(self)
+        self
     }
 }
 

@@ -1,8 +1,8 @@
 //! Submodule providing the `ColumnModel` trait for SynQL struct attributes.
 
 use synql_core::{
-    prelude::Builder,
-    structs::{DataVariantRef, InternalAttribute, Workspace},
+    prelude::{Builder, TableLike},
+    structs::{DataVariantRef, Documentation, InternalAttribute, Workspace},
     traits::ColumnSynLike,
 };
 
@@ -29,16 +29,24 @@ pub trait ColumnModelLike: ColumnSynLike {
             attribute_type = attribute_type.optional();
         }
 
-        let mut builder = InternalAttribute::new()
+        InternalAttribute::new()
             .name(self.column_snake_name())
             .expect("Failed to set name")
+            .documentation(
+                Documentation::new()
+                    .documentation(self.column_doc(database).expect(&format!(
+                        "Failed to get documentation for column `{}.{}`",
+                        self.table(database).table_name(),
+                        self.column_name()
+                    )))
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
             .public()
-            .ty(attribute_type);
-
-        if let Some(documentation) = self.column_doc(database) {
-            builder = builder.documentation(documentation).expect("Failed to set documentation");
-        }
-        builder.build().expect("Failed to build column attribute")
+            .ty(attribute_type)
+            .build()
+            .expect("Failed to build column attribute")
     }
 }
 

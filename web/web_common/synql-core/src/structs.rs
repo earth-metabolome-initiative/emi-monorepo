@@ -36,3 +36,5 @@ mod internal_trait;
 pub use internal_trait::InternalTrait;
 mod decorator;
 pub use decorator::Decorator;
+mod documentation;
+pub use documentation::{Documentation, ModuleDocumentation};

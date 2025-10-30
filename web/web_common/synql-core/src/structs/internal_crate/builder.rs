@@ -7,7 +7,7 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 
-use crate::structs::{InternalCrate, InternalModule};
+use crate::structs::{InternalCrate, InternalModule, ModuleDocumentation};
 
 #[derive(Default)]
 /// Builder for the `InternalCrate` struct.
@@ -17,7 +17,7 @@ pub struct InternalCrateBuilder<'data> {
     /// The root modules of the crate.
     modules: Vec<Rc<InternalModule<'data>>>,
     /// Crate documentation.
-    documentation: Option<String>,
+    documentation: Option<ModuleDocumentation<'data>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -52,8 +52,6 @@ pub enum InternalCrateBuilderError {
     /// A module with the same name has already been added to the
     /// crate.
     DuplicatedModuleName,
-    /// The documentation is invalid (empty or whitespace only).
-    InvalidDocumentation,
 }
 
 impl Display for InternalCrateBuilderError {
@@ -63,9 +61,6 @@ impl Display for InternalCrateBuilderError {
             InternalCrateBuilderError::InvalidName => write!(f, "Invalid crate name"),
             InternalCrateBuilderError::DuplicatedModuleName => {
                 write!(f, "A module with the same name has already been added to the crate")
-            }
-            InternalCrateBuilderError::InvalidDocumentation => {
-                write!(f, "Invalid crate documentation (empty or whitespace only)")
             }
         }
     }
@@ -102,16 +97,9 @@ impl<'data> InternalCrateBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the crate.
-    pub fn documentation<S: ToString>(
-        mut self,
-        documentation: S,
-    ) -> Result<Self, InternalCrateBuilderError> {
-        let documentation = documentation.to_string();
-        if documentation.trim().is_empty() {
-            return Err(InternalCrateBuilderError::InvalidDocumentation);
-        }
-        self.documentation = Some(documentation);
-        Ok(self)
+    pub fn documentation(mut self, documentation: impl Into<ModuleDocumentation<'data>>) -> Self {
+        self.documentation = Some(documentation.into());
+        self
     }
 
     /// Adds a module to the crate.

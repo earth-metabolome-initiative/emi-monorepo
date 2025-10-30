@@ -2,13 +2,14 @@
 use quote::quote;
 use syn::Ident;
 use synql_core::{
-    prelude::{Builder, ColumnLike},
+    prelude::Builder,
     structs::{
-        InternalCrate, InternalData, InternalDataVariant, InternalEnum, InternalModule,
-        InternalToken, InternalVariant,
+        Documentation, InternalCrate, InternalData, InternalDataVariant, InternalEnum,
+        InternalModule, InternalToken, InternalVariant,
     },
     traits::ColumnSynLike,
 };
+use synql_diesel_schema::traits::ColumnSchema;
 
 use crate::traits::{
     TableAttributesLike, TableExtensionAttributesLike,
@@ -86,6 +87,28 @@ impl<'data, 'table, T: TableAttributesLike + ?Sized> TableAttributes<'data, 'tab
             .build()
             .unwrap()
     }
+
+    fn from_extension_impl(&self) -> Option<InternalToken<'data>> {
+        let extension_attributes = self.table.extension_attributes_enum_ref(self.workspace)?;
+
+        let enum_ident = self.table.table_attributes_ident();
+        let extension_ident =
+            Ident::new(EXTENSION_ATTRIBUTES_ENUM_NAME, proc_macro2::Span::call_site());
+
+        Some(
+            InternalToken::new()
+                .private()
+                .stream(quote! {
+                    impl From<#extension_attributes> for #enum_ident {
+                        fn from(extension: #extension_attributes) -> Self {
+                            Self::#extension_ident(extension)
+                        }
+                    }
+                })
+                .build()
+                .unwrap(),
+        )
+    }
 }
 
 impl<'data, 'table, T: TableAttributesLike + TableExtensionAttributesLike + ?Sized>
@@ -100,11 +123,15 @@ impl<'data, 'table, T: TableAttributesLike + TableExtensionAttributesLike + ?Siz
             Some(
                 InternalVariant::new()
                     .name(extension_ident)
-                    .doc(format!(
-                        "Extension attributes variant for the `{}` table.",
-                        attributes.table.table_name()
-                    ))
-                    .expect("Failed to set documentation for extension attribute variant")
+                    .doc(
+                        Documentation::new()
+                            .documentation("Extension attributes variant.")
+                            .expect("Failed to set documentation for extension attribute variant")
+                            .build()
+                            .expect(
+                                "Failed to build documentation for extension attribute variant",
+                            ),
+                    )
                     .ty(extension_attributes)
                     .build()
                     .expect("Failed to build extension attribute variant"),
@@ -113,16 +140,27 @@ impl<'data, 'table, T: TableAttributesLike + TableExtensionAttributesLike + ?Siz
             None
         };
 
+        let schema_crate_ref = attributes
+            .table
+            .table_schema_ref(attributes.workspace)
+            .expect("Failed to get table schema crate ref for attributes enum");
+
         InternalEnum::new()
             .variants(attributes.table.columns(attributes.database).map(|column| {
                 InternalVariant::new()
                     .name(column.column_camel_ident())
-                    .doc(format!(
-                        "Attribute representing the `{}.{}` column.",
-                        attributes.table.table_name(),
-                        column.column_name()
-                    ))
-                    .expect("Failed to set documentation for attribute variant")
+                    .doc(
+                        Documentation::new()
+                            .documentation(format!(
+                                "Attribute representing the {} column.",
+                                column.column_schema_doc_path(attributes.database)
+                            ))
+                            .expect("Failed to set documentation for attribute variant")
+                            .internal_dependency(schema_crate_ref.clone())
+                            .unwrap()
+                            .build()
+                            .expect("Failed to build documentation for attribute variant"),
+                    )
                     .build()
                     .expect("Failed to build attribute variant")
             }))
@@ -147,17 +185,30 @@ impl<'data, 'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'data,
     for InternalData<'data>
 {
     fn from(attributes: TableAttributes<'data, 'table, T>) -> Self {
+        let schema_crate_ref = attributes
+            .table
+            .table_schema_ref(attributes.workspace)
+            .expect("Failed to get table schema crate ref for attributes enum");
         InternalData::new()
             .name(attributes.table.table_attributes_name())
             .expect("Failed to set attributes enum name")
             .public()
-            .documentation(format!(
-                "Enumeration of the attributes of the `{}` table.",
-                attributes.table.table_name()
-            ))
-            .expect("Failed to add documentation to attributes enum")
+            .documentation(
+                Documentation::new()
+                    .documentation(format!(
+                        "Enumeration of the attributes of the {} table.",
+                        attributes.table.table_schema_doc_path()
+                    ))
+                    .unwrap()
+                    .internal_dependency(schema_crate_ref)
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
             .variant(attributes.into())
             .add_trait(attributes.display_impl())
+            .unwrap()
+            .add_traits(attributes.from_extension_impl())
             .unwrap()
             .build()
             .expect("Failed to build attributes enum")
@@ -168,15 +219,26 @@ impl<'data, 'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'data,
     for InternalModule<'data>
 {
     fn from(attributes: TableAttributes<'data, 'table, T>) -> Self {
+        let schema_crate_ref = attributes
+            .table
+            .table_schema_ref(attributes.workspace)
+            .expect("Failed to get table schema crate ref for attributes enum");
         InternalModule::new()
             .name(ATTRIBUTES_MODULE_NAME)
             .expect("Failed to set attributes module name")
             .public()
-            .documentation(format!(
-                "Submodule providing the attributes enumeration for the `{}` table.",
-                attributes.table.table_name()
-            ))
-            .expect("Failed to add documentation to attributes module")
+            .documentation(
+                Documentation::new()
+                    .documentation(format!(
+                        "Submodule providing the attributes enumeration for the {} table.",
+                        attributes.table.table_schema_doc_path()
+                    ))
+                    .unwrap()
+                    .internal_dependency(schema_crate_ref)
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
             .data(attributes.into())
             .expect("Failed to add attributes enum to attributes module")
             .build()
@@ -188,14 +250,25 @@ impl<'data, 'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'data,
     for InternalCrate<'data>
 {
     fn from(attributes: TableAttributes<'data, 'table, T>) -> Self {
+        let schema_crate_ref = attributes
+            .table
+            .table_schema_ref(attributes.workspace)
+            .expect("Failed to get table schema crate ref for attributes enum");
         InternalCrate::new()
             .name(attributes.table.table_attributes_crate_name())
             .expect("Failed to set attributes crate name")
-            .documentation(format!(
-                "Crate containing the attributes enumeration for the `{}` table.",
-                attributes.table.table_name()
-            ))
-            .expect("Failed to add documentation to attributes crate")
+            .documentation(
+                Documentation::new()
+                    .documentation(format!(
+                        "Crate containing the attributes enumeration for the {} table.",
+                        attributes.table.table_schema_doc_path()
+                    ))
+                    .unwrap()
+                    .internal_dependency(schema_crate_ref)
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
             .module(attributes.into())
             .expect("Failed to add attributes module to attributes crate")
             .build()

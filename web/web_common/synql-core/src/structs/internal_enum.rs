@@ -9,7 +9,10 @@ use quote::ToTokens;
 use syn::Ident;
 
 use crate::{
-    structs::{InternalCrate, external_trait::TraitVariantRef, internal_data::DataVariantRef},
+    structs::{
+        Documentation, InternalCrate, external_trait::TraitVariantRef,
+        internal_data::DataVariantRef,
+    },
     traits::{ExternalDependencies, InternalDependencies},
 };
 
@@ -19,7 +22,7 @@ pub struct InternalVariant<'data> {
     /// Name of the variant.
     name: Ident,
     /// Documentation comment of the variant.
-    doc: String,
+    doc: Documentation<'data>,
     /// Type of the variant.
     ty: Option<DataVariantRef<'data>>,
 }
@@ -36,7 +39,7 @@ impl<'data> InternalVariant<'data> {
     }
 
     /// Returns the documentation comment of the variant.
-    pub fn doc(&self) -> &str {
+    pub fn doc(&self) -> &Documentation<'data> {
         &self.doc
     }
 
@@ -61,13 +64,21 @@ impl<'data> InternalVariant<'data> {
 
 impl<'data> InternalDependencies<'data> for InternalVariant<'data> {
     fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
-        self.ty.internal_dependencies()
+        let mut dependencies = self.ty.internal_dependencies();
+        dependencies.extend(self.doc.internal_dependencies());
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
     }
 }
 
 impl<'data> ExternalDependencies<'data> for InternalVariant<'data> {
     fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
-        self.ty.external_dependencies()
+        let mut dependencies = self.ty.external_dependencies();
+        dependencies.extend(self.doc.external_dependencies());
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
     }
 }
 
@@ -75,10 +86,9 @@ impl ToTokens for InternalVariant<'_> {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let name = &self.name;
         let doc = &self.doc;
-        let doc_token = quote::quote! {
-            #[doc = #doc]
-        };
-        tokens.extend(doc_token);
+        tokens.extend(quote::quote! {
+            #doc
+        });
 
         if let Some(ty) = &self.ty {
             tokens.extend(quote::quote! {

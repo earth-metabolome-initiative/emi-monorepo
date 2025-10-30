@@ -12,7 +12,8 @@ use syn::Ident;
 
 use crate::{
     structs::{
-        InternalCrate, Publicness, external_trait::TraitVariantRef, internal_data::DataVariantRef,
+        Documentation, InternalCrate, Publicness, external_trait::TraitVariantRef,
+        internal_data::DataVariantRef,
     },
     traits::{ExternalDependencies, InternalDependencies},
     utils::RESERVED_RUST_WORDS,
@@ -24,7 +25,7 @@ pub struct InternalAttribute<'data> {
     /// Publicness of the attribute.
     pubness: Publicness,
     /// The documentation of the attribute.
-    documentation: Option<String>,
+    documentation: Documentation<'data>,
     /// Identifier of the attribute.
     name: String,
     /// Type of the attribute.
@@ -57,8 +58,8 @@ impl<'data> InternalAttribute<'data> {
     }
 
     /// Returns the documentation of the attribute.
-    pub fn documentation(&self) -> Option<&str> {
-        self.documentation.as_deref()
+    pub fn documentation(&self) -> &Documentation<'data> {
+        &self.documentation
     }
 
     /// Returns the type of the attribute.
@@ -78,13 +79,21 @@ impl<'data> InternalAttribute<'data> {
 
 impl<'data> InternalDependencies<'data> for InternalAttribute<'data> {
     fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
-        self.ty.internal_dependencies()
+        let mut dependencies = self.ty.internal_dependencies();
+        dependencies.extend(self.documentation.internal_dependencies());
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
     }
 }
 
 impl<'data> ExternalDependencies<'data> for InternalAttribute<'data> {
     fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
-        self.ty.external_dependencies()
+        let mut dependencies = self.ty.external_dependencies();
+        dependencies.extend(self.documentation.external_dependencies());
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
     }
 }
 
@@ -92,14 +101,7 @@ impl ToTokens for InternalAttribute<'_> {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let pubness = self.pubness.to_token_stream();
         let ident = self.ident();
-        let documentation = match &self.documentation {
-            Some(doc) => {
-                quote::quote! {
-                    #[doc = #doc]
-                }
-            }
-            None => quote::quote! {},
-        };
+        let documentation = &self.documentation;
         let ty = &self.ty;
 
         let token = quote::quote! {

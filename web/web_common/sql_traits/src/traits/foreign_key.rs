@@ -316,25 +316,6 @@ pub trait ForeignKeyLike:
         self.host_columns(database).nth(1).is_some()
     }
 
-    /// Returns the formatted human readable representation of the foreign key.
-    fn documentation_repr(&self, database: &Self::DB) -> String {
-        let host_table = self.host_table(database);
-        let referenced_table = self.referenced_table(database);
-        self.host_columns(database)
-            .zip(self.referenced_columns(database))
-            .map(|(host_col, ref_col)| {
-                format!(
-                    "`{}.{}` -> `{}.{}`",
-                    host_table.table_name(),
-                    host_col.column_name(),
-                    referenced_table.table_name(),
-                    ref_col.column_name()
-                )
-            })
-            .collect::<Vec<_>>()
-            .join(", ")
-    }
-
     /// Returns the match kind of the foreign key.
     ///
     /// # Example

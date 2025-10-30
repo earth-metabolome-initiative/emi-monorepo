@@ -6,7 +6,7 @@ pub use builder::{ArgumentAttribute, ArgumentBuilder, ArgumentBuilderError};
 use quote::ToTokens;
 
 use crate::{
-    structs::internal_data::DataVariantRef,
+    structs::{Documentation, internal_data::DataVariantRef},
     traits::{ExternalDependencies, InternalDependencies},
     utils::RESERVED_RUST_WORDS,
 };
@@ -21,7 +21,7 @@ pub struct Argument<'data> {
     /// Whether the argument is mutable.
     mutable: bool,
     /// Documentation of the argument.
-    documentation: Option<String>,
+    documentation: Option<Documentation<'data>>,
 }
 
 impl Argument<'_> {
@@ -31,8 +31,8 @@ impl Argument<'_> {
     }
 
     /// Returns the documentation of the argument.
-    pub fn documentation(&self) -> Option<&str> {
-        self.documentation.as_deref()
+    pub fn documentation(&self) -> Option<&Documentation<'_>> {
+        self.documentation.as_ref()
     }
 
     /// Returns the type of the argument.
@@ -88,12 +88,24 @@ impl ToTokens for Argument<'_> {
 
 impl<'data> InternalDependencies<'data> for Argument<'data> {
     fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
-        self.arg_type.internal_dependencies()
+        let mut dependencies = self.arg_type.internal_dependencies();
+        if let Some(doc) = &self.documentation {
+            dependencies.extend(doc.internal_dependencies());
+        }
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
     }
 }
 
 impl<'data> ExternalDependencies<'data> for Argument<'data> {
     fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
-        self.arg_type.external_dependencies()
+        let mut dependencies = self.arg_type.external_dependencies();
+        if let Some(doc) = &self.documentation {
+            dependencies.extend(doc.external_dependencies());
+        }
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
     }
 }

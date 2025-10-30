@@ -14,8 +14,8 @@ use syn::{Ident, Lifetime};
 
 use crate::{
     structs::{
-        Decorator, Derive, ExternalCrate, InternalCrate, InternalEnum, InternalModule,
-        InternalStruct, InternalToken, Publicness, external_crate::ExternalTypeRef,
+        Decorator, Derive, Documentation, ExternalCrate, InternalCrate, InternalEnum,
+        InternalModule, InternalStruct, InternalToken, Publicness, external_crate::ExternalTypeRef,
         external_trait::TraitVariantRef,
     },
     traits::{ExternalDependencies, InternalDependencies},
@@ -326,6 +326,11 @@ impl<'data> InternalDataRef<'data> {
         self.internal_crate.as_ref()
     }
 
+    /// Returns the internal crate Rc reference.
+    pub fn crate_ref(&self) -> &Rc<InternalCrate<'data>> {
+        &self.internal_crate
+    }
+
     /// Returns the name of the internal data.
     pub fn name(&self) -> &str {
         self.data.name()
@@ -457,7 +462,7 @@ pub struct InternalData<'data> {
     /// Name of the data.
     name: String,
     /// Documentation of the data.
-    documentation: Option<String>,
+    documentation: Documentation<'data>,
     /// The variant of the data (struct or enum).
     variant: InternalDataVariant<'data>,
     /// The traits implemented for the data.
@@ -516,14 +521,7 @@ impl<'data> ToTokens for InternalData<'data> {
                 }
             }
         };
-        let documentation = match &self.documentation {
-            Some(doc) => {
-                quote::quote! {
-                    #[doc = #doc]
-                }
-            }
-            None => quote::quote! {},
-        };
+        let documentation = &self.documentation;
         let derives = &self.derives;
         let decorators = &self.decorators;
         let traits = &self.traits;
@@ -556,6 +554,8 @@ impl<'data> ExternalDependencies<'data> for InternalData<'data> {
 
         crates.extend(self.variant.external_dependencies());
 
+        crates.extend(self.documentation.external_dependencies());
+
         crates.sort_unstable();
         crates.dedup();
         crates
@@ -579,6 +579,8 @@ impl<'data> InternalDependencies<'data> for InternalData<'data> {
         }
 
         crates.extend(self.variant.internal_dependencies());
+
+        crates.extend(self.documentation.internal_dependencies());
 
         crates.sort_unstable();
         crates.dedup();

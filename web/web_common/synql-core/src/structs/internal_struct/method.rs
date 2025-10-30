@@ -10,7 +10,7 @@ use syn::Ident;
 pub use where_clause::WhereClause;
 
 use crate::{
-    structs::{InternalToken, Publicness, internal_data::DataVariantRef},
+    structs::{Documentation, InternalToken, Publicness, internal_data::DataVariantRef},
     traits::{ExternalDependencies, InternalDependencies},
 };
 
@@ -30,9 +30,9 @@ pub struct Method<'data> {
     /// The return type of the method.
     return_type: Option<DataVariantRef<'data>>,
     /// Documentation of the method.
-    documentation: String,
+    documentation: Documentation<'data>,
     /// Error documentation of the method.
-    error_documentation: Option<String>,
+    error_documentation: Option<Documentation<'data>>,
     /// Generics of the method.
     generics: Vec<Ident>,
     /// Where clauses of the method.
@@ -113,7 +113,7 @@ impl ToTokens for Method<'_> {
             quote::quote! { where #(#where_tokens),* }
         };
 
-        let mut documentation = vec![self.documentation.clone()];
+        let mut documentation = Vec::new();
 
         if self.has_non_self_arguments() {
             documentation.push(String::default());
@@ -122,7 +122,7 @@ impl ToTokens for Method<'_> {
                 documentation.push(format!(
                     " * `{}` - {}",
                     arg.name(),
-                    arg.documentation().unwrap_or_default()
+                    arg.documentation().map(|d| d.documentation()).unwrap_or_default()
                 ));
             }
         }
@@ -130,10 +130,13 @@ impl ToTokens for Method<'_> {
         if let Some(error_doc) = &self.error_documentation {
             documentation.push(String::default());
             documentation.push("# Errors".to_string());
-            documentation.push(error_doc.clone());
+            documentation.push(error_doc.documentation().to_string());
         }
 
+        let main_documentation = &self.documentation;
+
         tokens.extend(quote::quote! {
+            #main_documentation
             #(#[doc = #documentation])*
 			#pubness_tokens #async_tokens fn #name_ident #formatted_generics (#(#arguments_tokens),*) #return_type_tokens #formatted_where #formatted_body
 		});
@@ -152,6 +155,10 @@ impl<'data> InternalDependencies<'data> for Method<'data> {
         for where_clause in &self.where_clauses {
             dependencies.extend(where_clause.internal_dependencies());
         }
+        dependencies.extend(self.documentation.internal_dependencies());
+        if let Some(error_doc) = &self.error_documentation {
+            dependencies.extend(error_doc.internal_dependencies());
+        }
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
@@ -169,6 +176,10 @@ impl<'data> ExternalDependencies<'data> for Method<'data> {
         }
         for where_clause in &self.where_clauses {
             dependencies.extend(where_clause.external_dependencies());
+        }
+        dependencies.extend(self.documentation.external_dependencies());
+        if let Some(error_doc) = &self.error_documentation {
+            dependencies.extend(error_doc.external_dependencies());
         }
         dependencies.sort_unstable();
         dependencies.dedup();

@@ -4,9 +4,12 @@ use quote::{ToTokens, quote};
 use sql_traits::traits::ColumnLike;
 use synql_core::{
     prelude::Builder,
-    structs::{Decorator, Derive, InternalCrate, InternalData, InternalModule, InternalToken},
+    structs::{
+        Decorator, Derive, Documentation, InternalCrate, InternalData, InternalModule,
+        InternalToken,
+    },
 };
-use synql_models::traits::ColumnModelLike;
+use synql_models::traits::{ColumnModelLike, TableModelLike};
 
 use crate::traits::TableInsertableLike;
 
@@ -85,6 +88,10 @@ impl<'data, 'table, T: TableInsertableLike + ?Sized> TableInsertable<'data, 'tab
 
     /// Returns the internal data representing the insertable.
     fn insertable_data(&self) -> InternalData<'data> {
+        let table_model_ref = self
+            .table
+            .model_ref(self.workspace)
+            .expect("Failed to get the table model ref for the insertable data");
         let struct_name = self.table.table_insertable_name();
         let mut data_builder = InternalData::new()
             .public()
@@ -93,14 +100,19 @@ impl<'data, 'table, T: TableInsertableLike + ?Sized> TableInsertable<'data, 'tab
             .derive(self.diesel_derives())
             .expect("Failed to add derives to insertable struct")
             .decorator(self.table_decorator())
-            .expect("Failed to add table decorator to insertable struct");
-
-        // Add documentation
-        if let Some(table_doc) = self.table.table_doc(self.database) {
-            data_builder = data_builder
-                .documentation(format!("Insertable struct for {}.", table_doc))
-                .expect("Failed to add documentation to insertable struct");
-        }
+            .expect("Failed to add table decorator to insertable struct")
+            .documentation(
+                Documentation::new()
+                    .documentation(format!(
+                        "Insertable struct variant of {}.",
+                        table_model_ref.documentation_path()
+                    ))
+                    .unwrap()
+                    .internal_dependency(table_model_ref.crate_ref().clone())
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            );
 
         // Add struct variant with attributes for insertable columns
         let attributes = self
@@ -123,17 +135,28 @@ impl<'data, 'table, T: TableInsertableLike + ?Sized> TableInsertable<'data, 'tab
     /// Returns the module containing the insertable struct.
     fn insertable_module(&self) -> InternalModule<'data> {
         let module_name = crate::traits::table_insertable_like::INSERTABLE_MODULE_NAME;
+        let schema_crate_ref = self
+            .table
+            .table_schema_ref(self.workspace)
+            .expect("Failed to get the table schema ref for the insertable module");
 
         InternalModule::new()
             .name(module_name)
             .expect("Failed to set insertable module name")
             .public()
-            .documentation(format!(
-                "Submodule providing the [`{}`] insertable struct for the `{}` table.",
-                self.table.table_insertable_name(),
-                self.table.table_name()
-            ))
-            .expect("Failed to add documentation to insertable module")
+            .documentation(
+                Documentation::new()
+                    .documentation(format!(
+                        "Submodule providing the [`{}`] insertable struct for the {} table.",
+                        self.table.table_insertable_name(),
+                        self.table.table_schema_doc_path()
+                    ))
+                    .unwrap()
+                    .internal_dependency(schema_crate_ref)
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
             .data(self.insertable_data())
             .expect("Failed to add insertable struct to insertable module")
             .build()
@@ -143,15 +166,26 @@ impl<'data, 'table, T: TableInsertableLike + ?Sized> TableInsertable<'data, 'tab
     /// Returns the crate containing the insertable module.
     fn insertable_crate(&self) -> InternalCrate<'data> {
         let crate_name = self.table.table_insertable_crate_name();
+        let schema_crate_ref = self
+            .table
+            .table_schema_ref(self.workspace)
+            .expect("Failed to get the table schema ref for the insertable crate");
 
         InternalCrate::new()
             .name(crate_name)
             .expect("Failed to set insertable crate name")
-            .documentation(format!(
-                "Crate containing the insertable struct for the `{}` table.",
-                self.table.table_name()
-            ))
-            .expect("Failed to add documentation to insertable crate")
+            .documentation(
+                Documentation::new()
+                    .documentation(format!(
+                        "Crate containing the insertable struct for the {} table.",
+                        self.table.table_schema_doc_path()
+                    ))
+                    .unwrap()
+                    .internal_dependency(schema_crate_ref)
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
             .module(self.insertable_module())
             .expect("Failed to add insertable module to insertable crate")
             .build()

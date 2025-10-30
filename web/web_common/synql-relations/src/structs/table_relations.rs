@@ -7,11 +7,12 @@ use syn::Ident;
 use synql_core::{
     prelude::{Builder, ColumnLike, DatabaseLike, ForeignKeyLike},
     structs::{
-        Argument, DataVariantRef, ExternalTraitRef, InternalCrate, InternalDataRef, InternalModule,
-        InternalToken, InternalTrait, Method, MethodBuilder, WhereClause,
+        Argument, DataVariantRef, Documentation, ExternalTraitRef, InternalCrate, InternalDataRef,
+        InternalModule, InternalToken, InternalTrait, Method, MethodBuilder, WhereClause,
     },
     traits::{ColumnSynLike, ForeignKeySynLike},
 };
+use synql_diesel_schema::traits::ForeignKeySchema;
 
 use crate::traits::{TRAIT_MODULE_NAME, TableRelationsLike};
 
@@ -75,8 +76,13 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
             .name("connection")
             .expect("Failed to set the method argument name")
             .arg_type(connection_generic.mutable_reference(None))
-            .documentation("Diesel connection to the DB.")
-            .unwrap()
+            .documentation(
+                Documentation::new()
+                    .documentation("The database connection to use.")
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
             .build()
             .expect("Failed to build the method argument for the connection");
 
@@ -84,13 +90,28 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
             connection_argument.clone(),
             Method::new()
                 .private()
-                .documentation(format!(
-                    "Returns the {} referenced to by the foreign key [{}].",
-                    referenced_table_model.documentation_path(),
-                    foreign_key.documentation_repr(self.database)
-                ))
-                .expect("Failed to set the method documentation")
-                .error_documentation("* If the provided DB connection fails.")
+                .documentation(
+                    Documentation::new()
+                        .documentation(format!(
+                            "Returns the {} referenced to by the foreign key ({}).",
+                            referenced_table_model.documentation_path(),
+                            foreign_key.documentation_schema_repr(self.database)
+                        ))
+                        .unwrap()
+                        .internal_dependencies(
+                            foreign_key.internal_crate_references(self.workspace, self.database),
+                        )
+                        .unwrap()
+                        .build()
+                        .unwrap(),
+                )
+                .error_documentation(
+                    Documentation::new()
+                        .documentation("* If the provided DB connection fails.")
+                        .unwrap()
+                        .build()
+                        .unwrap(),
+                )
                 .name(foreign_key.foreign_key_getter_name(self.database))
                 .expect("Failed to set the method name")
                 .add_argument(
@@ -216,15 +237,25 @@ where
     fn from(table_relation: TableRelations<'data, 'table, T>) -> Self {
         let extension_of = table_relation.extension_of_trait();
         let model_ref = table_relation.model_ref();
+        let schema_crate_ref = table_relation
+            .table
+            .table_schema_ref(table_relation.workspace)
+            .expect("Failed to get the table schema ref for the table relations");
         InternalTrait::new()
             .public()
             .name(table_relation.table.table_relations_trait_name())
             .expect("Failed to set the internal trait name")
-            .documentation(format!(
-                "Trait providing relations for the `{}` table.",
-                table_relation.table.table_name()
-            ))
-            .expect("Failed to set the internal trait documentation")
+            .documentation(Documentation::new()
+                .documentation(format!(
+                    "Trait providing methods to access the relations of the {} struct for the {} table.",
+                    model_ref.documentation_path(),
+                    table_relation.table.table_schema_doc_path()
+                ))
+                .unwrap()
+                .internal_dependency(schema_crate_ref)
+                .unwrap()
+                .build()
+                .unwrap())
             .generic(syn::parse_quote! {C})
             .unwrap()
             .super_trait(
@@ -272,18 +303,21 @@ where
 
         let internal_trait: InternalTrait<'data> = InternalTrait::from(table_relation);
         let auto_blanket = internal_trait.auto_blanket().expect("Failed to generate auto blanket");
+        let schema_crate_ref = table_relation
+            .table
+            .table_schema_ref(table_relation.workspace)
+            .expect("Failed to get the table schema ref for the table relations");
 
         InternalModule::new()
             .public()
             .name(TRAIT_MODULE_NAME)
             .expect("Failed to set the module name")
-            .documentation(format!(
-                "Submodule providing the [`{}`] trait for the [`{}`]({model_ref}) struct and the `{}` table.",
+            .documentation(Documentation::new().documentation(format!(
+                "Submodule providing the [`{}`] trait for the [`{}`]({model_ref}) struct and the {} table.",
                 table_relation.table.table_relations_trait_name(),
                 model_ref.data().name(),
-                table_relation.table.table_name()
-            ))
-            .expect("Failed to set the module documentation")
+                table_relation.table.table_schema_doc_path()
+            )).unwrap().internal_dependency(schema_crate_ref).unwrap().build().unwrap())
             .public()
             .internal_trait(internal_trait)
             .expect("Failed to add the internal data to module")
@@ -298,15 +332,26 @@ where
     T: TableRelationsLike + ?Sized,
 {
     fn from(table_relation: TableRelations<'data, 'table, T>) -> Self {
+        let schema_crate_ref = table_relation
+            .table
+            .table_schema_ref(table_relation.workspace)
+            .expect("Failed to get the table schema ref for the table relations");
         InternalCrate::new()
             .name(table_relation.table.table_relations_crate_name())
             .expect("Failed to set the crate name")
-            .documentation(format!(
-                "Crate providing the [`{}`] trait for the `{}` table.",
-                table_relation.table.table_relations_trait_name(),
-                table_relation.table.table_name()
-            ))
-            .expect("Failed to set the crate documentation")
+            .documentation(
+                Documentation::new()
+                    .documentation(format!(
+                        "Crate providing the [`{}`] trait for the {} table.",
+                        table_relation.table.table_relations_trait_name(),
+                        table_relation.table.table_schema_doc_path()
+                    ))
+                    .unwrap()
+                    .internal_dependency(schema_crate_ref)
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
             .module(table_relation.into())
             .expect("Failed to add internal module to internal crate")
             .build()
