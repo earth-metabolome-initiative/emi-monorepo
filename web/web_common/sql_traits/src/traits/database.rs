@@ -58,6 +58,35 @@ pub trait DatabaseLike: Clone + Debug {
 
     /// Returns tables as a Kahn's ordering based on foreign key dependencies,
     /// ignoring potential self-references which would create cycles.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE users (
+    ///    id SERIAL PRIMARY KEY,
+    ///   name TEXT NOT NULL
+    /// );
+    /// CREATE TABLE comments (
+    ///   id SERIAL PRIMARY KEY,
+    /// name TEXT NOT NULL,
+    /// user_id INT REFERENCES users(id)
+    /// );
+    /// CREATE TABLE extended_comments (
+    ///  id INT PRIMARY KEY REFERENCES comments(id),
+    /// extra_info TEXT
+    /// );
+    /// "#,
+    /// )?;
+    /// let ordered_tables: Vec<&str> = db.table_dag().iter().map(|t| t.table_name()).collect();
+    /// assert_eq!(ordered_tables, vec!["users", "comments", "extended_comments"]);
+    /// # Ok(())
+    /// # }
+    /// ```
     fn table_dag(&self) -> Vec<&Self::Table> {
         let tables = self.tables().collect::<Vec<&Self::Table>>();
         let mut edges = tables
@@ -74,7 +103,7 @@ pub trait DatabaseLike: Clone + Debug {
                         if referenced_table == *table {
                             return None;
                         }
-                        tables_ref.binary_search(&referenced_table).ok()
+                        Some(tables_ref.binary_search(&referenced_table).unwrap())
                     })
                     .map(move |referenced_table_number| (referenced_table_number, table_number))
             })
@@ -94,10 +123,11 @@ pub trait DatabaseLike: Clone + Debug {
             .expect("Failed to build table dependency DAG");
         let dag_ordering = dag.kahn().expect("Failed to compute Kahn's ordering");
 
-        let mut ordered_tables = Vec::with_capacity(tables.len());
-        for table_index in dag_ordering {
-            ordered_tables.push(tables[table_index]);
+        let mut ordered_tables = tables.clone();
+        for (table_index, table) in dag_ordering.into_iter().zip(tables.iter()) {
+            ordered_tables[table_index] = table;
         }
+
         ordered_tables
     }
 

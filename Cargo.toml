@@ -68,7 +68,9 @@ members = [
   "web/web_common/synql-models",
   "web/web_common/synql-builders",
   "web/web_common/synql-relations",
-  "web/web_common/diesel-queries", "web/web_common/synql-insertable", "web/web_common/synql-attributes",
+  "web/web_common/diesel-queries",
+  "web/web_common/synql-insertable",
+  "web/web_common/synql-attributes",
 ]
 
 [workspace.dependencies]

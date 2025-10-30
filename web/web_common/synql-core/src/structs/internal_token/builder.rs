@@ -10,9 +10,8 @@ use proc_macro2::TokenStream;
 use quote::ToTokens;
 
 use crate::structs::{
-    DataVariantRef, InternalToken, Publicness,
-    external_crate::{ExternalMacroRef, ExternalTraitRef},
-    internal_data::InternalModuleRef,
+    DataVariantRef, InternalToken, Publicness, external_crate::ExternalMacroRef,
+    external_trait::TraitVariantRef, internal_data::InternalModuleRef,
 };
 
 #[derive(Default)]
@@ -24,8 +23,10 @@ pub struct InternalTokenBuilder<'data> {
     stream: Option<TokenStream>,
     /// External macros used in the token stream.
     external_macros: Vec<ExternalMacroRef<'data>>,
-    /// External traits used in the token stream.
-    external_traits: Vec<ExternalTraitRef<'data>>,
+    /// Traits used in the token stream.
+    employed_traits: Vec<TraitVariantRef<'data>>,
+    /// Traits which are implemented by the token stream.
+    implemented_traits: Vec<TraitVariantRef<'data>>,
     /// Data used in the token stream.
     data: Vec<DataVariantRef<'data>>,
     /// Internal modules from other crates in the same workspace which are used
@@ -51,7 +52,7 @@ pub enum InternalTokenAttribute {
 }
 
 /// Error enumeration which might occur when building a `InternalToken`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum InternalTokenBuilderError {
     /// An error occurred during the building process.
     Builder(BuilderError<InternalTokenAttribute>),
@@ -66,7 +67,7 @@ pub enum InternalTokenBuilderError {
     /// The provided external macro does not appear in the token stream.
     ExternalMacroNotFound,
     /// The provided external trait does not appear in the token stream.
-    ExternalTraitNotFound,
+    TraitNotFound(String),
     /// The provided internal data does not appear in the token stream.
     InternalDataNotFound,
     /// The provided internal module does not appear in the token stream.
@@ -98,8 +99,8 @@ impl Display for InternalTokenBuilderError {
             InternalTokenBuilderError::ExternalMacroNotFound => {
                 write!(f, "External macro not found in token stream")
             }
-            InternalTokenBuilderError::ExternalTraitNotFound => {
-                write!(f, "External trait not found in token stream")
+            InternalTokenBuilderError::TraitNotFound(name) => {
+                write!(f, "Trait '{name}' not found in token stream")
             }
             InternalTokenBuilderError::InternalDataNotFound => {
                 write!(f, "Internal data not found in token stream")
@@ -191,42 +192,68 @@ impl<'data> InternalTokenBuilder<'data> {
         Ok(self)
     }
 
-    /// Adds an external trait reference to the token stream.
+    /// Adds a trait employed by the token stream.
     ///
     /// # Arguments
-    /// * `external_trait` - The external trait reference.
+    /// * `employed_trait` - The employed trait.
     ///
     /// # Errors
     ///
-    /// Returns an error if the external trait is already present.
-    pub fn external_trait(
+    /// * If the employed trait is already present.
+    pub fn employed_trait(
         mut self,
-        external_trait: ExternalTraitRef<'data>,
+        employed_trait: TraitVariantRef<'data>,
     ) -> Result<Self, InternalTokenBuilderError> {
-        if self.external_traits.contains(&external_trait) {
+        if self.employed_traits.contains(&employed_trait) {
             return Err(InternalTokenBuilderError::DuplicateExternalTrait);
         }
-        self.external_traits.push(external_trait);
+        self.employed_traits.push(employed_trait);
         Ok(self)
     }
 
-    /// Sets the external traits used in the token stream.
+    /// Adds several traits employed by the token stream.
+    pub fn employed_traits<I>(
+        mut self,
+        employed_traits: I,
+    ) -> Result<Self, InternalTokenBuilderError>
+    where
+        I: IntoIterator<Item = TraitVariantRef<'data>>,
+    {
+        for employed_trait in employed_traits {
+            self = self.employed_trait(employed_trait)?;
+        }
+        Ok(self)
+    }
+
+    /// Adds a trait implemented by the token stream.
     ///
     /// # Arguments
-    /// * `external_traits` - The external traits.
+    /// * `implemented_trait` - The implemented trait.
     ///
     /// # Errors
     ///
-    /// Returns an error if any duplicate external traits are detected.
-    pub fn external_traits<I>(
+    /// * If the implemented trait is already present.
+    pub fn implemented_trait(
         mut self,
-        external_traits: I,
+        implemented_trait: TraitVariantRef<'data>,
+    ) -> Result<Self, InternalTokenBuilderError> {
+        if self.implemented_traits.contains(&implemented_trait) {
+            return Err(InternalTokenBuilderError::DuplicateExternalTrait);
+        }
+        self.implemented_traits.push(implemented_trait);
+        Ok(self)
+    }
+
+    /// Adds several traits implemented by the token stream.
+    pub fn implemented_traits<I>(
+        mut self,
+        implemented_traits: I,
     ) -> Result<Self, InternalTokenBuilderError>
     where
-        I: IntoIterator<Item = ExternalTraitRef<'data>>,
+        I: IntoIterator<Item = TraitVariantRef<'data>>,
     {
-        for external_trait in external_traits {
-            self = self.external_trait(external_trait)?;
+        for implemented_trait in implemented_traits {
+            self = self.implemented_trait(implemented_trait)?;
         }
         Ok(self)
     }
@@ -318,10 +345,16 @@ impl<'data> Builder for InternalTokenBuilder<'data> {
                 return Err(InternalTokenBuilderError::ExternalMacroNotFound);
             }
         }
-        for external_trait in &self.external_traits {
-            let trait_name = external_trait.name();
+        for employed_trait in &self.employed_traits {
+            let trait_name = employed_trait.name();
             if !string_token_stream.contains(trait_name) {
-                return Err(InternalTokenBuilderError::ExternalTraitNotFound);
+                return Err(InternalTokenBuilderError::TraitNotFound(trait_name.to_string()));
+            }
+        }
+        for implemented_trait in &self.implemented_traits {
+            let trait_name = implemented_trait.name();
+            if !string_token_stream.contains(trait_name) {
+                return Err(InternalTokenBuilderError::TraitNotFound(trait_name.to_string()));
             }
         }
         for data in &self.data {
@@ -343,7 +376,8 @@ impl<'data> Builder for InternalTokenBuilder<'data> {
                 .stream
                 .ok_or(BuilderError::IncompleteBuild(InternalTokenAttribute::Stream))?,
             external_macros: self.external_macros,
-            external_traits: self.external_traits,
+            employed_traits: self.employed_traits,
+            implemented_traits: self.implemented_traits,
             data: self.data,
             internal_modules: self.internal_modules,
         })

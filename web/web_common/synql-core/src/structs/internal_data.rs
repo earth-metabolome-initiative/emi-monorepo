@@ -451,7 +451,7 @@ pub struct InternalData<'data> {
     /// The variant of the data (struct or enum).
     variant: InternalDataVariant<'data>,
     /// The traits implemented for the data.
-    traits: Vec<TraitVariantRef<'data>>,
+    traits: Vec<InternalToken<'data>>,
     /// The derives applies to the data.
     derives: Vec<Derive<'data>>,
     /// The decorators applied to the data which are not derives.
@@ -516,11 +516,13 @@ impl<'data> ToTokens for InternalData<'data> {
         };
         let derives = &self.derives;
         let decorators = &self.decorators;
+        let traits = &self.traits;
         let token = quote::quote! {
             #(#derives)*
             #(#decorators)*
             #documentation
             #publicness #variant
+            #(#traits)*
         };
         tokens.extend(token);
     }
@@ -531,13 +533,7 @@ impl<'data> ExternalDependencies<'data> for InternalData<'data> {
         let mut crates = self
             .traits
             .iter()
-            .filter_map(|t| {
-                if let TraitVariantRef::External(ext_trait_ref) = t {
-                    Some(ext_trait_ref.external_crate())
-                } else {
-                    None
-                }
-            })
+            .flat_map(ExternalDependencies::external_dependencies)
             .collect::<Vec<_>>();
 
         for derive in &self.derives {
@@ -559,9 +555,7 @@ impl<'data> InternalDependencies<'data> for InternalData<'data> {
         let mut crates = self
             .traits
             .iter()
-            .filter_map(|t| {
-                if let TraitVariantRef::Internal(_, krate) = t { Some(*krate) } else { None }
-            })
+            .flat_map(InternalDependencies::internal_dependencies)
             .collect::<Vec<_>>();
 
         for derive in &self.derives {

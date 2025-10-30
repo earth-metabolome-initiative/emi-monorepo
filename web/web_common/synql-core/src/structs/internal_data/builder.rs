@@ -9,8 +9,8 @@ use common_traits::{
 use strum::IntoEnumIterator;
 
 use crate::structs::{
-    Decorator, Derive, ExternalCrate, InternalData, InternalDataVariant, Publicness, Trait,
-    external_trait::TraitVariantRef,
+    Decorator, Derive, ExternalCrate, InternalData, InternalDataVariant, InternalToken, Publicness,
+    Trait, external_trait::TraitVariantRef,
 };
 
 #[derive(Default)]
@@ -25,7 +25,7 @@ pub struct InternalDataBuilder<'data> {
     /// The variant of the data (struct or enum).
     variant: Option<InternalDataVariant<'data>>,
     /// The traits implemented for the data.
-    traits: Vec<TraitVariantRef<'data>>,
+    traits: Vec<InternalToken<'data>>,
     /// The derives applied to the data.
     derives: Vec<Derive<'data>>,
     /// The decorators applied to the data.
@@ -179,15 +179,15 @@ impl<'data> InternalDataBuilder<'data> {
     /// Adds a trait implementation to the data.
     ///
     /// # Arguments
-    /// * `trait_ref` - The trait to implement.
+    /// * `internal_token` - The trait to implement.
     pub fn add_trait(
         mut self,
-        trait_ref: TraitVariantRef<'data>,
+        internal_token: InternalToken<'data>,
     ) -> Result<Self, InternalDataBuilderError> {
-        if self.traits.iter().any(|t| t == &trait_ref) {
+        if self.traits.iter().any(|t| t == &internal_token) {
             return Err(InternalDataBuilderError::DuplicatedTrait);
         }
-        self.traits.push(trait_ref);
+        self.traits.push(internal_token);
         Ok(self)
     }
 
@@ -195,12 +195,12 @@ impl<'data> InternalDataBuilder<'data> {
     ///
     /// # Arguments
     /// * `traits` - The traits to implement.
-    pub fn add_traits<I>(mut self, traits: I) -> Result<Self, InternalDataBuilderError>
+    pub fn add_traits<I>(mut self, internal_tokens: I) -> Result<Self, InternalDataBuilderError>
     where
-        I: IntoIterator<Item = TraitVariantRef<'data>>,
+        I: IntoIterator<Item = InternalToken<'data>>,
     {
-        for trait_ref in traits {
-            self = self.add_trait(trait_ref)?;
+        for internal_token in internal_tokens {
+            self = self.add_trait(internal_token)?;
         }
         Ok(self)
     }
@@ -285,7 +285,7 @@ impl<'data> Builder for InternalDataBuilder<'data> {
             // If the current trait variant is supported by the data variant, and it has not
             // been already been added, we add it as an auto-derive.
             if variant.supports_trait(&trait_variant.into())
-                && !self.traits.contains(&trait_variant.into())
+                && !self.traits.iter().any(|t| t.implements_trait(&trait_variant.into()))
             {
                 derive_builder = derive_builder
                     .add_trait(trait_variant)
@@ -299,7 +299,9 @@ impl<'data> Builder for InternalDataBuilder<'data> {
         let mut serde_derive = Derive::new();
         for serde_trait in ExternalCrate::serde().external_trait_refs() {
             let serde_trait: TraitVariantRef<'data> = serde_trait.into();
-            if variant.supports_trait(&serde_trait) && !self.traits.contains(&serde_trait) {
+            if variant.supports_trait(&serde_trait)
+                && !self.traits.iter().any(|t| t.implements_trait(&serde_trait))
+            {
                 serde_derive = serde_derive
                     .add_trait(serde_trait)
                     .expect("It is not possible to double-add a trait here");

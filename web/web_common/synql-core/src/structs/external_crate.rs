@@ -4,9 +4,12 @@
 use quote::ToTokens;
 use syn::Type;
 
-use crate::structs::{
-    ExternalMacro, ExternalTrait, ExternalType, Trait,
-    external_crate::builder::ExternalCrateBuilder, external_trait::TraitVariantRef,
+use crate::{
+    structs::{
+        ExternalMacro, ExternalTrait, ExternalType, Trait,
+        external_crate::builder::ExternalCrateBuilder, external_trait::TraitVariantRef,
+    },
+    traits::ExternalDependencies,
 };
 
 mod builder;
@@ -230,7 +233,7 @@ impl<'data> ExternalMacroRef<'data> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a reference to an external crate and one of its traits.
 pub struct ExternalTraitRef<'data> {
     crate_ref: &'data ExternalCrate<'data>,
@@ -246,6 +249,12 @@ impl From<Trait> for ExternalTraitRef<'static> {
                 .external_trait(trait_def.as_ref())
                 .expect(&format!("Trait `{trait_def}` should exist")),
         }
+    }
+}
+
+impl<'data> ExternalDependencies<'data> for ExternalTraitRef<'data> {
+    fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
+        vec![self.crate_ref]
     }
 }
 

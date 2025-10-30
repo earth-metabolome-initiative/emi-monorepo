@@ -4,7 +4,7 @@
 use common_traits::builder::Builder;
 use strum::IntoEnumIterator;
 
-use crate::structs::{ExternalCrate, Trait};
+use crate::structs::{ExternalCrate, ExternalTrait, Trait};
 mod numeric;
 
 use lazy_static::lazy_static;
@@ -16,6 +16,13 @@ lazy_static! {
         .add_types(numeric::all_types())
         .unwrap()
         .add_traits(Trait::iter().map(|t| t.into()))
+        .unwrap()
+        .add_traits([ExternalTrait::new()
+            .name("Display")
+            .unwrap()
+            .path(syn::parse_quote!(core::fmt::Display))
+            .build()
+            .unwrap()])
         .unwrap()
         .build()
         .unwrap();

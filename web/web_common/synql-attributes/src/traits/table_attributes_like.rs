@@ -1,5 +1,6 @@
 //! Submodule providing the `TableAttributes` trait for SynQL table attributes.
 
+use syn::Ident;
 use synql_core::{
     structs::{InternalDataRef, Workspace},
     traits::TableSynLike,
@@ -22,6 +23,11 @@ pub trait TableAttributesLike: TableSchema {
     /// Returns the name of the attributes enum for the table.
     fn table_attributes_name(&self) -> String {
         format!("{}Attribute", self.table_singular_camel_name())
+    }
+
+    /// Returns the ident of the attributes enum for the table.
+    fn table_attributes_ident(&self) -> Ident {
+        Ident::new(&self.table_attributes_name(), proc_macro2::Span::call_site())
     }
 
     /// Returns the name of the extension attributes enum for the table.

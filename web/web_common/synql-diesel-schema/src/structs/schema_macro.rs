@@ -59,7 +59,11 @@ impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for Int
                             |referenced_table| {
                                 referenced_table
                                     .schema_module(value.workspace)
-                                    .expect("Failed to get the module ref")
+                                    .expect(&format!(
+                                        "Failed to get the schema module for the referenced table `{}` while building the schema macro for table `{}`.",
+                                        referenced_table.table_name(),
+                                        value.table.table_name()
+                                    ))
                             },
                         ),
                     )

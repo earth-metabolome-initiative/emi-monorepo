@@ -7,7 +7,10 @@ use std::{fmt::Debug, hash::Hash};
 use builder::ExternalTraitBuilder;
 use quote::ToTokens;
 
-use crate::structs::{InternalCrate, InternalTrait, Trait, external_crate::ExternalTraitRef};
+use crate::{
+    structs::{InternalCrate, InternalTrait, Trait, external_crate::ExternalTraitRef},
+    traits::{ExternalDependencies, InternalDependencies},
+};
 
 #[derive(Clone)]
 /// Struct defining a trait available in an external crate.
@@ -174,6 +177,24 @@ impl TraitVariantRef<'_> {
             TraitVariantRef::External(ext_trait_ref) => {
                 ext_trait_ref.implemented_for_typeless_enum()
             }
+        }
+    }
+}
+
+impl<'data> ExternalDependencies<'data> for TraitVariantRef<'data> {
+    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+        match self {
+            TraitVariantRef::Internal(_, _) => vec![],
+            TraitVariantRef::External(ext_trait_ref) => ext_trait_ref.external_dependencies(),
+        }
+    }
+}
+
+impl<'data> InternalDependencies<'data> for TraitVariantRef<'data> {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+        match self {
+            TraitVariantRef::Internal(_, crate_def) => vec![crate_def],
+            TraitVariantRef::External(_) => vec![],
         }
     }
 }

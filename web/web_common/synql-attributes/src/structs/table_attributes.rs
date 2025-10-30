@@ -1,9 +1,10 @@
 //! Submodule defining the `TableAttributes` struct.
+use quote::quote;
 use synql_core::{
     prelude::{Builder, ColumnLike},
     structs::{
         InternalCrate, InternalData, InternalDataVariant, InternalEnum, InternalModule,
-        InternalVariant,
+        InternalToken, InternalVariant,
     },
     traits::ColumnSynLike,
 };
@@ -33,6 +34,35 @@ impl<'data, 'table, T: TableAttributesLike + ?Sized> TableAttributes<'data, 'tab
         database: &'table T::DB,
     ) -> Self {
         Self { table, workspace, database }
+    }
+
+    fn display_impl(&self) -> InternalToken<'data> {
+        let display_trait = synql_core::structs::ExternalCrate::core()
+            .external_trait_ref("Display")
+            .expect("Core crate must have Display trait");
+        let enum_ident = self.table.table_attributes_ident();
+        let variants = self.table.columns(self.database).map(|column| {
+            let column_camel_ident = column.column_camel_ident();
+            let column_snake_ident = column.column_snake_name();
+            quote! {
+                Self::#column_camel_ident => write!(f, #column_snake_ident),
+            }
+        });
+        InternalToken::new()
+            .private()
+            .implemented_trait(display_trait.into())
+            .unwrap()
+            .stream(quote! {
+                impl #display_trait for #enum_ident {
+                    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                        match self {
+                            #(#variants)*
+                        }
+                    }
+                }
+            })
+            .build()
+            .unwrap()
     }
 }
 
@@ -82,6 +112,8 @@ impl<'data, 'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'data,
             ))
             .expect("Failed to add documentation to attributes enum")
             .variant(attributes.into())
+            .add_trait(attributes.display_impl())
+            .unwrap()
             .build()
             .expect("Failed to build attributes enum")
     }

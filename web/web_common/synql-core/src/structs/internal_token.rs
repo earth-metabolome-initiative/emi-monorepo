@@ -11,9 +11,8 @@ use quote::ToTokens;
 
 use crate::{
     structs::{
-        DataVariantRef, ExternalCrate, InternalCrate, Publicness,
-        external_crate::{ExternalMacroRef, ExternalTraitRef},
-        internal_data::InternalModuleRef,
+        DataVariantRef, ExternalCrate, InternalCrate, Publicness, external_crate::ExternalMacroRef,
+        external_trait::TraitVariantRef, internal_data::InternalModuleRef,
     },
     traits::{ExternalDependencies, InternalDependencies},
 };
@@ -27,8 +26,10 @@ pub struct InternalToken<'data> {
     stream: TokenStream,
     /// External macros used in the token stream.
     external_macros: Vec<ExternalMacroRef<'data>>,
-    /// External traits used in the token stream.
-    external_traits: Vec<ExternalTraitRef<'data>>,
+    /// Traits used in the token stream.
+    employed_traits: Vec<TraitVariantRef<'data>>,
+    /// Traits which are implemented by the token stream.
+    implemented_traits: Vec<TraitVariantRef<'data>>,
     /// Data used in the token stream.
     data: Vec<DataVariantRef<'data>>,
     /// Internal modules from other crates in the same workspace which are used
@@ -41,7 +42,8 @@ impl PartialEq for InternalToken<'_> {
         self.stream.to_string() == other.stream.to_string()
             && self.publicness == other.publicness
             && self.external_macros == other.external_macros
-            && self.external_traits == other.external_traits
+            && self.employed_traits == other.employed_traits
+            && self.implemented_traits == other.implemented_traits
             && self.data == other.data
             && self.internal_modules == other.internal_modules
     }
@@ -72,9 +74,14 @@ impl Ord for InternalToken<'_> {
             return external_macros_cmp;
         }
 
-        let external_traits_cmp = self.external_traits.cmp(&other.external_traits);
-        if external_traits_cmp != std::cmp::Ordering::Equal {
-            return external_traits_cmp;
+        let employed_traits_cmp = self.employed_traits.cmp(&other.employed_traits);
+        if employed_traits_cmp != std::cmp::Ordering::Equal {
+            return employed_traits_cmp;
+        }
+
+        let implemented_traits_cmp = self.implemented_traits.cmp(&other.implemented_traits);
+        if implemented_traits_cmp != std::cmp::Ordering::Equal {
+            return implemented_traits_cmp;
         }
 
         let internal_data_cmp = self.data.cmp(&other.data);
@@ -91,7 +98,8 @@ impl Hash for InternalToken<'_> {
         self.stream.to_string().hash(state);
         self.publicness.hash(state);
         self.external_macros.hash(state);
-        self.external_traits.hash(state);
+        self.employed_traits.hash(state);
+        self.implemented_traits.hash(state);
         self.data.hash(state);
         self.internal_modules.hash(state);
     }
@@ -106,6 +114,11 @@ impl<'data> InternalToken<'data> {
     /// Returns whether the token stream is public.
     pub fn is_public(&self) -> bool {
         self.publicness.is_public()
+    }
+
+    /// Returns whether it implements the given trait.
+    pub fn implements_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
+        self.implemented_traits.contains(trait_ref)
     }
 }
 
@@ -124,6 +137,13 @@ impl<'data> InternalDependencies<'data> for InternalToken<'data> {
         for module in &self.internal_modules {
             dependencies.push(module.internal_crate());
         }
+        for trait_ref in &self.employed_traits {
+            dependencies.extend(trait_ref.internal_dependencies());
+        }
+        for trait_ref in &self.implemented_traits {
+            dependencies.extend(trait_ref.internal_dependencies());
+        }
+
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
@@ -136,8 +156,11 @@ impl<'data> ExternalDependencies<'data> for InternalToken<'data> {
         for ext_macro in &self.external_macros {
             dependencies.push(ext_macro.external_crate());
         }
-        for ext_trait in &self.external_traits {
-            dependencies.push(ext_trait.external_crate());
+        for trait_ref in &self.employed_traits {
+            dependencies.extend(trait_ref.external_dependencies());
+        }
+        for trait_ref in &self.implemented_traits {
+            dependencies.extend(trait_ref.external_dependencies());
         }
         dependencies.sort_unstable();
         dependencies.dedup();

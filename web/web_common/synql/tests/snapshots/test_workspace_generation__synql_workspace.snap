@@ -29,6 +29,26 @@ expression: normalized_output
         /src
             /lib.rs
             /schema.rs
+    /extended_comment_attributes
+        /Cargo.toml
+        /src
+            /attributes.rs
+            /lib.rs
+    /extended_comment_model
+        /Cargo.toml
+        /src
+            /lib.rs
+            /model.rs
+    /extended_comment_relations
+        /Cargo.toml
+        /src
+            /lib.rs
+            /relations.rs
+    /extended_comments_schema
+        /Cargo.toml
+        /src
+            /lib.rs
+            /schema.rs
     /rustfmt.toml
     /user_attributes
         /Cargo.toml

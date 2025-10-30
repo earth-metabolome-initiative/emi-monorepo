@@ -176,7 +176,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
                         }
                     }
                 })
-                .external_trait(extension_of_trait.clone())
+                .implemented_trait(extension_of_trait.into())
                 .unwrap()
                 .build()
                 .unwrap(),
@@ -209,11 +209,9 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
                             }
                         }
                     })
-                    .external_traits([
-                        extension_of_trait.clone(),
-                        read_trait.clone(),
-                        identifiable_trait.clone(),
-                    ])
+                    .implemented_trait(extension_of_trait.into())
+                    .unwrap()
+                    .employed_traits([read_trait.into(), identifiable_trait.into()])
                     .unwrap()
                     .build()
                     .unwrap(),

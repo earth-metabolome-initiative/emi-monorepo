@@ -144,7 +144,7 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
                     };
                 });
             } else {
-                host_column_idents.push(quote! { borrowed_ancestor.#host_column_ident.as_ref() });
+                host_column_idents.push(quote! { &borrowed_ancestor.#host_column_ident });
             }
         }
 
@@ -154,11 +154,16 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
             quote! { (#(#host_column_idents),*) }
         };
 
-        let (maybe_use_optional, optional) = if !foreign_key.is_always_enforced(self.database) {
-            (Some(quote! {use #optional_trait;}), Some(quote! {.optional()}))
-        } else {
-            (None, None)
-        };
+        let (maybe_use_optional, optional, maybe_optional_trait) =
+            if !foreign_key.is_always_enforced(self.database) {
+                (
+                    Some(quote! {use #optional_trait;}),
+                    Some(quote! {.optional()}),
+                    Some(optional_trait.into()),
+                )
+            } else {
+                (None, None, None)
+            };
 
         method_builder
             .add_where_clause(
@@ -168,7 +173,7 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
                         InternalToken::new()
                             .private()
                             .stream(quote! {#read_trait<#connection_generic>})
-                            .external_trait(read_trait.clone())
+                            .employed_trait(read_trait.into())
                             .unwrap()
                             .build()
                             .unwrap(),
@@ -192,7 +197,9 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
                             #connection_ident
                         )#optional
                     })
-                    .external_traits([read_trait, optional_trait])
+                    .employed_traits([read_trait.into()])
+                    .unwrap()
+                    .employed_traits(maybe_optional_trait)
                     .unwrap()
                     .build()
                     .unwrap(),
@@ -224,7 +231,7 @@ where
                 InternalToken::new()
                     .private()
                     .stream(quote! {#extension_of<#model_ref, C>})
-                    .external_trait(extension_of)
+                    .employed_trait(extension_of.into())
                     .unwrap()
                     .data(model_ref.into())
                     .unwrap()
@@ -232,15 +239,21 @@ where
                     .unwrap(),
             )
             .unwrap()
-            .methods(table_relation.table.foreign_keys(table_relation.database).map(
-                |fk: &<T::DB as DatabaseLike>::ForeignKey| {
-                    if fk.is_referenced_primary_key(table_relation.database) {
-                        table_relation.read_based_method(fk)
-                    } else {
-                        todo!()
-                    }
-                },
-            ))
+            .methods(
+                table_relation
+                    .table
+                    .foreign_keys(table_relation.database)
+                    // We filter out foreign keys that start from the primary key of the host table,
+                    // as those should be handled by the `Read` trait implementation.
+                    .filter(|fk| !fk.is_host_primary_key(table_relation.database))
+                    .map(|fk: &<T::DB as DatabaseLike>::ForeignKey| {
+                        if fk.is_referenced_primary_key(table_relation.database) {
+                            table_relation.read_based_method(fk)
+                        } else {
+                            todo!()
+                        }
+                    }),
+            )
             .expect("Failed to set the internal trait methods")
             .build()
             .expect("Failed to convert internal trait builder into internal trait")
