@@ -3,7 +3,7 @@
 
 use std::path::Path;
 
-use synql_attributes::traits::TableAttributesLike;
+use synql_attributes::traits::{TableAttributesLike, TableExtensionAttributesLike};
 use synql_core::structs::Workspace;
 use synql_diesel_schema::prelude::*;
 use synql_insertable::traits::TableInsertableLike;
@@ -75,6 +75,12 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             workspace.add_internal_crate(table.schema_macro(&workspace, self.database).into());
             workspace.add_internal_crate(table.model(&workspace, self.database).into());
             workspace.add_internal_crate(table.relations_trait(&workspace, self.database).into());
+            // If the table is an extension, we need to add the extension attributes enum as
+            // well
+            if let Some(extension_attribute) = table.extension_attributes(&workspace, self.database)
+            {
+                workspace.add_internal_crate(extension_attribute.into());
+            }
             workspace.add_internal_crate(table.attributes(&workspace, self.database).into());
             // If the table has some generated columns, we need to generate an alternative
             // insertable struct that excludes those columns.

@@ -34,6 +34,11 @@ expression: normalized_output
         /src
             /attributes.rs
             /lib.rs
+    /extended_comment_extension_attributes
+        /Cargo.toml
+        /src
+            /extension_attributes.rs
+            /lib.rs
     /extended_comment_model
         /Cargo.toml
         /src

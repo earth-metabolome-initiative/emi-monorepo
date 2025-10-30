@@ -60,6 +60,15 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
     let cargo_toml = workspace_path.join("Cargo.toml");
     assert!(cargo_toml.exists(), "Cargo.toml should be created");
 
+    // Runs the `cargo fmt` command in the specified directory.
+    let output = Command::new("cargo").arg("fmt").current_dir(&workspace_path).output()?;
+
+    if !output.status.success() {
+        eprintln!("cargo fmt stdout: {}", String::from_utf8_lossy(&output.stdout));
+        eprintln!("cargo fmt stderr: {}", String::from_utf8_lossy(&output.stderr));
+        panic!("cargo fmt failed for generated workspace");
+    }
+
     // Verify that the generated workspace can be checked
     let output = Command::new("cargo").arg("check").current_dir(&workspace_path).output()?;
 
@@ -76,15 +85,6 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
         eprintln!("cargo test stdout: {}", String::from_utf8_lossy(&output.stdout));
         eprintln!("cargo test stderr: {}", String::from_utf8_lossy(&output.stderr));
         panic!("cargo test failed for generated workspace");
-    }
-
-    // Runs the `cargo fmt` command in the specified directory.
-    let output = Command::new("cargo").arg("fmt").current_dir(&workspace_path).output()?;
-
-    if !output.status.success() {
-        eprintln!("cargo fmt stdout: {}", String::from_utf8_lossy(&output.stdout));
-        eprintln!("cargo fmt stderr: {}", String::from_utf8_lossy(&output.stderr));
-        panic!("cargo fmt failed for generated workspace");
     }
 
     Ok(())

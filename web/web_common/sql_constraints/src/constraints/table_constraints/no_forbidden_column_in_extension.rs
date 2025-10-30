@@ -22,8 +22,7 @@ use crate::{
 /// ```rust
 /// use sql_constraints::prelude::*;
 ///
-/// let constrainer: GenericConstrainer<ParserDB> =
-///     NoForbiddenColumnInExtension::default().into();
+/// let constrainer: GenericConstrainer<ParserDB> = NoForbiddenColumnInExtension::default().into();
 ///
 /// let invalid_schema = ParserDB::try_from(
 ///     r#"
@@ -106,9 +105,7 @@ impl<DB> Default for NoForbiddenColumnInExtension<DB> {
     }
 }
 
-impl<DB: DatabaseLike + 'static> From<NoForbiddenColumnInExtension<DB>>
-    for GenericConstrainer<DB>
-{
+impl<DB: DatabaseLike + 'static> From<NoForbiddenColumnInExtension<DB>> for GenericConstrainer<DB> {
     fn from(constraint: NoForbiddenColumnInExtension<DB>) -> Self {
         let mut constrainer = GenericConstrainer::default();
         constrainer.register_table_constraint(Box::new(constraint));

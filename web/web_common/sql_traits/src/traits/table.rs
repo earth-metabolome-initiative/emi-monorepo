@@ -955,6 +955,36 @@ pub trait TableLike:
         referenced_tables
     }
 
+    /// Returns whether the table extends any other table.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE child_table (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES parent_table(id));
+    /// "#,
+    /// )?;
+    /// let child_table = db.table(None, "child_table");
+    /// let parent_table = db.table(None, "parent_table");
+    /// assert!(child_table.is_extension(&db));
+    /// assert!(!parent_table.is_extension(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn is_extension(&self, database: &Self::DB) -> bool {
+        self.extension_foreign_keys(database).next().is_some()
+    }
+
     /// Returns whether the table is a descendant of another table, i.e., if it
     /// extends the other table either directly or some other table which
     /// extends the other table.

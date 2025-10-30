@@ -30,11 +30,6 @@ pub trait TableAttributesLike: TableSchema {
         Ident::new(&self.table_attributes_name(), proc_macro2::Span::call_site())
     }
 
-    /// Returns the name of the extension attributes enum for the table.
-    fn table_extension_attributes_name(&self) -> String {
-        format!("{}ExtensionAttribute", self.table_singular_camel_name())
-    }
-
     /// Returns the
     /// [`TableAttributes<'data, 'table,
     /// Self>`](crate::structs::TableAttributes) representing the attributes
@@ -65,18 +60,6 @@ pub trait TableAttributesLike: TableSchema {
         Some(InternalDataRef::new(
             crate_ref,
             crate_ref.internal_data(&self.table_attributes_name())?,
-        ))
-    }
-
-    /// Returns a reference to the extension attributes enum for the table.
-    fn extension_attributes_ref<'data>(
-        &self,
-        workspace: &Workspace<'data>,
-    ) -> Option<InternalDataRef<'data>> {
-        let crate_ref = workspace.internal_crate(&self.table_attributes_crate_name())?;
-        Some(InternalDataRef::new(
-            crate_ref,
-            crate_ref.internal_data(&self.table_extension_attributes_name())?,
         ))
     }
 }

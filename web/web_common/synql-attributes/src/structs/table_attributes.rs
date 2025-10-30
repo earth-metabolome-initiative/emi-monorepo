@@ -1,5 +1,6 @@
 //! Submodule defining the `TableAttributes` struct.
 use quote::quote;
+use syn::Ident;
 use synql_core::{
     prelude::{Builder, ColumnLike},
     structs::{
@@ -9,7 +10,11 @@ use synql_core::{
     traits::ColumnSynLike,
 };
 
-use crate::traits::{TableAttributesLike, table_attributes_like::ATTRIBUTES_MODULE_NAME};
+use crate::traits::{
+    TableAttributesLike, TableExtensionAttributesLike,
+    table_attributes_like::ATTRIBUTES_MODULE_NAME,
+    table_extension_attributes_like::EXTENSION_ATTRIBUTES_ENUM_NAME,
+};
 
 #[derive(Debug)]
 /// Struct representing a SynQL table attributes enumeration.
@@ -41,13 +46,30 @@ impl<'data, 'table, T: TableAttributesLike + ?Sized> TableAttributes<'data, 'tab
             .external_trait_ref("Display")
             .expect("Core crate must have Display trait");
         let enum_ident = self.table.table_attributes_ident();
-        let variants = self.table.columns(self.database).map(|column| {
-            let column_camel_ident = column.column_camel_ident();
-            let column_snake_ident = column.column_snake_name();
-            quote! {
-                Self::#column_camel_ident => write!(f, #column_snake_ident),
-            }
-        });
+        let table_snake_name = self.table.table_snake_name();
+
+        let maybe_extension_variant = if self.table.is_extension(self.database) {
+            let extension_camel_ident =
+                Ident::new(EXTENSION_ATTRIBUTES_ENUM_NAME, proc_macro2::Span::call_site());
+            Some(quote! {
+                Self::#extension_camel_ident(e) => write!(f, "{e}"),
+            })
+        } else {
+            None
+        };
+
+        let variants = self
+            .table
+            .columns(self.database)
+            .map(|column| {
+                let column_camel_ident = column.column_camel_ident();
+                let column_snake_ident = column.column_snake_name();
+                let display_name = format!("{}.{}", table_snake_name, column_snake_ident);
+                quote! {
+                    Self::#column_camel_ident => write!(f, #display_name),
+                }
+            })
+            .chain(maybe_extension_variant);
         InternalToken::new()
             .private()
             .implemented_trait(display_trait.into())
@@ -66,10 +88,31 @@ impl<'data, 'table, T: TableAttributesLike + ?Sized> TableAttributes<'data, 'tab
     }
 }
 
-impl<'data, 'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'data, 'table, T>>
-    for InternalEnum<'data>
+impl<'data, 'table, T: TableAttributesLike + TableExtensionAttributesLike + ?Sized>
+    From<TableAttributes<'data, 'table, T>> for InternalEnum<'data>
 {
     fn from(attributes: TableAttributes<'data, 'table, T>) -> Self {
+        let maybe_extension_variant = if let Some(extension_attributes) =
+            attributes.table.extension_attributes_enum_ref(attributes.workspace)
+        {
+            let extension_ident =
+                Ident::new(EXTENSION_ATTRIBUTES_ENUM_NAME, proc_macro2::Span::call_site());
+            Some(
+                InternalVariant::new()
+                    .name(extension_ident)
+                    .doc(format!(
+                        "Extension attributes variant for the `{}` table.",
+                        attributes.table.table_name()
+                    ))
+                    .expect("Failed to set documentation for extension attribute variant")
+                    .ty(extension_attributes)
+                    .build()
+                    .expect("Failed to build extension attribute variant"),
+            )
+        } else {
+            None
+        };
+
         InternalEnum::new()
             .variants(attributes.table.columns(attributes.database).map(|column| {
                 InternalVariant::new()
@@ -83,6 +126,8 @@ impl<'data, 'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'data,
                     .build()
                     .expect("Failed to build attribute variant")
             }))
+            .expect("Failed to set variants for attributes enum")
+            .variants(maybe_extension_variant)
             .expect("Failed to set variants for attributes enum")
             .build()
             .expect("Failed to build attributes enum")

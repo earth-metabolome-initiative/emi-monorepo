@@ -42,15 +42,25 @@ impl<'data> From<InternalEnum<'data>> for InternalDataVariant<'data> {
     }
 }
 
-impl<'data> InternalDataVariant<'data> {
-    /// Returns the internal crate dependencies of the variant.
-    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl<'data> ExternalDependencies<'data> for InternalDataVariant<'data> {
+    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+        match self {
+            InternalDataVariant::StructVariant(s) => s.external_dependencies(),
+            InternalDataVariant::EnumVariant(e) => e.external_dependencies(),
+        }
+    }
+}
+
+impl<'data> InternalDependencies<'data> for InternalDataVariant<'data> {
+    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
         match self {
             InternalDataVariant::StructVariant(s) => s.internal_dependencies(),
             InternalDataVariant::EnumVariant(e) => e.internal_dependencies(),
         }
     }
+}
 
+impl<'data> InternalDataVariant<'data> {
     /// Returns whether the underlying variant supports the given trait.
     ///
     /// # Arguments
@@ -544,6 +554,8 @@ impl<'data> ExternalDependencies<'data> for InternalData<'data> {
             crates.extend(decorator.external_dependencies());
         }
 
+        crates.extend(self.variant.external_dependencies());
+
         crates.sort_unstable();
         crates.dedup();
         crates
@@ -565,6 +577,8 @@ impl<'data> InternalDependencies<'data> for InternalData<'data> {
         for decorator in &self.decorators {
             crates.extend(decorator.internal_dependencies());
         }
+
+        crates.extend(self.variant.internal_dependencies());
 
         crates.sort_unstable();
         crates.dedup();
