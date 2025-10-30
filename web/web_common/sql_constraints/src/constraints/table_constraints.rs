@@ -14,3 +14,5 @@ mod non_composite_primary_key_named_id;
 pub use non_composite_primary_key_named_id::NonCompositePrimaryKeyNamedId;
 mod no_forbidden_column_in_extension;
 pub use no_forbidden_column_in_extension::NoForbiddenColumnInExtension;
+mod non_redundant_extension_dag;
+pub use non_redundant_extension_dag::NonRedundantExtensionDag;
