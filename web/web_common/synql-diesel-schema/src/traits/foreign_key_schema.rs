@@ -37,7 +37,7 @@ pub trait ForeignKeySchema: ForeignKeySynLike + Sized {
     /// );
     /// "#,
     /// )?;
-    /// let host_table = db.table(None, "host_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
     /// let foreign_key = host_table.foreign_keys(&db).next().expect("Should have a foreign key");
     /// let doc_repr = foreign_key.documentation_schema_repr(&db);
     /// assert_eq!(

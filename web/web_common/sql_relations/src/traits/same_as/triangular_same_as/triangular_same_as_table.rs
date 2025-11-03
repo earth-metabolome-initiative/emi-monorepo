@@ -38,7 +38,7 @@ where
     /// );
     /// "#,
     /// )?;
-    /// let child = db.table(None, "child");
+    /// let child = db.table(None, "child").unwrap();
     /// let triangular_fks = child.triangular_same_as_foreign_keys(&db).collect::<Vec<_>>();
     /// assert_eq!(triangular_fks.len(), 1, "Expected exactly one triangular same-as foreign key");
     /// # Ok(())

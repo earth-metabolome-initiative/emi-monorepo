@@ -32,7 +32,7 @@ pub trait HorizontalSameAsForeignKeyLike: VerticalSameAsForeignKeyLike {
     /// );
     /// "#,
     /// )?;
-    /// let child_table = db.table(None, "child");
+    /// let child_table = db.table(None, "child").unwrap();
     /// let [extension_primary_key, parent_fk, brother_fk] =
     ///     child_table.foreign_keys(&db).collect::<Vec<_>>()[..]
     /// else {

@@ -2,7 +2,7 @@
 
 use std::borrow::Borrow;
 
-use quote::{ToTokens, quote};
+use quote::quote;
 use syn::Ident;
 use synql_core::{
     prelude::{Builder, ColumnLike, DatabaseLike, ForeignKeyLike},
@@ -114,7 +114,7 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
                 )
                 .name(foreign_key.foreign_key_getter_name(self.database))
                 .expect("Failed to set the method name")
-                .add_argument(
+                .argument(
                     Argument::new()
                         .name("self")
                         .unwrap()
@@ -123,7 +123,7 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
                         .expect("Failed to build self argument"),
                 )
                 .expect("Failed to add self argument")
-                .add_argument(connection_argument)
+                .argument(connection_argument)
                 .expect("Failed to add the method argument for the connection")
                 .return_type(DataVariantRef::diesel_result(
                     if foreign_key.is_always_enforced(self.database) {
@@ -187,7 +187,7 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
             };
 
         method_builder
-            .add_where_clause(
+            .where_clause(
                 WhereClause::new()
                     .left(referenced_table_model.clone())
                     .right(
@@ -356,15 +356,5 @@ where
             .expect("Failed to add internal module to internal crate")
             .build()
             .expect("Failed to convert internal data into internal crate")
-    }
-}
-
-impl<'data, 'table, T> ToTokens for TableRelations<'data, 'table, T>
-where
-    T: TableRelationsLike + ?Sized,
-{
-    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let internal_data: InternalTrait<'data> = InternalTrait::from(*self);
-        internal_data.to_tokens(tokens);
     }
 }

@@ -37,7 +37,7 @@ impl<'db, FK: HorizontalSameAsForeignKeyLike + ?Sized> Triangular<'db, FK> {
     ///     FOREIGN KEY (sibling_id, id) REFERENCES sibling(id, grandparent_id));
     /// "#,
     /// ).unwrap();
-    /// let child_table = db.table(None, "child");
+    /// let child_table = db.table(None, "child").unwrap();
     /// // Look for triangular relationships
     /// for fk in child_table.foreign_keys(&db) {
     ///     if let Some(triangle) = fk.triangular_same_as(&db) {
@@ -66,7 +66,7 @@ impl<'db, FK: HorizontalSameAsForeignKeyLike + ?Sized> Triangular<'db, FK> {
     ///     FOREIGN KEY (sibling_id, id) REFERENCES sibling(id, grandparent_id));
     /// "#,
     /// ).unwrap();
-    /// let child_table = db.table(None, "child");
+    /// let child_table = db.table(None, "child").unwrap();
     /// // Look for triangular relationships
     /// for fk in child_table.foreign_keys(&db) {
     ///     if let Some(triangle) = fk.triangular_same_as(&db) {
@@ -95,7 +95,7 @@ impl<'db, FK: HorizontalSameAsForeignKeyLike + ?Sized> Triangular<'db, FK> {
     ///     FOREIGN KEY (sibling_id, id) REFERENCES sibling(id, grandparent_id));
     /// "#,
     /// ).unwrap();
-    /// let child_table = db.table(None, "child");
+    /// let child_table = db.table(None, "child").unwrap();
     /// // Look for triangular relationships
     /// for fk in child_table.foreign_keys(&db) {
     ///     if let Some(triangle) = fk.triangular_same_as(&db) {
@@ -132,7 +132,7 @@ pub trait TriangularSameAsForeignKeyLike: HorizontalSameAsForeignKeyLike {
     ///     FOREIGN KEY (sibling_id, id) REFERENCES sibling(id, grandparent_id));
     /// "#,
     /// ).unwrap();
-    /// let child_table = db.table(None, "child");
+    /// let child_table = db.table(None, "child").unwrap();
     /// // Check which foreign keys are triangular same-as relationships
     /// let triangular_count =
     ///     child_table.foreign_keys(&db).filter(|fk| fk.is_triangular_same_as(&db)).count();
@@ -181,9 +181,9 @@ pub trait TriangularSameAsForeignKeyLike: HorizontalSameAsForeignKeyLike {
     /// "#,
     /// )?;
     ///
-    /// let child = db.table(None, "child");
-    /// let grandparent_hyphotenuse = db.table(None, "grandparent_hyphotenuse");
-    /// let parent_hyphotenuse = db.table(None, "parent_hyphotenuse");
+    /// let child = db.table(None, "child").unwrap();
+    /// let grandparent_hyphotenuse = db.table(None, "grandparent_hyphotenuse").unwrap();
+    /// let parent_hyphotenuse = db.table(None, "parent_hyphotenuse").unwrap();
     ///
     /// let [
     ///     extension_primary_key,

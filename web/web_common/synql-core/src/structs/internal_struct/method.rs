@@ -32,7 +32,7 @@ pub struct Method<'data> {
     /// Documentation of the method.
     documentation: Documentation<'data>,
     /// Error documentation of the method.
-    error_documentation: Option<Documentation<'data>>,
+    error_documentations: Vec<Documentation<'data>>,
     /// Generics of the method.
     generics: Vec<Ident>,
     /// Where clauses of the method.
@@ -127,10 +127,13 @@ impl ToTokens for Method<'_> {
             }
         }
 
-        if let Some(error_doc) = &self.error_documentation {
+        if !self.error_documentations.is_empty() {
             documentation.push(String::default());
             documentation.push("# Errors".to_string());
-            documentation.push(error_doc.documentation().to_string());
+            for error_doc in &self.error_documentations {
+                documentation.push(" * ".to_string());
+                documentation.push(error_doc.documentation().to_string());
+            }
         }
 
         let main_documentation = &self.documentation;
@@ -156,7 +159,7 @@ impl<'data> InternalDependencies<'data> for Method<'data> {
             dependencies.extend(where_clause.internal_dependencies());
         }
         dependencies.extend(self.documentation.internal_dependencies());
-        if let Some(error_doc) = &self.error_documentation {
+        for error_doc in &self.error_documentations {
             dependencies.extend(error_doc.internal_dependencies());
         }
         dependencies.sort_unstable();
@@ -178,7 +181,7 @@ impl<'data> ExternalDependencies<'data> for Method<'data> {
             dependencies.extend(where_clause.external_dependencies());
         }
         dependencies.extend(self.documentation.external_dependencies());
-        if let Some(error_doc) = &self.error_documentation {
+        for error_doc in &self.error_documentations {
             dependencies.extend(error_doc.external_dependencies());
         }
         dependencies.sort_unstable();

@@ -20,6 +20,7 @@ mod diesel_queries_crate;
 mod postgis_diesel_crate;
 mod serde_crate;
 mod std_crate;
+mod validation_errors_crate;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining the crate required by some type found in the postgres
@@ -159,7 +160,7 @@ impl<'data> ExternalTypeRef<'data> {
     }
 
     /// Returns a reference to the diesel type.
-    pub fn diesel_type(&self) -> &'data syn::Type {
+    pub fn diesel_type(&self) -> Option<&'data syn::Type> {
         self.type_ref.diesel_type()
     }
 
@@ -201,6 +202,12 @@ impl<'data> ExternalTypeRef<'data> {
     /// Returns whether the type supports the `Copy` trait in Rust.
     pub fn supports_copy(&self) -> bool {
         self.type_ref.supports(&Trait::Copy.into())
+    }
+}
+
+impl ToTokens for ExternalTypeRef<'_> {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        self.type_ref.rust_type().to_tokens(tokens);
     }
 }
 

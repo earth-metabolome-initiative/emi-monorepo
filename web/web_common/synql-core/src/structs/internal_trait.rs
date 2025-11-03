@@ -185,11 +185,7 @@ impl ToTokens for InternalTrait<'_> {
 
         let where_clause_tokens = self.formatted_where_constraints(false);
 
-        let documentation = self.documentation.documentation();
-        let documentation = quote::quote! {
-            #[doc = #documentation]
-        };
-
+        let documentation = &self.documentation;
         let formatted_generics = self.formatted_generics();
 
         let maybe_supertraits = if self.super_traits.is_empty() {

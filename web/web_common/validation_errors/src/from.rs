@@ -2,9 +2,9 @@
 
 use std::convert::Infallible;
 
-use crate::{DoubleFieldError, Error, SingleFieldError};
+use crate::{DoubleFieldError, ValidationError, SingleFieldError};
 
-impl From<Infallible> for Error {
+impl From<Infallible> for ValidationError {
     fn from(_error: Infallible) -> Self {
         unreachable!("Infallible cannot be converted to Error.")
     }
@@ -28,7 +28,7 @@ impl From<cas_codes::errors::Error> for SingleFieldError {
     }
 }
 
-impl From<cas_codes::errors::Error> for Error {
+impl From<cas_codes::errors::Error> for ValidationError {
     fn from(error: cas_codes::errors::Error) -> Self {
         Self::SingleField(error.into())
     }
@@ -40,7 +40,7 @@ impl From<molecular_formulas::errors::Error> for SingleFieldError {
     }
 }
 
-impl From<molecular_formulas::errors::Error> for Error {
+impl From<molecular_formulas::errors::Error> for ValidationError {
     fn from(error: molecular_formulas::errors::Error) -> Self {
         Self::SingleField(error.into())
     }

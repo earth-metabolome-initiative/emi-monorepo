@@ -9,6 +9,8 @@ pub use builder::InternalTokenBuilder;
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 
+mod from_ident;
+
 use crate::{
     structs::{
         DataVariantRef, ExternalCrate, InternalCrate, Publicness, external_crate::ExternalMacroRef,

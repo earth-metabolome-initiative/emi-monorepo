@@ -3,7 +3,8 @@
 pub mod structs;
 pub mod traits;
 
-/// Prelude module re-exporting commonly used items.
+/// Prelude for synql-insertable
 pub mod prelude {
-    pub use crate::{structs::*, traits::*};
+    pub use crate::traits::*;
+    pub use crate::structs::*;
 }

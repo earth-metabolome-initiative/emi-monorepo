@@ -31,7 +31,7 @@ where
     /// use synql_core::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE _my__table (id INT);")?;
-    /// let table = db.table(None, "_my__table");
+    /// let table = db.table(None, "_my__table").unwrap();
     /// assert_eq!(table.table_snake_name(), "my_table");
     /// # Ok(())
     /// # }
@@ -49,7 +49,7 @@ where
     /// use synql_core::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
-    /// let table = db.table(None, "users");
+    /// let table = db.table(None, "users").unwrap();
     /// assert_eq!(table.table_singular_snake_name(), "user");
     /// # Ok(())
     /// # }
@@ -71,8 +71,8 @@ where
     /// 	CREATE TABLE MyTable (id INT);
     /// "#,
     /// )?;
-    /// let table1 = db.table(None, "my_table");
-    /// let table2 = db.table(None, "MyTable");
+    /// let table1 = db.table(None, "my_table").unwrap();
+    /// let table2 = db.table(None, "MyTable").unwrap();
     /// assert!(table1.has_snake_case_table_name());
     /// assert!(!table2.has_snake_case_table_name());
     /// # Ok(())
@@ -91,7 +91,7 @@ where
     /// use synql_core::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE box (id INT);")?;
-    /// let table = db.table(None, "box");
+    /// let table = db.table(None, "box").unwrap();
     /// assert_eq!(table.table_snake_ident().to_string(), "r#box");
     /// # Ok(())
     /// # }
@@ -114,7 +114,7 @@ where
     /// use synql_core::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
-    /// let table = db.table(None, "users");
+    /// let table = db.table(None, "users").unwrap();
     /// assert_eq!(table.table_singular_snake_ident().to_string(), "user");
     /// # Ok(())
     /// # }
@@ -132,7 +132,7 @@ where
     /// use synql_core::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT);")?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// assert_eq!(table.table_camel_name(), "MyTable");
     /// # Ok(())
     /// # }
@@ -150,7 +150,7 @@ where
     /// use synql_core::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
-    /// let table = db.table(None, "users");
+    /// let table = db.table(None, "users").unwrap();
     /// assert_eq!(table.table_singular_camel_name(), "User");
     /// # Ok(())
     /// # }
@@ -167,7 +167,7 @@ where
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use synql_core::prelude::*;
     /// let db = ParserDB::try_from("CREATE TABLE struct (id INT);")?;
-    /// let table = db.table(None, "struct");
+    /// let table = db.table(None, "struct").unwrap();
     /// assert_eq!(table.table_camel_ident().to_string(), "Struct");
     /// # Ok(())
     /// # }
@@ -189,7 +189,7 @@ where
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use synql_core::prelude::*;
     /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
-    /// let table = db.table(None, "users");
+    /// let table = db.table(None, "users").unwrap();
     /// assert_eq!(table.table_singular_camel_ident().to_string(), "User");
     /// # Ok(())
     /// # }

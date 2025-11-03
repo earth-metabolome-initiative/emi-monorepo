@@ -39,7 +39,7 @@ where
     /// );
     ///   "#,
     /// )?;
-    /// let left_table = db.table(None, "left");
+    /// let left_table = db.table(None, "left").unwrap();
     /// let name_column = left_table.column("name", &db).expect("Column 'name' should exist");
     /// let age_column = left_table.column("age", &db).expect("Column 'age' should exist");
     /// assert_eq!(name_column.horizontal_same_as_foreign_keys(&db, left_table).count(), 1);

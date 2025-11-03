@@ -26,7 +26,7 @@ pub trait ColumnLike:
     /// use sql_traits::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT);")?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let columns: Vec<&str> = table.columns(&db).map(|col| col.column_name()).collect();
     /// assert_eq!(columns, vec!["id", "name"]);
     /// # Ok(())
@@ -53,7 +53,7 @@ pub trait ColumnLike:
     /// use sql_traits::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT, score DECIMAL(10,2));")?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// let score_column = table.column("score", &db).expect("Column 'score' should exist");
@@ -77,7 +77,7 @@ pub trait ColumnLike:
     /// let db = ParserDB::try_from(
     ///     "CREATE TABLE my_table (id SERIAL, name TEXT, age INT, bigg_id BIGSERIAL);",
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// let age_column = table.column("age", &db).expect("Column 'age' should exist");
@@ -106,7 +106,7 @@ pub trait ColumnLike:
     /// use sql_traits::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT, age INT);")?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// let age_column = table.column("age", &db).expect("Column 'age' should exist");
@@ -132,7 +132,7 @@ pub trait ColumnLike:
     /// let db = ParserDB::try_from(
     ///     "CREATE TABLE my_table (id INT, serial_id SERIAL, bigg_id BIGSERIAL, small_id SMALLSERIAL, name TEXT);",
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let serial_id_column = table.column("serial_id", &db).expect("Column 'serial_id' should exist");
     /// let bigg_id_column = table.column("bigg_id", &db).expect("Column 'bigg_id' should exist");
@@ -159,7 +159,7 @@ pub trait ColumnLike:
     /// let db = ParserDB::try_from(
     ///     "CREATE TABLE my_table (id INT NOT NULL, name TEXT, optional_field INT);",
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// let optional_column =
@@ -186,7 +186,7 @@ pub trait ColumnLike:
     /// let db = ParserDB::try_from(
     ///     "CREATE TABLE my_table (id INT DEFAULT 0, name TEXT, created_at TIMESTAMP DEFAULT NOW());",
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// let created_at_column =
@@ -213,7 +213,7 @@ pub trait ColumnLike:
     /// use sql_traits::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT);")?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let column_table = ColumnLike::table(id_column, &db);
     /// assert_eq!(column_table.table_name(), "my_table");
@@ -247,7 +247,7 @@ pub trait ColumnLike:
     /// );
     /// "#,
     /// )?;
-    /// let host_table = db.table(None, "host_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
     /// let id_column = host_table.column("id", &db).expect("Column 'id' should exist");
     /// let name_column = host_table.column("name", &db).expect("Column 'name' should exist");
     /// let id_fks = id_column.foreign_keys(&db).collect::<Vec<_>>();
@@ -267,6 +267,40 @@ pub trait ColumnLike:
         ColumnLike::table(self, database).foreign_keys(database).filter(move |fk| {
             fk.host_columns(database).map(Borrow::borrow).any(|col: &Self| col == self)
         })
+    }
+
+    /// Returns whether the column is a foreign key, i.e. it is part of any
+    /// foreign key constraint.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `database` - A reference to the database instance to query foreign keys from.
+    /// 
+    /// # Example
+    /// 
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// 
+    /// let db = ParserDB::try_from(
+    ///    r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
+    /// CREATE TABLE host_table (
+    ///    id INT REFERENCES referenced_table(id),
+    ///   name TEXT,
+    /// );
+    /// "#,
+    /// )?;
+    /// let host_table = db.table(None, "host_table").unwrap();
+    /// let id_column = host_table.column("id", &db).unwrap();
+    /// let name_column = host_table.column("name", &db).unwrap();
+    /// assert!(id_column.is_foreign_key(&db), "id column should be a foreign key");
+    /// assert!(!name_column.is_foreign_key(&db), "name column should not be a foreign key");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn is_foreign_key(&self, database: &Self::DB) -> bool {
+        self.foreign_keys(database).next().is_some()
     }
 
     /// Returns whether the column is compatible with another column.
@@ -308,22 +342,22 @@ pub trait ColumnLike:
     /// CREATE TABLE serial_table_two (id SERIAL PRIMARY KEY, name TEXT);
     /// "#,
     /// )?;
-    /// let host_table = db.table(None, "host_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
     /// let id_column = host_table.column("id", &db).expect("Column 'id' should exist");
-    /// let compatible_table = db.table(None, "compatible_table");
-    /// let serial_table_one = db.table(None, "serial_table_one");
+    /// let compatible_table = db.table(None, "compatible_table").unwrap();
+    /// let serial_table_one = db.table(None, "serial_table_one").unwrap();
     /// let serial_id_column = serial_table_one.column("id", &db).expect("Column 'id' should exist");
-    /// let serial_table_two = db.table(None, "serial_table_two");
+    /// let serial_table_two = db.table(None, "serial_table_two").unwrap();
     /// let serial_id_column_two =
     ///     serial_table_two.column("id", &db).expect("Column 'id' should exist");
     /// let compatible_id_column =
     ///     compatible_table.column("id", &db).expect("Column 'id' should exist");
-    /// let incompatible_table = db.table(None, "incompatible_table");
+    /// let incompatible_table = db.table(None, "incompatible_table").unwrap();
     /// let incompatible_id_column =
     ///     incompatible_table.column("id", &db).expect("Column 'id' should exist");
-    /// let another_host_table = db.table(None, "another_host_table");
+    /// let another_host_table = db.table(None, "another_host_table").unwrap();
     /// let another_id_column = another_host_table.column("id", &db).expect("Column 'id' should exist");
-    /// let non_fk_table = db.table(None, "non_fk_table");
+    /// let non_fk_table = db.table(None, "non_fk_table").unwrap();
     /// let non_fk_id_column = non_fk_table.column("id", &db).expect("Column 'id' should exist");
     /// assert!(
     ///     id_column.is_compatible_with(&db, compatible_id_column),

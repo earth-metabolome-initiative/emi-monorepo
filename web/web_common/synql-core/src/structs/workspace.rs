@@ -5,6 +5,7 @@ mod builder;
 use std::{path::Path, rc::Rc};
 
 pub use builder::WorkspaceBuilder;
+use syn::Type;
 
 use crate::{
     structs::{
@@ -95,7 +96,7 @@ impl<'data> Workspace<'data> {
         None
     }
 
-    /// Returns the external type ref corresponding to the provided name, if
+    /// Returns the external type ref corresponding to the provided Postgres name, if
     /// any.
     ///
     /// # Arguments
@@ -103,6 +104,20 @@ impl<'data> Workspace<'data> {
     pub fn external_postgres_type(&self, postgres_type: &str) -> Option<ExternalTypeRef<'data>> {
         for ext_crate in &self.external_crates {
             if let Some(ext_type) = ext_crate.external_postgres_type(postgres_type) {
+                return Some(ext_type);
+            }
+        }
+        None
+    }
+
+    /// Returns the external type ref corresponding to the provided name, if
+    /// any.
+    /// 
+    /// # Arguments
+    /// * `ident` - A reference to the type.
+    pub fn external_type(&self, ident: &Type) -> Option<ExternalTypeRef<'data>> {
+        for ext_crate in &self.external_crates {
+            if let Some(ext_type) = ext_crate.external_type(ident) {
                 return Some(ext_type);
             }
         }

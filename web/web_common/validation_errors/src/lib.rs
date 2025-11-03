@@ -4,35 +4,35 @@ mod from;
 
 #[derive(Debug, Clone, PartialEq, PartialOrd, serde::Deserialize, serde::Serialize)]
 /// Enumeration of errors that can occur during validation.
-pub enum Error<FieldName = ()> {
+pub enum ValidationError<FieldName = ()> {
     /// Single field errors.
     SingleField(SingleFieldError<FieldName>),
     /// Double field errors.
     DoubleField(DoubleFieldError<FieldName>),
 }
 
-impl<FieldName> Error<FieldName> {
+impl<FieldName> ValidationError<FieldName> {
     /// Converts the error into the provided new attribute type.
-    pub fn into_field_name<F, NewFieldName>(self, convert: F) -> Error<NewFieldName>
+    pub fn into_field_name<F, NewFieldName>(self, convert: F) -> ValidationError<NewFieldName>
     where
         F: Fn(FieldName) -> NewFieldName,
     {
         match self {
-            Error::SingleField(error) => Error::SingleField(error.into_field_name(convert)),
-            Error::DoubleField(error) => Error::DoubleField(error.into_field_name(convert)),
+            ValidationError::SingleField(error) => ValidationError::SingleField(error.into_field_name(convert)),
+            ValidationError::DoubleField(error) => ValidationError::DoubleField(error.into_field_name(convert)),
         }
     }
 }
 
-impl<FieldName: core::fmt::Display + core::fmt::Debug> core::error::Error for Error<FieldName> {}
+impl<FieldName: core::fmt::Display + core::fmt::Debug> core::error::Error for ValidationError<FieldName> {}
 
-impl<FieldName: core::fmt::Display> core::fmt::Display for Error<FieldName> {
+impl<FieldName: core::fmt::Display> core::fmt::Display for ValidationError<FieldName> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Error::SingleField(error) => {
+            Self::SingleField(error) => {
                 <SingleFieldError<FieldName> as core::fmt::Display>::fmt(error, f)
             }
-            Error::DoubleField(error) => {
+            Self::DoubleField(error) => {
                 <DoubleFieldError<FieldName> as core::fmt::Display>::fmt(error, f)
             }
         }
@@ -195,9 +195,9 @@ impl<FieldName> SingleFieldError<FieldName> {
     }
 }
 
-impl<A> From<SingleFieldError<A>> for Error<A> {
+impl<A> From<SingleFieldError<A>> for ValidationError<A> {
     fn from(error: SingleFieldError<A>) -> Self {
-        Error::SingleField(error)
+        Self::SingleField(error)
     }
 }
 
@@ -212,9 +212,9 @@ pub enum DoubleFieldError<FieldName = ()> {
     MustBeGreaterThan(FieldName, FieldName),
 }
 
-impl<A> From<DoubleFieldError<A>> for Error<A> {
+impl<A> From<DoubleFieldError<A>> for ValidationError<A> {
     fn from(error: DoubleFieldError<A>) -> Self {
-        Error::DoubleField(error)
+        Self::DoubleField(error)
     }
 }
 

@@ -233,6 +233,11 @@ impl<'data> DataVariantRef<'data> {
         matches!(self, Self::Result(_, _))
     }
 
+    /// Returns whether it is an `Option` variant.
+    pub fn is_option(&self) -> bool {
+        matches!(self, Self::Option(_))
+    }
+
     /// Returns whether it is a `Self` type variant.
     pub fn is_self_type(&self) -> bool {
         matches!(self, Self::SelfType(_))
@@ -245,11 +250,12 @@ impl<'data> DataVariantRef<'data> {
     /// # Arguments
     /// * `left` - The left variant of the `Result`.
     /// * `right` - The right variant of the `Result`.
-    pub fn result(
-        ok_variant: DataVariantRef<'data>,
-        err_variant: DataVariantRef<'data>,
-    ) -> DataVariantRef<'data> {
-        DataVariantRef::Result(Box::new(ok_variant), Box::new(err_variant))
+    pub fn result<Ok, Err>(ok_variant: Ok, err_variant: Err) -> DataVariantRef<'data>
+    where
+        Ok: Into<DataVariantRef<'data>>,
+        Err: Into<DataVariantRef<'data>>,
+    {
+        DataVariantRef::Result(Box::new(ok_variant.into()), Box::new(err_variant.into()))
     }
 
     /// Creates a new `Option` variant from the given inner variant.
@@ -279,7 +285,7 @@ impl<'data> DataVariantRef<'data> {
         let err_variant = diesel
             .external_type(&syn::parse_quote!(diesel::result::Error))
             .expect("Failed to get diesel::result::Error external type");
-        Self::result(ok_variant, err_variant.into())
+        Self::result(ok_variant, err_variant)
     }
 }
 

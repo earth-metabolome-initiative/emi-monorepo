@@ -27,13 +27,13 @@ pub trait SameAsIndexLike: UniqueIndexLike {
     /// "#,
     /// )?;
     ///
-    /// let table_with_same_as = db.table(None, "with_same_as");
+    /// let table_with_same_as = db.table(None, "with_same_as").unwrap();
     /// let same_as_indices = table_with_same_as.same_as_indices(&db).collect::<Vec<_>>();
     /// assert_eq!(same_as_indices.len(), 1, "Expected exactly one same-as index");
     ///
-    /// let table_no_same_as_one = db.table(None, "no_same_as_one");
+    /// let table_no_same_as_one = db.table(None, "no_same_as_one").unwrap();
     /// assert_eq!(table_no_same_as_one.same_as_indices(&db).count(), 0, "Expected no same-as indices");
-    /// let table_no_same_as_two = db.table(None, "no_same_as_two");
+    /// let table_no_same_as_two = db.table(None, "no_same_as_two").unwrap();
     /// assert_eq!(table_no_same_as_two.same_as_indices(&db).count(), 0, "Expected no same-as indices");
     ///
     /// # Ok(())

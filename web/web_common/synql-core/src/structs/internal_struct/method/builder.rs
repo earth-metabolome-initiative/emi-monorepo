@@ -34,8 +34,8 @@ pub struct MethodBuilder<'data> {
     generics: Vec<Ident>,
     /// Where clauses of the method.
     where_clauses: Vec<WhereClause<'data>>,
-    /// Error documentation of the method.
-    error_documentation: Option<Documentation<'data>>,
+    /// Error documentations of the method.
+    error_documentations: Vec<Documentation<'data>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -213,7 +213,7 @@ impl<'data> MethodBuilder<'data> {
     ///
     /// # Arguments
     /// * `argument` - The argument to add.
-    pub fn add_argument(mut self, argument: Argument<'data>) -> Result<Self, MethodBuilderError> {
+    pub fn argument(mut self, argument: Argument<'data>) -> Result<Self, MethodBuilderError> {
         if self.arguments.iter().any(|a| a.name() == argument.name()) {
             return Err(MethodBuilderError::DuplicatedArgument);
         }
@@ -225,12 +225,12 @@ impl<'data> MethodBuilder<'data> {
     ///
     /// # Arguments
     /// * `arguments` - The arguments to add.
-    pub fn add_arguments<I>(mut self, arguments: I) -> Result<Self, MethodBuilderError>
+    pub fn arguments<I>(mut self, arguments: I) -> Result<Self, MethodBuilderError>
     where
         I: IntoIterator<Item = Argument<'data>>,
     {
         for argument in arguments {
-            self = self.add_argument(argument)?;
+            self = self.argument(argument)?;
         }
         Ok(self)
     }
@@ -239,7 +239,7 @@ impl<'data> MethodBuilder<'data> {
     ///
     /// # Arguments
     /// * `generic` - The generic to add.
-    pub fn add_generic(mut self, generic: Ident) -> Result<Self, MethodBuilderError> {
+    pub fn generic(mut self, generic: Ident) -> Result<Self, MethodBuilderError> {
         if self.generics.iter().any(|g| g == &generic) {
             return Err(MethodBuilderError::DuplicatedGeneric);
         }
@@ -251,12 +251,12 @@ impl<'data> MethodBuilder<'data> {
     ///
     /// # Arguments
     /// * `generics` - The generics to add.
-    pub fn add_generics<I>(mut self, generics: I) -> Result<Self, MethodBuilderError>
+    pub fn generics<I>(mut self, generics: I) -> Result<Self, MethodBuilderError>
     where
         I: IntoIterator<Item = Ident>,
     {
         for generic in generics {
-            self = self.add_generic(generic)?;
+            self = self.generic(generic)?;
         }
         Ok(self)
     }
@@ -265,7 +265,7 @@ impl<'data> MethodBuilder<'data> {
     ///
     /// # Arguments
     /// * `where_clause` - The where clause to add.
-    pub fn add_where_clause(
+    pub fn where_clause(
         mut self,
         where_clause: WhereClause<'data>,
     ) -> Result<Self, MethodBuilderError> {
@@ -280,12 +280,12 @@ impl<'data> MethodBuilder<'data> {
     ///
     /// # Arguments
     /// * `where_clauses` - The where clauses to add.
-    pub fn add_where_clauses<I>(mut self, where_clauses: I) -> Result<Self, MethodBuilderError>
+    pub fn where_clauses<I>(mut self, where_clauses: I) -> Result<Self, MethodBuilderError>
     where
         I: IntoIterator<Item = WhereClause<'data>>,
     {
         for where_clause in where_clauses {
-            self = self.add_where_clause(where_clause)?;
+            self = self.where_clause(where_clause)?;
         }
         Ok(self)
     }
@@ -295,7 +295,22 @@ impl<'data> MethodBuilder<'data> {
     /// # Arguments
     /// * `error_documentation` - The error documentation of the method.
     pub fn error_documentation(mut self, error_documentation: Documentation<'data>) -> Self {
-        self.error_documentation = Some(error_documentation);
+        self.error_documentations.push(error_documentation);
+        self
+    }
+
+    /// Sets multiple error documentations of the method.
+    ///
+    /// # Arguments
+    ///
+    /// * `error_documentations` - The error documentations of the method.
+    pub fn error_documentations<I>(mut self, error_documentations: I) -> Self
+    where
+        I: IntoIterator<Item = Documentation<'data>>,
+    {
+        for error_documentation in error_documentations {
+            self.error_documentations.push(error_documentation);
+        }
         self
     }
 }
@@ -316,11 +331,11 @@ impl<'data> Builder for MethodBuilder<'data> {
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         if self.return_type.as_ref().map_or(false, |rt| rt.is_result())
-            && self.error_documentation.is_none()
+            && self.error_documentations.is_empty()
         {
             return Err(BuilderError::IncompleteBuild(MethodAttribute::ErrorDocumentation).into());
         } else if self.return_type.as_ref().map_or(true, |rt| !rt.is_result())
-            && self.error_documentation.is_some()
+            && !self.error_documentations.is_empty()
         {
             return Err(
                 BuilderError::UnexpectedAttribute(MethodAttribute::ErrorDocumentation).into()
@@ -341,7 +356,7 @@ impl<'data> Builder for MethodBuilder<'data> {
                 .ok_or(BuilderError::IncompleteBuild(MethodAttribute::Documentation))?,
             generics: self.generics,
             where_clauses: self.where_clauses,
-            error_documentation: self.error_documentation,
+            error_documentations: self.error_documentations,
         })
     }
 }

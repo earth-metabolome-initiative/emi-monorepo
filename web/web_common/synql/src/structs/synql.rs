@@ -9,6 +9,7 @@ use synql_diesel_schema::prelude::*;
 use synql_insertable::traits::TableInsertableLike;
 use synql_models::traits::TableModelLike;
 use synql_relations::prelude::*;
+use synql_value_settable::prelude::*;
 
 mod builder;
 pub use builder::SynQLBuilder;
@@ -63,6 +64,8 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             .expect("Unable to register `diesel-queries` crate")
             .serde()
             .expect("Unable to register `serde` crate")
+            .validation_errors()
+            .expect("Unable to register `validation_errors` crate")
             .version(self.version.0, self.version.1, self.version.2)
             .edition(self.edition)
             .build()
@@ -75,6 +78,8 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             workspace.add_internal_crate(table.schema_macro(&workspace, self.database).into());
             workspace.add_internal_crate(table.model(&workspace, self.database).into());
             workspace.add_internal_crate(table.relations_trait(&workspace, self.database).into());
+            workspace
+                .add_internal_crate(table.value_settable_trait(&workspace, self.database).into());
             // If the table is an extension, we need to add the extension attributes enum as
             // well
             if let Some(extension_attribute) = table.extension_attributes(&workspace, self.database)

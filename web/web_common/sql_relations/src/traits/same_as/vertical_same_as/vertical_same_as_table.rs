@@ -35,7 +35,7 @@ where
     /// );
     /// "#,
     /// )?;
-    /// let child_table = db.table(None, "child");
+    /// let child_table = db.table(None, "child").unwrap();
     /// let vertical_same_as_fks = child_table.vertical_same_as_foreign_keys(&db).collect::<Vec<_>>();
     /// assert_eq!(vertical_same_as_fks.len(), 1, "Expected exactly one vertical same-as foreign key");
     /// # Ok(())

@@ -24,7 +24,7 @@ pub trait ColumnSchema: ColumnSynLike + Sized {
     /// let db = ParserDB::try_from(
     ///     "CREATE TABLE my_table (id INT PRIMARY KEY NOT NULL, name TEXT NOT NULL);",
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let column = table.column("name", &db).unwrap();
     /// let doc_path = column.column_schema_doc_path(&db);
     /// assert_eq!(doc_path, "[`name`](my_table_schema::schema::my_table::name)");

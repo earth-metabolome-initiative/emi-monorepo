@@ -20,7 +20,7 @@ pub trait CheckConstraintLike: Clone + Eq + Ord + Debug {
     /// let db = ParserDB::try_from(
     ///     r#"CREATE TABLE my_table (id INT CHECK (id > 0), name TEXT CHECK (length(name) > 0));"#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let check_constraints: Vec<_> =
     ///     table.check_constraints(&db).map(|cc| cc.expression().to_string()).collect();
     /// assert_eq!(check_constraints, vec!["id > 0", "length(name) > 0"]);

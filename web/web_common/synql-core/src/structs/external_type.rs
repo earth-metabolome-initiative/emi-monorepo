@@ -19,7 +19,7 @@ use crate::structs::{
 pub struct ExternalType<'data> {
     /// The diesel type defined within the crate compatible with the given
     /// postgres type.
-    diesel_type: syn::Type,
+    diesel_type: Option<syn::Type>,
     /// The rust type defined within the crate compatible with the given
     /// postgres type.
     rust_type: syn::Type,
@@ -112,8 +112,8 @@ impl<'data> ExternalType<'data> {
 
     /// Returns the diesel type defined within the crate compatible with the
     /// given postgres type.
-    pub fn diesel_type(&self) -> &syn::Type {
-        &self.diesel_type
+    pub fn diesel_type(&self) -> Option<&syn::Type> {
+        self.diesel_type.as_ref()
     }
 
     /// Returns the rust type defined within the crate compatible with the given

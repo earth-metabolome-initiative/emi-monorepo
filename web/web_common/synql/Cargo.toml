@@ -12,8 +12,9 @@ synql-core.workspace = true
 synql-models.workspace = true
 synql-diesel-schema.workspace = true
 synql-relations.workspace = true
-synql-insertable.workspace = true
 synql-attributes.workspace = true
+synql-insertable.workspace = true
+synql-value-settable.workspace = true
 
 [dev-dependencies]
 graph.workspace = true

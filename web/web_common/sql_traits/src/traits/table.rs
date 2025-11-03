@@ -26,7 +26,7 @@ pub trait TableLike:
     /// use sql_traits::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE mytable (id INT);")?;
-    /// let table = db.table(None, "mytable");
+    /// let table = db.table(None, "mytable").unwrap();
     /// assert_eq!(table.table_name(), "mytable");
     /// # Ok(())
     /// # }
@@ -49,9 +49,9 @@ pub trait TableLike:
     ///     r#"CREATE TABLE my_schema.my_table_with_schema (id INT);
     /// CREATE TABLE my_table (id INT);"#,
     /// )?;
-    /// let table_no_schema = db.table(None, "my_table");
+    /// let table_no_schema = db.table(None, "my_table").unwrap();
     /// assert_eq!(table_no_schema.table_schema(), None);
-    /// let table_with_schema = db.table(Some("my_schema"), "my_table_with_schema");
+    /// let table_with_schema = db.table(Some("my_schema"), "my_table_with_schema").unwrap();
     /// assert_eq!(table_with_schema.table_schema(), Some("my_schema"));
     /// # Ok(())
     /// # }
@@ -71,7 +71,7 @@ pub trait TableLike:
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT);")?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let column_names: Vec<&str> = table.columns(&db).map(|col| col.column_name()).collect();
     /// assert_eq!(column_names, vec!["id", "name"]);
     /// # Ok(())
@@ -104,9 +104,9 @@ pub trait TableLike:
     /// "#,
     /// )?;
     ///
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// assert!(table.has_generated_columns(&db));
-    /// let other_table = db.table(None, "my_other_table");
+    /// let other_table = db.table(None, "my_other_table").unwrap();
     /// assert!(!other_table.has_generated_columns(&db));
     /// # Ok(())
     /// # }
@@ -129,7 +129,7 @@ pub trait TableLike:
     /// use sql_traits::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT, age INT);")?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// assert_eq!(table.number_of_columns(&db), 3);
     /// # Ok(())
     /// # }
@@ -151,7 +151,7 @@ pub trait TableLike:
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT);")?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// assert_eq!(id_column.column_name(), "id");
     /// let non_existent_column = table.column("non_existent", &db);
@@ -190,8 +190,8 @@ pub trait TableLike:
     /// CREATE TABLE table2 (id INT, description TEXT);
     /// "#,
     /// )?;
-    /// let table1 = db.table(None, "table1");
-    /// let table2 = db.table(None, "table2");
+    /// let table1 = db.table(None, "table1").unwrap();
+    /// let table2 = db.table(None, "table2").unwrap();
     /// let table1_id = table1.column("id", &db).expect("Column 'id' should exist in table1");
     /// let table2_id = table2.column("id", &db).expect("Column 'id' should exist in table2");
     /// assert!(table1.has_column(table1_id, &db));
@@ -225,15 +225,15 @@ pub trait TableLike:
     /// CREATE TABLE my_no_pk_table (id INT, name TEXT);
     /// "#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let pk_columns: Vec<&str> =
     ///     table.primary_key_columns(&db).map(|col| col.column_name()).collect();
     /// assert_eq!(pk_columns, vec!["id"]);
-    /// let composite_pk_table = db.table(None, "my_composite_pk_table");
+    /// let composite_pk_table = db.table(None, "my_composite_pk_table").unwrap();
     /// let composite_pk_columns: Vec<&str> =
     ///     composite_pk_table.primary_key_columns(&db).map(|col| col.column_name()).collect();
     /// assert_eq!(composite_pk_columns, vec!["id1", "id2"]);
-    /// let no_pk_table = db.table(None, "my_no_pk_table");
+    /// let no_pk_table = db.table(None, "my_no_pk_table").unwrap();
     /// let no_pk_columns: Vec<&str> =
     ///     no_pk_table.primary_key_columns(&db).map(|col| col.column_name()).collect();
     /// assert_eq!(no_pk_columns, Vec::<&str>::new());
@@ -268,7 +268,7 @@ pub trait TableLike:
     /// CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT);
     /// "#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let pk_column = table.primary_key_column(&db);
     /// assert_eq!(pk_column.column_name(), "id");
     /// # Ok(())
@@ -305,9 +305,9 @@ pub trait TableLike:
     /// CREATE TABLE my_no_gen_pk_table (id INT PRIMARY KEY, name TEXT);
     /// "#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// assert!(table.has_generated_primary_key(&db));
-    /// let no_gen_pk_table = db.table(None, "my_no_gen_pk_table");
+    /// let no_gen_pk_table = db.table(None, "my_no_gen_pk_table").unwrap();
     /// assert!(!no_gen_pk_table.has_generated_primary_key(&db));
     /// # Ok(())
     /// # }
@@ -336,10 +336,10 @@ pub trait TableLike:
     /// CREATE TABLE my_composite_pk_table (id1 INT, id2 BIGSERIAL, name TEXT, PRIMARY KEY (id1, id2));
     /// "#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let pk_types = table.primary_key_type(&db);
     /// assert_eq!(pk_types, vec!["INT"]);
-    /// let composite_pk_table = db.table(None, "my_composite_pk_table");
+    /// let composite_pk_table = db.table(None, "my_composite_pk_table").unwrap();
     /// let composite_pk_types = composite_pk_table.primary_key_type(&db);
     /// assert_eq!(composite_pk_types, vec!["INT", "BIGINT"]);
     /// # Ok(())
@@ -368,7 +368,7 @@ pub trait TableLike:
     /// CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT);
     /// "#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// assert!(table.is_primary_key_column(&db, id_column));
@@ -401,9 +401,9 @@ pub trait TableLike:
     /// CREATE TABLE my_no_pk_table (id INT, name TEXT);
     /// "#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// assert!(table.has_primary_key(&db));
-    /// let no_pk_table = db.table(None, "my_no_pk_table");
+    /// let no_pk_table = db.table(None, "my_no_pk_table").unwrap();
     /// assert!(!no_pk_table.has_primary_key(&db));
     /// # Ok(())
     /// # }
@@ -429,7 +429,7 @@ pub trait TableLike:
     /// CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT, age INT);
     /// "#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let non_pk_columns: Vec<&str> =
     ///     table.non_primary_key_columns(&db).map(|col| col.column_name()).collect();
     /// assert_eq!(non_pk_columns, vec!["name", "age"]);
@@ -467,9 +467,9 @@ pub trait TableLike:
     /// CREATE TABLE my_pk_only_table (id INT PRIMARY KEY);
     /// "#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// assert!(table.has_non_primary_key_columns(&db));
-    /// let pk_only_table = db.table(None, "my_pk_only_table");
+    /// let pk_only_table = db.table(None, "my_pk_only_table").unwrap();
     /// assert!(!pk_only_table.has_non_primary_key_columns(&db));
     /// # Ok(())
     /// # }
@@ -494,9 +494,9 @@ pub trait TableLike:
     /// CREATE TABLE my_composite_pk_table (id1 INT, id2 INT, name TEXT, PRIMARY KEY (id1, id2));
     /// "#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// assert!(!table.has_composite_primary_key(&db));
-    /// let composite_pk_table = db.table(None, "my_composite_pk_table");
+    /// let composite_pk_table = db.table(None, "my_composite_pk_table").unwrap();
     /// assert!(composite_pk_table.has_composite_primary_key(&db));
     /// # Ok(())
     /// # }
@@ -523,7 +523,7 @@ pub trait TableLike:
     /// CREATE TABLE my_table (id INT CHECK (id > 0), name TEXT, CHECK (length(name) > 0));
     /// "#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let check_constraints: Vec<_> =
     ///     table.check_constraints(&db).map(|cc| cc.expression().to_string()).collect();
     /// assert_eq!(check_constraints, vec!["id > 0", "length(name) > 0"]);
@@ -555,7 +555,7 @@ pub trait TableLike:
     /// CREATE TABLE my_table (id INT UNIQUE, name TEXT, UNIQUE (name));
     /// "#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let unique_indices: Vec<_> = table
     ///     .unique_indices(&db)
     ///     .map(|ui| ui.columns(&db).map(|col| col.column_name()).collect::<Vec<_>>())
@@ -587,7 +587,7 @@ pub trait TableLike:
     /// CREATE TABLE host_table (id INT, name TEXT, FOREIGN KEY (id) REFERENCES referenced_table(id));
     /// "#,
     /// )?;
-    /// let host_table = db.table(None, "host_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
     /// let foreign_keys = host_table.foreign_keys(&db).collect::<Vec<_>>();
     /// assert_eq!(foreign_keys.len(), 1);
     /// # Ok(())
@@ -619,11 +619,11 @@ pub trait TableLike:
     /// CREATE TABLE host_table_without_fk (id INT, name TEXT);
     /// "#,
     /// )?;
-    /// let referenced_table = db.table(None, "referenced_table");
+    /// let referenced_table = db.table(None, "referenced_table").unwrap();
     /// assert!(!referenced_table.has_foreign_keys(&db));
-    /// let host_table_with_fk = db.table(None, "host_table_with_fk");
+    /// let host_table_with_fk = db.table(None, "host_table_with_fk").unwrap();
     /// assert!(host_table_with_fk.has_foreign_keys(&db));
-    /// let host_table_without_fk = db.table(None, "host_table_without_fk");
+    /// let host_table_without_fk = db.table(None, "host_table_without_fk").unwrap();
     /// assert!(!host_table_without_fk.has_foreign_keys(&db));
     /// # Ok(())
     /// # }
@@ -651,9 +651,9 @@ pub trait TableLike:
     /// CREATE TABLE self_ref_table (id INT PRIMARY KEY, parent_id INT REFERENCES self_ref_table(id));
     /// "#,
     /// )?;
-    /// let child_table = db.table(None, "child_table");
+    /// let child_table = db.table(None, "child_table").unwrap();
     /// assert!(child_table.has_non_self_referential_foreign_keys(&db));
-    /// let self_ref_table = db.table(None, "self_ref_table");
+    /// let self_ref_table = db.table(None, "self_ref_table").unwrap();
     /// assert!(!self_ref_table.has_non_self_referential_foreign_keys(&db));
     /// # Ok(())
     /// # }
@@ -695,8 +695,8 @@ pub trait TableLike:
     /// "#,
     /// )?;
     ///
-    /// let host_table = db.table(None, "host_table");
-    /// let child_table = db.table(None, "child_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
+    /// let child_table = db.table(None, "child_table").unwrap();
     /// let fks_to_ancestors = host_table.foreign_keys_to_ancestors_of(&db, child_table);
     /// assert_eq!(fks_to_ancestors.count(), 2);
     /// # Ok(())
@@ -740,7 +740,7 @@ pub trait TableLike:
     ///     FOREIGN KEY (id) REFERENCES referenced_table2(id));
     /// "#,
     /// )?;
-    /// let host_table = db.table(None, "host_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
     /// let referenced_tables = host_table.referenced_tables(&db);
     /// assert_eq!(referenced_tables.len(), 2);
     /// # Ok(())
@@ -798,7 +798,7 @@ pub trait TableLike:
     /// CREATE TABLE host_table (id INT PRIMARY KEY REFERENCES referenced_table(id), name TEXT);
     /// "#,
     /// )?;
-    /// let host_table = db.table(None, "host_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
     /// let extension_fks = host_table.extension_foreign_keys(&db).collect::<Vec<_>>();
     /// assert_eq!(extension_fks.len(), 1);
     /// # Ok(())
@@ -839,7 +839,7 @@ pub trait TableLike:
     /// );
     /// "#,
     /// )?;
-    /// let host_table = db.table(None, "host_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
     /// let extended_tables = host_table.extended_tables(&db);
     /// assert_eq!(extended_tables.len(), 1);
     /// # Ok(())
@@ -876,7 +876,7 @@ pub trait TableLike:
     ///     FOREIGN KEY (id) REFERENCES parent_table(id));
     /// "#,
     /// )?;
-    /// let child_table = db.table(None, "child_table");
+    /// let child_table = db.table(None, "child_table").unwrap();
     /// let ancestral_tables = child_table.ancestral_extended_tables(&db);
     /// assert_eq!(ancestral_tables.len(), 2);
     /// # Ok(())
@@ -921,7 +921,7 @@ pub trait TableLike:
     ///     FOREIGN KEY (id) REFERENCES referenced_table(id));
     /// "#,
     /// )?;
-    /// let host_table = db.table(None, "host_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
     /// let id_column = host_table.column("id", &db).expect("Column 'id' should exist");
     /// let referenced_tables = host_table.referenced_tables_via_column(&db, id_column);
     /// assert_eq!(referenced_tables.len(), 1);
@@ -974,8 +974,8 @@ pub trait TableLike:
     ///     FOREIGN KEY (id) REFERENCES parent_table(id));
     /// "#,
     /// )?;
-    /// let child_table = db.table(None, "child_table");
-    /// let parent_table = db.table(None, "parent_table");
+    /// let child_table = db.table(None, "child_table").unwrap();
+    /// let parent_table = db.table(None, "parent_table").unwrap();
     /// assert!(child_table.is_extension(&db));
     /// assert!(!parent_table.is_extension(&db));
     /// # Ok(())
@@ -1007,8 +1007,8 @@ pub trait TableLike:
     ///     FOREIGN KEY (id) REFERENCES parent_table(id));
     /// "#,
     /// )?;
-    /// let child_table = db.table(None, "child_table");
-    /// let parent_table = db.table(None, "parent_table");
+    /// let child_table = db.table(None, "child_table").unwrap();
+    /// let parent_table = db.table(None, "parent_table").unwrap();
     /// assert!(child_table.is_descendant_of(&db, parent_table));
     /// assert!(!parent_table.is_descendant_of(&db, child_table));
     /// # Ok(())
@@ -1041,10 +1041,10 @@ pub trait TableLike:
     /// CREATE TABLE unrelated_table (id INT PRIMARY KEY, name TEXT);
     /// "#,
     /// )?;
-    /// let child_table = db.table(None, "child_table");
-    /// let parent_table = db.table(None, "parent_table");
-    /// let grandparent_table = db.table(None, "grandparent_table");
-    /// let unrelated_table = db.table(None, "unrelated_table");
+    /// let child_table = db.table(None, "child_table").unwrap();
+    /// let parent_table = db.table(None, "parent_table").unwrap();
+    /// let grandparent_table = db.table(None, "grandparent_table").unwrap();
+    /// let unrelated_table = db.table(None, "unrelated_table").unwrap();
     /// assert!(
     ///     child_table.shares_ancestors_with(&db, parent_table),
     ///     "Child should share ancestors with parent"
@@ -1089,7 +1089,7 @@ pub trait TableLike:
     ///     FOREIGN KEY (id) REFERENCES referenced_table(id));
     /// "#,
     /// )?;
-    /// let host_table = db.table(None, "host_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
     /// let singleton_fks = host_table.singleton_foreign_keys(&db).collect::<Vec<_>>();
     /// assert_eq!(singleton_fks.len(), 1);
     /// # Ok(())
@@ -1128,7 +1128,7 @@ pub trait TableLike:
     /// );
     /// "#,
     /// )?;
-    /// let host_table = db.table(None, "host_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
     /// let non_self_referential_singleton_fks =
     ///     host_table.non_self_referential_singleton_foreign_keys(&db).collect::<Vec<_>>();
     /// assert_eq!(non_self_referential_singleton_fks.len(), 1);
@@ -1166,7 +1166,7 @@ pub trait TableLike:
     ///     FOREIGN KEY (id) REFERENCES referenced_table(id));
     /// "#,
     /// )?;
-    /// let host_table = db.table(None, "host_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
     /// assert!(host_table.has_singleton_foreign_keys(&db));
     /// # Ok(())
     /// # }
@@ -1199,9 +1199,9 @@ pub trait TableLike:
     /// );
     /// "#,
     /// )?;
-    /// let referenced_table = db.table(None, "referenced_table");
+    /// let referenced_table = db.table(None, "referenced_table").unwrap();
     /// assert!(!referenced_table.has_non_self_referential_singleton_foreign_keys(&db));
-    /// let host_table = db.table(None, "host_table");
+    /// let host_table = db.table(None, "host_table").unwrap();
     /// assert!(host_table.has_non_self_referential_singleton_foreign_keys(&db));
     /// # Ok(())
     /// # }
@@ -1233,9 +1233,9 @@ pub trait TableLike:
     ///     FOREIGN KEY (id) REFERENCES parent_table(id));
     /// "#,
     /// )?;
-    /// let child_table = db.table(None, "child_table");
-    /// let parent_table = db.table(None, "parent_table");
-    /// let grandparent_table = db.table(None, "grandparent_table");
+    /// let child_table = db.table(None, "child_table").unwrap();
+    /// let parent_table = db.table(None, "parent_table").unwrap();
+    /// let grandparent_table = db.table(None, "grandparent_table").unwrap();
     /// assert!(child_table.depends_on(&db, parent_table));
     /// assert!(child_table.depends_on(&db, grandparent_table));
     /// assert!(!parent_table.depends_on(&db, child_table));

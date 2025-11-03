@@ -46,7 +46,7 @@ pub trait UniqueIndexLike: Metadata + Ord + Eq + Debug + Clone {
     ///
     /// let db =
     ///     ParserDB::try_from(r#"CREATE TABLE my_table (id INT UNIQUE, name TEXT, UNIQUE (name));"#)?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let unique_indices: Vec<_> = table.unique_indices(&db).collect();
     /// let expressions: Vec<String> =
     ///     unique_indices.iter().map(|ui| ui.expression(&db).to_string()).collect();
@@ -74,7 +74,7 @@ pub trait UniqueIndexLike: Metadata + Ord + Eq + Debug + Clone {
     ///
     /// let db =
     ///     ParserDB::try_from(r#"CREATE TABLE my_table (id INT UNIQUE, name TEXT, UNIQUE (name));"#)?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let unique_indices: Vec<_> = table.unique_indices(&db).collect();
     /// let simple_flags: Vec<bool> = unique_indices.iter().map(|ui| ui.is_simple(&db)).collect();
     /// assert!(
@@ -104,7 +104,7 @@ pub trait UniqueIndexLike: Metadata + Ord + Eq + Debug + Clone {
     /// let db = ParserDB::try_from(
     ///     r#"CREATE TABLE my_table (id INT, name TEXT, UNIQUE (id), UNIQUE (name, id));"#,
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let unique_indices: Vec<_> = table.unique_indices(&db).collect();
     /// let single_column_ui = &unique_indices[0];
     /// let multi_column_ui = &unique_indices[1];

@@ -39,7 +39,7 @@ pub trait TableSchema: TableSynLike + Sized {
     /// let db = ParserDB::try_from(
     ///     "CREATE TABLE my_table (id INT PRIMARY KEY NOT NULL, name TEXT NOT NULL, age INT);",
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let schema_macro = table.schema_macro(&workspace, &db);
     /// let tokens = quote! { #schema_macro };
     /// assert_eq!(
@@ -101,7 +101,7 @@ pub trait TableSchema: TableSynLike + Sized {
     /// let db = ParserDB::try_from(
     ///     "CREATE TABLE my_table (id INT PRIMARY KEY NOT NULL, name TEXT NOT NULL);",
     /// )?;
-    /// let table = db.table(None, "my_table");
+    /// let table = db.table(None, "my_table").unwrap();
     /// let doc_path = table.table_schema_doc_path();
     /// assert_eq!(doc_path, "[`my_table`](my_table_schema::schema::my_table)");
     /// # Ok(())

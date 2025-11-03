@@ -272,6 +272,17 @@ impl<'data> InternalTraitBuilder<'data> {
         }
         Ok(self)
     }
+
+    /// Adds the `Sized` super-trait to the trait.
+    pub fn sized(self) -> Result<Self, InternalTraitBuilderError> {
+        self.super_trait(
+            InternalToken::new()
+                .private()
+                .stream(quote::quote! { Sized })
+                .build()
+                .expect("Failed to build InternalToken for Sized super-trait"),
+        )
+    }
 }
 
 impl Attributed for InternalTraitBuilder<'_> {

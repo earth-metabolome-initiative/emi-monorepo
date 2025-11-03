@@ -303,9 +303,7 @@ impl<'data> Builder for ExternalTypeBuilder<'data> {
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(ExternalType {
-            diesel_type: self
-                .diesel_type
-                .ok_or(BuilderError::IncompleteBuild(ExternalTypeAttribute::DieselType))?,
+            diesel_type: self.diesel_type,
             rust_type: self
                 .rust_type
                 .ok_or(BuilderError::IncompleteBuild(ExternalTypeAttribute::RustType))?,

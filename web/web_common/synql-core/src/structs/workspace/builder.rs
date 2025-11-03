@@ -188,6 +188,11 @@ impl<'data> WorkspaceBuilder<'data> {
         self.external_crate(ExternalCrate::serde())
     }
 
+    /// Adds the `validation_errors` external crate to the workspace.
+    pub fn validation_errors(self) -> Result<Self, WorkspaceBuilderError> {
+        self.external_crate(ExternalCrate::validation_errors())
+    }
+
     /// Adds multiple external crates to the workspace.
     ///
     /// # Arguments

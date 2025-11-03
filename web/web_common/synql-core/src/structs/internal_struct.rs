@@ -38,6 +38,16 @@ impl<'data> InternalAttribute<'data> {
         InternalAttributeBuilder::default()
     }
 
+    /// Returns a variant of the current attribute with the type
+    /// made optional.
+    pub fn optional(&self) -> InternalAttribute<'data> {
+        let mut new_attr = self.clone();
+        if !new_attr.ty.is_option() {
+            new_attr.ty = new_attr.ty.optional();
+        }
+        new_attr
+    }
+
     /// Returns the publicness of the attribute.
     pub fn pubness(&self) -> &Publicness {
         &self.pubness

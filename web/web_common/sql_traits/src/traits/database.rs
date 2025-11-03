@@ -175,17 +175,17 @@ pub trait DatabaseLike: Clone + Debug {
     /// CREATE TABLE my_table (id INT);
     /// "#,
     /// )?;
-    /// let table_with_schema = db.table(Some("my_schema"), "my_table_with_schema");
+    /// let table_with_schema = db.table(Some("my_schema"), "my_table_with_schema").unwrap();
     /// assert_eq!(table_with_schema.table_name(), "my_table_with_schema");
     /// assert_eq!(table_with_schema.table_schema(), Some("my_schema"));
     ///
-    /// let table_without_schema = db.table(None, "my_table");
+    /// let table_without_schema = db.table(None, "my_table").unwrap();
     /// assert_eq!(table_without_schema.table_name(), "my_table");
     /// assert_eq!(table_without_schema.table_schema(), None);
     /// # Ok(())
     /// # }
     /// ```
-    fn table(&self, schema: Option<&str>, table_name: &str) -> &Self::Table;
+    fn table(&self, schema: Option<&str>, table_name: &str) -> Option<&Self::Table>;
 
     /// Returns the function with the given name.
     ///

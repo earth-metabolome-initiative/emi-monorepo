@@ -35,7 +35,7 @@ where
     /// );
     /// "#,
     /// )?;
-    /// let child_table = db.table(None, "child");
+    /// let child_table = db.table(None, "child").unwrap();
     /// let horizontal_same_as_fks =
     ///     child_table.horizontal_same_as_foreign_keys(&db).collect::<Vec<_>>();
     /// assert_eq!(

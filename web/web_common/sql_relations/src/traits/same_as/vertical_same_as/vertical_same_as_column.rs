@@ -39,7 +39,7 @@ where
     ///     );
     ///   "#,
     /// )?;
-    /// let child_table = db.table(None, "child");
+    /// let child_table = db.table(None, "child").unwrap();
     /// let name_column = child_table.column("name", &db).expect("Column 'name' should exist");
     /// let age_column = child_table.column("age", &db).expect("Column 'age' should exist");
     /// assert_eq!(name_column.vertical_same_as_foreign_keys(&db).count(), 1);
@@ -82,10 +82,10 @@ where
     ///     );
     ///   "#,
     /// )?;
-    /// let child_table = db.table(None, "child");
+    /// let child_table = db.table(None, "child").unwrap();
     /// let name_column = child_table.column("name", &db).expect("Column 'name' should exist");
     /// let age_column = child_table.column("age", &db).expect("Column 'age' should exist");
-    /// let parent_table = db.table(None, "parent");
+    /// let parent_table = db.table(None, "parent").unwrap();
     /// let parent_name_column = parent_table.column("name", &db).expect("Column 'name' should exist");
     /// let parent_age_column = parent_table.column("age", &db).expect("Column 'age' should exist");
     /// assert_eq!(name_column.vertical_same_as_columns(&db), vec![parent_name_column]);
@@ -130,10 +130,10 @@ where
     ///     );
     ///   "#,
     /// )?;
-    /// let child_table = db.table(None, "child");
+    /// let child_table = db.table(None, "child").unwrap();
     /// let child_name_column =
     ///     child_table.column("child_name", &db).expect("Column 'child_name' should exist");
-    /// let grandparent_table = db.table(None, "grandparent");
+    /// let grandparent_table = db.table(None, "grandparent").unwrap();
     /// let grandparent_name_column =
     ///     grandparent_table.column("name", &db).expect("Column 'name' should exist");
     /// assert_eq!(
@@ -187,13 +187,13 @@ where
     ///     );
     ///   "#,
     /// )?;
-    /// let child_table = db.table(None, "child");
+    /// let child_table = db.table(None, "child").unwrap();
     /// let child_name_column =
     ///     child_table.column("child_name", &db).expect("Column 'child_name' should exist");
-    /// let parent_table = db.table(None, "parent");
+    /// let parent_table = db.table(None, "parent").unwrap();
     /// let parent_name_column =
     ///     parent_table.column("parent_name", &db).expect("Column 'parent_name' should exist");
-    /// let grandparent_table = db.table(None, "grandparent");
+    /// let grandparent_table = db.table(None, "grandparent").unwrap();
     /// let grandparent_name_column =
     ///     grandparent_table.column("name", &db).expect("Column 'name' should exist");
     /// assert_eq!(child_name_column.dominant_vertical_same_as_columns(&db), vec![parent_name_column]);
