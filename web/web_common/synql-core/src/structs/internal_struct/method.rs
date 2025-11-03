@@ -131,8 +131,7 @@ impl ToTokens for Method<'_> {
             documentation.push(String::default());
             documentation.push("# Errors".to_string());
             for error_doc in &self.error_documentations {
-                documentation.push(" * ".to_string());
-                documentation.push(error_doc.documentation().to_string());
+                documentation.push(format!(" * {}", error_doc.documentation()));
             }
         }
 
