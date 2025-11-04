@@ -1,0 +1,15 @@
+name: Test
+
+on:
+  push:
+    paths:
+      - 'data_structures/multi_ranged/**'
+  pull_request:
+    paths:
+      - 'data_structures/multi_ranged/**'
+
+jobs:
+  test:
+    uses: ./.github/workflows/cargo-test-template.yml
+    with:
+      path: 'data_structures/multi_ranged'

@@ -3,13 +3,13 @@ name: Clippy
 on:
   push:
     paths:
-      - 'web/web_common/elements/**'
+      - 'web/web_common/elements-rs/**'
   pull_request:
     paths:
-      - 'web/web_common/elements/**'
+      - 'web/web_common/elements-rs/**'
 
 jobs:
   clippy:
     uses: ./.github/workflows/cargo-clippy-template.yml
     with:
-      path: 'web/web_common/elements'
+      path: 'web/web_common/elements-rs'
