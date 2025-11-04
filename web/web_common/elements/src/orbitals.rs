@@ -1,10 +1,9 @@
-//! Submodule providing the `AtomicOrbital` enumeration and the method to obtain
-//! the orbitals for a given element.
+//! Electron orbital configurations for elements.
 
 mod element;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-/// Enum representing the types of orbitals.
+/// Atomic orbital type (s, p, d, or f).
 pub enum AtomicOrbitalType {
     /// s orbital
     S,
@@ -17,7 +16,7 @@ pub enum AtomicOrbitalType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-/// Struct representing an orbital.
+/// An atomic orbital with its quantum number and electron count.
 pub struct AtomicOrbital {
     /// The principal quantum number of the orbital
     principal_quantum_number: u8,
@@ -35,19 +34,21 @@ impl AtomicOrbital {
     ) -> Self {
         Self { principal_quantum_number, orbital_type, number_of_electrons }
     }
+
+    /// Returns the principal quantum number (n).
     #[must_use]
-    /// Returns the orbitals for a given element.
     pub fn principal_quantum_number(&self) -> u8 {
         self.principal_quantum_number
     }
+
+    /// Returns the orbital type (s, p, d, or f).
     #[must_use]
-    /// Returns the type of the orbital.
     pub fn orbital_type(&self) -> AtomicOrbitalType {
         self.orbital_type
     }
 
+    /// Returns the number of electrons in this orbital.
     #[must_use]
-    /// Returns the number of electrons in the orbital.
     pub fn number_of_electrons(&self) -> u8 {
         self.number_of_electrons
     }

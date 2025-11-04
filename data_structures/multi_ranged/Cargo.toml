@@ -1,7 +1,14 @@
 [package]
 name = "multi_ranged"
 version = "0.1.0"
-edition = "2024"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Efficient data structures for representing and manipulating ranges of discrete values"
+readme = "README.md"
+keywords = ["range", "intervals", "data-structures", "numeric", "collections"]
+categories = ["data-structures", "mathematics"]
 
 [dependencies]
 num-traits.workspace = true

@@ -1,6 +1,5 @@
 [workspace]
 resolver = "2"
-
 members = [
   "bindings/sirius_bindings",
   "data_migrations/directus_migration",
@@ -58,6 +57,12 @@ members = [
   "web/web_common/web_common_traits",
   "web/web_common/ws_messages",
 ]
+
+[workspace.package]
+authors = ["Earth Metabolome Initiative"]
+license = "GPL-3.0"
+repository = "https://github.com/earth-metabolome-initiative/emi-monorepo"
+edition = "2024"
 
 [workspace.dependencies]
 actix-web = { version = "4.11", features = ["cookies", "openssl"] }
@@ -201,6 +206,16 @@ unreachable_patterns = "forbid"
 unused_import_braces = "forbid"
 unused_must_use = "forbid"
 deprecated = "deny"
+
+[workspace.lints.rustdoc]
+broken_intra_doc_links = "forbid"
+bare_urls = "forbid"
+invalid_codeblock_attributes = "forbid"
+invalid_html_tags = "forbid"
+missing_crate_level_docs = "forbid"
+unescaped_backticks = "forbid"
+redundant_explicit_links = "forbid"
+invalid_rust_codeblocks = "forbid" 
 
 [workspace.lints.clippy]
 unreadable_literal = "allow"

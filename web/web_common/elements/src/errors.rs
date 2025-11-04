@@ -1,10 +1,10 @@
-//! Error codes enumeration which may be returned by the library.
+//! Error types for element and isotope parsing.
 
 use crate::Element;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Error codes enumeration which may be returned by the library.
+/// Errors that can occur when parsing elements or isotopes.
 pub enum Error {
     /// The provided element is unknown.
     Element([char; 2]),

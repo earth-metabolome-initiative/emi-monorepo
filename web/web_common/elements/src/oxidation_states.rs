@@ -1,14 +1,14 @@
-//! Submodule implementing the `oxidation_states` element method.
+//! Valid oxidation states for elements.
 
 use multi_ranged::{MultiRange, MultiRanged};
 impl super::Element {
-    /// Returns whether the provided oxidation state is valid for the element.
+    /// Returns whether the oxidation state is valid for this element.
     #[must_use]
     pub fn is_valid_oxidation_state(&self, state: i16) -> bool {
         self.oxidation_states().contains(state)
     }
 
-    /// Returns the allowed oxidation states of the element.
+    /// Returns all valid oxidation states.
     #[must_use]
     #[inline]
     pub fn oxidation_states(&self) -> MultiRange<i16> {

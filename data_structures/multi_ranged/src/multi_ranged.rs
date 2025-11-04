@@ -1,11 +1,10 @@
-//! Submodule providing a `Range`-like struct with softer and stable
-//! constraints.
+//! Common trait for range types.
 
 use std::ops::{Mul, MulAssign};
 
 use crate::{Step, errors::Error};
 
-/// A trait for types that represent a range.
+/// Common interface for range data structures.
 pub trait MultiRanged:
     core::fmt::Debug
     + Clone
@@ -20,57 +19,32 @@ pub trait MultiRanged:
     /// The type of the elements in the range.
     type Step: Step;
 
-    /// Inserts a new element to the range.
-    ///
-    /// # Arguments
-    ///
-    /// * `element`: The element to add to the range.
-    ///
-    /// # Returns
-    ///
-    /// The range with the new element.
+    /// Inserts an element into the range.
     ///
     /// # Errors
     ///
-    /// * If the element cannot be added to the range.
-    /// * If the element already exists in the range.
+    /// Returns an error if the element cannot be added or already exists.
     fn insert(&mut self, element: Self::Step) -> Result<(), Error<Self::Step>>;
 
-    /// Merges two ranges into one.
-    ///
-    /// # Arguments
-    ///
-    /// * `other`: The other range to merge with.
-    ///
-    /// # Returns
-    ///
-    /// The merged range.
+    /// Merges another range into this one.
     ///
     /// # Errors
     ///
-    /// * If the ranges cannot be merged.
+    /// Returns an error if the ranges cannot be merged.
     fn merge<Rhs: MultiRanged<Step = Self::Step>>(
         &mut self,
         other: &Rhs,
     ) -> Result<(), Error<Self::Step>>;
 
-    /// Returns whether the provided element is in the range.
-    ///
-    /// # Arguments
-    ///
-    /// * `element`: The element to check.
-    ///
-    /// # Returns
-    ///
-    /// `true` if the element is in the range, `false` otherwise.
+    /// Returns whether the element is in the range.
     fn contains(&self, element: Self::Step) -> bool;
 
-    /// Returns the start of the range.
+    /// Returns the start of the range, if it exists.
     fn absolute_start(&self) -> Option<Self::Step>;
 
-    /// Returns the end of the range.
+    /// Returns the end of the range, if it exists.
     fn absolute_end(&self) -> Option<Self::Step>;
 
-    /// Returns whether the range is dense.
+    /// Returns whether the range is contiguous (not split).
     fn is_dense(&self) -> bool;
 }

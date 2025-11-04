@@ -1,12 +1,10 @@
-//! Submodule providing the `PrincipalQuantumNumber` trait and its
-//! implementation for the `Element` and `Isotope` enums.
+//! Principal quantum number (electron shell number) for elements.
 
 use crate::isotopes::ElementVariant;
 
-/// Trait providing the principal quantum number for elements.
+/// Number of electron shells in the atom.
 pub trait PrincipalQuantumNumber {
-    /// Returns the principal quantum number for the element,
-    /// which is the number of the shells characterizing the atom.
+    /// Returns the principal quantum number (shell number).
     fn principal_quantum_number(&self) -> u8;
 }
 

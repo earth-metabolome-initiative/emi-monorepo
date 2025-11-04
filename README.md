@@ -15,7 +15,7 @@ Here follows a table with the crates, and the badges illustrating their status.
 
 | Crate | Description | Status | Crates.io |
 |-------|-------------|--------|-----------|
-| [`diesel_pgrx`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/utils/diesel_pgrx) | [Diesel](https://docs.rs/diesel/latest/diesel/) integration for [PGRX](https://github.com/pgcentralfoundation/pgrx) | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml) | [Tracking issue](https://github.com/earth-metabolome-initiative/emi-monorepo/issues/78) |
+| [`diesel_pgrx`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/utils/diesel_pgrx) | [Diesel](https://docs.rs/diesel/latest/diesel/) integration for [PGRX](https://github.com/pgcentralfoundation/pgrx) | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml) | TODO |
 
 ### Web-related crates
 
@@ -27,6 +27,7 @@ Here follows a table with the crates, and the badges illustrating their status.
 
 | Crate | Description | Status | Crates.io |
 |-------|-------------|--------|-----------|
+| [`elements`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/elements) | [Chemical elements](https://en.wikipedia.org/wiki/Chemical_element) and their [isotopes](https://en.wikipedia.org/wiki/Isotope) | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-elements.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-elements.yml) | TODO |
 | [`molecular_formulas`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/molecular_formulas) | [Molecular formula](https://en.wikipedia.org/wiki/Molecular_formula) parser | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-molecular_formulas.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-molecular_formulas.yml) | [Tracking issue](https://github.com/earth-metabolome-initiative/emi-monorepo/issues/81) |
 | [`cas_codes`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/cas_codes) | [CAS codes](https://en.wikipedia.org/wiki/CAS_Registry_Number) for chemical compounds | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-cas_codes.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-cas_codes.yml) | [Tracking issue](https://github.com/earth-metabolome-initiative/emi-monorepo/issues/80) |
 

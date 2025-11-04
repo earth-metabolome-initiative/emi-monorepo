@@ -1,14 +1,13 @@
-//! Submodule providing the `BondsNumber` trait and its
-//! implementation for the `Element` and `Isotope` enums.
+//! Bonding capacity of chemical elements.
 
 use crate::isotopes::ElementVariant;
 
-/// Trait providing the minimum and maximum number of bonds for elements.
+/// Minimum and maximum number of bonds an element can form.
 pub trait BondsNumber {
-    /// Returns the minimum and maximum number of bonds for the element.
+    /// Returns `(min_bonds, max_bonds)` for the element.
     fn number_of_bonds(&self) -> (u8, u8);
 
-    /// Returns whether the element is a noble gas.
+    /// Returns `true` for noble gases (elements with zero bonds).
     fn is_noble_gas(&self) -> bool {
         self.number_of_bonds() == (0, 0)
     }

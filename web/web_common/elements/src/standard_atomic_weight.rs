@@ -1,9 +1,8 @@
-//! Submodule providing implementations of the `AsRef` trait
-//! for the `Element` enumeration.
+//! Standard atomic weights for elements.
 
 impl crate::Element {
     #[allow(clippy::too_many_lines)]
-    /// Returns the standard atomic weight of the element.
+    /// Returns the standard atomic weight.
     #[must_use]
     pub fn standard_atomic_weight(&self) -> f64 {
         match self {

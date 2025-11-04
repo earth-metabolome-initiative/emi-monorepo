@@ -1,10 +1,9 @@
-//! Submodule providing implementations of the `AsRef` trait
-//! for the `Element` enumeration.
+//! Element names.
 
 impl crate::Element {
     #[must_use]
     #[allow(clippy::too_many_lines)]
-    /// Returns the name of the element.
+    /// Returns the full element name (e.g., "Carbon").
     pub fn name(&self) -> &str {
         match self {
             Self::H => "Hydrogen",

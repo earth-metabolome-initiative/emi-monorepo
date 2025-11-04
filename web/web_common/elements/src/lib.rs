@@ -34,7 +34,15 @@ pub use valence_electrons::ValenceElectrons;
 	feature = "diesel",
 	diesel(sql_type = crate::diesel_impls::Element)
 )]
-/// Enum representing the elements of the periodic table.
+/// All 118 elements of the periodic table.
+///
+/// ```rust
+/// use elements::Element;
+///
+/// let oxygen = Element::O;
+/// assert_eq!(oxygen.name(), "Oxygen");
+/// assert_eq!(oxygen.standard_atomic_weight(), 15.999);
+/// ```
 pub enum Element {
     /// Hydrogen
     H,

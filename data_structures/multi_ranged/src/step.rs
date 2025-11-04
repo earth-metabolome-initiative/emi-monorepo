@@ -1,10 +1,10 @@
-//! Submodule defining the `Step` trait for number types.
+//! Trait for types that can be used as range boundaries.
 
 use std::ops::{Mul, MulAssign};
 
 use num_traits::{CheckedMul, ConstOne, ConstZero, SaturatingAdd, SaturatingSub, ToPrimitive};
 
-/// A trait for types that can be used as steps in a range.
+/// Types that support stepping forward and backward with saturating arithmetic.
 pub trait Step:
     ConstOne
     + ConstZero
@@ -19,16 +19,16 @@ pub trait Step:
     + SaturatingAdd
     + SaturatingSub
 {
+    /// Returns the next value.
     #[inline]
     #[must_use]
-    /// Returns the next step after the current one.
     fn next(self) -> Self {
         self.saturating_add(&Self::ONE)
     }
 
+    /// Returns the previous value.
     #[inline]
     #[must_use]
-    /// Returns the previous step before the current one.
     fn prev(self) -> Self {
         self.saturating_sub(&Self::ONE)
     }

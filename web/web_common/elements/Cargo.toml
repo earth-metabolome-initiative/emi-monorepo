@@ -2,6 +2,11 @@
 name = "elements"
 version = "0.1.0"
 edition = "2024"
+authors = ["Earth Metabolome Initiative"]
+description = "A comprehensive library for chemical elements and their isotopes with rich metadata"
+readme = "README.md"
+keywords = ["chemistry", "periodic-table", "elements", "isotopes", "science"]
+categories = ["science", "database"]
 include = [
   "src/**/*",
   "Cargo.toml",
@@ -10,12 +15,12 @@ include = [
   "isotopes_data.json",
 ]
 
-# [lib]
-# crate-type = ["cdylib", "lib"]
+[lib]
+crate-type = ["cdylib", "lib"]
 
-[[bin]]
-name = "pgrx_embed_elements"
-path = "./src/bin/pgrx_embed.rs"
+# [[bin]]
+# name = "pgrx_embed_elements"
+# path = "./src/bin/pgrx_embed.rs"
 
 [dependencies]
 serde = { workspace = true, optional = true }

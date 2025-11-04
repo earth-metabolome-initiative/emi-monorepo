@@ -1,12 +1,10 @@
-//! Submodule proving the `ValenceElectrons` trait and its implementation for
-//! the `Element` enum.
+//! Valence electrons (outermost shell electrons) for chemical elements.
 
 use crate::isotopes::ElementVariant;
 
-/// Trait providing the number of valence electrons for elements.
+/// Number of electrons in the outermost shell that participate in bonding.
 pub trait ValenceElectrons: Sized {
-    /// Returns the number of valence electrons for the element,
-    /// which is the number of electrons in the outermost shell of the atom.
+    /// Returns the number of valence electrons.
     fn valence_electrons(&self) -> u8;
 }
 
