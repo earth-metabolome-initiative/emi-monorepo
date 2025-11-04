@@ -33,6 +33,10 @@ Here follows a table with the crates, and the badges illustrating their status.
 
 ### Data structures
 
+| Crate | Description | Status | Crates.io |
+|-------|-------------|--------|-----------|
+| [`multi_ranged`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/data_structures/multi_ranged) | Efficient data structures for representing ranges of discrete values | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-multi_ranged.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-multi_ranged.yml) | [![Crates.io](https://img.shields.io/crates/v/multi_ranged.svg)](https://crates.io/crates/multi_ranged) |
+
 ## How to contribute
 
 If you'd like to contribute to the project, please read the [CONTRIBUTING.md](CONTRIBUTING.md) file. We are happy to have you here! This is a short guide on how to contribute to the project. If you have any questions, please feel free to open an issue on the GitHub repository and we will be happy to help you.

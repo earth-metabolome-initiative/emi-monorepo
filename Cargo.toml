@@ -215,7 +215,7 @@ invalid_html_tags = "forbid"
 missing_crate_level_docs = "forbid"
 unescaped_backticks = "forbid"
 redundant_explicit_links = "forbid"
-invalid_rust_codeblocks = "forbid" 
+invalid_rust_codeblocks = "forbid"
 
 [workspace.lints.clippy]
 unreadable_literal = "allow"
