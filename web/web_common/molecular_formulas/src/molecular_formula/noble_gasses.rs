@@ -1,7 +1,7 @@
 //! Submodule providing methods to work with molecular formulas containing noble
 //! gasses.
 
-use elements::BondsNumber;
+use elements_rs::BondsNumber;
 
 impl crate::MolecularFormula {
     /// Returns whether the formula solely contains noble gasses.

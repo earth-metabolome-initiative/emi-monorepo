@@ -11,7 +11,7 @@ keywords = ["diesel", "pgrx", "postgresql", "orm", "database"]
 categories = ["database"]
 
 [dependencies]
-diesel_pgrx_derive = { version = "0.1.0", path = "../diesel_pgrx_derive" }
+diesel_pgrx_derive.workspace = true
 serde.workspace = true
 serde_cbor = { workspace = true, features = ["unsealed_read_write"] }
 diesel.workspace = true
@@ -20,7 +20,7 @@ diesel.workspace = true
 testcontainers.workspace = true
 tokio.workspace = true
 diesel = { workspace = true, features = ["postgres", "sqlite"] }
-diesel_pgrx_derive = { version = "0.1.0", path = "../diesel_pgrx_derive", features = ["postgres", "sqlite"] }
+diesel_pgrx_derive = { workspace = true, features = ["postgres", "sqlite"] }
 example_extension.workspace = true
 
 [features]

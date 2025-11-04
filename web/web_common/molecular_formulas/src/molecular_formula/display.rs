@@ -2,7 +2,7 @@
 
 use std::fmt::Display;
 
-use elements::{ElementVariant, MassNumber};
+use elements_rs::{ElementVariant, MassNumber};
 use fmtastic::{Subscript, Superscript};
 
 use super::{MolecularFormula, Side};

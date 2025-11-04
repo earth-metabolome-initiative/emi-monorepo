@@ -1,7 +1,7 @@
 //! Submodule providing a validation for oxidation states of the
 //! `MolecularFormula` struct.
 
-use elements::ElementVariant;
+use elements_rs::ElementVariant;
 use multi_ranged::{MultiRange, MultiRanged, Step};
 
 impl super::MolecularFormula {

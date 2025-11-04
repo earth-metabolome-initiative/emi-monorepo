@@ -3,7 +3,7 @@
 
 use std::collections::VecDeque;
 
-use elements::{Element, Isotope};
+use elements_rs::{Element, Isotope};
 use num_traits::{CheckedAdd, CheckedMul, ConstOne, ConstZero};
 
 use crate::token::{Token, greek_letters::GreekLetter};

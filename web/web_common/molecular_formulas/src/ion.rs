@@ -2,7 +2,7 @@
 
 use std::fmt::Display;
 
-use elements::Element;
+use elements_rs::Element;
 use fmtastic::Superscript;
 use multi_ranged::MultiRanged;
 
@@ -70,14 +70,14 @@ impl Ion<MolecularFormula> {
     }
 }
 
-impl From<Ion<elements::Element>> for Ion<MolecularFormula> {
-    fn from(ion: Ion<elements::Element>) -> Self {
+impl From<Ion<elements_rs::Element>> for Ion<MolecularFormula> {
+    fn from(ion: Ion<elements_rs::Element>) -> Self {
         Ion { entry: MolecularFormula::Element(ion.entry), charge: ion.charge }
     }
 }
 
-impl From<Ion<elements::Element>> for Ion<Box<MolecularFormula>> {
-    fn from(ion: Ion<elements::Element>) -> Self {
+impl From<Ion<elements_rs::Element>> for Ion<Box<MolecularFormula>> {
+    fn from(ion: Ion<elements_rs::Element>) -> Self {
         Ion { entry: Box::new(MolecularFormula::Element(ion.entry)), charge: ion.charge }
     }
 }

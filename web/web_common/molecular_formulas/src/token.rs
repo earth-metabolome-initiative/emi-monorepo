@@ -1,7 +1,7 @@
 //! Submodule providing a `Token` enumeration with the entries which may appear
 //! in a molecular formula.
 
-use elements::{Element, Isotope};
+use elements_rs::{Element, Isotope};
 use greek_letters::GreekLetter;
 pub mod greek_letters;
 

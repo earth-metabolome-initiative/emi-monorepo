@@ -1,6 +1,6 @@
 //! Represents each molecular formula that can be parsed.
 
-use elements::{Element, Isotope};
+use elements_rs::{Element, Isotope};
 
 use crate::{Ion, token::greek_letters::GreekLetter};
 

@@ -1,7 +1,7 @@
 //! Submodule implementing the `molar_mass` method for the `MolecularFormula`
 //! struct
 
-use elements::ElementVariant;
+use elements_rs::ElementVariant;
 
 use super::MolecularFormula;
 

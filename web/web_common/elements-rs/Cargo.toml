@@ -9,12 +9,7 @@ description = "A comprehensive library for chemical elements and their isotopes 
 readme = "README.md"
 keywords = ["chemistry", "periodic-table", "elements", "isotopes", "science"]
 categories = ["science", "database"]
-include = [
-  "src/**/*",
-  "Cargo.toml",
-  "README.md",
-  "LICENSE",
-]
+include = ["src/**/*", "Cargo.toml", "README.md", "LICENSE"]
 
 [lib]
 crate-type = ["cdylib", "lib"]

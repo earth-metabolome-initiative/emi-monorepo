@@ -98,8 +98,8 @@ diesel = { version = "2.3.1", features = [
   "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
 ] }
 # diesel_full_text_search = "2.2"
-diesel_pgrx = { path = "utils/diesel_pgrx" }
-diesel_pgrx_derive = { path = "utils/diesel_pgrx_derive" }
+diesel_pgrx = { path = "utils/diesel_pgrx", version = "0.1.0" }
+diesel_pgrx_derive = { path = "utils/diesel_pgrx_derive", version = "0.1.0" }
 example_extension = { path = "utils/diesel_pgrx/example_extension" }
 redis = { version = "0.32.1", features = ["tokio-comp"] }
 postgis_diesel = { version = "3.0.1", default-features = false }

@@ -1,7 +1,7 @@
 //! Submodule implementing the unmatched electrons calculation for molecular
 //! formulas.
 
-use elements::BondsNumber;
+use elements_rs::BondsNumber;
 
 use crate::errors::Error;
 

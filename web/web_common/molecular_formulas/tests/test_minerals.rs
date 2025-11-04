@@ -5,7 +5,7 @@
 //! formula, which does not have any specific chemical meaning, but simply
 //! distinguishes the different variants of the same mineral.
 
-use elements::Element;
+use elements_rs::Element;
 use molecular_formulas::{GreekLetter, MolecularFormula, errors::Error};
 
 #[test]

@@ -1,7 +1,7 @@
 //! Submodule implementing the `isotopologue_mass_with_charge` and
 //! `isotopologue_mass_without_charge` methods for the `MolecularFormula` struct
 
-use elements::RelativeAtomicMass;
+use elements_rs::RelativeAtomicMass;
 
 use super::MolecularFormula;
 

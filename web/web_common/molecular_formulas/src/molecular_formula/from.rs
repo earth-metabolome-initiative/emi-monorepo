@@ -1,7 +1,7 @@
 //! Submodule implementing several `From` traits for the `MolecularFormula`
 //! struct
 
-use elements::{Element, Isotope};
+use elements_rs::{Element, Isotope};
 
 use super::MolecularFormula;
 use crate::{Ion, token::greek_letters::GreekLetter};

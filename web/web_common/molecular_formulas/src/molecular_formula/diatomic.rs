@@ -3,7 +3,7 @@
 //! elements. This also returns true in case of homonuclear diatomics, such as
 //! `H2`, `O2`, etc.
 
-use elements::{ElementVariant, ValenceElectrons};
+use elements_rs::{ElementVariant, ValenceElectrons};
 mod homodiatomic;
 
 impl crate::MolecularFormula {
@@ -65,8 +65,8 @@ impl crate::MolecularFormula {
 
     fn inner_diatomic(
         &self,
-        left: &mut Option<elements::Element>,
-        right: &mut Option<elements::Element>,
+        left: &mut Option<elements_rs::Element>,
+        right: &mut Option<elements_rs::Element>,
     ) {
         match self {
             Self::Isotope(isotope) => {
@@ -131,7 +131,7 @@ impl crate::MolecularFormula {
     ///   is not well defined and as such an error is returned.
     pub fn diatomic(
         &self,
-    ) -> Result<Option<(elements::Element, elements::Element)>, crate::errors::Error> {
+    ) -> Result<Option<(elements_rs::Element, elements_rs::Element)>, crate::errors::Error> {
         if !self.is_diatomic()? {
             return Ok(None);
         }
