@@ -6,27 +6,29 @@ use synql_core::{
     structs::{Documentation, InternalModule},
 };
 
-use crate::{structs::TableInsertable, traits::TableInsertableLike};
+use crate::{
+    structs::TableBuildable,
+    traits::{BUILDABLE_MODULE_NAME, TableBuildableLike},
+};
 
-impl<'data, 'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'data, 'table, T>>
+impl<'data, 'table, T: TableBuildableLike + ?Sized> From<TableBuildable<'data, 'table, T>>
     for InternalModule<'data>
 {
-    fn from(value: TableInsertable<'data, 'table, T>) -> Self {
-        let module_name = crate::traits::table_insertable_like::INSERTABLE_MODULE_NAME;
+    fn from(value: TableBuildable<'data, 'table, T>) -> Self {
         let schema_crate_ref = value
             .table
             .table_schema_ref(value.workspace)
-            .expect("Failed to get the table schema ref for the insertable module");
+            .expect("Failed to get the table schema ref for the buildable module");
 
         InternalModule::new()
-            .name(module_name)
-            .expect("Failed to set insertable module name")
+            .name(BUILDABLE_MODULE_NAME)
+            .expect("Failed to set buildable module name")
             .public()
             .documentation(
                 Documentation::new()
                     .documentation(format!(
-                        "Submodule providing the [`{}`] insertable struct for the {} table.",
-                        value.table.table_insertable_name(),
+                        "Submodule providing the [`{}`] buildable struct for the {} table.",
+                        value.table.table_buildable_name(),
                         value.table.table_schema_doc_path()
                     ))
                     .unwrap()
@@ -36,8 +38,8 @@ impl<'data, 'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'data,
                     .unwrap(),
             )
             .data(value.into())
-            .expect("Failed to add insertable struct to insertable module")
+            .expect("Failed to add buildable struct to buildable module")
             .build()
-            .expect("Failed to build insertable module")
+            .expect("Failed to build buildable module")
     }
 }

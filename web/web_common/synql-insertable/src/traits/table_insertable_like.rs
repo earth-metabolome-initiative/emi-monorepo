@@ -1,6 +1,7 @@
 //! Submodule providing the `TableInsertable` trait for SynQL table insertables.
 
-use synql_core::structs::Workspace;
+use sql_traits::traits::{ColumnLike, DatabaseLike};
+use synql_core::structs::{InternalDataRef, Workspace};
 use synql_diesel_schema::traits::TableSchema;
 use synql_value_settable::traits::TableValueSettableLike;
 
@@ -45,6 +46,19 @@ pub trait TableInsertableLike: TableValueSettableLike {
         format!("New{}", self.table_singular_camel_name())
     }
 
+    /// Iterates the insertable columns for the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - The database connection to use to query the table
+    ///   columns.
+    fn insertable_columns<'table>(
+        &'table self,
+        database: &'table Self::DB,
+    ) -> impl Iterator<Item = &'table <Self::DB as DatabaseLike>::Column> + 'table {
+        self.columns(database).filter(move |column| !column.is_generated())
+    }
+
     /// Returns the [`TableInsertable`] representing the insertable for the
     /// table.
     ///
@@ -62,6 +76,23 @@ pub trait TableInsertableLike: TableValueSettableLike {
         Self: 'data,
     {
         TableInsertable::new(self, workspace, database)
+    }
+
+    /// Returns the reference to the [`InternalDataRef`] for the table
+    /// insertable.
+    ///
+    /// # Arguments
+    ///
+    /// * `workspace` - The workspace where the table is defined.
+    fn insertable_data_ref<'data>(
+        &self,
+        workspace: &Workspace<'data>,
+    ) -> Option<InternalDataRef<'data>> {
+        let crate_ref = workspace.internal_crate(&self.table_insertable_crate_name())?;
+        Some(InternalDataRef::new(
+            crate_ref,
+            crate_ref.internal_data(&self.table_insertable_name())?,
+        ))
     }
 }
 

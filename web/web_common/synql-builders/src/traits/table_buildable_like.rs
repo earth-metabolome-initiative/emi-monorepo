@@ -1,10 +1,10 @@
 //! Submodule providing the `TableBuildable` trait for SynQL table buildables.
 
 use synql_core::{
-    structs::{InternalDataRef, Workspace},
-    traits::TableSynLike,
+    prelude::Builder,
+    structs::{DataVariantRef, Documentation, InternalAttribute, Workspace},
 };
-use synql_diesel_schema::traits::TableSchema;
+use synql_insertable::traits::TableInsertableLike;
 
 use crate::structs::TableBuildable;
 
@@ -12,9 +12,21 @@ use crate::structs::TableBuildable;
 pub const BUILDABLE_MODULE_NAME: &str = "buildable";
 
 /// Trait representing a SynQL table buildable.
-pub trait TableBuildableLike: TableSchema {
+pub trait TableBuildableLike: TableInsertableLike {
     /// Returns the crate name which contains the buildable struct, and
     /// associated traits.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use synql_settable::prelude::*;
+    /// let db = ParserDB::try_from("CREATE TABLE users (id INT PRIMARY KEY);")?;
+    /// let table = db.table(None, "users").unwrap();
+    /// assert_eq!(table.table_buildable_crate_name(), "user_builders");
+    /// # Ok(())
+    /// # }
+    /// ```
     fn table_buildable_crate_name(&self) -> String {
         format!("{}_builders", self.table_singular_snake_name())
     }
@@ -26,9 +38,9 @@ pub trait TableBuildableLike: TableSchema {
     /// ```rust
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use synql_settable::prelude::*;
-    /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT PRIMARY KEY);")?;
-    /// let table = db.table(None, "my_table").unwrap();
-    /// assert_eq!(table.table_buildable_name(), "MyTableBuilder");
+    /// let db = ParserDB::try_from("CREATE TABLE users (id INT PRIMARY KEY);")?;
+    /// let table = db.table(None, "users").unwrap();
+    /// assert_eq!(table.table_buildable_name(), "UserBuilder");
     /// # Ok(())
     /// # }
     /// ```
@@ -36,9 +48,65 @@ pub trait TableBuildableLike: TableSchema {
         format!("{}Builder", self.table_singular_camel_name())
     }
 
-    /// Returns the [`TableBuildable<'data, 'table,
-    /// Self>`](crate::structs::TableBuildable) representing the buildable
-    /// for the table.
+    /// Returns the attribute for an extension field of a builder
+    /// when the table is extended by another table.
+    fn builder_extension_attribute<'data>(
+        &self,
+        workspace: &Workspace<'data>,
+    ) -> InternalAttribute<'data> {
+        let schema_crate_ref = self
+            .table_schema_ref(workspace)
+            .expect("Failed to get the table schema ref for the buildable module");
+
+        InternalAttribute::new()
+            .private()
+            .documentation(
+                Documentation::new()
+                    .documentation(format!(
+                        "Extension field to the ancestral {} table.",
+                        self.table_schema_doc_path()
+                    ))
+                    .unwrap()
+                    .internal_dependency(schema_crate_ref)
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
+            .ty(DataVariantRef::generic(self.table_singular_camel_ident()))
+            .name(self.table_singular_snake_name())
+            .unwrap()
+            .build()
+            .unwrap()
+    }
+
+    /// Returns the attribute for an insertable field of a builder
+    /// for the underlying insertable object.
+    fn insertable_attribute<'data>(
+        &self,
+        workspace: &Workspace<'data>,
+    ) -> InternalAttribute<'data> {
+        let insertable_ref = self
+            .insertable_data_ref(workspace)
+            .expect("Failed to get the table schema ref for the buildable module");
+
+        InternalAttribute::new()
+            .private()
+            .documentation(
+                Documentation::new()
+                    .documentation("Underlying insertable field.")
+                    .unwrap()
+                    .build()
+                    .unwrap(),
+            )
+            .ty(insertable_ref)
+            .name(self.table_singular_snake_name())
+            .unwrap()
+            .build()
+            .unwrap()
+    }
+
+    /// Returns the [`TableBuildable`](crate::structs::TableBuildable)
+    /// representing the buildable for the table.
     ///
     /// # Arguments
     ///
@@ -56,3 +124,5 @@ pub trait TableBuildableLike: TableSchema {
         TableBuildable::new(self, workspace, database)
     }
 }
+
+impl<T: TableInsertableLike> TableBuildableLike for T {}

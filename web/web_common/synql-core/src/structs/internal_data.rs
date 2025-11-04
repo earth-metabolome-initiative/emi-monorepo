@@ -9,6 +9,7 @@ use std::{
 
 pub use builder::InternalDataBuilder;
 use common_traits::prelude::Builder;
+use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
 use syn::{Ident, Lifetime};
 
@@ -477,6 +478,8 @@ pub struct InternalData<'data> {
     derives: Vec<Derive<'data>>,
     /// The decorators applied to the data which are not derives.
     decorators: Vec<Decorator<'data>>,
+    /// The generics used in the data.
+    generics: Vec<Ident>,
 }
 
 impl<'data> InternalData<'data> {
@@ -493,6 +496,16 @@ impl<'data> InternalData<'data> {
     /// Returns whether the data is public.
     pub fn is_public(&self) -> bool {
         self.publicness.is_public()
+    }
+
+    /// Returns the formatted generics of the data.
+    pub fn generics(&self) -> Option<TokenStream> {
+        if self.generics.is_empty() {
+            None
+        } else {
+            let generics = &self.generics;
+            Some(quote::quote! { <#(#generics),*> })
+        }
     }
 
     /// Returns the name of the data.
@@ -515,15 +528,17 @@ impl<'data> ToTokens for InternalData<'data> {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let publicness = &self.publicness;
         let ident = self.ident();
+        let maybe_generics = self.generics();
+
         let variant = match &self.variant {
             InternalDataVariant::StructVariant(s) => {
                 quote::quote! {
-                    struct #ident #s
+                    struct #ident #maybe_generics #s
                 }
             }
             InternalDataVariant::EnumVariant(e) => {
                 quote::quote! {
-                    enum #ident #e
+                    enum #ident #maybe_generics #e
                 }
             }
         };

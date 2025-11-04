@@ -2,18 +2,12 @@
 //! traits.
 
 mod into_crate;
+mod into_data;
+mod into_data_variant;
+mod into_module;
+mod into_struct;
 
-use quote::{ToTokens, quote};
-use sql_relations::traits::TriangularSameAsForeignKeyLike;
-use sql_traits::traits::{ColumnLike, DatabaseLike, ForeignKeyLike};
-use synql_core::{
-    prelude::Builder,
-    structs::{
-        Argument, DataVariantRef, Documentation, InternalToken, InternalTrait, Method,
-        MethodBuilder, WhereClause, Workspace,
-    },
-    traits::{ColumnSynLike, TableSynLike},
-};
+use synql_core::structs::Workspace;
 
 use crate::traits::TableBuildableLike;
 

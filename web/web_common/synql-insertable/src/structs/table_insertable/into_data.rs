@@ -1,7 +1,6 @@
 //! Submodule implementing the `From` trait to convert a `TableInsertable` into
 //! an `InternalData`.
 
-use sql_relations::traits::InheritableDatabaseLike;
 use synql_core::{
     prelude::Builder,
     structs::{Documentation, InternalData},
@@ -12,8 +11,6 @@ use crate::{structs::TableInsertable, traits::TableInsertableLike};
 
 impl<'data, 'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'data, 'table, T>>
     for InternalData<'data>
-where
-    T::DB: InheritableDatabaseLike,
 {
     fn from(insertable: TableInsertable<'data, 'table, T>) -> Self {
         let table_model_ref = insertable
@@ -43,7 +40,7 @@ where
             )
             .variant(
                 synql_core::structs::InternalStruct::new()
-                    .attributes(insertable.table.value_settable_columns(insertable.database).map(
+                    .attributes(insertable.table.insertable_columns(insertable.database).map(
                         |column| {
                             column.attribute(insertable.database, insertable.workspace).optional()
                         },

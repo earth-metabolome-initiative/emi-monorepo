@@ -9,6 +9,11 @@ expression: normalized_output
         /src
             /attributes.rs
             /lib.rs
+    /comment_builders
+        /Cargo.toml
+        /src
+            /buildable.rs
+            /lib.rs
     /comment_insertable
         /Cargo.toml
         /src
@@ -39,10 +44,20 @@ expression: normalized_output
         /src
             /attributes.rs
             /lib.rs
+    /extended_comment_builders
+        /Cargo.toml
+        /src
+            /buildable.rs
+            /lib.rs
     /extended_comment_extension_attributes
         /Cargo.toml
         /src
             /extension_attributes.rs
+            /lib.rs
+    /extended_comment_insertable
+        /Cargo.toml
+        /src
+            /insertable.rs
             /lib.rs
     /extended_comment_model
         /Cargo.toml
@@ -69,6 +84,11 @@ expression: normalized_output
         /Cargo.toml
         /src
             /attributes.rs
+            /lib.rs
+    /user_builders
+        /Cargo.toml
+        /src
+            /buildable.rs
             /lib.rs
     /user_insertable
         /Cargo.toml

@@ -14,6 +14,7 @@ synql-diesel-schema.workspace = true
 synql-relations.workspace = true
 synql-attributes.workspace = true
 synql-insertable.workspace = true
+synql-builders.workspace = true
 synql-value-settable.workspace = true
 
 [dev-dependencies]

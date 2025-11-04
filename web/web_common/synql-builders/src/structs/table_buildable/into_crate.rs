@@ -24,6 +24,8 @@ impl<'data, 'table, T: crate::traits::TableBuildableLike + ?Sized>
 				"Crate containing the buildable struct and associated traits for the {} table.",
 				buildable.table.table_schema_doc_path()
 			)).unwrap().internal_dependency(schema_ref).unwrap().build().unwrap())
+            .module(buildable.into())
+            .unwrap()
             .build()
             .unwrap()
     }

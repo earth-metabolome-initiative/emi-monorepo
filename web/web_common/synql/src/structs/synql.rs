@@ -4,6 +4,7 @@
 use std::path::Path;
 
 use synql_attributes::traits::{TableAttributesLike, TableExtensionAttributesLike};
+use synql_builders::prelude::*;
 use synql_core::structs::Workspace;
 use synql_diesel_schema::prelude::*;
 use synql_insertable::traits::TableInsertableLike;
@@ -87,11 +88,8 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
                 workspace.add_internal_crate(extension_attribute.into());
             }
             workspace.add_internal_crate(table.attributes(&workspace, self.database).into());
-            // If the table has some generated columns, we need to generate an alternative
-            // insertable struct that excludes those columns.
-            if table.has_generated_columns(self.database) {
-                workspace.add_internal_crate(table.insertable(&workspace, self.database).into());
-            }
+            workspace.add_internal_crate(table.insertable(&workspace, self.database).into());
+            workspace.add_internal_crate(table.buildable(&workspace, self.database).into());
         }
 
         workspace.write_to_disk()?;

@@ -7,6 +7,7 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 use strum::IntoEnumIterator;
+use syn::Ident;
 
 use crate::structs::{
     Decorator, Derive, Documentation, ExternalCrate, InternalData, InternalDataVariant,
@@ -30,6 +31,8 @@ pub struct InternalDataBuilder<'data> {
     derives: Vec<Derive<'data>>,
     /// The decorators applied to the data.
     decorators: Vec<Decorator<'data>>,
+    /// Generics used in the data.
+    generics: Vec<Ident>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -49,6 +52,8 @@ pub enum InternalDataAttribute {
     Derives,
     /// The decorators applied to the data.
     Decorators,
+    /// Generics used in the data.
+    Generics,
 }
 
 impl Display for InternalDataAttribute {
@@ -61,11 +66,12 @@ impl Display for InternalDataAttribute {
             InternalDataAttribute::Traits => write!(f, "traits"),
             InternalDataAttribute::Derives => write!(f, "derives"),
             InternalDataAttribute::Decorators => write!(f, "decorators"),
+            InternalDataAttribute::Generics => write!(f, "generics"),
         }
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Enumeration of errors that can occur during the building of an
 /// `InternalData`.
 pub enum InternalDataBuilderError {
@@ -79,6 +85,8 @@ pub enum InternalDataBuilderError {
     DuplicatedDerive,
     /// A decorator with the same token has already been added.
     DuplicatedDecorator,
+    /// A generic with the same name has already been added.
+    DuplicatedGeneric(String),
 }
 
 impl Display for InternalDataBuilderError {
@@ -94,6 +102,9 @@ impl Display for InternalDataBuilderError {
             }
             InternalDataBuilderError::DuplicatedDecorator => {
                 write!(f, "A decorator with the same token has already been added")
+            }
+            InternalDataBuilderError::DuplicatedGeneric(name) => {
+                write!(f, "A generic with the name '{name}' has already been added")
             }
         }
     }
@@ -247,6 +258,32 @@ impl<'data> InternalDataBuilder<'data> {
         }
         Ok(self)
     }
+
+    /// Adds a generic to the data.
+    ///
+    /// # Arguments
+    /// * `generic` - The generic to add.
+    pub fn generic(mut self, generic: Ident) -> Result<Self, InternalDataBuilderError> {
+        if self.generics.iter().any(|g| g == &generic) {
+            return Err(InternalDataBuilderError::DuplicatedGeneric(generic.to_string()));
+        }
+        self.generics.push(generic);
+        Ok(self)
+    }
+
+    /// Adds multiple generics to the data.
+    ///
+    /// # Arguments
+    /// * `generics` - The generics to add.
+    pub fn generics<I>(mut self, generics: I) -> Result<Self, InternalDataBuilderError>
+    where
+        I: IntoIterator<Item = Ident>,
+    {
+        for generic in generics {
+            self = self.generic(generic)?;
+        }
+        Ok(self)
+    }
 }
 
 impl Attributed for InternalDataBuilder<'_> {
@@ -314,6 +351,7 @@ impl<'data> Builder for InternalDataBuilder<'data> {
             traits: self.traits,
             derives: self.derives,
             decorators: self.decorators,
+            generics: self.generics,
         })
     }
 }
