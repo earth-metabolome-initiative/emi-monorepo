@@ -1,7 +1,14 @@
 [package]
 name = "diesel_pgrx_derive"
 version = "0.1.0"
-edition = "2024"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Derive macros for diesel_pgrx - Diesel ORM integration with PGRX"
+readme = "README.md"
+keywords = ["diesel", "pgrx", "postgresql", "derive", "macro"]
+categories = ["database"]
 
 [lib]
 proc-macro = true
