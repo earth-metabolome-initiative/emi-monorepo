@@ -15,7 +15,7 @@ serde = { workspace = true, optional = true }
 pgrx = { workspace = true, optional = true }
 diesel_pgrx = { workspace = true, optional = true }
 diesel = { workspace = true, optional = true }
-elements.workspace = true
+elements-rs.workspace = true
 fmtastic.workspace = true
 num-traits.workspace = true
 multi_ranged.workspace = true

@@ -38,8 +38,8 @@ members = [
   "web/web_common/backend_request_errors",
   "web/web_common/cas_codes",
   "web/web_common/csqlv",
-  "web/web_common/elements",
-  "web/web_common/elements/elements_builder",
+  "web/web_common/elements-rs",
+  "web/web_common/elements-rs/elements_builder",
   "web/web_common/generic_backend_request_errors",
   "web/web_common/iso_codes",
   "web/web_common/media_types",
@@ -132,7 +132,7 @@ rosetta_timestamp = { path = "utils/rosetta_timestamp" }
 taxonomy_fetcher = { path = "data_retrieval/taxonomy_fetcher" }
 csqlv = { path = "web/web_common/csqlv", default-features = false }
 iso_codes = { path = "web/web_common/iso_codes" }
-elements = { path = "web/web_common/elements" }
+elements-rs = { path = "web/web_common/elements-rs" }
 testcontainers = { version = "0.25.0" }
 web_common_traits = { path = "web/web_common/web_common_traits" }
 webcodegen = { path = "web/web_common/webcodegen" }
