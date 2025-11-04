@@ -360,3 +360,20 @@ impl<'data> Builder for MethodBuilder<'data> {
         })
     }
 }
+
+impl<'data> From<Method<'data>> for MethodBuilder<'data> {
+    fn from(method: Method<'data>) -> Self {
+        MethodBuilder {
+            arguments: method.arguments,
+            name: Some(method.name),
+            publicness: Some(method.publicness),
+            body: method.body,
+            async_method: method.async_method,
+            return_type: method.return_type,
+            documentation: Some(method.documentation),
+            generics: method.generics,
+            where_clauses: method.where_clauses,
+            error_documentations: method.error_documentations,
+        }
+    }
+}

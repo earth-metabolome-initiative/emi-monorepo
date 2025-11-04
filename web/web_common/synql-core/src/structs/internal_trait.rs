@@ -76,6 +76,11 @@ impl<'data> InternalTrait<'data> {
         self.methods.iter().all(|method| method.has_body())
     }
 
+    /// Returns the methods defined by the trait.
+    pub fn methods(&self) -> &Vec<Method<'data>> {
+        &self.methods
+    }
+
     /// Returns the formatted where constraints for the trait, including
     /// optionally the super-traits applied to Self.
     pub fn formatted_where_constraints(&self, include_super_traits: bool) -> Option<TokenStream> {
@@ -89,6 +94,19 @@ impl<'data> InternalTrait<'data> {
             }
         }
         if constraints.is_empty() { None } else { Some(quote::quote! { where #(#constraints),* }) }
+    }
+
+    /// Returns the requested method by name.
+    pub fn get_method_by_name(&self, name: &str) -> Option<&Method<'data>> {
+        self.methods.iter().find(|method| method.name() == name)
+    }
+
+    /// Returns whether the trait defines the provided method.
+    pub fn defines_method(&self, method: &Method<'_>) -> bool {
+        let Some(curresponding_method) = self.get_method_by_name(method.name()) else {
+            return false;
+        };
+        curresponding_method.is_compatible_with(method)
     }
 
     /// Returns the auto-blanket for the trait, if it can be generated.

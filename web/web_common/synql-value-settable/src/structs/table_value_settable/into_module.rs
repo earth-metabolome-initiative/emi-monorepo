@@ -43,6 +43,7 @@ where
             .public()
             .internal_trait(table_relation.into())
             .expect("Failed to add the internal data to module")
+            .internal_token(table_relation.into())
             .build()
             .expect("Failed to convert internal data into internal module")
     }

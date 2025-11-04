@@ -67,10 +67,44 @@ impl<'data> Method<'data> {
         self.non_self_arguments().next().is_some()
     }
 
+    /// Returns the method signature as a string.
+    pub fn signature(&self) -> String {
+        let args = self
+            .arguments
+            .iter()
+            .map(|arg| arg.to_token_stream().to_string())
+            .collect::<Vec<_>>()
+            .join(", ");
+        let return_type = if let Some(ret_type) = &self.return_type {
+            format!(" -> {}", ret_type.to_token_stream().to_string())
+        } else {
+            String::new()
+        };
+        let generics = if self.generics.is_empty() {
+            String::new()
+        } else {
+            format!(
+                "<{}>",
+                self.generics.iter().map(|ident| ident.to_string()).collect::<Vec<_>>().join(", ")
+            )
+        };
+        format!("fn {}{generics}({args}){return_type}", self.name)
+    }
+
     /// Returns whether the method can fail, (i.e. has a return type of
     /// `Result`).
     pub fn can_fail(&self) -> bool {
         self.return_type.as_ref().map_or(false, |ret_type| ret_type.is_result())
+    }
+
+    /// Returns whether the method is compatible with the provided method
+    /// signature.
+    pub fn is_compatible_with(&self, other: &Method<'_>) -> bool {
+        self.arguments == other.arguments
+            && self.async_method == other.async_method
+            && self.return_type == other.return_type
+            && self.generics == other.generics
+            && self.where_clauses == other.where_clauses
     }
 }
 

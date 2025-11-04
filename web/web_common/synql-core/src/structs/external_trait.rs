@@ -2,13 +2,13 @@
 //! crate.
 
 mod builder;
-use std::{fmt::Debug, hash::Hash};
+use std::{fmt::Debug, hash::Hash, rc::Rc};
 
 use builder::ExternalTraitBuilder;
 use quote::ToTokens;
 
 use crate::{
-    structs::{InternalCrate, InternalTrait, Trait, external_crate::ExternalTraitRef},
+    structs::{InternalCrate, InternalTrait, Method, Trait, external_crate::ExternalTraitRef},
     traits::{ExternalDependencies, InternalDependencies},
 };
 
@@ -155,7 +155,9 @@ impl ExternalTrait {
 /// which may be defined within the workspace or come from an external crate.
 pub enum TraitVariantRef<'data> {
     /// Variant representing a trait defined within the workspace.
-    Internal(InternalTrait<'data>, &'data InternalCrate<'data>),
+    /// The crate definition is optional for cases where the crate itself
+    /// has not yet been defined (e.g., for the current crate).
+    Internal(Rc<InternalTrait<'data>>, Option<&'data InternalCrate<'data>>),
     /// Variant representing a trait defined within an external crate.
     External(ExternalTraitRef<'data>),
 }
@@ -163,6 +165,12 @@ pub enum TraitVariantRef<'data> {
 impl<'data> From<ExternalTraitRef<'data>> for TraitVariantRef<'data> {
     fn from(ext_trait_ref: ExternalTraitRef<'data>) -> Self {
         Self::External(ext_trait_ref)
+    }
+}
+
+impl<'data> From<Rc<InternalTrait<'data>>> for TraitVariantRef<'data> {
+    fn from(trait_def: Rc<InternalTrait<'data>>) -> Self {
+        Self::Internal(trait_def, None)
     }
 }
 
@@ -190,6 +198,22 @@ impl TraitVariantRef<'_> {
             }
         }
     }
+
+    /// Returns whether the trait defines the provided method.
+    pub fn defines_method(&self, method: &Method<'_>) -> bool {
+        match self {
+            TraitVariantRef::Internal(trait_def, _crate_def) => trait_def.defines_method(method),
+            TraitVariantRef::External(_) => false,
+        }
+    }
+
+    /// Returns a reference to the slice of methods defined by the trait.
+    pub fn methods(&self) -> &[Method<'_>] {
+        match self {
+            TraitVariantRef::Internal(trait_def, _crate_def) => trait_def.methods(),
+            TraitVariantRef::External(_) => &[],
+        }
+    }
 }
 
 impl<'data> ExternalDependencies<'data> for TraitVariantRef<'data> {
@@ -204,7 +228,7 @@ impl<'data> ExternalDependencies<'data> for TraitVariantRef<'data> {
 impl<'data> InternalDependencies<'data> for TraitVariantRef<'data> {
     fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
         match self {
-            TraitVariantRef::Internal(_, crate_def) => vec![crate_def],
+            TraitVariantRef::Internal(_, crate_def) => crate_def.into_iter().copied().collect(),
             TraitVariantRef::External(_) => vec![],
         }
     }
@@ -215,7 +239,13 @@ impl ToTokens for TraitVariantRef<'_> {
         match self {
             TraitVariantRef::Internal(trait_def, crate_def) => {
                 let trait_ident = trait_def.ident();
-                let crate_name = crate_def.name();
+                let crate_name = crate_def.map_or_else(
+                    || quote::quote! { crate },
+                    |crate_def| {
+                        let crate_ident = crate_def.ident();
+                        quote::quote! { #crate_ident }
+                    },
+                );
                 tokens.extend(quote::quote! {
                     #crate_name::prelude::#trait_ident
                 });

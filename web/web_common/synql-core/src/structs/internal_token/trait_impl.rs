@@ -1,0 +1,231 @@
+//! Submodule providing a variant of the `InternalToken` builder which
+//! helps to implement completely an `InternalTrait` in meta-programming.
+
+use std::fmt::Display;
+
+use common_traits::{
+    builder::{Attributed, IsCompleteBuilder},
+    prelude::{Builder, BuilderError},
+};
+use quote::quote;
+
+use crate::structs::{
+    DataVariantRef, InternalToken, Method, WhereClause,
+    external_trait::TraitVariantRef,
+    internal_token::{
+        InternalTokenBuilder,
+        builder::{InternalTokenAttribute, InternalTokenBuilderError},
+    },
+};
+
+/// Struct to help implement a trait into an `InternalToken`.
+pub struct TraitImpl<'data> {
+    /// The underlying internal token builder.
+    builder: InternalTokenBuilder<'data>,
+    /// The trait to implement.
+    trait_ref: TraitVariantRef<'data>,
+    /// The methods defined by the user, to be added to the token stream.
+    methods: Vec<Method<'data>>,
+    /// The type for which the trait is being implemented.
+    data: Option<DataVariantRef<'data>>,
+    /// Where clauses for the implementation.
+    where_clauses: Vec<WhereClause<'data>>,
+}
+
+impl<'data> TraitImpl<'data> {
+    /// Creates a new `TraitImpl` instance.
+    ///
+    /// # Arguments
+    ///
+    /// * `trait_ref` - The trait to implement.
+    pub fn new(trait_ref: TraitVariantRef<'data>) -> Self {
+        Self {
+            builder: InternalToken::new(),
+            trait_ref,
+            methods: Vec::new(),
+            data: None,
+            where_clauses: Vec::new(),
+        }
+    }
+
+    /// Sets the type for which the trait is being implemented.
+    ///
+    /// # Arguments
+    /// * `data` - The type for which the trait is being implemented.
+    pub fn for_type(mut self, data: DataVariantRef<'data>) -> Self {
+        self.data = Some(data);
+        self
+    }
+
+    /// Adds a method to the trait implementation.
+    ///
+    /// # Arguments
+    ///
+    /// * `method` - The method to add.
+    ///
+    /// # Errors
+    ///
+    /// * If the provided method is already defined.
+    /// * If the provided method does not belong to the trait being implemented.
+    /// * If the provided method is missing the body.
+    /// * If the provided method has a documentation field.
+    /// * If the provided method has a visibility other than private.
+    /// * If the provided method is incompatible with the curresponding method
+    ///   in the trait.
+    pub fn method(mut self, method: Method<'data>) -> Result<Self, TraitImplError> {
+        if self.methods.iter().any(|m| m.name() == method.name()) {
+            return Err(TraitImplError::MethodAlreadyDefined(method.name().to_string()));
+        }
+        if !self.trait_ref.defines_method(&method) {
+            return Err(TraitImplError::MethodSignatureMismatch(method.name().to_string()));
+        }
+        if !method.has_body() {
+            return Err(TraitImplError::MethodWithoutBody(method.name().to_string()));
+        }
+
+        self.methods.push(method);
+        Ok(self)
+    }
+
+    /// Adds a where clause to the trait implementation.
+    ///
+    /// # Arguments
+    ///
+    /// * `where_clause` - The where clause to add.
+    ///
+    /// # Errors
+    ///
+    /// * If the provided where clause is already defined.
+    pub fn where_clause(
+        mut self,
+        where_clause: WhereClause<'data>,
+    ) -> Result<Self, TraitImplError> {
+        if self.where_clauses.iter().any(|wc| wc == &where_clause) {
+            return Err(TraitImplError::DuplicateWhereClause(where_clause.to_string()));
+        }
+        self.where_clauses.push(where_clause);
+        Ok(self)
+    }
+}
+
+#[derive(Debug)]
+/// Errors that can occur when building a `TraitImpl`.
+pub enum TraitImplError {
+    /// Some error occurred in the internal token builder.
+    Builder(InternalTokenBuilderError),
+    /// A required method for the trait implementation is missing.
+    RequiredMethodMissing(String),
+    /// A method was provided without a body.
+    MethodWithoutBody(String),
+    /// A method was provided with incompatible signature.
+    MethodSignatureMismatch(String),
+    /// A method was provided multiple times.
+    MethodAlreadyDefined(String),
+    /// The data type for which the trait is being implemented is missing.
+    MissingDataType,
+    /// A where clause was duplicated.
+    DuplicateWhereClause(String),
+}
+
+impl Display for TraitImplError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TraitImplError::Builder(err) => write!(f, "TraitImpl builder error: {}", err),
+            TraitImplError::RequiredMethodMissing(method_name) => {
+                write!(f, "Required method '{}' is missing for trait implementation", method_name)
+            }
+            TraitImplError::MethodWithoutBody(method_name) => {
+                write!(f, "Method '{}' was provided without a body", method_name)
+            }
+            TraitImplError::MethodSignatureMismatch(method_name) => {
+                write!(f, "Method '{}' has a signature incompatible with the trait", method_name)
+            }
+            TraitImplError::MethodAlreadyDefined(method_name) => {
+                write!(
+                    f,
+                    "Method '{}' was already defined in the trait implementation",
+                    method_name
+                )
+            }
+            TraitImplError::MissingDataType => {
+                write!(f, "The data type for which the trait is being implemented is missing")
+            }
+            TraitImplError::DuplicateWhereClause(where_clause) => {
+                write!(
+                    f,
+                    "The where clause '{}' was duplicated in the trait implementation",
+                    where_clause
+                )
+            }
+        }
+    }
+}
+
+impl std::error::Error for TraitImplError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            TraitImplError::Builder(err) => Some(err),
+            _ => None,
+        }
+    }
+}
+
+impl From<InternalTokenBuilderError> for TraitImplError {
+    fn from(err: InternalTokenBuilderError) -> Self {
+        TraitImplError::Builder(err)
+    }
+}
+
+impl From<BuilderError<InternalTokenAttribute>> for TraitImplError {
+    fn from(err: BuilderError<InternalTokenAttribute>) -> Self {
+        let err: InternalTokenBuilderError = err.into();
+        err.into()
+    }
+}
+
+impl<'data> Attributed for TraitImpl<'data> {
+    type Attribute = InternalTokenAttribute;
+}
+
+impl<'data> IsCompleteBuilder for TraitImpl<'data> {
+    fn is_complete(&self) -> bool {
+        self.builder.is_complete()
+    }
+}
+
+impl<'data> TryFrom<TraitImpl<'data>> for InternalToken<'data> {
+    type Error = TraitImplError;
+
+    fn try_from(value: TraitImpl<'data>) -> Result<Self, Self::Error> {
+        // Ensure all required methods are provided.
+        for method in value.trait_ref.methods() {
+            // Method with default implementation can be skipped.
+            if method.has_body() {
+                continue;
+            }
+            // Check if the method is provided.
+            if !value.methods.iter().any(|m| m.name() == method.name()) {
+                return Err(TraitImplError::RequiredMethodMissing(method.signature()));
+            }
+        }
+
+        let trait_ref = &value.trait_ref;
+        let data = value.data.ok_or(TraitImplError::MissingDataType)?;
+        let methods = &value.methods;
+        let formatted_where_clauses = if value.where_clauses.is_empty() {
+            None
+        } else {
+            let clauses = &value.where_clauses;
+            Some(quote! { where #(#clauses),* })
+        };
+
+        Ok(value
+            .builder
+            .stream(quote! {
+                impl #trait_ref for #data #formatted_where_clauses {
+                    #(#methods)*
+                }
+            })
+            .build()?)
+    }
+}

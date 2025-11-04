@@ -10,11 +10,13 @@ use proc_macro2::TokenStream;
 use quote::ToTokens;
 
 mod from_ident;
+mod trait_impl;
 
 use crate::{
     structs::{
         DataVariantRef, ExternalCrate, InternalCrate, Publicness, external_crate::ExternalMacroRef,
         external_trait::TraitVariantRef, internal_data::InternalModuleRef,
+        internal_token::trait_impl::TraitImpl,
     },
     traits::{ExternalDependencies, InternalDependencies},
 };
@@ -111,6 +113,15 @@ impl<'data> InternalToken<'data> {
     /// Initializes a new `InternalTokenBuilder`.
     pub fn new() -> InternalTokenBuilder<'data> {
         InternalTokenBuilder::default()
+    }
+
+    /// Initializess a new `TraitImpl` to help implement the provided trait.
+    ///
+    /// # Arguments
+    ///
+    /// * `trait_ref` - The trait to implement.
+    pub fn implements(trait_ref: TraitVariantRef<'data>) -> TraitImpl<'data> {
+        TraitImpl::new(trait_ref)
     }
 
     /// Returns whether the token stream is public.

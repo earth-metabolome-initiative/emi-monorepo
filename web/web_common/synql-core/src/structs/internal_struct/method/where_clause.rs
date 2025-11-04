@@ -48,3 +48,9 @@ impl ToTokens for WhereClause<'_> {
         tokens.extend(quote::quote! { #left_tokens : #right_tokens });
     }
 }
+
+impl ToString for WhereClause<'_> {
+    fn to_string(&self) -> String {
+        self.to_token_stream().to_string()
+    }
+}

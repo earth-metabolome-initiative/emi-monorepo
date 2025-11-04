@@ -17,6 +17,7 @@ use crate::traits::TableValueSettableLike;
 
 mod into_crate;
 mod into_module;
+mod into_token;
 mod into_trait;
 
 #[derive(Debug)]
