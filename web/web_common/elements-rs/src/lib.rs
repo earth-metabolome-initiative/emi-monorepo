@@ -37,7 +37,7 @@ pub use valence_electrons::ValenceElectrons;
 /// All 118 elements of the periodic table.
 ///
 /// ```rust
-/// use elements::Element;
+/// use elements_rs::Element;
 ///
 /// let oxygen = Element::O;
 /// assert_eq!(oxygen.name(), "Oxygen");

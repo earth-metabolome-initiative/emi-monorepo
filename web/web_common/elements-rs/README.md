@@ -18,7 +18,7 @@ elements = "0.1"
 ### Basic Example
 
 ```rust
-use elements::{Element, BondsNumber, ValenceElectrons};
+use elements_rs::{Element, BondsNumber, ValenceElectrons};
 
 // Get an element
 let carbon = Element::C;
@@ -40,7 +40,7 @@ assert_eq!((min_bonds, max_bonds), (4, 4));
 ### Working with Isotopes
 
 ```rust
-use elements::isotopes::{CarbonIsotope, Isotope, MassNumber, RelativeAtomicMass};
+use elements_rs::isotopes::{CarbonIsotope, Isotope, MassNumber, RelativeAtomicMass};
 
 // Get a specific isotope
 let carbon_12 = CarbonIsotope::C12;
@@ -54,7 +54,7 @@ let isotope = Isotope::C(carbon_12);
 ### Parsing from Strings
 
 ```rust
-use elements::Element;
+use elements_rs::Element;
 use std::str::FromStr;
 
 // Parse element symbols
