@@ -25,10 +25,10 @@ COPY ./web_common/iso_codes/extension/usr/lib/postgresql/17/lib/iso_codes.so /us
 COPY ./web_common/iso_codes/extension/usr/share/postgresql/17/extension/iso_codes.control /usr/share/postgresql/17/extension/iso_codes.control
 COPY ./web_common/iso_codes/extension/usr/share/postgresql/17/extension/iso_codes--0.1.0.sql usr/share/postgresql/17/extension/iso_codes--0.1.0.sql
 
-# Next, we copy the the `elements-rs` extension files to the image
-COPY ./web_common/elements-rs/extension/usr/lib/postgresql/17/lib/elements-rs.so /usr/lib/postgresql/17/lib/elements-rs.so
-COPY ./web_common/elements-rs/extension/usr/share/postgresql/17/extension/elements-rs.control /usr/share/postgresql/17/extension/elements-rs.control
-COPY ./web_common/elements-rs/extension/usr/share/postgresql/17/extension/elements-rs--0.1.0.sql usr/share/postgresql/17/extension/elements-rs--0.1.0.sql
+# Next, we copy the the `elements_rs` extension files to the image
+COPY ./web_common/elements_rs/extension/usr/lib/postgresql/17/lib/elements_rs.so /usr/lib/postgresql/17/lib/elements_rs.so
+COPY ./web_common/elements_rs/extension/usr/share/postgresql/17/extension/elements_rs.control /usr/share/postgresql/17/extension/elements_rs.control
+COPY ./web_common/elements_rs/extension/usr/share/postgresql/17/extension/elements_rs--0.1.0.sql usr/share/postgresql/17/extension/elements_rs--0.1.0.sql
 
 # Next, we copy the the `molecular_formulas` extension files to the image
 COPY ./web_common/molecular_formulas/extension/usr/lib/postgresql/17/lib/molecular_formulas.so /usr/lib/postgresql/17/lib/molecular_formulas.so
