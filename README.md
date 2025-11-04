@@ -15,7 +15,8 @@ Here follows a table with the crates, and the badges illustrating their status.
 
 | Crate | Description | Status | Crates.io |
 |-------|-------------|--------|-----------|
-| [`diesel_pgrx`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/utils/diesel_pgrx) | [Diesel](https://docs.rs/diesel/latest/diesel/) integration for [PGRX](https://github.com/pgcentralfoundation/pgrx) | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml) | TODO |
+| [`diesel_pgrx`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/utils/diesel_pgrx) | Diesel ORM integration for PGRX PostgreSQL extensions | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml) | [![Crates.io](https://img.shields.io/crates/v/diesel_pgrx.svg)](https://crates.io/crates/diesel_pgrx) |
+| [`diesel_pgrx_derive`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/utils/diesel_pgrx_derive) | Derive macros for diesel_pgrx | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml) | [![Crates.io](https://img.shields.io/crates/v/diesel_pgrx_derive.svg)](https://crates.io/crates/diesel_pgrx_derive) |
 
 ### Web-related crates
 

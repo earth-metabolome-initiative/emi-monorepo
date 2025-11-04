@@ -1,8 +1,10 @@
 [package]
 name = "elements"
 version = "0.1.0"
-edition = "2024"
-authors = ["Earth Metabolome Initiative"]
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
 description = "A comprehensive library for chemical elements and their isotopes with rich metadata"
 readme = "README.md"
 keywords = ["chemistry", "periodic-table", "elements", "isotopes", "science"]
@@ -12,7 +14,6 @@ include = [
   "Cargo.toml",
   "README.md",
   "LICENSE",
-  "isotopes_data.json",
 ]
 
 [lib]
