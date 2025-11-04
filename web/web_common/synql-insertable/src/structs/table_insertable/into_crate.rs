@@ -7,7 +7,10 @@ use synql_core::{
     structs::{Documentation, InternalCrate},
 };
 
-use crate::{structs::TableInsertable, traits::TableInsertableLike};
+use crate::{
+    structs::TableInsertable,
+    traits::{INSERTABLE_MODULE_NAME, TableInsertableLike},
+};
 
 impl<'data, 'table, T> From<TableInsertable<'data, 'table, T>> for InternalCrate<'data>
 where
@@ -25,9 +28,9 @@ where
             .documentation(
                 Documentation::new()
                     .documentation(format!(
-                        "Crate providing the [`{}`] trait for the {} table.",
-                        insertable.table.table_insertable_name(),
-                        insertable.table.table_schema_doc_path()
+                        "Crate providing the [`{table_insertable_name}`](crate::{INSERTABLE_MODULE_NAME}::{table_insertable_name}) trait for the {} table.",
+                        insertable.table.table_schema_doc_path(),
+                        table_insertable_name=insertable.table.table_insertable_name(),
                     ))
                     .unwrap()
                     .internal_dependency(schema_crate_ref)

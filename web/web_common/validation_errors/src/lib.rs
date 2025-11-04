@@ -18,13 +18,20 @@ impl<FieldName> ValidationError<FieldName> {
         F: Fn(FieldName) -> NewFieldName,
     {
         match self {
-            ValidationError::SingleField(error) => ValidationError::SingleField(error.into_field_name(convert)),
-            ValidationError::DoubleField(error) => ValidationError::DoubleField(error.into_field_name(convert)),
+            ValidationError::SingleField(error) => {
+                ValidationError::SingleField(error.into_field_name(convert))
+            }
+            ValidationError::DoubleField(error) => {
+                ValidationError::DoubleField(error.into_field_name(convert))
+            }
         }
     }
 }
 
-impl<FieldName: core::fmt::Display + core::fmt::Debug> core::error::Error for ValidationError<FieldName> {}
+impl<FieldName: core::fmt::Display + core::fmt::Debug> core::error::Error
+    for ValidationError<FieldName>
+{
+}
 
 impl<FieldName: core::fmt::Display> core::fmt::Display for ValidationError<FieldName> {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {

@@ -271,19 +271,20 @@ pub trait ColumnLike:
 
     /// Returns whether the column is a foreign key, i.e. it is part of any
     /// foreign key constraint.
-    /// 
+    ///
     /// # Arguments
-    /// 
-    /// * `database` - A reference to the database instance to query foreign keys from.
-    /// 
+    ///
+    /// * `database` - A reference to the database instance to query foreign
+    ///   keys from.
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// 
+    ///
     /// let db = ParserDB::try_from(
-    ///    r#"
+    ///     r#"
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
     /// CREATE TABLE host_table (
     ///    id INT REFERENCES referenced_table(id),

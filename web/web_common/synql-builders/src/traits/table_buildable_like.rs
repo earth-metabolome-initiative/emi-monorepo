@@ -1,6 +1,9 @@
 //! Submodule providing the `TableBuildable` trait for SynQL table buildables.
 
-use synql_core::{structs::{InternalDataRef, Workspace}, traits::TableSynLike};
+use synql_core::{
+    structs::{InternalDataRef, Workspace},
+    traits::TableSynLike,
+};
 use synql_diesel_schema::traits::TableSchema;
 
 use crate::structs::TableBuildable;

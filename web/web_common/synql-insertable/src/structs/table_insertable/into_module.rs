@@ -2,10 +2,12 @@
 //! an `InternalModule`.
 
 use sql_relations::traits::InheritableDatabaseLike;
-use synql_core::structs::{Documentation, InternalModule};
-use synql_core::prelude::Builder;
-use crate::{structs::TableInsertable, traits::TableInsertableLike};
+use synql_core::{
+    prelude::Builder,
+    structs::{Documentation, InternalModule},
+};
 
+use crate::{structs::TableInsertable, traits::TableInsertableLike};
 
 impl<'data, 'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'data, 'table, T>>
     for InternalModule<'data>

@@ -87,5 +87,18 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
         panic!("cargo test failed for generated workspace");
     }
 
+    // Verify that the generated documentation can be built without errors or
+    // warnings
+    let output = Command::new("cargo")
+        .args(&["doc", "--no-deps", "--document-private-items"])
+        .current_dir(&workspace_path)
+        .output()?;
+
+    if !output.status.success() {
+        eprintln!("cargo doc stdout: {}", String::from_utf8_lossy(&output.stdout));
+        eprintln!("cargo doc stderr: {}", String::from_utf8_lossy(&output.stderr));
+        panic!("cargo doc failed for generated workspace");
+    }
+
     Ok(())
 }

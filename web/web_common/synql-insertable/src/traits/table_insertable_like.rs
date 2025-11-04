@@ -14,7 +14,7 @@ pub trait TableInsertableLike: TableValueSettableLike {
     /// Returns the name of the crate for the table insertable.
     ///
     /// # Examples
-    /// 
+    ///
     /// ```rust
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use synql_settable::prelude::*;

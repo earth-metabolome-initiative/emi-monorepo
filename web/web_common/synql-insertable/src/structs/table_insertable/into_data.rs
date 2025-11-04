@@ -2,12 +2,13 @@
 //! an `InternalData`.
 
 use sql_relations::traits::InheritableDatabaseLike;
-use synql_core::structs::{Documentation, InternalData};
-use synql_core::prelude::Builder;
+use synql_core::{
+    prelude::Builder,
+    structs::{Documentation, InternalData},
+};
 use synql_models::traits::ColumnModelLike;
 
 use crate::{structs::TableInsertable, traits::TableInsertableLike};
-
 
 impl<'data, 'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'data, 'table, T>>
     for InternalData<'data>

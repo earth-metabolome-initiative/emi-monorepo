@@ -2,7 +2,7 @@
 
 use std::convert::Infallible;
 
-use crate::{DoubleFieldError, ValidationError, SingleFieldError};
+use crate::{DoubleFieldError, SingleFieldError, ValidationError};
 
 impl From<Infallible> for ValidationError {
     fn from(_error: Infallible) -> Self {

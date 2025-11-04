@@ -96,8 +96,8 @@ impl<'data> Workspace<'data> {
         None
     }
 
-    /// Returns the external type ref corresponding to the provided Postgres name, if
-    /// any.
+    /// Returns the external type ref corresponding to the provided Postgres
+    /// name, if any.
     ///
     /// # Arguments
     /// * `postgres_type` - A string slice representing the postgres type.
@@ -112,7 +112,7 @@ impl<'data> Workspace<'data> {
 
     /// Returns the external type ref corresponding to the provided name, if
     /// any.
-    /// 
+    ///
     /// # Arguments
     /// * `ident` - A reference to the type.
     pub fn external_type(&self, ident: &Type) -> Option<ExternalTypeRef<'data>> {
@@ -222,11 +222,24 @@ impl<'data> Workspace<'data> {
         // Add [workspace.lints] section
         doc["workspace"]["lints"]["rust"]["missing_docs"] = toml_edit::value("forbid");
         doc["workspace"]["lints"]["rust"]["unused_macro_rules"] = toml_edit::value("forbid");
+        doc["workspace"]["lints"]["rust"]["unused_doc_comments"] = toml_edit::value("forbid");
         doc["workspace"]["lints"]["rust"]["unconditional_recursion"] = toml_edit::value("forbid");
         doc["workspace"]["lints"]["rust"]["unreachable_patterns"] = toml_edit::value("forbid");
         doc["workspace"]["lints"]["rust"]["unused_import_braces"] = toml_edit::value("forbid");
         doc["workspace"]["lints"]["rust"]["unused_must_use"] = toml_edit::value("forbid");
         doc["workspace"]["lints"]["rust"]["deprecated"] = toml_edit::value("deny");
+        doc["workspace"]["lints"]["rustdoc"]["broken_intra_doc_links"] = toml_edit::value("forbid");
+        doc["workspace"]["lints"]["rustdoc"]["bare_urls"] = toml_edit::value("forbid");
+        doc["workspace"]["lints"]["rustdoc"]["invalid_codeblock_attributes"] =
+            toml_edit::value("forbid");
+        doc["workspace"]["lints"]["rustdoc"]["invalid_html_tags"] = toml_edit::value("forbid");
+        doc["workspace"]["lints"]["rustdoc"]["missing_crate_level_docs"] =
+            toml_edit::value("forbid");
+        doc["workspace"]["lints"]["rustdoc"]["unescaped_backticks"] = toml_edit::value("forbid");
+        doc["workspace"]["lints"]["rustdoc"]["redundant_explicit_links"] =
+            toml_edit::value("forbid");
+        doc["workspace"]["lints"]["rustdoc"]["invalid_rust_codeblocks"] =
+            toml_edit::value("forbid");
 
         // Write to file
         let mut buffer = std::fs::File::create(toml_path)?;

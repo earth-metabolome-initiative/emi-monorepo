@@ -5,6 +5,5 @@ pub mod traits;
 
 /// Prelude for synql-insertable
 pub mod prelude {
-    pub use crate::traits::*;
-    pub use crate::structs::*;
+    pub use crate::{structs::*, traits::*};
 }

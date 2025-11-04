@@ -15,9 +15,9 @@ use crate::{
 /// generate Rust code for them.
 pub trait ColumnSynLike: ColumnLike {
     /// Returns the uppercased acronym of this column.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use synql_core::prelude::*;

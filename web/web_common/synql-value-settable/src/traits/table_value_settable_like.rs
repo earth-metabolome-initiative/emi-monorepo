@@ -48,7 +48,7 @@ pub trait TableValueSettableLike: TableModelLike {
     /// # }
     /// ```
     fn table_value_settable_trait_name(&self) -> String {
-        format!("{}ScalarSettable", self.table_singular_camel_name())
+        format!("{}ValueSettable", self.table_singular_camel_name())
     }
 
     /// Returns the trait ident for the table value settable trait.

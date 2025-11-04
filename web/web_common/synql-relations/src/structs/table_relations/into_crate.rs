@@ -1,36 +1,34 @@
-//! Submodule implementing the `From` trait to convert a `TableValueSettable`
+//! Submodule implementing the `From` trait to convert a `TableRelations`
 //! into an `InternalCrate`.
 
-use sql_relations::traits::InheritableDatabaseLike;
 use synql_core::{
     prelude::Builder,
     structs::{Documentation, InternalCrate},
 };
 
 use crate::{
-    structs::TableValueSettable,
-    traits::{TRAIT_MODULE_NAME, TableValueSettableLike},
+    structs::TableRelations,
+    traits::{TRAIT_MODULE_NAME, TableRelationsLike},
 };
 
-impl<'data, 'table, T> From<TableValueSettable<'data, 'table, T>> for InternalCrate<'data>
+impl<'data, 'table, T> From<TableRelations<'data, 'table, T>> for InternalCrate<'data>
 where
-    T: TableValueSettableLike + ?Sized,
-    T::DB: InheritableDatabaseLike,
+    T: TableRelationsLike + ?Sized,
 {
-    fn from(table_relation: TableValueSettable<'data, 'table, T>) -> Self {
+    fn from(table_relation: TableRelations<'data, 'table, T>) -> Self {
         let schema_crate_ref = table_relation
             .table
             .table_schema_ref(table_relation.workspace)
             .expect("Failed to get the table schema ref for the table relations");
         InternalCrate::new()
-            .name(table_relation.table.table_value_settable_crate_name())
+            .name(table_relation.table.table_relations_crate_name())
             .expect("Failed to set the crate name")
             .documentation(
                 Documentation::new()
                     .documentation(format!(
-                        "Crate providing the [`{table_value_settable_trait_name}`](crate::{TRAIT_MODULE_NAME}::{table_value_settable_trait_name}) trait for the {} table.",
+                        "Crate providing the [`{table_relations_trait_name}`](crate::{TRAIT_MODULE_NAME}::{table_relations_trait_name}) trait for the {} table.",
                         table_relation.table.table_schema_doc_path(),
-                        table_value_settable_trait_name=table_relation.table.table_value_settable_trait_name(),
+                        table_relations_trait_name=table_relation.table.table_relations_trait_name(),
                     ))
                     .unwrap()
                     .internal_dependency(schema_crate_ref)

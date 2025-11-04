@@ -7,14 +7,18 @@ use syn::Ident;
 use synql_core::{
     prelude::{Builder, ColumnLike, DatabaseLike, ForeignKeyLike},
     structs::{
-        Argument, DataVariantRef, Documentation, ExternalTraitRef, InternalCrate, InternalDataRef,
-        InternalModule, InternalToken, InternalTrait, Method, MethodBuilder, WhereClause,
+        Argument, DataVariantRef, Documentation, ExternalTraitRef, InternalDataRef, InternalToken,
+        Method, MethodBuilder, WhereClause,
     },
     traits::{ColumnSynLike, ForeignKeySynLike},
 };
 use synql_diesel_schema::traits::ForeignKeySchema;
 
-use crate::traits::{TRAIT_MODULE_NAME, TableRelationsLike};
+use crate::traits::TableRelationsLike;
+
+mod into_crate;
+mod into_module;
+mod into_trait;
 
 #[derive(Debug)]
 /// Struct representing a SynQL table relations trait.
@@ -227,134 +231,5 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
             )
             .build()
             .unwrap()
-    }
-}
-
-impl<'data, 'table, T> From<TableRelations<'data, 'table, T>> for InternalTrait<'data>
-where
-    T: TableRelationsLike + ?Sized,
-{
-    fn from(table_relation: TableRelations<'data, 'table, T>) -> Self {
-        let extension_of = table_relation.extension_of_trait();
-        let model_ref = table_relation.model_ref();
-        let schema_crate_ref = table_relation
-            .table
-            .table_schema_ref(table_relation.workspace)
-            .expect("Failed to get the table schema ref for the table relations");
-        InternalTrait::new()
-            .public()
-            .name(table_relation.table.table_relations_trait_name())
-            .expect("Failed to set the internal trait name")
-            .documentation(Documentation::new()
-                .documentation(format!(
-                    "Trait providing methods to access the relations of the {} struct for the {} table.",
-                    model_ref.documentation_path(),
-                    table_relation.table.table_schema_doc_path()
-                ))
-                .unwrap()
-                .internal_dependency(schema_crate_ref)
-                .unwrap()
-                .build()
-                .unwrap())
-            .generic(syn::parse_quote! {C})
-            .unwrap()
-            .super_trait(
-                InternalToken::new()
-                    .private()
-                    .stream(quote! {#extension_of<#model_ref, C>})
-                    .employed_trait(extension_of.into())
-                    .unwrap()
-                    .data(model_ref.into())
-                    .unwrap()
-                    .build()
-                    .unwrap(),
-            )
-            .unwrap()
-            .methods(
-                table_relation
-                    .table
-                    .foreign_keys(table_relation.database)
-                    // We filter out foreign keys that start from the primary key of the host table,
-                    // as those should be handled by the `Read` trait implementation.
-                    .filter(|fk| !fk.is_host_primary_key(table_relation.database))
-                    .map(|fk: &<T::DB as DatabaseLike>::ForeignKey| {
-                        if fk.is_referenced_primary_key(table_relation.database) {
-                            table_relation.read_based_method(fk)
-                        } else {
-                            todo!()
-                        }
-                    }),
-            )
-            .expect("Failed to set the internal trait methods")
-            .build()
-            .expect("Failed to convert internal trait builder into internal trait")
-    }
-}
-
-impl<'data, 'table, T> From<TableRelations<'data, 'table, T>> for InternalModule<'data>
-where
-    T: TableRelationsLike + ?Sized,
-{
-    fn from(table_relation: TableRelations<'data, 'table, T>) -> Self {
-        let model_ref = table_relation
-            .table
-            .model_ref(table_relation.workspace)
-            .expect("Failed to get the model ref for the table relations");
-
-        let internal_trait: InternalTrait<'data> = InternalTrait::from(table_relation);
-        let auto_blanket = internal_trait.auto_blanket().expect("Failed to generate auto blanket");
-        let schema_crate_ref = table_relation
-            .table
-            .table_schema_ref(table_relation.workspace)
-            .expect("Failed to get the table schema ref for the table relations");
-
-        InternalModule::new()
-            .public()
-            .name(TRAIT_MODULE_NAME)
-            .expect("Failed to set the module name")
-            .documentation(Documentation::new().documentation(format!(
-                "Submodule providing the [`{}`] trait for the [`{}`]({model_ref}) struct and the {} table.",
-                table_relation.table.table_relations_trait_name(),
-                model_ref.data().name(),
-                table_relation.table.table_schema_doc_path()
-            )).unwrap().internal_dependency(schema_crate_ref).unwrap().build().unwrap())
-            .public()
-            .internal_trait(internal_trait)
-            .expect("Failed to add the internal data to module")
-            .internal_token(auto_blanket)
-            .build()
-            .expect("Failed to convert internal data into internal module")
-    }
-}
-
-impl<'data, 'table, T> From<TableRelations<'data, 'table, T>> for InternalCrate<'data>
-where
-    T: TableRelationsLike + ?Sized,
-{
-    fn from(table_relation: TableRelations<'data, 'table, T>) -> Self {
-        let schema_crate_ref = table_relation
-            .table
-            .table_schema_ref(table_relation.workspace)
-            .expect("Failed to get the table schema ref for the table relations");
-        InternalCrate::new()
-            .name(table_relation.table.table_relations_crate_name())
-            .expect("Failed to set the crate name")
-            .documentation(
-                Documentation::new()
-                    .documentation(format!(
-                        "Crate providing the [`{}`] trait for the {} table.",
-                        table_relation.table.table_relations_trait_name(),
-                        table_relation.table.table_schema_doc_path()
-                    ))
-                    .unwrap()
-                    .internal_dependency(schema_crate_ref)
-                    .unwrap()
-                    .build()
-                    .unwrap(),
-            )
-            .module(table_relation.into())
-            .expect("Failed to add internal module to internal crate")
-            .build()
-            .expect("Failed to convert internal data into internal crate")
     }
 }
