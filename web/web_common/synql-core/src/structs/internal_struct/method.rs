@@ -57,6 +57,16 @@ impl<'data> Method<'data> {
         MethodBuilder::default()
     }
 
+    /// Iterates over the arguments of the method.
+    pub fn arguments(&self) -> impl Iterator<Item = &Argument<'data>> {
+        self.arguments.iter()
+    }
+
+    /// Returns the return type of the method.
+    pub fn return_type(&self) -> Option<&DataVariantRef<'data>> {
+        self.return_type.as_ref()
+    }
+
     /// Returns an iterator over the non-self arguments of the method.
     pub fn non_self_arguments(&self) -> impl Iterator<Item = &Argument<'data>> {
         self.arguments.iter().filter(|arg| !arg.is_self())

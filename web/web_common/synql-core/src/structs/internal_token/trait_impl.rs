@@ -1,7 +1,7 @@
 //! Submodule providing a variant of the `InternalToken` builder which
 //! helps to implement completely an `InternalTrait` in meta-programming.
 
-use std::fmt::Display;
+use std::{collections::HashSet, fmt::Display};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -225,9 +225,19 @@ impl<'trt, 'data> TryFrom<TraitImpl<'trt, 'data>> for InternalToken<'data> {
             }
         }
 
+        let mut unique_types: HashSet<DataVariantRef<'data>> = HashSet::new();
+        let methods = value.methods;
+        for provided_method in methods.iter() {
+            for arg in provided_method.arguments() {
+                unique_types.insert(arg.arg_type().clone());
+            }
+            if let Some(ret_type) = provided_method.return_type() {
+                unique_types.insert(ret_type.clone());
+            }
+        }
+
         let trait_ref = &value.trait_ref;
         let data = value.data.ok_or(TraitImplError::MissingDataType)?;
-        let methods = &value.methods;
         let formatted_where_clauses = if value.where_clauses.is_empty() {
             None
         } else {
@@ -237,6 +247,13 @@ impl<'trt, 'data> TryFrom<TraitImpl<'trt, 'data>> for InternalToken<'data> {
 
         Ok(value
             .builder
+            .private()
+            .employed_trait(value.trait_ref.clone())
+            .unwrap()
+            .data(data.clone())
+            .unwrap()
+            .datas(unique_types)
+            .unwrap()
             .stream(quote! {
                 impl #trait_ref for #data #formatted_where_clauses {
                     #(#methods)*

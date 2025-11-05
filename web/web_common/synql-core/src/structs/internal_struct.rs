@@ -48,6 +48,13 @@ impl<'data> InternalAttribute<'data> {
         new_attr
     }
 
+    /// Sets the publicness of the attribute to private and returns
+    /// the modified attribute.
+    pub fn private(mut self) -> InternalAttribute<'data> {
+        self.pubness = Publicness::Private;
+        self
+    }
+
     /// Returns the publicness of the attribute.
     pub fn pubness(&self) -> &Publicness {
         &self.pubness

@@ -6,9 +6,7 @@ use sql_relations::{prelude::ColumnLike, traits::InheritableDatabaseLike};
 use sql_traits::traits::DatabaseLike;
 use synql_core::{
     prelude::Builder,
-    structs::{
-        Argument, DataVariantRef, Documentation, InternalToken, Method, WhereClause, Workspace,
-    },
+    structs::{Argument, DataVariantRef, Documentation, Method, WhereClause, Workspace},
     traits::ColumnSynLike,
 };
 use synql_diesel_schema::traits::ColumnSchema;
@@ -140,18 +138,21 @@ impl<'data, 'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'data
             .where_clauses(
                 [
                     WhereClause::new()
-                    .left(column_acronym)
-                    .right(
-                        InternalToken::new()
-                            .private()
-                            .stream(quote! {
-                                TryInto<#column_type>
-                            })
-                            .build()
-                            .expect("Failed to build token"),
-                    )
+                    .left(column_acronym.clone())
+                    .right(quote! {
+                        TryInto<#column_type>
+                    })
                     .build()
-                    .expect("Failed to build where clause")
+                    .expect("Failed to build where clause"),
+                    WhereClause::new()
+                        .left(quote!{
+                            #validation_error
+                        })
+                        .right(quote! {
+                            From<<#column_acronym as TryInto<#column_type>>::Error>
+                        })
+                        .build()
+                        .expect("Failed to build where clause")
                 ]
             )
             .unwrap()

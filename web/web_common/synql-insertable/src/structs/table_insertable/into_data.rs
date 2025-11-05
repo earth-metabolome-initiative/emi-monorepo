@@ -42,7 +42,10 @@ impl<'data, 'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'data,
                 synql_core::structs::InternalStruct::new()
                     .attributes(insertable.table.insertable_columns(insertable.database).map(
                         |column| {
-                            column.attribute(insertable.database, insertable.workspace).optional()
+                            column
+                                .attribute(insertable.database, insertable.workspace)
+                                .optional()
+                                .private()
                         },
                     ))
                     .expect("Failed to set attributes")

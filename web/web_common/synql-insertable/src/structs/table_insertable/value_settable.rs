@@ -35,7 +35,7 @@ where
                     .make_mut_self()
                     .unwrap()
                     .body(quote::quote! {
-                        self.#snake_case_ident = #snake_case_ident.try_into()?;
+                        self.#snake_case_ident = Some(#snake_case_ident.try_into()?);
                         Ok(self)
                     })
                     .build()

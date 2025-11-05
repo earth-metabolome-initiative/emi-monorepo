@@ -275,6 +275,17 @@ impl<'data> InternalTokenBuilder<'data> {
         Ok(self)
     }
 
+    /// Adds several internal data references to the token stream.
+    pub fn datas<I>(mut self, data: I) -> Result<Self, InternalTokenBuilderError>
+    where
+        I: IntoIterator<Item = DataVariantRef<'data>>,
+    {
+        for data_ref in data {
+            self = self.data(data_ref)?;
+        }
+        Ok(self)
+    }
+
     /// Adds an internal module reference to the token stream.
     ///
     /// # Arguments

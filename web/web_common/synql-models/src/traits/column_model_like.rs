@@ -43,7 +43,7 @@ pub trait ColumnModelLike: ColumnSynLike {
                     .build()
                     .unwrap(),
             )
-            .private()
+            .public()
             .ty(attribute_type)
             .build()
             .expect("Failed to build column attribute")

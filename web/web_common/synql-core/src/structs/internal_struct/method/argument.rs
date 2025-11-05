@@ -24,19 +24,19 @@ pub struct Argument<'data> {
     documentation: Option<Documentation<'data>>,
 }
 
-impl Argument<'_> {
+impl<'data> Argument<'data> {
     /// Returns the name of the argument.
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns the documentation of the argument.
-    pub fn documentation(&self) -> Option<&Documentation<'_>> {
+    pub fn documentation(&self) -> Option<&Documentation<'data>> {
         self.documentation.as_ref()
     }
 
     /// Returns the type of the argument.
-    pub fn arg_type(&self) -> &DataVariantRef<'_> {
+    pub fn arg_type(&self) -> &DataVariantRef<'data> {
         &self.arg_type
     }
 

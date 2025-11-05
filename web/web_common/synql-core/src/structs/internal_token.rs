@@ -171,6 +171,9 @@ impl<'data> InternalDependencies<'data> for InternalToken<'data> {
         for trait_ref in &self.implemented_traits {
             dependencies.extend(trait_ref.internal_dependencies());
         }
+        for data in &self.data {
+            dependencies.extend(data.internal_dependencies());
+        }
 
         dependencies.sort_unstable();
         dependencies.dedup();
@@ -189,6 +192,9 @@ impl<'data> ExternalDependencies<'data> for InternalToken<'data> {
         }
         for trait_ref in &self.implemented_traits {
             dependencies.extend(trait_ref.external_dependencies());
+        }
+        for data in &self.data {
+            dependencies.extend(data.external_dependencies());
         }
         dependencies.sort_unstable();
         dependencies.dedup();
