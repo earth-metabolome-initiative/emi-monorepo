@@ -271,8 +271,8 @@ impl<'data> DataVariantRef<'data> {
             Self::External(external) => external.supports_trait(trait_ref),
             Self::Reference(_lifetime, inner) => inner.supports_trait(trait_ref),
             Self::MutableReference(_lifetime, inner) => inner.supports_trait(trait_ref),
-            Self::Generic(_) => false,
-            Self::Result(_, _) => false,
+            Self::Generic(_) => true,
+            Self::Result(ok, err) => ok.supports_trait(trait_ref) && err.supports_trait(trait_ref),
             Self::Option(inner) => inner.supports_trait(trait_ref),
             Self::SelfType(inner) => {
                 match inner {
