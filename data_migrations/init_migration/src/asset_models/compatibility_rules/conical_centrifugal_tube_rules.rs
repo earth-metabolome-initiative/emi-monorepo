@@ -6,7 +6,7 @@ use crate::asset_models::containers::{
     boxes::polystyrene_box, conical_centrifugal_tubes::conical_centrifugal_tube_50ml,
     racks::conical_centrifugal_tube_50ml_rack, wrappers::coffee_filter_wrapper,
 };
-
+use crate::asset_models::organisms::organism_sample_model;
 /// Initializes the compatibility rules for conical centrifugal tubes.
 ///
 /// # Arguments
@@ -32,6 +32,9 @@ pub(super) fn init_conical_centrifugal_tube_rules(
 
     let coffee_filter = coffee_filter_wrapper(user, conn)?;
     cct_50ml.can_contain(&coffee_filter, 1, user, conn)?;
+
+    let sample = organism_sample_model(user, conn)?;
+    cct_50ml.can_contain(&sample, 1, user, conn)?;
 
     Ok(())
 }

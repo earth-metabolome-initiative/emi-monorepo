@@ -5,8 +5,10 @@ CREATE TABLE IF NOT EXISTS procedure_templates (
 	-- which allows for rapidly determining the type of a procedure template
 	-- without having to execute multiple queries.
 	most_concrete_table TEXT NOT NULL,
+	--- Unique global name or id of the procedure template
+	global_name TEXT UNIQUE CHECK (must_be_paragraph(name)),
 	-- Human-readable name of the procedure template
-	name TEXT UNIQUE NOT NULL CHECK (must_be_paragraph(name)),
+	name TEXT NOT NULL CHECK (must_be_paragraph(name)),
 	-- Human-readable description of the procedure template
 	description TEXT NOT NULL CHECK (must_be_paragraph(description)),
 	-- The user who created this procedure template

@@ -15,6 +15,7 @@ pub mod markers;
 pub mod organism;
 pub mod phone;
 pub mod photograph;
+pub mod panels;
 pub mod pipette_tips;
 pub mod pipettes;
 pub mod ppe;

@@ -9,9 +9,7 @@ use core_structures::{
     traits::AppendProcedureTemplate,
 };
 use diesel::OptionalExtension;
-use web_common_traits::database::{
-    DispatchableInsertableVariant, Insertable, PrimaryKeyLike, Read,
-};
+use web_common_traits::database::{DispatchableInsertableVariant, Insertable, PrimaryKeyLike};
 
 use crate::procedure_template_asset_models::{
     markers::marker_arrow_model_builder, organism::organism_builder, phone::phone_builder,

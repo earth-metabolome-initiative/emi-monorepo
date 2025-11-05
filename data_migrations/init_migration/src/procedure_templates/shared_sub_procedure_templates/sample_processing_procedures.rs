@@ -16,6 +16,7 @@ use core_structures::{
     traits::AppendProcedureTemplate,
 };
 use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
+use diesel::OptionalExtension;
 
 use crate::{
     asset_models::{
@@ -35,13 +36,36 @@ use crate::{
 };
 
 #[allow(clippy::too_many_lines)]
-pub(super) fn init_dbgi_sample_processing_procedures(
+pub fn full_sample_processing_procedures(
     user: &core_structures::User,
     cct: &ProcedureTemplateAssetModel,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureTemplate> {
+    fractioning_sample_processing_procedures(user, cct, "Full Sample Processing", conn)
+}
+
+#[allow(clippy::too_many_lines)]
+pub fn partial_sample_processing_procedures(
+    user: &core_structures::User,
+    cct: &ProcedureTemplateAssetModel,
+    conn: &mut diesel::PgConnection,
+) -> anyhow::Result<ProcedureTemplate> {
+    fractioning_sample_processing_procedures(user, cct, "Fractional Sample Processing", conn)
+}
+
+#[allow(clippy::too_many_lines)]
+fn fractioning_sample_processing_procedures(
+    user: &core_structures::User,
+    cct: &ProcedureTemplateAssetModel,
+    name: &str,
+    conn: &mut diesel::PgConnection,
+) -> anyhow::Result<ProcedureTemplate> {
+    if let Some(existing) = ProcedureTemplate::from_name(name, conn).optional()? {
+        return Ok(existing);
+    }
+
     let dbgi_sample_processing_procedure = ProcedureTemplate::new()
-        .name("Sample Processing")?
+        .name(name)?
         .description("Sample Processing procedure template")?
         .created_by(user)?
         .insert(user.id, conn)?;
@@ -89,7 +113,7 @@ pub(super) fn init_dbgi_sample_processing_procedures(
         .description("Fractioning procedure template")?
         .created_by(user)?
         .kilograms(50e-6)?
-        .tolerance_percentage(5.0)?
+        .tolerance_percentage(100.0)?
         .procedure_template_fragment_container_model(cct)?
         .procedure_template_fragment_placed_into_model(safelock_builder(user, conn)?)?
         .procedure_template_weighed_with_model(weighing_device_builder(user, conn)?)?

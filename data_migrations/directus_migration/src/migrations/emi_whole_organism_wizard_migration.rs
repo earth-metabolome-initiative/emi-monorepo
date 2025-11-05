@@ -10,7 +10,6 @@ use core_structures::{
 use guided_procedures::{GuidedProcedure, ProcedureTemplateGraph};
 use init_migration::{
     asset_models::{instruments::phone::phone_model, photographs::photograph_model},
-    dbgi_plan,
 };
 use web_common_traits::{
     database::{BoundedRead, DispatchableInsertableVariant},

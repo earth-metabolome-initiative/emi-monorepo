@@ -10,7 +10,7 @@ use core_structures::{
 use guided_procedures::{GuidedProcedure, ProcedureTemplateGraph};
 use init_migration::{
     asset_models::{instruments::phone::phone_model, photographs::photograph_model},
-    dbgi_plan,
+    dbgi_procedure_template,
 };
 use web_common_traits::{
     database::{BoundedRead, DispatchableInsertableVariant},
@@ -25,7 +25,7 @@ impl FieldDatumWrapper {
         user: &User,
         conn: &mut diesel::PgConnection,
     ) -> anyhow::Result<()> {
-        let procedure_template = dbgi_plan(user, conn)?;
+        let procedure_template = dbgi_procedure_template(user, conn)?;
         let procedure_graph = ProcedureTemplateGraph::new(&procedure_template, conn)?;
 
         let photograph_model = photograph_model(user, conn)?;

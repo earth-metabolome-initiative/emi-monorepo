@@ -1,0 +1,12 @@
+//! Submodule providing shared sub-subprocedure templates.
+
+mod organism_observation_procedure;
+pub use organism_observation_procedure::organism_observation_procedure;
+mod part_of_organism_collection_procedure;
+pub use part_of_organism_collection_procedure::part_of_organism_collection;
+mod full_organism_collection_procedure;
+pub use full_organism_collection_procedure::full_organism_collection_procedure;
+mod sample_processing_procedures;
+pub use sample_processing_procedures::{full_sample_processing_procedures, partial_sample_processing_procedures};
+mod gloves_procedure_template;
+pub use gloves_procedure_template::gloves_procedure_template;

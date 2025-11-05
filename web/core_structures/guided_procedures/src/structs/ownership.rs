@@ -64,7 +64,11 @@ impl Ownership {
             if let Some(original_ptam) = ptam.based_on {
                 let original_index = ptams
                     .binary_search_by(|am| am.id.cmp(&original_ptam))
-                    .expect("Based on asset model not found in vocabulary");
+                    .expect(&format!(
+                        "Based on asset model with id `{original_ptam}` for `{}` (`{}`) not found in vocabulary",
+                        ptam.name,
+                        ptam.id
+                    ));
                 edges.push((i, original_index));
             }
         }

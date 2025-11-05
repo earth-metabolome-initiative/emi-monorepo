@@ -3,7 +3,10 @@
 
 use core_structures_vis::MermaidDB;
 use init_db::init_database;
-use init_migration::{dbgi_plan, init_migration, init_root_user};
+use init_migration::{
+    dbgi_procedure_template, emi_insect_procedure_template, emi_procedure_template, init_migration,
+    init_root_user,
+};
 use reference_docker::reference_docker_with_connection;
 use time_requirements::prelude::{Task, TimeTracker};
 
@@ -41,18 +44,29 @@ async fn test_init_migration() {
     test_time_tracker.add_completed_task(task);
 
     let user = init_root_user(&mut conn).expect("Failed to initialize the root user");
-    let procedure_template =
-        dbgi_plan(&user, &mut conn).expect("Failed to initialize the DBGI plan");
 
-    let flowchart = procedure_template
-        .to_mermaid(&mut conn)
-        .expect("Failed to convert the procedure template to Mermaid format");
+    let emi_insect_pt = emi_insect_procedure_template(&user, &mut conn)
+        .expect("Failed to initialize the EMI Insect procedure template");
+    let emi_pt = emi_procedure_template(&user, &mut conn)
+        .expect("Failed to initialize the EMI procedure template");
+    let dbgi_pt =
+        dbgi_procedure_template(&user, &mut conn).expect("Failed to initialize the DBGI plan");
+
+    for pt in [&emi_pt, &dbgi_pt, &emi_insect_pt] {
+        println!("Generating flowchart for procedure template: `{}` ({})", pt.name, pt.procedure_template);
+        let flowchart = pt
+            .to_mermaid(&mut conn)
+            .expect("Failed to convert the procedure template to Mermaid format");
+
+        let pt_name = pt.name.replace(' ', "_").to_lowercase();
+
+        // We write out the flowchart to a file.
+        std::fs::write(&format!("{pt_name}.mermaid"), flowchart.to_string())
+            .expect("Failed to write the flowchart file");
+    }
+
     let er = core_structures_vis::asset_model_hierarchy(&mut conn)
         .expect("Failed to generate the asset model hierarchy ERD");
-
-    // We write out the flowchart to a file.
-    std::fs::write("test_init_migration_flowchart.mermaid", flowchart.to_string())
-        .expect("Failed to write the flowchart file");
 
     // We write out the ERD to a file.
     std::fs::write("test_init_migration_erd.mermaid", er.to_string())

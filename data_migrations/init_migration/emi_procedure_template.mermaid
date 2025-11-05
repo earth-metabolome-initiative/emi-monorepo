@@ -1,0 +1,418 @@
+---
+config:
+  theme: default
+  look: classic
+  flowchart:
+    defaultRenderer: "elk"
+title: EMI Procedure Template
+---
+flowchart TB
+classDef ptam_node_17 rx: 2px, ry: 2px,stroke-dasharray: 5, 5,fill: #efa8a8,stroke: #d62727
+classDef ptam_edge_17 stroke-dasharray: 5, 5,stroke: #d62727,stroke-width: 2px
+classDef ptam_node_21 rx: 2px, ry: 2px,stroke-dasharray: 5, 5,fill: #efb6a8,stroke: #d64927
+classDef ptam_edge_21 stroke-dasharray: 5, 5,stroke: #d64927,stroke-width: 2px
+classDef ptam_node_26 rx: 2px, ry: 2px,stroke-dasharray: 5, 5,fill: #efc3a8,stroke: #d66a27
+classDef ptam_edge_26 stroke-dasharray: 5, 5,stroke: #d66a27,stroke-width: 2px
+classDef ptam_node_39 rx: 2px, ry: 2px,stroke-dasharray: 5, 5,fill: #efd1a8,stroke: #d68c27
+classDef ptam_edge_39 stroke-dasharray: 5, 5,stroke: #d68c27,stroke-width: 2px
+classDef ptam_node_97 rx: 2px, ry: 2px,fill: #efdfa8,stroke: #d6af27
+classDef ptam_edge_97 stroke: #d6af27,stroke-width: 2px
+classDef ptam_node_98 rx: 2px, ry: 2px,fill: #efeda8,stroke: #d6d127
+classDef ptam_edge_98 stroke: #d6d127,stroke-width: 2px
+classDef ptam_node_99 rx: 2px, ry: 2px,fill: #e4efa8,stroke: #bbd627
+classDef ptam_node_100 rx: 2px, ry: 2px,fill: #d6efa8,stroke: #98d627
+classDef ptam_node_101 rx: 2px, ry: 2px,fill: #c8efa8,stroke: #76d627
+classDef ptam_node_102 rx: 2px, ry: 2px,fill: #baefa8,stroke: #53d627
+classDef ptam_node_103 rx: 2px, ry: 2px,fill: #acefa8,stroke: #31d627
+classDef ptam_node_104 rx: 2px, ry: 2px,fill: #a8efb1,stroke: #27d63d
+classDef ptam_edge_104 stroke: #27d63d,stroke-width: 2px
+classDef ptam_node_105 rx: 2px, ry: 2px,fill: #a8efbf,stroke: #27d660
+classDef ptam_node_106 rx: 2px, ry: 2px,fill: #a8efcd,stroke: #27d682
+classDef ptam_edge_106 stroke: #27d682,stroke-width: 2px
+classDef ptam_node_107 rx: 2px, ry: 2px,fill: #a8efda,stroke: #27d6a2
+classDef ptam_edge_107 stroke: #27d6a2,stroke-width: 2px
+classDef ptam_node_108 rx: 2px, ry: 2px,fill: #a8efe8,stroke: #27d6c5
+classDef ptam_edge_108 stroke: #27d6c5,stroke-width: 2px
+classDef ptam_node_109 rx: 2px, ry: 2px,fill: #a8e8ef,stroke: #27c5d6
+classDef ptam_node_110 rx: 2px, ry: 2px,fill: #a8daef,stroke: #27a2d6
+classDef ptam_node_111 rx: 2px, ry: 2px,fill: #a8cdef,stroke: #2782d6
+classDef ptam_node_112 rx: 2px, ry: 2px,fill: #a8bfef,stroke: #2760d6
+classDef ptam_node_113 rx: 2px, ry: 2px,fill: #a8b1ef,stroke: #273dd6
+classDef ptam_node_114 rx: 2px, ry: 2px,fill: #aca8ef,stroke: #3127d6
+classDef ptam_edge_114 stroke: #3127d6,stroke-width: 2px
+classDef ptam_node_115 rx: 2px, ry: 2px,fill: #baa8ef,stroke: #5327d6
+classDef ptam_edge_115 stroke: #5327d6,stroke-width: 2px
+classDef ptam_node_116 rx: 2px, ry: 2px,fill: #c8a8ef,stroke: #7627d6
+classDef ptam_edge_116 stroke: #7627d6,stroke-width: 2px
+classDef ptam_node_117 rx: 2px, ry: 2px,fill: #d6a8ef,stroke: #9827d6
+classDef ptam_node_118 rx: 2px, ry: 2px,fill: #e4a8ef,stroke: #bb27d6
+classDef ptam_node_119 rx: 2px, ry: 2px,fill: #efa8ed,stroke: #d627d1
+classDef ptam_edge_119 stroke: #d627d1,stroke-width: 2px
+classDef ptam_node_120 rx: 2px, ry: 2px,fill: #efa8df,stroke: #d627af
+classDef ptam_node_121 rx: 2px, ry: 2px,fill: #efa8d1,stroke: #d6278c
+classDef ptam_edge_121 stroke: #d6278c,stroke-width: 2px
+classDef ptam_node_122 rx: 2px, ry: 2px,fill: #efa8c3,stroke: #d6276a
+classDef ptam_node_123 rx: 2px, ry: 2px,fill: #efa8b6,stroke: #d62749
+classDef procedure_arrow stroke: #1a1a1a
+subgraph v9440232569631866091 ["`*Organism observation procedure*`"]
+    subgraph v1415021992607914371 ["`fa:fa-camera *Organism Picture*`"]
+    v5071521965525510488@{shape: hex, label: "fa:fa-mobile-screen-button Phone"}
+class v5071521965525510488 ptam_node_97
+    v11393678415928990372@{shape: rect, label: "fa:fa-file Organism Picture"}
+class v11393678415928990372 ptam_node_101
+    v11733587347898369769@{shape: hex, label: "fa:fa-bacterium Organism"}
+class v11733587347898369769 ptam_node_98
+end
+style v1415021992607914371 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v2204439732249309527 ["`*Place Arrow*`"]
+    v2762497472341832207@{shape: rect, label: "Marker Arrow"}
+class v2762497472341832207 ptam_node_99
+    v7188323179572118976@{shape: rect, label: "fa:fa-bacterium Organism"}
+class v7188323179572118976 ptam_node_98
+    v17495994817985097603@{shape: rect, label: "fa:fa-mobile-screen-button Phone"}
+class v17495994817985097603 ptam_node_97
+end
+style v2204439732249309527 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v3018685089425743547 ["`fa:fa-map-location-dot *Organism Geolocation*`"]
+    v9681711934960840529@{shape: hex, label: "fa:fa-mobile-screen-button Phone"}
+class v9681711934960840529 ptam_node_97
+    v17382788831544451931@{shape: hex, label: "fa:fa-bacterium Organism"}
+class v17382788831544451931 ptam_node_98
+end
+style v3018685089425743547 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v8309424698731712410 ["`fa:fa-camera *Organism Collected Part Picture*`"]
+    v1358683372730598978@{shape: hex, label: "fa:fa-mobile-screen-button Phone"}
+class v1358683372730598978 ptam_node_97
+    v3212265800877936329@{shape: rect, label: "fa:fa-file Organism Collected Part Picture"}
+class v3212265800877936329 ptam_node_103
+    v12179848752736090357@{shape: hex, label: "fa:fa-bacterium Organism"}
+class v12179848752736090357 ptam_node_98
+end
+style v8309424698731712410 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v13322543944030498981 ["`fa:fa-camera *Organism and Panel Picture*`"]
+    v8468906756755271354@{shape: hex, label: "fa:fa-mobile-screen-button Phone"}
+class v8468906756755271354 ptam_node_97
+    v16204819762803616007@{shape: hex, label: "fa:fa-bacterium Organism"}
+class v16204819762803616007 ptam_node_98
+    v17062686568646642580@{shape: rect, label: "fa:fa-file Organism and Panel Picture"}
+class v17062686568646642580 ptam_node_100
+end
+style v13322543944030498981 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v14254459205605726465 ["`fa:fa-camera *Organism Details Picture*`"]
+    v2563395051016411176@{shape: hex, label: "fa:fa-bacterium Organism"}
+class v2563395051016411176 ptam_node_98
+    v9267810255605505066@{shape: rect, label: "fa:fa-file Organism Details Picture"}
+class v9267810255605505066 ptam_node_102
+    v10696041444047111210@{shape: hex, label: "fa:fa-mobile-screen-button Phone"}
+class v10696041444047111210 ptam_node_97
+end
+style v14254459205605726465 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+end
+style v9440232569631866091 rx: 3px, ry: 3px , fill: #e3e5e6 , stroke: #cdcccb 
+subgraph v1410413030464697215 ["`*Part of Organism Collection*`"]
+    subgraph v714647675616183528 ["`fa:fa-warehouse *Place in conical centrifugal tube*`"]
+    v3552290094107731884@{shape: rect, label: "fa:fa-flask-vial Conical Centrifugal Tube"}
+class v3552290094107731884 ptam_node_108
+    v16661473999694976801@{shape: hex, label: "fa:fa-sheet-plastic Coffee Filter Wrapper"}
+class v16661473999694976801 ptam_node_107
+end
+style v714647675616183528 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v2141313794501108811 ["`*Wear and sterilize gloves*`"]
+    subgraph v11935757128955102332 ["`*Wear gloves*`"]
+    v18090443118661522327@{shape: rect, label: "Glove"}
+class v18090443118661522327 ptam_node_104
+end
+style v11935757128955102332 rx: 3px, ry: 3px , fill: #d1d5d6 , stroke: #bdbcbb 
+    subgraph v17539539977501135093 ["`*Sterilize gloves*`"]
+    v4029457667533149719@{shape: hex, label: "Glove"}
+class v4029457667533149719 ptam_node_104
+    v4192218778944244683@{shape: lean-r, label: "fa:fa-flask-vial Ethanol bottle"}
+class v4192218778944244683 ptam_node_17
+end
+style v17539539977501135093 rx: 3px, ry: 3px , fill: #d1d5d6 , stroke: #bdbcbb 
+end
+style v2141313794501108811 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v2807098965884154572 ["`fa:fa-warehouse *Place in storage box*`"]
+    v6057409163398933358@{shape: rect, label: "fa:fa-box Polystyrene Box"}
+class v6057409163398933358 ptam_node_109
+    v14596640987338177548@{shape: hex, label: "fa:fa-flask-vial Conical Centrifugal Tube"}
+class v14596640987338177548 ptam_node_108
+end
+style v2807098965884154572 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v7194480892257529885 ["`*Harvest sample*`"]
+    v8729603881156600385@{shape: hex, label: "fa:fa-bacterium Organism"}
+class v8729603881156600385 ptam_node_98
+    v16157225452801445165@{shape: rect, label: "fa:fa-vial Organism Sample"}
+class v16157225452801445165 ptam_node_106
+end
+style v7194480892257529885 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v15544563799696548181 ["`fa:fa-gifts *Wrap in coffee filter paper*`"]
+    v10400933087766189289@{shape: rect, label: "fa:fa-sheet-plastic Coffee Filter Wrapper"}
+class v10400933087766189289 ptam_node_107
+    v12120009086834086670@{shape: hex, label: "fa:fa-vial Organism Sample"}
+class v12120009086834086670 ptam_node_106
+end
+style v15544563799696548181 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v16493525886299016835 ["`*Sterilize scalpel*`"]
+    v7711406975158147822@{shape: lean-r, label: "fa:fa-flask-vial Ethanol bottle"}
+class v7711406975158147822 ptam_node_21
+    v12548129001717483663@{shape: rect, label: "Scalpel"}
+class v12548129001717483663 ptam_node_105
+end
+style v16493525886299016835 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+end
+style v1410413030464697215 rx: 3px, ry: 3px , fill: #e3e5e6 , stroke: #cdcccb 
+subgraph v5255109839055407840 ["`*Sample Processing*`"]
+    subgraph v2668221838840504007 ["`fa:fa-trash *Dispose of Eppendorf Tube*`"]
+    v14114964835284555084@{shape: hex, label: "fa:fa-flask-vial Safelock Tube 2ml"}
+class v14114964835284555084 ptam_node_114
+end
+style v2668221838840504007 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v3330608674009609781 ["`*Ball Mill 1*`"]
+    v15676615344117242435@{shape: rect, label: "Metal Bead 3mm"}
+class v15676615344117242435 ptam_node_115
+    v15883819123244370694@{shape: hex, label: "fa:fa-flask-vial Safelock Tube 2ml"}
+class v15883819123244370694 ptam_node_114
+    v17360009679378205860@{shape: rect, label: "Ball Mill Machine"}
+class v17360009679378205860 ptam_node_116
+end
+style v3330608674009609781 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v5004031916309933239 ["`fa:fa-trash *Dispose of Pipette Tips*`"]
+    v14178112711327705799@{shape: hex, label: "Pipette Tip 1ml"}
+class v14178112711327705799 ptam_node_121
+end
+style v5004031916309933239 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v5318254331014348762 ["`fa:fa-warehouse *Falcon Storage*`"]
+    v6806490846186748880@{shape: lean-r, label: "fa:fa-flask-vial Insect Conical Centrifugal Tube"}
+class v6806490846186748880 ptam_node_26
+    v15592416774129596915@{shape: rect, label: "fa:fa-box Conical Centrifugal Tube 50ml Rack"}
+class v15592416774129596915 ptam_node_112
+end
+style v5318254331014348762 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v6374713189788666606 ["`fa:fa-icicles *Freeze Drying*`"]
+    v7609970805989556075@{shape: lean-r, label: "fa:fa-flask-vial Insect Conical Centrifugal Tube"}
+class v7609970805989556075 ptam_node_26
+    v14075183090438657932@{shape: rect, label: "fa:fa-icicles Freeze dryer"}
+class v14075183090438657932 ptam_node_111
+end
+style v6374713189788666606 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v7307189265850270771 ["`*Ball Mill 2*`"]
+    v6953995271476472110@{shape: hex, label: "Metal Bead 3mm"}
+class v6953995271476472110 ptam_node_115
+    v9748973950419375852@{shape: hex, label: "fa:fa-flask-vial Safelock Tube 2ml"}
+class v9748973950419375852 ptam_node_114
+    v10274555536773658838@{shape: hex, label: "Ball Mill Machine"}
+class v10274555536773658838 ptam_node_116
+end
+style v7307189265850270771 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v7518460975294198577 ["`*Capping*`"]
+    v5421803771594315182@{shape: hex, label: "fa:fa-flask-vial Long Term Storage Vial"}
+class v5421803771594315182 ptam_node_119
+    v17737625842494904979@{shape: rect, label: "Sealed Cap for Vial 1.5ml"}
+class v17737625842494904979 ptam_node_122
+end
+style v7518460975294198577 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v8103049511424544088 ["`*Centrifuge*`"]
+    v2528127132172718742@{shape: rect, label: "Safelock Centrifuge"}
+class v2528127132172718742 ptam_node_118
+    v9040993347649350333@{shape: hex, label: "fa:fa-flask-vial Safelock Tube 2ml"}
+class v9040993347649350333 ptam_node_114
+end
+style v8103049511424544088 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v9219964029751197111 ["`fa:fa-warehouse *Long Term Storage Vial Storage*`"]
+    v9594979469553706933@{shape: rect, label: "fa:fa-box Long Term Storage Vial Box"}
+class v9594979469553706933 ptam_node_123
+    v14549572942063742505@{shape: hex, label: "fa:fa-flask-vial Long Term Storage Vial"}
+class v14549572942063742505 ptam_node_119
+end
+style v9219964029751197111 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v14275782117119946267 ["`*Pouring Solvent*`"]
+    v163410465904503946@{shape: hex, label: "fa:fa-flask-vial Safelock Tube 2ml"}
+class v163410465904503946 ptam_node_114
+    v5497146612815135196@{shape: lean-r, label: "fa:fa-flask-vial Sample extraction solvent"}
+class v5497146612815135196 ptam_node_39
+    v8731865223659933132@{shape: rect, label: "Volume Measuring Device"}
+class v8731865223659933132 ptam_node_117
+end
+style v14275782117119946267 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v15379368247962300020 ["`fa:fa-eye-dropper *Supernatant*`"]
+    v4574342437855275404@{shape: rect, label: "fa:fa-flask-vial Long Term Storage Vial"}
+class v4574342437855275404 ptam_node_119
+    v8247251960735693595@{shape: rect, label: "fa:fa-eye-dropper Pipette 1000µl"}
+class v8247251960735693595 ptam_node_120
+    v14099089884228315619@{shape: hex, label: "fa:fa-flask-vial Safelock Tube 2ml"}
+class v14099089884228315619 ptam_node_114
+    v14144716497144992367@{shape: rect, label: "Pipette Tip 1ml"}
+class v14144716497144992367 ptam_node_121
+end
+style v15379368247962300020 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v16287277818969985508 ["`fa:fa-snowflake *Freezing*`"]
+    v116967346834377246@{shape: lean-r, label: "fa:fa-flask-vial Insect Conical Centrifugal Tube"}
+class v116967346834377246 ptam_node_26
+    v1399073366449199260@{shape: rect, label: "fa:fa-snowflake Freezer -80°C"}
+class v1399073366449199260 ptam_node_110
+end
+style v16287277818969985508 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+    subgraph v17533159380741695517 ["`*Fractioning*`"]
+    v4975290579420140886@{shape: rect, label: "fa:fa-scale-unbalanced Weighing Scale"}
+class v4975290579420140886 ptam_node_113
+    v7060693933392056154@{shape: rect, label: "fa:fa-flask-vial Safelock Tube 2ml"}
+class v7060693933392056154 ptam_node_114
+    v7412075181725996711@{shape: lean-r, label: "fa:fa-flask-vial Insect Conical Centrifugal Tube"}
+class v7412075181725996711 ptam_node_26
+end
+style v17533159380741695517 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+end
+style v5255109839055407840 rx: 3px, ry: 3px , fill: #e3e5e6 , stroke: #cdcccb 
+v8091685410507379857@{shape: rounded, label: "*Positive Ionization LC-MS*"}
+style v8091685410507379857 rx: 3px, ry: 3px , fill: #e3e5e6 , stroke: #cdcccb 
+v1629020058778162494@{shape: rounded, label: "*Negative Ionization LC-MS*"}
+style v1629020058778162494 rx: 3px, ry: 3px , fill: #e3e5e6 , stroke: #cdcccb 
+subgraph v15298315593309386350 ["`*Data Enrichment Procedure*`"]
+    v10640344000498290128@{shape: rounded, label: "*Weather Retrieval Procedure*"}
+style v10640344000498290128 rx: 3px, ry: 3px , fill: #daddde , stroke: #c5c4c3 
+end
+style v15298315593309386350 rx: 3px, ry: 3px , fill: #e3e5e6 , stroke: #cdcccb 
+subgraph v102 ["`**Required Procedures**`"]
+    subgraph v1 ["`*Ethanol 70 percent*`"]
+    v6330494347067255313@{shape: lean-r, label: "*Ethanol bottle*"}
+class v6330494347067255313 ptam_node_21
+end
+style v1 rx: 3px, ry: 3px , fill: #e6e7e9 , stroke: #d0cecd , stroke-dasharray: 5, 5 
+    subgraph v3 ["`*Pour ethanol*`"]
+    v7616507455816087315@{shape: lean-r, label: "*Ethanol bottle*"}
+class v7616507455816087315 ptam_node_17
+end
+style v3 rx: 3px, ry: 3px , fill: #e6e7e9 , stroke: #d0cecd , stroke-dasharray: 5, 5 
+    subgraph v5 ["`fa:fa-warehouse *Place insect in conical centrifugal tube*`"]
+    v15983984228506224006@{shape: lean-r, label: "*Insect Conical Centrifugal Tube*"}
+class v15983984228506224006 ptam_node_26
+end
+style v5 rx: 3px, ry: 3px , fill: #e6e7e9 , stroke: #d0cecd , stroke-dasharray: 5, 5 
+    subgraph v7 ["`*Sample extraction solvent*`"]
+    v17137110240363131974@{shape: lean-r, label: "*Sample extraction solvent*"}
+class v17137110240363131974 ptam_node_39
+end
+style v7 rx: 3px, ry: 3px , fill: #e6e7e9 , stroke: #d0cecd , stroke-dasharray: 5, 5 
+end
+style v102 fill: #ecedee , stroke: #d5d4d3 , rx: 3px, ry: 3px , stroke-dasharray: 5, 5 
+v7188323179572118976 e0@-.- v16204819762803616007
+class e0 ptam_edge_98
+v17495994817985097603 e1@-.- v8468906756755271354
+class e1 ptam_edge_97
+v2204439732249309527 e2@---> v13322543944030498981
+class e2 procedure_arrow
+v16204819762803616007 e3@-.- v11733587347898369769
+class e3 ptam_edge_98
+v8468906756755271354 e4@-.- v5071521965525510488
+class e4 ptam_edge_97
+v13322543944030498981 e5@---> v1415021992607914371
+class e5 procedure_arrow
+v11733587347898369769 e6@-.- v2563395051016411176
+class e6 ptam_edge_98
+v5071521965525510488 e7@-.- v10696041444047111210
+class e7 ptam_edge_97
+v1415021992607914371 e8@---> v14254459205605726465
+class e8 procedure_arrow
+v2563395051016411176 e9@-.- v12179848752736090357
+class e9 ptam_edge_98
+v10696041444047111210 e10@-.- v1358683372730598978
+class e10 ptam_edge_97
+v14254459205605726465 e11@---> v8309424698731712410
+class e11 procedure_arrow
+v12179848752736090357 e12@-.- v17382788831544451931
+class e12 ptam_edge_98
+v1358683372730598978 e13@-.- v9681711934960840529
+class e13 ptam_edge_97
+v8309424698731712410 e14@---> v3018685089425743547
+class e14 procedure_arrow
+v18090443118661522327 e15@-.- v4029457667533149719
+class e15 ptam_edge_104
+v7616507455816087315 e16@-.- v4192218778944244683
+class e16 ptam_edge_17
+v11935757128955102332 e17@---> v17539539977501135093
+class e17 procedure_arrow
+v6330494347067255313 e18@-.- v7711406975158147822
+class e18 ptam_edge_21
+v17539539977501135093 e19@---> v16493525886299016835
+class e19 procedure_arrow
+v16493525886299016835 e20@---> v7194480892257529885
+class e20 procedure_arrow
+v16157225452801445165 e21@-.- v12120009086834086670
+class e21 ptam_edge_106
+v7194480892257529885 e22@---> v15544563799696548181
+class e22 procedure_arrow
+v10400933087766189289 e23@-.- v16661473999694976801
+class e23 ptam_edge_107
+v15544563799696548181 e24@---> v714647675616183528
+class e24 procedure_arrow
+v3552290094107731884 e25@-.- v14596640987338177548
+class e25 ptam_edge_108
+v714647675616183528 e26@---> v2807098965884154572
+class e26 procedure_arrow
+v3018685089425743547 e27@---> v11935757128955102332
+class e27 procedure_arrow
+v15983984228506224006 e28@-.- v116967346834377246
+class e28 ptam_edge_26
+v15983984228506224006 e29@-.- v7609970805989556075
+class e29 ptam_edge_26
+v16287277818969985508 e30@---> v6374713189788666606
+class e30 procedure_arrow
+v15983984228506224006 e31@-.- v6806490846186748880
+class e31 ptam_edge_26
+v6374713189788666606 e32@---> v5318254331014348762
+class e32 procedure_arrow
+v15983984228506224006 e33@-.- v7412075181725996711
+class e33 ptam_edge_26
+v5318254331014348762 e34@---> v17533159380741695517
+class e34 procedure_arrow
+v7060693933392056154 e35@-.- v15883819123244370694
+class e35 ptam_edge_114
+v17533159380741695517 e36@---> v3330608674009609781
+class e36 procedure_arrow
+v17137110240363131974 e37@-.- v5497146612815135196
+class e37 ptam_edge_39
+v15883819123244370694 e38@-.- v163410465904503946
+class e38 ptam_edge_114
+v3330608674009609781 e39@---> v14275782117119946267
+class e39 procedure_arrow
+v17360009679378205860 e40@-.- v10274555536773658838
+class e40 ptam_edge_116
+v15676615344117242435 e41@-.- v6953995271476472110
+class e41 ptam_edge_115
+v163410465904503946 e42@-.- v9748973950419375852
+class e42 ptam_edge_114
+v14275782117119946267 e43@---> v7307189265850270771
+class e43 procedure_arrow
+v9748973950419375852 e44@-.- v9040993347649350333
+class e44 ptam_edge_114
+v7307189265850270771 e45@---> v8103049511424544088
+class e45 procedure_arrow
+v9040993347649350333 e46@-.- v14099089884228315619
+class e46 ptam_edge_114
+v8103049511424544088 e47@---> v15379368247962300020
+class e47 procedure_arrow
+v14099089884228315619 e48@-.- v14114964835284555084
+class e48 ptam_edge_114
+v15379368247962300020 e49@---> v2668221838840504007
+class e49 procedure_arrow
+v14144716497144992367 e50@-.- v14178112711327705799
+class e50 ptam_edge_121
+v2668221838840504007 e51@---> v5004031916309933239
+class e51 procedure_arrow
+v4574342437855275404 e52@-.- v5421803771594315182
+class e52 ptam_edge_119
+v5004031916309933239 e53@---> v7518460975294198577
+class e53 procedure_arrow
+v5421803771594315182 e54@-.- v14549572942063742505
+class e54 ptam_edge_119
+v7518460975294198577 e55@---> v9219964029751197111
+class e55 procedure_arrow
+v2807098965884154572 e56@---> v16287277818969985508
+class e56 procedure_arrow
+v9219964029751197111 e57@---> v8091685410507379857
+class e57 procedure_arrow
+v8091685410507379857 e58@---> v1629020058778162494
+class e58 procedure_arrow
+v1629020058778162494 e59@---> v10640344000498290128
+class e59 procedure_arrow

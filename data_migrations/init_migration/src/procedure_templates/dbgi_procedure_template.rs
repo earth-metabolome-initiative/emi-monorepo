@@ -10,14 +10,14 @@ use crate::procedure_templates::{
     init_data_enrichment_procedure, init_negative_ionization_lcms_procedure,
     init_positive_ionization_lcms_procedure,
 };
-mod organism_observation_procedure;
-mod part_of_organism_collection_procedure;
-mod sample_processing_procedures;
-pub use organism_observation_procedure::organism_observation_procedure;
-use part_of_organism_collection_procedure::part_of_organism_collection;
-
-/// The name of the DBGI plan procedure template.
-pub const DBGI_PLAN: &str = "DBGI Plan";
+mod panel_observation_procedure;
+mod cct_and_panel_picture_procedure;
+use crate::procedure_templates::organism_observation_procedure;
+use panel_observation_procedure::panel_observation_procedure;
+use cct_and_panel_picture_procedure::cct_and_panel_picture_procedure;
+use crate::procedure_templates::shared_sub_procedure_templates::part_of_organism_collection;
+use crate::procedure_templates::shared_sub_procedure_templates::partial_sample_processing_procedures;
+use diesel::OptionalExtension;
 
 /// Initializes the DBGI plan procedure template in the database.
 ///
@@ -34,28 +34,40 @@ pub const DBGI_PLAN: &str = "DBGI Plan";
 /// # Errors
 ///
 /// * If the connection to the database fails.
-pub fn dbgi_plan(
+pub fn dbgi_procedure_template(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<ProcedureTemplate> {
-    let dbgi_plan = ProcedureTemplate::new()
-        .name(DBGI_PLAN)?
+    /// The name of the DBGI plan procedure template.
+    const DBGI_PT: &str = "DBGI Procedure Template";
+
+    if let Some(procedure) = ProcedureTemplate::from_name(DBGI_PT, conn).optional()? {
+        return Ok(procedure);
+    }
+
+    let dbgi_procedure_template = ProcedureTemplate::new()
+        .name(DBGI_PT)?
         .description("DBGI Plan procedure template")?
         .created_by(user)?
         .insert(user.id, conn)?;
 
     let (observation_procedure, _organism, _phone) = organism_observation_procedure(user, conn)?;
+    let panel_observation_procedure = panel_observation_procedure(user, conn)?;
     let (part_of_organism_collection, cct) = part_of_organism_collection(user, conn)?;
+    let cct_and_panel_picture_procedure =
+        cct_and_panel_picture_procedure(user, conn)?;
     let sample_processing_procedure =
-        sample_processing_procedures::init_dbgi_sample_processing_procedures(user, &cct, conn)?;
+        partial_sample_processing_procedures(user, &cct, conn)?;
     let positive_lcms_procedure = init_positive_ionization_lcms_procedure(user, conn)?;
     let negative_lcms_procedure = init_negative_ionization_lcms_procedure(user, conn)?;
     let data_enrichment = init_data_enrichment_procedure(user, conn)?;
 
-    dbgi_plan.extend(
+    dbgi_procedure_template.extend(
         &[
             observation_procedure.into(),
+            panel_observation_procedure.into(),
             part_of_organism_collection.into(),
+            cct_and_panel_picture_procedure.into(),
             sample_processing_procedure.into(),
             positive_lcms_procedure.into(),
             negative_lcms_procedure.into(),
@@ -65,5 +77,5 @@ pub fn dbgi_plan(
         conn,
     )?;
 
-    Ok(dbgi_plan)
+    Ok(dbgi_procedure_template)
 }

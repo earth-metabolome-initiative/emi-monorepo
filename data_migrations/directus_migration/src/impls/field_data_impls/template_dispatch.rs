@@ -3,7 +3,6 @@
 use core_structures::{ProcedureTemplate, User};
 use diesel::PgConnection;
 use directus_codegen::FieldDatum;
-use init_migration::dbgi_plan;
 
 use crate::{directus_template::DirectusTemplate, structs::FieldDatumWrapper};
 

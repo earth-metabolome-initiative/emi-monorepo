@@ -2,12 +2,12 @@
 
 use core_structures::{
     CleaningProcedureTemplate, HarvestingProcedureTemplate, PackagingProcedureTemplate,
-    PhotographProcedureTemplate, PpeReminderProcedureTemplate, ProcedureTemplate,
+    PpeReminderProcedureTemplate, ProcedureTemplate,
     ProcedureTemplateAssetModel, StorageProcedureTemplate, User,
     tables::insertables::{
         CleaningProcedureTemplateSettable, HarvestingProcedureTemplateSettable,
-        PackagingProcedureTemplateSettable, PhotographProcedureTemplateSettable,
-        PpeReminderProcedureTemplateSettable, ProcedureTemplateAssetModelSettable,
+        PackagingProcedureTemplateSettable,
+        PpeReminderProcedureTemplateSettable,
         ProcedureTemplateSettable, StorageProcedureTemplateSettable,
     },
     traits::AppendProcedureTemplate,
@@ -19,13 +19,15 @@ use crate::{
     procedure_template_asset_models::{
         coffee_wrapper::coffee_wrapper_builder, conical_tubes::cct_builder,
         conical_tubes_box::cct_box_builder, organism::sample_builder,
-        photograph::photograph_builder, ppe::glove_model_builder, tools::scalpel_model_builder,
+        ppe::glove_model_builder, tools::scalpel_model_builder,
     },
     procedure_templates::{
         collection_preparation_procedures::ethanol_70_percent_procedure,
-        dbgi_plan::organism_observation_procedure::organism_observation_procedure,
+        organism_observation_procedure,
     },
 };
+use crate::procedure_templates::shared_sub_procedure_templates::gloves_procedure_template;
+use core_structures::tables::insertables::ProcedureTemplateAssetModelSettable;
 
 /// Initializes the part of organism collection procedure template in the
 /// database.
@@ -39,20 +41,24 @@ use crate::{
 ///
 /// * If the connection fails to insert the procedure template.
 /// * If the procedure template building fails.
-pub(crate) fn part_of_organism_collection(
+pub fn part_of_organism_collection(
     user: &User,
     conn: &mut diesel::PgConnection,
 ) -> anyhow::Result<(ProcedureTemplate, ProcedureTemplateAssetModel)> {
     let name = "Part of Organism Collection";
+    const CCT: &str = "Conical Centrifugal Tube";
     let storage_procedure_name = "Place in conical centrifugal tube";
 
     if let Some(existing) = ProcedureTemplate::from_name(name, conn).optional()? {
-        let storage_procedure = StorageProcedureTemplate::from_name(storage_procedure_name, conn)?;
-        let cct = storage_procedure.procedure_template_stored_into_model(conn)?;
+        let cct = ProcedureTemplateAssetModel::from_name_and_procedure_template(
+            CCT,
+            existing.procedure_template,
+            conn,
+        )?;
         return Ok((existing, cct));
     }
 
-    let (_, organism, phone) = organism_observation_procedure(user, conn)?;
+    let (_, organism, _phone) = organism_observation_procedure(user, conn)?;
     let (_, bottle) = ethanol_70_percent_procedure(user, conn)?;
 
     let collection = ProcedureTemplate::new()
@@ -64,24 +70,7 @@ pub(crate) fn part_of_organism_collection(
         .insert(user.id, conn)?;
 
     // Remind the user to wear gloves
-    let gloves_reminder = PpeReminderProcedureTemplate::new()
-        .procedure_template_ppe_asset_model(glove_model_builder(user, conn)?)?
-        .name("Wear gloves")?
-        .description("Please wear gloves to avoid contamination and protect yourself.")?
-        .created_by(user)?
-        .insert(user.id, conn)?;
-    let gloves_model = gloves_reminder.procedure_template_ppe_asset_model(conn)?;
-
-    // Remind the user to sterilize / clean the gloves with ethanol 70
-    // percent
-    let glove_cleaning_step = CleaningProcedureTemplate::new()
-        .name("Sterilize gloves")?
-        .description("Please sterilize the gloves with ethanol 70 percent to avoid contamination.")?
-        .procedure_template_cleaned_model(&gloves_model)?
-        .procedure_template_cleaned_with_model(&bottle)?
-        .liters(0.05)?
-        .created_by(user)?
-        .insert(user.id, conn)?;
+    let gloves_procedure = gloves_procedure_template(user, conn)?;
 
     let scalpel_cleaning_step = CleaningProcedureTemplate::new()
         .name("Sterilize scalpel")?
@@ -122,27 +111,11 @@ pub(crate) fn part_of_organism_collection(
         .description(
             "Place the wrapped sample in a conical centrifugal tube for storage and transport.",
         )?
-        .procedure_template_stored_into_model(cct_builder(user, conn)?)?
+        .procedure_template_stored_into_model(cct_builder(user, conn)?.name(CCT)?)?
         .procedure_template_stored_asset_model(coffee_wrapper)?
         .created_by(user)?
         .insert(user.id, conn)?;
     let cct = place_in_tube.procedure_template_stored_into_model(conn)?;
-
-    // Take a picture of the sample collection tube with a visible label
-    // together with the organism panel
-
-    let sample_label_and_panel_picture = PhotographProcedureTemplate::new()
-        .name("Sample Label and Panel Picture")?
-        .description(
-            "Photograph of the sample collection tube with a visible label together with the organism panel.",
-        )?
-        .procedure_template_photographed_with_model(&phone)?
-        .procedure_template_photographed_asset_model(&cct)?
-        .procedure_template_photograph_model(
-            photograph_builder(user, conn)?.name("Sample Label and Panel Picture")?,
-        )?
-        .created_by(user)?
-        .insert(user.id, conn)?;
 
     // Put it in the storage box
     let place_in_storage_box = StorageProcedureTemplate::new()
@@ -159,13 +132,11 @@ pub(crate) fn part_of_organism_collection(
 
     collection.extend(
         &[
-            gloves_reminder.into(),
-            glove_cleaning_step.into(),
+            gloves_procedure.into(),
             scalpel_cleaning_step.into(),
             sample_harvesting.into(),
             coffee_filter_wrapping.into(),
             place_in_tube.into(),
-            sample_label_and_panel_picture.into(),
             place_in_storage_box.into(),
         ],
         user,

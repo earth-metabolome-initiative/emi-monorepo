@@ -7,6 +7,7 @@ pub mod instruments;
 pub mod markers;
 pub mod organisms;
 pub mod photographs;
+pub mod panels;
 pub mod ppe;
 pub mod reagent_models;
 pub mod soils;

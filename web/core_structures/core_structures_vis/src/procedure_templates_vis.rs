@@ -207,6 +207,8 @@ impl<'graph> PTGListener<'graph> for &mut ProcedureTemplateVisualization<'graph>
             |icon| format!("{} *{}*", icon, child.name),
         );
 
+        println!("{}Entering procedure template: {}", "\t".repeat(parents.len()), child.name);
+
         let mut node_builder = FlowchartNodeBuilder::default()
             .id(node_id)
             .label(&procedure_name)?

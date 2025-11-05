@@ -12,7 +12,9 @@ mod users;
 use asset_models::init_compatibility_rules;
 pub(crate) use brands::{fisherbrand, greiner_bio_one};
 use login_providers::init_login_providers;
-pub use procedure_templates::{dbgi_plan, vinesh_plan};
+pub use procedure_templates::{
+    dbgi_procedure_template, emi_insect_procedure_template, emi_procedure_template,
+};
 pub use users::init_root_user;
 
 /// Executes the init migration.

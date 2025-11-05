@@ -14,6 +14,8 @@ use crate::procedure_template_asset_models::{
     volume_measuring_device::volume_measuring_device_model_builder,
 };
 
+use core_structures::tables::insertables::ProcedureTemplateAssetModelSettable;
+
 /// Initializes the DBGI Collection preparation procedure template in the
 /// database.
 ///
@@ -55,7 +57,7 @@ pub fn ethanol_70_percent_procedure(
         .description("Pour ethanol in the container.")?
         .procedure_template_measured_with_model(volume_measuring_device_model_builder(user, conn)?)?
         .procedure_template_poured_from_model(absolute_ethanol_model_builder(user, conn)?)?
-        .procedure_template_poured_into_model(bottle_1l_builder(user, conn)?)?
+        .procedure_template_poured_into_model(bottle_1l_builder(user, conn)?.name(ETHANOL_BOTTLE)?)?
         .liters(0.7)?
         .created_by(user)?
         .insert(user.id, conn)?;

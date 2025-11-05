@@ -1,8 +1,5 @@
 //! Submodule defining the functions to initialize `cutting_tools` asset models.
-use core_structures::{
-    CommercialProduct, PhysicalAssetModel, User,
-    tables::insertables::{AssetModelSettable, CommercialProductSettable},
-};
+use core_structures::{PhysicalAssetModel, User, tables::insertables::AssetModelSettable};
 use diesel::{OptionalExtension, PgConnection};
 use web_common_traits::database::{DispatchableInsertableVariant, Insertable};
 
