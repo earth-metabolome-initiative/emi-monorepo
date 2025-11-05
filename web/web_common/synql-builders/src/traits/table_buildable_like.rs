@@ -80,11 +80,6 @@ pub trait TableBuildableLike: TableInsertableLike {
             .unwrap()
     }
 
-    /// Returns the ident of the insertable attribute for the builder.
-    fn insertable_attribute_ident(&self) -> Ident {
-        self.table_singular_snake_ident()
-    }
-
     /// Returns the attribute for an insertable field of a builder
     /// for the underlying insertable object.
     fn insertable_attribute<'data>(

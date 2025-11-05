@@ -288,7 +288,7 @@ pub trait ColumnLike:
     /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
     /// CREATE TABLE host_table (
     ///    id INT REFERENCES referenced_table(id),
-    ///   name TEXT,
+    ///    name TEXT
     /// );
     /// "#,
     /// )?;

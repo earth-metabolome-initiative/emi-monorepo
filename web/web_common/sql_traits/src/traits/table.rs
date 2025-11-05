@@ -854,6 +854,117 @@ pub trait TableLike:
             .collect()
     }
 
+    /// Returns the first extension foreign key found in the current table which
+    /// references to the provided table or any of its descendants.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    /// * `table` - A reference to the table to check for extensions.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE grandparent_table (id INT PRIMARY KEY);
+    /// CREATE TABLE father_table (id INT PRIMARY KEY REFERENCES grandparent_table(id));
+    /// CREATE TABLE mother_table (id INT PRIMARY KEY REFERENCES grandparent_table(id));
+    /// CREATE TABLE child_table (
+    ///     id INT PRIMARY KEY,
+    ///     FOREIGN KEY (id) REFERENCES father_table(id),
+    ///     FOREIGN KEY (id) REFERENCES mother_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let child_table = db.table(None, "child_table").unwrap();
+    /// let father_table = db.table(None, "father_table").unwrap();
+    /// let mother_table = db.table(None, "mother_table").unwrap();
+    /// let grandparent_table = db.table(None, "grandparent_table").unwrap();
+    /// let extension_fks = child_table.extension_foreign_keys(&db).collect::<Vec<_>>();
+    /// let [father_extension_fk, mother_extension_fk] = extension_fks.as_slice() else {
+    ///     panic!("Expected two extension foreign keys");
+    /// };
+    /// let extension_fk_to_father = child_table.extension_foreign_key_to(&db, father_table);
+    /// assert_eq!(extension_fk_to_father, Some(*father_extension_fk));
+    /// let extension_fk_to_mother = child_table.extension_foreign_key_to(&db, mother_table);
+    /// assert_eq!(extension_fk_to_mother, Some(*mother_extension_fk));
+    /// let extension_fk_to_grandparent = child_table.extension_foreign_key_to(&db, grandparent_table);
+    /// assert_eq!(extension_fk_to_grandparent, Some(*father_extension_fk));
+    /// assert!(child_table.extension_foreign_key_to(&db, child_table).is_none());
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn extension_foreign_key_to<'db>(
+        &'db self,
+        database: &'db Self::DB,
+        table: &'db Self,
+    ) -> Option<&'db <Self::DB as DatabaseLike>::ForeignKey>
+    where
+        Self: 'db,
+    {
+        self.extension_foreign_keys(database).find(|fk| {
+            let referenced_table: &Self = fk.referenced_table(database).borrow();
+            referenced_table == table
+                || referenced_table.extension_foreign_key_to(database, table).is_some()
+        })
+    }
+
+    /// Returns the first extended table found in the current table which
+    /// matches the provided table or is its descendants.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///  belongs.
+    /// * `table` - A reference to the table to check for extensions.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE grandparent_table (id INT PRIMARY KEY);
+    /// CREATE TABLE father_table (id INT PRIMARY KEY REFERENCES grandparent_table(id));
+    /// CREATE TABLE mother_table (id INT PRIMARY KEY REFERENCES grandparent_table(id));
+    /// CREATE TABLE child_table (
+    ///     id INT PRIMARY KEY,
+    ///     FOREIGN KEY (id) REFERENCES father_table(id),
+    ///     FOREIGN KEY (id) REFERENCES mother_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let child_table = db.table(None, "child_table").unwrap();
+    /// let father_table = db.table(None, "father_table").unwrap();
+    /// let mother_table = db.table(None, "mother_table").unwrap();
+    /// let grandparent_table = db.table(None, "grandparent_table").unwrap();
+    /// let extended_table_to_father = child_table.extended_table_to(&db, father_table);
+    /// assert_eq!(extended_table_to_father, Some(father_table));
+    /// let extended_table_to_mother = child_table.extended_table_to(&db, mother_table);
+    /// assert_eq!(extended_table_to_mother, Some(mother_table));
+    /// let extended_table_to_grandparent = child_table.extended_table_to(&db, grandparent_table);
+    /// assert_eq!(extended_table_to_grandparent, Some(father_table));
+    /// assert!(child_table.extended_table_to(&db, child_table).is_none());
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn extended_table_to<'db>(
+        &'db self,
+        database: &'db Self::DB,
+        table: &'db Self,
+    ) -> Option<&'db Self>
+    where
+        Self: 'db,
+    {
+        self.extension_foreign_key_to(database, table)
+            .map(|fk| fk.referenced_table(database).borrow())
+    }
+
     /// Returns the unique tables which are extended by either the current
     /// table or any of the tables it extends via foreign keys.
     ///
