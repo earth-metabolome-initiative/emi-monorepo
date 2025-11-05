@@ -245,6 +245,14 @@ impl<'trt, 'data> TryFrom<TraitImpl<'trt, 'data>> for InternalToken<'data> {
             Some(quote! { where #(#clauses),* })
         };
 
+        let data_with_generics = data.format_with_generics();
+        let generics_without_defaults = data.generics_without_defaults();
+        let formatted_generics_without_defaults = if generics_without_defaults.is_empty() {
+            quote! {}
+        } else {
+            quote! { <#(#generics_without_defaults),*> }
+        };
+
         Ok(value
             .builder
             .private()
@@ -255,7 +263,7 @@ impl<'trt, 'data> TryFrom<TraitImpl<'trt, 'data>> for InternalToken<'data> {
             .datas(unique_types)
             .unwrap()
             .stream(quote! {
-                impl #trait_ref for #data #formatted_where_clauses {
+                impl #formatted_generics_without_defaults #trait_ref for #data_with_generics #formatted_where_clauses {
                     #(#methods)*
                 }
             })

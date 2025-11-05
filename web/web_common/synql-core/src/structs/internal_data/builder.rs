@@ -1,6 +1,6 @@
 //! Submodule defining a builder for the `InternalData` struct.
 
-use std::{error::Error, fmt::Display};
+use std::{collections::HashMap, error::Error, fmt::Display};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -10,8 +10,8 @@ use strum::IntoEnumIterator;
 use syn::Ident;
 
 use crate::structs::{
-    Decorator, Derive, Documentation, ExternalCrate, InternalData, InternalDataVariant,
-    InternalToken, Publicness, Trait, external_trait::TraitVariantRef,
+    DataVariantRef, Decorator, Derive, Documentation, ExternalCrate, InternalData,
+    InternalDataVariant, InternalToken, Publicness, Trait, external_trait::TraitVariantRef,
 };
 
 #[derive(Default)]
@@ -33,6 +33,8 @@ pub struct InternalDataBuilder<'data> {
     decorators: Vec<Decorator<'data>>,
     /// Generics used in the data.
     generics: Vec<Ident>,
+    /// Generic defaults for the data.
+    generic_defaults: HashMap<Ident, DataVariantRef<'data>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -54,6 +56,8 @@ pub enum InternalDataAttribute {
     Decorators,
     /// Generics used in the data.
     Generics,
+    /// Generic defaults for the data.
+    GenericDefaults,
 }
 
 impl Display for InternalDataAttribute {
@@ -67,6 +71,7 @@ impl Display for InternalDataAttribute {
             InternalDataAttribute::Derives => write!(f, "derives"),
             InternalDataAttribute::Decorators => write!(f, "decorators"),
             InternalDataAttribute::Generics => write!(f, "generics"),
+            InternalDataAttribute::GenericDefaults => write!(f, "generic_defaults"),
         }
     }
 }
@@ -87,6 +92,8 @@ pub enum InternalDataBuilderError {
     DuplicatedDecorator,
     /// A generic with the same name has already been added.
     DuplicatedGeneric(String),
+    /// A generic default was specified for a generic that does not exist.
+    GenericDefaultForNonexistentGeneric(Ident),
 }
 
 impl Display for InternalDataBuilderError {
@@ -105,6 +112,12 @@ impl Display for InternalDataBuilderError {
             }
             InternalDataBuilderError::DuplicatedGeneric(name) => {
                 write!(f, "A generic with the name '{name}' has already been added")
+            }
+            InternalDataBuilderError::GenericDefaultForNonexistentGeneric(ident) => {
+                write!(
+                    f,
+                    "A generic default was specified for a generic that does not exist: {ident}",
+                )
             }
         }
     }
@@ -284,6 +297,27 @@ impl<'data> InternalDataBuilder<'data> {
         }
         Ok(self)
     }
+
+    /// Adds a type default for a generic.
+    ///
+    /// # Arguments
+    ///
+    /// * `generic` - The generic to add a default for.
+    /// * `default` - The default type for the generic.
+    ///
+    /// # Errors
+    /// * If the generic does not exist.
+    pub fn generic_default(
+        mut self,
+        generic: Ident,
+        default: DataVariantRef<'data>,
+    ) -> Result<Self, InternalDataBuilderError> {
+        if !self.generics.iter().any(|g| g == &generic) {
+            return Err(InternalDataBuilderError::GenericDefaultForNonexistentGeneric(generic));
+        }
+        self.generic_defaults.insert(generic, default);
+        Ok(self)
+    }
 }
 
 impl Attributed for InternalDataBuilder<'_> {
@@ -339,6 +373,15 @@ impl<'data> Builder for InternalDataBuilder<'data> {
             self.derives.push(derive);
         }
 
+        let generic_defaults = self
+            .generics
+            .iter()
+            .map(|g| {
+                let default = self.generic_defaults.remove(g);
+                default
+            })
+            .collect::<Vec<Option<DataVariantRef<'data>>>>();
+
         Ok(InternalData {
             publicness: self
                 .publicness
@@ -352,6 +395,7 @@ impl<'data> Builder for InternalDataBuilder<'data> {
             derives: self.derives,
             decorators: self.decorators,
             generics: self.generics,
+            generic_defaults,
         })
     }
 }

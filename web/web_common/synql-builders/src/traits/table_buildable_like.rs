@@ -1,5 +1,6 @@
 //! Submodule providing the `TableBuildable` trait for SynQL table buildables.
 
+use syn::Ident;
 use synql_core::{
     prelude::Builder,
     structs::{DataVariantRef, Documentation, InternalAttribute, Workspace},
@@ -77,6 +78,11 @@ pub trait TableBuildableLike: TableInsertableLike {
             .unwrap()
             .build()
             .unwrap()
+    }
+
+    /// Returns the ident of the insertable attribute for the builder.
+    fn insertable_attribute_ident(&self) -> Ident {
+        self.table_singular_snake_ident()
     }
 
     /// Returns the attribute for an insertable field of a builder

@@ -6,6 +6,7 @@ mod into_data;
 mod into_data_variant;
 mod into_module;
 mod into_struct;
+mod value_settable;
 
 use synql_core::structs::Workspace;
 

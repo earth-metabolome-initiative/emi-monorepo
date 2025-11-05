@@ -1,6 +1,7 @@
 //! Submodule implementing the `From` trait to convert a `TableBuildable` into
 //! an `InternalCrate`.
 
+use sql_relations::traits::InheritableDatabaseLike;
 use synql_core::{
     prelude::Builder,
     structs::{Documentation, InternalCrate},
@@ -8,6 +9,8 @@ use synql_core::{
 
 impl<'data, 'table, T: crate::traits::TableBuildableLike + ?Sized>
     From<super::TableBuildable<'data, 'table, T>> for synql_core::structs::InternalCrate<'data>
+where
+    T::DB: InheritableDatabaseLike,
 {
     fn from(
         buildable: super::TableBuildable<'data, 'table, T>,

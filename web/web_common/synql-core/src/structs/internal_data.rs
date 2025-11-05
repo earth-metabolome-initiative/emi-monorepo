@@ -192,6 +192,64 @@ impl<'data> DataVariantRef<'data> {
         DataVariantRef::MutableReference(lifetime, Box::new(self.clone()))
     }
 
+    /// Returns an iterator over the generics without a default used in the
+    /// data variant.
+    pub fn generics_without_defaults(&self) -> Vec<&Ident> {
+        match self {
+            DataVariantRef::Internal(internal) => {
+                internal.data().generics_without_defaults().collect()
+            }
+            DataVariantRef::External(_) => vec![],
+            DataVariantRef::Reference(_, inner) => inner.generics_without_defaults(),
+            DataVariantRef::MutableReference(_, inner) => inner.generics_without_defaults(),
+            DataVariantRef::Generic(ident) => vec![ident],
+            DataVariantRef::Result(left, right) => {
+                let mut generics = left.generics_without_defaults();
+                generics.extend(right.generics_without_defaults());
+                generics.sort_unstable();
+                generics.dedup();
+                generics
+            }
+            DataVariantRef::Option(inner) => inner.generics_without_defaults(),
+            DataVariantRef::SelfType(inner) => {
+                if let Some(inner) = inner {
+                    inner.generics_without_defaults()
+                } else {
+                    vec![]
+                }
+            }
+        }
+    }
+
+    /// Formats the variant including the generics, if any, with defaults.
+    pub fn format_with_generics(&self) -> TokenStream {
+        match self {
+            Self::External(external) => quote! {#external},
+            Self::Internal(internal) => internal.format_with_generics(),
+            Self::Generic(generic) => quote! {#generic},
+            Self::Reference(_, inner) => {
+                let inner_tokens = inner.format_with_generics();
+                quote! { & #inner_tokens }
+            }
+            Self::MutableReference(_, inner) => {
+                let inner_tokens = inner.format_with_generics();
+                quote! { &mut #inner_tokens }
+            }
+            Self::Result(left, right) => {
+                let left_tokens = left.format_with_generics();
+                let right_tokens = right.format_with_generics();
+                quote! { Result<#left_tokens, #right_tokens> }
+            }
+            Self::Option(inner) => {
+                let inner_tokens = inner.format_with_generics();
+                quote! { Option<#inner_tokens> }
+            }
+            Self::SelfType(_) => {
+                quote! { Self }
+            }
+        }
+    }
+
     /// Returns the dereferenced variant if it is a reference or mutable
     /// reference, otherwise returns itself.
     pub fn dereference(&self) -> &DataVariantRef<'data> {
@@ -380,6 +438,12 @@ impl<'data> InternalDataRef<'data> {
     pub fn documentation_path(&self) -> String {
         format!("[`{}`]({self})", self.name())
     }
+
+    /// Formats the variant including the generics, if any, with defaults.
+    pub fn format_with_generics(&self) -> TokenStream {
+        let generics = self.data.generics_with_defaults();
+        quote::quote! { #self #generics }
+    }
 }
 
 impl Display for InternalDataRef<'_> {
@@ -511,6 +575,8 @@ pub struct InternalData<'data> {
     decorators: Vec<Decorator<'data>>,
     /// The generics used in the data.
     generics: Vec<Ident>,
+    /// Defaults for generic type parameters.
+    generic_defaults: Vec<Option<DataVariantRef<'data>>>,
 }
 
 impl<'data> InternalData<'data> {
@@ -537,6 +603,32 @@ impl<'data> InternalData<'data> {
             let generics = &self.generics;
             Some(quote::quote! { <#(#generics),*> })
         }
+    }
+
+    /// Returns the formatted generics, with defaults in place of the generic
+    /// where they exist.
+    pub fn generics_with_defaults(&self) -> Option<TokenStream> {
+        if self.generics.is_empty() {
+            None
+        } else {
+            let generics_with_defaults =
+                self.generics.iter().zip(self.generic_defaults.iter()).map(|(ident, default)| {
+                    if let Some(default) = default {
+                        quote::quote! { #default }
+                    } else {
+                        quote::quote! { #ident }
+                    }
+                });
+            Some(quote::quote! { <#(#generics_with_defaults),*> })
+        }
+    }
+
+    /// Returns an iterator over the generics for which no default is defined.
+    pub fn generics_without_defaults(&self) -> impl Iterator<Item = &Ident> {
+        self.generics
+            .iter()
+            .zip(self.generic_defaults.iter())
+            .filter_map(|(ident, default)| if default.is_none() { Some(ident) } else { None })
     }
 
     /// Returns the name of the data.
