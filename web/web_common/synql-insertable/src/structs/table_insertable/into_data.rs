@@ -33,7 +33,7 @@ impl<'data, 'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'data,
                         table_model_ref.documentation_path()
                     ))
                     .unwrap()
-                    .internal_dependency(table_model_ref.crate_ref().clone())
+                    .internal_dependency(table_model_ref.crate_ref().unwrap().clone())
                     .unwrap()
                     .build()
                     .unwrap(),

@@ -12,11 +12,12 @@ use quote::ToTokens;
 mod from_ident;
 mod trait_impl;
 
+pub use trait_impl::TraitImpl;
+
 use crate::{
     structs::{
         DataVariantRef, ExternalCrate, InternalCrate, Publicness, external_crate::ExternalMacroRef,
         external_trait::TraitVariantRef, internal_data::InternalModuleRef,
-        internal_token::trait_impl::TraitImpl,
     },
     traits::{ExternalDependencies, InternalDependencies},
 };
@@ -115,12 +116,12 @@ impl<'data> InternalToken<'data> {
         InternalTokenBuilder::default()
     }
 
-    /// Initializess a new `TraitImpl` to help implement the provided trait.
+    /// Initializes a new `TraitImpl` to help implement the provided trait.
     ///
     /// # Arguments
     ///
     /// * `trait_ref` - The trait to implement.
-    pub fn implements(trait_ref: TraitVariantRef<'data>) -> TraitImpl<'data> {
+    pub fn implements<'trt>(trait_ref: &'trt TraitVariantRef<'data>) -> TraitImpl<'trt, 'data> {
         TraitImpl::new(trait_ref)
     }
 
@@ -132,6 +133,20 @@ impl<'data> InternalToken<'data> {
     /// Returns whether it implements the given trait.
     pub fn implements_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
         self.implemented_traits.contains(trait_ref)
+    }
+}
+
+impl From<TokenStream> for InternalToken<'_> {
+    fn from(stream: TokenStream) -> Self {
+        InternalToken {
+            publicness: Publicness::Private,
+            stream,
+            external_macros: Vec::new(),
+            employed_traits: Vec::new(),
+            implemented_traits: Vec::new(),
+            data: Vec::new(),
+            internal_modules: Vec::new(),
+        }
     }
 }
 

@@ -100,7 +100,7 @@ impl<'data> Method<'data> {
     /// Returns whether the method is compatible with the provided method
     /// signature.
     pub fn is_compatible_with(&self, other: &Method<'_>) -> bool {
-        self.arguments == other.arguments
+        self.arguments.iter().zip(other.arguments.iter()).all(|(a, b)| a.is_compatible_with(b))
             && self.async_method == other.async_method
             && self.return_type == other.return_type
             && self.generics == other.generics

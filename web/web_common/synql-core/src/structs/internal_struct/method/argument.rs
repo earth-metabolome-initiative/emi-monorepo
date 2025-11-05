@@ -45,6 +45,11 @@ impl Argument<'_> {
         self.name == "self" && self.arg_type().is_self_type()
     }
 
+    /// Makes the argument mutable.
+    pub fn make_mutable(&mut self) {
+        self.mutable = true;
+    }
+
     /// Returns the ident of the argument.
     pub fn ident(&self) -> syn::Ident {
         if RESERVED_RUST_WORDS.contains(&self.name()) {
@@ -52,6 +57,11 @@ impl Argument<'_> {
         } else {
             syn::Ident::new(&self.name, proc_macro2::Span::call_site())
         }
+    }
+
+    /// Returns whether the argument is compatible with another argument.
+    pub fn is_compatible_with(&self, other: &Argument<'_>) -> bool {
+        self.name == other.name && self.arg_type == other.arg_type
     }
 }
 

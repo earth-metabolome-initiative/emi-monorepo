@@ -94,6 +94,8 @@ pub enum MethodBuilderError {
     DuplicatedWhereClause,
     /// A generic with the same name has already been added.
     DuplicatedGeneric,
+    /// No self parameter to make mutable.
+    NoSelfParameter,
 }
 
 impl From<BuilderError<MethodAttribute>> for MethodBuilderError {
@@ -115,6 +117,9 @@ impl Display for MethodBuilderError {
             }
             MethodBuilderError::DuplicatedGeneric => {
                 write!(f, "A generic with the same name has already been added")
+            }
+            MethodBuilderError::NoSelfParameter => {
+                write!(f, "No self parameter to make mutable")
             }
         }
     }
@@ -233,6 +238,21 @@ impl<'data> MethodBuilder<'data> {
             self = self.argument(argument)?;
         }
         Ok(self)
+    }
+
+    /// Makes the self parameter mutable.
+    ///
+    /// # Errors
+    ///
+    /// * Returns an error if the method has no self parameter.
+    pub fn make_mut_self(mut self) -> Result<Self, MethodBuilderError> {
+        for arg in &mut self.arguments {
+            if arg.is_self() {
+                arg.make_mutable();
+                return Ok(self);
+            }
+        }
+        Err(MethodBuilderError::NoSelfParameter)
     }
 
     /// Adds a generic to the method.

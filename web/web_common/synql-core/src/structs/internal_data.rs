@@ -126,6 +126,12 @@ impl<'data> From<InternalDataRef<'data>> for DataVariantRef<'data> {
     }
 }
 
+impl<'data> From<InternalData<'data>> for DataVariantRef<'data> {
+    fn from(internal: InternalData<'data>) -> Self {
+        DataVariantRef::Internal(internal.into())
+    }
+}
+
 impl<'data> From<ExternalTypeRef<'data>> for DataVariantRef<'data> {
     fn from(external: ExternalTypeRef<'data>) -> Self {
         DataVariantRef::External(external)
@@ -294,7 +300,11 @@ impl<'data> DataVariantRef<'data> {
 /// Struct representing a reference to internal data and its crate.
 pub struct InternalDataRef<'data> {
     data: Rc<InternalData<'data>>,
-    internal_crate: Rc<InternalCrate<'data>>,
+    /// The crate in which the internal data is defined.
+    ///
+    /// This is optional to allow for cases where the crate
+    /// itself has not yet been defined (e.g., for the current crate).
+    internal_crate: Option<Rc<InternalCrate<'data>>>,
 }
 
 impl<'data> From<InternalDataRef<'data>> for InternalToken<'data> {
@@ -309,6 +319,18 @@ impl<'data> From<InternalDataRef<'data>> for InternalToken<'data> {
     }
 }
 
+impl<'data> From<Rc<InternalData<'data>>> for InternalDataRef<'data> {
+    fn from(data: Rc<InternalData<'data>>) -> Self {
+        InternalDataRef { data, internal_crate: None }
+    }
+}
+
+impl<'data> From<InternalData<'data>> for InternalDataRef<'data> {
+    fn from(data: InternalData<'data>) -> Self {
+        InternalDataRef { data: Rc::new(data), internal_crate: None }
+    }
+}
+
 impl<'data> InternalDataRef<'data> {
     /// Creates a new `InternalDataRef`.
     ///
@@ -320,7 +342,7 @@ impl<'data> InternalDataRef<'data> {
         internal_crate: &Rc<InternalCrate<'data>>,
         data: &Rc<InternalData<'data>>,
     ) -> InternalDataRef<'data> {
-        InternalDataRef { data: data.clone(), internal_crate: internal_crate.clone() }
+        InternalDataRef { data: data.clone(), internal_crate: Some(internal_crate.clone()) }
     }
 
     /// Returns the internal data.
@@ -329,13 +351,13 @@ impl<'data> InternalDataRef<'data> {
     }
 
     /// Returns the internal crate.
-    pub fn internal_crate(&self) -> &InternalCrate<'data> {
-        self.internal_crate.as_ref()
+    pub fn internal_crate(&self) -> Option<&InternalCrate<'data>> {
+        self.internal_crate.as_deref()
     }
 
     /// Returns the internal crate Rc reference.
-    pub fn crate_ref(&self) -> &Rc<InternalCrate<'data>> {
-        &self.internal_crate
+    pub fn crate_ref(&self) -> Option<&Rc<InternalCrate<'data>>> {
+        self.internal_crate.as_ref()
     }
 
     /// Returns the name of the internal data.
@@ -344,13 +366,13 @@ impl<'data> InternalDataRef<'data> {
     }
 
     /// Returns the ident of the internal crate.
-    pub fn crate_ident(&self) -> Ident {
-        self.internal_crate.ident()
+    pub fn crate_ident(&self) -> Option<Ident> {
+        self.internal_crate.as_ref().map(|krate| krate.ident())
     }
 
     /// Returns the internal crate dependencies of the variant.
     pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
-        vec![self.internal_crate.as_ref()]
+        self.internal_crate().into_iter().collect()
     }
 
     /// Returns the markdown formatted documentation path of the internal data
@@ -362,7 +384,11 @@ impl<'data> InternalDataRef<'data> {
 
 impl Display for InternalDataRef<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let internal_crate_name = self.internal_crate.name();
+        let internal_crate_name = if let Some(internal_crate) = &self.internal_crate {
+            internal_crate.name()
+        } else {
+            "crate"
+        };
         let internal_data_name = self.data.name();
         write!(f, "{internal_crate_name}::prelude::{internal_data_name}")
     }
@@ -370,7 +396,12 @@ impl Display for InternalDataRef<'_> {
 
 impl ToTokens for InternalDataRef<'_> {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let internal_crate_ident = self.internal_crate.ident();
+        let internal_crate_ident = if let Some(internal_crate) = &self.internal_crate {
+            let ident = internal_crate.ident();
+            quote::quote! {#ident}
+        } else {
+            quote::quote! {crate}
+        };
         let internal_data_ident = self.data.ident();
         tokens.extend(quote! {#internal_crate_ident::prelude::#internal_data_ident});
     }

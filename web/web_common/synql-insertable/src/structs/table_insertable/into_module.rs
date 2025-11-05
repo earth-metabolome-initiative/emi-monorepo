@@ -1,6 +1,7 @@
 //! Submodule implementing the `From` trait to convert a `TableInsertable` into
 //! an `InternalModule`.
 
+use sql_relations::traits::InheritableDatabaseLike;
 use synql_core::{
     prelude::Builder,
     structs::{Documentation, InternalModule},
@@ -10,6 +11,8 @@ use crate::{structs::TableInsertable, traits::TableInsertableLike};
 
 impl<'data, 'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'data, 'table, T>>
     for InternalModule<'data>
+where
+    T::DB: InheritableDatabaseLike,
 {
     fn from(value: TableInsertable<'data, 'table, T>) -> Self {
         let module_name = crate::traits::table_insertable_like::INSERTABLE_MODULE_NAME;
@@ -37,6 +40,7 @@ impl<'data, 'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'data,
             )
             .data(value.into())
             .expect("Failed to add insertable struct to insertable module")
+            .internal_token(value.value_settable_impl())
             .build()
             .expect("Failed to build insertable module")
     }

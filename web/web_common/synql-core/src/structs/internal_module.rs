@@ -114,6 +114,22 @@ impl<'data> InternalModule<'data> {
         None
     }
 
+    /// Returns a reference to the internal trait with the given name if it
+    /// exists in the module.
+    pub fn internal_trait(&self, name: &str) -> Option<&Rc<InternalTrait<'data>>> {
+        for internal_trait in &self.internal_traits {
+            if internal_trait.name() == name {
+                return Some(internal_trait);
+            }
+        }
+        for submodule in &self.submodules {
+            if let Some(internal_trait) = submodule.internal_trait(name) {
+                return Some(internal_trait);
+            }
+        }
+        None
+    }
+
     /// Writes the module to disk at the specified path.
     ///
     /// # Arguments

@@ -8,7 +8,10 @@ use builder::ExternalTraitBuilder;
 use quote::ToTokens;
 
 use crate::{
-    structs::{InternalCrate, InternalTrait, Method, Trait, external_crate::ExternalTraitRef},
+    structs::{
+        DataVariantRef, InternalCrate, InternalTrait, Method, Trait, TraitImpl,
+        external_crate::ExternalTraitRef,
+    },
     traits::{ExternalDependencies, InternalDependencies},
 };
 
@@ -157,7 +160,7 @@ pub enum TraitVariantRef<'data> {
     /// Variant representing a trait defined within the workspace.
     /// The crate definition is optional for cases where the crate itself
     /// has not yet been defined (e.g., for the current crate).
-    Internal(Rc<InternalTrait<'data>>, Option<&'data InternalCrate<'data>>),
+    Internal(Rc<InternalTrait<'data>>, Option<Rc<InternalCrate<'data>>>),
     /// Variant representing a trait defined within an external crate.
     External(ExternalTraitRef<'data>),
 }
@@ -180,7 +183,7 @@ impl<'data> From<Trait> for TraitVariantRef<'data> {
     }
 }
 
-impl TraitVariantRef<'_> {
+impl<'data> TraitVariantRef<'data> {
     /// Returns the name of the trait.
     pub fn name(&self) -> &str {
         match self {
@@ -208,11 +211,25 @@ impl TraitVariantRef<'_> {
     }
 
     /// Returns a reference to the slice of methods defined by the trait.
-    pub fn methods(&self) -> &[Method<'_>] {
+    pub fn methods(&self) -> &[Method<'data>] {
         match self {
             TraitVariantRef::Internal(trait_def, _crate_def) => trait_def.methods(),
             TraitVariantRef::External(_) => &[],
         }
+    }
+
+    /// Returns a reference to the method with the provided name, if it exists.
+    pub fn method(&self, name: &str) -> Option<&Method<'data>> {
+        self.methods().iter().find(|method| method.name() == name)
+    }
+
+    /// Returns the [`TraitImpl`] struct to implement the trait for the provided
+    /// type.
+    pub fn impl_for_type<'trt>(
+        &'trt self,
+        type_token: &'trt DataVariantRef<'data>,
+    ) -> TraitImpl<'trt, 'data> {
+        TraitImpl::new(self).for_type(type_token)
     }
 }
 
@@ -228,7 +245,9 @@ impl<'data> ExternalDependencies<'data> for TraitVariantRef<'data> {
 impl<'data> InternalDependencies<'data> for TraitVariantRef<'data> {
     fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
         match self {
-            TraitVariantRef::Internal(_, crate_def) => crate_def.into_iter().copied().collect(),
+            TraitVariantRef::Internal(_, crate_def) => {
+                crate_def.into_iter().map(AsRef::as_ref).collect()
+            }
             TraitVariantRef::External(_) => vec![],
         }
     }
@@ -239,7 +258,7 @@ impl ToTokens for TraitVariantRef<'_> {
         match self {
             TraitVariantRef::Internal(trait_def, crate_def) => {
                 let trait_ident = trait_def.ident();
-                let crate_name = crate_def.map_or_else(
+                let crate_name = crate_def.as_ref().map_or_else(
                     || quote::quote! { crate },
                     |crate_def| {
                         let crate_ident = crate_def.ident();

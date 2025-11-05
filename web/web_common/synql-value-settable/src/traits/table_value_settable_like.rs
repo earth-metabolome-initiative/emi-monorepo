@@ -7,7 +7,7 @@ use sql_relations::{
 };
 use sql_traits::traits::DatabaseLike;
 use syn::Ident;
-use synql_core::structs::Workspace;
+use synql_core::structs::{TraitVariantRef, Workspace};
 use synql_models::traits::TableModelLike;
 
 use crate::structs::table_value_settable::TableValueSettable;
@@ -87,6 +87,16 @@ pub trait TableValueSettableLike: TableModelLike {
         Self: 'data,
     {
         TableValueSettable::new(self, workspace, database)
+    }
+
+    /// Returns the trait reference for the table value settable trait.
+    fn value_settable_trait_ref<'table, 'data>(
+        &'table self,
+        workspace: &'table Workspace<'data>,
+    ) -> Option<TraitVariantRef<'data>> {
+        let crate_ref = workspace.internal_crate(&self.table_value_settable_crate_name())?;
+        let trait_ref = crate_ref.internal_trait(&self.table_value_settable_trait_name())?;
+        Some(TraitVariantRef::Internal(trait_ref.clone(), Some(crate_ref.clone())))
     }
 }
 

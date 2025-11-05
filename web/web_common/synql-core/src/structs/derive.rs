@@ -51,7 +51,7 @@ impl<'data> InternalDependencies<'data> for Derive<'data> {
         let mut crates = self
             .traits
             .iter()
-            .filter_map(|t| if let TraitVariantRef::Internal(_, krate) = t { *krate } else { None })
+            .filter_map(|t| if let TraitVariantRef::Internal(_, krate) = t { krate.as_deref() } else { None })
             .collect::<Vec<_>>();
         crates.sort_unstable();
         crates.dedup();

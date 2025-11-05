@@ -19,26 +19,26 @@ use crate::structs::{
 };
 
 /// Struct to help implement a trait into an `InternalToken`.
-pub struct TraitImpl<'data> {
+pub struct TraitImpl<'trt, 'data> {
     /// The underlying internal token builder.
     builder: InternalTokenBuilder<'data>,
     /// The trait to implement.
-    trait_ref: TraitVariantRef<'data>,
+    trait_ref: &'trt TraitVariantRef<'data>,
     /// The methods defined by the user, to be added to the token stream.
     methods: Vec<Method<'data>>,
     /// The type for which the trait is being implemented.
-    data: Option<DataVariantRef<'data>>,
+    data: Option<&'trt DataVariantRef<'data>>,
     /// Where clauses for the implementation.
     where_clauses: Vec<WhereClause<'data>>,
 }
 
-impl<'data> TraitImpl<'data> {
+impl<'trt, 'data> TraitImpl<'trt, 'data> {
     /// Creates a new `TraitImpl` instance.
     ///
     /// # Arguments
     ///
     /// * `trait_ref` - The trait to implement.
-    pub fn new(trait_ref: TraitVariantRef<'data>) -> Self {
+    pub fn new(trait_ref: &'trt TraitVariantRef<'data>) -> Self {
         Self {
             builder: InternalToken::new(),
             trait_ref,
@@ -52,7 +52,7 @@ impl<'data> TraitImpl<'data> {
     ///
     /// # Arguments
     /// * `data` - The type for which the trait is being implemented.
-    pub fn for_type(mut self, data: DataVariantRef<'data>) -> Self {
+    pub fn for_type(mut self, data: &'trt DataVariantRef<'data>) -> Self {
         self.data = Some(data);
         self
     }
@@ -74,16 +74,32 @@ impl<'data> TraitImpl<'data> {
     ///   in the trait.
     pub fn method(mut self, method: Method<'data>) -> Result<Self, TraitImplError> {
         if self.methods.iter().any(|m| m.name() == method.name()) {
-            return Err(TraitImplError::MethodAlreadyDefined(method.name().to_string()));
+            return Err(TraitImplError::MethodAlreadyDefined(method.signature()));
         }
         if !self.trait_ref.defines_method(&method) {
-            return Err(TraitImplError::MethodSignatureMismatch(method.name().to_string()));
+            return Err(TraitImplError::MethodSignatureMismatch(method.signature()));
         }
         if !method.has_body() {
-            return Err(TraitImplError::MethodWithoutBody(method.name().to_string()));
+            return Err(TraitImplError::MethodWithoutBody(method.signature()));
         }
 
         self.methods.push(method);
+        Ok(self)
+    }
+
+    /// Adds several methods to the trait implementation.
+    ///
+    /// # Arguments
+    ///
+    /// * `methods` - The methods to add.
+    pub fn methods<I>(mut self, methods: I) -> Result<Self, TraitImplError>
+    where
+        I: IntoIterator<Item = Method<'data>>,
+    {
+        for method in methods {
+            self = self.method(method)?;
+        }
+
         Ok(self)
     }
 
@@ -183,20 +199,20 @@ impl From<BuilderError<InternalTokenAttribute>> for TraitImplError {
     }
 }
 
-impl<'data> Attributed for TraitImpl<'data> {
+impl<'trt, 'data> Attributed for TraitImpl<'trt, 'data> {
     type Attribute = InternalTokenAttribute;
 }
 
-impl<'data> IsCompleteBuilder for TraitImpl<'data> {
+impl<'trt, 'data> IsCompleteBuilder for TraitImpl<'trt, 'data> {
     fn is_complete(&self) -> bool {
         self.builder.is_complete()
     }
 }
 
-impl<'data> TryFrom<TraitImpl<'data>> for InternalToken<'data> {
+impl<'trt, 'data> TryFrom<TraitImpl<'trt, 'data>> for InternalToken<'data> {
     type Error = TraitImplError;
 
-    fn try_from(value: TraitImpl<'data>) -> Result<Self, Self::Error> {
+    fn try_from(value: TraitImpl<'trt, 'data>) -> Result<Self, Self::Error> {
         // Ensure all required methods are provided.
         for method in value.trait_ref.methods() {
             // Method with default implementation can be skipped.

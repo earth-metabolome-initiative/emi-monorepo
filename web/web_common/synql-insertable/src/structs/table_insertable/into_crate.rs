@@ -1,6 +1,7 @@
 //! Submodule implementing the `From` trait to convert a `TableInsertable` into
 //! an `InternalCrate`.
 
+use sql_relations::traits::InheritableDatabaseLike;
 use synql_core::{
     prelude::Builder,
     structs::{Documentation, InternalCrate},
@@ -14,6 +15,7 @@ use crate::{
 impl<'data, 'table, T> From<TableInsertable<'data, 'table, T>> for InternalCrate<'data>
 where
     T: TableInsertableLike + ?Sized,
+    T::DB: InheritableDatabaseLike,
 {
     fn from(insertable: TableInsertable<'data, 'table, T>) -> Self {
         let schema_crate_ref = insertable
