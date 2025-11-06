@@ -6,3 +6,7 @@ mod single_field_error;
 pub use single_field_error::SingleFieldError;
 mod validation_error;
 pub use validation_error::ValidationError;
+mod generic_error;
+pub use generic_error::GenericError;
+mod unspecified;
+pub use unspecified::Unspecified;

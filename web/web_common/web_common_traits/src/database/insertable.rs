@@ -367,10 +367,10 @@ impl<FieldName: TableField> From<validation_errors::prelude::ValidationError<Fie
     }
 }
 
-impl<FieldName: TableField> From<validation_errors::SingleFieldError<FieldName>>
+impl<FieldName: TableField> From<validation_errors::prelude::SingleFieldError<FieldName>>
     for InsertError<FieldName>
 {
-    fn from(error: validation_errors::SingleFieldError<FieldName>) -> Self {
+    fn from(error: validation_errors::prelude::SingleFieldError<FieldName>) -> Self {
         let validation_error: validation_errors::prelude::ValidationError<FieldName> = error.into();
         validation_error.into()
     }

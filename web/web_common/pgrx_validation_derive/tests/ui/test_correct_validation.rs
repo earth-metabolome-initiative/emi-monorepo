@@ -8,7 +8,7 @@ use pgrx_validation_derive::validation;
 /// # Errors
 ///
 /// * `Error::EmptyText` if the given argument is empty.
-pub fn must_not_be_another_empty(_arg: &str) -> Result<(), validation_errors::SingleFieldError> {
+pub fn must_not_be_another_empty(_arg: &str) -> Result<(), validation_errors::prelude::SingleFieldError> {
     Ok(())
 }
 
@@ -19,7 +19,7 @@ pub fn must_not_be_another_empty(_arg: &str) -> Result<(), validation_errors::Si
 /// # Errors
 ///
 /// * `Error::EmptyText` if the given argument is empty.
-pub fn must_not_be_empty(arg: &str) -> Result<(), validation_errors::SingleFieldError> {
+pub fn must_not_be_empty(arg: &str) -> Result<(), validation_errors::prelude::SingleFieldError> {
     must_not_be_another_empty(arg)?;
     Ok(())
 }
@@ -32,7 +32,7 @@ pub fn must_not_be_empty(arg: &str) -> Result<(), validation_errors::SingleField
 /// * `Error::EmptyText` if the given argument is empty.
 pub fn must_not_contain_another_empty(
     _arg: &str,
-) -> Result<(), validation_errors::SingleFieldError> {
+) -> Result<(), validation_errors::prelude::SingleFieldError> {
     Ok(())
 }
 
@@ -42,7 +42,7 @@ pub fn must_not_contain_another_empty(
 /// # Errors
 ///
 /// * `Error::EmptyText` if the given argument is empty.
-pub fn must_contain_another_empty(_arg: &str) -> Result<(), validation_errors::SingleFieldError> {
+pub fn must_contain_another_empty(_arg: &str) -> Result<(), validation_errors::prelude::SingleFieldError> {
     Ok(())
 }
 
@@ -53,7 +53,7 @@ pub fn must_contain_another_empty(_arg: &str) -> Result<(), validation_errors::S
 /// # Errors
 ///
 /// * `Error::EmptyText` if the given argument is empty.
-pub fn must_not_contain_empty(arg: &str) -> Result<(), validation_errors::SingleFieldError> {
+pub fn must_not_contain_empty(arg: &str) -> Result<(), validation_errors::prelude::SingleFieldError> {
     must_not_be_another_empty(arg)?;
     must_contain_another_empty(arg)?;
     must_not_contain_another_empty(arg)?;

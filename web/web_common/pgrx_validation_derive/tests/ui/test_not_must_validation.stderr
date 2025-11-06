@@ -1,5 +1,5 @@
 error: Function `other_must_not_be_empty` must start with any of ["must_be_", "must_not_be_", "must_contain_", "must_not_contain_"] to be decorated with `validation`.
  --> tests/ui/test_not_must_validation.rs:7:8
   |
-7 | pub fn other_must_not_be_empty(_arg: &str) -> Result<(), validation_errors::SingleFieldError> {
+7 | pub fn other_must_not_be_empty(_arg: &str) -> Result<(), validation_errors::prelude::SingleFieldError> {
   |        ^^^^^^^^^^^^^^^^^^^^^^^

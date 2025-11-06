@@ -331,7 +331,7 @@ where
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         Ok(
             match self {
@@ -462,7 +462,7 @@ where
     fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         Ok(
             match self {
@@ -723,7 +723,7 @@ where
     fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
@@ -986,7 +986,7 @@ where
     fn updated_at<UA>(self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
@@ -1119,7 +1119,7 @@ where
     fn deprecated<D>(self, deprecated: D) -> Result<Self, Self::Error>
     where
         D: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
         Ok(
             match self {

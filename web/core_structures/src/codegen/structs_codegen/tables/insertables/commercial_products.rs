@@ -205,7 +205,7 @@ pub trait CommercialProductSettable: Sized {
     fn deprecation_date<DD>(self, deprecation_date: DD) -> Result<Self, Self::Error>
     where
         DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error>;
     /// Sets the value of the `public.commercial_products.brand_id` column.
     ///
@@ -243,14 +243,14 @@ where
     fn deprecation_date<DD>(mut self, deprecation_date: DD) -> Result<Self, Self::Error>
     where
         DD: TryInto<Option<::rosetta_timestamp::TimestampUTC>>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <DD as TryInto<Option<::rosetta_timestamp::TimestampUTC>>>::Error,
         >,
     {
         let deprecation_date = deprecation_date
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(CommercialProductAttribute::DeprecationDate)
             })?;
         self.deprecation_date = deprecation_date;
@@ -289,7 +289,7 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.id,
@@ -308,7 +308,7 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.id,
@@ -363,7 +363,7 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
@@ -402,7 +402,7 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {

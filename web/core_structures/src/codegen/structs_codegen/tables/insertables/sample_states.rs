@@ -152,7 +152,7 @@ pub trait SampleStateSettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.sample_states.description` column.
     ///
     /// # Arguments
@@ -175,7 +175,7 @@ pub trait SampleStateSettable: Sized {
     fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>;
     /// Sets the value of the `public.sample_states.icon` column.
     ///
     /// # Arguments
@@ -197,7 +197,7 @@ pub trait SampleStateSettable: Sized {
     fn icon<I>(self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<I as TryInto<String>>::Error>;
     /// Sets the value of the `public.sample_states.color_id` column.
     ///
     /// # Arguments
@@ -233,10 +233,11 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(SampleStateAttribute::Name)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(SampleStateAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -245,10 +246,10 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         let description = description.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(SampleStateAttribute::Description)
         })?;
         self.description = Some(description);
@@ -258,10 +259,11 @@ where
     fn icon<I>(mut self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(SampleStateAttribute::Icon)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(SampleStateAttribute::Icon)
         })?;
         self.icon = Some(icon);
         Ok(self)

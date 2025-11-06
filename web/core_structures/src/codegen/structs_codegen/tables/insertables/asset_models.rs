@@ -226,7 +226,7 @@ pub trait AssetModelSettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.asset_models.description` column.
     ///
     /// # Arguments
@@ -249,7 +249,7 @@ pub trait AssetModelSettable: Sized {
     fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>;
     /// Sets the value of the `public.asset_models.parent_model` column.
     ///
     /// # Arguments
@@ -314,7 +314,7 @@ pub trait AssetModelSettable: Sized {
     fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.asset_models.updated_by` column.
     ///
@@ -359,7 +359,7 @@ pub trait AssetModelSettable: Sized {
     fn updated_at<UA>(self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl AssetModelSettable for InsertableAssetModelBuilder
@@ -375,10 +375,11 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(AssetModelAttribute::Name)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(AssetModelAttribute::Name)
         })?;
         if let Some(description) = self.description.as_ref() {
             pgrx_validation::must_be_distinct(name.as_ref(), description)
@@ -402,10 +403,10 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         let description = description.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(AssetModelAttribute::Description)
         })?;
         if let Some(name) = self.name.as_ref() {
@@ -471,11 +472,11 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(AssetModelAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
@@ -505,11 +506,11 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let updated_at = updated_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(AssetModelAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {

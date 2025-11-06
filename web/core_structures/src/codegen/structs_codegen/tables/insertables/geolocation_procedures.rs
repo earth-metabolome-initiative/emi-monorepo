@@ -746,7 +746,7 @@ pub trait GeolocationProcedureSettable: Sized {
     fn location<L>(self, location: L) -> Result<Self, Self::Error>
     where
         L: TryInto<postgis_diesel::types::Point>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<L as TryInto<postgis_diesel::types::Point>>::Error>;
 }
 impl<
@@ -1347,14 +1347,14 @@ where
     fn location<L>(mut self, location: L) -> Result<Self, Self::Error>
     where
         L: TryInto<postgis_diesel::types::Point>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <L as TryInto<postgis_diesel::types::Point>>::Error,
         >,
     {
         let location = location
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(GeolocationProcedureAttribute::Location)
             })?;
         self.location = Some(location);
@@ -1543,7 +1543,7 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
@@ -1582,7 +1582,7 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {

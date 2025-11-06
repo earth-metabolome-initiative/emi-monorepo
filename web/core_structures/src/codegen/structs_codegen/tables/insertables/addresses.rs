@@ -177,7 +177,7 @@ pub trait AddressSettable: Sized {
     fn street_name<SN>(self, street_name: SN) -> Result<Self, Self::Error>
     where
         SN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<SN as TryInto<String>>::Error>;
     /// Sets the value of the `public.addresses.house_number` column.
     ///
     /// # Arguments
@@ -200,7 +200,7 @@ pub trait AddressSettable: Sized {
     fn house_number<HN>(self, house_number: HN) -> Result<Self, Self::Error>
     where
         HN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<HN as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<HN as TryInto<String>>::Error>;
     /// Sets the value of the `public.addresses.postal_code` column.
     ///
     /// # Arguments
@@ -223,7 +223,7 @@ pub trait AddressSettable: Sized {
     fn postal_code<PC>(self, postal_code: PC) -> Result<Self, Self::Error>
     where
         PC: TryInto<String>,
-        validation_errors::SingleFieldError: From<<PC as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<PC as TryInto<String>>::Error>;
     /// Sets the value of the `public.addresses.geolocation` column.
     ///
     /// # Arguments
@@ -246,7 +246,7 @@ pub trait AddressSettable: Sized {
     fn geolocation<G>(self, geolocation: G) -> Result<Self, Self::Error>
     where
         G: TryInto<postgis_diesel::types::Point>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<G as TryInto<postgis_diesel::types::Point>>::Error>;
 }
 impl AddressSettable for InsertableAddressBuilder
@@ -271,10 +271,10 @@ where
     fn street_name<SN>(mut self, street_name: SN) -> Result<Self, Self::Error>
     where
         SN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<SN as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<SN as TryInto<String>>::Error>,
     {
         let street_name = street_name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(AddressAttribute::StreetName)
         })?;
         self.street_name = Some(street_name);
@@ -284,10 +284,10 @@ where
     fn house_number<HN>(mut self, house_number: HN) -> Result<Self, Self::Error>
     where
         HN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<HN as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<HN as TryInto<String>>::Error>,
     {
         let house_number = house_number.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(AddressAttribute::HouseNumber)
         })?;
         self.house_number = Some(house_number);
@@ -297,10 +297,10 @@ where
     fn postal_code<PC>(mut self, postal_code: PC) -> Result<Self, Self::Error>
     where
         PC: TryInto<String>,
-        validation_errors::SingleFieldError: From<<PC as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<PC as TryInto<String>>::Error>,
     {
         let postal_code = postal_code.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(AddressAttribute::PostalCode)
         })?;
         self.postal_code = Some(postal_code);
@@ -310,11 +310,11 @@ where
     fn geolocation<G>(mut self, geolocation: G) -> Result<Self, Self::Error>
     where
         G: TryInto<postgis_diesel::types::Point>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<G as TryInto<postgis_diesel::types::Point>>::Error>,
     {
         let geolocation = geolocation.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(AddressAttribute::Geolocation)
         })?;
         self.geolocation = Some(geolocation);

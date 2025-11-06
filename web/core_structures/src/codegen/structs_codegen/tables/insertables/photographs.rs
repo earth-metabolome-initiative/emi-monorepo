@@ -212,7 +212,7 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<Option<String>>>::Error>,
     {
         self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::name(
                 self.id,
@@ -231,7 +231,7 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<Option<String>>>::Error>,
     {
         self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::description(
                 self.id,
@@ -300,7 +300,7 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::created_at(
@@ -338,7 +338,7 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         self.id = <DigitalAsset as crate::codegen::structs_codegen::tables::insertables::AssetSettable>::updated_at(

@@ -139,7 +139,7 @@ pub trait CountrySettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
 }
 impl CountrySettable for InsertableCountryBuilder
 where
@@ -163,10 +163,11 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(CountryAttribute::Name)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(CountryAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)

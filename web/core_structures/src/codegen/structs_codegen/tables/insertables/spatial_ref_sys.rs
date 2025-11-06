@@ -164,7 +164,7 @@ pub trait SpatialRefSySettable: Sized {
     fn auth_name<AN>(self, auth_name: AN) -> Result<Self, Self::Error>
     where
         AN: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<AN as TryInto<Option<String>>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<AN as TryInto<Option<String>>>::Error>;
     /// Sets the value of the `public.spatial_ref_sys.auth_srid` column.
     ///
     /// # Arguments
@@ -186,7 +186,7 @@ pub trait SpatialRefSySettable: Sized {
     fn auth_srid<AS>(self, auth_srid: AS) -> Result<Self, Self::Error>
     where
         AS: TryInto<Option<i32>>,
-        validation_errors::SingleFieldError: From<<AS as TryInto<Option<i32>>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<AS as TryInto<Option<i32>>>::Error>;
     /// Sets the value of the `public.spatial_ref_sys.srtext` column.
     ///
     /// # Arguments
@@ -209,7 +209,7 @@ pub trait SpatialRefSySettable: Sized {
     fn srtext<S>(self, srtext: S) -> Result<Self, Self::Error>
     where
         S: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<S as TryInto<Option<String>>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<S as TryInto<Option<String>>>::Error>;
     /// Sets the value of the `public.spatial_ref_sys.proj4text` column.
     ///
     /// # Arguments
@@ -232,7 +232,7 @@ pub trait SpatialRefSySettable: Sized {
     fn proj4text<P>(self, proj4text: P) -> Result<Self, Self::Error>
     where
         P: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<P as TryInto<Option<String>>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<P as TryInto<Option<String>>>::Error>;
 }
 impl SpatialRefSySettable for InsertableSpatialRefSyBuilder
 where
@@ -256,10 +256,10 @@ where
     fn auth_name<AN>(mut self, auth_name: AN) -> Result<Self, Self::Error>
     where
         AN: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<AN as TryInto<Option<String>>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<AN as TryInto<Option<String>>>::Error>,
     {
         let auth_name = auth_name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(SpatialRefSyAttribute::AuthName)
         })?;
         self.auth_name = auth_name;
@@ -269,10 +269,10 @@ where
     fn auth_srid<AS>(mut self, auth_srid: AS) -> Result<Self, Self::Error>
     where
         AS: TryInto<Option<i32>>,
-        validation_errors::SingleFieldError: From<<AS as TryInto<Option<i32>>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<AS as TryInto<Option<i32>>>::Error>,
     {
         let auth_srid = auth_srid.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(SpatialRefSyAttribute::AuthSrid)
         })?;
         self.auth_srid = auth_srid;
@@ -282,10 +282,10 @@ where
     fn srtext<S>(mut self, srtext: S) -> Result<Self, Self::Error>
     where
         S: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<S as TryInto<Option<String>>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<S as TryInto<Option<String>>>::Error>,
     {
         let srtext = srtext.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(SpatialRefSyAttribute::Srtext)
         })?;
         self.srtext = srtext;
@@ -295,10 +295,10 @@ where
     fn proj4text<P>(mut self, proj4text: P) -> Result<Self, Self::Error>
     where
         P: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<P as TryInto<Option<String>>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<P as TryInto<Option<String>>>::Error>,
     {
         let proj4text = proj4text.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(SpatialRefSyAttribute::Proj4text)
         })?;
         self.proj4text = proj4text;

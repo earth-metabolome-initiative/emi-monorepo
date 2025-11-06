@@ -914,7 +914,7 @@ pub trait FractioningProcedureSettable: Sized {
     fn kilograms<K>(self, kilograms: K) -> Result<Self, Self::Error>
     where
         K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<K as TryInto<f32>>::Error>;
     /// Sets the value of the `public.fractioning_procedures.weighed_with`
     /// column.
     ///
@@ -1605,12 +1605,12 @@ where
     fn kilograms<K>(mut self, kilograms: K) -> Result<Self, Self::Error>
     where
         K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
         let kilograms = kilograms
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(FractioningProcedureAttribute::Kilograms)
             })?;
         pgrx_validation::must_be_strictly_positive_f32(kilograms)
@@ -2066,7 +2066,7 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
@@ -2105,7 +2105,7 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {

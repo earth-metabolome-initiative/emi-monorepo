@@ -189,7 +189,7 @@ pub trait BeadModelSettable: Sized {
     fn diameter_millimeters<DM>(self, diameter_millimeters: DM) -> Result<Self, Self::Error>
     where
         DM: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<DM as TryInto<f32>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<DM as TryInto<f32>>::Error>;
 }
 impl<PhysicalAssetModel> BeadModelSettable for InsertableBeadModelBuilder<PhysicalAssetModel>
 where
@@ -204,10 +204,10 @@ where
     fn diameter_millimeters<DM>(mut self, diameter_millimeters: DM) -> Result<Self, Self::Error>
     where
         DM: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<DM as TryInto<f32>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<DM as TryInto<f32>>::Error>,
     {
         let diameter_millimeters = diameter_millimeters.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(BeadModelAttribute::DiameterMillimeters)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(diameter_millimeters)
@@ -247,7 +247,7 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.id,
@@ -266,7 +266,7 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.id,
@@ -336,7 +336,7 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
@@ -374,7 +374,7 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         self.id = <PhysicalAssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(

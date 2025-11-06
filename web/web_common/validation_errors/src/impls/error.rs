@@ -19,7 +19,7 @@ impl<FieldName: std::fmt::Debug + std::fmt::Display> Error for SingleFieldError<
 impl<FieldName: std::fmt::Debug + std::fmt::Display> Error for DoubleFieldError<FieldName> {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
-            DoubleFieldError::Generic(_, error) => Some(error.as_ref()),
+            DoubleFieldError::Generic(_, _, error) => Some(error.as_ref()),
             _ => None,
         }
     }

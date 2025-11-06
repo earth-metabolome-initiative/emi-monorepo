@@ -231,7 +231,7 @@ pub trait ProcedureTemplateAssetModelSettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the
     /// `public.procedure_template_asset_models.procedure_template` column.
     ///
@@ -312,12 +312,12 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(ProcedureTemplateAssetModelAttribute::Name)
             })?;
         pgrx_validation::must_be_paragraph(name.as_ref())

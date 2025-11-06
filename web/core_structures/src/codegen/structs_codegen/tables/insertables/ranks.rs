@@ -120,7 +120,7 @@ pub trait RankSettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.ranks.description` column.
     ///
     /// # Arguments
@@ -143,7 +143,7 @@ pub trait RankSettable: Sized {
     fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>;
 }
 impl RankSettable for InsertableRankBuilder
 where
@@ -158,10 +158,11 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(RankAttribute::Name)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(RankAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -170,10 +171,11 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         let description = description.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(RankAttribute::Description)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(RankAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)

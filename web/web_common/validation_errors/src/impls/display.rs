@@ -8,7 +8,7 @@ impl<FieldName: Display> Display for SingleFieldError<FieldName> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match self {
             Self::EmptyText(field) => {
-                write!(f, "Field `{field}` cannot be empty")
+                write!(f, "Field `{field}` must not be empty")
             }
             Self::MustBeStrictlyPositive(field) => {
                 write!(f, "Field `{field}` must be strictly positive (> 0)")
@@ -53,8 +53,8 @@ impl<FieldName: Display> Display for DoubleFieldError<FieldName> {
             Self::MustBeGreaterThan(field1, field2) => {
                 write!(f, "Field `{field1}` must be greater than or equal to field `{field2}`")
             }
-            Self::Generic(field, error) => {
-                write!(f, "Field `{field}`: {error}")
+            Self::Generic(field1, field2, error) => {
+                write!(f, "Fields `{field1}` and `{field2}`: {error}")
             }
         }
     }

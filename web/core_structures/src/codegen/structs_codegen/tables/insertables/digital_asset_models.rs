@@ -235,7 +235,8 @@ pub trait DigitalAssetModelSettable: Sized {
     fn mime_type<MT>(self, mime_type: MT) -> Result<Self, Self::Error>
     where
         MT: TryInto<::media_types::MediaType>,
-        validation_errors::SingleFieldError: From<<MT as TryInto<::media_types::MediaType>>::Error>;
+        validation_errors::prelude::SingleFieldError:
+            From<<MT as TryInto<::media_types::MediaType>>::Error>;
 }
 impl<
     AssetModel: crate::codegen::structs_codegen::tables::insertables::AssetModelSettable<
@@ -298,14 +299,14 @@ where
     fn mime_type<MT>(mut self, mime_type: MT) -> Result<Self, Self::Error>
     where
         MT: TryInto<::media_types::MediaType>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <MT as TryInto<::media_types::MediaType>>::Error,
         >,
     {
         let mime_type = mime_type
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(DigitalAssetModelAttribute::MimeType)
             })?;
         self.mime_type = Some(mime_type);
@@ -338,7 +339,7 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.id,
@@ -357,7 +358,7 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.id,
@@ -424,7 +425,7 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
@@ -463,7 +464,7 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {

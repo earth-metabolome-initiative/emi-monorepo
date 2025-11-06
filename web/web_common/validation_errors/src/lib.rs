@@ -7,7 +7,7 @@ mod traits;
 /// Prelude module re-exporting commonly used items.
 pub mod prelude {
     pub use crate::{
-        structs::{DoubleFieldError, SingleFieldError, ValidationError},
+        structs::{DoubleFieldError, GenericError, SingleFieldError, Unspecified, ValidationError},
         traits::{ReplaceFieldName, ValidationErrorLike},
     };
 }

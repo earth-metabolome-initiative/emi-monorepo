@@ -241,7 +241,7 @@ pub trait ContainerCompatibilityRuleSettable: Sized {
     fn quantity<Q>(self, quantity: Q) -> Result<Self, Self::Error>
     where
         Q: TryInto<Option<i16>>,
-        validation_errors::SingleFieldError: From<<Q as TryInto<Option<i16>>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<Q as TryInto<Option<i16>>>::Error>;
     /// Sets the value of the `public.container_compatibility_rules.created_by`
     /// column.
     ///
@@ -287,7 +287,7 @@ pub trait ContainerCompatibilityRuleSettable: Sized {
     fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl ContainerCompatibilityRuleSettable for InsertableContainerCompatibilityRuleBuilder
@@ -348,12 +348,12 @@ where
     fn quantity<Q>(mut self, quantity: Q) -> Result<Self, Self::Error>
     where
         Q: TryInto<Option<i16>>,
-        validation_errors::SingleFieldError: From<<Q as TryInto<Option<i16>>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<Q as TryInto<Option<i16>>>::Error>,
     {
         let quantity = quantity
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(ContainerCompatibilityRuleAttribute::Quantity)
             })?;
         if let Some(quantity) = quantity {
@@ -383,14 +383,14 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
         let created_at = created_at
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(ContainerCompatibilityRuleAttribute::CreatedAt)
             })?;
         self.created_at = Some(created_at);

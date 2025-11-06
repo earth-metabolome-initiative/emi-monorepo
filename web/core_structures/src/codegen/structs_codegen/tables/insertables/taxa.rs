@@ -164,7 +164,7 @@ pub trait TaxonSettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.taxa.parent_id` column.
     ///
     /// # Arguments
@@ -185,7 +185,7 @@ pub trait TaxonSettable: Sized {
     fn parent<PI>(self, parent_id: PI) -> Result<Self, Self::Error>
     where
         PI: TryInto<Option<i32>>,
-        validation_errors::SingleFieldError: From<<PI as TryInto<Option<i32>>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<PI as TryInto<Option<i32>>>::Error>;
     /// Sets the value of the `public.taxa.rank_id` column.
     ///
     /// # Arguments
@@ -229,10 +229,11 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(TaxonAttribute::Name)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(TaxonAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -241,10 +242,11 @@ where
     fn parent<PI>(mut self, parent_id: PI) -> Result<Self, Self::Error>
     where
         PI: TryInto<Option<i32>>,
-        validation_errors::SingleFieldError: From<<PI as TryInto<Option<i32>>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<PI as TryInto<Option<i32>>>::Error>,
     {
         let parent_id = parent_id.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(TaxonAttribute::ParentId)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(TaxonAttribute::ParentId)
         })?;
         self.parent_id = parent_id;
         Ok(self)

@@ -122,7 +122,7 @@ impl Table {
                         let #column_snake_case_ident = #column_snake_case_ident
                             .try_into()
                             .map_err(|err| {
-                                validation_errors::SingleFieldError::from(err)
+                                validation_errors::prelude::SingleFieldError::from(err)
                                     .rename_field(#insertable_enum::#column_camel_case_ident)
                             })?;
                     }

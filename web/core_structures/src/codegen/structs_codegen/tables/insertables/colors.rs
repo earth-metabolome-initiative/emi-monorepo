@@ -127,7 +127,7 @@ pub trait ColorSettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.colors.hexadecimal_value` column.
     ///
     /// # Arguments
@@ -150,7 +150,7 @@ pub trait ColorSettable: Sized {
     fn hexadecimal_value<HV>(self, hexadecimal_value: HV) -> Result<Self, Self::Error>
     where
         HV: TryInto<String>,
-        validation_errors::SingleFieldError: From<<HV as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<HV as TryInto<String>>::Error>;
     /// Sets the value of the `public.colors.description` column.
     ///
     /// # Arguments
@@ -173,7 +173,7 @@ pub trait ColorSettable: Sized {
     fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>;
 }
 impl ColorSettable for InsertableColorBuilder
 where
@@ -188,10 +188,11 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(ColorAttribute::Name)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(ColorAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -200,10 +201,10 @@ where
     fn hexadecimal_value<HV>(mut self, hexadecimal_value: HV) -> Result<Self, Self::Error>
     where
         HV: TryInto<String>,
-        validation_errors::SingleFieldError: From<<HV as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<HV as TryInto<String>>::Error>,
     {
         let hexadecimal_value = hexadecimal_value.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(ColorAttribute::HexadecimalValue)
         })?;
         self.hexadecimal_value = Some(hexadecimal_value);
@@ -213,10 +214,11 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         let description = description.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(ColorAttribute::Description)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(ColorAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)

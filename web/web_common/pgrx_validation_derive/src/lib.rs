@@ -39,14 +39,14 @@ impl VisitMut for MethodRenamer {
 ///
 /// The [`validation`] attrobute macro is meant to be used on functions that
 /// return a `Result<(), Error>`, where the error type is an enum defined in
-/// [`validation_errors::Error`].
+/// [`validation_errors::prelude::ValidationError`].
 ///
 /// When the feature flag `pgrx` is enabled, the function will be transformed
 /// into a `pg_extern` function which returns `bool` instead of `Result<(),
-/// validation_errors::Error>`. The function will return `true` if the
-/// validation passes, and will return `false` if the validation fails. If the
-/// validation fails, the function will also log an error message using the
-/// `pgrx::error!` macro. The Error
+/// validation_errors::prelude::ValidationError>`. The function will return
+/// `true` if the validation passes, and will return `false` if the validation
+/// fails. If the validation fails, the function will also log an error message
+/// using the `pgrx::error!` macro. The Error
 ///
 /// The function is left unchanged when the `pgrx` feature flag is not enabled.
 pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
@@ -93,11 +93,11 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
     }
 
     // We expect the function to return a `Result<(),
-    // validation_errors::SingleFieldError>` or `Result<(),
-    // validation_errors::DoubleFieldError>`.
+    // validation_errors::prelude::SingleFieldError>` or `Result<(),
+    // validation_errors::prelude::DoubleFieldError>`.
     if !is_result_unit_pgrx_error(&sig.output) {
         let error_message = format!(
-            "Function `{fn_name}` must return a `Result<(), validation_errors::SingleFieldError>` or `Result<(), validation_errors::DoubleFieldError>` to be decorated with `validation`, but returns `{output}`.",
+            "Function `{fn_name}` must return a `Result<(), validation_errors::prelude::SingleFieldError>` or `Result<(), validation_errors::prelude::DoubleFieldError>` to be decorated with `validation`, but returns `{output}`.",
             output = match &sig.output {
                 syn::ReturnType::Type(_, ty) => quote!(#ty).to_string(),
                 syn::ReturnType::Default => "()".to_string(),
@@ -187,8 +187,8 @@ pub fn validation(_attr: TokenStream, item: TokenStream) -> TokenStream {
 }
 
 /// Determines if the return type is `Result<(),
-/// validation_errors::SingleFieldError>` or `Result<(),
-/// validation_errors::DoubleFieldError>`.
+/// validation_errors::prelude::SingleFieldError>` or `Result<(),
+/// validation_errors::prelude::DoubleFieldError>`.
 fn is_result_unit_pgrx_error(output: &syn::ReturnType) -> bool {
     if let syn::ReturnType::Type(_, ty) = output
         && let syn::Type::Path(type_path) = &**ty
@@ -209,8 +209,8 @@ fn is_result_unit_pgrx_error(output: &syn::ReturnType) -> bool {
             }
 
             // Second generic argument: Must be
-            // `validation_errors::SingleFieldError`
-            // or `validation_errors::DoubleFieldError`
+            // `validation_errors::prelude::SingleFieldError`
+            // or `validation_errors::prelude::DoubleFieldError`
             if let Some(syn::GenericArgument::Type(syn::Type::Path(error_path))) = iter.next() {
                 return is_pgrx_validation_error(error_path);
             }
@@ -219,10 +219,13 @@ fn is_result_unit_pgrx_error(output: &syn::ReturnType) -> bool {
     false
 }
 
-/// Checks if a `TypePath` matches `validation_errors::Error`
+/// Checks if a `TypePath` matches
+/// `validation_errors::prelude::SingleFieldError` or
+/// `validation_errors::prelude::DoubleFieldError`.
 fn is_pgrx_validation_error(path: &syn::TypePath) -> bool {
-    path.path.segments.len() == 2
+    path.path.segments.len() == 3
         && path.path.segments[0].ident == "validation_errors"
-        && (path.path.segments[1].ident == "SingleFieldError"
-            || path.path.segments[1].ident == "DoubleFieldError")
+        && path.path.segments[1].ident == "prelude"
+        && (path.path.segments[2].ident == "SingleFieldError"
+            || path.path.segments[2].ident == "DoubleFieldError")
 }

@@ -1,10 +1,10 @@
 //! Submodule defining the structs used for single field validation errors.
 
-use crate::traits::ValidationErrorLike;
+use crate::{structs::Unspecified, traits::ValidationErrorLike};
 
 #[derive(Debug)]
 /// Enumeration of errors that can occur during validation of a single field.
-pub enum SingleFieldError<FieldName> {
+pub enum SingleFieldError<FieldName = Unspecified> {
     /// The provided text is empty.
     EmptyText(FieldName),
     /// The numeric value is not strictly positive (0.0, ...]
@@ -21,4 +21,11 @@ pub enum SingleFieldError<FieldName> {
     MustBeGreaterThan(FieldName, f64),
     /// Some third-party validation error.
     Generic(FieldName, Box<dyn ValidationErrorLike>),
+}
+
+impl SingleFieldError {
+    /// Creates a new `SingleFieldError::EmptyText` with unspecified field name.
+    pub fn empty_text() -> Self {
+        SingleFieldError::EmptyText(Unspecified)
+    }
 }

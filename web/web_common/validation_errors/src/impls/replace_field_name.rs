@@ -60,7 +60,9 @@ impl<FieldName> ReplaceFieldName for DoubleFieldError<FieldName> {
             Self::MustBeGreaterThan(field1, field2) => {
                 DoubleFieldError::MustBeGreaterThan(map(field1), map(field2))
             }
-            Self::Generic(field, error) => DoubleFieldError::Generic(map(field), error),
+            Self::Generic(field1, field2, error) => {
+                DoubleFieldError::Generic(map(field1), map(field2), error)
+            }
         }
     }
 }

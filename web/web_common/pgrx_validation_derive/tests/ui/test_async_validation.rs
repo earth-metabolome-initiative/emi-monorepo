@@ -4,7 +4,7 @@ use pgrx_validation_derive::validation;
 
 #[validation]
 /// An async validation function should not compile.
-pub async fn must_not_be_empty(_arg: &str) -> Result<(), validation_errors::SingleFieldError> {
+pub async fn must_not_be_empty(_arg: &str) -> Result<(), validation_errors::prelude::SingleFieldError> {
     Ok(())
 }
 

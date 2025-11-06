@@ -156,7 +156,7 @@ pub trait LoginProviderSettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.login_providers.icon` column.
     ///
     /// # Arguments
@@ -178,7 +178,7 @@ pub trait LoginProviderSettable: Sized {
     fn icon<I>(self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<I as TryInto<String>>::Error>;
     /// Sets the value of the `public.login_providers.client_id` column.
     ///
     /// # Arguments
@@ -201,7 +201,7 @@ pub trait LoginProviderSettable: Sized {
     fn client<CI>(self, client_id: CI) -> Result<Self, Self::Error>
     where
         CI: TryInto<String>,
-        validation_errors::SingleFieldError: From<<CI as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<CI as TryInto<String>>::Error>;
     /// Sets the value of the `public.login_providers.redirect_uri` column.
     ///
     /// # Arguments
@@ -224,7 +224,7 @@ pub trait LoginProviderSettable: Sized {
     fn redirect_uri<RU>(self, redirect_uri: RU) -> Result<Self, Self::Error>
     where
         RU: TryInto<String>,
-        validation_errors::SingleFieldError: From<<RU as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<RU as TryInto<String>>::Error>;
     /// Sets the value of the `public.login_providers.oauth_url` column.
     ///
     /// # Arguments
@@ -247,7 +247,7 @@ pub trait LoginProviderSettable: Sized {
     fn oauth_url<OU>(self, oauth_url: OU) -> Result<Self, Self::Error>
     where
         OU: TryInto<String>,
-        validation_errors::SingleFieldError: From<<OU as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<OU as TryInto<String>>::Error>;
     /// Sets the value of the `public.login_providers.scope` column.
     ///
     /// # Arguments
@@ -270,7 +270,7 @@ pub trait LoginProviderSettable: Sized {
     fn scope<S>(self, scope: S) -> Result<Self, Self::Error>
     where
         S: TryInto<String>,
-        validation_errors::SingleFieldError: From<<S as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<S as TryInto<String>>::Error>;
 }
 impl LoginProviderSettable for InsertableLoginProviderBuilder
 where
@@ -285,12 +285,12 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(LoginProviderAttribute::Name)
             })?;
         pgrx_validation::must_be_paragraph(name.as_ref())
@@ -307,12 +307,12 @@ where
     fn icon<I>(mut self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(LoginProviderAttribute::Icon)
             })?;
         pgrx_validation::must_be_font_awesome_class(icon.as_ref())
@@ -329,12 +329,12 @@ where
     fn client<CI>(mut self, client_id: CI) -> Result<Self, Self::Error>
     where
         CI: TryInto<String>,
-        validation_errors::SingleFieldError: From<<CI as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<CI as TryInto<String>>::Error>,
     {
         let client_id = client_id
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(LoginProviderAttribute::ClientId)
             })?;
         pgrx_validation::must_be_paragraph(client_id.as_ref())
@@ -351,12 +351,12 @@ where
     fn redirect_uri<RU>(mut self, redirect_uri: RU) -> Result<Self, Self::Error>
     where
         RU: TryInto<String>,
-        validation_errors::SingleFieldError: From<<RU as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<RU as TryInto<String>>::Error>,
     {
         let redirect_uri = redirect_uri
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(LoginProviderAttribute::RedirectUri)
             })?;
         self.redirect_uri = Some(redirect_uri);
@@ -366,12 +366,12 @@ where
     fn oauth_url<OU>(mut self, oauth_url: OU) -> Result<Self, Self::Error>
     where
         OU: TryInto<String>,
-        validation_errors::SingleFieldError: From<<OU as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<OU as TryInto<String>>::Error>,
     {
         let oauth_url = oauth_url
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(LoginProviderAttribute::OauthUrl)
             })?;
         self.oauth_url = Some(oauth_url);
@@ -381,12 +381,12 @@ where
     fn scope<S>(mut self, scope: S) -> Result<Self, Self::Error>
     where
         S: TryInto<String>,
-        validation_errors::SingleFieldError: From<<S as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<S as TryInto<String>>::Error>,
     {
         let scope = scope
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(LoginProviderAttribute::Scope)
             })?;
         pgrx_validation::must_be_paragraph(scope.as_ref())

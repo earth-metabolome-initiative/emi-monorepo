@@ -200,7 +200,7 @@ pub trait ReagentModelSettable: Sized {
     fn purity<P>(self, purity: P) -> Result<Self, Self::Error>
     where
         P: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<P as TryInto<f32>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<P as TryInto<f32>>::Error>;
     /// Sets the value of the `public.reagent_models.cas_code` column.
     ///
     /// # Arguments
@@ -223,7 +223,8 @@ pub trait ReagentModelSettable: Sized {
     fn cas_code<CC>(self, cas_code: CC) -> Result<Self, Self::Error>
     where
         CC: TryInto<::cas_codes::CAS>,
-        validation_errors::SingleFieldError: From<<CC as TryInto<::cas_codes::CAS>>::Error>;
+        validation_errors::prelude::SingleFieldError:
+            From<<CC as TryInto<::cas_codes::CAS>>::Error>;
     /// Sets the value of the `public.reagent_models.molecular_formula` column.
     ///
     /// # Arguments
@@ -246,7 +247,7 @@ pub trait ReagentModelSettable: Sized {
     fn molecular_formula<MF>(self, molecular_formula: MF) -> Result<Self, Self::Error>
     where
         MF: TryInto<::molecular_formulas::MolecularFormula>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<MF as TryInto<::molecular_formulas::MolecularFormula>>::Error>;
 }
 impl<AssetModel> ReagentModelSettable for InsertableReagentModelBuilder<AssetModel>
@@ -262,10 +263,10 @@ where
     fn purity<P>(mut self, purity: P) -> Result<Self, Self::Error>
     where
         P: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<P as TryInto<f32>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<P as TryInto<f32>>::Error>,
     {
         let purity = purity.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(ReagentModelAttribute::Purity)
         })?;
         pgrx_validation::must_be_strictly_positive_f32(purity)
@@ -291,10 +292,11 @@ where
     fn cas_code<CC>(mut self, cas_code: CC) -> Result<Self, Self::Error>
     where
         CC: TryInto<::cas_codes::CAS>,
-        validation_errors::SingleFieldError: From<<CC as TryInto<::cas_codes::CAS>>::Error>,
+        validation_errors::prelude::SingleFieldError:
+            From<<CC as TryInto<::cas_codes::CAS>>::Error>,
     {
         let cas_code = cas_code.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(ReagentModelAttribute::CasCode)
         })?;
         self.cas_code = Some(cas_code);
@@ -304,11 +306,11 @@ where
     fn molecular_formula<MF>(mut self, molecular_formula: MF) -> Result<Self, Self::Error>
     where
         MF: TryInto<::molecular_formulas::MolecularFormula>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<MF as TryInto<::molecular_formulas::MolecularFormula>>::Error>,
     {
         let molecular_formula = molecular_formula.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(ReagentModelAttribute::MolecularFormula)
         })?;
         self.molecular_formula = Some(molecular_formula);
@@ -336,7 +338,7 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.id,
@@ -355,7 +357,7 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.id,
@@ -410,7 +412,7 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
@@ -448,7 +450,7 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         self.id = <AssetModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(

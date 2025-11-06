@@ -290,7 +290,7 @@ pub trait TeamSettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.teams.description` column.
     ///
     /// # Arguments
@@ -313,7 +313,7 @@ pub trait TeamSettable: Sized {
     fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>;
     /// Sets the value of the `public.teams.icon` column.
     ///
     /// # Arguments
@@ -335,7 +335,7 @@ pub trait TeamSettable: Sized {
     fn icon<I>(self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<I as TryInto<String>>::Error>;
     /// Sets the value of the `public.teams.color_id` column.
     ///
     /// # Arguments
@@ -440,7 +440,7 @@ pub trait TeamSettable: Sized {
     fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.teams.updated_by` column.
     ///
@@ -485,7 +485,7 @@ pub trait TeamSettable: Sized {
     fn updated_at<UA>(self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl TeamSettable for InsertableTeamBuilder
@@ -520,10 +520,11 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(TeamAttribute::Name)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(TeamAttribute::Name)
         })?;
         pgrx_validation::must_be_paragraph(name.as_ref()).map_err(|e| {
             e.rename_field(
@@ -537,10 +538,11 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         let description = description.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(TeamAttribute::Description)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(TeamAttribute::Description)
         })?;
         self.description = Some(description);
         Ok(self)
@@ -549,10 +551,11 @@ where
     fn icon<I>(mut self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(TeamAttribute::Icon)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(TeamAttribute::Icon)
         })?;
         pgrx_validation::must_be_font_awesome_class(icon.as_ref()).map_err(|e| {
             e.rename_field(
@@ -633,11 +636,12 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(TeamAttribute::CreatedAt)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(TeamAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
@@ -664,11 +668,12 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let updated_at = updated_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(TeamAttribute::UpdatedAt)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(TeamAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {

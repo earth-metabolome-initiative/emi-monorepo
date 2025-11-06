@@ -156,7 +156,7 @@ pub trait OrganizationSettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.organizations.url` column.
     ///
     /// # Arguments
@@ -178,7 +178,7 @@ pub trait OrganizationSettable: Sized {
     fn url<U>(self, url: U) -> Result<Self, Self::Error>
     where
         U: TryInto<String>,
-        validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<U as TryInto<String>>::Error>;
     /// Sets the value of the `public.organizations.country` column.
     ///
     /// # Arguments
@@ -201,7 +201,7 @@ pub trait OrganizationSettable: Sized {
     fn country<C>(self, country: C) -> Result<Self, Self::Error>
     where
         C: TryInto<String>,
-        validation_errors::SingleFieldError: From<<C as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<C as TryInto<String>>::Error>;
     /// Sets the value of the `public.organizations.alpha_two_code` column.
     ///
     /// # Arguments
@@ -224,7 +224,7 @@ pub trait OrganizationSettable: Sized {
     fn alpha_two_code<ATC>(self, alpha_two_code: ATC) -> Result<Self, Self::Error>
     where
         ATC: TryInto<::iso_codes::CountryCode>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<ATC as TryInto<::iso_codes::CountryCode>>::Error>;
     /// Sets the value of the `public.organizations.state_province` column.
     ///
@@ -248,7 +248,7 @@ pub trait OrganizationSettable: Sized {
     fn state_province<SP>(self, state_province: SP) -> Result<Self, Self::Error>
     where
         SP: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<SP as TryInto<Option<String>>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<SP as TryInto<Option<String>>>::Error>;
     /// Sets the value of the `public.organizations.domain` column.
     ///
     /// # Arguments
@@ -271,7 +271,7 @@ pub trait OrganizationSettable: Sized {
     fn domain<D>(self, domain: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>;
 }
 impl OrganizationSettable for InsertableOrganizationBuilder
 where
@@ -286,10 +286,11 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(OrganizationAttribute::Name)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(OrganizationAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -298,10 +299,11 @@ where
     fn url<U>(mut self, url: U) -> Result<Self, Self::Error>
     where
         U: TryInto<String>,
-        validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<U as TryInto<String>>::Error>,
     {
         let url = url.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(OrganizationAttribute::Url)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(OrganizationAttribute::Url)
         })?;
         self.url = Some(url);
         Ok(self)
@@ -310,10 +312,10 @@ where
     fn country<C>(mut self, country: C) -> Result<Self, Self::Error>
     where
         C: TryInto<String>,
-        validation_errors::SingleFieldError: From<<C as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<C as TryInto<String>>::Error>,
     {
         let country = country.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(OrganizationAttribute::Country)
         })?;
         self.country = Some(country);
@@ -323,11 +325,11 @@ where
     fn alpha_two_code<ATC>(mut self, alpha_two_code: ATC) -> Result<Self, Self::Error>
     where
         ATC: TryInto<::iso_codes::CountryCode>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<ATC as TryInto<::iso_codes::CountryCode>>::Error>,
     {
         let alpha_two_code = alpha_two_code.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(OrganizationAttribute::AlphaTwoCode)
         })?;
         self.alpha_two_code = Some(alpha_two_code);
@@ -337,10 +339,10 @@ where
     fn state_province<SP>(mut self, state_province: SP) -> Result<Self, Self::Error>
     where
         SP: TryInto<Option<String>>,
-        validation_errors::SingleFieldError: From<<SP as TryInto<Option<String>>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<SP as TryInto<Option<String>>>::Error>,
     {
         let state_province = state_province.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(OrganizationAttribute::StateProvince)
         })?;
         self.state_province = state_province;
@@ -350,10 +352,10 @@ where
     fn domain<D>(mut self, domain: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         let domain = domain.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(OrganizationAttribute::Domain)
         })?;
         self.domain = Some(domain);

@@ -1,5 +1,5 @@
-error: Function `is_not_empty` must return a `Result<(), validation_errors::SingleFieldError>` or `Result<(), validation_errors::DoubleFieldError>` to be decorated with `validation`, but returns `Result < bool, validation_errors :: SingleFieldError >`.
+error: Function `is_not_empty` must return a `Result<(), validation_errors::prelude::SingleFieldError>` or `Result<(), validation_errors::prelude::DoubleFieldError>` to be decorated with `validation`, but returns `Result < bool, validation_errors :: prelude :: SingleFieldError < () > >`.
  --> tests/ui/test_almost_correct_validation.rs:7:33
   |
-7 | pub fn is_not_empty(_arg: &str) -> Result<bool, validation_errors::SingleFieldError> {
-  |                                 ^
+7 | pub fn is_not_empty(_arg: &str) -> Result<bool, validation_errors::prelude::SingleFieldError> {
+  |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

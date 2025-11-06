@@ -332,7 +332,7 @@ pub trait ProjectSettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.projects.description` column.
     ///
     /// # Arguments
@@ -355,7 +355,7 @@ pub trait ProjectSettable: Sized {
     fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>;
     /// Sets the value of the `public.projects.state_id` column.
     ///
     /// # Arguments
@@ -398,7 +398,7 @@ pub trait ProjectSettable: Sized {
     fn icon<I>(self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<I as TryInto<String>>::Error>;
     /// Sets the value of the `public.projects.color_id` column.
     ///
     /// # Arguments
@@ -461,7 +461,7 @@ pub trait ProjectSettable: Sized {
     fn budget<B>(self, budget: B) -> Result<Self, Self::Error>
     where
         B: TryInto<Option<f64>>,
-        validation_errors::SingleFieldError: From<<B as TryInto<Option<f64>>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<B as TryInto<Option<f64>>>::Error>;
     /// Sets the value of the `public.projects.expenses` column.
     ///
     /// # Arguments
@@ -483,7 +483,7 @@ pub trait ProjectSettable: Sized {
     fn expenses<E>(self, expenses: E) -> Result<Self, Self::Error>
     where
         E: TryInto<Option<f64>>,
-        validation_errors::SingleFieldError: From<<E as TryInto<Option<f64>>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<E as TryInto<Option<f64>>>::Error>;
     /// Sets the value of the `public.projects.created_by` column.
     ///
     /// # Arguments
@@ -527,7 +527,7 @@ pub trait ProjectSettable: Sized {
     fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.projects.updated_by` column.
     ///
@@ -572,7 +572,7 @@ pub trait ProjectSettable: Sized {
     fn updated_at<UA>(self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.projects.expected_end_date` column.
     ///
@@ -596,7 +596,7 @@ pub trait ProjectSettable: Sized {
     fn expected_end_date<EED>(self, expected_end_date: EED) -> Result<Self, Self::Error>
     where
         EED: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<EED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.projects.end_date` column.
     ///
@@ -620,7 +620,7 @@ pub trait ProjectSettable: Sized {
     fn end_date<ED>(self, end_date: ED) -> Result<Self, Self::Error>
     where
         ED: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<ED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl ProjectSettable for InsertableProjectBuilder
@@ -655,10 +655,11 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::Name)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(ProjectAttribute::Name)
         })?;
         if let Some(description) = self.description.as_ref() {
             pgrx_validation::must_be_distinct(name.as_ref(), description)
@@ -682,10 +683,10 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         let description = description.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(ProjectAttribute::Description)
         })?;
         if let Some(name) = self.name.as_ref() {
@@ -719,10 +720,11 @@ where
     fn icon<I>(mut self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::Icon)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(ProjectAttribute::Icon)
         })?;
         pgrx_validation::must_be_font_awesome_class(icon.as_ref()).map_err(|e| {
             e.rename_field(
@@ -767,10 +769,11 @@ where
     fn budget<B>(mut self, budget: B) -> Result<Self, Self::Error>
     where
         B: TryInto<Option<f64>>,
-        validation_errors::SingleFieldError: From<<B as TryInto<Option<f64>>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<B as TryInto<Option<f64>>>::Error>,
     {
         let budget = budget.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::Budget)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(ProjectAttribute::Budget)
         })?;
         self.budget = budget;
         Ok(self)
@@ -779,10 +782,11 @@ where
     fn expenses<E>(mut self, expenses: E) -> Result<Self, Self::Error>
     where
         E: TryInto<Option<f64>>,
-        validation_errors::SingleFieldError: From<<E as TryInto<Option<f64>>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<E as TryInto<Option<f64>>>::Error>,
     {
         let expenses = expenses.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::Expenses)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(ProjectAttribute::Expenses)
         })?;
         self.expenses = expenses;
         Ok(self)
@@ -818,11 +822,12 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::CreatedAt)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(ProjectAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
@@ -851,11 +856,12 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let updated_at = updated_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::UpdatedAt)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(ProjectAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at)
@@ -874,11 +880,11 @@ where
     fn expected_end_date<EED>(mut self, expected_end_date: EED) -> Result<Self, Self::Error>
     where
         EED: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<EED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let expected_end_date = expected_end_date.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(ProjectAttribute::ExpectedEndDate)
         })?;
         self.expected_end_date = Some(expected_end_date);
@@ -888,11 +894,12 @@ where
     fn end_date<ED>(mut self, end_date: ED) -> Result<Self, Self::Error>
     where
         ED: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<ED as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let end_date = end_date.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(ProjectAttribute::EndDate)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(ProjectAttribute::EndDate)
         })?;
         self.end_date = Some(end_date);
         Ok(self)

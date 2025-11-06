@@ -460,7 +460,7 @@ pub trait CentrifugeProcedureTemplateSettable: Sized {
     fn kelvin<K>(self, kelvin: K) -> Result<Self, Self::Error>
     where
         K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<K as TryInto<f32>>::Error>;
     /// Sets the value of the
     /// `public.centrifuge_procedure_templates.kelvin_tolerance_percentage`
     /// column.
@@ -488,7 +488,7 @@ pub trait CentrifugeProcedureTemplateSettable: Sized {
     ) -> Result<Self, Self::Error>
     where
         KTP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<KTP as TryInto<f32>>::Error>;
     /// Sets the value of the `public.centrifuge_procedure_templates.seconds`
     /// column.
     ///
@@ -511,7 +511,7 @@ pub trait CentrifugeProcedureTemplateSettable: Sized {
     fn seconds<S>(self, seconds: S) -> Result<Self, Self::Error>
     where
         S: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<S as TryInto<f32>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<S as TryInto<f32>>::Error>;
     /// Sets the value of the
     /// `public.centrifuge_procedure_templates.rotation_per_minute` column.
     ///
@@ -534,7 +534,7 @@ pub trait CentrifugeProcedureTemplateSettable: Sized {
     fn rotation_per_minute<RPM>(self, rotation_per_minute: RPM) -> Result<Self, Self::Error>
     where
         RPM: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<RPM as TryInto<f32>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<RPM as TryInto<f32>>::Error>;
     /// Sets the value of the
     /// `public.centrifuge_procedure_templates.centrifuged_with_model` column.
     ///
@@ -663,12 +663,12 @@ where
     fn kelvin<K>(mut self, kelvin: K) -> Result<Self, Self::Error>
     where
         K: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<K as TryInto<f32>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<K as TryInto<f32>>::Error>,
     {
         let kelvin = kelvin
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(CentrifugeProcedureTemplateAttribute::Kelvin)
             })?;
         pgrx_validation::must_be_strictly_positive_f32(kelvin)
@@ -688,12 +688,12 @@ where
     ) -> Result<Self, Self::Error>
     where
         KTP: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<KTP as TryInto<f32>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<KTP as TryInto<f32>>::Error>,
     {
         let kelvin_tolerance_percentage = kelvin_tolerance_percentage
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(
                         CentrifugeProcedureTemplateAttribute::KelvinTolerancePercentage,
                     )
@@ -724,12 +724,12 @@ where
     fn seconds<S>(mut self, seconds: S) -> Result<Self, Self::Error>
     where
         S: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<S as TryInto<f32>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<S as TryInto<f32>>::Error>,
     {
         let seconds = seconds
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(CentrifugeProcedureTemplateAttribute::Seconds)
             })?;
         pgrx_validation::must_be_greater_than_f32(seconds, 30f32)
@@ -758,12 +758,12 @@ where
     ) -> Result<Self, Self::Error>
     where
         RPM: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<RPM as TryInto<f32>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<RPM as TryInto<f32>>::Error>,
     {
         let rotation_per_minute = rotation_per_minute
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(
                         CentrifugeProcedureTemplateAttribute::RotationPerMinute,
                     )
@@ -1099,7 +1099,7 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::name(
                 self.procedure_template,
@@ -1118,7 +1118,7 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::description(
                 self.procedure_template,
@@ -1155,7 +1155,7 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
@@ -1194,7 +1194,7 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
@@ -1215,7 +1215,7 @@ where
     fn deprecated<D>(mut self, deprecated: D) -> Result<Self, Self::Error>
     where
         D: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<D as TryInto<bool>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<bool>>::Error>,
     {
         self.procedure_template = <ProcedureTemplate as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateSettable>::deprecated(
                 self.procedure_template,

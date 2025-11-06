@@ -1443,13 +1443,13 @@ static FONT_AWESOME_CLASSES: Set<&'static str> = phf_set! {
 ///
 /// # Errors
 ///
-/// * `validation_errors::SingleFieldError::EmptyText` if the string is empty.
-pub fn must_be_font_awesome_class(value: &str) -> Result<(), validation_errors::SingleFieldError> {
+/// * `validation_errors::prelude::SingleFieldError::EmptyText` if the string is
+///   empty.
+pub fn must_be_font_awesome_class(
+    value: &str,
+) -> Result<(), validation_errors::prelude::SingleFieldError> {
     if !FONT_AWESOME_CLASSES.contains(value) {
-        return Err(validation_errors::SingleFieldError::InvalidFontAwesomeClass(
-            (),
-            value.to_owned(),
-        ));
+        return Err(format!("'{value}' is not a valid Font Awesome class name.").into());
     }
     Ok(())
 }

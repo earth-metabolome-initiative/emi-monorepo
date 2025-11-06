@@ -142,7 +142,7 @@ pub trait TemporaryUserSettable: Sized {
     fn email<E>(self, email: E) -> Result<Self, Self::Error>
     where
         E: TryInto<String>,
-        validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<E as TryInto<String>>::Error>;
     /// Sets the value of the `public.temporary_user.login_provider_id` column.
     ///
     /// # Arguments
@@ -178,12 +178,12 @@ where
     fn email<E>(mut self, email: E) -> Result<Self, Self::Error>
     where
         E: TryInto<String>,
-        validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<E as TryInto<String>>::Error>,
     {
         let email = email
             .try_into()
             .map_err(|err| {
-                validation_errors::SingleFieldError::from(err)
+                validation_errors::prelude::SingleFieldError::from(err)
                     .rename_field(TemporaryUserAttribute::Email)
             })?;
         pgrx_validation::must_be_email(email.as_ref())

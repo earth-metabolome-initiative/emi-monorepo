@@ -1,10 +1,10 @@
 //! Submodule defining the structs used for double field validation errors.
 
-use crate::traits::ValidationErrorLike;
+use crate::{structs::Unspecified, traits::ValidationErrorLike};
 
 #[derive(Debug)]
 /// Enumeration of errors that can occur during validation of two fields.
-pub enum DoubleFieldError<FieldName> {
+pub enum DoubleFieldError<FieldName = Unspecified> {
     /// The provided entries should be distinct.
     MustBeDistinct(FieldName, FieldName),
     /// The provided left entry must be strictly smaller than the right entry.
@@ -16,5 +16,5 @@ pub enum DoubleFieldError<FieldName> {
     /// The provided left entry must be greater than the right entry.
     MustBeGreaterThan(FieldName, FieldName),
     /// Some third-party validation error.
-    Generic(FieldName, Box<dyn ValidationErrorLike>),
+    Generic(FieldName, FieldName, Box<dyn ValidationErrorLike>),
 }

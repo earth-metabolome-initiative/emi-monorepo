@@ -149,7 +149,7 @@ pub trait UserSettable: Sized {
     fn first_name<FN>(self, first_name: FN) -> Result<Self, Self::Error>
     where
         FN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<FN as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<FN as TryInto<String>>::Error>;
     /// Sets the value of the `public.users.last_name` column.
     ///
     /// # Arguments
@@ -171,7 +171,7 @@ pub trait UserSettable: Sized {
     fn last_name<LN>(self, last_name: LN) -> Result<Self, Self::Error>
     where
         LN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<LN as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<LN as TryInto<String>>::Error>;
     /// Sets the value of the `public.users.created_at` column.
     ///
     /// # Arguments
@@ -194,7 +194,7 @@ pub trait UserSettable: Sized {
     fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.users.updated_at` column.
     ///
@@ -218,7 +218,7 @@ pub trait UserSettable: Sized {
     fn updated_at<UA>(self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl UserSettable for InsertableUserBuilder
@@ -234,10 +234,11 @@ where
     fn first_name<FN>(mut self, first_name: FN) -> Result<Self, Self::Error>
     where
         FN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<FN as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<FN as TryInto<String>>::Error>,
     {
         let first_name = first_name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(UserAttribute::FirstName)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(UserAttribute::FirstName)
         })?;
         pgrx_validation::must_be_paragraph(first_name.as_ref()).map_err(|e| {
             e.rename_field(
@@ -251,10 +252,11 @@ where
     fn last_name<LN>(mut self, last_name: LN) -> Result<Self, Self::Error>
     where
         LN: TryInto<String>,
-        validation_errors::SingleFieldError: From<<LN as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<LN as TryInto<String>>::Error>,
     {
         let last_name = last_name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(UserAttribute::LastName)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(UserAttribute::LastName)
         })?;
         pgrx_validation::must_be_paragraph(last_name.as_ref()).map_err(|e| {
             e.rename_field(
@@ -268,11 +270,12 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(UserAttribute::CreatedAt)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(UserAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
@@ -289,11 +292,12 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let updated_at = updated_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(UserAttribute::UpdatedAt)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(UserAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {

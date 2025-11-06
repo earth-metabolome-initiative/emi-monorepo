@@ -366,7 +366,7 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         self.commercial_bead_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.commercial_bead_lots_id_fkey,
@@ -385,7 +385,7 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         self.commercial_bead_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.commercial_bead_lots_id_fkey,
@@ -455,7 +455,7 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
@@ -494,7 +494,7 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError: From<
+        validation_errors::prelude::SingleFieldError: From<
             <UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error,
         >,
     {
@@ -536,7 +536,7 @@ where
     ) -> Result<Self, Self::Error>
     where
         DM: TryInto<f32>,
-        validation_errors::SingleFieldError: From<<DM as TryInto<f32>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<DM as TryInto<f32>>::Error>,
     {
         self.commercial_bead_lots_id_fkey1 = <BeadModel as crate::codegen::structs_codegen::tables::insertables::BeadModelSettable>::diameter_millimeters(
                 self.commercial_bead_lots_id_fkey1,
@@ -578,7 +578,7 @@ where
     fn lot<L>(mut self, lot: L) -> Result<Self, Self::Error>
     where
         L: TryInto<String>,
-        validation_errors::SingleFieldError: From<<L as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<L as TryInto<String>>::Error>,
     {
         self.commercial_bead_lots_id_fkey = <CommercialProductLot as crate::codegen::structs_codegen::tables::insertables::CommercialProductLotSettable>::lot(
                 self.commercial_bead_lots_id_fkey,

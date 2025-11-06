@@ -226,7 +226,7 @@ pub trait RoomSettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.rooms.description` column.
     ///
     /// # Arguments
@@ -249,7 +249,7 @@ pub trait RoomSettable: Sized {
     fn description<D>(self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>;
     /// Sets the value of the `public.rooms.qrcode` column.
     ///
     /// # Arguments
@@ -271,7 +271,8 @@ pub trait RoomSettable: Sized {
     fn qrcode<Q>(self, qrcode: Q) -> Result<Self, Self::Error>
     where
         Q: TryInto<::rosetta_uuid::Uuid>,
-        validation_errors::SingleFieldError: From<<Q as TryInto<::rosetta_uuid::Uuid>>::Error>;
+        validation_errors::prelude::SingleFieldError:
+            From<<Q as TryInto<::rosetta_uuid::Uuid>>::Error>;
     /// Sets the value of the `public.rooms.addresses_id` column.
     ///
     /// # Arguments
@@ -315,7 +316,7 @@ pub trait RoomSettable: Sized {
     fn geolocation<G>(self, geolocation: G) -> Result<Self, Self::Error>
     where
         G: TryInto<postgis_diesel::types::Point>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<G as TryInto<postgis_diesel::types::Point>>::Error>;
     /// Sets the value of the `public.rooms.created_by` column.
     ///
@@ -360,7 +361,7 @@ pub trait RoomSettable: Sized {
     fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.rooms.updated_by` column.
     ///
@@ -405,7 +406,7 @@ pub trait RoomSettable: Sized {
     fn updated_at<UA>(self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
 }
 impl RoomSettable for InsertableRoomBuilder
@@ -421,10 +422,11 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(RoomAttribute::Name)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(RoomAttribute::Name)
         })?;
         pgrx_validation::must_be_paragraph(name.as_ref()).map_err(|e| {
             e.rename_field(
@@ -438,10 +440,11 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         let description = description.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(RoomAttribute::Description)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(RoomAttribute::Description)
         })?;
         pgrx_validation::must_be_paragraph(description.as_ref()).map_err(|e| {
             e.rename_field(
@@ -455,10 +458,12 @@ where
     fn qrcode<Q>(mut self, qrcode: Q) -> Result<Self, Self::Error>
     where
         Q: TryInto<::rosetta_uuid::Uuid>,
-        validation_errors::SingleFieldError: From<<Q as TryInto<::rosetta_uuid::Uuid>>::Error>,
+        validation_errors::prelude::SingleFieldError:
+            From<<Q as TryInto<::rosetta_uuid::Uuid>>::Error>,
     {
         let qrcode = qrcode.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(RoomAttribute::Qrcode)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(RoomAttribute::Qrcode)
         })?;
         self.qrcode = Some(qrcode);
         Ok(self)
@@ -477,11 +482,12 @@ where
     fn geolocation<G>(mut self, geolocation: G) -> Result<Self, Self::Error>
     where
         G: TryInto<postgis_diesel::types::Point>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<G as TryInto<postgis_diesel::types::Point>>::Error>,
     {
         let geolocation = geolocation.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(RoomAttribute::Geolocation)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(RoomAttribute::Geolocation)
         })?;
         self.geolocation = Some(geolocation);
         Ok(self)
@@ -517,11 +523,12 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(RoomAttribute::CreatedAt)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(RoomAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
@@ -548,11 +555,12 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let updated_at = updated_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(RoomAttribute::UpdatedAt)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(RoomAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
             pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {

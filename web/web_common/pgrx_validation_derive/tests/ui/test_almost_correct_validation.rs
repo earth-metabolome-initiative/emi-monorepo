@@ -4,7 +4,7 @@ use pgrx_validation_derive::validation;
 
 #[validation]
 /// A simple validation function which returns the wrong error type should fail.
-pub fn is_not_empty(_arg: &str) -> Result<bool, validation_errors::SingleFieldError> {
+pub fn is_not_empty(_arg: &str) -> Result<bool, validation_errors::prelude::SingleFieldError> {
 	Ok(true)
 }
 

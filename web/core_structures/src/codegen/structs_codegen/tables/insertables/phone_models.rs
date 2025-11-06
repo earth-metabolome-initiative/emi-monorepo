@@ -232,7 +232,7 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::name(
                 self.phone_models_camera,
@@ -251,7 +251,7 @@ where
     fn description<D>(mut self, description: D) -> Result<Self, Self::Error>
     where
         D: TryInto<String>,
-        validation_errors::SingleFieldError: From<<D as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<D as TryInto<String>>::Error>,
     {
         self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::description(
                 self.phone_models_camera,
@@ -321,7 +321,7 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::created_at(
@@ -359,7 +359,7 @@ where
     fn updated_at<UA>(mut self, updated_at: UA) -> Result<Self, Self::Error>
     where
         UA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<UA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         self.phone_models_camera = <CameraModel as crate::codegen::structs_codegen::tables::insertables::AssetModelSettable>::updated_at(

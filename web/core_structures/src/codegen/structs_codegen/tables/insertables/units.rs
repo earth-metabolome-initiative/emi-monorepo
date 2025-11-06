@@ -146,7 +146,7 @@ pub trait UnitSettable: Sized {
     fn name<N>(self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>;
     /// Sets the value of the `public.units.unit` column.
     ///
     /// # Arguments
@@ -168,7 +168,7 @@ pub trait UnitSettable: Sized {
     fn unit<U>(self, unit: U) -> Result<Self, Self::Error>
     where
         U: TryInto<String>,
-        validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<U as TryInto<String>>::Error>;
     /// Sets the value of the `public.units.icon` column.
     ///
     /// # Arguments
@@ -190,7 +190,7 @@ pub trait UnitSettable: Sized {
     fn icon<I>(self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<I as TryInto<String>>::Error>;
     /// Sets the value of the `public.units.color_id` column.
     ///
     /// # Arguments
@@ -225,10 +225,11 @@ where
     fn name<N>(mut self, name: N) -> Result<Self, Self::Error>
     where
         N: TryInto<String>,
-        validation_errors::SingleFieldError: From<<N as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<N as TryInto<String>>::Error>,
     {
         let name = name.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(UnitAttribute::Name)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(UnitAttribute::Name)
         })?;
         self.name = Some(name);
         Ok(self)
@@ -237,10 +238,11 @@ where
     fn unit<U>(mut self, unit: U) -> Result<Self, Self::Error>
     where
         U: TryInto<String>,
-        validation_errors::SingleFieldError: From<<U as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<U as TryInto<String>>::Error>,
     {
         let unit = unit.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(UnitAttribute::Unit)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(UnitAttribute::Unit)
         })?;
         self.unit = Some(unit);
         Ok(self)
@@ -249,10 +251,11 @@ where
     fn icon<I>(mut self, icon: I) -> Result<Self, Self::Error>
     where
         I: TryInto<String>,
-        validation_errors::SingleFieldError: From<<I as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<I as TryInto<String>>::Error>,
     {
         let icon = icon.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(UnitAttribute::Icon)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(UnitAttribute::Icon)
         })?;
         self.icon = Some(icon);
         Ok(self)

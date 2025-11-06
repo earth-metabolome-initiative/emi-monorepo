@@ -57,7 +57,7 @@ impl Column {
             Ok(Some(quote! {
                 where
                     #column_acronym: TryInto<#argument_type>,
-                    validation_errors::SingleFieldError: From<<#column_acronym as TryInto<#argument_type>>::Error>
+                    validation_errors::prelude::SingleFieldError: From<<#column_acronym as TryInto<#argument_type>>::Error>
             }))
         }
     }

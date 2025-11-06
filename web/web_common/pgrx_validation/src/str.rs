@@ -12,15 +12,11 @@ use validator::ValidateEmail;
 ///
 /// # Errors
 ///
-/// * `validation_errors::SingleFieldError::InvalidMail` if the string is not a
-///   valid mail address.
-pub fn must_be_email(value: &str) -> Result<(), validation_errors::SingleFieldError> {
+/// * `validation_errors::prelude::SingleFieldError::InvalidMail` if the string
+///   is not a valid mail address.
+pub fn must_be_email(value: &str) -> Result<(), validation_errors::prelude::SingleFieldError> {
     must_not_be_empty(value)?;
-    if value.validate_email() {
-        Ok(())
-    } else {
-        Err(validation_errors::SingleFieldError::InvalidMail(()))
-    }
+    if value.validate_email() { Ok(()) } else { Err("Invalid mail address".into()) }
 }
 
 #[validation]
@@ -32,29 +28,11 @@ pub fn must_be_email(value: &str) -> Result<(), validation_errors::SingleFieldEr
 ///
 /// # Errors
 ///
-/// * `validation_errors::SingleFieldError::EmptyText` if the string is empty.
-pub fn must_not_be_empty(value: &str) -> Result<(), validation_errors::SingleFieldError> {
-    if value.is_empty() { Err(validation_errors::SingleFieldError::EmptyText(())) } else { Ok(()) }
-}
-
-#[validation]
-/// Validates that two provided strings are distinct.
-///
-/// # Arguments
-///
-/// * `left` a string
-/// * `right` a string
-///
-/// # Errors
-///
-/// * `validation_errors::DoubleFieldError::NotDistinct((), ())` if the two
-///   strings are equal.
-pub fn must_be_distinct(
-    left: &str,
-    right: &str,
-) -> Result<(), validation_errors::DoubleFieldError> {
-    if left == right {
-        Err(validation_errors::DoubleFieldError::NotDistinct((), ()))
+/// * `validation_errors::prelude::SingleFieldError::EmptyText` if the string is
+///   empty.
+pub fn must_not_be_empty(value: &str) -> Result<(), validation_errors::prelude::SingleFieldError> {
+    if value.is_empty() {
+        Err(validation_errors::prelude::SingleFieldError::empty_text())
     } else {
         Ok(())
     }
@@ -69,11 +47,11 @@ pub fn must_be_distinct(
 ///
 /// # Errors
 ///
-/// * `validation_errors::SingleFieldError::PaddedText` if the
+/// * `validation_errors::prelude::SingleFieldError::PaddedText` if the
 ///  string has leading or trailing whitespace.
-pub fn must_not_be_padded(value: &str) -> Result<(), validation_errors::SingleFieldError> {
+pub fn must_not_be_padded(value: &str) -> Result<(), validation_errors::prelude::SingleFieldError> {
     if value.trim_start() != value || value.trim_end() != value {
-        Err(validation_errors::SingleFieldError::PaddedText(()))
+        Err("Must not be padded".into())
     } else {
         Ok(())
     }
@@ -88,13 +66,14 @@ pub fn must_not_be_padded(value: &str) -> Result<(), validation_errors::SingleFi
 ///
 /// # Errors
 ///
-/// * `validation_errors::SingleFieldError::ConsecutiveWhitespace` if the
+/// * `validation_errors::prelude::SingleFieldError::ConsecutiveWhitespace` if
+///   the
 /// string contains two or more consecutive whitespace.
 pub fn must_not_contain_consecutive_whitespace(
     value: &str,
-) -> Result<(), validation_errors::SingleFieldError> {
+) -> Result<(), validation_errors::prelude::SingleFieldError> {
     if value.contains("  ") {
-        Err(validation_errors::SingleFieldError::ConsecutiveWhitespace(()))
+        Err("Must not contain consecutive whitespace".into())
     } else {
         Ok(())
     }
@@ -109,13 +88,13 @@ pub fn must_not_contain_consecutive_whitespace(
 ///
 /// # Errors
 ///
-/// * `validation_errors::SingleFieldError::ControlCharacters` if the
+/// * `validation_errors::prelude::SingleFieldError::ControlCharacters` if the
 /// string contains control characters.
 pub fn must_not_contain_control_characters(
     value: &str,
-) -> Result<(), validation_errors::SingleFieldError> {
+) -> Result<(), validation_errors::prelude::SingleFieldError> {
     if value.chars().any(char::is_control) {
-        Err(validation_errors::SingleFieldError::ControlCharacters(()))
+        Err("Must not contain control characters".into())
     } else {
         Ok(())
     }
@@ -135,9 +114,9 @@ pub fn must_not_contain_control_characters(
 ///
 /// # Errors
 ///
-/// * `validation_errors::SingleFieldError::InvalidParagraph` if the
+/// * `validation_errors::prelude::SingleFieldError::InvalidParagraph` if the
 /// string is not a valid paragraph.
-pub fn must_be_paragraph(value: &str) -> Result<(), validation_errors::SingleFieldError> {
+pub fn must_be_paragraph(value: &str) -> Result<(), validation_errors::prelude::SingleFieldError> {
     must_not_be_empty(value)?;
     must_not_be_padded(value)?;
     must_not_contain_consecutive_whitespace(value)?;
@@ -167,25 +146,15 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_must_not_be_empty() {
-        let x = "";
-        assert_eq!(
-            must_not_be_empty(x).unwrap_err(),
-            validation_errors::SingleFieldError::EmptyText(())
-        );
-        assert!(must_not_be_empty("marco").is_ok());
-    }
-
-    #[test]
     fn test_must_be_email() {
         assert!(must_be_email("marco.visani@unifr.ch").is_ok());
         assert_eq!(
-            must_be_email("marco").unwrap_err(),
-            validation_errors::SingleFieldError::InvalidMail(())
+            must_be_email("marco").unwrap_err().to_string(),
+            "Field `Unspecified`: Invalid mail address"
         );
         assert_eq!(
-            must_be_email("").unwrap_err(),
-            validation_errors::SingleFieldError::EmptyText(())
+            must_be_email("").unwrap_err().to_string(),
+            "Field `Unspecified` must not be empty"
         );
     }
 
@@ -193,8 +162,8 @@ mod tests {
     fn test_must_not_be_padded() {
         assert!(must_not_be_padded("marco").is_ok());
         assert_eq!(
-            must_not_be_padded(" marco ").unwrap_err(),
-            validation_errors::SingleFieldError::PaddedText(())
+            must_not_be_padded(" marco ").unwrap_err().to_string(),
+            "Field `Unspecified`: Must not be padded"
         );
     }
 
@@ -202,43 +171,34 @@ mod tests {
     fn test_must_not_contain_control_characters() {
         assert!(must_not_contain_control_characters("marco").is_ok());
         assert_eq!(
-            must_not_contain_control_characters("marco\n").unwrap_err(),
-            validation_errors::SingleFieldError::ControlCharacters(())
-        );
-    }
-
-    #[test]
-    fn test_must_be_distinct() {
-        assert!(must_be_distinct("marco", "visani").is_ok());
-        assert_eq!(
-            must_be_distinct("marco", "marco").unwrap_err(),
-            validation_errors::DoubleFieldError::NotDistinct((), ())
+            must_not_contain_control_characters("marco\n").unwrap_err().to_string(),
+            "Field `Unspecified`: Must not contain control characters"
         );
     }
 
     #[test]
     fn test_must_not_contain_consecutive_whitespace() {
-        assert_eq!(must_not_contain_consecutive_whitespace("marco visani"), Ok(()));
+        assert!(must_not_contain_consecutive_whitespace("marco visani").is_ok());
         assert_eq!(
-            must_not_contain_consecutive_whitespace("marco  visani").unwrap_err(),
-            validation_errors::SingleFieldError::ConsecutiveWhitespace(())
+            must_not_contain_consecutive_whitespace("marco  visani").unwrap_err().to_string(),
+            "Field `Unspecified`: Must not contain consecutive whitespace"
         );
     }
 
     #[test]
     fn test_must_be_paragraph() {
-        assert_eq!(must_be_paragraph("marco visani"), Ok(()));
+        assert!(must_be_paragraph("marco visani").is_ok());
         assert_eq!(
-            must_be_paragraph("marco  visani").unwrap_err(),
-            validation_errors::SingleFieldError::ConsecutiveWhitespace(())
+            must_be_paragraph("marco  visani").unwrap_err().to_string(),
+            "Field `Unspecified`: Must not contain consecutive whitespace"
         );
         assert_eq!(
-            must_be_paragraph("marco\nvisani").unwrap_err(),
-            validation_errors::SingleFieldError::ControlCharacters(())
+            must_be_paragraph("marco\nvisani").unwrap_err().to_string(),
+            "Field `Unspecified`: Must not contain control characters"
         );
         assert_eq!(
-            must_be_paragraph("").unwrap_err(),
-            validation_errors::SingleFieldError::EmptyText(())
+            must_be_paragraph("").unwrap_err().to_string(),
+            "Field `Unspecified` must not be empty"
         );
     }
 }

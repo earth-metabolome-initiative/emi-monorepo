@@ -160,7 +160,7 @@ pub trait UserEmailSettable: Sized {
     fn email<E>(self, email: E) -> Result<Self, Self::Error>
     where
         E: TryInto<String>,
-        validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<E as TryInto<String>>::Error>;
     /// Sets the value of the `public.user_emails.created_by` column.
     ///
     /// # Arguments
@@ -204,7 +204,7 @@ pub trait UserEmailSettable: Sized {
     fn created_at<CA>(self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>;
     /// Sets the value of the `public.user_emails.primary_email` column.
     ///
@@ -227,7 +227,7 @@ pub trait UserEmailSettable: Sized {
     fn primary_email<PE>(self, primary_email: PE) -> Result<Self, Self::Error>
     where
         PE: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<PE as TryInto<bool>>::Error>;
+        validation_errors::prelude::SingleFieldError: From<<PE as TryInto<bool>>::Error>;
 }
 impl UserEmailSettable for InsertableUserEmailBuilder
 where
@@ -242,10 +242,11 @@ where
     fn email<E>(mut self, email: E) -> Result<Self, Self::Error>
     where
         E: TryInto<String>,
-        validation_errors::SingleFieldError: From<<E as TryInto<String>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<E as TryInto<String>>::Error>,
     {
         let email = email.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err).rename_field(UserEmailAttribute::Email)
+            validation_errors::prelude::SingleFieldError::from(err)
+                .rename_field(UserEmailAttribute::Email)
         })?;
         pgrx_validation::must_be_email(email.as_ref()).map_err(|e| {
             e.rename_field(
@@ -269,11 +270,11 @@ where
     fn created_at<CA>(mut self, created_at: CA) -> Result<Self, Self::Error>
     where
         CA: TryInto<::rosetta_timestamp::TimestampUTC>,
-        validation_errors::SingleFieldError:
+        validation_errors::prelude::SingleFieldError:
             From<<CA as TryInto<::rosetta_timestamp::TimestampUTC>>::Error>,
     {
         let created_at = created_at.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(UserEmailAttribute::CreatedAt)
         })?;
         self.created_at = Some(created_at);
@@ -283,10 +284,10 @@ where
     fn primary_email<PE>(mut self, primary_email: PE) -> Result<Self, Self::Error>
     where
         PE: TryInto<bool>,
-        validation_errors::SingleFieldError: From<<PE as TryInto<bool>>::Error>,
+        validation_errors::prelude::SingleFieldError: From<<PE as TryInto<bool>>::Error>,
     {
         let primary_email = primary_email.try_into().map_err(|err| {
-            validation_errors::SingleFieldError::from(err)
+            validation_errors::prelude::SingleFieldError::from(err)
                 .rename_field(UserEmailAttribute::PrimaryEmail)
         })?;
         self.primary_email = Some(primary_email);
