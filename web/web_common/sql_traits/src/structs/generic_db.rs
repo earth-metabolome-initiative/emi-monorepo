@@ -36,7 +36,7 @@ where
     /// List of functions created in the database.
     functions: Vec<(Rc<Func>, Func::Meta)>,
     /// Phantom data for check constraints.
-    _check_constraints: std::marker::PhantomData<Ch>,
+    check_constraints: Vec<(Rc<Ch>, Ch::Meta)>,
 }
 
 impl<T, C, U, F, Func, Ch> Debug for GenericDB<T, C, U, F, Func, Ch>
@@ -77,7 +77,7 @@ where
             unique_indices: self.unique_indices.clone(),
             foreign_keys: self.foreign_keys.clone(),
             functions: self.functions.clone(),
-            _check_constraints: std::marker::PhantomData,
+            check_constraints: self.check_constraints.clone(),
         }
     }
 }
@@ -121,6 +121,14 @@ where
             .binary_search_by(|(i, _)| i.as_ref().cmp(index))
             .map(|index| &self.unique_indices[index].1)
             .expect("Index not found in GenericDB")
+    }
+
+    /// Returns a reference to the metadata of the specified check constraint.
+    pub fn check_constraint_metadata(&self, constraint: &Ch) -> &Ch::Meta {
+        self.check_constraints
+            .binary_search_by(|(c, _)| c.as_ref().cmp(constraint))
+            .map(|index| &self.check_constraints[index].1)
+            .expect("Check constraint not found in GenericDB")
     }
 
     /// Returns a reference to the metadata of the specified foreign key.

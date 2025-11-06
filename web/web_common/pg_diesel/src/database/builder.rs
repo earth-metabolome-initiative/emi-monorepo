@@ -265,6 +265,13 @@ impl Builder for PgDatabaseBuilder<'_> {
         for table in tables {
             let table_metadata = table.metadata(connection, &self.denylist_types)?;
 
+            for check_constraint in table_metadata.check_constraint_rcs() {
+                builder = builder.add_check_constraint(
+                    check_constraint.clone(),
+                    check_constraint.metadata(table.clone(), &table_metadata, connection)?,
+                );
+            }
+
             for column in table_metadata.column_rcs() {
                 builder =
                     builder.add_column(column.clone(), column.metadata(table.clone(), connection)?);

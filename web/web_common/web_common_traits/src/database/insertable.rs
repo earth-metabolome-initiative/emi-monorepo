@@ -221,7 +221,7 @@ pub enum InsertError<FieldName: TableField> {
     /// A build error occurred.
     BuilderError(BuilderError<FieldName>),
     /// A validation error occurred.
-    ValidationError(validation_errors::Error<FieldName>),
+    ValidationError(validation_errors::prelude::ValidationError<FieldName>),
     /// A diesel error occurred.
     DieselError(String),
     /// A foreign key was violated.
@@ -306,7 +306,9 @@ impl<FieldName: TableField> core::fmt::Display for InsertError<FieldName> {
                 <BuilderError<FieldName> as core::fmt::Display>::fmt(error, f)
             }
             InsertError::ValidationError(error) => {
-                <validation_errors::Error<FieldName> as core::fmt::Display>::fmt(error, f)
+                <validation_errors::prelude::ValidationError<FieldName> as core::fmt::Display>::fmt(
+                    error, f,
+                )
             }
             InsertError::DieselError(error) => {
                 write!(f, "Diesel error: {error}")
@@ -357,8 +359,10 @@ impl<FieldName: TableField> From<BuilderError<FieldName>> for InsertError<FieldN
     }
 }
 
-impl<FieldName: TableField> From<validation_errors::Error<FieldName>> for InsertError<FieldName> {
-    fn from(error: validation_errors::Error<FieldName>) -> Self {
+impl<FieldName: TableField> From<validation_errors::prelude::ValidationError<FieldName>>
+    for InsertError<FieldName>
+{
+    fn from(error: validation_errors::prelude::ValidationError<FieldName>) -> Self {
         InsertError::ValidationError(error)
     }
 }
@@ -367,7 +371,7 @@ impl<FieldName: TableField> From<validation_errors::SingleFieldError<FieldName>>
     for InsertError<FieldName>
 {
     fn from(error: validation_errors::SingleFieldError<FieldName>) -> Self {
-        let validation_error: validation_errors::Error<FieldName> = error.into();
+        let validation_error: validation_errors::prelude::ValidationError<FieldName> = error.into();
         validation_error.into()
     }
 }
@@ -376,7 +380,7 @@ impl<FieldName: TableField> From<validation_errors::DoubleFieldError<FieldName>>
     for InsertError<FieldName>
 {
     fn from(error: validation_errors::DoubleFieldError<FieldName>) -> Self {
-        let validation_error: validation_errors::Error<FieldName> = error.into();
+        let validation_error: validation_errors::prelude::ValidationError<FieldName> = error.into();
         validation_error.into()
     }
 }

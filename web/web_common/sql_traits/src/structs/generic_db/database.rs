@@ -15,7 +15,7 @@ where
     U: UniqueIndexLike<DB = Self>,
     F: ForeignKeyLike<DB = Self>,
     Func: FunctionLike<DB = Self>,
-    Ch: CheckConstraintLike,
+    Ch: CheckConstraintLike<DB = Self>,
 {
     type Table = T;
     type Column = C;

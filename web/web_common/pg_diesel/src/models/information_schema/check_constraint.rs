@@ -1,11 +1,18 @@
-use std::fmt::{Debug, Display};
+use std::{
+    fmt::{Debug, Display},
+    rc::Rc,
+};
 
 use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, Queryable,
     QueryableByName, Selectable, SelectableHelper,
 };
+use sql_traits::structs::metadata::CheckMetadata;
 
-use crate::models::{Column, PgConstraint, PgOperator, PgProc, Table, TableConstraint};
+use crate::{
+    model_metadata::TableMetadata,
+    models::{Column, PgConstraint, PgOperator, PgProc, Table, TableConstraint},
+};
 
 mod cached_queries;
 
@@ -142,5 +149,49 @@ impl CheckConstraint {
     /// * If their is an error while querying the database.
     pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
         cached_queries::columns(self, conn)
+    }
+
+    /// Returns the metadata for this check constraint
+    ///
+    /// # Arguments
+    ///
+    /// * `table` - The table this check constraint belongs to
+    /// * `table_metadata` - The metadata of the table
+    /// * `conn` - A mutable reference to a `PgConnection`
+    ///
+    /// # Errors
+    ///
+    /// * If there is an error while querying the database.
+    ///
+    /// # Panics
+    ///
+    /// * If the check clause cannot be parsed into an expression, which should
+    ///  not happen if the database is consistent.
+    pub fn metadata(
+        &self,
+        table: Rc<Table>,
+        table_metadata: &TableMetadata,
+        conn: &mut PgConnection,
+    ) -> Result<CheckMetadata<CheckConstraint>, diesel::result::Error> {
+        use sqlparser::parser::Parser;
+        let expression = Parser::new(&sqlparser::dialect::PostgreSqlDialect {})
+            .try_with_sql(self.check_clause.as_str())
+            .expect("Failed to parse unique constraint expression")
+            .parse_expr()
+            .expect("No expression found in parsed unique constraint");
+
+        Ok(CheckMetadata::new(
+            expression,
+            table,
+            self.columns(conn)?
+                .into_iter()
+                .filter_map(|col| {
+                    table_metadata
+                        .column_rcs()
+                        .find(|table_col| table_col.column_name == col.column_name)
+                        .cloned()
+                })
+                .collect(),
+        ))
     }
 }

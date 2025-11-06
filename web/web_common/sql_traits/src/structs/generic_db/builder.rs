@@ -37,7 +37,7 @@ where
     /// List of functions created in the database.
     functions: Vec<(Rc<Func>, Func::Meta)>,
     /// Phantom data for check constraints.
-    _check_constraints: std::marker::PhantomData<Ch>,
+    check_constraints: Vec<(Rc<Ch>, Ch::Meta)>,
 }
 
 impl<T, C, U, F, Func, Ch> Default for GenericDBBuilder<T, C, U, F, Func, Ch>
@@ -57,7 +57,7 @@ where
             unique_indices: Vec::new(),
             foreign_keys: Vec::new(),
             functions: Vec::new(),
-            _check_constraints: std::marker::PhantomData,
+            check_constraints: Vec::new(),
         }
     }
 }
@@ -162,6 +162,12 @@ where
         self.functions.extend(functions);
         self
     }
+
+    /// Adds a check constraint with its metadata to the builder.
+    pub fn add_check_constraint(mut self, constraint: Rc<Ch>, metadata: Ch::Meta) -> Self {
+        self.check_constraints.push((constraint, metadata));
+        self
+    }
 }
 
 impl<T, C, U, F, Func, Ch> Attributed for GenericDBBuilder<T, C, U, F, Func, Ch>
@@ -215,6 +221,7 @@ where
         self.unique_indices.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
         self.foreign_keys.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
         self.functions.sort_unstable_by(|(a, _), (b, _)| a.name().cmp(b.name()));
+        self.check_constraints.sort_unstable_by(|(a, _), (b, _)| a.as_ref().cmp(b.as_ref()));
 
         Ok(GenericDB {
             catalog_name,
@@ -223,7 +230,7 @@ where
             unique_indices: self.unique_indices,
             foreign_keys: self.foreign_keys,
             functions: self.functions,
-            _check_constraints: std::marker::PhantomData,
+            check_constraints: self.check_constraints,
         })
     }
 }

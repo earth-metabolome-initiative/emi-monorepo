@@ -13,7 +13,7 @@ lazy_static! {
         .unwrap()
         .add_type(
             ExternalType::new()
-                .rust_type(syn::parse_quote!(validation_errors::ValidationError))
+                .rust_type(syn::parse_quote!(validation_errors::prelude::ValidationError))
                 .build()
                 .unwrap(),
         )

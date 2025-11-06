@@ -6,7 +6,7 @@ use diesel::{
     SelectableHelper,
 };
 
-use crate::models::{CheckConstraint, Column, PgConstraint, TableConstraint};
+use crate::models::{CheckConstraint, Column, TableConstraint};
 
 #[pg_cached::auto_cached]
 pub(super) fn columns(
@@ -59,23 +59,5 @@ pub fn table_constraint(
                 .and(table_constraints::constraint_schema.eq(&check_constraint.constraint_schema)),
         )
         .select(TableConstraint::as_select())
-        .first(conn)?)
-}
-
-#[pg_cached::auto_cached]
-pub fn pg_constraint(
-    check_constraint: &CheckConstraint,
-    conn: &mut PgConnection,
-) -> Result<PgConstraint, diesel::result::Error> {
-    use crate::schema::pg_catalog::{pg_constraint::pg_constraint, pg_namespace::pg_namespace};
-    Ok(pg_constraint::table
-        .inner_join(pg_namespace::table.on(pg_constraint::connamespace.eq(pg_namespace::oid)))
-        .filter(
-            pg_constraint::conname
-                .eq(&check_constraint.constraint_name)
-                .and(pg_constraint::contype.eq("c")),
-        )
-        .filter(pg_namespace::nspname.eq(&check_constraint.constraint_schema))
-        .select(PgConstraint::as_select())
         .first(conn)?)
 }

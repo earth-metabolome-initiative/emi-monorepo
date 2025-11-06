@@ -2,7 +2,7 @@
 
 use std::{borrow::Borrow, fmt::Debug, hash::Hash};
 
-use crate::traits::{DatabaseLike, ForeignKeyLike, Metadata, TableLike};
+use crate::traits::{CheckConstraintLike, DatabaseLike, ForeignKeyLike, Metadata, TableLike};
 
 /// A trait for types that can be treated as SQL columns.
 pub trait ColumnLike:
@@ -440,5 +440,46 @@ pub trait ColumnLike:
         other_referenced_tables.extend(other_referenced_ancestors);
 
         local_referenced_tables.iter().any(|table| other_referenced_tables.contains(table))
+    }
+
+    /// Iterates over the
+    /// [`CheckConstraintLike`](crate::traits::CheckConstraintLike)s
+    /// that involve this column within the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query check
+    ///  constraints from.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     "CREATE TABLE my_table (id INT, age INT CHECK (age >= 0), score INT CHECK (score BETWEEN 0 AND 100));",
+    /// )?;
+    ///
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let age_column = table.column("age", &db).expect("Column 'age' should exist");
+    /// let score_column = table.column("score", &db).expect("Column 'score' should exist");
+    ///
+    /// let age_checks = age_column.check_constraints(&db).collect::<Vec<_>>();
+    /// let score_checks = score_column.check_constraints(&db).collect::<Vec<_>>();
+    ///
+    /// assert_eq!(age_checks.len(), 1, "age column should have one check constraint");
+    /// assert_eq!(score_checks.len(), 1, "score column should have one check constraint");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn check_constraints<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::CheckConstraint> + 'db {
+        let table: &<Self::DB as DatabaseLike>::Table = ColumnLike::table(self, database);
+        table
+            .check_constraints(database)
+            .filter(|check| check.involves_column(database, self.borrow()))
     }
 }

@@ -42,11 +42,23 @@ impl<T: TableLike> TableMetadata<T> {
         self.columns.iter()
     }
 
+    /// Returns a slice of the Rc of columns of the table.
+    pub fn column_rc_slice(&self) -> &[Rc<<T::DB as DatabaseLike>::Column>] {
+        &self.columns
+    }
+
     /// Returns an iterator over the check constraints of the table.
     pub fn check_constraints(
         &self,
     ) -> impl Iterator<Item = &<T::DB as DatabaseLike>::CheckConstraint> {
         self.check_constraints.iter().map(|cc| cc.as_ref())
+    }
+
+    /// Returns an iterator over the Rc of check constraints of the table.
+    pub fn check_constraint_rcs(
+        &self,
+    ) -> impl Iterator<Item = &Rc<<T::DB as DatabaseLike>::CheckConstraint>> {
+        self.check_constraints.iter()
     }
 
     /// Returns an iterator over the unique indices of the table.

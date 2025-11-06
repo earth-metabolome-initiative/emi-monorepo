@@ -8,15 +8,28 @@
 //! The implementation parses the check constraint expression from the
 //! `check_clause` field using the PostgreSQL SQL parser.
 
-use sql_traits::traits::CheckConstraintLike;
-use sqlparser::parser::Parser;
+use sql_traits::{
+    structs::metadata::CheckMetadata,
+    traits::{CheckConstraintLike, Metadata},
+};
 
-impl CheckConstraintLike for crate::models::CheckConstraint {
-    fn expression(&self) -> sqlparser::ast::Expr {
-        Parser::new(&sqlparser::dialect::PostgreSqlDialect {})
-            .try_with_sql(self.check_clause.as_str())
-            .expect("Failed to parse unique constraint expression")
-            .parse_expr()
-            .expect("No expression found in parsed unique constraint")
+use crate::{PgDatabase, models::CheckConstraint};
+
+impl Metadata for CheckConstraint {
+    type Meta = CheckMetadata<Self>;
+}
+
+impl CheckConstraintLike for CheckConstraint {
+    type DB = PgDatabase;
+
+    fn expression<'db>(&'db self, database: &'db Self::DB) -> &'db sqlparser::ast::Expr {
+        database.check_constraint_metadata(self).expression()
+    }
+
+    fn columns<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::prelude::DatabaseLike>::Column> {
+        database.check_constraint_metadata(self).columns()
     }
 }

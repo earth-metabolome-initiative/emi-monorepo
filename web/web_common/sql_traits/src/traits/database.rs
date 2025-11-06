@@ -26,7 +26,7 @@ pub trait DatabaseLike: Clone + Debug {
     /// Type of the unique indexes in the schema.
     type UniqueIndex: UniqueIndexLike<DB = Self>;
     /// Type of the check constraints in the schema.
-    type CheckConstraint: CheckConstraintLike;
+    type CheckConstraint: CheckConstraintLike<DB = Self>;
 
     /// Returns the name of the database.
     fn catalog_name(&self) -> &str;
