@@ -26,6 +26,8 @@ where
 {
     /// Catalog name of the database.
     catalog_name: Option<String>,
+    /// Timezone of the database.
+    timezone: Option<String>,
     /// List of tables in the database.
     tables: Vec<(Rc<T>, T::Meta)>,
     /// List of columns in the database.
@@ -52,6 +54,7 @@ where
     fn default() -> Self {
         Self {
             catalog_name: None,
+            timezone: None,
             tables: Vec::new(),
             columns: Vec::new(),
             unique_indices: Vec::new(),
@@ -67,12 +70,15 @@ where
 pub enum GenericDBAttribute {
     /// The catalog (database) name.
     CatalogName,
+    /// The timezone of the database.
+    Timezone,
 }
 
 impl Display for GenericDBAttribute {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             GenericDBAttribute::CatalogName => write!(f, "catalog_name"),
+            GenericDBAttribute::Timezone => write!(f, "timezone"),
         }
     }
 }
@@ -89,6 +95,12 @@ where
     /// Creates a new `GenericDBBuilder` instance.
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// Sets the timezone for the database.
+    pub fn timezone(mut self, timezone: String) -> Self {
+        self.timezone = Some(timezone);
+        self
     }
 
     /// Sets the catalog name for the database.
@@ -230,6 +242,7 @@ where
 
         Ok(GenericDB {
             catalog_name,
+            timezone: self.timezone,
             tables: self.tables,
             columns: self.columns,
             unique_indices: self.unique_indices,

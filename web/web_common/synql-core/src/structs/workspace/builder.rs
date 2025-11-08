@@ -86,9 +86,6 @@ pub enum WorkspaceBuilderError {
     Builder(BuilderError<WorkspaceAttribute>),
     /// The name of the workspace is invalid.
     InvalidName,
-    /// A crate with the same name has already been added to the
-    /// workspace.
-    DuplicatedCrateName,
 }
 
 impl Display for WorkspaceBuilderError {
@@ -96,9 +93,6 @@ impl Display for WorkspaceBuilderError {
         match self {
             WorkspaceBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             WorkspaceBuilderError::InvalidName => write!(f, "Invalid workspace name"),
-            WorkspaceBuilderError::DuplicatedCrateName => {
-                write!(f, "A crate with the same name has already been added to the workspace")
-            }
         }
     }
 }
@@ -162,56 +156,65 @@ impl<'data> WorkspaceBuilder<'data> {
     pub fn external_crate(
         mut self,
         external_crate: Arc<ExternalCrate>,
-    ) -> Result<Self, WorkspaceBuilderError> {
-        if self.external_crates.contains(&external_crate) {
-            return Err(WorkspaceBuilderError::DuplicatedCrateName);
+    ) -> Self {
+        if !self.external_crates.contains(&external_crate) {
+            self.external_crates.push(external_crate);
         }
-        self.external_crates.push(external_crate);
-        Ok(self)
+        self
     }
 
     /// Adds the `std` external crate to the workspace.
-    pub fn std(self) -> Result<Self, WorkspaceBuilderError> {
+    pub fn std(self) -> Self {
         self.external_crate(ExternalCrate::std())
     }
 
     /// Adds the core external crate to the workspace.
-    pub fn core(self) -> Result<Self, WorkspaceBuilderError> {
+    pub fn core(self) -> Self {
         self.external_crate(ExternalCrate::core())
     }
 
     /// Adds the diesel external crate to the workspace.
-    pub fn diesel(self) -> Result<Self, WorkspaceBuilderError> {
+    pub fn diesel(self) -> Self {
         self.external_crate(ExternalCrate::diesel())
     }
 
     /// Adds the `diesel-queries` external crate to the workspace.
-    pub fn diesel_queries(self) -> Result<Self, WorkspaceBuilderError> {
-        self.external_crate(ExternalCrate::diesel_queries())?.diesel()
+    pub fn diesel_queries(self) -> Self {
+        self.external_crate(ExternalCrate::diesel_queries()).diesel()
+    }
+
+    /// Adds the `postgis-diesel` external crate to the workspace.
+    pub fn postgis_diesel(self) -> Self {
+        self.external_crate(ExternalCrate::postgis_diesel()).diesel()
     }
 
     /// Adds the serde external crate to the workspace.
-    pub fn serde(self) -> Result<Self, WorkspaceBuilderError> {
+    pub fn serde(self) -> Self {
         self.external_crate(ExternalCrate::serde())
     }
 
     /// Adds the `validation_errors` external crate to the workspace.
-    pub fn validation_errors(self) -> Result<Self, WorkspaceBuilderError> {
+    pub fn validation_errors(self) -> Self {
         self.external_crate(ExternalCrate::validation_errors())
+    }
+
+    /// Adds the `uuid` external crate to the workspace.
+    pub fn uuid(self) -> Self {
+        self.external_crate(ExternalCrate::uuid())
     }
 
     /// Adds multiple external crates to the workspace.
     ///
     /// # Arguments
     /// * `external_crates` - The external crates to add.
-    pub fn external_crates<I>(mut self, external_crates: I) -> Result<Self, WorkspaceBuilderError>
+    pub fn external_crates<I>(mut self, external_crates: I) -> Self
     where
         I: IntoIterator<Item = Arc<ExternalCrate>>,
     {
         for external_crate in external_crates {
-            self = self.external_crate(external_crate)?;
+            self = self.external_crate(external_crate);
         }
-        Ok(self)
+        self
     }
 }
 

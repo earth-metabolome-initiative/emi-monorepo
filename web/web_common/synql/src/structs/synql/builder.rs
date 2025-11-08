@@ -1,11 +1,12 @@
 //! Submodule providing a builder for the `SynQL` struct.
 
-use std::{fmt::Display, path::Path};
+use std::{fmt::Display, path::Path, sync::Arc};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
+use synql_core::structs::ExternalCrate;
 
 use super::SynQL;
 use crate::traits::SynQLDatabaseLike;
@@ -19,6 +20,7 @@ pub struct SynQLBuilder<'a, DB: SynQLDatabaseLike> {
     edition: u16,
     generate_workspace_toml: bool,
     generate_rustfmt: bool,
+    external_crates: Vec<Arc<ExternalCrate>>,
 }
 
 impl<'a, DB: SynQLDatabaseLike> Default for SynQLBuilder<'a, DB> {
@@ -31,6 +33,7 @@ impl<'a, DB: SynQLDatabaseLike> Default for SynQLBuilder<'a, DB> {
             edition: 2024,
             generate_workspace_toml: false,
             generate_rustfmt: false,
+            external_crates: Vec::new(),
         }
     }
 }
@@ -116,6 +119,23 @@ impl<'a, DB: SynQLDatabaseLike> SynQLBuilder<'a, DB> {
         self
     }
 
+    /// Adds an external crate to the workspace.
+    pub fn external_crate(mut self, external_crate: Arc<ExternalCrate>) -> Self {
+        self.external_crates.push(external_crate);
+        self
+    }
+
+    /// Adds several external crates to the workspace.
+    pub fn external_crates<I>(mut self, external_crates: I) -> Self
+    where
+        I: IntoIterator<Item = Arc<ExternalCrate>>,
+    {
+        for external_crate in external_crates {
+            self.external_crates.push(external_crate);
+        }
+        self
+    }
+
     /// Sets to generate the rustfmt configuration file.
     pub fn generate_rustfmt(mut self) -> Self {
         self.generate_rustfmt = true;
@@ -150,6 +170,7 @@ impl<'a, DB: SynQLDatabaseLike> Builder for SynQLBuilder<'a, DB> {
             edition: self.edition,
             generate_workspace_toml: self.generate_workspace_toml,
             generate_rustfmt: self.generate_rustfmt,
+            external_crates: self.external_crates,
         })
     }
 }

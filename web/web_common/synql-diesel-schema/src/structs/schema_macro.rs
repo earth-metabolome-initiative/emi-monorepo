@@ -65,9 +65,12 @@ impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for Int
                             },
                         ),
                     )
-                    .stream(value.into_token_stream())
+                    .stream(value.to_token_stream())
                     .build()
-                    .unwrap(),
+                    .expect(&format!(
+                        "Failed to build the internal token for the schema macro of table `{}`",
+                        value.table.table_name()
+                    )),
             )
             .build()
             .unwrap()

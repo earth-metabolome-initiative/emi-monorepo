@@ -11,24 +11,27 @@ use crate::structs::{ExternalCrate, ExternalType};
 impl ExternalCrate {
     /// Initializes a `ExternalCrate` instance describing the `postgis_diesel`
     /// crate.
-    pub fn postgis_diesel() -> Self {
-        ExternalCrate::new()
-            .name("postgis_diesel")
-            .unwrap()
-            .add_types(vec![
-                Arc::new(ExternalType::point()),
-                Arc::new(ExternalType::linestring()),
-                Arc::new(ExternalType::polygon()),
-                Arc::new(ExternalType::multipoint()),
-                Arc::new(ExternalType::multilinestring()),
-                Arc::new(ExternalType::multipolygon()),
-                Arc::new(ExternalType::geometrycollection()),
-                Arc::new(ExternalType::geometry()),
-            ])
-            .unwrap()
-            .version("3.0.1")
-            .build()
-            .expect("Failed to build ExternalCrate for postgis_diesel")
+    pub fn postgis_diesel() -> Arc<Self> {
+        Arc::from(
+            ExternalCrate::new()
+                .name("postgis_diesel")
+                .unwrap()
+                .add_types(vec![
+                    Arc::new(ExternalType::point()),
+                    Arc::new(ExternalType::linestring()),
+                    Arc::new(ExternalType::polygon()),
+                    Arc::new(ExternalType::multipoint()),
+                    Arc::new(ExternalType::multilinestring()),
+                    Arc::new(ExternalType::multipolygon()),
+                    Arc::new(ExternalType::geometrycollection()),
+                    Arc::new(ExternalType::geometry()),
+                    Arc::new(ExternalType::geography()),
+                ])
+                .unwrap()
+                .version("3.0.1")
+                .build()
+                .expect("Failed to build ExternalCrate for postgis_diesel"),
+        )
     }
 }
 
@@ -37,8 +40,8 @@ impl ExternalType {
         ExternalType::new()
             .postgres_type("point")
             .unwrap()
-            .diesel_type(syn::parse_str("postgis_diesel::sql_types::Geometry").unwrap())
-            .rust_type(syn::parse_str("postgis_diesel::types::Point").unwrap())
+            .diesel_type(syn::parse_quote!(postgis_diesel::sql_types::Geometry))
+            .rust_type(syn::parse_quote!(postgis_diesel::types::Point))
             .supports_copy()
             .supports_debug()
             .supports_partial_eq()
@@ -51,8 +54,8 @@ impl ExternalType {
         ExternalType::new()
             .postgres_type("linestring")
             .unwrap()
-            .diesel_type(syn::parse_str("postgis_diesel::sql_types::Geometry").unwrap())
-            .rust_type(syn::parse_str("postgis_diesel::types::LineString").unwrap())
+            .diesel_type(syn::parse_quote!(postgis_diesel::sql_types::Geometry))
+            .rust_type(syn::parse_quote!(postgis_diesel::types::LineString))
             .supports_clone()
             .supports_debug()
             .supports_partial_eq()
@@ -64,8 +67,8 @@ impl ExternalType {
         ExternalType::new()
             .postgres_type("polygon")
             .unwrap()
-            .diesel_type(syn::parse_str("postgis_diesel::sql_types::Geometry").unwrap())
-            .rust_type(syn::parse_str("postgis_diesel::types::Polygon").unwrap())
+            .diesel_type(syn::parse_quote!(postgis_diesel::sql_types::Geometry))
+            .rust_type(syn::parse_quote!(postgis_diesel::types::Polygon))
             .supports_clone()
             .supports_debug()
             .supports_partial_eq()
@@ -77,8 +80,8 @@ impl ExternalType {
         ExternalType::new()
             .postgres_type("multipoint")
             .unwrap()
-            .diesel_type(syn::parse_str("postgis_diesel::sql_types::Geometry").unwrap())
-            .rust_type(syn::parse_str("postgis_diesel::types::MultiPoint").unwrap())
+            .diesel_type(syn::parse_quote!(postgis_diesel::sql_types::Geometry))
+            .rust_type(syn::parse_quote!(postgis_diesel::types::MultiPoint))
             .supports_clone()
             .supports_debug()
             .supports_partial_eq()
@@ -90,8 +93,8 @@ impl ExternalType {
         ExternalType::new()
             .postgres_type("multilinestring")
             .unwrap()
-            .diesel_type(syn::parse_str("postgis_diesel::sql_types::Geometry").unwrap())
-            .rust_type(syn::parse_str("postgis_diesel::types::MultiLineString").unwrap())
+            .diesel_type(syn::parse_quote!(postgis_diesel::sql_types::Geometry))
+            .rust_type(syn::parse_quote!(postgis_diesel::types::MultiLineString))
             .supports_clone()
             .supports_debug()
             .supports_partial_eq()
@@ -103,8 +106,8 @@ impl ExternalType {
         ExternalType::new()
             .postgres_type("multipolygon")
             .unwrap()
-            .diesel_type(syn::parse_str("postgis_diesel::sql_types::Geometry").unwrap())
-            .rust_type(syn::parse_str("postgis_diesel::types::MultiPolygon").unwrap())
+            .diesel_type(syn::parse_quote!(postgis_diesel::sql_types::Geometry))
+            .rust_type(syn::parse_quote!(postgis_diesel::types::MultiPolygon))
             .supports_clone()
             .supports_debug()
             .supports_partial_eq()
@@ -116,8 +119,8 @@ impl ExternalType {
         ExternalType::new()
             .postgres_type("geometrycollection")
             .unwrap()
-            .diesel_type(syn::parse_str("postgis_diesel::sql_types::Geometry").unwrap())
-            .rust_type(syn::parse_str("postgis_diesel::types::GeometryCollection").unwrap())
+            .diesel_type(syn::parse_quote!(postgis_diesel::sql_types::Geometry))
+            .rust_type(syn::parse_quote!(postgis_diesel::types::GeometryCollection))
             .supports_clone()
             .supports_debug()
             .supports_partial_eq()
@@ -129,17 +132,29 @@ impl ExternalType {
         ExternalType::new()
             .postgres_type("geometry")
             .unwrap()
-            .diesel_type(syn::parse_str("postgis_diesel::sql_types::Geometry").unwrap())
-            .rust_type(
-                syn::parse_str(
-                    "postgis_diesel::types::GeometryContainer<postgis_diesel::types::Point>",
-                )
-                .unwrap(),
-            )
+            .diesel_type(syn::parse_quote!(postgis_diesel::sql_types::Geometry))
+            .rust_type(syn::parse_quote!(
+                postgis_diesel::types::GeometryContainer<postgis_diesel::types::Point>
+            ))
             .supports_clone()
             .supports_debug()
             .supports_partial_eq()
             .build()
             .expect("Failed to build ExternalType for Geometry")
+    }
+
+    fn geography() -> Self {
+        ExternalType::new()
+            .postgres_type("geography")
+            .unwrap()
+            .diesel_type(syn::parse_quote!(postgis_diesel::sql_types::Geography))
+            .rust_type(syn::parse_quote!(
+                postgis_diesel::types::GeographyContainer<postgis_diesel::types::Point>
+            ))
+            .supports_clone()
+            .supports_debug()
+            .supports_partial_eq()
+            .build()
+            .expect("Failed to build ExternalType for Geography")
     }
 }

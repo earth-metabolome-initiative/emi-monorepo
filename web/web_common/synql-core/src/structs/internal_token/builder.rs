@@ -57,13 +57,13 @@ pub enum InternalTokenBuilderError {
     /// An error occurred during the building process.
     Builder(BuilderError<InternalTokenAttribute>),
     /// The provided external macro does not appear in the token stream.
-    ExternalMacroNotFound,
+    ExternalMacroNotFound(String),
     /// The provided external trait does not appear in the token stream.
     TraitNotFound(String),
     /// The provided internal data does not appear in the token stream.
     InternalDataNotFound(String),
     /// The provided internal module does not appear in the token stream.
-    InternalModuleNotFound,
+    InternalModuleNotFound(String),
 }
 
 impl From<BuilderError<InternalTokenAttribute>> for InternalTokenBuilderError {
@@ -76,8 +76,8 @@ impl Display for InternalTokenBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             InternalTokenBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
-            InternalTokenBuilderError::ExternalMacroNotFound => {
-                write!(f, "External macro not found in token stream")
+            InternalTokenBuilderError::ExternalMacroNotFound(name) => {
+                write!(f, "External macro '{name}' not found in token stream")
             }
             InternalTokenBuilderError::TraitNotFound(name) => {
                 write!(f, "Trait '{name}' not found in token stream")
@@ -85,8 +85,8 @@ impl Display for InternalTokenBuilderError {
             InternalTokenBuilderError::InternalDataNotFound(name) => {
                 write!(f, "Internal data '{name}' not found in token stream")
             }
-            InternalTokenBuilderError::InternalModuleNotFound => {
-                write!(f, "Internal module not found in token stream")
+            InternalTokenBuilderError::InternalModuleNotFound(name) => {
+                write!(f, "Internal module '{name}' not found in token stream")
             }
         }
     }
@@ -313,7 +313,9 @@ impl Builder for InternalTokenBuilder {
         for external_macro in &self.external_macros {
             let macro_name = external_macro.name();
             if !string_token_stream.contains(macro_name) {
-                return Err(InternalTokenBuilderError::ExternalMacroNotFound);
+                return Err(InternalTokenBuilderError::ExternalMacroNotFound(
+                    macro_name.to_string(),
+                ));
             }
         }
         for employed_trait in &self.employed_traits {
@@ -338,7 +340,9 @@ impl Builder for InternalTokenBuilder {
         for internal_module in &self.internal_modules {
             let module_name = internal_module.name();
             if !string_token_stream.contains(module_name) {
-                return Err(InternalTokenBuilderError::InternalModuleNotFound);
+                return Err(InternalTokenBuilderError::InternalModuleNotFound(
+                    module_name.to_string(),
+                ));
             }
         }
         Ok(InternalToken {

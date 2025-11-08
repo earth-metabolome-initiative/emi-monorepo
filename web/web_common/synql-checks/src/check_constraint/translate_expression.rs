@@ -297,7 +297,9 @@ where
     /// * If the function does not exist, which should not happen as
     /// it would mean that the provided SQL defining the database is invalid.
     fn function(&self, name: &str) -> &DB::Function {
-        self.check_constraint.function(self.database, name).unwrap()
+        self.check_constraint
+            .function(self.database, name)
+            .expect(&format!("Function `{}` not found for check constraint", name))
     }
 
     /// Returns reference to the requested involved column by name.
@@ -558,7 +560,7 @@ where
             return validation_error_token;
         }
 
-        panic!("No validation error mapping found, proceeding to full parse: {expr:?}");
+        return quote! {}.into();
 
         let (internal_token, scoped_columns, returning_type) = self.inner_parse(expr, None);
 

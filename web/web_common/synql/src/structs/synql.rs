@@ -1,7 +1,7 @@
 //! Submodule defining the `SQLWorkspace` trait which allows to generate the
 //! `diesel` workspace from a SQL schema, based on `sql_traits`.
 
-use std::path::Path;
+use std::{path::Path, sync::Arc};
 
 use synql_attributes::traits::{TableAttributesLike, TableExtensionAttributesLike};
 use synql_builders::prelude::*;
@@ -34,6 +34,8 @@ pub struct SynQL<'a, DB: SynQLDatabaseLike> {
     generate_workspace_toml: bool,
     /// Whether to also generate the rustfmt configuration file.
     generate_rustfmt: bool,
+    /// External rust crates to include in the workspace.
+    external_crates: Vec<Arc<ExternalCrate>>,
 }
 
 impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
@@ -57,16 +59,14 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             .path(self.path)
             .name(self.database.catalog_name())
             .expect("Invalid workspace name")
+            .external_crates(self.external_crates.iter().cloned())
             .core()
-            .expect("Unable to register `core` crate")
             .std()
-            .expect("Unable to register `std` crate")
             .diesel_queries()
-            .expect("Unable to register `diesel-queries` crate")
             .serde()
-            .expect("Unable to register `serde` crate")
             .validation_errors()
-            .expect("Unable to register `validation_errors` crate")
+            .postgis_diesel()
+            .uuid()
             .version(self.version.0, self.version.1, self.version.2)
             .edition(self.edition)
             .build()

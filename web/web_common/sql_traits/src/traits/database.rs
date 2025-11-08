@@ -34,6 +34,9 @@ pub trait DatabaseLike: Clone + Debug {
     /// Returns the number of tables in the database.
     fn number_of_tables(&self) -> usize;
 
+    /// Returns the timezone of the database, if any.
+    fn timezone(&self) -> Option<&str>;
+
     /// Iterates over the tables defined in the schema.
     ///
     /// # Example
@@ -55,6 +58,34 @@ pub trait DatabaseLike: Clone + Debug {
     /// # }
     /// ```
     fn tables(&self) -> impl Iterator<Item = &Self::Table>;
+
+    /// Returns whether the database has at least one table.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db_with_tables = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE table1 (id INT);
+    /// "#,
+    /// )?;
+    /// assert!(db_with_tables.has_tables());
+    ///
+    /// let db_without_tables = ParserDB::try_from(
+    ///     r#"
+    /// -- No tables defined
+    /// "#,
+    /// )?;
+    /// assert!(!db_without_tables.has_tables());
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_tables(&self) -> bool {
+        self.tables().next().is_some()
+    }
 
     /// Returns tables as a Kahn's ordering based on foreign key dependencies,
     /// ignoring potential self-references which would create cycles.

@@ -25,6 +25,8 @@ where
 {
     /// Catalog name of the database.
     catalog_name: String,
+    /// Timezone of the database.
+    timezone: Option<String>,
     /// List of tables in the database.
     tables: Vec<(Rc<T>, T::Meta)>,
     /// List of columns in the database.
@@ -72,6 +74,7 @@ where
     fn clone(&self) -> Self {
         Self {
             catalog_name: self.catalog_name.clone(),
+            timezone: self.timezone.clone(),
             tables: self.tables.clone(),
             columns: self.columns.clone(),
             unique_indices: self.unique_indices.clone(),

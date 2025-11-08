@@ -1,14 +1,15 @@
 //! Implementations for [`GenericDB`] relative to sqlparser structures.
 
-use std::rc::Rc;
+use std::{path::Path, rc::Rc};
 
 use common_traits::prelude::Builder;
+use csqlv::{CSVSchema, CSVSchemaBuilder, SQLGenerationOptions};
 use sqlparser::{
     ast::{
         CheckConstraint, ColumnDef, ColumnOption, CreateFunction, CreateTable, Expr,
-        ForeignKeyConstraint, Statement, TableConstraint, UniqueConstraint,
+        ForeignKeyConstraint, Statement, TableConstraint, UniqueConstraint, Value, ValueWithSpan,
     },
-    parser::Parser,
+    parser::{Parser, ParserError},
 };
 
 use crate::{
@@ -231,10 +232,33 @@ impl ParserDB {
 
                     builder = builder.add_table(create_table, table_metadata);
                 }
+                Statement::Set(sqlparser::ast::Set::SetTimeZone { local, value }) => {
+                    // We currently ignore SET TIME ZONE statements.
+                    if local {
+                        builder = builder.timezone("LOCAL".to_string());
+                    } else if let Expr::Value(ValueWithSpan {
+                        value: Value::SingleQuotedString(lit),
+                        ..
+                    }) = value
+                    {
+                        builder = builder.timezone(lit);
+                    } else {
+                        unimplemented!(
+                            "Only string literals are supported for SET TIME ZONE, found: {value:?}"
+                        );
+                    }
+                }
+                Statement::CreateExtension(_) => {
+                    // At the moment, we ignore CREATE EXTENSION statements.
+                }
+                Statement::CreateIndex(_) => {
+                    // At the moment, we ignore CREATE INDEX statements.
+                }
+                Statement::CreateTrigger(_) => {
+                    // At the moment, we ignore CREATE TRIGGER statements.
+                }
                 _ => {
-                    unimplemented!(
-                        "Only CREATE TABLE and CREATE FUNCTION statements are supported, found: {statement:?}"
-                    );
+                    unimplemented!("Unsupported statement found: {statement:?}");
                 }
             }
         }
@@ -251,5 +275,102 @@ impl TryFrom<&str> for ParserDB {
         let mut parser = sqlparser::parser::Parser::new(&dialect).try_with_sql(sql)?;
         let statements = parser.parse_statements()?;
         Ok(Self::from_statements(statements, "unknown_catalog".to_string()))
+    }
+}
+
+fn search_sql_documents(path: &Path) -> Vec<std::path::PathBuf> {
+    let mut sql_files = Vec::new();
+    if path.is_dir() {
+        for entry in std::fs::read_dir(path).expect("Failed to read directory") {
+            let entry = entry.expect("Failed to read directory entry");
+            let path = entry.path();
+            if path.is_dir() {
+                sql_files.extend(search_sql_documents(&path));
+            } else if let Some(extension) = path.extension() {
+                if extension == "sql" {
+                    sql_files.push(path);
+                }
+            }
+        }
+    } else if let Some(extension) = path.extension() {
+        if extension == "sql" {
+            sql_files.push(path.to_path_buf());
+        }
+    }
+    sql_files
+}
+
+impl TryFrom<&Path> for ParserDB {
+    type Error = sqlparser::parser::ParserError;
+
+    fn try_from(path: &Path) -> Result<Self, Self::Error> {
+        let mut comulative_sql = String::new();
+        let mut sql_files = search_sql_documents(path);
+        sql_files.sort_unstable();
+        for sql_file in sql_files {
+            // We exclude `down.sql` files as they are not relevant for
+            // schema definition.
+            if sql_file.file_name().unwrap() == "down.sql" {
+                continue;
+            }
+
+            let sql_content = std::fs::read_to_string(&sql_file)
+                .map_err(|e| ParserError::TokenizerError(e.to_string()))?;
+            comulative_sql.push_str(&sql_content);
+        }
+        Self::try_from(comulative_sql.as_str())
+    }
+}
+
+impl TryFrom<&[&Path]> for ParserDB {
+    type Error = sqlparser::parser::ParserError;
+
+    fn try_from(paths: &[&Path]) -> Result<Self, Self::Error> {
+        let mut comulative_sql = String::new();
+
+        let mut sql_files = Vec::new();
+        for path in paths {
+            if !path.exists() {
+                return Err(ParserError::TokenizerError(format!(
+                    "Path does not exist: {}",
+                    path.display()
+                )));
+            }
+
+            sql_files.extend(search_sql_documents(path));
+
+            let schema: CSVSchema =
+                CSVSchemaBuilder::default().include_gz().from_dir(path).map_err(|e| {
+                    ParserError::TokenizerError(format!(
+                        "Failed to build CSV schema from path {}: {}",
+                        path.display(),
+                        e
+                    ))
+                })?;
+
+            comulative_sql.push_str(&schema.to_sql(&SQLGenerationOptions::default()).map_err(
+                |e| {
+                    ParserError::TokenizerError(format!(
+                        "Failed to convert CSV schema to SQL from path {}: {}",
+                        path.display(),
+                        e
+                    ))
+                },
+            )?);
+        }
+        sql_files.sort_unstable();
+
+        for sql_file in sql_files {
+            // We exclude `down.sql` files as they are not relevant for
+            // schema definition.
+            if sql_file.file_name().unwrap() == "down.sql" {
+                continue;
+            }
+
+            let sql_content = std::fs::read_to_string(&sql_file)
+                .map_err(|e| ParserError::TokenizerError(e.to_string()))?;
+            comulative_sql.push_str(&sql_content);
+        }
+        Self::try_from(comulative_sql.as_str())
     }
 }

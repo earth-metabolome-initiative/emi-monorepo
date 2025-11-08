@@ -935,6 +935,9 @@ pub trait ForeignKeyLike:
         if self.is_self_referential(database) {
             return false;
         }
+        if self.is_composite(database) {
+            return false;
+        }
         let foreign_table = self.referenced_table(database);
         self.host_table(database)
             .foreign_keys(database)

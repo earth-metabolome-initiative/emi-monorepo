@@ -1255,7 +1255,8 @@ pub trait TableLike:
     where
         Self: 'db,
     {
-        self.singleton_foreign_keys(database).filter(move |fk| !fk.is_self_referential(database))
+        self.singleton_foreign_keys(database)
+            .filter(move |fk| !fk.is_self_referential(database))
     }
 
     /// Returns whether the table has singleton foreign keys.

@@ -9,6 +9,7 @@ synql-models.workspace = true
 syn.workspace = true
 proc-macro2.workspace = true
 synql-diesel-schema.workspace = true
+sql_relations.workspace = true
 quote.workspace = true
 
 [lints]

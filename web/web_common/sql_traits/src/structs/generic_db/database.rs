@@ -32,6 +32,10 @@ where
         self.tables.len()
     }
 
+    fn timezone(&self) -> Option<&str> {
+        self.timezone.as_deref()
+    }
+
     fn table(&self, schema: Option<&str>, table_name: &str) -> Option<&Self::Table> {
         // The tables are sorted by schema and name, so we can use binary search.
         let key = (schema, table_name);
