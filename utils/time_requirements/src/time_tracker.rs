@@ -61,6 +61,17 @@ impl TimeTracker {
         self.tasks.push(task.complete());
     }
 
+    /// Extends a previously completed task.
+    pub fn add_or_extend_completed_task(&mut self, task: Task) {
+        for existing_task in &mut self.tasks {
+            if existing_task.name() == task.name() {
+                existing_task.extend(&task.complete());
+                return;
+            }
+        }
+        self.tasks.push(task.complete());
+    }
+
     #[must_use]
     /// Returns the name of the project.
     pub fn name(&self) -> &str {

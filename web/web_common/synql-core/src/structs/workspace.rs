@@ -5,6 +5,7 @@ mod builder;
 use std::{path::Path, sync::Arc};
 
 pub use builder::WorkspaceBuilder;
+use rayon::prelude::*;
 use syn::Type;
 
 use crate::{
@@ -279,9 +280,10 @@ impl<'data> Workspace<'data> {
         // Then, we create the workspace directory.
         std::fs::create_dir_all(self.path)?;
         // And we start writing each internal crate to disk.
-        for internal_crate in &self.internal_crates {
-            internal_crate.write_to_disk(self)?;
-        }
+        self.internal_crates
+            .par_iter()
+            .map(|internal_crate: &Arc<InternalCrate>| internal_crate.write_to_disk(self))
+            .collect::<Result<Vec<()>, std::io::Error>>()?;
         Ok(())
     }
 }

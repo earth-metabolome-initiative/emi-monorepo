@@ -2,7 +2,7 @@
 
 mod builder;
 
-use std::{path::Path, sync::Arc};
+use std::{hash::Hash, path::Path, sync::Arc};
 
 pub use builder::InternalCrateBuilder;
 use quote::{ToTokens, quote};
@@ -13,7 +13,7 @@ use crate::{
     traits::{ExternalDependencies, InternalDependencies},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone)]
 /// Struct defining a crate model.
 pub struct InternalCrate {
     /// Name of the crate.
@@ -23,6 +23,35 @@ pub struct InternalCrate {
     /// Crate documentation.
     documentation: ModuleDocumentation,
 }
+
+impl PartialEq for InternalCrate {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
+}
+
+impl Eq for InternalCrate {}
+
+impl PartialOrd for InternalCrate {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.name.cmp(&other.name))
+    }
+}
+
+impl Ord for InternalCrate {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.name.cmp(&other.name)
+    }
+}
+
+impl Hash for InternalCrate {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+    }
+}
+
+unsafe impl Send for InternalCrate {}
+unsafe impl Sync for InternalCrate {}
 
 impl ToTokens for InternalCrate {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {

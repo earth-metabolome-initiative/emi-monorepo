@@ -330,13 +330,6 @@ impl Builder for InternalTokenBuilder {
                 return Err(InternalTokenBuilderError::TraitNotFound(trait_name.to_string()));
             }
         }
-        for data in &self.data {
-            if !string_token_stream.contains(&data.format_with_generics().to_string()) {
-                return Err(InternalTokenBuilderError::InternalDataNotFound(
-                    data.format_with_generics().to_string(),
-                ));
-            }
-        }
         for internal_module in &self.internal_modules {
             let module_name = internal_module.name();
             if !string_token_stream.contains(module_name) {

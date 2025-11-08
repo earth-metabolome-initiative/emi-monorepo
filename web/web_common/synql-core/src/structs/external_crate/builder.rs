@@ -73,8 +73,6 @@ pub enum ExternalCrateBuilderError {
     DuplicatedMacro,
     /// A trait with the same name has already been added to the crate.
     DuplicatedTrait,
-    /// A feature with the same name has already been added.
-    DuplicatedFeature,
 }
 
 impl Display for ExternalCrateBuilderError {
@@ -93,9 +91,6 @@ impl Display for ExternalCrateBuilderError {
             }
             ExternalCrateBuilderError::DuplicatedTrait => {
                 write!(f, "A trait with the same name has already been added to the crate")
-            }
-            ExternalCrateBuilderError::DuplicatedFeature => {
-                write!(f, "A feature with the same name has already been added")
             }
         }
     }
@@ -245,35 +240,27 @@ impl ExternalCrateBuilder {
     ///
     /// # Arguments
     /// * `feature` - The feature to add.
-    ///
-    /// # Errors
-    /// Returns an error if a feature with the same name has already been added.
-    pub fn feature<S: ToString>(mut self, feature: S) -> Result<Self, ExternalCrateBuilderError> {
+    pub fn feature<S: ToString>(mut self, feature: S) -> Self {
         let feature = feature.to_string();
-        if self.features.contains(&feature) {
-            return Err(ExternalCrateBuilderError::DuplicatedFeature);
+        if !self.features.contains(&feature) {
+            self.features.push(feature);
         }
-        self.features.push(feature);
-        Ok(self)
+        self
     }
 
     /// Adds several features required by the crate.
     ///
     /// # Arguments
     /// * `features` - The features to add.
-    ///
-    /// # Errors
-    /// Returns an error if any feature with the same name has already been
-    /// added.
-    pub fn features<I, S>(mut self, features: I) -> Result<Self, ExternalCrateBuilderError>
+    pub fn features<I, S>(mut self, features: I) -> Self
     where
         I: IntoIterator<Item = S>,
         S: ToString,
     {
         for feature in features {
-            self = self.feature(feature)?;
+            self = self.feature(feature);
         }
-        Ok(self)
+        self
     }
 }
 

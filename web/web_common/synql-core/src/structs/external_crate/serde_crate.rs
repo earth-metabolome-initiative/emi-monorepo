@@ -20,18 +20,17 @@ impl ExternalCrate {
                         .unwrap()
                         .version("1.0")
                         .features(["derive", "rc"])
-                        .unwrap()
                         .add_traits([
                             ExternalTrait::new()
                                 .name("Serialize")
                                 .unwrap()
-                                .path(syn::parse_str("serde::Serialize").unwrap())
+                                .path(syn::parse_quote!(serde::Serialize))
                                 .build()
                                 .unwrap(),
                             ExternalTrait::new()
                                 .name("Deserialize")
                                 .unwrap()
-                                .path(syn::parse_str("serde::Deserialize").unwrap())
+                                .path(syn::parse_quote!(serde::Deserialize))
                                 .build()
                                 .unwrap(),
                         ])

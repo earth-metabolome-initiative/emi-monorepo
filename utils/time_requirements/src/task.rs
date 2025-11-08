@@ -15,6 +15,12 @@ impl Task {
         Self { name: name.to_string(), start: chrono::Local::now().naive_local() }
     }
 
+    /// Returns the name of the task.
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
     #[must_use]
     /// Marks the task as completed.
     pub fn complete(self) -> CompletedTask {
@@ -48,6 +54,11 @@ impl CompletedTask {
     /// Returns the time required to complete the task.
     pub fn time(&self) -> chrono::TimeDelta {
         self.end - self.start
+    }
+
+    /// Extends the completed task by another completed task.
+    pub fn extend(&mut self, other: &CompletedTask) {
+        self.end += other.time();
     }
 }
 

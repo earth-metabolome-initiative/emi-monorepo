@@ -18,7 +18,8 @@ impl ExternalCrate {
                     ExternalCrate::new()
                         .name("diesel".to_string())
                         .unwrap()
-                        .version("2.3.1")
+                        // .version("2.3.3")
+                        .git("https://github.com/diesel-rs/diesel", "main")
                         .add_macros([
                             ExternalMacro::new().name("table").unwrap().build().unwrap(),
                             ExternalMacro::new()

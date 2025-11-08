@@ -153,10 +153,7 @@ impl<'data> WorkspaceBuilder<'data> {
     ///
     /// # Arguments
     /// * `external_crate` - The external crate to add.
-    pub fn external_crate(
-        mut self,
-        external_crate: Arc<ExternalCrate>,
-    ) -> Self {
+    pub fn external_crate(mut self, external_crate: Arc<ExternalCrate>) -> Self {
         if !self.external_crates.contains(&external_crate) {
             self.external_crates.push(external_crate);
         }

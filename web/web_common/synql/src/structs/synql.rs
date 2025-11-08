@@ -14,6 +14,7 @@ use synql_value_settable::prelude::*;
 
 mod builder;
 pub use builder::SynQLBuilder;
+use time_requirements::{prelude::TimeTracker, task::Task};
 
 use crate::traits::SynQLDatabaseLike;
 
@@ -54,7 +55,7 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
     }
 
     /// Executes the workspace generation.
-    pub fn generate(&self) -> std::io::Result<()> {
+    pub fn generate(&self) -> std::io::Result<TimeTracker> {
         let mut workspace = Workspace::new()
             .path(self.path)
             .name(self.database.catalog_name())
@@ -72,34 +73,66 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             .build()
             .expect("Unable to build workspace");
 
+        let mut time_tracker = TimeTracker::new("SQL Workspace Generation");
+
         for table in self.database.table_dag() {
             if self.skip_table(table) {
                 continue;
             }
+
+            let schema_macro_task = Task::new("schema_macro");
             workspace.add_internal_crate(table.schema_macro(&workspace, self.database).into());
+            time_tracker.add_or_extend_completed_task(schema_macro_task);
+
+            let model_task = Task::new("model");
             workspace.add_internal_crate(table.model(&workspace, self.database).into());
+            time_tracker.add_or_extend_completed_task(model_task);
+
+            let relations_trait_task = Task::new("relations_trait");
             workspace.add_internal_crate(table.relations_trait(&workspace, self.database).into());
+            time_tracker.add_or_extend_completed_task(relations_trait_task);
+
             if let Some(extension_attribute) = table.extension_attributes(&workspace, self.database)
             {
+                let extension_attribute_task = Task::new("extension_attributes");
                 workspace.add_internal_crate(extension_attribute.into());
+                time_tracker.add_or_extend_completed_task(extension_attribute_task);
             }
+
+            let attributes_task = Task::new("attributes");
             workspace.add_internal_crate(table.attributes(&workspace, self.database).into());
+            time_tracker.add_or_extend_completed_task(attributes_task);
+
+            let value_settable_trait_task = Task::new("value_settable_trait");
             workspace
                 .add_internal_crate(table.value_settable_trait(&workspace, self.database).into());
+            time_tracker.add_or_extend_completed_task(value_settable_trait_task);
+
+            let insertable_task = Task::new("insertable");
             workspace.add_internal_crate(table.insertable(&workspace, self.database).into());
+            time_tracker.add_or_extend_completed_task(insertable_task);
+
+            let buildable_task = Task::new("buildable");
             workspace.add_internal_crate(table.buildable(&workspace, self.database).into());
+            time_tracker.add_or_extend_completed_task(buildable_task);
         }
 
+        let workspace_write_task = Task::new("workspace_write_to_disk");
         workspace.write_to_disk()?;
+        time_tracker.add_or_extend_completed_task(workspace_write_task);
 
         if self.generate_workspace_toml {
+            let workspace_toml_task = Task::new("workspace_toml");
             workspace.write_toml()?;
+            time_tracker.add_or_extend_completed_task(workspace_toml_task);
         }
 
         if self.generate_rustfmt {
+            let workspace_rustfmt_task = Task::new("workspace_rustfmt");
             workspace.write_rustfmt()?;
+            time_tracker.add_or_extend_completed_task(workspace_rustfmt_task);
         }
 
-        Ok(())
+        Ok(time_tracker)
     }
 }

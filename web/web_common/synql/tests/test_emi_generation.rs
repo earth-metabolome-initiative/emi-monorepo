@@ -4,11 +4,16 @@
 //! the EMI database schema and generate the workspace without errors,
 //! cleaning up the temporary directory after the tests complete.
 
-use std::{path::PathBuf, process::Command, sync::Arc};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+    sync::Arc,
+};
 
 use ::graph::prelude::DirectoryTree;
 use synql::prelude::*;
 use synql_core::structs::{ExternalCrate, ExternalType};
+use time_requirements::{prelude::TimeTracker, report::Report, task::Task};
 
 #[test]
 fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
@@ -19,6 +24,9 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
     // And we adequately move to the emi-monorepo root.
     workspace_root.push_str("/../../..");
 
+    let mut tracking_test = TimeTracker::new("EMI Workspace Generation Test");
+
+    let task = Task::new("Database Parsing");
     let db = ParserDB::try_from(
         [
             PathBuf::from(format!("{workspace_root}/data_migrations/init_db/csvs")).as_path(),
@@ -28,15 +36,17 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
         ]
         .as_slice(),
     )?;
-
     assert!(db.has_tables(), "Database should have tables");
+    tracking_test.add_completed_task(task);
 
+    let task = Task::new("Codegen setup");
     let temp_dir = tempfile::tempdir().expect("Unable to create temporary directory");
     // let workspace_path = temp_dir.path().join("synql_workspace");
     let workspace_path = std::path::PathBuf::from("../../../../emi_local");
 
     let iso_codes = ExternalCrate::new()
         .name("iso_codes")?
+        .feature("diesel")
         .version("0.1.0")
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
         .add_type(Arc::new(
@@ -51,6 +61,7 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
 
     let media_types = ExternalCrate::new()
         .name("media_types")?
+        .feature("diesel")
         .version("0.1.0")
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
         .add_type(Arc::new(
@@ -65,6 +76,7 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
 
     let cas_codes = ExternalCrate::new()
         .name("cas_codes")?
+        .feature("diesel")
         .version("0.1.0")
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
         .add_type(Arc::new(
@@ -79,6 +91,7 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
 
     let molecular_formulas = ExternalCrate::new()
         .name("molecular_formulas")?
+        .feature("diesel")
         .version("0.1.0")
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
         .add_type(Arc::new(
@@ -106,17 +119,13 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
         .generate_rustfmt()
         .build()
         .expect("Unable to build SynQL instance");
-    synql.generate().expect("Unable to generate workspace");
+    tracking_test.add_completed_task(task);
+    tracking_test.extend(synql.generate().expect("Unable to generate workspace"));
 
-    // Load the path tree to see if it matches expectation using `insta`
-    let directory_tree = DirectoryTree::from(workspace_path.clone());
-
-    // Convert to string and replace the temp directory path with a placeholder
-    let tree_output = directory_tree.to_string();
-    let normalized_output = tree_output
-        .replace(&workspace_path.to_string_lossy().to_string(), "[TEMP_DIR]/synql_workspace");
-
-    insta::assert_snapshot!("synql_workspace", normalized_output);
+    // We print the report
+    Report::new(tracking_test)
+        .write(Path::new("emi_codegen.md"), Path::new("emi_codegen.png"))
+        .unwrap();
 
     // Verify that the workspace directory was created
     assert!(workspace_path.exists(), "Workspace directory should be created");

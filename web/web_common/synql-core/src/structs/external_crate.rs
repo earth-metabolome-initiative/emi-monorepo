@@ -1,7 +1,7 @@
 //! Submodule providing a struct defining the crate required by some type found
 //! in the postgres database schema.
 
-use std::sync::Arc;
+use std::{hash::Hash, sync::Arc};
 
 use proc_macro2::TokenStream;
 use quote::ToTokens;
@@ -27,7 +27,7 @@ mod std_crate;
 mod uuid_crate;
 mod validation_errors_crate;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone)]
 /// Struct defining the crate required by some type found in the postgres
 /// database schema.
 pub struct ExternalCrate {
@@ -46,6 +46,32 @@ pub struct ExternalCrate {
     git: Option<(String, String)>,
     /// Feature flags required by the crate.
     features: Vec<String>,
+}
+
+impl PartialEq for ExternalCrate {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
+}
+
+impl Eq for ExternalCrate {}
+
+impl PartialOrd for ExternalCrate {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.name.cmp(&other.name))
+    }
+}
+
+impl Ord for ExternalCrate {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.name.cmp(&other.name)
+    }
+}
+
+impl Hash for ExternalCrate {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+    }
 }
 
 impl ExternalCrate {

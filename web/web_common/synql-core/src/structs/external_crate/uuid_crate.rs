@@ -20,7 +20,6 @@ impl ExternalCrate {
                         .unwrap()
                         .version("1.0")
                         .features(["v4", "serde"])
-                        .unwrap()
                         .add_type(Arc::new(
                             ExternalType::new()
                                 .diesel_type(syn::parse_quote!(diesel::sql_types::Uuid))
