@@ -44,7 +44,7 @@ pub trait CheckConstraintSynLike: CheckConstraintLike {
 
         let relevant_optional_columns = self
             .columns(database)
-            .filter(|column| !contextual_columns.contains(&column) && column.is_nullable(database))
+            .filter(|column| !contextual_columns.contains(&column))
             .collect::<Vec<_>>();
 
         if relevant_optional_columns.is_empty() {

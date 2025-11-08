@@ -197,12 +197,10 @@ where
             if column.supports_copy(self.database, self.workspace) || !reference {
                 quote! { #column_ident }
             } else {
-                quote! { #column_ident.as_ref() }
+                quote! { &#column_ident }
             }
-        } else if column.is_nullable(self.database) {
-            quote! { #column_ident }
         } else {
-            quote! { self.#column_ident }
+            quote! { #column_ident }
         }
     }
 

@@ -71,7 +71,8 @@ members = [
   "web/web_common/diesel-queries",
   "web/web_common/synql-attributes",
   "web/web_common/synql-value-settable",
-  "web/web_common/synql-insertable", "web/web_common/synql-checks",
+  "web/web_common/synql-insertable",
+  "web/web_common/synql-checks",
 ]
 
 [workspace.dependencies]
