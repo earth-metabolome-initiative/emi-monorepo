@@ -19,7 +19,10 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
 		    name TEXT NOT NULL CHECK (name <> ''),
             description TEXT,
 		    email TEXT UNIQUE NOT NULL,
-            CHECK (name <> description)
+            created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            CHECK (name <> description),
+            CHECK (created_at <= updated_at)
 		);
         CREATE TABLE comments (
 		    id SERIAL PRIMARY KEY,

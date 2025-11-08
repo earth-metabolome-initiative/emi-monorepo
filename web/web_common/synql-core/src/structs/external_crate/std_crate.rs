@@ -294,7 +294,6 @@ impl ExternalType {
             ])
             .unwrap()
             .supports_clone()
-            .supports_default()
             .supports_hash()
             .supports_ord()
             .supports_serde()

@@ -1,6 +1,6 @@
 //! Submodule providing a function for normalizing SQLParser data types.
 
-use sqlparser::ast::{DataType, ObjectName, ObjectNamePart};
+use sqlparser::ast::{DataType, ObjectName, ObjectNamePart, TimezoneInfo};
 
 /// Normalizes SQLParser data types to a standard representation.
 pub fn normalize_sqlparser_type(sqlparser_type: &DataType) -> &str {
@@ -10,6 +10,8 @@ pub fn normalize_sqlparser_type(sqlparser_type: &DataType) -> &str {
         DataType::Varchar(_) => "VARCHAR",
         DataType::Int(None) | DataType::Integer(None) => "INT",
         DataType::Real => "REAL",
+        DataType::Timestamp(None, TimezoneInfo::None) => "TIMESTAMP",
+        DataType::Timestamp(None, TimezoneInfo::WithTimeZone) => "TIMESTAMPTZ",
         DataType::Custom(ObjectName(object_names), segments) => {
             if let [ObjectNamePart::Identifier(ident)] = object_names.as_slice() {
                 ident.value.as_str()

@@ -129,6 +129,74 @@ where
                     unimplemented!("Operator {op:?} not supported for double field error mapping");
                 }
             }
+            BinaryOperator::LtEq => {
+                Some(
+                    InternalToken::new()
+                        .private()
+                        .stream(quote! {
+                            if #formatted_left > #formatted_right {
+                                return Err(#validation_error::smaller_than(
+                                    #table_attribute_enum::#left_camel_cased,
+                                    #table_attribute_enum::#right_camel_cased
+                                ));
+                            }
+                        })
+                        .data(table_attribute_enum)
+                        .build()
+                        .unwrap(),
+                )
+            }
+            BinaryOperator::Lt => {
+                Some(
+                    InternalToken::new()
+                        .private()
+                        .stream(quote! {
+                            if #formatted_left >= #formatted_right {
+                                return Err(#validation_error::strictly_smaller_than(
+                                    #table_attribute_enum::#left_camel_cased,
+                                    #table_attribute_enum::#right_camel_cased
+                                ));
+                            }
+                        })
+                        .data(table_attribute_enum)
+                        .build()
+                        .unwrap(),
+                )
+            }
+            BinaryOperator::Gt => {
+                Some(
+                    InternalToken::new()
+                        .private()
+                        .stream(quote! {
+                            if #formatted_left <= #formatted_right {
+                                return Err(#validation_error::strictly_greater_than(
+                                    #table_attribute_enum::#left_camel_cased,
+                                    #table_attribute_enum::#right_camel_cased
+                                ));
+                            }
+                        })
+                        .data(table_attribute_enum)
+                        .build()
+                        .unwrap(),
+                )
+            }
+            BinaryOperator::GtEq => {
+                Some(
+                    InternalToken::new()
+                        .private()
+                        .stream(quote! {
+                            if #formatted_left < #formatted_right {
+                                return Err(#validation_error::greater_than(
+                                    #table_attribute_enum::#left_camel_cased,
+                                    #table_attribute_enum::#right_camel_cased
+                                ));
+                            }
+                        })
+                        .data(table_attribute_enum)
+                        .build()
+                        .unwrap(),
+                )
+            }
             _ => {
                 unimplemented!("Operator {op:?} not supported for double field error mapping");
             }

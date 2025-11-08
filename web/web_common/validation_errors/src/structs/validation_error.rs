@@ -63,13 +63,13 @@ impl<FieldName> ValidationError<FieldName> {
         ))
     }
 
-    /// Creates a new validation error for a field who should be strictly smaller
-    /// than another field.
+    /// Creates a new validation error for a field who should be strictly
+    /// smaller than another field.
     ///
     /// # Arguments
     ///
-    /// * `smaller_equal_field` - The name of the field that should be strictly smaller
-    ///   than another field.
+    /// * `smaller_equal_field` - The name of the field that should be strictly
+    ///   smaller than another field.
     /// * `greater_field` - The name of the field that should be greater.
     pub fn strictly_smaller_than(smaller_equal_field: FieldName, greater_field: FieldName) -> Self {
         ValidationError::DoubleField(DoubleFieldError::MustBeStrictlySmallerThan(
@@ -78,13 +78,13 @@ impl<FieldName> ValidationError<FieldName> {
         ))
     }
 
-    /// Creates a new validation error for a field who should be strictly greater
-    /// than another field.
+    /// Creates a new validation error for a field who should be strictly
+    /// greater than another field.
     ///
     /// # Arguments
     ///
-    /// * `greater_equal_field` - The name of the field that should be strictly greater
-    ///   than another field.
+    /// * `greater_equal_field` - The name of the field that should be strictly
+    ///   greater than another field.
     /// * `smaller_field` - The name of the field that should be smaller.
     pub fn strictly_greater_than(greater_equal_field: FieldName, smaller_field: FieldName) -> Self {
         ValidationError::DoubleField(DoubleFieldError::MustBeStrictlyGreaterThan(
