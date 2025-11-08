@@ -164,7 +164,7 @@ impl<'data, 'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'data
             .return_type(DataVariantRef::result(DataVariantRef::self_type(None), validation_error))
             .error_documentation(Documentation::new()
                 .documentation(format!(
-                    "Returns a [`ValidationError`](validation_errors::ValidationError) if the provided value for column {} is invalid.",
+                    "Returns a [`ValidationError`](validation_errors::prelude::ValidationError) if the provided value for column {} is invalid.",
                     column.column_schema_doc_path(self.database)
                 ))
                 .expect("Failed to set the error documentation").internal_dependency(table_schema_ref).unwrap().build().unwrap())

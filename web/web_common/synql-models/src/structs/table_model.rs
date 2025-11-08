@@ -191,7 +191,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
                     .stream(quote! {
                         impl<C> #extension_of_trait<#extended_table_model, C> for #table_model
                         where
-                            #extended_table_model: #read_trait,
+                            #extended_table_model: #read_trait<C>,
                         {
                             type ExtendedType<'data> = #extended_table_model
                             where
