@@ -1,6 +1,7 @@
 //! Submodule for string validation
 
 use pgrx_validation_derive::validation;
+use validation_errors::prelude::Unspecified;
 use validator::ValidateEmail;
 
 #[validation]
@@ -32,7 +33,7 @@ pub fn must_be_email(value: &str) -> Result<(), validation_errors::prelude::Sing
 ///   empty.
 pub fn must_not_be_empty(value: &str) -> Result<(), validation_errors::prelude::SingleFieldError> {
     if value.is_empty() {
-        Err(validation_errors::prelude::SingleFieldError::empty_text())
+        Err(validation_errors::prelude::SingleFieldError::empty(Unspecified))
     } else {
         Ok(())
     }

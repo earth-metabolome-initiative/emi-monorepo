@@ -15,27 +15,27 @@ use crate::structs::{
 
 #[derive(Default)]
 /// Builder for the `Method` struct.
-pub struct MethodBuilder<'data> {
+pub struct MethodBuilder {
     /// Arguments of the method.
-    arguments: Vec<Argument<'data>>,
+    arguments: Vec<Argument>,
     /// Name of the method.
     name: Option<String>,
     /// Publicness of the method.
     publicness: Option<Publicness>,
     /// The body of the method.
-    body: Option<InternalToken<'data>>,
+    body: Option<InternalToken>,
     /// Whether the method is asynchronous.
     async_method: bool,
     /// The return type of the method.
-    return_type: Option<DataVariantRef<'data>>,
+    return_type: Option<DataVariantRef>,
     /// Documentation of the method.
-    documentation: Option<Documentation<'data>>,
+    documentation: Option<Documentation>,
     /// Generics of the method.
     generics: Vec<Ident>,
     /// Where clauses of the method.
-    where_clauses: Vec<WhereClause<'data>>,
+    where_clauses: Vec<WhereClause>,
     /// Error documentations of the method.
-    error_documentations: Vec<Documentation<'data>>,
+    error_documentations: Vec<Documentation>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -64,7 +64,7 @@ pub enum MethodAttribute {
 }
 
 impl Display for MethodAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             MethodAttribute::Arguments => write!(f, "arguments"),
             MethodAttribute::Name => write!(f, "name"),
@@ -105,7 +105,7 @@ impl From<BuilderError<MethodAttribute>> for MethodBuilderError {
 }
 
 impl Display for MethodBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             MethodBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             MethodBuilderError::InvalidName => write!(f, "Invalid method name"),
@@ -134,7 +134,7 @@ impl Error for MethodBuilderError {
     }
 }
 
-impl<'data> MethodBuilder<'data> {
+impl MethodBuilder {
     /// Sets the name of the method.
     ///
     /// # Arguments
@@ -155,7 +155,7 @@ impl<'data> MethodBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the method.
-    pub fn documentation(mut self, documentation: Documentation<'data>) -> Self {
+    pub fn documentation(mut self, documentation: Documentation) -> Self {
         self.documentation = Some(documentation);
         self
     }
@@ -187,7 +187,7 @@ impl<'data> MethodBuilder<'data> {
     /// * `body` - The body of the method.
     pub fn body<T>(mut self, body: T) -> Self
     where
-        T: Into<InternalToken<'data>>,
+        T: Into<InternalToken>,
     {
         self.body = Some(body.into());
         self
@@ -208,7 +208,7 @@ impl<'data> MethodBuilder<'data> {
     /// * `return_type` - The return type of the method.
     pub fn return_type<T>(mut self, return_type: T) -> Self
     where
-        T: Into<DataVariantRef<'data>>,
+        T: Into<DataVariantRef>,
     {
         self.return_type = Some(return_type.into());
         self
@@ -218,7 +218,7 @@ impl<'data> MethodBuilder<'data> {
     ///
     /// # Arguments
     /// * `argument` - The argument to add.
-    pub fn argument(mut self, argument: Argument<'data>) -> Result<Self, MethodBuilderError> {
+    pub fn argument(mut self, argument: Argument) -> Result<Self, MethodBuilderError> {
         if self.arguments.iter().any(|a| a.name() == argument.name()) {
             return Err(MethodBuilderError::DuplicatedArgument);
         }
@@ -232,7 +232,7 @@ impl<'data> MethodBuilder<'data> {
     /// * `arguments` - The arguments to add.
     pub fn arguments<I>(mut self, arguments: I) -> Result<Self, MethodBuilderError>
     where
-        I: IntoIterator<Item = Argument<'data>>,
+        I: IntoIterator<Item = Argument>,
     {
         for argument in arguments {
             self = self.argument(argument)?;
@@ -285,10 +285,7 @@ impl<'data> MethodBuilder<'data> {
     ///
     /// # Arguments
     /// * `where_clause` - The where clause to add.
-    pub fn where_clause(
-        mut self,
-        where_clause: WhereClause<'data>,
-    ) -> Result<Self, MethodBuilderError> {
+    pub fn where_clause(mut self, where_clause: WhereClause) -> Result<Self, MethodBuilderError> {
         if self.where_clauses.iter().any(|w| w == &where_clause) {
             return Err(MethodBuilderError::DuplicatedWhereClause);
         }
@@ -302,7 +299,7 @@ impl<'data> MethodBuilder<'data> {
     /// * `where_clauses` - The where clauses to add.
     pub fn where_clauses<I>(mut self, where_clauses: I) -> Result<Self, MethodBuilderError>
     where
-        I: IntoIterator<Item = WhereClause<'data>>,
+        I: IntoIterator<Item = WhereClause>,
     {
         for where_clause in where_clauses {
             self = self.where_clause(where_clause)?;
@@ -314,7 +311,7 @@ impl<'data> MethodBuilder<'data> {
     ///
     /// # Arguments
     /// * `error_documentation` - The error documentation of the method.
-    pub fn error_documentation(mut self, error_documentation: Documentation<'data>) -> Self {
+    pub fn error_documentation(mut self, error_documentation: Documentation) -> Self {
         self.error_documentations.push(error_documentation);
         self
     }
@@ -326,7 +323,7 @@ impl<'data> MethodBuilder<'data> {
     /// * `error_documentations` - The error documentations of the method.
     pub fn error_documentations<I>(mut self, error_documentations: I) -> Self
     where
-        I: IntoIterator<Item = Documentation<'data>>,
+        I: IntoIterator<Item = Documentation>,
     {
         for error_documentation in error_documentations {
             self.error_documentations.push(error_documentation);
@@ -335,19 +332,19 @@ impl<'data> MethodBuilder<'data> {
     }
 }
 
-impl Attributed for MethodBuilder<'_> {
+impl Attributed for MethodBuilder {
     type Attribute = MethodAttribute;
 }
 
-impl IsCompleteBuilder for MethodBuilder<'_> {
+impl IsCompleteBuilder for MethodBuilder {
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.publicness.is_some() && self.documentation.is_some()
     }
 }
 
-impl<'data> Builder for MethodBuilder<'data> {
+impl Builder for MethodBuilder {
     type Error = MethodBuilderError;
-    type Object = Method<'data>;
+    type Object = Method;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         if self.return_type.as_ref().map_or(false, |rt| rt.is_result())
@@ -381,8 +378,8 @@ impl<'data> Builder for MethodBuilder<'data> {
     }
 }
 
-impl<'data> From<Method<'data>> for MethodBuilder<'data> {
-    fn from(method: Method<'data>) -> Self {
+impl From<Method> for MethodBuilder {
+    fn from(method: Method) -> Self {
         MethodBuilder {
             arguments: method.arguments,
             name: Some(method.name),

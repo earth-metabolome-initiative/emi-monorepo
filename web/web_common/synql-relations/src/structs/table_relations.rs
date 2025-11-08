@@ -53,14 +53,14 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
     }
 
     /// Returns a reference to the `ExtensionOf` trait.
-    fn extension_of_trait(&self) -> ExternalTraitRef<'data> {
+    fn extension_of_trait(&self) -> ExternalTraitRef {
         self.workspace
             .external_trait("ExtensionOf")
             .expect("Failed to get ExtensionOf trait from workspace")
     }
 
     /// Returns a reference to the `ModelRef` of the current table.
-    fn model_ref(&self) -> InternalDataRef<'data> {
+    fn model_ref(&self) -> InternalDataRef {
         self.table
             .model_ref(self.workspace)
             .expect("Failed to get the model ref for the table relations")
@@ -69,7 +69,7 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
     fn init_method_builders(
         &self,
         foreign_key: &<T::DB as DatabaseLike>::ForeignKey,
-    ) -> (Argument<'data>, MethodBuilder<'data>) {
+    ) -> (Argument, MethodBuilder) {
         let connection_generic =
             DataVariantRef::generic(Ident::new("C", proc_macro2::Span::call_site()));
         let referenced_table: &T = foreign_key.referenced_table(self.database).borrow();
@@ -139,10 +139,7 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
         )
     }
 
-    fn read_based_method(
-        &self,
-        foreign_key: &<T::DB as DatabaseLike>::ForeignKey,
-    ) -> Method<'data> {
+    fn read_based_method(&self, foreign_key: &<T::DB as DatabaseLike>::ForeignKey) -> Method {
         let referenced_table: &T = foreign_key.referenced_table(self.database).borrow();
         let referenced_table_model = referenced_table
             .model_ref(self.workspace)
@@ -198,8 +195,7 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
                         InternalToken::new()
                             .private()
                             .stream(quote! {#read_trait<#connection_generic>})
-                            .employed_trait(read_trait.into())
-                            .unwrap()
+                            .employed_trait(read_trait.clone().into())
                             .build()
                             .unwrap(),
                     )
@@ -223,9 +219,7 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
                         )#optional
                     })
                     .employed_traits([read_trait.into()])
-                    .unwrap()
                     .employed_traits(maybe_optional_trait)
-                    .unwrap()
                     .build()
                     .unwrap(),
             )

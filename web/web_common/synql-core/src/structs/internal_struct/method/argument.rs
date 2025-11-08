@@ -2,7 +2,9 @@
 //! argument.
 
 mod builder;
-pub use builder::{ArgumentAttribute, ArgumentBuilder, ArgumentBuilderError};
+use std::sync::Arc;
+
+pub use builder::ArgumentBuilder;
 use quote::ToTokens;
 
 use crate::{
@@ -13,30 +15,30 @@ use crate::{
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a rust method argument.
-pub struct Argument<'data> {
+pub struct Argument {
     /// Name of the argument.
     name: String,
     /// Type of the argument.
-    arg_type: DataVariantRef<'data>,
+    arg_type: DataVariantRef,
     /// Whether the argument is mutable.
     mutable: bool,
     /// Documentation of the argument.
-    documentation: Option<Documentation<'data>>,
+    documentation: Option<Documentation>,
 }
 
-impl<'data> Argument<'data> {
+impl Argument {
     /// Returns the name of the argument.
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns the documentation of the argument.
-    pub fn documentation(&self) -> Option<&Documentation<'data>> {
+    pub fn documentation(&self) -> Option<&Documentation> {
         self.documentation.as_ref()
     }
 
     /// Returns the type of the argument.
-    pub fn arg_type(&self) -> &DataVariantRef<'data> {
+    pub fn arg_type(&self) -> &DataVariantRef {
         &self.arg_type
     }
 
@@ -60,19 +62,19 @@ impl<'data> Argument<'data> {
     }
 
     /// Returns whether the argument is compatible with another argument.
-    pub fn is_compatible_with(&self, other: &Argument<'_>) -> bool {
+    pub fn is_compatible_with(&self, other: &Argument) -> bool {
         self.name == other.name && self.arg_type == other.arg_type
     }
 }
 
-impl<'data> Argument<'data> {
+impl Argument {
     /// Initializes a new `ArgumentBuilder`.
-    pub fn new() -> ArgumentBuilder<'data> {
+    pub fn new() -> ArgumentBuilder {
         ArgumentBuilder::default()
     }
 }
 
-impl ToTokens for Argument<'_> {
+impl ToTokens for Argument {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         if self.is_self() {
             if self.arg_type.is_reference() {
@@ -87,7 +89,7 @@ impl ToTokens for Argument<'_> {
             return;
         }
         let name_ident = syn::Ident::new(&self.name, proc_macro2::Span::call_site());
-        let arg_type_tokens = self.arg_type.to_token_stream();
+        let arg_type_tokens = self.arg_type.format_with_generics();
         if self.mutable {
             tokens.extend(quote::quote! { mut #name_ident: #arg_type_tokens });
         } else {
@@ -96,8 +98,8 @@ impl ToTokens for Argument<'_> {
     }
 }
 
-impl<'data> InternalDependencies<'data> for Argument<'data> {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
+impl InternalDependencies for Argument {
+    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
         let mut dependencies = self.arg_type.internal_dependencies();
         if let Some(doc) = &self.documentation {
             dependencies.extend(doc.internal_dependencies());
@@ -108,8 +110,8 @@ impl<'data> InternalDependencies<'data> for Argument<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for Argument<'data> {
-    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl ExternalDependencies for Argument {
+    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
         let mut dependencies = self.arg_type.external_dependencies();
         if let Some(doc) = &self.documentation {
             dependencies.extend(doc.external_dependencies());

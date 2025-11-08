@@ -37,7 +37,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
         Self { table, workspace, database }
     }
 
-    fn diesel_derives(&self) -> Derive<'data> {
+    fn diesel_derives(&self) -> Derive {
         let mut traits = vec![
             self.workspace.external_trait("Selectable").expect("Failed to get Selectable trait"),
         ];
@@ -88,7 +88,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
             .expect("Failed to build Selectable derive")
     }
 
-    fn belongs_to_decorators(&self) -> Vec<Decorator<'data>> {
+    fn belongs_to_decorators(&self) -> Vec<Decorator> {
         let mut decorators = Vec::new();
 
         for foreign_key in self.table.singleton_foreign_keys(self.database) {
@@ -111,7 +111,6 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
                             diesel(belongs_to(#referenced_table_model, foreign_key = #column_ident))
                         })
                         .data(referenced_table_model.into())
-                        .unwrap()
                         .build()
                         .unwrap(),
                 )
@@ -125,7 +124,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
         decorators
     }
 
-    fn primary_key_decorator(&self) -> Option<Decorator<'data>> {
+    fn primary_key_decorator(&self) -> Option<Decorator> {
         if !self.table.has_primary_key(self.database) {
             return None;
         }
@@ -149,7 +148,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
         )
     }
 
-    fn extension_of_impls(&self) -> Vec<InternalToken<'data>> {
+    fn extension_of_impls(&self) -> Vec<InternalToken> {
         let extension_of_trait =
             self.workspace.external_trait("ExtensionOf").expect("Failed to get ExtensionOf trait");
         let read_trait = self.workspace.external_trait("Read").expect("Failed to get Read trait");
@@ -176,8 +175,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
                         }
                     }
                 })
-                .implemented_trait(extension_of_trait.into())
-                .unwrap()
+                .implemented_trait(extension_of_trait.clone().into())
                 .build()
                 .unwrap(),
         ];
@@ -193,7 +191,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
                     .stream(quote! {
                         impl<C> #extension_of_trait<#extended_table_model, C> for #table_model
                         where
-                            #extended_table_model: #read_trait<C>,
+                            #extended_table_model: #read_trait,
                         {
                             type ExtendedType<'data> = #extended_table_model
                             where
@@ -209,10 +207,8 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
                             }
                         }
                     })
-                    .implemented_trait(extension_of_trait.into())
-                    .unwrap()
-                    .employed_traits([read_trait.into(), identifiable_trait.into()])
-                    .unwrap()
+                    .implemented_trait(extension_of_trait.clone().into())
+                    .employed_traits([read_trait.clone().into(), identifiable_trait.clone().into()])
                     .build()
                     .unwrap(),
             );
@@ -227,7 +223,7 @@ where
     T: TableModelLike + ?Sized,
 {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let internal_data: InternalData<'data> = InternalData::from(*self);
+        let internal_data: InternalData = InternalData::from(*self);
         internal_data.to_tokens(tokens);
     }
 }

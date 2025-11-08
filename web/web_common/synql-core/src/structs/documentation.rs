@@ -4,7 +4,7 @@
 
 mod builder;
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub use builder::DocumentationBuilder;
 use quote::ToTokens;
@@ -16,18 +16,18 @@ use crate::{
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining documentation for various structs, enums, traits, etc.
-pub struct Documentation<'data> {
+pub struct Documentation {
     /// The documentation string.
     documentation: String,
     /// The external crate dependencies required by this documentation.
-    external_dependencies: Vec<&'data ExternalCrate<'data>>,
+    external_dependencies: Vec<Arc<ExternalCrate>>,
     /// The internal crate dependencies required by this documentation.
-    internal_dependencies: Vec<Rc<InternalCrate<'data>>>,
+    internal_dependencies: Vec<Arc<InternalCrate>>,
 }
 
-impl<'data> Documentation<'data> {
+impl Documentation {
     /// Initializes a new `DocumentationBuilder`.
-    pub fn new() -> DocumentationBuilder<'data> {
+    pub fn new() -> DocumentationBuilder {
         DocumentationBuilder::default()
     }
 
@@ -37,19 +37,19 @@ impl<'data> Documentation<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for Documentation<'data> {
-    fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
+impl ExternalDependencies for Documentation {
+    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
         self.external_dependencies.clone()
     }
 }
 
-impl<'data> InternalDependencies<'data> for Documentation<'data> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl InternalDependencies for Documentation {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
         self.internal_dependencies.iter().map(|c| c.as_ref()).collect()
     }
 }
 
-impl ToTokens for Documentation<'_> {
+impl ToTokens for Documentation {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         // Split documentation by newlines to create separate doc attributes
         let doc_lines: Vec<&str> = self.documentation.lines().collect();
@@ -63,20 +63,20 @@ impl ToTokens for Documentation<'_> {
 /// Struct defining documentation specifically for modules, which uses a
 /// different ToTokens implementation (with `#![doc = ...]` instead of `#[doc =
 /// ...]`).
-pub struct ModuleDocumentation<'data> {
+pub struct ModuleDocumentation {
     /// The underlying documentation.
-    documentation: Documentation<'data>,
+    documentation: Documentation,
 }
 
-impl<'data> From<Documentation<'data>> for ModuleDocumentation<'data> {
-    fn from(documentation: Documentation<'data>) -> Self {
+impl From<Documentation> for ModuleDocumentation {
+    fn from(documentation: Documentation) -> Self {
         ModuleDocumentation { documentation }
     }
 }
 
-impl<'data> ModuleDocumentation<'data> {
+impl ModuleDocumentation {
     /// Returns a reference to the underlying documentation.
-    pub fn documentation(&self) -> &Documentation<'data> {
+    pub fn documentation(&self) -> &Documentation {
         &self.documentation
     }
 
@@ -86,19 +86,19 @@ impl<'data> ModuleDocumentation<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for ModuleDocumentation<'data> {
-    fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
+impl ExternalDependencies for ModuleDocumentation {
+    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
         self.documentation.external_dependencies()
     }
 }
 
-impl<'data> InternalDependencies<'data> for ModuleDocumentation<'data> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl InternalDependencies for ModuleDocumentation {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
         self.documentation.internal_dependencies()
     }
 }
 
-impl ToTokens for ModuleDocumentation<'_> {
+impl ToTokens for ModuleDocumentation {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         // For modules, use inner doc attributes (#![doc = ...])
         let doc_string = self.documentation.documentation();

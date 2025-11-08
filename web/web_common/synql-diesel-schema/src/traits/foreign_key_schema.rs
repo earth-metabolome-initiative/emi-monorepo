@@ -1,7 +1,7 @@
 //! Submodule defining the `ForeignKeySchema` trait which provides documentation
 //! representation for foreign keys in the diesel schema.
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use sql_traits::traits::DatabaseLike;
 use synql_core::{
@@ -78,7 +78,7 @@ pub trait ForeignKeySchema: ForeignKeySynLike + Sized {
         &self,
         workspace: &Workspace<'data>,
         database: &Self::DB,
-    ) -> Vec<Rc<InternalCrate<'data>>>
+    ) -> Vec<Arc<InternalCrate>>
     where
         <Self::DB as DatabaseLike>::Table: TableSchema,
         <Self::DB as DatabaseLike>::Column: ColumnSchema,

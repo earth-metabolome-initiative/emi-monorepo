@@ -28,16 +28,18 @@ impl FunctionLike for PgProc {
         &self.proname
     }
 
-    fn argument_type_names(&self, database: &Self::DB) -> Vec<String> {
+    fn argument_type_names<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db str> {
         database
             .function_metadata(self)
             .argument_types()
             .iter()
-            .map(|pg_type| pg_type.typname.clone())
-            .collect()
+            .map(|pg_type| pg_type.typname.as_str())
     }
 
-    fn return_type_name(&self, database: &Self::DB) -> Option<String> {
-        database.function_metadata(self).return_type().map(|pg_type| pg_type.typname.clone())
+    fn return_type_name<'db>(&'db self, database: &'db Self::DB) -> Option<&'db str> {
+        database.function_metadata(self).return_type().map(|pg_type| pg_type.typname.as_str())
     }
 }

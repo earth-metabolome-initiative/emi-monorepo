@@ -16,25 +16,25 @@ use crate::structs::{
 
 #[derive(Default)]
 /// Builder for the `InternalData` struct.
-pub struct InternalDataBuilder<'data> {
+pub struct InternalDataBuilder {
     /// Publicness of the data.
     publicness: Option<Publicness>,
     /// Name of the data.
     name: Option<String>,
     /// Documentation of the data.
-    documentation: Option<Documentation<'data>>,
+    documentation: Option<Documentation>,
     /// The variant of the data (struct or enum).
-    variant: Option<InternalDataVariant<'data>>,
+    variant: Option<InternalDataVariant>,
     /// The traits implemented for the data.
-    traits: Vec<InternalToken<'data>>,
+    traits: Vec<InternalToken>,
     /// The derives applied to the data.
-    derives: Vec<Derive<'data>>,
+    derives: Vec<Derive>,
     /// The decorators applied to the data.
-    decorators: Vec<Decorator<'data>>,
+    decorators: Vec<Decorator>,
     /// Generics used in the data.
     generics: Vec<Ident>,
     /// Generic defaults for the data.
-    generic_defaults: HashMap<Ident, DataVariantRef<'data>>,
+    generic_defaults: HashMap<Ident, DataVariantRef>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -61,7 +61,7 @@ pub enum InternalDataAttribute {
 }
 
 impl Display for InternalDataAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalDataAttribute::Publicness => write!(f, "publicness"),
             InternalDataAttribute::Name => write!(f, "name"),
@@ -97,7 +97,7 @@ pub enum InternalDataBuilderError {
 }
 
 impl Display for InternalDataBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalDataBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             InternalDataBuilderError::InvalidName => write!(f, "Invalid data name"),
@@ -132,7 +132,7 @@ impl Error for InternalDataBuilderError {
     }
 }
 
-impl<'data> InternalDataBuilder<'data> {
+impl InternalDataBuilder {
     /// Sets the name of the data.
     ///
     /// # Arguments
@@ -153,7 +153,7 @@ impl<'data> InternalDataBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the data.
-    pub fn documentation(mut self, documentation: Documentation<'data>) -> Self {
+    pub fn documentation(mut self, documentation: Documentation) -> Self {
         self.documentation = Some(documentation);
         self
     }
@@ -183,7 +183,7 @@ impl<'data> InternalDataBuilder<'data> {
     ///
     /// # Arguments
     /// * `variant` - The variant of the data (struct or enum).
-    pub fn variant(mut self, variant: InternalDataVariant<'data>) -> Self {
+    pub fn variant(mut self, variant: InternalDataVariant) -> Self {
         self.variant = Some(variant);
         self
     }
@@ -194,7 +194,7 @@ impl<'data> InternalDataBuilder<'data> {
     /// * `internal_token` - The trait to implement.
     pub fn add_trait(
         mut self,
-        internal_token: InternalToken<'data>,
+        internal_token: InternalToken,
     ) -> Result<Self, InternalDataBuilderError> {
         if self.traits.iter().any(|t| t == &internal_token) {
             return Err(InternalDataBuilderError::DuplicatedTrait);
@@ -209,7 +209,7 @@ impl<'data> InternalDataBuilder<'data> {
     /// * `traits` - The traits to implement.
     pub fn add_traits<I>(mut self, internal_tokens: I) -> Result<Self, InternalDataBuilderError>
     where
-        I: IntoIterator<Item = InternalToken<'data>>,
+        I: IntoIterator<Item = InternalToken>,
     {
         for internal_token in internal_tokens {
             self = self.add_trait(internal_token)?;
@@ -221,7 +221,7 @@ impl<'data> InternalDataBuilder<'data> {
     ///
     /// # Arguments
     /// * `derive` - The derive to add.
-    pub fn derive(mut self, derive: Derive<'data>) -> Result<Self, InternalDataBuilderError> {
+    pub fn derive(mut self, derive: Derive) -> Result<Self, InternalDataBuilderError> {
         if self.derives.iter().any(|d| d == &derive) {
             return Err(InternalDataBuilderError::DuplicatedDerive);
         }
@@ -235,7 +235,7 @@ impl<'data> InternalDataBuilder<'data> {
     /// * `derives` - The derives to add.
     pub fn derives<I>(mut self, derives: I) -> Result<Self, InternalDataBuilderError>
     where
-        I: IntoIterator<Item = Derive<'data>>,
+        I: IntoIterator<Item = Derive>,
     {
         for derive in derives {
             self = self.derive(derive)?;
@@ -247,10 +247,7 @@ impl<'data> InternalDataBuilder<'data> {
     ///
     /// # Arguments
     /// * `decorator` - The decorator to add.
-    pub fn decorator(
-        mut self,
-        decorator: Decorator<'data>,
-    ) -> Result<Self, InternalDataBuilderError> {
+    pub fn decorator(mut self, decorator: Decorator) -> Result<Self, InternalDataBuilderError> {
         if self.decorators.iter().any(|d| d == &decorator) {
             return Err(InternalDataBuilderError::DuplicatedDecorator);
         }
@@ -264,7 +261,7 @@ impl<'data> InternalDataBuilder<'data> {
     /// * `decorators` - The decorators to add.
     pub fn decorators<I>(mut self, decorators: I) -> Result<Self, InternalDataBuilderError>
     where
-        I: IntoIterator<Item = Decorator<'data>>,
+        I: IntoIterator<Item = Decorator>,
     {
         for decorator in decorators {
             self = self.decorator(decorator)?;
@@ -310,7 +307,7 @@ impl<'data> InternalDataBuilder<'data> {
     pub fn generic_default(
         mut self,
         generic: Ident,
-        default: DataVariantRef<'data>,
+        default: DataVariantRef,
     ) -> Result<Self, InternalDataBuilderError> {
         if !self.generics.iter().any(|g| g == &generic) {
             return Err(InternalDataBuilderError::GenericDefaultForNonexistentGeneric(generic));
@@ -320,11 +317,11 @@ impl<'data> InternalDataBuilder<'data> {
     }
 }
 
-impl Attributed for InternalDataBuilder<'_> {
+impl Attributed for InternalDataBuilder {
     type Attribute = InternalDataAttribute;
 }
 
-impl IsCompleteBuilder for InternalDataBuilder<'_> {
+impl IsCompleteBuilder for InternalDataBuilder {
     fn is_complete(&self) -> bool {
         self.publicness.is_some()
             && self.name.is_some()
@@ -333,9 +330,9 @@ impl IsCompleteBuilder for InternalDataBuilder<'_> {
     }
 }
 
-impl<'data> Builder for InternalDataBuilder<'data> {
+impl Builder for InternalDataBuilder {
     type Error = BuilderError<InternalDataAttribute>;
-    type Object = InternalData<'data>;
+    type Object = InternalData;
 
     fn build(mut self) -> Result<Self::Object, Self::Error> {
         // We add the auto-derives depending on which traits are supported by all of the
@@ -360,7 +357,7 @@ impl<'data> Builder for InternalDataBuilder<'data> {
 
         let mut serde_derive = Derive::new();
         for serde_trait in ExternalCrate::serde().external_trait_refs() {
-            let serde_trait: TraitVariantRef<'data> = serde_trait.into();
+            let serde_trait: TraitVariantRef = serde_trait.into();
             if variant.supports_trait(&serde_trait)
                 && !self.traits.iter().any(|t| t.implements_trait(&serde_trait))
             {
@@ -380,7 +377,7 @@ impl<'data> Builder for InternalDataBuilder<'data> {
                 let default = self.generic_defaults.remove(g);
                 default
             })
-            .collect::<Vec<Option<DataVariantRef<'data>>>>();
+            .collect::<Vec<Option<DataVariantRef>>>();
 
         Ok(InternalData {
             publicness: self

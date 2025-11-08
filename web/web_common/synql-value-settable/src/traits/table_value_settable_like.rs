@@ -93,7 +93,7 @@ pub trait TableValueSettableLike: TableModelLike {
     fn value_settable_trait_ref<'table, 'data>(
         &'table self,
         workspace: &'table Workspace<'data>,
-    ) -> Option<TraitVariantRef<'data>> {
+    ) -> Option<TraitVariantRef> {
         let crate_ref = workspace.internal_crate(&self.table_value_settable_crate_name())?;
         let trait_ref = crate_ref.internal_trait(&self.table_value_settable_trait_name())?;
         Some(TraitVariantRef::Internal(trait_ref.clone(), Some(crate_ref.clone())))

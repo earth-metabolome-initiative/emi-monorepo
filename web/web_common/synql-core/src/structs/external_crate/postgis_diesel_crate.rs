@@ -2,11 +2,13 @@
 //! struct which initializes a `ExternalCrate` instance describing the
 //! `postgis_diesel` crate.
 
+use std::sync::Arc;
+
 use common_traits::builder::Builder;
 
 use crate::structs::{ExternalCrate, ExternalType};
 
-impl ExternalCrate<'static> {
+impl ExternalCrate {
     /// Initializes a `ExternalCrate` instance describing the `postgis_diesel`
     /// crate.
     pub fn postgis_diesel() -> Self {
@@ -14,14 +16,14 @@ impl ExternalCrate<'static> {
             .name("postgis_diesel")
             .unwrap()
             .add_types(vec![
-                ExternalType::point(),
-                ExternalType::linestring(),
-                ExternalType::polygon(),
-                ExternalType::multipoint(),
-                ExternalType::multilinestring(),
-                ExternalType::multipolygon(),
-                ExternalType::geometrycollection(),
-                ExternalType::geometry(),
+                Arc::new(ExternalType::point()),
+                Arc::new(ExternalType::linestring()),
+                Arc::new(ExternalType::polygon()),
+                Arc::new(ExternalType::multipoint()),
+                Arc::new(ExternalType::multilinestring()),
+                Arc::new(ExternalType::multipolygon()),
+                Arc::new(ExternalType::geometrycollection()),
+                Arc::new(ExternalType::geometry()),
             ])
             .unwrap()
             .version("3.0.1")
@@ -30,7 +32,7 @@ impl ExternalCrate<'static> {
     }
 }
 
-impl<'data> ExternalType<'data> {
+impl ExternalType {
     fn point() -> Self {
         ExternalType::new()
             .postgres_type("point")

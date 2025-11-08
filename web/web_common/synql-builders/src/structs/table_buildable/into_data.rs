@@ -9,7 +9,7 @@ use synql_core::{
 use crate::{structs::TableBuildable, traits::TableBuildableLike};
 
 impl<'data, 'table, T: TableBuildableLike + ?Sized> From<TableBuildable<'data, 'table, T>>
-    for InternalData<'data>
+    for InternalData
 {
     fn from(buildable: TableBuildable<'data, 'table, T>) -> Self {
         let table_model_ref = buildable

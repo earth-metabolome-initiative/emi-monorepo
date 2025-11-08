@@ -1,6 +1,6 @@
 //! Submodule defining a builder for the `Documentation` struct.
 
-use std::{error::Error, fmt::Display, rc::Rc};
+use std::{error::Error, fmt::Display, sync::Arc};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -11,13 +11,13 @@ use crate::structs::{Documentation, ExternalCrate, InternalCrate};
 
 #[derive(Default)]
 /// Builder for the `Documentation` struct.
-pub struct DocumentationBuilder<'data> {
+pub struct DocumentationBuilder {
     /// The documentation string.
     documentation: Option<String>,
     /// The external crate dependencies required by this documentation.
-    external_dependencies: Vec<&'data ExternalCrate<'data>>,
+    external_dependencies: Vec<Arc<ExternalCrate>>,
     /// The internal crate dependencies required by this documentation.
-    internal_dependencies: Vec<Rc<InternalCrate<'data>>>,
+    internal_dependencies: Vec<Arc<InternalCrate>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -32,7 +32,7 @@ pub enum DocumentationAttribute {
 }
 
 impl Display for DocumentationAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             DocumentationAttribute::Documentation => write!(f, "documentation"),
             DocumentationAttribute::ExternalDependencies => write!(f, "external dependencies"),
@@ -62,7 +62,7 @@ pub enum DocumentationBuilderError {
 }
 
 impl Display for DocumentationBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             DocumentationBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             DocumentationBuilderError::InvalidDocumentation => {
@@ -107,7 +107,7 @@ impl From<BuilderError<DocumentationAttribute>> for DocumentationBuilderError {
     }
 }
 
-impl<'data> DocumentationBuilder<'data> {
+impl DocumentationBuilder {
     /// Sets the documentation string.
     ///
     /// # Arguments
@@ -130,7 +130,7 @@ impl<'data> DocumentationBuilder<'data> {
     /// * `external_crate` - The external crate dependency.
     pub fn external_dependency(
         mut self,
-        external_crate: &'data ExternalCrate<'data>,
+        external_crate: Arc<ExternalCrate>,
     ) -> Result<Self, DocumentationBuilderError> {
         if self.external_dependencies.iter().any(|c| c.name() == external_crate.name()) {
             return Err(DocumentationBuilderError::DuplicatedExternalCrateDependency);
@@ -148,7 +148,7 @@ impl<'data> DocumentationBuilder<'data> {
         external_crates: I,
     ) -> Result<Self, DocumentationBuilderError>
     where
-        I: IntoIterator<Item = &'data ExternalCrate<'data>>,
+        I: IntoIterator<Item = Arc<ExternalCrate>>,
     {
         for external_crate in external_crates {
             self = self.external_dependency(external_crate)?;
@@ -162,7 +162,7 @@ impl<'data> DocumentationBuilder<'data> {
     /// * `internal_crate` - The internal crate dependency.
     pub fn internal_dependency(
         mut self,
-        internal_crate: Rc<InternalCrate<'data>>,
+        internal_crate: Arc<InternalCrate>,
     ) -> Result<Self, DocumentationBuilderError> {
         if self.internal_dependencies.iter().any(|c| c.name() == internal_crate.name()) {
             return Err(DocumentationBuilderError::DuplicatedInternalCrateDependency);
@@ -180,7 +180,7 @@ impl<'data> DocumentationBuilder<'data> {
         internal_crates: I,
     ) -> Result<Self, DocumentationBuilderError>
     where
-        I: IntoIterator<Item = Rc<InternalCrate<'data>>>,
+        I: IntoIterator<Item = Arc<InternalCrate>>,
     {
         for internal_crate in internal_crates {
             self = self.internal_dependency(internal_crate)?;
@@ -189,19 +189,19 @@ impl<'data> DocumentationBuilder<'data> {
     }
 }
 
-impl Attributed for DocumentationBuilder<'_> {
+impl Attributed for DocumentationBuilder {
     type Attribute = DocumentationAttribute;
 }
 
-impl IsCompleteBuilder for DocumentationBuilder<'_> {
+impl IsCompleteBuilder for DocumentationBuilder {
     fn is_complete(&self) -> bool {
         self.documentation.is_some()
     }
 }
 
-impl<'data> Builder for DocumentationBuilder<'data> {
+impl Builder for DocumentationBuilder {
     type Error = DocumentationBuilderError;
-    type Object = Documentation<'data>;
+    type Object = Documentation;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         let documentation = self

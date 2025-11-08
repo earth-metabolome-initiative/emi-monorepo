@@ -9,7 +9,7 @@ use synql_core::{
 /// Trait representing a SynQL column model.
 pub trait ColumnModelLike: ColumnSynLike {
     /// Returns the
-    /// [`InternalAttribute<'data>`](synql_core::structs::InternalAttribute)
+    /// [`InternalAttribute`](synql_core::structs::InternalAttribute)
     /// representing the attribute for the column.
     ///
     /// # Arguments
@@ -20,8 +20,8 @@ pub trait ColumnModelLike: ColumnSynLike {
         &self,
         database: &Self::DB,
         workspace: &Workspace<'data>,
-    ) -> InternalAttribute<'data> {
-        let mut attribute_type: DataVariantRef<'data> = self
+    ) -> InternalAttribute {
+        let mut attribute_type: DataVariantRef = self
             .external_postgres_type(workspace, database)
             .expect("Failed to find external type")
             .into();

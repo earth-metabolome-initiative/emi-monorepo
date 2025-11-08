@@ -3,11 +3,12 @@
 
 mod builder;
 
-use std::hash::Hash;
+use std::{hash::Hash, sync::Arc};
 
 pub use builder::InternalTokenBuilder;
+use common_traits::prelude::Builder;
 use proc_macro2::TokenStream;
-use quote::ToTokens;
+use quote::{ToTokens, quote};
 
 mod from_ident;
 mod trait_impl;
@@ -24,25 +25,36 @@ use crate::{
 
 #[derive(Debug, Clone)]
 /// Struct representing a rust tokenstream alongside its metadata.
-pub struct InternalToken<'data> {
+pub struct InternalToken {
     /// Publicness of the token stream.
     publicness: Publicness,
     /// The token stream.
     stream: TokenStream,
     /// External macros used in the token stream.
-    external_macros: Vec<ExternalMacroRef<'data>>,
+    external_macros: Vec<ExternalMacroRef>,
     /// Traits used in the token stream.
-    employed_traits: Vec<TraitVariantRef<'data>>,
+    employed_traits: Vec<TraitVariantRef>,
     /// Traits which are implemented by the token stream.
-    implemented_traits: Vec<TraitVariantRef<'data>>,
+    implemented_traits: Vec<TraitVariantRef>,
     /// Data used in the token stream.
-    data: Vec<DataVariantRef<'data>>,
+    data: Vec<DataVariantRef>,
     /// Internal modules from other crates in the same workspace which are used
     /// in the token stream.
-    internal_modules: Vec<InternalModuleRef<'data>>,
+    internal_modules: Vec<InternalModuleRef>,
 }
 
-impl PartialEq for InternalToken<'_> {
+impl From<Vec<InternalToken>> for InternalToken {
+    fn from(tokens: Vec<InternalToken>) -> Self {
+        InternalToken::new()
+            .private()
+            .inherits(tokens.iter().cloned())
+            .stream(quote! {#( #tokens )*})
+            .build()
+            .unwrap()
+    }
+}
+
+impl PartialEq for InternalToken {
     fn eq(&self, other: &Self) -> bool {
         self.stream.to_string() == other.stream.to_string()
             && self.publicness == other.publicness
@@ -54,15 +66,15 @@ impl PartialEq for InternalToken<'_> {
     }
 }
 
-impl Eq for InternalToken<'_> {}
+impl Eq for InternalToken {}
 
-impl PartialOrd for InternalToken<'_> {
+impl PartialOrd for InternalToken {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl Ord for InternalToken<'_> {
+impl Ord for InternalToken {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         let stream_cmp = self.stream.to_string().cmp(&other.stream.to_string());
         if stream_cmp != std::cmp::Ordering::Equal {
@@ -98,7 +110,7 @@ impl Ord for InternalToken<'_> {
     }
 }
 
-impl Hash for InternalToken<'_> {
+impl Hash for InternalToken {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         self.stream.to_string().hash(state);
         self.publicness.hash(state);
@@ -110,9 +122,9 @@ impl Hash for InternalToken<'_> {
     }
 }
 
-impl<'data> InternalToken<'data> {
+impl InternalToken {
     /// Initializes a new `InternalTokenBuilder`.
-    pub fn new() -> InternalTokenBuilder<'data> {
+    pub fn new() -> InternalTokenBuilder {
         InternalTokenBuilder::default()
     }
 
@@ -121,7 +133,7 @@ impl<'data> InternalToken<'data> {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait to implement.
-    pub fn implements<'trt>(trait_ref: &'trt TraitVariantRef<'data>) -> TraitImpl<'trt, 'data> {
+    pub fn implements<'trt>(trait_ref: &'trt TraitVariantRef) -> TraitImpl<'trt> {
         TraitImpl::new(trait_ref)
     }
 
@@ -131,12 +143,12 @@ impl<'data> InternalToken<'data> {
     }
 
     /// Returns whether it implements the given trait.
-    pub fn implements_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
+    pub fn implements_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         self.implemented_traits.contains(trait_ref)
     }
 }
 
-impl From<TokenStream> for InternalToken<'_> {
+impl From<TokenStream> for InternalToken {
     fn from(stream: TokenStream) -> Self {
         InternalToken {
             publicness: Publicness::Private,
@@ -150,14 +162,14 @@ impl From<TokenStream> for InternalToken<'_> {
     }
 }
 
-impl ToTokens for InternalToken<'_> {
+impl ToTokens for InternalToken {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         self.stream.to_tokens(tokens);
     }
 }
 
-impl<'data> InternalDependencies<'data> for InternalToken<'data> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl InternalDependencies for InternalToken {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
         let mut dependencies = Vec::new();
         for data in &self.data {
             dependencies.extend(data.internal_dependencies());
@@ -181,11 +193,11 @@ impl<'data> InternalDependencies<'data> for InternalToken<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for InternalToken<'data> {
-    fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
+impl ExternalDependencies for InternalToken {
+    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
         let mut dependencies = Vec::new();
         for ext_macro in &self.external_macros {
-            dependencies.push(ext_macro.external_crate());
+            dependencies.push(Arc::new(ext_macro.external_crate().clone()));
         }
         for trait_ref in &self.employed_traits {
             dependencies.extend(trait_ref.external_dependencies());

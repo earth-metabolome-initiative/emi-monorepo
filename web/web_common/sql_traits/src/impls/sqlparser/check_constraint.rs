@@ -4,7 +4,7 @@ use sqlparser::ast::{CheckConstraint, CreateTable, Expr};
 
 use crate::{
     structs::{ParserDB, TableAttribute, metadata::CheckMetadata},
-    traits::{CheckConstraintLike, Metadata},
+    traits::{CheckConstraintLike, DatabaseLike, Metadata},
 };
 
 impl Metadata for TableAttribute<CreateTable, CheckConstraint> {
@@ -18,10 +18,21 @@ impl CheckConstraintLike for TableAttribute<CreateTable, CheckConstraint> {
         self.attribute().expr.as_ref()
     }
 
+    fn table<'db>(&'db self, database: &'db Self::DB) -> &'db <Self::DB as DatabaseLike>::Table {
+        database.check_constraint_metadata(self).table()
+    }
+
     fn columns<'db>(
         &'db self,
         database: &'db Self::DB,
     ) -> impl Iterator<Item = &'db <Self::DB as crate::prelude::DatabaseLike>::Column> {
         database.check_constraint_metadata(self).columns()
+    }
+
+    fn functions<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as crate::prelude::DatabaseLike>::Function> + 'db {
+        database.check_constraint_metadata(self).functions()
     }
 }

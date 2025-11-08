@@ -1,6 +1,5 @@
 //! Submodule providing the `TableBuildable` trait for SynQL table buildables.
 
-use syn::Ident;
 use synql_core::{
     prelude::Builder,
     structs::{DataVariantRef, Documentation, InternalAttribute, Workspace},
@@ -54,7 +53,7 @@ pub trait TableBuildableLike: TableInsertableLike {
     fn builder_extension_attribute<'data>(
         &self,
         workspace: &Workspace<'data>,
-    ) -> InternalAttribute<'data> {
+    ) -> InternalAttribute {
         let schema_crate_ref = self
             .table_schema_ref(workspace)
             .expect("Failed to get the table schema ref for the buildable module");
@@ -82,10 +81,7 @@ pub trait TableBuildableLike: TableInsertableLike {
 
     /// Returns the attribute for an insertable field of a builder
     /// for the underlying insertable object.
-    fn insertable_attribute<'data>(
-        &self,
-        workspace: &Workspace<'data>,
-    ) -> InternalAttribute<'data> {
+    fn insertable_attribute<'data>(&self, workspace: &Workspace<'data>) -> InternalAttribute {
         let insertable_ref = self
             .insertable_data_ref(workspace)
             .expect("Failed to get the table schema ref for the buildable module");

@@ -62,7 +62,7 @@ pub trait TableExtensionAttributesLike: TableSchema {
     fn extension_attributes_enum_ref<'data>(
         &self,
         workspace: &Workspace<'data>,
-    ) -> Option<InternalDataRef<'data>> {
+    ) -> Option<InternalDataRef> {
         let crate_ref = workspace.internal_crate(&self.table_extension_attributes_crate_name())?;
         Some(InternalDataRef::new(
             crate_ref,

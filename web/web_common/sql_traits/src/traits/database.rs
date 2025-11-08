@@ -22,7 +22,7 @@ pub trait DatabaseLike: Clone + Debug {
     /// Type of the foreign keys in the schema.
     type ForeignKey: ForeignKeyLike<DB = Self>;
     /// Type of the functions in the schema.
-    type Function: FunctionLike;
+    type Function: FunctionLike<DB = Self>;
     /// Type of the unique indexes in the schema.
     type UniqueIndex: UniqueIndexLike<DB = Self>;
     /// Type of the check constraints in the schema.

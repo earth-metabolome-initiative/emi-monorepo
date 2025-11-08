@@ -11,7 +11,7 @@ use crate::{
     traits::{MODEL_MODULE_NAME, TableModelLike},
 };
 
-impl<'data, 'table, T> From<TableModel<'data, 'table, T>> for InternalCrate<'data>
+impl<'data, 'table, T> From<TableModel<'data, 'table, T>> for InternalCrate
 where
     T: TableModelLike + ?Sized,
 {

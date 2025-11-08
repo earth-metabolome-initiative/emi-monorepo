@@ -247,6 +247,11 @@ impl Builder for PgDatabaseBuilder<'_> {
 
         let mut builder = GenericDBBuilder::new().catalog_name(table_catalog.clone());
 
+        for function in PgProc::load_all(connection)? {
+            let metadata = crate::database::PgProcMetadata::new(&function, connection)?;
+            builder = builder.add_function(std::rc::Rc::new(function), metadata);
+        }
+
         let mut tables = Vec::new();
         for table_schema in &table_schemas {
             tables.extend(
@@ -266,10 +271,13 @@ impl Builder for PgDatabaseBuilder<'_> {
             let table_metadata = table.metadata(connection, &self.denylist_types)?;
 
             for check_constraint in table_metadata.check_constraint_rcs() {
-                builder = builder.add_check_constraint(
-                    check_constraint.clone(),
-                    check_constraint.metadata(table.clone(), &table_metadata, connection)?,
-                );
+                let metadata = check_constraint.metadata(
+                    table.clone(),
+                    &table_metadata,
+                    builder.function_rc_vec().as_slice(),
+                    connection,
+                )?;
+                builder = builder.add_check_constraint(check_constraint.clone(), metadata);
             }
 
             for column in table_metadata.column_rcs() {
@@ -288,11 +296,6 @@ impl Builder for PgDatabaseBuilder<'_> {
             }
 
             builder = builder.add_table(table, table_metadata);
-        }
-
-        for function in PgProc::load_all(connection)? {
-            let metadata = crate::database::PgProcMetadata::new(&function, connection)?;
-            builder = builder.add_function(std::rc::Rc::new(function), metadata);
         }
 
         Ok(builder.build().expect("Failed to build PgDatabase: catalog_name should be set"))

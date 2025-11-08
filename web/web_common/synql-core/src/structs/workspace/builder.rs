@@ -1,6 +1,10 @@
 //! Submodule defining a builder for the `Workspace` struct.
 
-use std::{error::Error, fmt::Display};
+use std::{
+    error::Error,
+    fmt::Display,
+    sync::{Arc, OnceLock},
+};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -12,7 +16,7 @@ use crate::structs::{ExternalCrate, Workspace};
 /// Builder for the `Workspace` struct.
 pub struct WorkspaceBuilder<'data> {
     /// External crates made available within the workspace.
-    external_crates: Vec<&'data ExternalCrate<'data>>,
+    external_crates: Vec<Arc<ExternalCrate>>,
     /// Name of the workspace.
     name: Option<String>,
     /// Path where the workspace is being created.
@@ -23,13 +27,16 @@ pub struct WorkspaceBuilder<'data> {
     edition: u16,
 }
 
-use lazy_static::lazy_static;
+static DEFAULT_WORKSPACE_PATH: OnceLock<std::path::PathBuf> = OnceLock::new();
 
-lazy_static! {
-    /// Default path for the workspace.
-    pub static ref DEFAULT_WORKSPACE_PATH: std::path::PathBuf = std::env::current_dir()
-        .unwrap_or_else(|_| std::path::PathBuf::from("."))
-        .join("synql_workspace");
+fn get_default_workspace_path() -> &'static std::path::Path {
+    DEFAULT_WORKSPACE_PATH
+        .get_or_init(|| {
+            std::env::current_dir()
+                .unwrap_or_else(|_| std::path::PathBuf::from("."))
+                .join("synql_workspace")
+        })
+        .as_path()
 }
 
 impl Default for WorkspaceBuilder<'_> {
@@ -37,7 +44,7 @@ impl Default for WorkspaceBuilder<'_> {
         Self {
             external_crates: Vec::new(),
             name: None,
-            path: DEFAULT_WORKSPACE_PATH.as_path(),
+            path: get_default_workspace_path(),
             version: (0, 1, 0),
             edition: 2024,
         }
@@ -154,7 +161,7 @@ impl<'data> WorkspaceBuilder<'data> {
     /// * `external_crate` - The external crate to add.
     pub fn external_crate(
         mut self,
-        external_crate: &'data ExternalCrate<'data>,
+        external_crate: Arc<ExternalCrate>,
     ) -> Result<Self, WorkspaceBuilderError> {
         if self.external_crates.contains(&external_crate) {
             return Err(WorkspaceBuilderError::DuplicatedCrateName);
@@ -199,7 +206,7 @@ impl<'data> WorkspaceBuilder<'data> {
     /// * `external_crates` - The external crates to add.
     pub fn external_crates<I>(mut self, external_crates: I) -> Result<Self, WorkspaceBuilderError>
     where
-        I: IntoIterator<Item = &'data ExternalCrate<'data>>,
+        I: IntoIterator<Item = Arc<ExternalCrate>>,
     {
         for external_crate in external_crates {
             self = self.external_crate(external_crate)?;

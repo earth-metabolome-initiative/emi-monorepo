@@ -11,9 +11,9 @@ use crate::structs::internal_enum::{InternalEnum, InternalVariant};
 
 #[derive(Default)]
 /// Builder for the `InternalEnum` struct.
-pub struct InternalEnumBuilder<'data> {
+pub struct InternalEnumBuilder {
     /// Variants of the enum.
-    variants: Vec<InternalVariant<'data>>,
+    variants: Vec<InternalVariant>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -24,7 +24,7 @@ pub enum InternalEnumAttribute {
 }
 
 impl Display for InternalEnumAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalEnumAttribute::Variants => write!(f, "variants"),
         }
@@ -48,7 +48,7 @@ impl From<BuilderError<InternalEnumAttribute>> for InternalEnumBuilderError {
 }
 
 impl Display for InternalEnumBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalEnumBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             InternalEnumBuilderError::DuplicatedVariant => {
@@ -67,15 +67,12 @@ impl Error for InternalEnumBuilderError {
     }
 }
 
-impl<'data> InternalEnumBuilder<'data> {
+impl InternalEnumBuilder {
     /// Adds a variant to the enum.
     ///
     /// # Arguments
     /// * `variant` - The variant to add.
-    pub fn variant(
-        mut self,
-        variant: InternalVariant<'data>,
-    ) -> Result<Self, InternalEnumBuilderError> {
+    pub fn variant(mut self, variant: InternalVariant) -> Result<Self, InternalEnumBuilderError> {
         if self.variants.iter().any(|v| v.ident() == variant.ident()) {
             return Err(InternalEnumBuilderError::DuplicatedVariant);
         }
@@ -89,7 +86,7 @@ impl<'data> InternalEnumBuilder<'data> {
     /// * `variants` - The variants to add.
     pub fn variants<I>(mut self, variants: I) -> Result<Self, InternalEnumBuilderError>
     where
-        I: IntoIterator<Item = InternalVariant<'data>>,
+        I: IntoIterator<Item = InternalVariant>,
     {
         for variant in variants {
             self = self.variant(variant)?;
@@ -98,20 +95,20 @@ impl<'data> InternalEnumBuilder<'data> {
     }
 }
 
-impl Attributed for InternalEnumBuilder<'_> {
+impl Attributed for InternalEnumBuilder {
     type Attribute = InternalEnumAttribute;
 }
 
-impl IsCompleteBuilder for InternalEnumBuilder<'_> {
+impl IsCompleteBuilder for InternalEnumBuilder {
     fn is_complete(&self) -> bool {
         // An enum can be empty (though not ideal), so it's always complete
         true
     }
 }
 
-impl<'data> Builder for InternalEnumBuilder<'data> {
+impl Builder for InternalEnumBuilder {
     type Error = InternalEnumBuilderError;
-    type Object = InternalEnum<'data>;
+    type Object = InternalEnum;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(InternalEnum { variants: self.variants })

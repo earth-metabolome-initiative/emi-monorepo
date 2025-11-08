@@ -13,15 +13,15 @@ use crate::structs::{
 
 #[derive(Default)]
 /// Builder for the `InternalAttribute` struct.
-pub struct InternalAttributeBuilder<'data> {
+pub struct InternalAttributeBuilder {
     /// Publicness of the attribute.
     pubness: Option<Publicness>,
     /// The documentation of the attribute.
-    documentation: Option<Documentation<'data>>,
+    documentation: Option<Documentation>,
     /// Name of the attribute.
     name: Option<String>,
     /// Type of the attribute.
-    ty: Option<DataVariantRef<'data>>,
+    ty: Option<DataVariantRef>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -40,7 +40,7 @@ pub enum InternalAttributeAttribute {
 }
 
 impl Display for InternalAttributeAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalAttributeAttribute::Pubness => write!(f, "pubness"),
             InternalAttributeAttribute::Documentation => write!(f, "documentation"),
@@ -68,7 +68,7 @@ impl From<BuilderError<InternalAttributeAttribute>> for InternalAttributeBuilder
 }
 
 impl Display for InternalAttributeBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalAttributeBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             InternalAttributeBuilderError::InvalidName => {
@@ -87,7 +87,7 @@ impl Error for InternalAttributeBuilderError {
     }
 }
 
-impl<'data> InternalAttributeBuilder<'data> {
+impl InternalAttributeBuilder {
     /// Sets the publicness of the attribute.
     ///
     /// # Arguments
@@ -113,7 +113,7 @@ impl<'data> InternalAttributeBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the attribute.
-    pub fn documentation(mut self, documentation: Documentation<'data>) -> Self {
+    pub fn documentation(mut self, documentation: Documentation) -> Self {
         self.documentation = Some(documentation);
         self
     }
@@ -137,18 +137,18 @@ impl<'data> InternalAttributeBuilder<'data> {
     /// * `ty` - The type of the attribute.
     pub fn ty<V>(mut self, ty: V) -> Self
     where
-        V: Into<DataVariantRef<'data>>,
+        V: Into<DataVariantRef>,
     {
         self.ty = Some(ty.into());
         self
     }
 }
 
-impl Attributed for InternalAttributeBuilder<'_> {
+impl Attributed for InternalAttributeBuilder {
     type Attribute = InternalAttributeAttribute;
 }
 
-impl IsCompleteBuilder for InternalAttributeBuilder<'_> {
+impl IsCompleteBuilder for InternalAttributeBuilder {
     fn is_complete(&self) -> bool {
         self.pubness.is_some()
             && self.documentation.is_some()
@@ -157,9 +157,9 @@ impl IsCompleteBuilder for InternalAttributeBuilder<'_> {
     }
 }
 
-impl<'data> Builder for InternalAttributeBuilder<'data> {
+impl Builder for InternalAttributeBuilder {
     type Error = InternalAttributeBuilderError;
-    type Object = InternalAttribute<'data>;
+    type Object = InternalAttribute;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(InternalAttribute {

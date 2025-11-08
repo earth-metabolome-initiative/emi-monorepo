@@ -10,7 +10,7 @@ use synql_core::{
 use crate::{structs::TableInsertable, traits::TableInsertableLike};
 
 impl<'data, 'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'data, 'table, T>>
-    for InternalModule<'data>
+    for InternalModule
 where
     T::DB: InheritableDatabaseLike,
 {

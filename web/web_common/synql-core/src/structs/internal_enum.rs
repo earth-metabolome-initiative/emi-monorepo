@@ -3,6 +3,8 @@
 mod internal_enum_builder;
 mod internal_variant_builder;
 
+use std::sync::Arc;
+
 pub use internal_enum_builder::InternalEnumBuilder;
 pub use internal_variant_builder::InternalVariantBuilder;
 use quote::ToTokens;
@@ -18,18 +20,18 @@ use crate::{
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining a variant of an enum model.
-pub struct InternalVariant<'data> {
+pub struct InternalVariant {
     /// Name of the variant.
     name: Ident,
     /// Documentation comment of the variant.
-    doc: Documentation<'data>,
+    doc: Documentation,
     /// Type of the variant.
-    ty: Option<DataVariantRef<'data>>,
+    ty: Option<DataVariantRef>,
 }
 
-impl<'data> InternalVariant<'data> {
+impl InternalVariant {
     /// Initializes a new `InternalVariantBuilder`.
-    pub fn new() -> InternalVariantBuilder<'data> {
+    pub fn new() -> InternalVariantBuilder {
         InternalVariantBuilder::default()
     }
 
@@ -39,12 +41,12 @@ impl<'data> InternalVariant<'data> {
     }
 
     /// Returns the documentation comment of the variant.
-    pub fn doc(&self) -> &Documentation<'data> {
+    pub fn doc(&self) -> &Documentation {
         &self.doc
     }
 
     /// Returns the type of the variant.
-    pub fn ty(&self) -> Option<&DataVariantRef<'data>> {
+    pub fn ty(&self) -> Option<&DataVariantRef> {
         self.ty.as_ref()
     }
 
@@ -53,7 +55,7 @@ impl<'data> InternalVariant<'data> {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait variant to check support for.
-    pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
+    pub fn supports_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         if let Some(ty) = &self.ty {
             ty.supports_trait(trait_ref)
         } else {
@@ -62,8 +64,8 @@ impl<'data> InternalVariant<'data> {
     }
 }
 
-impl<'data> InternalDependencies<'data> for InternalVariant<'data> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl InternalDependencies for InternalVariant {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
         let mut dependencies = self.ty.internal_dependencies();
         dependencies.extend(self.doc.internal_dependencies());
         dependencies.sort_unstable();
@@ -72,8 +74,8 @@ impl<'data> InternalDependencies<'data> for InternalVariant<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for InternalVariant<'data> {
-    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl ExternalDependencies for InternalVariant {
+    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
         let mut dependencies = self.ty.external_dependencies();
         dependencies.extend(self.doc.external_dependencies());
         dependencies.sort_unstable();
@@ -82,7 +84,7 @@ impl<'data> ExternalDependencies<'data> for InternalVariant<'data> {
     }
 }
 
-impl ToTokens for InternalVariant<'_> {
+impl ToTokens for InternalVariant {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let name = &self.name;
         let doc = &self.doc;
@@ -104,13 +106,13 @@ impl ToTokens for InternalVariant<'_> {
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining a enum model.
-pub struct InternalEnum<'data> {
+pub struct InternalEnum {
     /// Variants of the enum.
-    variants: Vec<InternalVariant<'data>>,
+    variants: Vec<InternalVariant>,
 }
 
-impl<'data> InternalDependencies<'data> for InternalEnum<'data> {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
+impl InternalDependencies for InternalEnum {
+    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
         let mut dependencies = Vec::new();
         for variant in &self.variants {
             dependencies.extend(variant.internal_dependencies());
@@ -121,8 +123,8 @@ impl<'data> InternalDependencies<'data> for InternalEnum<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for InternalEnum<'data> {
-    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl ExternalDependencies for InternalEnum {
+    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
         let mut dependencies = Vec::new();
         for variant in &self.variants {
             dependencies.extend(variant.external_dependencies());
@@ -133,14 +135,14 @@ impl<'data> ExternalDependencies<'data> for InternalEnum<'data> {
     }
 }
 
-impl<'data> InternalEnum<'data> {
+impl InternalEnum {
     /// Initializes a new `InternalEnumBuilder`.
-    pub fn new() -> InternalEnumBuilder<'data> {
+    pub fn new() -> InternalEnumBuilder {
         InternalEnumBuilder::default()
     }
 
     /// Returns a reference to the variants of the enum.
-    pub fn variants(&self) -> &Vec<InternalVariant<'data>> {
+    pub fn variants(&self) -> &Vec<InternalVariant> {
         &self.variants
     }
 
@@ -149,12 +151,12 @@ impl<'data> InternalEnum<'data> {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait variant to check support for.
-    pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
+    pub fn supports_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         self.variants.iter().all(|variant| variant.supports_trait(trait_ref))
     }
 }
 
-impl<'data> ToTokens for InternalEnum<'data> {
+impl ToTokens for InternalEnum {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let variants = &self.variants;
         let token = quote::quote! {

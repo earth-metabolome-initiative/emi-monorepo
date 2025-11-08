@@ -12,11 +12,11 @@ use crate::structs::{FeatureFlag, InternalToken, decorator::Decorator};
 
 #[derive(Default)]
 /// Builder for the `Decorator` struct.
-pub struct DecoratorBuilder<'data> {
+pub struct DecoratorBuilder {
     /// Features required by the decorator.
     features: Vec<FeatureFlag>,
     /// Internal token which represents the decorator.
-    token: Option<InternalToken<'data>>,
+    token: Option<InternalToken>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -29,7 +29,7 @@ pub enum DecoratorAttribute {
 }
 
 impl Display for DecoratorAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             DecoratorAttribute::Features => write!(f, "features"),
             DecoratorAttribute::Token => write!(f, "token"),
@@ -50,7 +50,7 @@ pub enum DecoratorBuilderError {
 }
 
 impl Display for DecoratorBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             DecoratorBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             DecoratorBuilderError::DuplicatedFeature => {
@@ -72,7 +72,7 @@ impl Error for DecoratorBuilderError {
     }
 }
 
-impl<'data> DecoratorBuilder<'data> {
+impl DecoratorBuilder {
     /// Adds a feature required by the decorator.
     ///
     /// # Arguments
@@ -103,7 +103,7 @@ impl<'data> DecoratorBuilder<'data> {
     ///
     /// # Arguments
     /// * `token` - The internal token to set.
-    pub fn token(mut self, token: InternalToken<'data>) -> Result<Self, DecoratorBuilderError> {
+    pub fn token(mut self, token: InternalToken) -> Result<Self, DecoratorBuilderError> {
         if token.to_token_stream().is_empty() {
             return Err(DecoratorBuilderError::InvalidToken);
         }
@@ -112,19 +112,19 @@ impl<'data> DecoratorBuilder<'data> {
     }
 }
 
-impl Attributed for DecoratorBuilder<'_> {
+impl Attributed for DecoratorBuilder {
     type Attribute = DecoratorAttribute;
 }
 
-impl IsCompleteBuilder for DecoratorBuilder<'_> {
+impl IsCompleteBuilder for DecoratorBuilder {
     fn is_complete(&self) -> bool {
         self.token.is_some()
     }
 }
 
-impl<'data> Builder for DecoratorBuilder<'data> {
+impl Builder for DecoratorBuilder {
     type Error = BuilderError<DecoratorAttribute>;
-    type Object = Decorator<'data>;
+    type Object = Decorator;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Decorator {

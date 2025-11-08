@@ -11,9 +11,9 @@ use crate::structs::internal_struct::{InternalAttribute, InternalStruct};
 
 #[derive(Default)]
 /// Builder for the `InternalStruct` struct.
-pub struct InternalStructBuilder<'data> {
+pub struct InternalStructBuilder {
     /// Attributes of the struct.
-    attributes: Vec<InternalAttribute<'data>>,
+    attributes: Vec<InternalAttribute>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -24,7 +24,7 @@ pub enum InternalStructAttribute {
 }
 
 impl Display for InternalStructAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalStructAttribute::Attributes => write!(f, "attributes"),
         }
@@ -42,7 +42,7 @@ pub enum InternalStructBuilderError {
 }
 
 impl Display for InternalStructBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalStructBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             InternalStructBuilderError::DuplicatedAttribute => {
@@ -61,14 +61,14 @@ impl Error for InternalStructBuilderError {
     }
 }
 
-impl<'data> InternalStructBuilder<'data> {
+impl InternalStructBuilder {
     /// Adds an attribute to the struct.
     ///
     /// # Arguments
     /// * `attribute` - The attribute to add.
     pub fn attribute(
         mut self,
-        attribute: InternalAttribute<'data>,
+        attribute: InternalAttribute,
     ) -> Result<Self, InternalStructBuilderError> {
         if self.attributes.iter().any(|a| a.ident() == attribute.ident()) {
             return Err(InternalStructBuilderError::DuplicatedAttribute);
@@ -83,7 +83,7 @@ impl<'data> InternalStructBuilder<'data> {
     /// * `attributes` - The attributes to add.
     pub fn attributes<I>(mut self, attributes: I) -> Result<Self, InternalStructBuilderError>
     where
-        I: IntoIterator<Item = InternalAttribute<'data>>,
+        I: IntoIterator<Item = InternalAttribute>,
     {
         for attribute in attributes {
             self = self.attribute(attribute)?;
@@ -92,20 +92,20 @@ impl<'data> InternalStructBuilder<'data> {
     }
 }
 
-impl Attributed for InternalStructBuilder<'_> {
+impl Attributed for InternalStructBuilder {
     type Attribute = InternalStructAttribute;
 }
 
-impl IsCompleteBuilder for InternalStructBuilder<'_> {
+impl IsCompleteBuilder for InternalStructBuilder {
     fn is_complete(&self) -> bool {
         // A struct can be empty, so it's always complete
         true
     }
 }
 
-impl<'data> Builder for InternalStructBuilder<'data> {
+impl Builder for InternalStructBuilder {
     type Error = BuilderError<InternalStructAttribute>;
-    type Object = InternalStruct<'data>;
+    type Object = InternalStruct;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(InternalStruct { attributes: self.attributes })

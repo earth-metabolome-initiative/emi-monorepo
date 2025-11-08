@@ -9,7 +9,7 @@ use synql_core::{
 
 use crate::{structs::TableRelations, traits::TableRelationsLike};
 
-impl<'data, 'table, T> From<TableRelations<'data, 'table, T>> for InternalTrait<'data>
+impl<'data, 'table, T> From<TableRelations<'data, 'table, T>> for InternalTrait
 where
     T: TableRelationsLike + ?Sized,
 {
@@ -42,9 +42,7 @@ where
                     .private()
                     .stream(quote! {#extension_of<#model_ref, C>})
                     .employed_trait(extension_of.into())
-                    .unwrap()
                     .data(model_ref.into())
-                    .unwrap()
                     .build()
                     .unwrap(),
             )

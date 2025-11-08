@@ -17,12 +17,12 @@ where
 {
     /// Returns the implementation of the `*ValueSettable` trait for the
     /// insertable struct.
-    pub(crate) fn value_settable_impl(&self) -> InternalToken<'data> {
+    pub(crate) fn value_settable_impl(&self) -> InternalToken {
         let trait_ref = self
             .table
             .value_settable_trait_ref(self.workspace)
             .expect("Failed to get ValueSettable trait ref");
-        let data: InternalData<'data> = self.clone().into();
+        let data: InternalData = self.clone().into();
         let insertable_ident = self.table.table_singular_snake_ident();
         trait_ref
             .impl_for_type(&data.into())
@@ -50,9 +50,7 @@ where
 
     /// Returns the implementation of the `*ValueSettable` trait for all
     /// ancestors of the model struct.
-    pub(crate) fn ancestor_value_settable_impls(
-        &self,
-    ) -> impl Iterator<Item = InternalToken<'data>> + '_ {
+    pub(crate) fn ancestor_value_settable_impls(&self) -> impl Iterator<Item = InternalToken> + '_ {
         self.table.ancestral_extended_tables(self.database).into_iter().map(move |ancestor_table| {
             let trait_ref = ancestor_table
                 .value_settable_trait_ref(self.workspace)
@@ -60,7 +58,7 @@ where
                     "Failed to get ValueSettable trait ref for ancestor table {}",
                     ancestor_table.table_schema_doc_path()
                 ));
-            let data: InternalData<'data> = self.clone().into();
+            let data: InternalData = self.clone().into();
             let table_to_get_to_ancestor = self.table.extended_table_to(self.database, ancestor_table).expect(&format!(
                 "Failed to get extended table path from {} to ancestor table {}",
                 self.table.table_schema_doc_path(),

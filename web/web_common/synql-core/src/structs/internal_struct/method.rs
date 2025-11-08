@@ -3,6 +3,8 @@
 mod argument;
 mod builder;
 mod where_clause;
+use std::sync::Arc;
+
 pub use argument::Argument;
 pub use builder::MethodBuilder;
 use quote::ToTokens;
@@ -16,30 +18,30 @@ use crate::{
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a rust method.
-pub struct Method<'data> {
+pub struct Method {
     /// Arguments of the method.
-    arguments: Vec<Argument<'data>>,
+    arguments: Vec<Argument>,
     /// Name of the method.
     name: String,
     /// Publicness of the method.
     publicness: Publicness,
     /// The body of the method.
-    body: Option<InternalToken<'data>>,
+    body: Option<InternalToken>,
     /// Whether the method is asynchronous.
     async_method: bool,
     /// The return type of the method.
-    return_type: Option<DataVariantRef<'data>>,
+    return_type: Option<DataVariantRef>,
     /// Documentation of the method.
-    documentation: Documentation<'data>,
+    documentation: Documentation,
     /// Error documentation of the method.
-    error_documentations: Vec<Documentation<'data>>,
+    error_documentations: Vec<Documentation>,
     /// Generics of the method.
     generics: Vec<Ident>,
     /// Where clauses of the method.
-    where_clauses: Vec<WhereClause<'data>>,
+    where_clauses: Vec<WhereClause>,
 }
 
-impl Method<'_> {
+impl Method {
     /// Returns the name of the method.
     pub fn name(&self) -> &str {
         &self.name
@@ -51,24 +53,24 @@ impl Method<'_> {
     }
 }
 
-impl<'data> Method<'data> {
+impl Method {
     /// Initializes a new `MethodBuilder`.
-    pub fn new() -> MethodBuilder<'data> {
+    pub fn new() -> MethodBuilder {
         MethodBuilder::default()
     }
 
     /// Iterates over the arguments of the method.
-    pub fn arguments(&self) -> impl Iterator<Item = &Argument<'data>> {
+    pub fn arguments(&self) -> impl Iterator<Item = &Argument> {
         self.arguments.iter()
     }
 
     /// Returns the return type of the method.
-    pub fn return_type(&self) -> Option<&DataVariantRef<'data>> {
+    pub fn return_type(&self) -> Option<&DataVariantRef> {
         self.return_type.as_ref()
     }
 
     /// Returns an iterator over the non-self arguments of the method.
-    pub fn non_self_arguments(&self) -> impl Iterator<Item = &Argument<'data>> {
+    pub fn non_self_arguments(&self) -> impl Iterator<Item = &Argument> {
         self.arguments.iter().filter(|arg| !arg.is_self())
     }
 
@@ -109,7 +111,7 @@ impl<'data> Method<'data> {
 
     /// Returns whether the method is compatible with the provided method
     /// signature.
-    pub fn is_compatible_with(&self, other: &Method<'_>) -> bool {
+    pub fn is_compatible_with(&self, other: &Method) -> bool {
         self.arguments.iter().zip(other.arguments.iter()).all(|(a, b)| a.is_compatible_with(b))
             && self.async_method == other.async_method
             && self.return_type == other.return_type
@@ -118,7 +120,7 @@ impl<'data> Method<'data> {
     }
 }
 
-impl ToTokens for Method<'_> {
+impl ToTokens for Method {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let name_ident = syn::Ident::new(&self.name, proc_macro2::Span::call_site());
         let pubness_tokens = self.publicness.to_token_stream();
@@ -130,7 +132,7 @@ impl ToTokens for Method<'_> {
         let arguments_tokens =
             self.arguments.iter().map(|arg| arg.to_token_stream()).collect::<Vec<_>>();
         let return_type_tokens = if let Some(return_type) = &self.return_type {
-            let ty_tokens = return_type.to_token_stream();
+            let ty_tokens = return_type.format_with_generics();
             quote::quote! { -> #ty_tokens }
         } else {
             quote::quote! {}
@@ -189,8 +191,8 @@ impl ToTokens for Method<'_> {
     }
 }
 
-impl<'data> InternalDependencies<'data> for Method<'data> {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
+impl InternalDependencies for Method {
+    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
         let mut dependencies = Vec::new();
         if let Some(return_type) = &self.return_type {
             dependencies.extend(return_type.internal_dependencies());
@@ -211,8 +213,8 @@ impl<'data> InternalDependencies<'data> for Method<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for Method<'data> {
-    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl ExternalDependencies for Method {
+    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
         let mut dependencies = Vec::new();
         if let Some(return_type) = &self.return_type {
             dependencies.extend(return_type.external_dependencies());

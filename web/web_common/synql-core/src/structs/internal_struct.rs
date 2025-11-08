@@ -4,6 +4,8 @@ mod internal_attribute_builder;
 mod internal_struct_builder;
 mod method;
 
+use std::sync::Arc;
+
 pub use internal_attribute_builder::InternalAttributeBuilder;
 pub use internal_struct_builder::InternalStructBuilder;
 pub use method::{Argument, Method, MethodBuilder, WhereClause};
@@ -21,26 +23,26 @@ use crate::{
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining an attribute of a struct model.
-pub struct InternalAttribute<'data> {
+pub struct InternalAttribute {
     /// Publicness of the attribute.
     pubness: Publicness,
     /// The documentation of the attribute.
-    documentation: Documentation<'data>,
+    documentation: Documentation,
     /// Identifier of the attribute.
     name: String,
     /// Type of the attribute.
-    ty: DataVariantRef<'data>,
+    ty: DataVariantRef,
 }
 
-impl<'data> InternalAttribute<'data> {
+impl InternalAttribute {
     /// Initializes a new `InternalAttributeBuilder`.
-    pub fn new() -> InternalAttributeBuilder<'data> {
+    pub fn new() -> InternalAttributeBuilder {
         InternalAttributeBuilder::default()
     }
 
     /// Returns a variant of the current attribute with the type
     /// made optional.
-    pub fn optional(&self) -> InternalAttribute<'data> {
+    pub fn optional(&self) -> InternalAttribute {
         let mut new_attr = self.clone();
         if !new_attr.ty.is_option() {
             new_attr.ty = new_attr.ty.optional();
@@ -50,7 +52,7 @@ impl<'data> InternalAttribute<'data> {
 
     /// Sets the publicness of the attribute to private and returns
     /// the modified attribute.
-    pub fn private(mut self) -> InternalAttribute<'data> {
+    pub fn private(mut self) -> InternalAttribute {
         self.pubness = Publicness::Private;
         self
     }
@@ -75,12 +77,12 @@ impl<'data> InternalAttribute<'data> {
     }
 
     /// Returns the documentation of the attribute.
-    pub fn documentation(&self) -> &Documentation<'data> {
+    pub fn documentation(&self) -> &Documentation {
         &self.documentation
     }
 
     /// Returns the type of the attribute.
-    pub fn ty(&self) -> &DataVariantRef<'data> {
+    pub fn ty(&self) -> &DataVariantRef {
         &self.ty
     }
 
@@ -89,13 +91,13 @@ impl<'data> InternalAttribute<'data> {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait variant to check support for.
-    pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
+    pub fn supports_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         self.ty.supports_trait(trait_ref)
     }
 }
 
-impl<'data> InternalDependencies<'data> for InternalAttribute<'data> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl InternalDependencies for InternalAttribute {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
         let mut dependencies = self.ty.internal_dependencies();
         dependencies.extend(self.documentation.internal_dependencies());
         dependencies.sort_unstable();
@@ -104,8 +106,8 @@ impl<'data> InternalDependencies<'data> for InternalAttribute<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for InternalAttribute<'data> {
-    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl ExternalDependencies for InternalAttribute {
+    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
         let mut dependencies = self.ty.external_dependencies();
         dependencies.extend(self.documentation.external_dependencies());
         dependencies.sort_unstable();
@@ -114,7 +116,7 @@ impl<'data> ExternalDependencies<'data> for InternalAttribute<'data> {
     }
 }
 
-impl ToTokens for InternalAttribute<'_> {
+impl ToTokens for InternalAttribute {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let pubness = self.pubness.to_token_stream();
         let ident = self.ident();
@@ -131,19 +133,19 @@ impl ToTokens for InternalAttribute<'_> {
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining a struct model.
-pub struct InternalStruct<'data> {
+pub struct InternalStruct {
     /// Attributes of the struct.
-    attributes: Vec<InternalAttribute<'data>>,
+    attributes: Vec<InternalAttribute>,
 }
 
-impl<'data> InternalStruct<'data> {
+impl InternalStruct {
     /// Initializes a new `InternalStructBuilder`.
-    pub fn new() -> InternalStructBuilder<'data> {
+    pub fn new() -> InternalStructBuilder {
         InternalStructBuilder::default()
     }
 
     /// Returns a reference to the attributes of the struct.
-    pub fn attributes(&self) -> &Vec<InternalAttribute<'data>> {
+    pub fn attributes(&self) -> &Vec<InternalAttribute> {
         &self.attributes
     }
 
@@ -152,12 +154,12 @@ impl<'data> InternalStruct<'data> {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait variant to check support for.
-    pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
+    pub fn supports_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         self.attributes.iter().all(|attr| attr.supports_trait(trait_ref))
     }
 }
 
-impl<'data> ToTokens for InternalStruct<'data> {
+impl ToTokens for InternalStruct {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let attrs = &self.attributes;
         let token = quote::quote! {
@@ -169,9 +171,9 @@ impl<'data> ToTokens for InternalStruct<'data> {
     }
 }
 
-impl<'data> InternalDependencies<'data> for InternalStruct<'data> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
-        let mut deps: Vec<&InternalCrate<'data>> =
+impl InternalDependencies for InternalStruct {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
+        let mut deps: Vec<&InternalCrate> =
             self.attributes.iter().flat_map(|attr| attr.internal_dependencies()).collect();
         deps.sort_unstable();
         deps.dedup();
@@ -179,9 +181,9 @@ impl<'data> InternalDependencies<'data> for InternalStruct<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for InternalStruct<'data> {
-    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
-        let mut deps: Vec<&crate::structs::ExternalCrate<'data>> =
+impl ExternalDependencies for InternalStruct {
+    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
+        let mut deps: Vec<Arc<crate::structs::ExternalCrate>> =
             self.attributes.iter().flat_map(|attr| attr.external_dependencies()).collect();
         deps.sort_unstable();
         deps.dedup();

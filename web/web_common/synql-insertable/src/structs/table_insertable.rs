@@ -40,7 +40,7 @@ impl<'data, 'table, T: TableInsertableLike + ?Sized> TableInsertable<'data, 'tab
     }
 
     /// Returns the derives for the insertable struct.
-    fn diesel_derives(&self) -> Derive<'data> {
+    fn diesel_derives(&self) -> Derive {
         let traits = vec![
             self.workspace.external_trait("Insertable").expect("Failed to get Insertable trait"),
         ];
@@ -53,7 +53,7 @@ impl<'data, 'table, T: TableInsertableLike + ?Sized> TableInsertable<'data, 'tab
     }
 
     /// Returns the table decorator for the insertable struct.
-    fn table_decorator(&self) -> Decorator<'data> {
+    fn table_decorator(&self) -> Decorator {
         let table_schema = self
             .table
             .schema_module(self.workspace)
@@ -68,7 +68,6 @@ impl<'data, 'table, T: TableInsertableLike + ?Sized> TableInsertable<'data, 'tab
                         diesel(table_name = #table_schema::#snake_case_ident)
                     })
                     .internal_module(table_schema)
-                    .unwrap()
                     .build()
                     .unwrap(),
             )

@@ -6,7 +6,7 @@ use crate::{structs::Unspecified, traits::ValidationErrorLike};
 /// Enumeration of errors that can occur during validation of a single field.
 pub enum SingleFieldError<FieldName = Unspecified> {
     /// The provided text is empty.
-    EmptyText(FieldName),
+    MustNotBeEmpty(FieldName),
     /// The numeric value is not strictly positive (0.0, ...]
     MustBeStrictlyPositive(FieldName),
     /// The numeric value is not positive [0.0, ...]
@@ -23,9 +23,17 @@ pub enum SingleFieldError<FieldName = Unspecified> {
     Generic(FieldName, Box<dyn ValidationErrorLike>),
 }
 
-impl SingleFieldError {
-    /// Creates a new `SingleFieldError::EmptyText` with unspecified field name.
-    pub fn empty_text() -> Self {
-        SingleFieldError::EmptyText(Unspecified)
+impl<FieldName> SingleFieldError<FieldName> {
+    /// Creates a new `MustNotBeEmpty` error for the specified field.
+    ///
+    /// # Arguments
+    ///
+    /// * `field` - The name of the field that is empty.
+    ///
+    /// # Returns
+    ///
+    /// A `SingleFieldError` indicating that the specified field is empty.
+    pub fn empty(field: FieldName) -> Self {
+        SingleFieldError::MustNotBeEmpty(field)
     }
 }

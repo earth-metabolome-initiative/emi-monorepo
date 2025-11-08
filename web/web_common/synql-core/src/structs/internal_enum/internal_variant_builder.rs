@@ -14,13 +14,13 @@ use crate::structs::{
 
 #[derive(Default)]
 /// Builder for the `InternalVariant` struct.
-pub struct InternalVariantBuilder<'data> {
+pub struct InternalVariantBuilder {
     /// Name of the variant.
     name: Option<Ident>,
     /// Documentation comment of the variant.
-    doc: Option<Documentation<'data>>,
+    doc: Option<Documentation>,
     /// Type of the variant.
-    ty: Option<DataVariantRef<'data>>,
+    ty: Option<DataVariantRef>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -35,7 +35,7 @@ pub enum InternalVariantAttribute {
 }
 
 impl Display for InternalVariantAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalVariantAttribute::Name => write!(f, "name"),
             InternalVariantAttribute::Doc => write!(f, "doc"),
@@ -59,7 +59,7 @@ impl From<BuilderError<InternalVariantAttribute>> for InternalVariantBuilderErro
 }
 
 impl Display for InternalVariantBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalVariantBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
         }
@@ -74,7 +74,7 @@ impl Error for InternalVariantBuilderError {
     }
 }
 
-impl<'data> InternalVariantBuilder<'data> {
+impl InternalVariantBuilder {
     /// Sets the name of the variant.
     ///
     /// # Arguments
@@ -90,7 +90,7 @@ impl<'data> InternalVariantBuilder<'data> {
     /// * `ty` - The type of the variant.
     pub fn ty<V>(mut self, ty: V) -> Self
     where
-        V: Into<DataVariantRef<'data>>,
+        V: Into<DataVariantRef>,
     {
         self.ty = Some(ty.into());
         self
@@ -100,25 +100,25 @@ impl<'data> InternalVariantBuilder<'data> {
     ///
     /// # Arguments
     /// * `doc` - The documentation comment of the variant.
-    pub fn doc(mut self, doc: Documentation<'data>) -> Self {
+    pub fn doc(mut self, doc: Documentation) -> Self {
         self.doc = Some(doc);
         self
     }
 }
 
-impl Attributed for InternalVariantBuilder<'_> {
+impl Attributed for InternalVariantBuilder {
     type Attribute = InternalVariantAttribute;
 }
 
-impl IsCompleteBuilder for InternalVariantBuilder<'_> {
+impl IsCompleteBuilder for InternalVariantBuilder {
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.doc.is_some()
     }
 }
 
-impl<'data> Builder for InternalVariantBuilder<'data> {
+impl Builder for InternalVariantBuilder {
     type Error = InternalVariantBuilderError;
-    type Object = InternalVariant<'data>;
+    type Object = InternalVariant;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(InternalVariant {

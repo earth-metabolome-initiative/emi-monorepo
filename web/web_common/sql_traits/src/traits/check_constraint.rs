@@ -5,7 +5,7 @@ use std::{borrow::Borrow, fmt::Debug};
 
 use sqlparser::ast::Expr;
 
-use crate::traits::{DatabaseLike, Metadata};
+use crate::traits::{DatabaseLike, Metadata, column::ColumnLike, function_like::FunctionLike};
 
 /// A check constraint is a rule that specifies a condition that must be met
 /// for data to be inserted or updated in a table. This trait represents such
@@ -46,6 +46,15 @@ pub trait CheckConstraintLike:
     /// ```
     fn expression<'db>(&'db self, database: &'db Self::DB) -> &'db Expr;
 
+    /// Returns a reference to the table that the check constraint is defined
+    /// on.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query the table
+    ///   from.
+    fn table<'db>(&'db self, database: &'db Self::DB) -> &'db <Self::DB as DatabaseLike>::Table;
+
     /// Iterates over the columns involved in the check constraint.
     ///
     /// # Arguments
@@ -80,6 +89,150 @@ pub trait CheckConstraintLike:
         &'db self,
         database: &'db Self::DB,
     ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>;
+
+    /// Returns a reference to the requested column by name, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query the columns
+    ///  from.
+    /// * `name` - The name of the column to retrieve.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"CREATE TABLE my_table (id INT CHECK (id > 0), name TEXT CHECK (length(name) > 0));"#,
+    /// )?;
+    ///
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let columns = table.columns(&db).collect::<Vec<_>>();
+    /// let [id, name] = &columns.as_slice() else {
+    ///     panic!("Expected two columns");
+    /// };
+    /// let check_constraints: Vec<_> = table.check_constraints(&db).collect();
+    /// let [cc1, cc2] = &check_constraints.as_slice() else {
+    ///     panic!("Expected two check constraints");
+    /// };
+    /// let col = cc1.column(&db, "id").unwrap();
+    /// assert_eq!(col, *id);
+    /// assert!(cc2.column(&db, "id").is_none());
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn column<'db>(
+        &'db self,
+        database: &'db Self::DB,
+        name: &str,
+    ) -> Option<&'db <Self::DB as DatabaseLike>::Column> {
+        self.columns(database).find(|c| c.column_name() == name)
+    }
+
+    /// Iterates over the functions used in the check constraint.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query the
+    ///   functions from.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"CREATE FUNCTION is_positive(INT) RETURNS BOOLEAN;
+    ///        CREATE TABLE my_table (id INT CHECK (is_positive(id)));"#,
+    /// )?;
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let check_constraints: Vec<_> = table.check_constraints(&db).collect();
+    /// let [cc] = &check_constraints.as_slice() else {
+    ///     panic!("Expected one check constraint");
+    /// };
+    /// let functions: Vec<_> = cc.functions(&db).collect();
+    /// assert_eq!(functions.len(), 1);
+    /// assert_eq!(functions[0].name(), "is_positive");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn functions<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Function> + 'db;
+
+    /// Returns a reference to the requested function by name, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query the
+    ///   functions
+    ///  from.
+    /// * `name` - The name of the function to retrieve.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"CREATE FUNCTION is_positive(INT) RETURNS BOOLEAN;
+    ///        CREATE TABLE my_table (id INT CHECK (is_positive(id)), age INT CHECK (age > 0));"#,
+    /// )?;
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let check_constraints: Vec<_> = table.check_constraints(&db).collect();
+    /// let [cc1, cc2] = &check_constraints.as_slice() else {
+    ///     panic!("Expected two check constraints");
+    /// };
+    /// let func = cc1.function(&db, "is_positive").unwrap();
+    /// assert_eq!(func.name(), "is_positive");
+    /// assert!(cc2.function(&db, "is_positive").is_none());
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn function<'db>(
+        &'db self,
+        database: &'db Self::DB,
+        name: &str,
+    ) -> Option<&'db <Self::DB as DatabaseLike>::Function> {
+        self.functions(database).find(|f| f.name() == name)
+    }
+
+    /// Returns whether the check constraint involves any functions.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query the
+    ///   functions
+    ///  from.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"CREATE FUNCTION is_positive(INT) RETURNS BOOLEAN;
+    ///        CREATE TABLE my_table (id INT CHECK (is_positive(id)), age INT CHECK (age > 0));"#,
+    /// )?;
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let check_constraints: Vec<_> = table.check_constraints(&db).collect();
+    /// let [cc1, cc2] = &check_constraints.as_slice() else {
+    ///     panic!("Expected two check constraints");
+    /// };
+    /// assert!(cc1.has_functions(&db));
+    /// assert!(!cc2.has_functions(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_functions(&self, database: &Self::DB) -> bool {
+        self.functions(database).next().is_some()
+    }
 
     /// Returns whether the check constraint involves a specific column.
     ///

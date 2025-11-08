@@ -151,7 +151,7 @@ pub trait ColumnSynLike: ColumnLike {
         &self,
         workspace: &'workspace Workspace<'data>,
         database: &Self::DB,
-    ) -> Option<ExternalTypeRef<'data>> {
+    ) -> Option<ExternalTypeRef> {
         workspace.external_postgres_type(&self.normalized_data_type(database))
     }
 

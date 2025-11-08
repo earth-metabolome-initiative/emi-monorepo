@@ -22,7 +22,7 @@ pub struct SchemaMacro<'data, 'table, T: TableSynLike> {
     database: &'table T::DB,
 }
 
-impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for InternalModule<'data> {
+impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for InternalModule {
     fn from(value: SchemaMacro<'data, 'table, T>) -> Self {
         let mut macros =
             vec![value.workspace.external_macro("table").expect("Failed to find the macro")];
@@ -52,7 +52,6 @@ impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for Int
                 InternalToken::new()
                     .public()
                     .external_macros(macros)
-                    .expect("Failed to insert the macros")
                     .internal_modules(
                         value.table.non_self_referenced_tables(value.database).into_iter().map(
                             |referenced_table| {
@@ -66,7 +65,6 @@ impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for Int
                             },
                         ),
                     )
-                    .expect("Failed to insert the module")
                     .stream(value.into_token_stream())
                     .build()
                     .unwrap(),
@@ -76,7 +74,7 @@ impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for Int
     }
 }
 
-impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for InternalCrate<'data> {
+impl<'table, 'data, T: TableSynLike> From<SchemaMacro<'data, 'table, T>> for InternalCrate {
     fn from(value: SchemaMacro<'data, 'table, T>) -> Self {
         InternalCrate::new()
             .name(value.table.table_schema_crate_name())

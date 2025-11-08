@@ -7,7 +7,7 @@ use crate::structs::{DoubleFieldError, SingleFieldError, ValidationError};
 impl<FieldName: Display> Display for SingleFieldError<FieldName> {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
         match self {
-            Self::EmptyText(field) => {
+            Self::MustNotBeEmpty(field) => {
                 write!(f, "Field `{field}` must not be empty")
             }
             Self::MustBeStrictlyPositive(field) => {

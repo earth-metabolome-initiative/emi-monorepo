@@ -14,7 +14,7 @@ impl<FieldName> ReplaceFieldName for SingleFieldError<FieldName> {
         Map: Fn(Self::FieldName) -> NewFieldName,
     {
         match self {
-            Self::EmptyText(field) => SingleFieldError::EmptyText(map(field)),
+            Self::MustNotBeEmpty(field) => SingleFieldError::MustNotBeEmpty(map(field)),
             Self::MustBeStrictlyPositive(field) => {
                 SingleFieldError::MustBeStrictlyPositive(map(field))
             }

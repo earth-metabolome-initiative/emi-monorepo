@@ -16,12 +16,12 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
         r#"
 		CREATE TABLE users (
 		    id SERIAL PRIMARY KEY,
-		    name TEXT NOT NULL,
+		    name TEXT NOT NULL CHECK (name <> ''),
 		    email TEXT UNIQUE NOT NULL
 		);
         CREATE TABLE comments (
 		    id SERIAL PRIMARY KEY,
-		    name TEXT NOT NULL,
+		    comment TEXT NOT NULL CHECK (comment <> ''),
             user_id INT REFERENCES users(id)
 		);
         CREATE TABLE extended_comments (

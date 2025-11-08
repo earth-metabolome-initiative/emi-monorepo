@@ -1,6 +1,6 @@
 //! Submodule defining a builder for the `InternalCrate` struct.
 
-use std::{error::Error, fmt::Display, rc::Rc};
+use std::{error::Error, fmt::Display, sync::Arc};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -11,13 +11,13 @@ use crate::structs::{InternalCrate, InternalModule, ModuleDocumentation};
 
 #[derive(Default)]
 /// Builder for the `InternalCrate` struct.
-pub struct InternalCrateBuilder<'data> {
+pub struct InternalCrateBuilder {
     /// Name of the crate.
     name: Option<String>,
     /// The root modules of the crate.
-    modules: Vec<Rc<InternalModule<'data>>>,
+    modules: Vec<Arc<InternalModule>>,
     /// Crate documentation.
-    documentation: Option<ModuleDocumentation<'data>>,
+    documentation: Option<ModuleDocumentation>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -32,7 +32,7 @@ pub enum InternalCrateAttribute {
 }
 
 impl Display for InternalCrateAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalCrateAttribute::Name => write!(f, "name"),
             InternalCrateAttribute::Modules => write!(f, "modules"),
@@ -55,7 +55,7 @@ pub enum InternalCrateBuilderError {
 }
 
 impl Display for InternalCrateBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalCrateBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             InternalCrateBuilderError::InvalidName => write!(f, "Invalid crate name"),
@@ -75,7 +75,7 @@ impl Error for InternalCrateBuilderError {
     }
 }
 
-impl<'data> InternalCrateBuilder<'data> {
+impl InternalCrateBuilder {
     /// Sets the name of the crate.
     ///
     /// # Arguments
@@ -97,7 +97,7 @@ impl<'data> InternalCrateBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the crate.
-    pub fn documentation(mut self, documentation: impl Into<ModuleDocumentation<'data>>) -> Self {
+    pub fn documentation(mut self, documentation: impl Into<ModuleDocumentation>) -> Self {
         self.documentation = Some(documentation.into());
         self
     }
@@ -106,14 +106,11 @@ impl<'data> InternalCrateBuilder<'data> {
     ///
     /// # Arguments
     /// * `module` - The module to add.
-    pub fn module(
-        mut self,
-        module: InternalModule<'data>,
-    ) -> Result<Self, InternalCrateBuilderError> {
+    pub fn module(mut self, module: InternalModule) -> Result<Self, InternalCrateBuilderError> {
         if self.modules.iter().any(|m| m.as_ref() == &module) {
             return Err(InternalCrateBuilderError::DuplicatedModuleName);
         }
-        self.modules.push(Rc::new(module));
+        self.modules.push(Arc::new(module));
         Ok(self)
     }
 
@@ -123,7 +120,7 @@ impl<'data> InternalCrateBuilder<'data> {
     /// * `modules` - The modules to add.
     pub fn modules<I>(mut self, modules: I) -> Result<Self, InternalCrateBuilderError>
     where
-        I: IntoIterator<Item = InternalModule<'data>>,
+        I: IntoIterator<Item = InternalModule>,
     {
         for module in modules {
             self = self.module(module)?;
@@ -132,19 +129,19 @@ impl<'data> InternalCrateBuilder<'data> {
     }
 }
 
-impl Attributed for InternalCrateBuilder<'_> {
+impl Attributed for InternalCrateBuilder {
     type Attribute = InternalCrateAttribute;
 }
 
-impl IsCompleteBuilder for InternalCrateBuilder<'_> {
+impl IsCompleteBuilder for InternalCrateBuilder {
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.documentation.is_some()
     }
 }
 
-impl<'data> Builder for InternalCrateBuilder<'data> {
+impl Builder for InternalCrateBuilder {
     type Error = BuilderError<InternalCrateAttribute>;
-    type Object = InternalCrate<'data>;
+    type Object = InternalCrate;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(InternalCrate {

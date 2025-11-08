@@ -1,6 +1,6 @@
 //! Submodule providing a builder for the `ExternalType` struct.
 
-use std::fmt::Display;
+use std::{collections::HashMap, fmt::Display};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -8,14 +8,14 @@ use common_traits::{
 };
 
 use crate::structs::{
-    ExternalCrate, ExternalType,
+    DataVariantRef, ExternalCrate, ExternalType,
     external_crate::ExternalTraitRef,
     external_type::{Trait, traits_mask::TraitsMask},
 };
 
 #[derive(Default)]
 /// Builder for the `ExternalType` struct.
-pub struct ExternalTypeBuilder<'data> {
+pub struct ExternalTypeBuilder {
     /// The diesel type defined within the crate compatible with the given
     /// postgres type.
     diesel_type: Option<syn::Type>,
@@ -28,7 +28,11 @@ pub struct ExternalTypeBuilder<'data> {
     /// Trait mask representing the traits supported by the current type.
     traits: TraitsMask,
     /// External traits implemented by the type.
-    external_traits: Vec<ExternalTraitRef<'data>>,
+    external_traits: Vec<ExternalTraitRef>,
+    /// Generic parameters of the type.
+    generics: Vec<syn::Ident>,
+    /// Default values for the generic parameters of the type.
+    generic_defaults: HashMap<syn::Ident, DataVariantRef>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -88,7 +92,7 @@ impl core::error::Error for ExternalTypeBuilderError {
     }
 }
 
-impl<'data> ExternalTypeBuilder<'data> {
+impl ExternalTypeBuilder {
     /// Sets the diesel type defined within the crate compatible with the given
     /// postgres type.
     pub fn diesel_type(mut self, diesel_type: syn::Type) -> Self {
@@ -243,7 +247,7 @@ impl<'data> ExternalTypeBuilder<'data> {
     /// been added.
     pub fn add_external_trait(
         mut self,
-        external_trait: ExternalTraitRef<'data>,
+        external_trait: ExternalTraitRef,
     ) -> Result<Self, ExternalTypeBuilderError> {
         if self.external_traits.iter().any(|t| t == &external_trait) {
             return Err(ExternalTypeBuilderError::DuplicatedExternalTrait);
@@ -266,12 +270,48 @@ impl<'data> ExternalTypeBuilder<'data> {
         external_traits: I,
     ) -> Result<Self, ExternalTypeBuilderError>
     where
-        I: IntoIterator<Item = ExternalTraitRef<'data>>,
+        I: IntoIterator<Item = ExternalTraitRef>,
     {
         for external_trait in external_traits {
             self = self.add_external_trait(external_trait)?;
         }
         Ok(self)
+    }
+
+    /// Adds a generic parameter to the type.
+    ///
+    /// # Arguments
+    /// * `generic` - The generic parameter to add.
+    pub fn generic(mut self, generic: syn::Ident) -> Self {
+        if !self.generics.contains(&generic) {
+            self.generics.push(generic);
+        }
+
+        self
+    }
+
+    /// Adds multiple generic parameters to the type.
+    ///
+    /// # Arguments
+    /// * `generics` - The generic parameters to add.
+    pub fn generics<I>(mut self, generics: I) -> Self
+    where
+        I: IntoIterator<Item = syn::Ident>,
+    {
+        for generic in generics {
+            self = self.generic(generic);
+        }
+        self
+    }
+
+    /// Sets a default value for a generic parameter of the type.
+    ///
+    /// # Arguments
+    /// * `generic` - The generic parameter.
+    /// * `default` - The default value for the generic parameter.
+    pub fn generic_default(mut self, generic: syn::Ident, default: DataVariantRef) -> Self {
+        self.generic_defaults.insert(generic, default);
+        self
     }
 }
 
@@ -287,21 +327,27 @@ impl Display for ExternalTypeAttribute {
     }
 }
 
-impl Attributed for ExternalTypeBuilder<'_> {
+impl Attributed for ExternalTypeBuilder {
     type Attribute = ExternalTypeAttribute;
 }
 
-impl IsCompleteBuilder for ExternalTypeBuilder<'_> {
+impl IsCompleteBuilder for ExternalTypeBuilder {
     fn is_complete(&self) -> bool {
         self.diesel_type.is_some() && self.rust_type.is_some() && !self.postgres_types.is_empty()
     }
 }
 
-impl<'data> Builder for ExternalTypeBuilder<'data> {
+impl Builder for ExternalTypeBuilder {
     type Error = BuilderError<ExternalTypeAttribute>;
-    type Object = ExternalType<'data>;
+    type Object = ExternalType;
 
-    fn build(self) -> Result<Self::Object, Self::Error> {
+    fn build(mut self) -> Result<Self::Object, Self::Error> {
+        let generic_defaults = self
+            .generics
+            .iter()
+            .map(|g| self.generic_defaults.remove(g))
+            .collect::<Vec<Option<DataVariantRef>>>();
+
         Ok(ExternalType {
             diesel_type: self.diesel_type,
             rust_type: self
@@ -310,6 +356,8 @@ impl<'data> Builder for ExternalTypeBuilder<'data> {
             postgres_types: self.postgres_types,
             traits: self.traits,
             external_traits: self.external_traits,
+            generics: self.generics,
+            generic_defaults,
         })
     }
 }

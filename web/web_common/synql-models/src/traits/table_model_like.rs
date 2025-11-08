@@ -24,7 +24,7 @@ where
     }
 
     /// Returns the
-    /// [`InternalData<'data>`](synql_core::structs::InternalData)
+    /// [`InternalData`](synql_core::structs::InternalData)
     /// representing the model for the table.
     ///
     /// # Arguments
@@ -45,7 +45,7 @@ where
     }
 
     /// Returns a reference to the model module ref for the table.
-    fn model_ref<'data>(&self, workspace: &Workspace<'data>) -> Option<InternalDataRef<'data>> {
+    fn model_ref<'data>(&self, workspace: &Workspace<'data>) -> Option<InternalDataRef> {
         let crate_ref = workspace.internal_crate(&self.table_model_crate_name())?;
         Some(InternalDataRef::new(
             crate_ref,

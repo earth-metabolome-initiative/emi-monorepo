@@ -48,12 +48,8 @@ impl ColumnLike for crate::models::Column {
             || self.is_identity.as_ref().is_some_and(|i| i == "YES")
     }
 
-    fn data_type(&self) -> String {
-        self.data_type_str().to_owned()
-    }
-
-    fn normalized_data_type(&self, database: &Self::DB) -> String {
-        database.column_metadata(self).normalized_data_type()
+    fn data_type<'db>(&'db self, _database: &'db Self::DB) -> &'db str {
+        self.data_type_str()
     }
 
     fn is_nullable(&self, _database: &Self::DB) -> bool {

@@ -3,38 +3,40 @@
 
 mod builder;
 
+use std::sync::Arc;
+
 pub use builder::DeriveBuilder;
 use quote::{ToTokens, quote};
 
 use crate::{
-    structs::{FeatureFlag, external_trait::TraitVariantRef},
+    structs::{ExternalCrate, FeatureFlag, external_trait::TraitVariantRef},
     traits::{ExternalDependencies, InternalDependencies},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a derive applied to SynQL internal data.
-pub struct Derive<'data> {
+pub struct Derive {
     /// Features required by the derive.
     features: Vec<FeatureFlag>,
     /// Traits implemented by the derive.
-    traits: Vec<TraitVariantRef<'data>>,
+    traits: Vec<TraitVariantRef>,
 }
 
-impl<'data> Derive<'data> {
+impl Derive {
     /// Initializes a new `DeriveBuilder`.
-    pub fn new() -> DeriveBuilder<'data> {
+    pub fn new() -> DeriveBuilder {
         DeriveBuilder::default()
     }
 }
 
-impl<'data> ExternalDependencies<'data> for Derive<'data> {
-    fn external_dependencies(&self) -> Vec<&super::ExternalCrate<'data>> {
+impl ExternalDependencies for Derive {
+    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
         let mut crates = self
             .traits
             .iter()
             .filter_map(|t| {
                 if let TraitVariantRef::External(ext_trait_ref) = t {
-                    Some(ext_trait_ref.external_crate())
+                    Some(Arc::new(ext_trait_ref.external_crate().clone()))
                 } else {
                     None
                 }
@@ -46,8 +48,8 @@ impl<'data> ExternalDependencies<'data> for Derive<'data> {
     }
 }
 
-impl<'data> InternalDependencies<'data> for Derive<'data> {
-    fn internal_dependencies(&self) -> Vec<&super::InternalCrate<'data>> {
+impl InternalDependencies for Derive {
+    fn internal_dependencies(&self) -> Vec<&super::InternalCrate> {
         let mut crates = self
             .traits
             .iter()
@@ -61,7 +63,7 @@ impl<'data> InternalDependencies<'data> for Derive<'data> {
     }
 }
 
-impl ToTokens for Derive<'_> {
+impl ToTokens for Derive {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let derive_statement = {
             let traits = &self.traits;

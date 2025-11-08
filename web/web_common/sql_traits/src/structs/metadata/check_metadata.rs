@@ -15,6 +15,8 @@ pub struct CheckMetadata<U: CheckConstraintLike> {
     table: Rc<<U::DB as DatabaseLike>::Table>,
     /// The columns involved in the constraint.
     columns: Vec<Rc<<U::DB as DatabaseLike>::Column>>,
+    /// The functions involved in the constraint.
+    functions: Vec<Rc<<U::DB as DatabaseLike>::Function>>,
 }
 
 impl<U: CheckConstraintLike> CheckMetadata<U> {
@@ -23,8 +25,9 @@ impl<U: CheckConstraintLike> CheckMetadata<U> {
         expression: Expr,
         table: Rc<<U::DB as DatabaseLike>::Table>,
         columns: Vec<Rc<<U::DB as DatabaseLike>::Column>>,
+        functions: Vec<Rc<<U::DB as DatabaseLike>::Function>>,
     ) -> Self {
-        Self { expression, table, columns }
+        Self { expression, table, columns, functions }
     }
 
     /// Returns a reference to the expression defining the constraint.
@@ -40,5 +43,10 @@ impl<U: CheckConstraintLike> CheckMetadata<U> {
     /// Returns an iterator over the columns involved in the constraint.
     pub fn columns(&self) -> impl Iterator<Item = &<U::DB as DatabaseLike>::Column> {
         self.columns.iter().map(|col| col.as_ref())
+    }
+
+    /// Returns an iterator over the functions involved in the constraint.
+    pub fn functions(&self) -> impl Iterator<Item = &<U::DB as DatabaseLike>::Function> {
+        self.functions.iter().map(|func| func.as_ref())
     }
 }

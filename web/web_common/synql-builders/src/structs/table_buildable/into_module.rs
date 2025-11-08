@@ -13,7 +13,7 @@ use crate::{
 };
 
 impl<'data, 'table, T: TableBuildableLike + ?Sized> From<TableBuildable<'data, 'table, T>>
-    for InternalModule<'data>
+    for InternalModule
 where
     T::DB: InheritableDatabaseLike,
 {

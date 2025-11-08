@@ -6,11 +6,10 @@ use sqlparser::ast::{ColumnDef, CreateTable};
 use crate::{
     structs::{generic_db::ParserDB, metadata::TableAttribute},
     traits::{ColumnLike, DatabaseLike, Metadata},
+    utils::normalize_sqlparser_type,
 };
 
 const GENERATED_TYPES: &[&str] = &["SERIAL", "BIGSERIAL", "SMALLSERIAL"];
-const NORMALIZED_TYPES: &[(&str, &str)] =
-    &[("SERIAL", "INT"), ("INTEGER", "INT"), ("BIGSERIAL", "BIGINT"), ("SMALLSERIAL", "SMALLINT")];
 
 impl Metadata for TableAttribute<CreateTable, ColumnDef> {
     type Meta = ();
@@ -31,22 +30,12 @@ impl ColumnLike for TableAttribute<CreateTable, ColumnDef> {
         Some("Undocumented column")
     }
 
-    fn data_type(&self) -> String {
-        self.attribute().data_type.to_string()
+    fn data_type<'db>(&'db self, _database: &'db Self::DB) -> &'db str {
+        normalize_sqlparser_type(&self.attribute().data_type)
     }
 
     fn is_generated(&self) -> bool {
         GENERATED_TYPES.contains(&self.attribute().data_type.to_string().as_str())
-    }
-
-    fn normalized_data_type(&self, _database: &Self::DB) -> String {
-        let data_type = self.attribute().data_type.to_string().to_uppercase();
-        for (ty, normalized) in NORMALIZED_TYPES {
-            if data_type == *ty {
-                return normalized.to_string();
-            }
-        }
-        data_type
     }
 
     fn is_nullable(&self, database: &Self::DB) -> bool {

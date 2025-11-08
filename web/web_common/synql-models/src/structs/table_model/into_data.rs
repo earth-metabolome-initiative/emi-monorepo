@@ -12,7 +12,7 @@ use crate::{
     traits::{TableModelLike, column_model_like::ColumnModelLike},
 };
 
-impl<'data, 'table, T> From<TableModel<'data, 'table, T>> for InternalData<'data>
+impl<'data, 'table, T> From<TableModel<'data, 'table, T>> for InternalData
 where
     T: TableModelLike + ?Sized,
 {
@@ -35,7 +35,6 @@ where
                             .private()
                             .stream(quote! {diesel(table_name = #table_schema::#snake_case_ident)})
                             .internal_module(table_schema)
-                            .unwrap()
                             .build()
                             .unwrap(),
                     )

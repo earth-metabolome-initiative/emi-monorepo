@@ -28,7 +28,7 @@ pub trait TableRelationsLike: TableModelLike {
     }
 
     /// Returns the
-    /// [`InternalData<'data>`](synql_core::structs::InternalData)
+    /// [`InternalData`](synql_core::structs::InternalData)
     /// representing the model for the table.
     ///
     /// # Arguments
@@ -49,10 +49,7 @@ pub trait TableRelationsLike: TableModelLike {
     }
 
     /// Returns a reference to the model module ref for the table.
-    fn relations_trait_ref<'data>(
-        &self,
-        workspace: &Workspace<'data>,
-    ) -> Option<InternalDataRef<'data>> {
+    fn relations_trait_ref<'data>(&self, workspace: &Workspace<'data>) -> Option<InternalDataRef> {
         let crate_ref = workspace.internal_crate(&self.table_relations_crate_name())?;
         Some(InternalDataRef::new(
             crate_ref,

@@ -2,7 +2,7 @@
 
 mod builder;
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub use builder::InternalModuleBuilder;
 use proc_macro2::TokenStream;
@@ -18,26 +18,26 @@ use crate::{
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a rust module.
-pub struct InternalModule<'data> {
+pub struct InternalModule {
     /// Name of the module.
     name: String,
     /// The submodules it contains.
-    submodules: Vec<InternalModule<'data>>,
+    submodules: Vec<InternalModule>,
     /// Publicness of the module.
     publicness: Publicness,
     /// Data structs defined within the module.
-    data: Vec<Rc<InternalData<'data>>>,
+    data: Vec<Arc<InternalData>>,
     /// Internal trait defined within the module.
-    internal_traits: Vec<Rc<InternalTrait<'data>>>,
+    internal_traits: Vec<Arc<InternalTrait>>,
     /// Internal token streams defined within the module.
-    internal_tokens: Vec<InternalToken<'data>>,
+    internal_tokens: Vec<InternalToken>,
     /// Module documentation.
-    documentation: ModuleDocumentation<'data>,
+    documentation: ModuleDocumentation,
 }
 
-impl<'data> InternalModule<'data> {
+impl InternalModule {
     /// Initializes a new `InternalModuleBuilder`.
-    pub fn new() -> InternalModuleBuilder<'data> {
+    pub fn new() -> InternalModuleBuilder {
         InternalModuleBuilder::default()
     }
 
@@ -72,7 +72,7 @@ impl<'data> InternalModule<'data> {
     /// # Arguments
     ///
     /// * `module` - The sub-module to get the path for.
-    pub fn submodule_path(&self, module: &InternalModule<'data>) -> Option<syn::Path> {
+    pub fn submodule_path(&self, module: &InternalModule) -> Option<syn::Path> {
         if module == self {
             return Some(syn::Path::from(self.ident()));
         }
@@ -100,7 +100,7 @@ impl<'data> InternalModule<'data> {
 
     /// Returns a reference to the internal data with the given name if it
     /// exists in the module.
-    pub fn internal_data(&self, name: &str) -> Option<&Rc<InternalData<'data>>> {
+    pub fn internal_data(&self, name: &str) -> Option<&Arc<InternalData>> {
         for data in &self.data {
             if data.name() == name {
                 return Some(data);
@@ -116,7 +116,7 @@ impl<'data> InternalModule<'data> {
 
     /// Returns a reference to the internal trait with the given name if it
     /// exists in the module.
-    pub fn internal_trait(&self, name: &str) -> Option<&Rc<InternalTrait<'data>>> {
+    pub fn internal_trait(&self, name: &str) -> Option<&Arc<InternalTrait>> {
         for internal_trait in &self.internal_traits {
             if internal_trait.name() == name {
                 return Some(internal_trait);
@@ -148,8 +148,8 @@ impl<'data> InternalModule<'data> {
     }
 }
 
-impl<'data> InternalDependencies<'data> for InternalModule<'data> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl InternalDependencies for InternalModule {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
         let mut dependencies = Vec::new();
         for submodule in &self.submodules {
             dependencies.extend(submodule.internal_dependencies());
@@ -170,8 +170,8 @@ impl<'data> InternalDependencies<'data> for InternalModule<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for InternalModule<'data> {
-    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl ExternalDependencies for InternalModule {
+    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
         let mut dependencies = Vec::new();
         for submodule in &self.submodules {
             dependencies.extend(submodule.external_dependencies());
@@ -192,7 +192,7 @@ impl<'data> ExternalDependencies<'data> for InternalModule<'data> {
     }
 }
 
-impl ToTokens for InternalModule<'_> {
+impl ToTokens for InternalModule {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         let publicness = &self.publicness;
         let submodules = self.submodules.iter().map(|m| {
@@ -207,9 +207,9 @@ impl ToTokens for InternalModule<'_> {
                 #publicness use #name::*;
             }
         });
-        let data = &self.data;
+        let data = self.data.iter().map(|d| d.as_ref());
         let internal_tokens = &self.internal_tokens;
-        let internal_traits = &self.internal_traits;
+        let internal_traits = self.internal_traits.iter().map(|t| t.as_ref());
         let documentation = &self.documentation;
         tokens.extend(quote! {
             #documentation

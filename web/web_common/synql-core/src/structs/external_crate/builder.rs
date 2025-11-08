@@ -1,6 +1,6 @@
 //! Submodule providing a builder for the `ExternalCrate` struct.
 
-use std::{error::Error, fmt::Display};
+use std::{error::Error, fmt::Display, sync::Arc};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -11,11 +11,11 @@ use crate::structs::{ExternalCrate, ExternalMacro, ExternalTrait, ExternalType};
 
 #[derive(Default)]
 /// Builder for the `ExternalCrate` struct.
-pub struct ExternalCrateBuilder<'data> {
+pub struct ExternalCrateBuilder {
     /// The name of the crate.
     name: Option<String>,
     /// The types provided by the crate.
-    types: Vec<ExternalType<'data>>,
+    types: Vec<Arc<ExternalType>>,
     /// List of the macros defined within the crate.
     macros: Vec<ExternalMacro>,
     /// List of the traits defined within the crate.
@@ -110,7 +110,7 @@ impl Error for ExternalCrateBuilderError {
     }
 }
 
-impl<'data> ExternalCrateBuilder<'data> {
+impl ExternalCrateBuilder {
     /// Sets the name of the crate.
     ///
     /// # Arguments
@@ -130,7 +130,7 @@ impl<'data> ExternalCrateBuilder<'data> {
     /// * `required_type` - The type provided by the crate.
     pub fn add_type(
         mut self,
-        required_type: ExternalType<'data>,
+        required_type: Arc<ExternalType>,
     ) -> Result<Self, ExternalCrateBuilderError> {
         for postgres_type in required_type.postgres_types() {
             if self.types.iter().any(|t| t.is_compatible_with(postgres_type)) {
@@ -147,7 +147,7 @@ impl<'data> ExternalCrateBuilder<'data> {
     /// * `required_types` - The types provided by the crate.
     pub fn add_types<I>(mut self, required_types: I) -> Result<Self, ExternalCrateBuilderError>
     where
-        I: IntoIterator<Item = ExternalType<'data>>,
+        I: IntoIterator<Item = Arc<ExternalType>>,
     {
         for required_type in required_types {
             self = self.add_type(required_type)?;
@@ -277,19 +277,19 @@ impl<'data> ExternalCrateBuilder<'data> {
     }
 }
 
-impl Attributed for ExternalCrateBuilder<'_> {
+impl Attributed for ExternalCrateBuilder {
     type Attribute = ExternalCrateAttribute;
 }
 
-impl IsCompleteBuilder for ExternalCrateBuilder<'_> {
+impl IsCompleteBuilder for ExternalCrateBuilder {
     fn is_complete(&self) -> bool {
         self.name.is_some()
     }
 }
 
-impl<'data> Builder for ExternalCrateBuilder<'data> {
+impl Builder for ExternalCrateBuilder {
     type Error = BuilderError<ExternalCrateAttribute>;
-    type Object = ExternalCrate<'data>;
+    type Object = ExternalCrate;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(ExternalCrate {

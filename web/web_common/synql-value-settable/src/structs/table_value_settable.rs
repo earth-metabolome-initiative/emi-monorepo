@@ -4,6 +4,8 @@
 use quote::quote;
 use sql_relations::{prelude::ColumnLike, traits::InheritableDatabaseLike};
 use sql_traits::traits::DatabaseLike;
+use syn::Ident;
+use synql_attributes::traits::TableAttributesLike;
 use synql_core::{
     prelude::Builder,
     structs::{Argument, DataVariantRef, Documentation, Method, WhereClause, Workspace},
@@ -56,7 +58,7 @@ impl<'data, 'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'data
 
     /// Generates the setter methods for all value-settable columns in the
     /// table.
-    fn value_setter_methods(&self) -> impl Iterator<Item = Method<'data>> + '_
+    fn value_setter_methods(&self) -> impl Iterator<Item = Method> + '_
     where
         T::DB: InheritableDatabaseLike,
     {
@@ -66,10 +68,7 @@ impl<'data, 'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'data
     }
 
     /// Generates the setter method for a column.
-    fn value_setter_method(
-        &self,
-        column: &'table <T::DB as DatabaseLike>::Column,
-    ) -> Method<'data> {
+    fn value_setter_method(&self, column: &'table <T::DB as DatabaseLike>::Column) -> Method {
         let table_schema_ref = self
             .table
             .table_schema_ref(self.workspace)
@@ -82,10 +81,18 @@ impl<'data, 'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'data
                 column.column_name()
             ));
 
+        let table_attributes =
+            self.table.attributes_ref(self.workspace).expect("Failed to retrieve table attributes");
+
         let validation_error = self
             .workspace
-            .external_type(&syn::parse_quote!(validation_errors::ValidationError))
-            .expect("Failed to get ValidationError type ref");
+            .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
+            .expect("Failed to get ValidationError type ref")
+            .set_generic_field(
+                &Ident::new("FieldName", proc_macro2::Span::call_site()),
+                table_attributes.into(),
+            )
+            .expect("Failed to set generic field for ValidationError");
         let column_acronym = column.column_acronym_ident();
 
         Method::new()
@@ -145,9 +152,7 @@ impl<'data, 'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'data
                     .build()
                     .expect("Failed to build where clause"),
                     WhereClause::new()
-                        .left(quote!{
-                            #validation_error
-                        })
+                        .left(validation_error.format_with_generics())
                         .right(quote! {
                             From<<#column_acronym as TryInto<#column_type>>::Error>
                         })

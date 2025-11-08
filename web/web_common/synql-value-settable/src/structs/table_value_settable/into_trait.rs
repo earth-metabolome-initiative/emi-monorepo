@@ -9,7 +9,7 @@ use synql_core::{
 
 use crate::{structs::TableValueSettable, traits::TableValueSettableLike};
 
-impl<'data, 'table, T> From<TableValueSettable<'data, 'table, T>> for InternalTrait<'data>
+impl<'data, 'table, T> From<TableValueSettable<'data, 'table, T>> for InternalTrait
 where
     T: TableValueSettableLike + ?Sized,
     T::DB: InheritableDatabaseLike,

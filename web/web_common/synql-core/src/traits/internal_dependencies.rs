@@ -5,14 +5,14 @@ use crate::structs::InternalCrate;
 
 /// Returns the sorted unique internal crate dependencies associated to
 /// the object.
-pub trait InternalDependencies<'data> {
+pub trait InternalDependencies {
     /// Returns the sorted unique internal crate dependencies associated to
     /// the object.
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>>;
+    fn internal_dependencies(&self) -> Vec<&InternalCrate>;
 }
 
-impl<'data, T: InternalDependencies<'data>> InternalDependencies<'data> for Option<T> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl<T: InternalDependencies> InternalDependencies for Option<T> {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
         match self {
             Some(inner) => inner.internal_dependencies(),
             None => vec![],
@@ -20,8 +20,8 @@ impl<'data, T: InternalDependencies<'data>> InternalDependencies<'data> for Opti
     }
 }
 
-impl<'data, T: InternalDependencies<'data>> InternalDependencies<'data> for Box<T> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl<T: InternalDependencies> InternalDependencies for Box<T> {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
         self.as_ref().internal_dependencies()
     }
 }

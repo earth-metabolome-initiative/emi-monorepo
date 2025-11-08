@@ -3,43 +3,45 @@
 
 mod builder;
 
+use std::sync::Arc;
+
 pub use builder::DecoratorBuilder;
 use quote::{ToTokens, quote};
 
 use crate::{
-    structs::{FeatureFlag, InternalToken},
+    structs::{ExternalCrate, FeatureFlag, InternalToken},
     traits::{ExternalDependencies, InternalDependencies},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// A decorator applied to SynQL internal data.
-pub struct Decorator<'data> {
+pub struct Decorator {
     /// Features required by the derive.
     features: Vec<FeatureFlag>,
     /// Internal token which represents the decorator.
-    token: InternalToken<'data>,
+    token: InternalToken,
 }
 
-impl<'data> Decorator<'data> {
+impl Decorator {
     /// Initializes a new `DecoratorBuilder`.
-    pub fn new() -> DecoratorBuilder<'data> {
+    pub fn new() -> DecoratorBuilder {
         DecoratorBuilder::default()
     }
 }
 
-impl<'data> ExternalDependencies<'data> for Decorator<'data> {
-    fn external_dependencies(&self) -> Vec<&super::ExternalCrate<'data>> {
+impl ExternalDependencies for Decorator {
+    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
         self.token.external_dependencies()
     }
 }
 
-impl<'data> InternalDependencies<'data> for Decorator<'data> {
-    fn internal_dependencies(&self) -> Vec<&super::InternalCrate<'data>> {
+impl InternalDependencies for Decorator {
+    fn internal_dependencies(&self) -> Vec<&super::InternalCrate> {
         self.token.internal_dependencies()
     }
 }
 
-impl ToTokens for Decorator<'_> {
+impl ToTokens for Decorator {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let token = &self.token;
         if !self.features.is_empty() {

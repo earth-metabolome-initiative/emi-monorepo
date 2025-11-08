@@ -163,6 +163,11 @@ where
         self
     }
 
+    /// Returns a vector of function Rc references.
+    pub fn function_rc_vec(&self) -> Vec<Rc<Func>> {
+        self.functions.iter().map(|(func_rc, _)| func_rc.clone()).collect()
+    }
+
     /// Adds a check constraint with its metadata to the builder.
     pub fn add_check_constraint(mut self, constraint: Rc<Ch>, metadata: Ch::Meta) -> Self {
         self.check_constraints.push((constraint, metadata));

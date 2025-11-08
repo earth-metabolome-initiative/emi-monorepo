@@ -14,21 +14,21 @@ use crate::structs::{
 
 #[derive(Default)]
 /// Builder for the `InternalTrait` struct.
-pub struct InternalTraitBuilder<'data> {
+pub struct InternalTraitBuilder {
     /// Name of the trait.
     name: Option<String>,
     /// Publicness of the trait.
     publicness: Option<Publicness>,
     /// Internal token streams defined within the trait.
-    methods: Vec<Method<'data>>,
+    methods: Vec<Method>,
     /// Trait documentation.
-    documentation: Option<Documentation<'data>>,
+    documentation: Option<Documentation>,
     /// Where statements for the trait.
-    where_statements: Vec<WhereClause<'data>>,
+    where_statements: Vec<WhereClause>,
     /// Generics for the trait.
     generics: Vec<syn::Ident>,
     /// Super traits for the trait.
-    super_traits: Vec<InternalToken<'data>>,
+    super_traits: Vec<InternalToken>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -51,7 +51,7 @@ pub enum InternalTraitAttribute {
 }
 
 impl Display for InternalTraitAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalTraitAttribute::Name => write!(f, "name"),
             InternalTraitAttribute::Publicness => write!(f, "publicness"),
@@ -83,7 +83,7 @@ pub enum InternalTraitBuilderError {
 }
 
 impl Display for InternalTraitBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalTraitBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             InternalTraitBuilderError::InvalidName => write!(f, "Invalid trait name"),
@@ -112,7 +112,7 @@ impl Error for InternalTraitBuilderError {
     }
 }
 
-impl<'data> InternalTraitBuilder<'data> {
+impl InternalTraitBuilder {
     /// Sets the name of the trait.
     ///
     /// # Arguments
@@ -154,7 +154,7 @@ impl<'data> InternalTraitBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the trait.
-    pub fn documentation(mut self, documentation: Documentation<'data>) -> Self {
+    pub fn documentation(mut self, documentation: Documentation) -> Self {
         self.documentation = Some(documentation);
         self
     }
@@ -163,7 +163,7 @@ impl<'data> InternalTraitBuilder<'data> {
     ///
     /// # Arguments
     /// * `method` - The method to add.
-    pub fn method(mut self, method: Method<'data>) -> Result<Self, InternalTraitBuilderError> {
+    pub fn method(mut self, method: Method) -> Result<Self, InternalTraitBuilderError> {
         if self.methods.iter().any(|m| m.name() == method.name()) {
             return Err(InternalTraitBuilderError::DuplicateMethodName(method.name().to_string()));
         }
@@ -177,7 +177,7 @@ impl<'data> InternalTraitBuilder<'data> {
     /// * `methods` - The methods to add.
     pub fn methods<I>(mut self, methods: I) -> Result<Self, InternalTraitBuilderError>
     where
-        I: IntoIterator<Item = Method<'data>>,
+        I: IntoIterator<Item = Method>,
     {
         for method in methods {
             self = self.method(method)?;
@@ -217,7 +217,7 @@ impl<'data> InternalTraitBuilder<'data> {
     /// * `where_clause` - The where clause to add.
     pub fn where_clause(
         mut self,
-        where_clause: WhereClause<'data>,
+        where_clause: WhereClause,
     ) -> Result<Self, InternalTraitBuilderError> {
         if self.where_statements.contains(&where_clause) {
             return Err(InternalTraitBuilderError::DuplicateWhereClause(
@@ -234,7 +234,7 @@ impl<'data> InternalTraitBuilder<'data> {
     /// * `where_clauses` - The where clauses to add.
     pub fn where_clauses<I>(mut self, where_clauses: I) -> Result<Self, InternalTraitBuilderError>
     where
-        I: IntoIterator<Item = WhereClause<'data>>,
+        I: IntoIterator<Item = WhereClause>,
     {
         for where_clause in where_clauses {
             self = self.where_clause(where_clause)?;
@@ -248,7 +248,7 @@ impl<'data> InternalTraitBuilder<'data> {
     /// * `super_trait` - The super trait to add.
     pub fn super_trait(
         mut self,
-        super_trait: InternalToken<'data>,
+        super_trait: InternalToken,
     ) -> Result<Self, InternalTraitBuilderError> {
         if self.super_traits.contains(&super_trait) {
             return Err(InternalTraitBuilderError::DuplicateSuperTrait(
@@ -265,7 +265,7 @@ impl<'data> InternalTraitBuilder<'data> {
     /// * `super_traits` - The super traits to add.
     pub fn super_traits<I>(mut self, super_traits: I) -> Result<Self, InternalTraitBuilderError>
     where
-        I: IntoIterator<Item = InternalToken<'data>>,
+        I: IntoIterator<Item = InternalToken>,
     {
         for super_trait in super_traits {
             self = self.super_trait(super_trait)?;
@@ -285,19 +285,19 @@ impl<'data> InternalTraitBuilder<'data> {
     }
 }
 
-impl Attributed for InternalTraitBuilder<'_> {
+impl Attributed for InternalTraitBuilder {
     type Attribute = InternalTraitAttribute;
 }
 
-impl IsCompleteBuilder for InternalTraitBuilder<'_> {
+impl IsCompleteBuilder for InternalTraitBuilder {
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.publicness.is_some() && self.documentation.is_some()
     }
 }
 
-impl<'data> Builder for InternalTraitBuilder<'data> {
+impl Builder for InternalTraitBuilder {
     type Error = BuilderError<InternalTraitAttribute>;
-    type Object = InternalTrait<'data>;
+    type Object = InternalTrait;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(InternalTrait {

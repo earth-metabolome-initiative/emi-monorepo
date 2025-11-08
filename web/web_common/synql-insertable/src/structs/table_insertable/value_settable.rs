@@ -1,7 +1,12 @@
 //! Submodule implementing the generation of the `*ValueSettable` trait for the
 //! `TableInsertable` struct.
 
+use std::borrow::Borrow;
+
+use quote::quote;
 use sql_relations::traits::InheritableDatabaseLike;
+use sql_traits::traits::ColumnLike;
+use synql_checks::prelude::CheckConstraintSynLike;
 use synql_core::{
     prelude::Builder,
     structs::{InternalData, InternalToken, MethodBuilder},
@@ -16,12 +21,12 @@ where
 {
     /// Returns the implementation of the `*ValueSettable` trait for the
     /// insertable struct.
-    pub(crate) fn value_settable_impl(&self) -> InternalToken<'data> {
+    pub(crate) fn value_settable_impl(&self) -> InternalToken {
         let trait_ref = self
             .table
             .value_settable_trait_ref(self.workspace)
             .expect("Failed to get ValueSettable trait ref");
-        let data: InternalData<'data> = self.clone().into();
+        let data: InternalData = self.clone().into();
         trait_ref
             .impl_for_type(&data.into())
             .methods(self.table.value_settable_columns(self.database).map(|column| {
@@ -31,13 +36,35 @@ where
                     .clone()
                     .into();
                 let snake_case_ident = column.column_snake_ident();
+                let contextual_columns = &[column.borrow()];
+                let check_constraints = column
+                    .check_constraints(self.database)
+                    .map(|check_constraint| {
+                        check_constraint.to_syn(self.database, self.workspace, contextual_columns)
+                    })
+                    .collect::<Vec<_>>();
                 builder
                     .make_mut_self()
                     .unwrap()
-                    .body(quote::quote! {
-                        self.#snake_case_ident = Some(#snake_case_ident.try_into()?);
-                        Ok(self)
-                    })
+                    .body(
+                        InternalToken::new()
+                            .inherits(check_constraints.clone())
+                            .stream(if column.has_check_constraints(self.database) {
+                                quote! {
+                                    let #snake_case_ident = #snake_case_ident.try_into()?;
+                                    #(#check_constraints)*
+                                    self.#snake_case_ident = Some(#snake_case_ident);
+                                    Ok(self)
+                                }
+                            } else {
+                                quote! {
+                                    self.#snake_case_ident = Some(#snake_case_ident.try_into()?);
+                                    Ok(self)
+                                }
+                            })
+                            .build()
+                            .unwrap(),
+                    )
                     .build()
                     .unwrap()
             }))

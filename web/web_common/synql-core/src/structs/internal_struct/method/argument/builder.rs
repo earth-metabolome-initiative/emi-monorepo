@@ -11,15 +11,15 @@ use crate::structs::{Argument, Documentation, internal_data::DataVariantRef};
 
 #[derive(Default)]
 /// Builder for the `Argument` struct.
-pub struct ArgumentBuilder<'data> {
+pub struct ArgumentBuilder {
     /// Name of the argument.
     name: Option<String>,
     /// Type of the argument.
-    arg_type: Option<DataVariantRef<'data>>,
+    arg_type: Option<DataVariantRef>,
     /// Whether the argument is mutable.
     mutable: bool,
     /// Documentation of the argument.
-    documentation: Option<Documentation<'data>>,
+    documentation: Option<Documentation>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -36,7 +36,7 @@ pub enum ArgumentAttribute {
 }
 
 impl Display for ArgumentAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             ArgumentAttribute::Name => write!(f, "name"),
             ArgumentAttribute::ArgType => write!(f, "arg_type"),
@@ -57,7 +57,7 @@ pub enum ArgumentBuilderError {
 }
 
 impl Display for ArgumentBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             ArgumentBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             ArgumentBuilderError::InvalidName => write!(f, "Invalid argument name"),
@@ -74,7 +74,7 @@ impl Error for ArgumentBuilderError {
     }
 }
 
-impl<'data> ArgumentBuilder<'data> {
+impl ArgumentBuilder {
     /// Sets the name of the argument.
     ///
     /// # Arguments
@@ -97,7 +97,7 @@ impl<'data> ArgumentBuilder<'data> {
     /// * `arg_type` - The type of the argument.
     pub fn arg_type<T>(mut self, arg_type: T) -> Self
     where
-        T: Into<DataVariantRef<'data>>,
+        T: Into<DataVariantRef>,
     {
         self.arg_type = Some(arg_type.into());
         self
@@ -116,17 +116,17 @@ impl<'data> ArgumentBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the argument.
-    pub fn documentation(mut self, documentation: Documentation<'data>) -> Self {
+    pub fn documentation(mut self, documentation: Documentation) -> Self {
         self.documentation = Some(documentation);
         self
     }
 }
 
-impl Attributed for ArgumentBuilder<'_> {
+impl Attributed for ArgumentBuilder {
     type Attribute = ArgumentAttribute;
 }
 
-impl IsCompleteBuilder for ArgumentBuilder<'_> {
+impl IsCompleteBuilder for ArgumentBuilder {
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.arg_type.is_some()
@@ -135,9 +135,9 @@ impl IsCompleteBuilder for ArgumentBuilder<'_> {
     }
 }
 
-impl<'data> Builder for ArgumentBuilder<'data> {
+impl Builder for ArgumentBuilder {
     type Error = BuilderError<ArgumentAttribute>;
-    type Object = Argument<'data>;
+    type Object = Argument;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         let arg_type =

@@ -52,10 +52,7 @@ pub trait TableAttributesLike: TableSchema {
     }
 
     /// Returns a reference to the attributes enum for the table.
-    fn attributes_ref<'data>(
-        &self,
-        workspace: &Workspace<'data>,
-    ) -> Option<InternalDataRef<'data>> {
+    fn attributes_ref<'data>(&self, workspace: &Workspace<'data>) -> Option<InternalDataRef> {
         let crate_ref = workspace.internal_crate(&self.table_attributes_crate_name())?;
         Some(InternalDataRef::new(
             crate_ref,

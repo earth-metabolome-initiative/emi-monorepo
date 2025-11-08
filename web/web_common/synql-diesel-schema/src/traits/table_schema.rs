@@ -1,7 +1,7 @@
 //! Submodule defining the `TableSchema` trait which allows to generate the
 //! `diesel` schema from a SQL schema, based on `sql_traits`.
 
-use std::rc::Rc;
+use std::sync::Arc;
 
 use synql_core::{
     structs::{InternalCrate, InternalModuleRef, Workspace},
@@ -74,19 +74,13 @@ pub trait TableSchema: TableSynLike + Sized {
     }
 
     /// Returns a reference to the schema module ref for the table.
-    fn schema_module<'data>(
-        &self,
-        workspace: &Workspace<'data>,
-    ) -> Option<InternalModuleRef<'data>> {
+    fn schema_module<'data>(&self, workspace: &Workspace<'data>) -> Option<InternalModuleRef> {
         let crate_ref = self.table_schema_ref(workspace)?;
         Some(InternalModuleRef::new(&crate_ref, crate_ref.module(TABLE_SCHEMA_MODULE_NAME)?))
     }
 
     /// Returns a reference to the schema crate ref for the table.
-    fn table_schema_ref<'data>(
-        &self,
-        workspace: &Workspace<'data>,
-    ) -> Option<Rc<InternalCrate<'data>>> {
+    fn table_schema_ref<'data>(&self, workspace: &Workspace<'data>) -> Option<Arc<InternalCrate>> {
         workspace.internal_crate(&self.table_schema_crate_name()).cloned()
     }
 

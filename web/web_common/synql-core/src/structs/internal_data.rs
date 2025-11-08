@@ -1,10 +1,13 @@
 //! Submodule providing a struct which defines a data model.
 
 mod builder;
+mod cast;
+mod constructors;
+mod helpers;
 
 use std::{
     fmt::{Debug, Display},
-    rc::Rc,
+    sync::Arc,
 };
 
 pub use builder::InternalDataBuilder;
@@ -24,27 +27,27 @@ use crate::{
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Enum representing the variant of internal data (struct or enum).
-pub enum InternalDataVariant<'data> {
+pub enum InternalDataVariant {
     /// Variant representing a struct.
-    StructVariant(InternalStruct<'data>),
+    StructVariant(InternalStruct),
     /// Variant representing an enum.
-    EnumVariant(InternalEnum<'data>),
+    EnumVariant(InternalEnum),
 }
 
-impl<'data> From<InternalStruct<'data>> for InternalDataVariant<'data> {
-    fn from(struct_variant: InternalStruct<'data>) -> Self {
+impl From<InternalStruct> for InternalDataVariant {
+    fn from(struct_variant: InternalStruct) -> Self {
         InternalDataVariant::StructVariant(struct_variant)
     }
 }
 
-impl<'data> From<InternalEnum<'data>> for InternalDataVariant<'data> {
-    fn from(enum_variant: InternalEnum<'data>) -> Self {
+impl From<InternalEnum> for InternalDataVariant {
+    fn from(enum_variant: InternalEnum) -> Self {
         InternalDataVariant::EnumVariant(enum_variant)
     }
 }
 
-impl<'data> ExternalDependencies<'data> for InternalDataVariant<'data> {
-    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl ExternalDependencies for InternalDataVariant {
+    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
         match self {
             InternalDataVariant::StructVariant(s) => s.external_dependencies(),
             InternalDataVariant::EnumVariant(e) => e.external_dependencies(),
@@ -52,8 +55,8 @@ impl<'data> ExternalDependencies<'data> for InternalDataVariant<'data> {
     }
 }
 
-impl<'data> InternalDependencies<'data> for InternalDataVariant<'data> {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
+impl InternalDependencies for InternalDataVariant {
+    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
         match self {
             InternalDataVariant::StructVariant(s) => s.internal_dependencies(),
             InternalDataVariant::EnumVariant(e) => e.internal_dependencies(),
@@ -61,13 +64,13 @@ impl<'data> InternalDependencies<'data> for InternalDataVariant<'data> {
     }
 }
 
-impl<'data> InternalDataVariant<'data> {
+impl InternalDataVariant {
     /// Returns whether the underlying variant supports the given trait.
     ///
     /// # Arguments
     ///
     /// * `trait_variant` - The trait variant to check support for.
-    pub fn supports_trait(&self, trait_variant: &TraitVariantRef<'data>) -> bool {
+    pub fn supports_trait(&self, trait_variant: &TraitVariantRef) -> bool {
         match self {
             InternalDataVariant::StructVariant(s) => s.supports_trait(trait_variant),
             InternalDataVariant::EnumVariant(e) => e.supports_trait(trait_variant),
@@ -78,27 +81,27 @@ impl<'data> InternalDataVariant<'data> {
 #[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Enum representing a variant of internal data, which may be defined within
 /// the workspace or come from an external crate.
-pub enum DataVariantRef<'data> {
+pub enum DataVariantRef {
     /// Variant representing internal data defined within the workspace.
-    Internal(InternalDataRef<'data>),
+    Internal(InternalDataRef),
     /// Variant representing data defined within an external crate.
-    External(ExternalTypeRef<'data>),
+    External(ExternalTypeRef),
     /// A reference to a data variant ref.
-    Reference(Option<Lifetime>, Box<DataVariantRef<'data>>),
+    Reference(Option<Lifetime>, Box<DataVariantRef>),
     /// A mutable reference to a data variant ref.
-    MutableReference(Option<Lifetime>, Box<DataVariantRef<'data>>),
+    MutableReference(Option<Lifetime>, Box<DataVariantRef>),
     /// A generic type parameter.
     Generic(Ident),
     /// A result type.
-    Result(Box<DataVariantRef<'data>>, Box<DataVariantRef<'data>>),
+    Result(Box<DataVariantRef>, Box<DataVariantRef>),
     /// A option type.
-    Option(Box<DataVariantRef<'data>>),
+    Option(Box<DataVariantRef>),
     /// A self type, of which sometimes it is known what it is.
-    SelfType(Option<Box<DataVariantRef<'data>>>),
+    SelfType(Option<Box<DataVariantRef>>),
 }
 
-impl Debug for DataVariantRef<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Debug for DataVariantRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             DataVariantRef::Internal(internal) => write!(f, "Internal({internal:?})"),
             DataVariantRef::External(external) => write!(f, "External({external:?})"),
@@ -120,29 +123,29 @@ impl Debug for DataVariantRef<'_> {
     }
 }
 
-impl<'data> From<InternalDataRef<'data>> for DataVariantRef<'data> {
-    fn from(internal: InternalDataRef<'data>) -> Self {
+impl From<InternalDataRef> for DataVariantRef {
+    fn from(internal: InternalDataRef) -> Self {
         DataVariantRef::Internal(internal)
     }
 }
 
-impl<'data> From<InternalData<'data>> for DataVariantRef<'data> {
-    fn from(internal: InternalData<'data>) -> Self {
+impl From<InternalData> for DataVariantRef {
+    fn from(internal: InternalData) -> Self {
         DataVariantRef::Internal(internal.into())
     }
 }
 
-impl<'data> From<ExternalTypeRef<'data>> for DataVariantRef<'data> {
-    fn from(external: ExternalTypeRef<'data>) -> Self {
+impl From<ExternalTypeRef> for DataVariantRef {
+    fn from(external: ExternalTypeRef) -> Self {
         DataVariantRef::External(external)
     }
 }
 
-impl<'data> InternalDependencies<'data> for DataVariantRef<'data> {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate<'data>> {
+impl InternalDependencies for DataVariantRef {
+    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
         match self {
             DataVariantRef::Internal(internal) => internal.internal_dependencies(),
-            DataVariantRef::External(_) => vec![],
+            DataVariantRef::External(external) => external.internal_dependencies(),
             DataVariantRef::Reference(_, inner) => inner.internal_dependencies(),
             DataVariantRef::MutableReference(_, inner) => inner.internal_dependencies(),
             DataVariantRef::Generic(_) => vec![],
@@ -157,11 +160,11 @@ impl<'data> InternalDependencies<'data> for DataVariantRef<'data> {
     }
 }
 
-impl<'data> crate::traits::ExternalDependencies<'data> for DataVariantRef<'data> {
-    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl crate::traits::ExternalDependencies for DataVariantRef {
+    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
         match self {
-            DataVariantRef::Internal(_) => vec![],
-            DataVariantRef::External(external) => vec![external.external_crate()],
+            DataVariantRef::Internal(internal) => internal.external_dependencies(),
+            DataVariantRef::External(external) => external.external_dependencies(),
             DataVariantRef::Reference(_, inner) => inner.external_dependencies(),
             DataVariantRef::MutableReference(_, inner) => inner.external_dependencies(),
             DataVariantRef::Generic(_) => vec![],
@@ -176,19 +179,19 @@ impl<'data> crate::traits::ExternalDependencies<'data> for DataVariantRef<'data>
     }
 }
 
-impl<'data> DataVariantRef<'data> {
+impl DataVariantRef {
     /// Creates a new generic `DataVariantRef`.
-    pub fn generic(ident: Ident) -> DataVariantRef<'data> {
+    pub fn generic(ident: Ident) -> DataVariantRef {
         DataVariantRef::Generic(ident)
     }
 
     /// Returns a reference variant of the data variant.
-    pub fn reference(&self, lifetime: Option<Lifetime>) -> DataVariantRef<'data> {
+    pub fn reference(&self, lifetime: Option<Lifetime>) -> DataVariantRef {
         DataVariantRef::Reference(lifetime, Box::new(self.clone()))
     }
 
     /// Returns a mutable reference variant of the data variant.
-    pub fn mutable_reference(&self, lifetime: Option<Lifetime>) -> DataVariantRef<'data> {
+    pub fn mutable_reference(&self, lifetime: Option<Lifetime>) -> DataVariantRef {
         DataVariantRef::MutableReference(lifetime, Box::new(self.clone()))
     }
 
@@ -199,7 +202,7 @@ impl<'data> DataVariantRef<'data> {
             DataVariantRef::Internal(internal) => {
                 internal.data().generics_without_defaults().collect()
             }
-            DataVariantRef::External(_) => vec![],
+            DataVariantRef::External(external) => external.generics_without_defaults().collect(),
             DataVariantRef::Reference(_, inner) => inner.generics_without_defaults(),
             DataVariantRef::MutableReference(_, inner) => inner.generics_without_defaults(),
             DataVariantRef::Generic(ident) => vec![ident],
@@ -224,7 +227,7 @@ impl<'data> DataVariantRef<'data> {
     /// Formats the variant including the generics, if any, with defaults.
     pub fn format_with_generics(&self) -> TokenStream {
         match self {
-            Self::External(external) => quote! {#external},
+            Self::External(external) => external.format_with_generics(),
             Self::Internal(internal) => internal.format_with_generics(),
             Self::Generic(generic) => quote! {#generic},
             Self::Reference(_, inner) => {
@@ -252,7 +255,7 @@ impl<'data> DataVariantRef<'data> {
 
     /// Returns the dereferenced variant if it is a reference or mutable
     /// reference, otherwise returns itself.
-    pub fn dereference(&self) -> &DataVariantRef<'data> {
+    pub fn dereference(&self) -> &DataVariantRef {
         match self {
             DataVariantRef::Reference(_, inner) => inner.as_ref(),
             DataVariantRef::MutableReference(_, inner) => inner.as_ref(),
@@ -265,7 +268,7 @@ impl<'data> DataVariantRef<'data> {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait variant to check support for.
-    pub fn supports_trait(&self, trait_ref: &TraitVariantRef<'data>) -> bool {
+    pub fn supports_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         match self {
             Self::Internal(internal) => internal.data().variant().supports_trait(trait_ref),
             Self::External(external) => external.supports_trait(trait_ref),
@@ -298,6 +301,30 @@ impl<'data> DataVariantRef<'data> {
         matches!(self, Self::Result(_, _))
     }
 
+    /// Returns whether it is a `Unit` variant.
+    pub fn is_unit(&self) -> bool {
+        match self {
+            Self::External(external) => external.is_unit(),
+            _ => false,
+        }
+    }
+
+    /// Returns whether it is a `Unit` `Result` variant.
+    pub fn is_unit_result(&self) -> bool {
+        match self {
+            Self::Result(left, _) => left.is_unit(),
+            _ => false,
+        }
+    }
+
+    /// Returns the err variant if it is a `Result` variant.
+    pub fn result_err(&self) -> Option<&DataVariantRef> {
+        match self {
+            Self::Result(_, err) => Some(err.as_ref()),
+            _ => None,
+        }
+    }
+
     /// Returns whether it is an `Option` variant.
     pub fn is_option(&self) -> bool {
         matches!(self, Self::Option(_))
@@ -315,10 +342,10 @@ impl<'data> DataVariantRef<'data> {
     /// # Arguments
     /// * `left` - The left variant of the `Result`.
     /// * `right` - The right variant of the `Result`.
-    pub fn result<Ok, Err>(ok_variant: Ok, err_variant: Err) -> DataVariantRef<'data>
+    pub fn result<Ok, Err>(ok_variant: Ok, err_variant: Err) -> DataVariantRef
     where
-        Ok: Into<DataVariantRef<'data>>,
-        Err: Into<DataVariantRef<'data>>,
+        Ok: Into<DataVariantRef>,
+        Err: Into<DataVariantRef>,
     {
         DataVariantRef::Result(Box::new(ok_variant.into()), Box::new(err_variant.into()))
     }
@@ -328,7 +355,7 @@ impl<'data> DataVariantRef<'data> {
     /// # Arguments
     ///
     /// * `inner` - The inner variant of the `Option`.
-    pub fn optional(&self) -> DataVariantRef<'data> {
+    pub fn optional(&self) -> DataVariantRef {
         DataVariantRef::Option(Box::new(self.clone()))
     }
 
@@ -337,7 +364,7 @@ impl<'data> DataVariantRef<'data> {
     /// # Arguments
     ///
     /// * `inner` - The optional inner variant of the `Self` type.
-    pub fn self_type(inner: Option<DataVariantRef<'data>>) -> DataVariantRef<'data> {
+    pub fn self_type(inner: Option<DataVariantRef>) -> DataVariantRef {
         DataVariantRef::SelfType(inner.map(Box::new))
     }
 
@@ -345,7 +372,7 @@ impl<'data> DataVariantRef<'data> {
     ///
     /// # Arguments
     /// * `ok_variant` - The ok variant of the Result.
-    pub fn diesel_result(ok_variant: DataVariantRef<'data>) -> DataVariantRef<'data> {
+    pub fn diesel_result(ok_variant: DataVariantRef) -> DataVariantRef {
         let diesel = ExternalCrate::diesel();
         let err_variant = diesel
             .external_type(&syn::parse_quote!(diesel::result::Error))
@@ -356,65 +383,85 @@ impl<'data> DataVariantRef<'data> {
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a reference to internal data and its crate.
-pub struct InternalDataRef<'data> {
-    data: Rc<InternalData<'data>>,
+pub struct InternalDataRef {
+    data: Arc<InternalData>,
     /// The crate in which the internal data is defined.
     ///
     /// This is optional to allow for cases where the crate
     /// itself has not yet been defined (e.g., for the current crate).
-    internal_crate: Option<Rc<InternalCrate<'data>>>,
+    internal_crate: Option<Arc<InternalCrate>>,
 }
 
-impl<'data> From<InternalDataRef<'data>> for InternalToken<'data> {
-    fn from(value: InternalDataRef<'data>) -> Self {
+impl From<InternalDataRef> for InternalToken {
+    fn from(value: InternalDataRef) -> Self {
         InternalToken::new()
             .public()
             .stream(value.to_token_stream())
             .data(value.into())
-            .unwrap()
             .build()
             .unwrap()
     }
 }
 
-impl<'data> From<Rc<InternalData<'data>>> for InternalDataRef<'data> {
-    fn from(data: Rc<InternalData<'data>>) -> Self {
+impl From<Arc<InternalData>> for InternalDataRef {
+    fn from(data: Arc<InternalData>) -> Self {
         InternalDataRef { data, internal_crate: None }
     }
 }
 
-impl<'data> From<InternalData<'data>> for InternalDataRef<'data> {
-    fn from(data: InternalData<'data>) -> Self {
-        InternalDataRef { data: Rc::new(data), internal_crate: None }
+impl From<InternalData> for InternalDataRef {
+    fn from(data: InternalData) -> Self {
+        InternalDataRef { data: Arc::new(data), internal_crate: None }
     }
 }
 
-impl<'data> InternalDataRef<'data> {
+impl InternalDependencies for InternalDataRef {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
+        let mut dependencies = self.data.internal_dependencies();
+        if let Some(internal_crate) = &self.internal_crate {
+            dependencies.push(internal_crate.as_ref());
+        }
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
+    }
+}
+
+impl ExternalDependencies for InternalDataRef {
+    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
+        let mut dependencies = self.data.external_dependencies();
+        if let Some(internal_crate) = &self.internal_crate {
+            dependencies.extend(internal_crate.external_dependencies());
+        }
+        dependencies.sort_unstable();
+        dependencies.dedup();
+        dependencies
+    }
+}
+
+impl InternalDataRef {
     /// Creates a new `InternalDataRef`.
     ///
     /// # Arguments
     ///
     /// * `internal_crate` - A reference to the internal crate.
     /// * `data` - A reference to the internal data.
-    pub fn new(
-        internal_crate: &Rc<InternalCrate<'data>>,
-        data: &Rc<InternalData<'data>>,
-    ) -> InternalDataRef<'data> {
+    pub fn new(internal_crate: &Arc<InternalCrate>, data: &Arc<InternalData>) -> InternalDataRef {
         InternalDataRef { data: data.clone(), internal_crate: Some(internal_crate.clone()) }
     }
 
     /// Returns the internal data.
-    pub fn data(&self) -> &InternalData<'data> {
+    pub fn data(&self) -> &InternalData {
         self.data.as_ref()
     }
 
     /// Returns the internal crate.
-    pub fn internal_crate(&self) -> Option<&InternalCrate<'data>> {
+    pub fn internal_crate(&self) -> Option<&InternalCrate> {
         self.internal_crate.as_deref()
     }
 
     /// Returns the internal crate Rc reference.
-    pub fn crate_ref(&self) -> Option<&Rc<InternalCrate<'data>>> {
+    pub fn crate_ref(&self) -> Option<&Arc<InternalCrate>> {
         self.internal_crate.as_ref()
     }
 
@@ -426,11 +473,6 @@ impl<'data> InternalDataRef<'data> {
     /// Returns the ident of the internal crate.
     pub fn crate_ident(&self) -> Option<Ident> {
         self.internal_crate.as_ref().map(|krate| krate.ident())
-    }
-
-    /// Returns the internal crate dependencies of the variant.
-    pub fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
-        self.internal_crate().into_iter().collect()
     }
 
     /// Returns the markdown formatted documentation path of the internal data
@@ -446,8 +488,8 @@ impl<'data> InternalDataRef<'data> {
     }
 }
 
-impl Display for InternalDataRef<'_> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl Display for InternalDataRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         let internal_crate_name = if let Some(internal_crate) = &self.internal_crate {
             internal_crate.name()
         } else {
@@ -458,7 +500,7 @@ impl Display for InternalDataRef<'_> {
     }
 }
 
-impl ToTokens for InternalDataRef<'_> {
+impl ToTokens for InternalDataRef {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let internal_crate_ident = if let Some(internal_crate) = &self.internal_crate {
             let ident = internal_crate.ident();
@@ -471,7 +513,7 @@ impl ToTokens for InternalDataRef<'_> {
     }
 }
 
-impl ToTokens for DataVariantRef<'_> {
+impl ToTokens for DataVariantRef {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         match self {
             DataVariantRef::Internal(internal) => {
@@ -506,12 +548,12 @@ impl ToTokens for DataVariantRef<'_> {
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a reference to internal module and its crate.
-pub struct InternalModuleRef<'data> {
-    module: Rc<InternalModule<'data>>,
-    internal_crate: Rc<InternalCrate<'data>>,
+pub struct InternalModuleRef {
+    module: Arc<InternalModule>,
+    internal_crate: Arc<InternalCrate>,
 }
 
-impl ToTokens for InternalModuleRef<'_> {
+impl ToTokens for InternalModuleRef {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let path = self
             .internal_crate
@@ -521,7 +563,7 @@ impl ToTokens for InternalModuleRef<'_> {
     }
 }
 
-impl<'data> InternalModuleRef<'data> {
+impl InternalModuleRef {
     /// Creates a new `InternalModuleRef`.
     ///
     /// # Arguments
@@ -529,19 +571,19 @@ impl<'data> InternalModuleRef<'data> {
     /// * `internal_crate` - A reference to the internal crate.
     /// * `module` - A reference to the internal module.
     pub fn new(
-        internal_crate: &Rc<InternalCrate<'data>>,
-        module: &Rc<InternalModule<'data>>,
-    ) -> InternalModuleRef<'data> {
+        internal_crate: &Arc<InternalCrate>,
+        module: &Arc<InternalModule>,
+    ) -> InternalModuleRef {
         InternalModuleRef { module: module.clone(), internal_crate: internal_crate.clone() }
     }
 
     /// Returns the internal module.
-    pub fn module(&self) -> &InternalModule<'data> {
+    pub fn module(&self) -> &InternalModule {
         self.module.as_ref()
     }
 
     /// Returns the internal crate.
-    pub fn internal_crate(&self) -> &InternalCrate<'data> {
+    pub fn internal_crate(&self) -> &InternalCrate {
         self.internal_crate.as_ref()
     }
 
@@ -558,30 +600,30 @@ impl<'data> InternalModuleRef<'data> {
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining a data model.
-pub struct InternalData<'data> {
+pub struct InternalData {
     /// Publicness of the data.
     publicness: Publicness,
     /// Name of the data.
     name: String,
     /// Documentation of the data.
-    documentation: Documentation<'data>,
+    documentation: Documentation,
     /// The variant of the data (struct or enum).
-    variant: InternalDataVariant<'data>,
+    variant: InternalDataVariant,
     /// The traits implemented for the data.
-    traits: Vec<InternalToken<'data>>,
+    traits: Vec<InternalToken>,
     /// The derives applies to the data.
-    derives: Vec<Derive<'data>>,
+    derives: Vec<Derive>,
     /// The decorators applied to the data which are not derives.
-    decorators: Vec<Decorator<'data>>,
+    decorators: Vec<Decorator>,
     /// The generics used in the data.
     generics: Vec<Ident>,
     /// Defaults for generic type parameters.
-    generic_defaults: Vec<Option<DataVariantRef<'data>>>,
+    generic_defaults: Vec<Option<DataVariantRef>>,
 }
 
-impl<'data> InternalData<'data> {
+impl InternalData {
     /// Initializes a new `InternalDataBuilder`.
-    pub fn new() -> InternalDataBuilder<'data> {
+    pub fn new() -> InternalDataBuilder {
         InternalDataBuilder::default()
     }
 
@@ -642,12 +684,12 @@ impl<'data> InternalData<'data> {
     }
 
     /// Returns a reference to the variant of the data.
-    pub fn variant(&self) -> &InternalDataVariant<'data> {
+    pub fn variant(&self) -> &InternalDataVariant {
         &self.variant
     }
 }
 
-impl<'data> ToTokens for InternalData<'data> {
+impl ToTokens for InternalData {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let publicness = &self.publicness;
         let ident = self.ident();
@@ -680,8 +722,8 @@ impl<'data> ToTokens for InternalData<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for InternalData<'data> {
-    fn external_dependencies(&self) -> Vec<&ExternalCrate<'data>> {
+impl ExternalDependencies for InternalData {
+    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
         let mut crates = self
             .traits
             .iter()
@@ -706,8 +748,8 @@ impl<'data> ExternalDependencies<'data> for InternalData<'data> {
     }
 }
 
-impl<'data> InternalDependencies<'data> for InternalData<'data> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl InternalDependencies for InternalData {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
         let mut crates = self
             .traits
             .iter()

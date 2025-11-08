@@ -2,14 +2,14 @@
 //! workspace.
 
 mod builder;
-use std::{path::Path, rc::Rc};
+use std::{path::Path, sync::Arc};
 
 pub use builder::WorkspaceBuilder;
 use syn::Type;
 
 use crate::{
     structs::{
-        ExternalCrate, InternalCrate,
+        ExternalCrate, ExternalFunctionRef, InternalCrate,
         external_crate::{ExternalMacroRef, ExternalTraitRef, ExternalTypeRef},
     },
     traits::ExternalDependencies,
@@ -19,7 +19,7 @@ use crate::{
 /// Struct defining a Cargo workspace.
 pub struct Workspace<'data> {
     /// External crates made available within the workspace.
-    external_crates: Vec<&'data ExternalCrate<'data>>,
+    external_crates: Vec<Arc<ExternalCrate>>,
     /// Name of the workspace.
     name: String,
     /// Path where the workspace is being created.
@@ -29,7 +29,7 @@ pub struct Workspace<'data> {
     /// Edition of the workspace.
     edition: u16,
     /// Internal crates created within the workspace.
-    internal_crates: Vec<Rc<InternalCrate<'data>>>,
+    internal_crates: Vec<Arc<InternalCrate>>,
 }
 
 impl<'data> Workspace<'data> {
@@ -54,12 +54,12 @@ impl<'data> Workspace<'data> {
     }
 
     /// Adds a new internal crate to the workspace.
-    pub fn add_internal_crate(&mut self, internal_crate: InternalCrate<'data>) {
-        self.internal_crates.push(Rc::new(internal_crate));
+    pub fn add_internal_crate(&mut self, internal_crate: InternalCrate) {
+        self.internal_crates.push(Arc::new(internal_crate));
     }
 
     /// Returns the internal crate with the given name, if any.
-    pub fn internal_crate(&self, name: &str) -> Option<&Rc<InternalCrate<'data>>> {
+    pub fn internal_crate(&self, name: &str) -> Option<&Arc<InternalCrate>> {
         for internal_crate in &self.internal_crates {
             if internal_crate.name() == name {
                 return Some(internal_crate);
@@ -73,7 +73,7 @@ impl<'data> Workspace<'data> {
     ///
     /// # Arguments
     /// * `name` - A string slice representing the name of the external macro.
-    pub fn external_macro(&self, name: &str) -> Option<ExternalMacroRef<'data>> {
+    pub fn external_macro(&self, name: &str) -> Option<ExternalMacroRef> {
         for ext_crate in &self.external_crates {
             if let Some(ext_macro) = ext_crate.external_macro(name) {
                 return Some(ext_macro);
@@ -87,7 +87,7 @@ impl<'data> Workspace<'data> {
     ///
     /// # Arguments
     /// * `name` - A string slice representing the name of the external trait.
-    pub fn external_trait(&self, name: &str) -> Option<ExternalTraitRef<'data>> {
+    pub fn external_trait(&self, name: &str) -> Option<ExternalTraitRef> {
         for ext_crate in &self.external_crates {
             if let Some(ext_trait) = ext_crate.external_trait_ref(name) {
                 return Some(ext_trait);
@@ -101,7 +101,7 @@ impl<'data> Workspace<'data> {
     ///
     /// # Arguments
     /// * `postgres_type` - A string slice representing the postgres type.
-    pub fn external_postgres_type(&self, postgres_type: &str) -> Option<ExternalTypeRef<'data>> {
+    pub fn external_postgres_type(&self, postgres_type: &str) -> Option<ExternalTypeRef> {
         for ext_crate in &self.external_crates {
             if let Some(ext_type) = ext_crate.external_postgres_type(postgres_type) {
                 return Some(ext_type);
@@ -115,10 +115,25 @@ impl<'data> Workspace<'data> {
     ///
     /// # Arguments
     /// * `ident` - A reference to the type.
-    pub fn external_type(&self, ident: &Type) -> Option<ExternalTypeRef<'data>> {
+    pub fn external_type(&self, ident: &Type) -> Option<ExternalTypeRef> {
         for ext_crate in &self.external_crates {
             if let Some(ext_type) = ext_crate.external_type(ident) {
                 return Some(ext_type);
+            }
+        }
+        None
+    }
+
+    /// Returns the external function ref corresponding to the provided name, if
+    /// any.
+    ///
+    /// # Arguments
+    /// * `name` - A string slice representing the name of the external
+    ///   function.
+    pub fn external_function(&self, name: &str) -> Option<ExternalFunctionRef> {
+        for ext_crate in &self.external_crates {
+            if let Some(ext_function) = ext_crate.external_function_ref(name) {
+                return Some(ext_function);
             }
         }
         None

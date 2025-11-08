@@ -4,11 +4,12 @@
 use quote::ToTokens;
 
 /// Enum representing the publicness of something.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
 pub enum Publicness {
     /// Public (e.g., `pub`).
     Public,
     /// Private (e.g., no `pub`).
+    #[default]
     Private,
     /// Crate-level visibility (e.g., `pub(crate)`).
     Crate,

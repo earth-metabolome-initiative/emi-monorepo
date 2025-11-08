@@ -2,7 +2,10 @@
 
 use std::{borrow::Borrow, fmt::Debug, hash::Hash};
 
-use crate::traits::{CheckConstraintLike, DatabaseLike, ForeignKeyLike, Metadata, TableLike};
+use crate::{
+    traits::{CheckConstraintLike, DatabaseLike, ForeignKeyLike, Metadata, TableLike},
+    utils::normalize_postgres_type,
+};
 
 /// A trait for types that can be treated as SQL columns.
 pub trait ColumnLike:
@@ -52,18 +55,18 @@ pub trait ColumnLike:
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
     ///
-    /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT, score DECIMAL(10,2));")?;
+    /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT, score REAL);")?;
     /// let table = db.table(None, "my_table").unwrap();
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// let score_column = table.column("score", &db).expect("Column 'score' should exist");
-    /// assert_eq!(id_column.data_type(), "INT");
-    /// assert_eq!(name_column.data_type(), "TEXT");
-    /// assert_eq!(score_column.data_type(), "DECIMAL(10,2)");
+    /// assert_eq!(id_column.data_type(&db), "INT");
+    /// assert_eq!(name_column.data_type(&db), "TEXT");
+    /// assert_eq!(score_column.data_type(&db), "REAL");
     /// # Ok(())
     /// # }
     /// ```
-    fn data_type(&self) -> String;
+    fn data_type<'db>(&'db self, database: &'db Self::DB) -> &'db str;
 
     /// Returns whether the data type of the column is generative, i.e., it
     /// generates values automatically (e.g., SERIAL in PostgreSQL).
@@ -146,7 +149,38 @@ pub trait ColumnLike:
     /// # Ok(())
     /// # }
     /// ```
-    fn normalized_data_type(&self, database: &Self::DB) -> String;
+    fn normalized_data_type<'db>(&'db self, database: &'db Self::DB) -> &'db str {
+        normalize_postgres_type(self.data_type(database))
+    }
+
+    /// Returns whether the column type is textual.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query the column
+    ///  data type from.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT, name TEXT, description VARCHAR);")?;
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
+    /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
+    /// let description_column =
+    ///     table.column("description", &db).expect("Column 'description' should exist");
+    /// assert!(!id_column.is_textual(&db), "id column should not be textual");
+    /// assert!(name_column.is_textual(&db), "name column should be textual");
+    /// assert!(description_column.is_textual(&db), "description column should be textual");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn is_textual(&self, database: &Self::DB) -> bool {
+        matches!(self.normalized_data_type(database), "TEXT" | "VARCHAR" | "CHAR")
+    }
 
     /// Returns whether the column is nullable.
     ///
@@ -481,5 +515,34 @@ pub trait ColumnLike:
         table
             .check_constraints(database)
             .filter(|check| check.involves_column(database, self.borrow()))
+    }
+
+    /// Returns whether the column has any check constraints.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query check
+    ///  constraints from.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db =
+    ///     ParserDB::try_from("CREATE TABLE my_table (id INT, age INT CHECK (age >= 0), score INT);")?;
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let age_column = table.column("age", &db).expect("Column 'age' should exist");
+    /// let score_column = table.column("score", &db).expect("Column 'score' should exist");
+    /// assert!(age_column.has_check_constraints(&db), "age column should have check constraints");
+    /// assert!(
+    ///     !score_column.has_check_constraints(&db),
+    ///     "score column should not have check constraints"
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_check_constraints(&self, database: &Self::DB) -> bool {
+        self.check_constraints(database).next().is_some()
     }
 }

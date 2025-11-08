@@ -26,10 +26,25 @@ impl CheckConstraintLike for CheckConstraint {
         database.check_constraint_metadata(self).expression()
     }
 
+    fn table<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> &'db <Self::DB as sql_traits::prelude::DatabaseLike>::Table {
+        database.check_constraint_metadata(self).table()
+    }
+
     fn columns<'db>(
         &'db self,
         database: &'db Self::DB,
     ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::prelude::DatabaseLike>::Column> {
         database.check_constraint_metadata(self).columns()
+    }
+
+    fn functions<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::prelude::DatabaseLike>::Function> + 'db
+    {
+        database.check_constraint_metadata(self).functions()
     }
 }

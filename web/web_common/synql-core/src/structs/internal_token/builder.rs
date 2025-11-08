@@ -16,22 +16,22 @@ use crate::structs::{
 
 #[derive(Default)]
 /// Builder for the `InternalToken` struct.
-pub struct InternalTokenBuilder<'data> {
+pub struct InternalTokenBuilder {
     /// Publicness of the token stream.
-    publicness: Option<Publicness>,
+    publicness: Publicness,
     /// The token stream.
     stream: Option<TokenStream>,
     /// External macros used in the token stream.
-    external_macros: Vec<ExternalMacroRef<'data>>,
+    external_macros: Vec<ExternalMacroRef>,
     /// Traits used in the token stream.
-    employed_traits: Vec<TraitVariantRef<'data>>,
+    employed_traits: Vec<TraitVariantRef>,
     /// Traits which are implemented by the token stream.
-    implemented_traits: Vec<TraitVariantRef<'data>>,
+    implemented_traits: Vec<TraitVariantRef>,
     /// Data used in the token stream.
-    data: Vec<DataVariantRef<'data>>,
+    data: Vec<DataVariantRef>,
     /// Internal modules from other crates in the same workspace which are used
     /// in the token stream.
-    internal_modules: Vec<InternalModuleRef<'data>>,
+    internal_modules: Vec<InternalModuleRef>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -56,20 +56,12 @@ pub enum InternalTokenAttribute {
 pub enum InternalTokenBuilderError {
     /// An error occurred during the building process.
     Builder(BuilderError<InternalTokenAttribute>),
-    /// Duplicate external macro detected.
-    DuplicateExternalMacro,
-    /// Duplicate external trait detected.
-    DuplicateExternalTrait,
-    /// Duplicate internal data detected.
-    DuplicateInternalData,
-    /// Duplicate internal module detected.
-    DuplicateInternalModule,
     /// The provided external macro does not appear in the token stream.
     ExternalMacroNotFound,
     /// The provided external trait does not appear in the token stream.
     TraitNotFound(String),
     /// The provided internal data does not appear in the token stream.
-    InternalDataNotFound,
+    InternalDataNotFound(String),
     /// The provided internal module does not appear in the token stream.
     InternalModuleNotFound,
 }
@@ -84,26 +76,14 @@ impl Display for InternalTokenBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             InternalTokenBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
-            InternalTokenBuilderError::DuplicateExternalMacro => {
-                write!(f, "Duplicate external macro detected")
-            }
-            InternalTokenBuilderError::DuplicateExternalTrait => {
-                write!(f, "Duplicate external trait detected")
-            }
-            InternalTokenBuilderError::DuplicateInternalData => {
-                write!(f, "Duplicate internal data detected")
-            }
-            InternalTokenBuilderError::DuplicateInternalModule => {
-                write!(f, "Duplicate internal module detected")
-            }
             InternalTokenBuilderError::ExternalMacroNotFound => {
                 write!(f, "External macro not found in token stream")
             }
             InternalTokenBuilderError::TraitNotFound(name) => {
                 write!(f, "Trait '{name}' not found in token stream")
             }
-            InternalTokenBuilderError::InternalDataNotFound => {
-                write!(f, "Internal data not found in token stream")
+            InternalTokenBuilderError::InternalDataNotFound(name) => {
+                write!(f, "Internal data '{name}' not found in token stream")
             }
             InternalTokenBuilderError::InternalModuleNotFound => {
                 write!(f, "Internal module not found in token stream")
@@ -121,25 +101,25 @@ impl core::error::Error for InternalTokenBuilderError {
     }
 }
 
-impl<'data> InternalTokenBuilder<'data> {
+impl InternalTokenBuilder {
     /// Sets the publicness of the token stream.
     ///
     /// # Arguments
     /// * `publicness` - The publicness of the token stream.
     pub fn publicness(mut self, publicness: Publicness) -> Self {
-        self.publicness = Some(publicness);
+        self.publicness = publicness;
         self
     }
 
     /// Set the stream as public.
     pub fn public(mut self) -> Self {
-        self.publicness = Some(Publicness::Public);
+        self.publicness = Publicness::Public;
         self
     }
 
     /// Set the stream as private.
     pub fn private(mut self) -> Self {
-        self.publicness = Some(Publicness::Private);
+        self.publicness = Publicness::Private;
         self
     }
 
@@ -152,23 +132,40 @@ impl<'data> InternalTokenBuilder<'data> {
         self
     }
 
+    /// Inherits properties from another `InternalToken`.
+    pub fn inherit(mut self, other: InternalToken) -> Self {
+        if other.is_public() {
+            self = self.public();
+        }
+        self = self.external_macros(other.external_macros);
+        self = self.employed_traits(other.employed_traits);
+        self = self.implemented_traits(other.implemented_traits);
+        self = self.datas(other.data);
+        self = self.internal_modules(other.internal_modules);
+
+        self
+    }
+
+    /// Inherits properties from several `InternalToken`s
+    pub fn inherits<I>(mut self, others: I) -> Self
+    where
+        I: IntoIterator<Item = InternalToken>,
+    {
+        for other in others {
+            self = self.inherit(other);
+        }
+        self
+    }
+
     /// Adds an external macro reference to the token stream.
     ///
     /// # Arguments
     /// * `external_macro` - The external macro reference.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if the external macro is already present.
-    pub fn external_macro(
-        mut self,
-        external_macro: ExternalMacroRef<'data>,
-    ) -> Result<Self, InternalTokenBuilderError> {
-        if self.external_macros.contains(&external_macro) {
-            return Err(InternalTokenBuilderError::DuplicateExternalMacro);
+    pub fn external_macro(mut self, external_macro: ExternalMacroRef) -> Self {
+        if !self.external_macros.contains(&external_macro) {
+            self.external_macros.push(external_macro);
         }
-        self.external_macros.push(external_macro);
-        Ok(self)
+        self
     }
 
     /// Sets the external macros used in the token stream.
@@ -179,50 +176,36 @@ impl<'data> InternalTokenBuilder<'data> {
     /// # Errors
     ///
     /// Returns an error if any duplicate external macros are detected.
-    pub fn external_macros<I>(
-        mut self,
-        external_macros: I,
-    ) -> Result<Self, InternalTokenBuilderError>
+    pub fn external_macros<I>(mut self, external_macros: I) -> Self
     where
-        I: IntoIterator<Item = ExternalMacroRef<'data>>,
+        I: IntoIterator<Item = ExternalMacroRef>,
     {
         for external_macro in external_macros {
-            self = self.external_macro(external_macro)?;
+            self = self.external_macro(external_macro);
         }
-        Ok(self)
+        self
     }
 
     /// Adds a trait employed by the token stream.
     ///
     /// # Arguments
     /// * `employed_trait` - The employed trait.
-    ///
-    /// # Errors
-    ///
-    /// * If the employed trait is already present.
-    pub fn employed_trait(
-        mut self,
-        employed_trait: TraitVariantRef<'data>,
-    ) -> Result<Self, InternalTokenBuilderError> {
-        if self.employed_traits.contains(&employed_trait) {
-            return Err(InternalTokenBuilderError::DuplicateExternalTrait);
+    pub fn employed_trait(mut self, employed_trait: TraitVariantRef) -> Self {
+        if !self.employed_traits.contains(&employed_trait) {
+            self.employed_traits.push(employed_trait);
         }
-        self.employed_traits.push(employed_trait);
-        Ok(self)
+        self
     }
 
     /// Adds several traits employed by the token stream.
-    pub fn employed_traits<I>(
-        mut self,
-        employed_traits: I,
-    ) -> Result<Self, InternalTokenBuilderError>
+    pub fn employed_traits<I>(mut self, employed_traits: I) -> Self
     where
-        I: IntoIterator<Item = TraitVariantRef<'data>>,
+        I: IntoIterator<Item = TraitVariantRef>,
     {
         for employed_trait in employed_traits {
-            self = self.employed_trait(employed_trait)?;
+            self = self.employed_trait(employed_trait);
         }
-        Ok(self)
+        self
     }
 
     /// Adds a trait implemented by the token stream.
@@ -233,29 +216,22 @@ impl<'data> InternalTokenBuilder<'data> {
     /// # Errors
     ///
     /// * If the implemented trait is already present.
-    pub fn implemented_trait(
-        mut self,
-        implemented_trait: TraitVariantRef<'data>,
-    ) -> Result<Self, InternalTokenBuilderError> {
-        if self.implemented_traits.contains(&implemented_trait) {
-            return Err(InternalTokenBuilderError::DuplicateExternalTrait);
+    pub fn implemented_trait(mut self, implemented_trait: TraitVariantRef) -> Self {
+        if !self.implemented_traits.contains(&implemented_trait) {
+            self.implemented_traits.push(implemented_trait);
         }
-        self.implemented_traits.push(implemented_trait);
-        Ok(self)
+        self
     }
 
     /// Adds several traits implemented by the token stream.
-    pub fn implemented_traits<I>(
-        mut self,
-        implemented_traits: I,
-    ) -> Result<Self, InternalTokenBuilderError>
+    pub fn implemented_traits<I>(mut self, implemented_traits: I) -> Self
     where
-        I: IntoIterator<Item = TraitVariantRef<'data>>,
+        I: IntoIterator<Item = TraitVariantRef>,
     {
         for implemented_trait in implemented_traits {
-            self = self.implemented_trait(implemented_trait)?;
+            self = self.implemented_trait(implemented_trait);
         }
-        Ok(self)
+        self
     }
 
     /// Adds an internal data reference to the token stream.
@@ -263,27 +239,22 @@ impl<'data> InternalTokenBuilder<'data> {
     /// # Arguments
     ///
     /// * `data` - The internal data reference.
-    ///
-    /// # Errors
-    ///
-    /// * Returns an error if the internal data is already present.
-    pub fn data(mut self, data: DataVariantRef<'data>) -> Result<Self, InternalTokenBuilderError> {
-        if self.data.contains(&data) {
-            return Err(InternalTokenBuilderError::DuplicateInternalData);
+    pub fn data(mut self, data: DataVariantRef) -> Self {
+        if !self.data.contains(&data) {
+            self.data.push(data);
         }
-        self.data.push(data);
-        Ok(self)
+        self
     }
 
     /// Adds several internal data references to the token stream.
-    pub fn datas<I>(mut self, data: I) -> Result<Self, InternalTokenBuilderError>
+    pub fn datas<I>(mut self, data: I) -> Self
     where
-        I: IntoIterator<Item = DataVariantRef<'data>>,
+        I: IntoIterator<Item = DataVariantRef>,
     {
         for data_ref in data {
-            self = self.data(data_ref)?;
+            self = self.data(data_ref);
         }
-        Ok(self)
+        self
     }
 
     /// Adds an internal module reference to the token stream.
@@ -291,33 +262,22 @@ impl<'data> InternalTokenBuilder<'data> {
     /// # Arguments
     ///
     /// * `internal_module` - The internal module reference.
-    ///
-    /// # Errors
-    ///
-    /// * Returns an error if the internal module is already present.
-    pub fn internal_module(
-        mut self,
-        internal_module: InternalModuleRef<'data>,
-    ) -> Result<Self, InternalTokenBuilderError> {
-        if self.internal_modules.contains(&internal_module) {
-            return Err(InternalTokenBuilderError::DuplicateInternalModule);
+    pub fn internal_module(mut self, internal_module: InternalModuleRef) -> Self {
+        if !self.internal_modules.contains(&internal_module) {
+            self.internal_modules.push(internal_module);
         }
-        self.internal_modules.push(internal_module);
-        Ok(self)
+        self
     }
 
     /// Adds internal module references to the token stream.
-    pub fn internal_modules<I>(
-        mut self,
-        internal_modules: I,
-    ) -> Result<Self, InternalTokenBuilderError>
+    pub fn internal_modules<I>(mut self, internal_modules: I) -> Self
     where
-        I: IntoIterator<Item = InternalModuleRef<'data>>,
+        I: IntoIterator<Item = InternalModuleRef>,
     {
         for internal_module in internal_modules {
-            self = self.internal_module(internal_module)?;
+            self = self.internal_module(internal_module);
         }
-        Ok(self)
+        self
     }
 }
 
@@ -334,19 +294,19 @@ impl Display for InternalTokenAttribute {
     }
 }
 
-impl<'data> Attributed for InternalTokenBuilder<'data> {
+impl Attributed for InternalTokenBuilder {
     type Attribute = InternalTokenAttribute;
 }
 
-impl<'data> IsCompleteBuilder for InternalTokenBuilder<'data> {
+impl IsCompleteBuilder for InternalTokenBuilder {
     fn is_complete(&self) -> bool {
-        self.publicness.is_some() && self.stream.is_some()
+        self.stream.is_some()
     }
 }
 
-impl<'data> Builder for InternalTokenBuilder<'data> {
+impl Builder for InternalTokenBuilder {
     type Error = InternalTokenBuilderError;
-    type Object = InternalToken<'data>;
+    type Object = InternalToken;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         let string_token_stream = self.stream.to_token_stream().to_string();
@@ -369,8 +329,10 @@ impl<'data> Builder for InternalTokenBuilder<'data> {
             }
         }
         for data in &self.data {
-            if !string_token_stream.contains(&data.to_token_stream().to_string()) {
-                return Err(InternalTokenBuilderError::InternalDataNotFound);
+            if !string_token_stream.contains(&data.format_with_generics().to_string()) {
+                return Err(InternalTokenBuilderError::InternalDataNotFound(
+                    data.format_with_generics().to_string(),
+                ));
             }
         }
         for internal_module in &self.internal_modules {
@@ -380,9 +342,7 @@ impl<'data> Builder for InternalTokenBuilder<'data> {
             }
         }
         Ok(InternalToken {
-            publicness: self
-                .publicness
-                .ok_or(BuilderError::IncompleteBuild(InternalTokenAttribute::Publicness))?,
+            publicness: self.publicness,
             stream: self
                 .stream
                 .ok_or(BuilderError::IncompleteBuild(InternalTokenAttribute::Stream))?,

@@ -7,7 +7,7 @@ use quote::ToTokens;
 
 use super::InternalToken;
 
-impl From<Ident> for InternalToken<'_> {
+impl From<Ident> for InternalToken {
     fn from(ident: Ident) -> Self {
         InternalToken::new()
             .private()

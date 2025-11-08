@@ -11,7 +11,7 @@ use crate::{
     traits::{TRAIT_MODULE_NAME, TableRelationsLike},
 };
 
-impl<'data, 'table, T> From<TableRelations<'data, 'table, T>> for InternalCrate<'data>
+impl<'data, 'table, T> From<TableRelations<'data, 'table, T>> for InternalCrate
 where
     T: TableRelationsLike + ?Sized,
 {

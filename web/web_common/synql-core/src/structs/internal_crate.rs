@@ -2,7 +2,7 @@
 
 mod builder;
 
-use std::{path::Path, rc::Rc};
+use std::{path::Path, sync::Arc};
 
 pub use builder::InternalCrateBuilder;
 use quote::{ToTokens, quote};
@@ -15,16 +15,16 @@ use crate::{
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct defining a crate model.
-pub struct InternalCrate<'data> {
+pub struct InternalCrate {
     /// Name of the crate.
     name: String,
     /// The root modules of the crate.
-    modules: Vec<Rc<InternalModule<'data>>>,
+    modules: Vec<Arc<InternalModule>>,
     /// Crate documentation.
-    documentation: ModuleDocumentation<'data>,
+    documentation: ModuleDocumentation,
 }
 
-impl<'data> ToTokens for InternalCrate<'data> {
+impl ToTokens for InternalCrate {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         // The crate to-tokens curresponds with the `lib` file of a crate.
         let modules = self.modules.iter().map(|m| {
@@ -49,9 +49,9 @@ impl<'data> ToTokens for InternalCrate<'data> {
     }
 }
 
-impl<'data> InternalCrate<'data> {
+impl InternalCrate {
     /// Initializes a new `InternalCrateBuilder`.
-    pub fn new() -> InternalCrateBuilder<'data> {
+    pub fn new() -> InternalCrateBuilder {
         InternalCrateBuilder::default()
     }
 
@@ -66,7 +66,7 @@ impl<'data> InternalCrate<'data> {
     }
 
     /// Returns the path to the provided module within the crate, if it exists.
-    pub fn module_path(&self, module: &InternalModule<'data>) -> Option<syn::Path> {
+    pub fn module_path(&self, module: &InternalModule) -> Option<syn::Path> {
         let crate_ident = self.ident();
         for m in &self.modules {
             if let Some(path) = m.submodule_path(module) {
@@ -84,7 +84,7 @@ impl<'data> InternalCrate<'data> {
 
     /// Returns a reference to the internal data with the given name if it
     /// exists in the crate.
-    pub fn internal_data(&self, name: &str) -> Option<&Rc<InternalData<'data>>> {
+    pub fn internal_data(&self, name: &str) -> Option<&Arc<InternalData>> {
         for module in &self.modules {
             if let Some(data) = module.internal_data(name) {
                 return Some(data);
@@ -95,7 +95,7 @@ impl<'data> InternalCrate<'data> {
 
     /// Returns a reference to the internal trait with the given name if it
     /// exists in the crate.
-    pub fn internal_trait(&self, name: &str) -> Option<&Rc<InternalTrait<'data>>> {
+    pub fn internal_trait(&self, name: &str) -> Option<&Arc<InternalTrait>> {
         for module in &self.modules {
             if let Some(trait_) = module.internal_trait(name) {
                 return Some(trait_);
@@ -106,7 +106,7 @@ impl<'data> InternalCrate<'data> {
 
     /// Returns a reference to the module with the given name if it exists in
     /// the crate.
-    pub fn module(&self, name: &str) -> Option<&Rc<InternalModule<'data>>> {
+    pub fn module(&self, name: &str) -> Option<&Arc<InternalModule>> {
         for module in &self.modules {
             if module.name() == name {
                 return Some(module);
@@ -191,8 +191,8 @@ impl<'data> InternalCrate<'data> {
     }
 }
 
-impl<'data> InternalDependencies<'data> for InternalCrate<'data> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl InternalDependencies for InternalCrate {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
         let mut dependencies = Vec::new();
         for module in &self.modules {
             dependencies.extend(module.internal_dependencies());
@@ -204,8 +204,8 @@ impl<'data> InternalDependencies<'data> for InternalCrate<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for InternalCrate<'data> {
-    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl ExternalDependencies for InternalCrate {
+    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
         let mut dependencies = Vec::new();
         for module in &self.modules {
             dependencies.extend(module.external_dependencies());

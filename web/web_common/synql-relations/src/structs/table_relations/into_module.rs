@@ -11,7 +11,7 @@ use crate::{
     traits::{TRAIT_MODULE_NAME, TableRelationsLike},
 };
 
-impl<'data, 'table, T> From<TableRelations<'data, 'table, T>> for InternalModule<'data>
+impl<'data, 'table, T> From<TableRelations<'data, 'table, T>> for InternalModule
 where
     T: TableRelationsLike + ?Sized,
 {
@@ -21,7 +21,7 @@ where
             .model_ref(table_relation.workspace)
             .expect("Failed to get the model ref for the table relations");
 
-        let internal_trait: InternalTrait<'data> = InternalTrait::from(table_relation);
+        let internal_trait: InternalTrait = InternalTrait::from(table_relation);
         let auto_blanket = internal_trait.auto_blanket().expect("Failed to generate auto blanket");
         let schema_crate_ref = table_relation
             .table

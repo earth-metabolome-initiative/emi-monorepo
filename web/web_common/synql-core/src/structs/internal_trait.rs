@@ -2,6 +2,8 @@
 
 mod builder;
 
+use std::sync::Arc;
+
 pub use builder::InternalTraitBuilder;
 use common_traits::prelude::Builder;
 use proc_macro2::TokenStream;
@@ -18,26 +20,26 @@ use crate::{
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 /// Struct representing a rust trait.
-pub struct InternalTrait<'data> {
+pub struct InternalTrait {
     /// Name of the trait.
     name: String,
     /// Publicness of the trait.
     publicness: Publicness,
     /// Method definitions.
-    methods: Vec<Method<'data>>,
+    methods: Vec<Method>,
     /// Trait documentation.
-    documentation: Documentation<'data>,
+    documentation: Documentation,
     /// Where statements for the trait.
-    where_statements: Vec<WhereClause<'data>>,
+    where_statements: Vec<WhereClause>,
     /// Generics for the trait.
     generics: Vec<Ident>,
     /// Super traits for the trait.
-    super_traits: Vec<InternalToken<'data>>,
+    super_traits: Vec<InternalToken>,
 }
 
-impl<'data> InternalTrait<'data> {
+impl InternalTrait {
     /// Initializes a new `InternalTraitBuilder`.
-    pub fn new() -> InternalTraitBuilder<'data> {
+    pub fn new() -> InternalTraitBuilder {
         InternalTraitBuilder::default()
     }
 
@@ -77,7 +79,7 @@ impl<'data> InternalTrait<'data> {
     }
 
     /// Returns the methods defined by the trait.
-    pub fn methods(&self) -> &Vec<Method<'data>> {
+    pub fn methods(&self) -> &Vec<Method> {
         &self.methods
     }
 
@@ -97,12 +99,12 @@ impl<'data> InternalTrait<'data> {
     }
 
     /// Returns the requested method by name.
-    pub fn get_method_by_name(&self, name: &str) -> Option<&Method<'data>> {
+    pub fn get_method_by_name(&self, name: &str) -> Option<&Method> {
         self.methods.iter().find(|method| method.name() == name)
     }
 
     /// Returns whether the trait defines the provided method.
-    pub fn defines_method(&self, method: &Method<'_>) -> bool {
+    pub fn defines_method(&self, method: &Method) -> bool {
         let Some(curresponding_method) = self.get_method_by_name(method.name()) else {
             return false;
         };
@@ -110,7 +112,7 @@ impl<'data> InternalTrait<'data> {
     }
 
     /// Returns the auto-blanket for the trait, if it can be generated.
-    pub fn auto_blanket(&self) -> Option<InternalToken<'data>> {
+    pub fn auto_blanket(&self) -> Option<InternalToken> {
         if !self.all_methods_have_default_impl() {
             return None;
         }
@@ -151,8 +153,8 @@ impl<'data> InternalTrait<'data> {
     }
 }
 
-impl<'data> InternalDependencies<'data> for InternalTrait<'data> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate<'data>> {
+impl InternalDependencies for InternalTrait {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
         let mut dependencies = Vec::new();
         for method in &self.methods {
             dependencies.extend(method.internal_dependencies());
@@ -173,8 +175,8 @@ impl<'data> InternalDependencies<'data> for InternalTrait<'data> {
     }
 }
 
-impl<'data> ExternalDependencies<'data> for InternalTrait<'data> {
-    fn external_dependencies(&self) -> Vec<&crate::structs::ExternalCrate<'data>> {
+impl ExternalDependencies for InternalTrait {
+    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
         let mut dependencies = Vec::new();
         for method in &self.methods {
             dependencies.extend(method.external_dependencies());
@@ -195,7 +197,7 @@ impl<'data> ExternalDependencies<'data> for InternalTrait<'data> {
     }
 }
 
-impl ToTokens for InternalTrait<'_> {
+impl ToTokens for InternalTrait {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let publicness = &self.publicness;
         let name = &self.ident();

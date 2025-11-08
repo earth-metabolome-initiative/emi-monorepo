@@ -12,7 +12,7 @@ use crate::{
     traits::{INSERTABLE_MODULE_NAME, TableInsertableLike},
 };
 
-impl<'data, 'table, T> From<TableInsertable<'data, 'table, T>> for InternalCrate<'data>
+impl<'data, 'table, T> From<TableInsertable<'data, 'table, T>> for InternalCrate
 where
     T: TableInsertableLike + ?Sized,
     T::DB: InheritableDatabaseLike,

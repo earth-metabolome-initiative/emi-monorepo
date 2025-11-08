@@ -1,6 +1,6 @@
 //! Submodule defining a builder for the `InternalModule` struct.
 
-use std::{error::Error, fmt::Display, rc::Rc};
+use std::{error::Error, fmt::Display, sync::Arc};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -13,21 +13,21 @@ use crate::structs::{
 
 #[derive(Default)]
 /// Builder for the `InternalModule` struct.
-pub struct InternalModuleBuilder<'data> {
+pub struct InternalModuleBuilder {
     /// Name of the module.
     name: Option<String>,
     /// The submodules it contains.
-    submodules: Vec<InternalModule<'data>>,
+    submodules: Vec<InternalModule>,
     /// Publicness of the module.
     publicness: Option<Publicness>,
     /// Data structs defined within the module.
-    data: Vec<Rc<InternalData<'data>>>,
+    data: Vec<Arc<InternalData>>,
     /// Internal traits defined within the module.
-    internal_traits: Vec<Rc<InternalTrait<'data>>>,
+    internal_traits: Vec<Arc<InternalTrait>>,
     /// Other token streams defined within the module.
-    internal_tokens: Vec<InternalToken<'data>>,
+    internal_tokens: Vec<InternalToken>,
     /// Module documentation.
-    documentation: Option<ModuleDocumentation<'data>>,
+    documentation: Option<ModuleDocumentation>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -50,7 +50,7 @@ pub enum InternalModuleAttribute {
 }
 
 impl Display for InternalModuleAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalModuleAttribute::Name => write!(f, "name"),
             InternalModuleAttribute::Submodules => write!(f, "submodules"),
@@ -83,7 +83,7 @@ pub enum InternalModuleBuilderError {
 }
 
 impl Display for InternalModuleBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             InternalModuleBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             InternalModuleBuilderError::InvalidName => write!(f, "Invalid module name"),
@@ -112,7 +112,7 @@ impl Error for InternalModuleBuilderError {
     }
 }
 
-impl<'data> InternalModuleBuilder<'data> {
+impl InternalModuleBuilder {
     /// Sets the name of the module.
     ///
     /// # Arguments
@@ -155,7 +155,7 @@ impl<'data> InternalModuleBuilder<'data> {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the module.
-    pub fn documentation(mut self, documentation: impl Into<ModuleDocumentation<'data>>) -> Self {
+    pub fn documentation(mut self, documentation: impl Into<ModuleDocumentation>) -> Self {
         self.documentation = Some(documentation.into());
         self
     }
@@ -166,7 +166,7 @@ impl<'data> InternalModuleBuilder<'data> {
     /// * `submodule` - The submodule to add.
     pub fn submodule(
         mut self,
-        submodule: InternalModule<'data>,
+        submodule: InternalModule,
     ) -> Result<Self, InternalModuleBuilderError> {
         if self.submodules.iter().any(|m| m.name() == submodule.name()) {
             return Err(InternalModuleBuilderError::DuplicatedSubmoduleName);
@@ -179,11 +179,11 @@ impl<'data> InternalModuleBuilder<'data> {
     ///
     /// # Arguments
     /// * `data` - The data struct to add.
-    pub fn data(mut self, data: InternalData<'data>) -> Result<Self, InternalModuleBuilderError> {
+    pub fn data(mut self, data: InternalData) -> Result<Self, InternalModuleBuilderError> {
         if self.data.iter().any(|d| d.as_ref() == &data) {
             return Err(InternalModuleBuilderError::DuplicatedDataName);
         }
-        self.data.push(Rc::new(data));
+        self.data.push(Arc::new(data));
         Ok(self)
     }
 
@@ -193,12 +193,12 @@ impl<'data> InternalModuleBuilder<'data> {
     /// * `internal_trait` - The internal trait to add.
     pub fn internal_trait(
         mut self,
-        internal_trait: InternalTrait<'data>,
+        internal_trait: InternalTrait,
     ) -> Result<Self, InternalModuleBuilderError> {
         if self.internal_traits.iter().any(|t| t.as_ref() == &internal_trait) {
             return Err(InternalModuleBuilderError::DuplicatedInternalTraitName);
         }
-        self.internal_traits.push(Rc::new(internal_trait));
+        self.internal_traits.push(Arc::new(internal_trait));
         Ok(self)
     }
 
@@ -206,7 +206,7 @@ impl<'data> InternalModuleBuilder<'data> {
     ///
     /// # Arguments
     /// * `internal_token` - The internal token stream to add.
-    pub fn internal_token(mut self, internal_token: InternalToken<'data>) -> Self {
+    pub fn internal_token(mut self, internal_token: InternalToken) -> Self {
         self.internal_tokens.push(internal_token);
         self
     }
@@ -217,26 +217,26 @@ impl<'data> InternalModuleBuilder<'data> {
     /// * `internal_tokens` - The internal token streams to add.
     pub fn internal_tokens<I>(mut self, internal_tokens: I) -> Self
     where
-        I: IntoIterator<Item = InternalToken<'data>>,
+        I: IntoIterator<Item = InternalToken>,
     {
         self.internal_tokens.extend(internal_tokens);
         self
     }
 }
 
-impl Attributed for InternalModuleBuilder<'_> {
+impl Attributed for InternalModuleBuilder {
     type Attribute = InternalModuleAttribute;
 }
 
-impl IsCompleteBuilder for InternalModuleBuilder<'_> {
+impl IsCompleteBuilder for InternalModuleBuilder {
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.publicness.is_some() && self.documentation.is_some()
     }
 }
 
-impl<'data> Builder for InternalModuleBuilder<'data> {
+impl Builder for InternalModuleBuilder {
     type Error = BuilderError<InternalModuleAttribute>;
-    type Object = InternalModule<'data>;
+    type Object = InternalModule;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(InternalModule {

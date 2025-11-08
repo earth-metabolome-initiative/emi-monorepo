@@ -6,6 +6,7 @@ use sqlparser::ast::{CreateFunction, ObjectNamePart};
 use crate::{
     structs::ParserDB,
     traits::{FunctionLike, Metadata},
+    utils::normalize_sqlparser_type,
 };
 
 impl Metadata for CreateFunction {
@@ -23,18 +24,16 @@ impl FunctionLike for CreateFunction {
         }
     }
 
-    fn argument_type_names(&self, _database: &Self::DB) -> Vec<String> {
-        let Some(args_list) = &self.args else {
-            return Vec::new();
-        };
-        let mut args = Vec::new();
-        for arg in args_list {
-            args.push(arg.data_type.to_string());
-        }
-        args
+    fn argument_type_names<'db>(
+        &'db self,
+        _database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db str> {
+        self.args
+            .iter()
+            .flat_map(|args| args.iter().map(|arg| normalize_sqlparser_type(&arg.data_type)))
     }
 
-    fn return_type_name(&self, _database: &Self::DB) -> Option<String> {
-        self.return_type.as_ref().map(|rt| rt.to_string())
+    fn return_type_name<'db>(&'db self, _database: &'db Self::DB) -> Option<&'db str> {
+        self.return_type.as_ref().map(|rt| normalize_sqlparser_type(rt))
     }
 }

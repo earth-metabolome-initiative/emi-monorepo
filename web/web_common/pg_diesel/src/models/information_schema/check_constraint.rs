@@ -7,7 +7,7 @@ use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, Queryable,
     QueryableByName, Selectable, SelectableHelper,
 };
-use sql_traits::structs::metadata::CheckMetadata;
+use sql_traits::{structs::metadata::CheckMetadata, traits::FunctionLike};
 
 use crate::{
     model_metadata::TableMetadata,
@@ -171,6 +171,7 @@ impl CheckConstraint {
         &self,
         table: Rc<Table>,
         table_metadata: &TableMetadata,
+        functions: &[Rc<PgProc>],
         conn: &mut PgConnection,
     ) -> Result<CheckMetadata<CheckConstraint>, diesel::result::Error> {
         use sqlparser::parser::Parser;
@@ -189,6 +190,15 @@ impl CheckConstraint {
                     table_metadata
                         .column_rcs()
                         .find(|table_col| table_col.column_name == col.column_name)
+                        .cloned()
+                })
+                .collect(),
+            self.functions(conn)?
+                .into_iter()
+                .filter_map(|func| {
+                    functions
+                        .iter()
+                        .find(|table_func| table_func.name() == func.proname.as_str())
                         .cloned()
                 })
                 .collect(),

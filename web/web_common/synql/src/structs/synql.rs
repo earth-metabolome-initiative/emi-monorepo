@@ -79,15 +79,13 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             workspace.add_internal_crate(table.schema_macro(&workspace, self.database).into());
             workspace.add_internal_crate(table.model(&workspace, self.database).into());
             workspace.add_internal_crate(table.relations_trait(&workspace, self.database).into());
-            workspace
-                .add_internal_crate(table.value_settable_trait(&workspace, self.database).into());
-            // If the table is an extension, we need to add the extension attributes enum as
-            // well
             if let Some(extension_attribute) = table.extension_attributes(&workspace, self.database)
             {
                 workspace.add_internal_crate(extension_attribute.into());
             }
             workspace.add_internal_crate(table.attributes(&workspace, self.database).into());
+            workspace
+                .add_internal_crate(table.value_settable_trait(&workspace, self.database).into());
             workspace.add_internal_crate(table.insertable(&workspace, self.database).into());
             workspace.add_internal_crate(table.buildable(&workspace, self.database).into());
         }

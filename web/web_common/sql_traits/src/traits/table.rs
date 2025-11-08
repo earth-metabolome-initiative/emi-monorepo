@@ -345,7 +345,7 @@ pub trait TableLike:
     /// # Ok(())
     /// # }
     /// ```
-    fn primary_key_type(&self, database: &Self::DB) -> Vec<String> {
+    fn primary_key_type<'db>(&'db self, database: &'db Self::DB) -> Vec<&'db str> {
         self.primary_key_columns(database).map(|col| col.normalized_data_type(database)).collect()
     }
 
@@ -525,7 +525,7 @@ pub trait TableLike:
     /// )?;
     /// let table = db.table(None, "my_table").unwrap();
     /// let check_constraints: Vec<_> =
-    ///     table.check_constraints(&db).map(|cc| cc.expression().to_string()).collect();
+    ///     table.check_constraints(&db).map(|cc| cc.expression(&db).to_string()).collect();
     /// assert_eq!(check_constraints, vec!["id > 0", "length(name) > 0"]);
     /// # Ok(())
     /// # }

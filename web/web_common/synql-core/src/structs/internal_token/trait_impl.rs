@@ -19,26 +19,26 @@ use crate::structs::{
 };
 
 /// Struct to help implement a trait into an `InternalToken`.
-pub struct TraitImpl<'trt, 'data> {
+pub struct TraitImpl<'trt> {
     /// The underlying internal token builder.
-    builder: InternalTokenBuilder<'data>,
+    builder: InternalTokenBuilder,
     /// The trait to implement.
-    trait_ref: &'trt TraitVariantRef<'data>,
+    trait_ref: &'trt TraitVariantRef,
     /// The methods defined by the user, to be added to the token stream.
-    methods: Vec<Method<'data>>,
+    methods: Vec<Method>,
     /// The type for which the trait is being implemented.
-    data: Option<&'trt DataVariantRef<'data>>,
+    data: Option<&'trt DataVariantRef>,
     /// Where clauses for the implementation.
-    where_clauses: Vec<WhereClause<'data>>,
+    where_clauses: Vec<WhereClause>,
 }
 
-impl<'trt, 'data> TraitImpl<'trt, 'data> {
+impl<'trt> TraitImpl<'trt> {
     /// Creates a new `TraitImpl` instance.
     ///
     /// # Arguments
     ///
     /// * `trait_ref` - The trait to implement.
-    pub fn new(trait_ref: &'trt TraitVariantRef<'data>) -> Self {
+    pub fn new(trait_ref: &'trt TraitVariantRef) -> Self {
         Self {
             builder: InternalToken::new(),
             trait_ref,
@@ -52,7 +52,7 @@ impl<'trt, 'data> TraitImpl<'trt, 'data> {
     ///
     /// # Arguments
     /// * `data` - The type for which the trait is being implemented.
-    pub fn for_type(mut self, data: &'trt DataVariantRef<'data>) -> Self {
+    pub fn for_type(mut self, data: &'trt DataVariantRef) -> Self {
         self.data = Some(data);
         self
     }
@@ -72,7 +72,7 @@ impl<'trt, 'data> TraitImpl<'trt, 'data> {
     /// * If the provided method has a visibility other than private.
     /// * If the provided method is incompatible with the curresponding method
     ///   in the trait.
-    pub fn method(mut self, method: Method<'data>) -> Result<Self, TraitImplError> {
+    pub fn method(mut self, method: Method) -> Result<Self, TraitImplError> {
         if self.methods.iter().any(|m| m.name() == method.name()) {
             return Err(TraitImplError::MethodAlreadyDefined(method.signature()));
         }
@@ -94,7 +94,7 @@ impl<'trt, 'data> TraitImpl<'trt, 'data> {
     /// * `methods` - The methods to add.
     pub fn methods<I>(mut self, methods: I) -> Result<Self, TraitImplError>
     where
-        I: IntoIterator<Item = Method<'data>>,
+        I: IntoIterator<Item = Method>,
     {
         for method in methods {
             self = self.method(method)?;
@@ -112,10 +112,7 @@ impl<'trt, 'data> TraitImpl<'trt, 'data> {
     /// # Errors
     ///
     /// * If the provided where clause is already defined.
-    pub fn where_clause(
-        mut self,
-        where_clause: WhereClause<'data>,
-    ) -> Result<Self, TraitImplError> {
+    pub fn where_clause(mut self, where_clause: WhereClause) -> Result<Self, TraitImplError> {
         if self.where_clauses.iter().any(|wc| wc == &where_clause) {
             return Err(TraitImplError::DuplicateWhereClause(where_clause.to_string()));
         }
@@ -199,20 +196,20 @@ impl From<BuilderError<InternalTokenAttribute>> for TraitImplError {
     }
 }
 
-impl<'trt, 'data> Attributed for TraitImpl<'trt, 'data> {
+impl<'trt> Attributed for TraitImpl<'trt> {
     type Attribute = InternalTokenAttribute;
 }
 
-impl<'trt, 'data> IsCompleteBuilder for TraitImpl<'trt, 'data> {
+impl<'trt> IsCompleteBuilder for TraitImpl<'trt> {
     fn is_complete(&self) -> bool {
         self.builder.is_complete()
     }
 }
 
-impl<'trt, 'data> TryFrom<TraitImpl<'trt, 'data>> for InternalToken<'data> {
+impl<'trt> TryFrom<TraitImpl<'trt>> for InternalToken {
     type Error = TraitImplError;
 
-    fn try_from(value: TraitImpl<'trt, 'data>) -> Result<Self, Self::Error> {
+    fn try_from(value: TraitImpl<'trt>) -> Result<Self, Self::Error> {
         // Ensure all required methods are provided.
         for method in value.trait_ref.methods() {
             // Method with default implementation can be skipped.
@@ -225,7 +222,7 @@ impl<'trt, 'data> TryFrom<TraitImpl<'trt, 'data>> for InternalToken<'data> {
             }
         }
 
-        let mut unique_types: HashSet<DataVariantRef<'data>> = HashSet::new();
+        let mut unique_types: HashSet<DataVariantRef> = HashSet::new();
         let methods = value.methods;
         for provided_method in methods.iter() {
             for arg in provided_method.arguments() {
@@ -257,11 +254,8 @@ impl<'trt, 'data> TryFrom<TraitImpl<'trt, 'data>> for InternalToken<'data> {
             .builder
             .private()
             .employed_trait(value.trait_ref.clone())
-            .unwrap()
             .data(data.clone())
-            .unwrap()
             .datas(unique_types)
-            .unwrap()
             .stream(quote! {
                 impl #formatted_generics_without_defaults #trait_ref for #data_with_generics #formatted_where_clauses {
                     #(#methods)*

@@ -10,3 +10,18 @@ pub enum ValidationError<FieldName = Unspecified> {
     /// Double field errors.
     DoubleField(DoubleFieldError<FieldName>),
 }
+
+impl<FieldName> ValidationError<FieldName> {
+    /// Creates a new validation error for an empty field.
+    ///
+    /// # Arguments
+    ///
+    /// * `field` - The name of the field that is empty.
+    ///
+    /// # Returns
+    ///
+    /// A `ValidationError` indicating that the specified field is empty.
+    pub fn empty(field: FieldName) -> Self {
+        ValidationError::SingleField(SingleFieldError::MustNotBeEmpty(field))
+    }
+}
