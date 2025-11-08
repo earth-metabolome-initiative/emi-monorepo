@@ -80,10 +80,58 @@ where
                         Expr::Value(ValueWithSpan { value, .. }),
                         Expr::Identifier(Ident { value: ident, .. }),
                     ) => self.map_expr_to_single_field_error(ident, value, &invert_operator(op)),
+                    (
+                        Expr::Identifier(Ident { value: left_ident, .. }),
+                        Expr::Identifier(Ident { value: right_ident, .. }),
+                    ) => self.map_expr_to_double_field_error(left_ident, right_ident, op),
                     _ => None,
                 }
             }
             _ => None,
+        }
+    }
+
+    fn map_expr_to_double_field_error(
+        &self,
+        left: &str,
+        right: &str,
+        op: &BinaryOperator,
+    ) -> Option<InternalToken> {
+        let left_column = self.column(left);
+        let right_column = self.column(right);
+        let formatted_left = self.formatted_column(left_column, true);
+        let formatted_right = self.formatted_column(right_column, true);
+        let table_attribute_enum = self.attributes_enumeration();
+        let left_camel_cased = left_column.column_camel_ident();
+        let right_camel_cased = right_column.column_camel_ident();
+        let validation_error = self
+            .workspace
+            .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))?;
+        match op {
+            BinaryOperator::NotEq => {
+                if left_column.is_textual(self.database) && right_column.is_textual(self.database) {
+                    Some(
+                        InternalToken::new()
+                            .private()
+                            .stream(quote! {
+                                if #formatted_left == #formatted_right {
+                                    return Err(#validation_error::equal(
+                                        #table_attribute_enum::#left_camel_cased,
+                                        #table_attribute_enum::#right_camel_cased
+                                    ));
+                                }
+                            })
+                            .data(table_attribute_enum)
+                            .build()
+                            .unwrap(),
+                    )
+                } else {
+                    unimplemented!("Operator {op:?} not supported for double field error mapping");
+                }
+            }
+            _ => {
+                unimplemented!("Operator {op:?} not supported for double field error mapping");
+            }
         }
     }
 
@@ -94,7 +142,7 @@ where
         op: &BinaryOperator,
     ) -> Option<InternalToken> {
         let column = self.column(ident);
-        let formatted_column = self.formatted_column(column);
+        let formatted_column = self.formatted_column(column, false);
         let table_attribute_enum = self.attributes_enumeration();
         let camel_cased = column.column_camel_ident();
         let validation_error = self
@@ -141,11 +189,17 @@ where
     /// # Arguments
     ///
     /// * `column` - The column to format
-    fn formatted_column(&self, column: &DB::Column) -> TokenStream {
+    fn formatted_column(&self, column: &DB::Column, reference: bool) -> TokenStream {
         let column_ident = column.column_snake_ident();
         // When a column is either contextual or nullable, it can be accessed directly
         // because we expect it to be accessible in the current scope.
-        if self.is_contextual(column) || column.is_nullable(self.database) {
+        if self.is_contextual(column) {
+            if column.supports_copy(self.database, self.workspace) || !reference {
+                quote! { #column_ident }
+            } else {
+                quote! { #column_ident.as_ref() }
+            }
+        } else if column.is_nullable(self.database) {
             quote! { #column_ident }
         } else {
             quote! { self.#column_ident }
@@ -479,7 +533,7 @@ where
             Expr::Identifier(ident) => {
                 let column = self.column(&ident.value);
                 (
-                    self.formatted_column(column).into(),
+                    self.formatted_column(column, false).into(),
                     vec![column],
                     column
                         .external_postgres_type(self.workspace, self.database)

@@ -172,10 +172,31 @@ impl ParserDB {
                                 builder = builder.add_foreign_key(fk, ());
                             }
                             TableConstraint::Check(check) => {
-                                table_metadata.add_check_constraint(Rc::new(TableAttribute::new(
+                                let check_rc = Rc::new(TableAttribute::new(
                                     create_table.clone(),
                                     check.clone(),
-                                )));
+                                ));
+                                table_metadata.add_check_constraint(check_rc.clone());
+                                let columns_in_expression: Vec<Rc<<Self as DatabaseLike>::Column>> =
+                                    columns_in_expression::columns_in_expression::<Self>(
+                                        &check.expr,
+                                        table_metadata.column_rc_slice(),
+                                    );
+                                let functions_in_expression: Vec<
+                                    Rc<<Self as DatabaseLike>::Function>,
+                                > = functions_in_expression::functions_in_expression::<Self>(
+                                    &check.expr,
+                                    builder.function_rc_vec().as_slice(),
+                                );
+                                builder = builder.add_check_constraint(
+                                    check_rc,
+                                    CheckMetadata::new(
+                                        *check.expr.clone(),
+                                        create_table.clone(),
+                                        columns_in_expression,
+                                        functions_in_expression,
+                                    ),
+                                );
                             }
                             TableConstraint::PrimaryKey(pk) => {
                                 let mut primary_key_columns = Vec::new();

@@ -17,7 +17,9 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
 		CREATE TABLE users (
 		    id SERIAL PRIMARY KEY,
 		    name TEXT NOT NULL CHECK (name <> ''),
-		    email TEXT UNIQUE NOT NULL
+            description TEXT,
+		    email TEXT UNIQUE NOT NULL,
+            CHECK (name <> description)
 		);
         CREATE TABLE comments (
 		    id SERIAL PRIMARY KEY,

@@ -44,7 +44,7 @@ pub trait CheckConstraintSynLike: CheckConstraintLike {
 
         let relevant_optional_columns = self
             .columns(database)
-            .filter(|column| !contextual_columns.contains(&column) && !column.is_nullable(database))
+            .filter(|column| !contextual_columns.contains(&column) && column.is_nullable(database))
             .collect::<Vec<_>>();
 
         if relevant_optional_columns.is_empty() {
@@ -57,10 +57,20 @@ pub trait CheckConstraintSynLike: CheckConstraintLike {
                     self.#ident.as_ref()
                 }
             });
+            let formatted_left = if left.len() == 1 {
+                quote! { #(Some(#left)),* }
+            } else {
+                quote! { #( Some(#left) ),* }
+            };
+            let formatted_right = if right.len() == 1 {
+                quote! { #(#right),* }
+            } else {
+                quote! { #( #right ),* }
+            };
             InternalToken::new()
                 .inherits(translated_expressions.iter().cloned())
                 .stream(quote! {
-                    if let ( #( Some(#left) ),* ) = ( #( #right ),* ) {
+                    if let #formatted_left = #formatted_right {
                         #( #translated_expressions )*
                     }
                 })
