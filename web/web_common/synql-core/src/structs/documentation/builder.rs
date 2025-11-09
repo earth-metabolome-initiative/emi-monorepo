@@ -51,10 +51,10 @@ pub enum DocumentationBuilderError {
     InvalidDocumentation,
     /// An external crate dependency was specified but does not appear in the
     /// documentation string.
-    UnexpectedExternalCrateDependency(String),
+    UnexpectedExternalCrateDependency(String, String),
     /// An internal crate dependency was specified but does not appear in the
     /// documentation string.
-    UnexpectedInternalCrateDependency(String),
+    UnexpectedInternalCrateDependency(String, String),
     /// A duplicated external crate dependency was added.
     DuplicatedExternalCrateDependency,
     /// A duplicated internal crate dependency was added.
@@ -68,18 +68,22 @@ impl Display for DocumentationBuilderError {
             DocumentationBuilderError::InvalidDocumentation => {
                 write!(f, "Invalid documentation string (empty or whitespace only)")
             }
-            DocumentationBuilderError::UnexpectedExternalCrateDependency(crate_name) => {
+            DocumentationBuilderError::UnexpectedExternalCrateDependency(
+                crate_name,
+                documentation,
+            ) => {
                 write!(
                     f,
-                    "External crate dependency '{}' does not appear in the documentation string",
-                    crate_name
+                    "External crate dependency '{crate_name}' does not appear in the documentation string: {documentation}",
                 )
             }
-            DocumentationBuilderError::UnexpectedInternalCrateDependency(crate_name) => {
+            DocumentationBuilderError::UnexpectedInternalCrateDependency(
+                crate_name,
+                documentation,
+            ) => {
                 write!(
                     f,
-                    "Internal crate dependency '{}' does not appear in the documentation string",
-                    crate_name
+                    "Internal crate dependency '{crate_name}' does not appear in the documentation string: {documentation}",
                 )
             }
             DocumentationBuilderError::DuplicatedExternalCrateDependency => {
@@ -213,6 +217,7 @@ impl Builder for DocumentationBuilder {
             if !documentation.contains(external_crate.name()) {
                 return Err(DocumentationBuilderError::UnexpectedExternalCrateDependency(
                     external_crate.name().to_string(),
+                    documentation.clone(),
                 ));
             }
         }
@@ -222,6 +227,7 @@ impl Builder for DocumentationBuilder {
             if !documentation.contains(internal_crate.name()) {
                 return Err(DocumentationBuilderError::UnexpectedInternalCrateDependency(
                     internal_crate.name().to_string(),
+                    documentation.clone(),
                 ));
             }
         }

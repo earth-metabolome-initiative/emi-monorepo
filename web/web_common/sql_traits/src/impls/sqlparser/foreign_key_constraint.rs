@@ -1,6 +1,6 @@
 //! Implement the [`ForeignKeyConstraint`] trait for the `sqlparser` crate's
 
-use sqlparser::ast::{CreateTable, ForeignKeyConstraint, MatchKind};
+use sqlparser::ast::{ConstraintReferenceMatchKind, CreateTable, ForeignKeyConstraint};
 
 use crate::{
     structs::{TableAttribute, generic_db::ParserDB},
@@ -53,8 +53,8 @@ impl ForeignKeyLike for TableAttribute<CreateTable, ForeignKeyConstraint> {
         matches!(self.attribute().on_delete, Some(sqlparser::ast::ReferentialAction::Cascade))
     }
 
-    fn match_kind(&self, _database: &Self::DB) -> MatchKind {
-        self.attribute().match_kind.clone().unwrap_or(MatchKind::Simple)
+    fn match_kind(&self, _database: &Self::DB) -> ConstraintReferenceMatchKind {
+        self.attribute().match_kind.clone().unwrap_or(ConstraintReferenceMatchKind::Simple)
     }
 
     fn host_columns<'db>(

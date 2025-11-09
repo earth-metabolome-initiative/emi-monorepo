@@ -104,7 +104,8 @@ where
         let right_camel_cased = right_column.column_camel_ident();
         let validation_error = self
             .workspace
-            .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))?;
+            .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
+            .unwrap();
         match op {
             BinaryOperator::NotEq => {
                 if left_column.is_textual(self.database) && right_column.is_textual(self.database) {
@@ -558,7 +559,9 @@ where
             return validation_error_token;
         }
 
-        return quote! {}.into();
+        if self.check_constraint.has_functions(self.database) {
+            return quote! {}.into();
+        }
 
         let (internal_token, scoped_columns, returning_type) = self.inner_parse(expr, None);
 

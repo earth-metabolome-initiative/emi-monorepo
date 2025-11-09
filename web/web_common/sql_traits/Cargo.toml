@@ -9,6 +9,7 @@ common_traits.workspace = true
 graph.workspace = true
 algebra.workspace = true
 csqlv.workspace = true
+rayon.workspace = true
 
 [lints]
 workspace = true

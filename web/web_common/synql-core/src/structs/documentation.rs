@@ -10,7 +10,7 @@ pub use builder::DocumentationBuilder;
 use quote::ToTokens;
 
 use crate::{
-    structs::{ExternalCrate, InternalCrate, documentation},
+    structs::{ExternalCrate, InternalCrate},
     traits::{ExternalDependencies, InternalDependencies},
 };
 

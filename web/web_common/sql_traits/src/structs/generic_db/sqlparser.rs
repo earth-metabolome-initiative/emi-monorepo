@@ -7,7 +7,8 @@ use csqlv::{CSVSchema, CSVSchemaBuilder, SQLGenerationOptions};
 use sqlparser::{
     ast::{
         CheckConstraint, ColumnDef, ColumnOption, CreateFunction, CreateTable, Expr,
-        ForeignKeyConstraint, Statement, TableConstraint, UniqueConstraint, Value, ValueWithSpan,
+        ForeignKeyConstraint, IndexColumn, OrderByExpr, Statement, TableConstraint,
+        UniqueConstraint, Value, ValueWithSpan,
     },
     parser::{Parser, ParserError},
 };
@@ -64,7 +65,7 @@ impl ParserDB {
                     }
                     for column in table_metadata.clone().column_rcs() {
                         for option in column.attribute().options.iter() {
-                            match &option.option {
+                            match option.option.clone() {
                                 ColumnOption::Check(check_constraint) => {
                                     let check_rc = Rc::new(TableAttribute::new(
                                         create_table.clone(),
@@ -93,18 +94,27 @@ impl ParserDB {
                                         ),
                                     );
                                 }
-                                ColumnOption::ForeignKey(foreign_key) => {
+                                ColumnOption::ForeignKey(mut foreign_key) => {
+                                    foreign_key.columns.push(column.attribute().name.clone());
                                     let fk = Rc::new(TableAttribute::new(
                                         create_table.clone(),
-                                        foreign_key.clone(),
+                                        foreign_key,
                                     ));
                                     table_metadata.add_foreign_key(fk.clone());
                                     builder = builder.add_foreign_key(fk, ());
                                 }
-                                ColumnOption::Unique(unique_constraint) => {
+                                ColumnOption::Unique(mut unique_constraint) => {
+                                    unique_constraint.columns.push(IndexColumn {
+                                        column: OrderByExpr {
+                                            expr: Expr::Identifier(column.attribute().name.clone()),
+                                            options: Default::default(),
+                                            with_fill: None,
+                                        },
+                                        operator_class: None,
+                                    });
                                     let unique_index = Rc::new(TableAttribute::new(
                                         create_table.clone(),
-                                        unique_constraint.clone(),
+                                        unique_constraint,
                                     ));
                                     let expression_string = format!(
                                         "({})",
@@ -121,9 +131,7 @@ impl ParserDB {
                                             .try_with_sql(expression_string.as_str())
                                             .expect("Failed to parse unique constraint expression")
                                             .parse_expr()
-                                            .expect(
-                                                "No expression found in parsed unique constraint",
-                                            );
+                                            .unwrap();
                                     let unique_index_metadata =
                                         UniqueIndexMetadata::new(expression, create_table.clone());
                                     table_metadata.add_unique_index(unique_index.clone());
@@ -248,6 +256,14 @@ impl ParserDB {
                         );
                     }
                 }
+                Statement::CreateOperator(_)
+                | Statement::CreateOperatorClass(_)
+                | Statement::CreateOperatorFamily(_) => {
+                    // At the moment, we ignore CREATE OPERATOR statements.
+                }
+                Statement::CreateType { .. } => {
+                    // At the moment, we ignore CREATE TYPE statements.
+                }
                 Statement::CreateExtension(_) => {
                     // At the moment, we ignore CREATE EXTENSION statements.
                 }
@@ -337,7 +353,9 @@ impl TryFrom<&[&Path]> for ParserDB {
                 )));
             }
 
-            sql_files.extend(search_sql_documents(path));
+            let mut paths = search_sql_documents(path);
+            paths.sort_unstable();
+            sql_files.extend(paths);
 
             let schema: CSVSchema =
                 CSVSchemaBuilder::default().include_gz().from_dir(path).map_err(|e| {
@@ -358,7 +376,6 @@ impl TryFrom<&[&Path]> for ParserDB {
                 },
             )?);
         }
-        sql_files.sort_unstable();
 
         for sql_file in sql_files {
             // We exclude `down.sql` files as they are not relevant for
@@ -371,6 +388,12 @@ impl TryFrom<&[&Path]> for ParserDB {
                 .map_err(|e| ParserError::TokenizerError(e.to_string()))?;
             comulative_sql.push_str(&sql_content);
         }
+
+        // We write out the comulative SQL to a temporary file `out.sql`
+        std::fs::write("out.sql", &comulative_sql).map_err(|e| {
+            ParserError::TokenizerError(format!("Failed to write to out.sql: {}", e))
+        })?;
+
         Self::try_from(comulative_sql.as_str())
     }
 }

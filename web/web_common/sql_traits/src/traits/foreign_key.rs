@@ -2,7 +2,7 @@
 
 use std::{borrow::Borrow, fmt::Debug};
 
-use sqlparser::ast::MatchKind;
+use sqlparser::ast::ConstraintReferenceMatchKind;
 
 use crate::traits::{ColumnLike, DatabaseLike, Metadata, TableLike, UniqueIndexLike};
 
@@ -336,11 +336,11 @@ pub trait ForeignKeyLike:
     /// )?;
     /// let host_table = db.table(None, "host_table").unwrap();
     /// let foreign_key = host_table.foreign_keys(&db).next().expect("Should have a foreign key");
-    /// assert_eq!(foreign_key.match_kind(&db), MatchKind::Full);
+    /// assert_eq!(foreign_key.match_kind(&db), ConstraintReferenceMatchKind::Full);
     /// # Ok(())
     /// # }
     /// ```
-    fn match_kind(&self, database: &Self::DB) -> MatchKind;
+    fn match_kind(&self, database: &Self::DB) -> ConstraintReferenceMatchKind;
 
     /// Returns whether the foreign key is labelled with a `MATCH FULL` clause.
     ///
@@ -374,7 +374,7 @@ pub trait ForeignKeyLike:
     /// # }
     /// ```
     fn match_full(&self, database: &Self::DB) -> bool {
-        matches!(self.match_kind(database), MatchKind::Full)
+        matches!(self.match_kind(database), ConstraintReferenceMatchKind::Full)
     }
 
     /// Returns whether the foreign key includes any host columns that are

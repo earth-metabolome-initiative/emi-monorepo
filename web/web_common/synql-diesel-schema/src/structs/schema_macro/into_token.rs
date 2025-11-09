@@ -158,16 +158,6 @@ where
             macros.push(allow_tables_to_appear_in_same_query);
         }
 
-        if schema_macro.table.has_non_self_referential_singleton_foreign_keys(schema_macro.database)
-        {
-            let joinable = schema_macro
-                .workspace
-                .external_macro("joinable")
-                .expect("Failed to find the joinable macro");
-
-            macros.push(joinable);
-        }
-
         InternalToken::new()
             .public()
             .external_macros(macros)

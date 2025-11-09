@@ -107,7 +107,7 @@ urlencoding = "2.1"
 schemars = "1.0.4"
 bincode = { version = "2", features = ["serde"] }
 # sqlparser = "0.58.0"
-sqlparser = { git = "https://github.com/LucaCappelletti94/sqlparser-rs", branch = "future-main", features = [
+sqlparser = { git = "https://github.com/LucaCappelletti94/sqlparser-rs", branch = "future-main2", features = [
   "serde",
 ] }
 arbitrary = { version = "1", features = ["derive"] }

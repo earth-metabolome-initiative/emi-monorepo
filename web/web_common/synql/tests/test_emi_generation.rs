@@ -34,6 +34,7 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
     let task = Task::new("Database Parsing");
     let db = ParserDB::try_from(
         [
+            PathBuf::from(format!("{workspace_root}/web/web_common")).as_path(),
             PathBuf::from(format!("{workspace_root}/data_migrations/init_db/csvs")).as_path(),
             PathBuf::from(format!("{workspace_root}/data_migrations/init_db/extension_migrations"))
                 .as_path(),
