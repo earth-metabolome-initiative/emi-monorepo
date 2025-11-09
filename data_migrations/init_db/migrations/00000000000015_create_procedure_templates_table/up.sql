@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS procedure_templates (
 	-- The user who last updated this procedure template
 	updated_by INTEGER NOT NULL REFERENCES users(id),
 	-- The timestamp when this procedure template was last updated
-	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP CHECK (must_be_smaller_than_utc(created_at, updated_at)),
+	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP CHECK (created_at <= updated_at),
 	-- Whether this procedure template is deprecated and should not be used for new procedures
 	deprecated BOOLEAN NOT NULL DEFAULT FALSE,
 	-- We enforce that the name and description are distinct to avoid lazy duplicates

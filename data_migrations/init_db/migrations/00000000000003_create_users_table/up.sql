@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     last_name TEXT NOT NULL CHECK (must_be_paragraph(last_name)),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CHECK (must_be_smaller_than_utc(created_at, updated_at))
+    CHECK (created_at <= updated_at)
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_first_name_last_name 

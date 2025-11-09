@@ -508,12 +508,13 @@ where
                 .rename_field(AssetAttribute::CreatedAt)
         })?;
         if let Some(updated_at) = self.updated_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
+            pgrx_validation::created_at
+                <= updated_at.map_err(|e| {
+                    e.rename_fields(
                     crate::codegen::structs_codegen::tables::insertables::AssetAttribute::CreatedAt,
                     crate::codegen::structs_codegen::tables::insertables::AssetAttribute::UpdatedAt,
                 )
-            })?;
+                })?;
         }
         self.created_at = Some(created_at);
         Ok(self)
@@ -540,12 +541,13 @@ where
                 .rename_field(AssetAttribute::UpdatedAt)
         })?;
         if let Some(created_at) = self.created_at {
-            pgrx_validation::must_be_smaller_than_utc(created_at, updated_at).map_err(|e| {
-                e.rename_fields(
+            pgrx_validation::created_at
+                <= updated_at.map_err(|e| {
+                    e.rename_fields(
                     crate::codegen::structs_codegen::tables::insertables::AssetAttribute::CreatedAt,
                     crate::codegen::structs_codegen::tables::insertables::AssetAttribute::UpdatedAt,
                 )
-            })?;
+                })?;
         }
         self.updated_at = Some(updated_at);
         Ok(self)

@@ -20,5 +20,5 @@ CREATE TABLE IF NOT EXISTS projects (
     FOREIGN KEY (parent_project_id) REFERENCES projects(id) ON DELETE CASCADE,
     CHECK (must_be_distinct_i32(parent_project_id, id)),
     CHECK (must_be_distinct(name, description)),
-    CHECK (must_be_smaller_than_utc(created_at, updated_at))
+    CHECK (created_at <= updated_at)
 );

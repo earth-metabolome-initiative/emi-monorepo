@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS procedures (
 	-- Timestamp when this procedure was last updated.
 	updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	-- We check that the created_at is before or equal to updated_at.
-	CHECK (must_be_smaller_than_utc(created_at, updated_at)),
+	CHECK (created_at <= updated_at),
 	-- We create an index on (procedure_template, parent_procedure_template) to allow for foreign
 	-- keys from the concrete procedures to check that the procedure template is correctly aligned.
 	UNIQUE (procedure, procedure_template),
