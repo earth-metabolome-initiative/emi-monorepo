@@ -1,7 +1,5 @@
 //! Submodule providing the `TranslateExpression` struct for translating SQL
 //! check constraint expressions into Rust code.
-use core::panic;
-
 use proc_macro2::TokenStream;
 use quote::quote;
 use sql_traits::traits::{CheckConstraintLike, ColumnLike, DatabaseLike, FunctionLike, TableLike};

@@ -10,26 +10,29 @@ use crate::structs::{ExternalCrate, ExternalType};
 static UUID_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
 
 impl ExternalCrate {
-    /// Initializes a `ExternalCrate` instance describing the `uuid` crate.
-    pub fn uuid() -> Arc<ExternalCrate> {
+    /// Initializes a `ExternalCrate` instance describing the `rosetta_uuid`
+    /// crate.
+    pub fn rosetta_uuid() -> Arc<ExternalCrate> {
         UUID_CRATE
             .get_or_init(|| {
                 Arc::new(
                     ExternalCrate::new()
-                        .name("uuid".to_string())
+                        .name("rosetta_uuid")
                         .unwrap()
-                        .version("1.0")
-                        .features(["v4", "serde"])
+                        .git(
+                            "https://github.com/earth-metabolome-initiative/emi-monorepo",
+                            "postgres-crate",
+                        )
+                        .features(["diesel", "serde"])
                         .add_type(Arc::new(
                             ExternalType::new()
-                                .diesel_type(syn::parse_quote!(diesel::sql_types::Uuid))
-                                .rust_type(syn::parse_quote!(uuid::Uuid))
+                                .diesel_type(syn::parse_quote!(rosetta_uuid::diesel_impls::Uuid))
+                                .rust_type(syn::parse_quote!(rosetta_uuid::Uuid))
                                 .postgres_type("uuid")
                                 .unwrap()
                                 .supports_copy()
                                 .supports_eq()
                                 .supports_serde()
-                                .unwrap()
                                 .build()
                                 .unwrap(),
                         ))

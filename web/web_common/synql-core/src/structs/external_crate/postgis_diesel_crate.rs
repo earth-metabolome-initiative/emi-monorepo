@@ -16,6 +16,7 @@ impl ExternalCrate {
             ExternalCrate::new()
                 .name("postgis_diesel")
                 .unwrap()
+                .features(["serde", "diesel", "postgres", "sqlite"])
                 .add_types(vec![
                     Arc::new(ExternalType::point()),
                     Arc::new(ExternalType::linestring()),
@@ -28,7 +29,8 @@ impl ExternalCrate {
                     Arc::new(ExternalType::geography()),
                 ])
                 .unwrap()
-                .version("3.0.1")
+                // .version("3.0.2")
+                .git("https://github.com/LucaCappelletti94/postgis-diesel", "master")
                 .build()
                 .expect("Failed to build ExternalCrate for postgis_diesel"),
         )
@@ -38,7 +40,7 @@ impl ExternalCrate {
 impl ExternalType {
     fn point() -> Self {
         ExternalType::new()
-            .postgres_type("point")
+            .postgres_types(["point", "geography(point, 4326)", "geometry(point, 4326)"])
             .unwrap()
             .diesel_type(syn::parse_quote!(postgis_diesel::sql_types::Geometry))
             .rust_type(syn::parse_quote!(postgis_diesel::types::Point))
@@ -46,6 +48,7 @@ impl ExternalType {
             .supports_debug()
             .supports_partial_eq()
             .supports_partial_ord()
+            .supports_serde()
             .build()
             .expect("Failed to build ExternalType for Point")
     }
@@ -149,7 +152,7 @@ impl ExternalType {
             .unwrap()
             .diesel_type(syn::parse_quote!(postgis_diesel::sql_types::Geography))
             .rust_type(syn::parse_quote!(
-                postgis_diesel::types::GeographyContainer<postgis_diesel::types::Point>
+                postgis_diesel::types::GeometryContainer<postgis_diesel::types::Point>
             ))
             .supports_clone()
             .supports_debug()

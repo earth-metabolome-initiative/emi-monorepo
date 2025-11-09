@@ -4,7 +4,7 @@
 //! [`CheckConstraintLike`](sql_traits::traits::CheckConstraintLike) trait.
 
 use quote::quote;
-use sql_traits::traits::{CheckConstraintLike, ColumnLike, DatabaseLike};
+use sql_traits::traits::{CheckConstraintLike, DatabaseLike};
 use synql_core::{
     prelude::Builder,
     structs::{InternalToken, Workspace},

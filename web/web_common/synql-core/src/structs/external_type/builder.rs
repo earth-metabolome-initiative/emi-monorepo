@@ -62,8 +62,6 @@ pub enum ExternalTypeBuilderError {
     DuplicatedPostgresType,
     /// If the provided postgres type is not lowercase.
     NotLowercasePostgresType,
-    /// An external trait with the same name has already been added.
-    DuplicatedExternalTrait,
 }
 
 impl Display for ExternalTypeBuilderError {
@@ -75,9 +73,6 @@ impl Display for ExternalTypeBuilderError {
             }
             ExternalTypeBuilderError::NotLowercasePostgresType => {
                 write!(f, "Provided a postgres type which is not lowercase")
-            }
-            ExternalTypeBuilderError::DuplicatedExternalTrait => {
-                write!(f, "An external trait with the same name has already been added")
             }
         }
     }
@@ -185,7 +180,7 @@ impl ExternalTypeBuilder {
     }
 
     /// Sets that the current type supports [`Serialize`](serde::Serialize).
-    pub fn supports_serialize(self) -> Result<Self, ExternalTypeBuilderError> {
+    pub fn supports_serialize(self) -> Self {
         let serde = ExternalCrate::serde();
         self.add_external_trait(
             serde
@@ -195,7 +190,7 @@ impl ExternalTypeBuilder {
     }
 
     /// Sets that the current type supports [`Deserialize`](serde::Deserialize).
-    pub fn supports_deserialize(self) -> Result<Self, ExternalTypeBuilderError> {
+    pub fn supports_deserialize(self) -> Self {
         let serde = ExternalCrate::serde();
         self.add_external_trait(
             serde
@@ -206,8 +201,8 @@ impl ExternalTypeBuilder {
 
     /// Sets support for both [`Serialize`](serde::Serialize) and
     /// [`Deserialize`](serde::Deserialize).
-    pub fn supports_serde(mut self) -> Result<Self, ExternalTypeBuilderError> {
-        self = self.supports_serialize()?;
+    pub fn supports_serde(mut self) -> Self {
+        self = self.supports_serialize();
         self.supports_deserialize()
     }
 
@@ -240,42 +235,25 @@ impl ExternalTypeBuilder {
     ///
     /// # Arguments
     /// * `external_trait` - The external trait to add.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if an external trait with the same name has already
-    /// been added.
-    pub fn add_external_trait(
-        mut self,
-        external_trait: ExternalTraitRef,
-    ) -> Result<Self, ExternalTypeBuilderError> {
-        if self.external_traits.iter().any(|t| t == &external_trait) {
-            return Err(ExternalTypeBuilderError::DuplicatedExternalTrait);
+    pub fn add_external_trait(mut self, external_trait: ExternalTraitRef) -> Self {
+        if self.external_traits.iter().all(|t| t != &external_trait) {
+            self.external_traits.push(external_trait);
         }
-        self.external_traits.push(external_trait);
-        Ok(self)
+        self
     }
 
     /// Adds multiple external traits implemented by the type.
     ///
     /// # Arguments
     /// * `external_traits` - The external traits to add.
-    ///
-    /// # Errors
-    ///
-    /// Returns an error if any external trait with the same name has already
-    /// been added.
-    pub fn add_external_traits<I>(
-        mut self,
-        external_traits: I,
-    ) -> Result<Self, ExternalTypeBuilderError>
+    pub fn add_external_traits<I>(mut self, external_traits: I) -> Self
     where
         I: IntoIterator<Item = ExternalTraitRef>,
     {
         for external_trait in external_traits {
-            self = self.add_external_trait(external_trait)?;
+            self = self.add_external_trait(external_trait);
         }
-        Ok(self)
+        self
     }
 
     /// Adds a generic parameter to the type.

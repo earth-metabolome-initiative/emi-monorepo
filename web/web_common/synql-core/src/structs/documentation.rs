@@ -10,7 +10,7 @@ pub use builder::DocumentationBuilder;
 use quote::ToTokens;
 
 use crate::{
-    structs::{ExternalCrate, InternalCrate},
+    structs::{ExternalCrate, InternalCrate, documentation},
     traits::{ExternalDependencies, InternalDependencies},
 };
 
@@ -35,6 +35,14 @@ impl Documentation {
     pub fn documentation(&self) -> &str {
         &self.documentation
     }
+
+    /// Extends the current documentation with another documentation.
+    pub fn extend(&mut self, other: &str) {
+        if !self.documentation.is_empty() {
+            self.documentation.push('\n');
+        }
+        self.documentation.push_str(other);
+    }
 }
 
 impl ExternalDependencies for Documentation {
@@ -52,9 +60,9 @@ impl InternalDependencies for Documentation {
 impl ToTokens for Documentation {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         // Split documentation by newlines to create separate doc attributes
-        let doc_lines: Vec<&str> = self.documentation.lines().collect();
+        let documentation = &self.documentation;
         tokens.extend(quote::quote! {
-            #(#[doc = #doc_lines])*
+            #[doc = #documentation]
         });
     }
 }

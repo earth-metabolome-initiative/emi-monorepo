@@ -6,7 +6,7 @@ edition = "2024"
 [dependencies]
 taxonomy_fetcher.workspace = true
 diesel = { workspace = true, features = ["postgres"] }
-csqlv = { workspace = true, features = ["diesel", "iso_codes"] }
+csqlv = { workspace = true, features = ["diesel"] }
 diesel_migrations_utils.workspace = true
 webcodegen.workspace = true
 procedure_codegen.workspace = true

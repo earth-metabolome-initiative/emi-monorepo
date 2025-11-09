@@ -30,7 +30,6 @@ impl ExternalCrate {
                                 .supports_hash()
                                 .supports_ord()
                                 .supports_serde()
-                                .unwrap()
                                 .build()
                                 .unwrap(),
                         ))

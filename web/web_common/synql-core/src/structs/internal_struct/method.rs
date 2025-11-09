@@ -181,11 +181,11 @@ impl ToTokens for Method {
             }
         }
 
-        let main_documentation = &self.documentation;
+        let mut main_documentation = self.documentation.clone();
+        main_documentation.extend(&documentation.join("\n"));
 
         tokens.extend(quote::quote! {
             #main_documentation
-            #(#[doc = #documentation])*
 			#pubness_tokens #async_tokens fn #name_ident #formatted_generics (#(#arguments_tokens),*) #return_type_tokens #formatted_where #formatted_body
 		});
     }

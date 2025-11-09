@@ -67,7 +67,7 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             .serde()
             .validation_errors()
             .postgis_diesel()
-            .uuid()
+            .rosetta_uuid()
             .version(self.version.0, self.version.1, self.version.2)
             .edition(self.edition)
             .build()

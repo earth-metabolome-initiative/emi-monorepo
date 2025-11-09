@@ -195,9 +195,9 @@ impl<'data> WorkspaceBuilder<'data> {
         self.external_crate(ExternalCrate::validation_errors())
     }
 
-    /// Adds the `uuid` external crate to the workspace.
-    pub fn uuid(self) -> Self {
-        self.external_crate(ExternalCrate::uuid())
+    /// Adds the `rosetta_uuid` external crate to the workspace.
+    pub fn rosetta_uuid(self) -> Self {
+        self.external_crate(ExternalCrate::rosetta_uuid())
     }
 
     /// Adds multiple external crates to the workspace.

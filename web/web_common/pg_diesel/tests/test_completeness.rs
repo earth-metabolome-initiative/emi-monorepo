@@ -89,13 +89,9 @@ async fn test_schema_completeness() {
         .name(database_name)
         .unwrap()
         .core()
-        .expect("Unable to register `core` crate")
         .std()
-        .expect("Unable to register `std` crate")
         .diesel()
-        .expect("Unable to register `diesel` crate")
         .serde()
-        .expect("Unable to register `serde` crate")
         .build()
         .expect("Unable to build workspace");
 

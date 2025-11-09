@@ -16,6 +16,12 @@ pub fn normalize_sqlparser_type(sqlparser_type: &DataType) -> &str {
         DataType::Timestamp(None, TimezoneInfo::WithTimeZone) => "TIMESTAMPTZ",
         DataType::Custom(ObjectName(object_names), segments) => {
             if let [ObjectNamePart::Identifier(ident)] = object_names.as_slice() {
+                if ident.value.as_str() == "GEOGRAPHY" && segments == &["Point", "4326"] {
+                    return "GEOGRAPHY(Point, 4326)";
+                }
+                if ident.value.as_str() == "GEOMETRY" && segments == &["Point", "4326"] {
+                    return "GEOMETRY(Point, 4326)";
+                }
                 ident.value.as_str()
             } else {
                 unimplemented!(

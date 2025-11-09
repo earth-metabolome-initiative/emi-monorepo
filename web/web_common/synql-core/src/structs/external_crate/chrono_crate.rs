@@ -23,7 +23,6 @@ impl ExternalCrate {
                     .supports_copy()
                     .supports_eq()
                     .supports_serde()
-                    .unwrap()
                     .build()
                     .unwrap(),
             ))
@@ -37,7 +36,6 @@ impl ExternalCrate {
                     .supports_copy()
                     .supports_eq()
                     .supports_serde()
-                    .unwrap()
                     .build()
                     .unwrap(),
             ))
@@ -51,7 +49,6 @@ impl ExternalCrate {
                     .supports_copy()
                     .supports_eq()
                     .supports_serde()
-                    .unwrap()
                     .build()
                     .unwrap(),
             ))
@@ -65,7 +62,6 @@ impl ExternalCrate {
                     .supports_copy()
                     .supports_eq()
                     .supports_serde()
-                    .unwrap()
                     .build()
                     .unwrap(),
             ))
@@ -79,7 +75,6 @@ impl ExternalCrate {
                     .supports_copy()
                     .supports_eq()
                     .supports_serde()
-                    .unwrap()
                     .build()
                     .unwrap(),
             ))

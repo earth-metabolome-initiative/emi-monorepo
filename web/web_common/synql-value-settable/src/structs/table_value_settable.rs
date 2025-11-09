@@ -8,7 +8,9 @@ use syn::Ident;
 use synql_attributes::traits::TableAttributesLike;
 use synql_core::{
     prelude::Builder,
-    structs::{Argument, DataVariantRef, Documentation, Method, WhereClause, Workspace},
+    structs::{
+        Argument, DataVariantRef, Documentation, InternalToken, Method, WhereClause, Workspace,
+    },
     traits::ColumnSynLike,
 };
 use synql_diesel_schema::traits::ColumnSchema;
@@ -146,16 +148,16 @@ impl<'data, 'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'data
                 [
                     WhereClause::new()
                     .left(column_acronym.clone())
-                    .right(quote! {
+                    .right(InternalToken::new().data(column_type.clone().into()).stream(quote! {
                         TryInto<#column_type>
-                    })
+                    }).build().expect("Failed to build the right side of the where clause"))
                     .build()
                     .expect("Failed to build where clause"),
                     WhereClause::new()
                         .left(validation_error.format_with_generics())
-                        .right(quote! {
+                        .right(InternalToken::new().data(column_type.clone().into()).stream(quote! {
                             From<<#column_acronym as TryInto<#column_type>>::Error>
-                        })
+                        }).build().expect("Failed to build the right side of the where clause"))
                         .build()
                         .expect("Failed to build where clause")
                 ]

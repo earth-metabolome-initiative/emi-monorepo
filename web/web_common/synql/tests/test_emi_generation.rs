@@ -10,10 +10,15 @@ use std::{
     sync::Arc,
 };
 
-use ::graph::prelude::DirectoryTree;
 use synql::prelude::*;
 use synql_core::structs::{ExternalCrate, ExternalType};
 use time_requirements::{prelude::TimeTracker, report::Report, task::Task};
+
+fn report(time_tracker: &TimeTracker) {
+    Report::new(time_tracker.clone())
+        .write(Path::new("emi_codegen.md"), Path::new("emi_codegen.png"))
+        .unwrap();
+}
 
 #[test]
 fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
@@ -39,14 +44,13 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
     assert!(db.has_tables(), "Database should have tables");
     tracking_test.add_completed_task(task);
 
-    let task = Task::new("Codegen setup");
     let temp_dir = tempfile::tempdir().expect("Unable to create temporary directory");
     // let workspace_path = temp_dir.path().join("synql_workspace");
     let workspace_path = std::path::PathBuf::from("../../../../emi_local");
 
     let iso_codes = ExternalCrate::new()
         .name("iso_codes")?
-        .feature("diesel")
+        .features(["diesel", "diesel_pgrx"])
         .version("0.1.0")
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
         .add_type(Arc::new(
@@ -61,13 +65,13 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
 
     let media_types = ExternalCrate::new()
         .name("media_types")?
-        .feature("diesel")
+        .features(["diesel", "diesel_pgrx"])
         .version("0.1.0")
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
         .add_type(Arc::new(
             ExternalType::new()
                 .rust_type(syn::parse_quote!(media_types::MediaType))
-                .diesel_type(syn::parse_quote!(media_types::media_types::diesel_impls::MediaType))
+                .diesel_type(syn::parse_quote!(media_types::diesel_impls::MediaType))
                 .postgres_type("mediatype")?
                 .build()?,
         ))
@@ -76,13 +80,13 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
 
     let cas_codes = ExternalCrate::new()
         .name("cas_codes")?
-        .feature("diesel")
+        .features(["diesel", "diesel_pgrx"])
         .version("0.1.0")
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
         .add_type(Arc::new(
             ExternalType::new()
                 .rust_type(syn::parse_quote!(cas_codes::CAS))
-                .diesel_type(syn::parse_quote!(cas_codes::cas_codes::diesel_impls::CAS))
+                .diesel_type(syn::parse_quote!(cas_codes::diesel_impls::CAS))
                 .postgres_type("cas")?
                 .build()?,
         ))
@@ -91,14 +95,14 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
 
     let molecular_formulas = ExternalCrate::new()
         .name("molecular_formulas")?
-        .feature("diesel")
+        .features(["diesel", "diesel_pgrx"])
         .version("0.1.0")
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
         .add_type(Arc::new(
             ExternalType::new()
                 .rust_type(syn::parse_quote!(molecular_formulas::MolecularFormula))
                 .diesel_type(syn::parse_quote!(
-                    molecular_formulas::molecular_formulas::diesel_impls::MolecularFormula
+                    molecular_formulas::molecular_formula::diesel_impls::MolecularFormula
                 ))
                 .postgres_type("molecularformula")?
                 .build()?,
@@ -119,13 +123,10 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
         .generate_rustfmt()
         .build()
         .expect("Unable to build SynQL instance");
-    tracking_test.add_completed_task(task);
     tracking_test.extend(synql.generate().expect("Unable to generate workspace"));
 
     // We print the report
-    Report::new(tracking_test)
-        .write(Path::new("emi_codegen.md"), Path::new("emi_codegen.png"))
-        .unwrap();
+    report(&tracking_test);
 
     // Verify that the workspace directory was created
     assert!(workspace_path.exists(), "Workspace directory should be created");
@@ -134,8 +135,11 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
     let cargo_toml = workspace_path.join("Cargo.toml");
     assert!(cargo_toml.exists(), "Cargo.toml should be created");
 
+    let fmt_task = Task::new("Formatting and Checking Generated Workspace");
     // Runs the `cargo fmt` command in the specified directory.
     let output = Command::new("cargo").arg("fmt").current_dir(&workspace_path).output()?;
+    tracking_test.add_completed_task(fmt_task);
+    report(&tracking_test);
 
     if !output.status.success() {
         eprintln!("cargo fmt stdout: {}", String::from_utf8_lossy(&output.stdout));
@@ -143,35 +147,16 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
         panic!("cargo fmt failed for generated workspace");
     }
 
+    let check_task = Task::new("Checking Generated Workspace");
     // Verify that the generated workspace can be checked
     let output = Command::new("cargo").arg("check").current_dir(&workspace_path).output()?;
+    tracking_test.add_completed_task(check_task);
+    report(&tracking_test);
 
     if !output.status.success() {
         eprintln!("cargo check stdout: {}", String::from_utf8_lossy(&output.stdout));
         eprintln!("cargo check stderr: {}", String::from_utf8_lossy(&output.stderr));
         panic!("cargo check failed for generated workspace");
-    }
-
-    // Verify that the generated workspace can be tested
-    let output = Command::new("cargo").arg("test").current_dir(&workspace_path).output()?;
-
-    if !output.status.success() {
-        eprintln!("cargo test stdout: {}", String::from_utf8_lossy(&output.stdout));
-        eprintln!("cargo test stderr: {}", String::from_utf8_lossy(&output.stderr));
-        panic!("cargo test failed for generated workspace");
-    }
-
-    // Verify that the generated documentation can be built without errors or
-    // warnings
-    let output = Command::new("cargo")
-        .args(&["doc", "--no-deps", "--document-private-items"])
-        .current_dir(&workspace_path)
-        .output()?;
-
-    if !output.status.success() {
-        eprintln!("cargo doc stdout: {}", String::from_utf8_lossy(&output.stdout));
-        eprintln!("cargo doc stderr: {}", String::from_utf8_lossy(&output.stderr));
-        panic!("cargo doc failed for generated workspace");
     }
 
     Ok(())

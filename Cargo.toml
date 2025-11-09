@@ -120,7 +120,7 @@ diesel_pgrx = { path = "utils/diesel_pgrx" }
 diesel_pgrx_derive = { path = "utils/diesel_pgrx_derive" }
 example_extension = { path = "utils/diesel_pgrx/example_extension" }
 redis = { version = "0.32.1", features = ["tokio-comp"] }
-postgis_diesel = { version = "3.0.1", default-features = false }
+postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel", branch = "master", default-features = false }
 chrono = { version = "0.4.39", features = ["serde"] }
 serde = { version = "1.0.225", features = ["derive", "rc"] }
 serde_json = "1.0.145"
@@ -145,7 +145,9 @@ criterion = { version = "0.7", features = ["html_reports"] }
 rosetta_uuid = { path = "data_structures/rosetta_uuid" }
 rosetta_timestamp = { path = "utils/rosetta_timestamp" }
 taxonomy_fetcher = { path = "data_retrieval/taxonomy_fetcher" }
-csqlv = { path = "web/web_common/csqlv", default-features = false }
+csqlv = { path = "web/web_common/csqlv", default-features = false, features = [
+  "iso_codes",
+] }
 iso_codes = { path = "web/web_common/iso_codes" }
 elements = { path = "web/web_common/elements" }
 testcontainers = { version = "0.25.0" }

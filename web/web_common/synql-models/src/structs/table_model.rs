@@ -209,6 +209,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
                     })
                     .implemented_trait(extension_of_trait.clone().into())
                     .employed_traits([read_trait.clone().into(), identifiable_trait.clone().into()])
+                    .data(extended_table_model.into())
                     .build()
                     .unwrap(),
             );

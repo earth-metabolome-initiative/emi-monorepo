@@ -158,7 +158,7 @@ impl<'data> Workspace<'data> {
         doc["format_code_in_doc_comments"] = Item::from(true);
         doc["comment_width"] = Item::from(80);
         doc["normalize_comments"] = Item::from(true);
-        doc["normalize_doc_attributes"] = Item::from(true);
+        doc["normalize_doc_attributes"] = Item::from(false);
         doc["force_multiline_blocks"] = Item::from(true);
         doc["fn_single_line"] = Item::from(false);
         doc["where_single_line"] = Item::from(false);

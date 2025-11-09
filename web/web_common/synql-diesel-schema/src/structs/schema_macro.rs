@@ -1,7 +1,11 @@
 //! Submodule defining the `SchemaMacro` struct to represent an SQL schema which
 //! can be printed out in the context of a `quote` macro.
 
-use synql_core::{structs::Workspace, traits::TableSynLike};
+use quote::ToTokens;
+use synql_core::{
+    structs::{InternalToken, Workspace},
+    traits::TableSynLike,
+};
 
 mod into_crate;
 mod into_module;
@@ -24,5 +28,20 @@ impl<'data, 'table, T: TableSynLike> SchemaMacro<'data, 'table, T> {
         database: &'table T::DB,
     ) -> Self {
         Self { table, workspace, database }
+    }
+}
+
+impl<'data, 'table, T: TableSynLike> Clone for SchemaMacro<'data, 'table, T> {
+    fn clone(&self) -> Self {
+        Self { table: self.table, workspace: self.workspace, database: self.database }
+    }
+}
+
+impl<'data, 'table, T: TableSynLike> Copy for SchemaMacro<'data, 'table, T> {}
+
+impl<'data, 'table, T: TableSynLike> ToTokens for SchemaMacro<'data, 'table, T> {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let internal_token: InternalToken = (*self).into();
+        internal_token.to_tokens(tokens);
     }
 }

@@ -68,7 +68,6 @@ impl ExternalType {
             .supports_hash()
             .supports_ord()
             .supports_serde()
-            .unwrap()
             .build()
             .unwrap()
     }
@@ -83,7 +82,6 @@ impl ExternalType {
             .supports_hash()
             .supports_ord()
             .supports_serialize()
-            .unwrap()
             .build()
             .unwrap()
     }
@@ -101,7 +99,6 @@ impl ExternalType {
             .supports_hash()
             .supports_ord()
             .supports_serde()
-            .unwrap()
             .build()
             .unwrap()
     }
@@ -119,7 +116,6 @@ impl ExternalType {
             .supports_hash()
             .supports_ord()
             .supports_serde()
-            .unwrap()
             .build()
             .unwrap()
     }
@@ -137,7 +133,6 @@ impl ExternalType {
             .supports_hash()
             .supports_ord()
             .supports_serde()
-            .unwrap()
             .build()
             .unwrap()
     }
@@ -155,7 +150,6 @@ impl ExternalType {
             .supports_hash()
             .supports_ord()
             .supports_serde()
-            .unwrap()
             .build()
             .unwrap()
     }
@@ -173,7 +167,6 @@ impl ExternalType {
             .supports_partial_eq()
             .supports_partial_ord()
             .supports_serde()
-            .unwrap()
             .build()
             .unwrap()
     }
@@ -191,7 +184,6 @@ impl ExternalType {
             .supports_partial_eq()
             .supports_partial_ord()
             .supports_serde()
-            .unwrap()
             .build()
             .unwrap()
     }
@@ -209,7 +201,6 @@ impl ExternalType {
             .supports_hash()
             .supports_ord()
             .supports_serde()
-            .unwrap()
             .build()
             .unwrap()
     }
@@ -236,7 +227,6 @@ impl ExternalType {
             .supports_hash()
             .supports_ord()
             .supports_serde()
-            .unwrap()
             .build()
             .unwrap()
     }
@@ -254,7 +244,6 @@ impl ExternalType {
             .supports_hash()
             .supports_ord()
             .supports_serde()
-            .unwrap()
             .build()
             .unwrap()
     }
@@ -272,7 +261,6 @@ impl ExternalType {
             .supports_hash()
             .supports_ord()
             .supports_serde()
-            .unwrap()
             .build()
             .unwrap()
     }
@@ -297,7 +285,6 @@ impl ExternalType {
             .supports_hash()
             .supports_ord()
             .supports_serde()
-            .unwrap()
             .build()
             .unwrap()
     }

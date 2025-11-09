@@ -22,9 +22,9 @@ mod diesel_crate;
 mod diesel_queries_crate;
 mod helpers;
 mod postgis_diesel_crate;
+mod rosetta_uuid_crate;
 mod serde_crate;
 mod std_crate;
-mod uuid_crate;
 mod validation_errors_crate;
 
 #[derive(Debug, Clone)]
