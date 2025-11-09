@@ -5,22 +5,20 @@ CREATE TABLE IF NOT EXISTS procedures (
 	procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template),
 	-- The parent procedure (if any) of this procedure.
 	parent_procedure UUID REFERENCES procedures(procedure) ON DELETE CASCADE CHECK (
-		must_be_distinct_uuid(procedure, parent_procedure)
+		procedure <> parent_procedure
 	),
 	-- The parent procedure template (if any) of this procedure.
 	parent_procedure_template INTEGER REFERENCES procedure_templates(procedure_template) CHECK (
-		must_be_distinct_i32(procedure_template, parent_procedure_template)
+		procedure_template <> parent_procedure_template
 	),
 	-- The predecessor procedure (if any) of this procedure.
 	predecessor_procedure UUID REFERENCES procedures(procedure) ON DELETE CASCADE CHECK (
-		must_be_distinct_uuid(procedure, predecessor_procedure)
+		procedure <> predecessor_procedure
 	),
 	-- The predecessor procedure template (if any) of this procedure.
 	predecessor_procedure_template INTEGER REFERENCES procedure_templates(procedure_template) CHECK (
-		must_be_distinct_i32(
-			procedure_template,
+		procedure_template <>
 			predecessor_procedure_template
-		)
 	),
 	-- The name of the most concrete table this procedure is associated with.
 	most_concrete_table TEXT NOT NULL,

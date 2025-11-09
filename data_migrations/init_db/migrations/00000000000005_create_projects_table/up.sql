@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS projects (
     FOREIGN KEY (state_id) REFERENCES project_states(id),
     FOREIGN KEY (color_id) REFERENCES colors(id),
     FOREIGN KEY (parent_project_id) REFERENCES projects(id) ON DELETE CASCADE,
-    CHECK (must_be_distinct_i32(parent_project_id, id)),
-    CHECK (must_be_distinct(name, description)),
+    CHECK (parent_project_id <> id),
+    CHECK (name <> description),
     CHECK (created_at <= updated_at)
 );

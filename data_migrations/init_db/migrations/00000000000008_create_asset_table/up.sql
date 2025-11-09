@@ -8,8 +8,8 @@ CREATE TABLE IF NOT EXISTS asset_models (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by INTEGER NOT NULL REFERENCES users(id),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CHECK (must_be_distinct(name, description)),
-    CHECK (must_be_distinct_i32(id, parent_model)),
+    CHECK (name <> description),
+    CHECK (id <> parent_model),
     CHECK (created_at <= updated_at),
     UNIQUE (id, parent_model)
 );
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS assets (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by INTEGER NOT NULL REFERENCES users(id),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CHECK (must_be_distinct(name, description)),
+    CHECK (name <> description),
     CHECK (created_at <= updated_at),
     UNIQUE (id, model),
     -- Assets of different models can have the same name, but not assets of the same model.
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS asset_compatibility_rules (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (left_asset_model, right_asset_model),
     CHECK (
-        must_be_distinct_i32(left_asset_model, right_asset_model)
+        left_asset_model <> right_asset_model
     )
 );
 CREATE UNIQUE INDEX unique_asset_compatibility_pair ON asset_compatibility_rules (

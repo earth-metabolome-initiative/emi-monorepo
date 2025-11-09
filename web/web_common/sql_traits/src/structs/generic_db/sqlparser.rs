@@ -353,9 +353,9 @@ impl TryFrom<&[&Path]> for ParserDB {
                 )));
             }
 
-            let mut paths = search_sql_documents(path);
-            paths.sort_unstable();
-            sql_files.extend(paths);
+            let mut sql_paths = search_sql_documents(path);
+            sql_paths.sort_unstable();
+            sql_files.extend(sql_paths);
 
             let schema: CSVSchema =
                 CSVSchemaBuilder::default().include_gz().from_dir(path).map_err(|e| {
@@ -377,6 +377,8 @@ impl TryFrom<&[&Path]> for ParserDB {
             )?);
         }
 
+        sql_files.dedup();
+
         for sql_file in sql_files {
             // We exclude `down.sql` files as they are not relevant for
             // schema definition.
@@ -388,11 +390,6 @@ impl TryFrom<&[&Path]> for ParserDB {
                 .map_err(|e| ParserError::TokenizerError(e.to_string()))?;
             comulative_sql.push_str(&sql_content);
         }
-
-        // We write out the comulative SQL to a temporary file `out.sql`
-        std::fs::write("out.sql", &comulative_sql).map_err(|e| {
-            ParserError::TokenizerError(format!("Failed to write to out.sql: {}", e))
-        })?;
 
         Self::try_from(comulative_sql.as_str())
     }

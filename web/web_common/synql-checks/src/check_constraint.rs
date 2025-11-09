@@ -53,8 +53,14 @@ pub trait CheckConstraintSynLike: CheckConstraintLike {
             let left = relevant_optional_columns.iter().map(|column| column.column_snake_ident());
             let right = relevant_optional_columns.iter().map(|column| {
                 let ident = column.column_snake_ident();
-                quote! {
-                    self.#ident.as_ref()
+                if column.supports_copy(database, workspace) {
+                    quote! {
+                        self.#ident
+                    }
+                } else {
+                    quote! {
+                        self.#ident.as_ref()
+                    }
                 }
             });
             let formatted_left = if left.len() == 1 {

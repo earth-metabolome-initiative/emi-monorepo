@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS teams (
     FOREIGN KEY (color_id) REFERENCES colors(id),
     FOREIGN KEY (state_id) REFERENCES team_states(id),
     FOREIGN KEY (parent_team_id) REFERENCES teams(id) ON DELETE CASCADE,
-    CHECK (must_be_distinct_i32(parent_team_id, id)),
+    CHECK (parent_team_id <> id),
     CHECK (created_at <= updated_at)
 );
 

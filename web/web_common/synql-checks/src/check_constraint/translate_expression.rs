@@ -108,25 +108,21 @@ where
             .unwrap();
         match op {
             BinaryOperator::NotEq => {
-                if left_column.is_textual(self.database) && right_column.is_textual(self.database) {
-                    Some(
-                        InternalToken::new()
-                            .private()
-                            .stream(quote! {
-                                if #formatted_left == #formatted_right {
-                                    return Err(#validation_error::equal(
-                                        #table_attribute_enum::#left_camel_cased,
-                                        #table_attribute_enum::#right_camel_cased
-                                    ));
-                                }
-                            })
-                            .data(table_attribute_enum)
-                            .build()
-                            .unwrap(),
-                    )
-                } else {
-                    unimplemented!("Operator {op:?} not supported for double field error mapping");
-                }
+                Some(
+                    InternalToken::new()
+                        .private()
+                        .stream(quote! {
+                            if #formatted_left == #formatted_right {
+                                return Err(#validation_error::equal(
+                                    #table_attribute_enum::#left_camel_cased,
+                                    #table_attribute_enum::#right_camel_cased
+                                ));
+                            }
+                        })
+                        .data(table_attribute_enum)
+                        .build()
+                        .unwrap(),
+                )
             }
             BinaryOperator::LtEq => {
                 Some(

@@ -20,14 +20,14 @@ CREATE TABLE IF NOT EXISTS procedure_templates (
 	-- Whether this procedure template is deprecated and should not be used for new procedures
 	deprecated BOOLEAN NOT NULL DEFAULT FALSE,
 	-- We enforce that the name and description are distinct to avoid lazy duplicates
-	CHECK (must_be_distinct(name, description))
+	CHECK (name <> description)
 );
 CREATE TABLE IF NOT EXISTS parent_procedure_templates (
 	PRIMARY KEY (parent, child),
 	-- The parent procedure template
 	parent INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- The child procedure template
-	child INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE CHECK (must_be_distinct_i32(parent, child)),
+	child INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE CHECK (parent <> child),
 	-- The user who created this relationship
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	-- The timestamp when this relationship was created
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS next_procedure_templates (
 	-- The predecessor procedure template
 	predecessor INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- The successor procedure template
-	successor INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE CHECK (must_be_distinct_i32(predecessor, successor)),
+	successor INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE CHECK (predecessor <> successor),
 	-- The user who created this relationship
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	-- The timestamp when this relationship was created

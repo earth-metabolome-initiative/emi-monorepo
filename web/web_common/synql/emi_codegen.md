@@ -1,32 +1,32 @@
 # Time Report for EMI Workspace Generation Test
 
-The total time spent on all tasks was 38 seconds.
-The slowest task was `Checking Generated Workspace` which took 24 seconds, 758 ms, 266 µs and 458 ns (63.16% of all time).
+The total time spent on all tasks was 33 seconds.
+The slowest task was `Checking Generated Workspace` which took 24 seconds, 197 ms, 723 µs and 341 ns (72.73% of all time).
 
 | name                                        | time                                  | percentage | comment |
 |---------------------------------------------|---------------------------------------|------------|---------|
-| Database Parsing                            | 3 seconds, 429 ms, 230 µs and 720 ns  | 7.89%      |         |
-| SQL Workspace Generation                    | 7 seconds, 836 ms, 441 µs and 824 ns  | 18.42%     |         |
-| Formatting and Checking Generated Workspace | 1 second, 979 ms, 247 µs and 726 ns   | 2.63%      |         |
-| Checking Generated Workspace                | 24 seconds, 758 ms, 266 µs and 458 ns | 63.16%     |         |
+| Database Parsing                            | 3 seconds, 849 ms, 672 µs and 695 ns  | 9.09%      |         |
+| SQL Workspace Generation                    | 4 seconds, 159 ms, 767 µs and 540 ns  | 12.12%     |         |
+| Formatting and Checking Generated Workspace | 1 second, 421 ms, 702 µs and 207 ns   | 3.03%      |         |
+| Checking Generated Workspace                | 24 seconds, 197 ms, 723 µs and 341 ns | 72.73%     |         |
 
 ## Time Report for SQL Workspace Generation
 
 The total time spent on all tasks was now.
-The slowest task was `workspace_toml` which took 4 seconds, 585 ms, 443 µs and 135 ns (57.14% of all time).
+The slowest task was `workspace_write_to_disk` which took 2 seconds, 306 ms, 231 µs and 390 ns (50.00% of all time).
 
 | name                    | time                                 | percentage | comment |
 |-------------------------|--------------------------------------|------------|---------|
-| schema_macro            | 34 ms, 695 µs and 786 ns             | 0.00%      |         |
-| model                   | 126 ms, 754 µs and 203 ns            | 0.00%      |         |
-| relations_trait         | 46 ms, 26 µs and 646 ns              | 0.00%      |         |
-| attributes              | 52 ms, 97 µs and 661 ns              | 0.00%      |         |
-| value_settable_trait    | 16 ms, 559 µs and 210 ns             | 0.00%      |         |
-| insertable              | 38 ms, 315 µs and 727 ns             | 0.00%      |         |
-| buildable               | 95 ms, 179 µs and 394 ns             | 0.00%      |         |
-| extension_attributes    | 35 ms, 369 µs and 150 ns             | 0.00%      |         |
-| workspace_write_to_disk | 2 seconds, 805 ms, 698 µs and 22 ns  | 28.57%     |         |
-| workspace_toml          | 4 seconds, 585 ms, 443 µs and 135 ns | 57.14%     |         |
-| workspace_rustfmt       | 302 µs and 890 ns                    | 0.00%      |         |
+| schema_macro            | 11 ms, 550 µs and 872 ns             | 0.00%      |         |
+| model                   | 84 ms, 741 µs and 294 ns             | 0.00%      |         |
+| relations_trait         | 12 ms, 590 µs and 377 ns             | 0.00%      |         |
+| attributes              | 17 ms, 743 µs and 314 ns             | 0.00%      |         |
+| value_settable_trait    | 5 ms, 381 µs and 177 ns              | 0.00%      |         |
+| insertable              | 12 ms, 738 µs and 173 ns             | 0.00%      |         |
+| buildable               | 29 ms, 321 µs and 623 ns             | 0.00%      |         |
+| extension_attributes    | 11 ms, 405 µs and 330 ns             | 0.00%      |         |
+| workspace_write_to_disk | 2 seconds, 306 ms, 231 µs and 390 ns | 50.00%     |         |
+| workspace_toml          | 1 second, 667 ms, 731 µs and 756 ns  | 25.00%     |         |
+| workspace_rustfmt       | 332 µs and 234 ns                    | 0.00%      |         |
 
 ![Plot](emi_codegen.png)

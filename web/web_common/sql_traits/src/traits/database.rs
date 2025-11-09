@@ -120,6 +120,7 @@ pub trait DatabaseLike: Clone + Debug {
     /// ```
     fn table_dag(&self) -> Vec<&Self::Table> {
         let tables = self.tables().collect::<Vec<&Self::Table>>();
+
         let mut edges = tables
             .iter()
             .enumerate()
@@ -134,7 +135,12 @@ pub trait DatabaseLike: Clone + Debug {
                         if referenced_table == *table {
                             return None;
                         }
-                        Some(tables_ref.binary_search(&referenced_table).unwrap())
+                        Some(tables_ref.binary_search(&referenced_table).expect(&format!(
+                            "Referenced table '{}' not found in database '{}' - Tables are {:?}",
+                            referenced_table.table_name(),
+                            self.catalog_name(),
+                            tables_ref.iter().map(|t| t.table_name()).collect::<Vec<&str>>()
+                        )))
                     })
                     .map(move |referenced_table_number| (referenced_table_number, table_number))
             })
