@@ -111,7 +111,7 @@ sqlparser = { git = "https://github.com/LucaCappelletti94/sqlparser-rs", branch 
   "serde",
 ] }
 arbitrary = { version = "1", features = ["derive"] }
-diesel = { git = "https://github.com/diesel-rs/diesel", features = [
+diesel = { git = "https://github.com/diesel-rs/diesel", branch = "main", features = [
   "extras",
   "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
 ] }
