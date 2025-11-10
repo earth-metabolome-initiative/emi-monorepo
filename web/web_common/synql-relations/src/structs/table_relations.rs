@@ -22,21 +22,21 @@ mod into_trait;
 
 #[derive(Debug)]
 /// Struct representing a SynQL table relations trait.
-pub struct TableRelations<'data, 'table, T: TableRelationsLike + ?Sized> {
+pub struct TableRelations<'table, T: TableRelationsLike + ?Sized> {
     table: &'table T,
-    workspace: &'table synql_core::structs::Workspace<'data>,
+    workspace: &'table synql_core::structs::Workspace,
     database: &'table T::DB,
 }
 
-impl<'data, 'table, T: TableRelationsLike + ?Sized> Clone for TableRelations<'data, 'table, T> {
+impl<'table, T: TableRelationsLike + ?Sized> Clone for TableRelations<'table, T> {
     fn clone(&self) -> Self {
         Self { table: self.table, workspace: self.workspace, database: self.database }
     }
 }
 
-impl<'data, 'table, T: TableRelationsLike + ?Sized> Copy for TableRelations<'data, 'table, T> {}
+impl<'table, T: TableRelationsLike + ?Sized> Copy for TableRelations<'table, T> {}
 
-impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table, T> {
+impl<'table, T: TableRelationsLike + ?Sized> TableRelations<'table, T> {
     /// Creates a new `TableRelations` instance.
     ///
     /// # Arguments
@@ -46,7 +46,7 @@ impl<'data, 'table, T: TableRelationsLike + ?Sized> TableRelations<'data, 'table
     /// * `database` - The database connection to use to query the table model.
     pub fn new(
         table: &'table T,
-        workspace: &'table synql_core::structs::Workspace<'data>,
+        workspace: &'table synql_core::structs::Workspace,
         database: &'table T::DB,
     ) -> Self {
         Self { table, workspace, database }

@@ -76,7 +76,7 @@ pub trait ForeignKeySchema: ForeignKeySynLike + Sized {
     ///   columns from.
     fn internal_crate_references<'data>(
         &self,
-        workspace: &Workspace<'data>,
+        workspace: &Workspace,
         database: &Self::DB,
     ) -> Vec<Arc<InternalCrate>>
     where

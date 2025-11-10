@@ -67,14 +67,11 @@ pub trait TableInsertableLike: TableValueSettableLike {
     /// * `workspace` - The workspace where the table is defined.
     /// * `database` - The database connection to use to query the table
     ///   insertable.
-    fn insertable<'table, 'data>(
+    fn insertable<'table>(
         &'table self,
-        workspace: &'table Workspace<'data>,
+        workspace: &'table Workspace,
         database: &'table Self::DB,
-    ) -> TableInsertable<'data, 'table, Self>
-    where
-        Self: 'data,
-    {
+    ) -> TableInsertable<'table, Self> {
         TableInsertable::new(self, workspace, database)
     }
 
@@ -84,7 +81,7 @@ pub trait TableInsertableLike: TableValueSettableLike {
     /// # Arguments
     ///
     /// * `workspace` - The workspace where the table is defined.
-    fn insertable_data_ref<'data>(&self, workspace: &Workspace<'data>) -> Option<InternalDataRef> {
+    fn insertable_data_ref(&self, workspace: &Workspace) -> Option<InternalDataRef> {
         let crate_ref = workspace.internal_crate(&self.table_insertable_crate_name())?;
         Some(InternalDataRef::new(
             crate_ref,

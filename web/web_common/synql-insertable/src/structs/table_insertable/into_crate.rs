@@ -12,12 +12,12 @@ use crate::{
     traits::{INSERTABLE_MODULE_NAME, TableInsertableLike},
 };
 
-impl<'data, 'table, T> From<TableInsertable<'data, 'table, T>> for InternalCrate
+impl<'table, T> From<TableInsertable<'table, T>> for InternalCrate
 where
     T: TableInsertableLike + ?Sized,
     T::DB: InheritableDatabaseLike,
 {
-    fn from(insertable: TableInsertable<'data, 'table, T>) -> Self {
+    fn from(insertable: TableInsertable<'table, T>) -> Self {
         let schema_crate_ref = insertable
             .table
             .table_schema_ref(insertable.workspace)

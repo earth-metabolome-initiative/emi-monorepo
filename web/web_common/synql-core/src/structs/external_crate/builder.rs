@@ -7,7 +7,7 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 
-use crate::structs::{ExternalCrate, ExternalMacro, ExternalTrait, ExternalType};
+use crate::structs::{ExternalCrate, ExternalMacro, ExternalTrait, ExternalType, Method};
 
 #[derive(Default)]
 /// Builder for the `ExternalCrate` struct.
@@ -26,6 +26,8 @@ pub struct ExternalCrateBuilder {
     git: Option<(String, String)>,
     /// The feature flags required by the crate.
     features: Vec<String>,
+    /// The functions provided by the crate.
+    functions: Vec<(Arc<Method>, Arc<syn::Path>)>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -43,6 +45,8 @@ pub enum ExternalCrateAttribute {
     Version,
     /// The feature flags required by the crate.
     Features,
+    /// The functions provided by the crate.
+    Functions,
 }
 
 impl Display for ExternalCrateAttribute {
@@ -54,6 +58,7 @@ impl Display for ExternalCrateAttribute {
             ExternalCrateAttribute::Traits => write!(f, "traits"),
             ExternalCrateAttribute::Version => write!(f, "version"),
             ExternalCrateAttribute::Features => write!(f, "features"),
+            ExternalCrateAttribute::Functions => write!(f, "functions"),
         }
     }
 }
@@ -262,6 +267,37 @@ impl ExternalCrateBuilder {
         }
         self
     }
+
+    /// Adds a function provided by the crate.
+    ///
+    /// # Arguments
+    ///
+    /// * `method` - The method signature of the function.
+    /// * `path` - The path to the function.
+    pub fn add_function(mut self, method: Arc<Method>, path: Arc<syn::Path>) -> Self {
+        for function in &self.functions {
+            if function.0 == method {
+                return self;
+            }
+        }
+
+        self.functions.push((method, path));
+        self
+    }
+
+    /// Adds several functions provided by the crate.
+    ///
+    /// # Arguments
+    /// * `functions` - The functions to add.
+    pub fn add_functions<I>(mut self, functions: I) -> Self
+    where
+        I: IntoIterator<Item = (Arc<Method>, Arc<syn::Path>)>,
+    {
+        for (method, path) in functions {
+            self = self.add_function(method, path);
+        }
+        self
+    }
 }
 
 impl Attributed for ExternalCrateBuilder {
@@ -286,6 +322,7 @@ impl Builder for ExternalCrateBuilder {
             traits: self.traits,
             version: self.version,
             features: self.features,
+            functions: self.functions,
             git: self.git,
         })
     }

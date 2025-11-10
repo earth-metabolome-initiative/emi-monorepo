@@ -18,26 +18,26 @@ mod into_module;
 /// This struct is used to generate the extension attributes enum for a table
 /// that extends other tables. The extension attributes enum contains variants
 /// for each extended table's attributes.
-pub struct TableExtensionAttributes<'data, 'table, T: TableExtensionAttributesLike + ?Sized> {
+pub struct TableExtensionAttributes<'table, T: TableExtensionAttributesLike + ?Sized> {
     table: &'table T,
-    workspace: &'table synql_core::structs::Workspace<'data>,
+    workspace: &'table synql_core::structs::Workspace,
     database: &'table T::DB,
 }
 
-impl<'data, 'table, T: TableExtensionAttributesLike + ?Sized> Clone
-    for TableExtensionAttributes<'data, 'table, T>
+impl<'table, T: TableExtensionAttributesLike + ?Sized> Clone
+    for TableExtensionAttributes<'table, T>
 {
     fn clone(&self) -> Self {
         Self { table: self.table, workspace: self.workspace, database: self.database }
     }
 }
 
-impl<'data, 'table, T: TableExtensionAttributesLike + TableAttributesLike + ?Sized>
-    TableExtensionAttributes<'data, 'table, T>
+impl<'table, T: TableExtensionAttributesLike + TableAttributesLike + ?Sized>
+    TableExtensionAttributes<'table, T>
 {
     pub(crate) fn new(
         table: &'table T,
-        workspace: &'table synql_core::structs::Workspace<'data>,
+        workspace: &'table synql_core::structs::Workspace,
         database: &'table T::DB,
     ) -> Self {
         Self { table, workspace, database }
@@ -76,10 +76,10 @@ impl<'data, 'table, T: TableExtensionAttributesLike + TableAttributesLike + ?Siz
     }
 }
 
-impl<'data, 'table, T: TableExtensionAttributesLike + ?Sized>
-    From<TableExtensionAttributes<'data, 'table, T>> for InternalDataVariant
+impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttributes<'table, T>>
+    for InternalDataVariant
 {
-    fn from(extension_attributes: TableExtensionAttributes<'data, 'table, T>) -> Self {
+    fn from(extension_attributes: TableExtensionAttributes<'table, T>) -> Self {
         let enum_variant: InternalEnum = extension_attributes.into();
         enum_variant.into()
     }

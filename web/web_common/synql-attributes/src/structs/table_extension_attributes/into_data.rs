@@ -8,10 +8,10 @@ use synql_core::{
 
 use crate::{structs::TableExtensionAttributes, traits::TableExtensionAttributesLike};
 
-impl<'data, 'table, T: TableExtensionAttributesLike + ?Sized>
-    From<TableExtensionAttributes<'data, 'table, T>> for InternalData
+impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttributes<'table, T>>
+    for InternalData
 {
-    fn from(extension_attributes: TableExtensionAttributes<'data, 'table, T>) -> Self {
+    fn from(extension_attributes: TableExtensionAttributes<'table, T>) -> Self {
         let display_impl = extension_attributes.display_impl();
         let extension_attributes_clone = extension_attributes.clone();
         let schema_crate_ref = extension_attributes

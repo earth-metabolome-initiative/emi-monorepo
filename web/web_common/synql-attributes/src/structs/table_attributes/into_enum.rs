@@ -17,10 +17,10 @@ use crate::{
     },
 };
 
-impl<'data, 'table, T: TableAttributesLike + TableExtensionAttributesLike + ?Sized>
-    From<TableAttributes<'data, 'table, T>> for InternalEnum
+impl<'table, T: TableAttributesLike + TableExtensionAttributesLike + ?Sized>
+    From<TableAttributes<'table, T>> for InternalEnum
 {
-    fn from(attributes: TableAttributes<'data, 'table, T>) -> Self {
+    fn from(attributes: TableAttributes<'table, T>) -> Self {
         let maybe_extension_variant = if let Some(extension_attributes) =
             attributes.table.extension_attributes_enum_ref(attributes.workspace)
         {

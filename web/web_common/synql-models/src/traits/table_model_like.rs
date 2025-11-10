@@ -33,19 +33,16 @@ where
     /// * `database` - The database connection to use to query the table model.
     ///
     /// # Examples
-    fn model<'table, 'data>(
+    fn model<'table>(
         &'table self,
-        workspace: &'table Workspace<'data>,
+        workspace: &'table Workspace,
         database: &'table Self::DB,
-    ) -> TableModel<'data, 'table, Self>
-    where
-        Self: 'data,
-    {
+    ) -> TableModel<'table, Self> {
         TableModel::new(self, workspace, database)
     }
 
     /// Returns a reference to the model module ref for the table.
-    fn model_ref<'data>(&self, workspace: &Workspace<'data>) -> Option<InternalDataRef> {
+    fn model_ref(&self, workspace: &Workspace) -> Option<InternalDataRef> {
         let crate_ref = workspace.internal_crate(&self.table_model_crate_name())?;
         Some(InternalDataRef::new(
             crate_ref,

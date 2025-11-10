@@ -10,8 +10,9 @@ use proc_macro2::TokenStream;
 use quote::ToTokens;
 
 use crate::structs::{
-    DataVariantRef, InternalToken, Publicness, external_crate::ExternalMacroRef,
-    external_trait::TraitVariantRef, internal_data::InternalModuleRef,
+    DataVariantRef, ExternalFunctionRef, InternalToken, Publicness,
+    external_crate::ExternalMacroRef, external_trait::TraitVariantRef,
+    internal_data::InternalModuleRef,
 };
 
 #[derive(Default)]
@@ -25,6 +26,8 @@ pub struct InternalTokenBuilder {
     external_macros: Vec<ExternalMacroRef>,
     /// Traits used in the token stream.
     employed_traits: Vec<TraitVariantRef>,
+    /// Employed functions.
+    employed_functions: Vec<ExternalFunctionRef>,
     /// Traits which are implemented by the token stream.
     implemented_traits: Vec<TraitVariantRef>,
     /// Data used in the token stream.
@@ -142,6 +145,7 @@ impl InternalTokenBuilder {
         self = self.implemented_traits(other.implemented_traits);
         self = self.datas(other.data);
         self = self.internal_modules(other.internal_modules);
+        self = self.employed_functions(other.employed_functions);
 
         self
     }
@@ -279,6 +283,23 @@ impl InternalTokenBuilder {
         }
         self
     }
+
+    /// Adds an employed function reference to the token stream.
+    pub fn employed_function(mut self, employed_function: ExternalFunctionRef) -> Self {
+        self.employed_functions.push(employed_function);
+        self
+    }
+
+    /// Adds several employed function references to the token stream.
+    pub fn employed_functions<I>(mut self, employed_functions: I) -> Self
+    where
+        I: IntoIterator<Item = ExternalFunctionRef>,
+    {
+        for employed_function in employed_functions {
+            self = self.employed_function(employed_function);
+        }
+        self
+    }
 }
 
 impl Display for InternalTokenAttribute {
@@ -345,6 +366,7 @@ impl Builder for InternalTokenBuilder {
                 .ok_or(BuilderError::IncompleteBuild(InternalTokenAttribute::Stream))?,
             external_macros: self.external_macros,
             employed_traits: self.employed_traits,
+            employed_functions: self.employed_functions,
             implemented_traits: self.implemented_traits,
             data: self.data,
             internal_modules: self.internal_modules,

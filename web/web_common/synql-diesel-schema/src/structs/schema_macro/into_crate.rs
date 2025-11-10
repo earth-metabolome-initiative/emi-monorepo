@@ -8,11 +8,11 @@ use synql_core::{
 
 use crate::{structs::SchemaMacro, traits::TableSchema};
 
-impl<'table, 'data, T> From<SchemaMacro<'data, 'table, T>> for InternalCrate
+impl<'table, T> From<SchemaMacro<'table, T>> for InternalCrate
 where
     T: synql_core::traits::TableSynLike,
 {
-    fn from(schema_macro: SchemaMacro<'data, 'table, T>) -> Self {
+    fn from(schema_macro: SchemaMacro<'table, T>) -> Self {
         InternalCrate::new()
             .name(schema_macro.table.table_schema_crate_name())
             .expect("Invalid crate name")

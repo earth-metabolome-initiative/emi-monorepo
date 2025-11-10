@@ -15,7 +15,7 @@ use synql_core::{
 
 use crate::{structs::TableInsertable, traits::TableInsertableLike};
 
-impl<'data, 'table, T: TableInsertableLike + ?Sized> TableInsertable<'data, 'table, T>
+impl<'table, T: TableInsertableLike + ?Sized> TableInsertable<'table, T>
 where
     T::DB: InheritableDatabaseLike,
 {
@@ -48,20 +48,20 @@ where
                     .unwrap()
                     .body(
                         InternalToken::new()
-                            .inherits(check_constraints.clone())
-                            .stream(if column.has_check_constraints(self.database) {
+                            .stream(if check_constraints.is_empty() {
+                                quote! {
+                                    self.#snake_case_ident = Some(#snake_case_ident.try_into()?);
+                                    Ok(self)
+                                }
+                            } else {
                                 quote! {
                                     let #snake_case_ident = #snake_case_ident.try_into()?;
                                     #(#check_constraints)*
                                     self.#snake_case_ident = Some(#snake_case_ident);
                                     Ok(self)
                                 }
-                            } else {
-                                quote! {
-                                    self.#snake_case_ident = Some(#snake_case_ident.try_into()?);
-                                    Ok(self)
-                                }
                             })
+                            .inherits(check_constraints)
                             .build()
                             .unwrap(),
                     )

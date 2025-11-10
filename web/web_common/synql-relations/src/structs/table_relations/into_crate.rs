@@ -11,11 +11,11 @@ use crate::{
     traits::{TRAIT_MODULE_NAME, TableRelationsLike},
 };
 
-impl<'data, 'table, T> From<TableRelations<'data, 'table, T>> for InternalCrate
+impl<'table, T> From<TableRelations<'table, T>> for InternalCrate
 where
     T: TableRelationsLike + ?Sized,
 {
-    fn from(table_relation: TableRelations<'data, 'table, T>) -> Self {
+    fn from(table_relation: TableRelations<'table, T>) -> Self {
         let schema_crate_ref = table_relation
             .table
             .table_schema_ref(table_relation.workspace)

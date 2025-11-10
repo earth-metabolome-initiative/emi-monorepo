@@ -11,7 +11,7 @@ use synql_core::{
 
 use crate::{structs::TableBuildable, traits::TableBuildableLike};
 
-impl<'data, 'table, T: TableBuildableLike + ?Sized> TableBuildable<'data, 'table, T>
+impl<'table, T: TableBuildableLike + ?Sized> TableBuildable<'table, T>
 where
     T::DB: InheritableDatabaseLike,
 {

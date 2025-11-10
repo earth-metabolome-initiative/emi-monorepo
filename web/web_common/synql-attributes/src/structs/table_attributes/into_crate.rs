@@ -8,10 +8,8 @@ use synql_core::{
 
 use crate::{structs::TableAttributes, traits::TableAttributesLike};
 
-impl<'data, 'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'data, 'table, T>>
-    for InternalCrate
-{
-    fn from(attributes: TableAttributes<'data, 'table, T>) -> Self {
+impl<'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'table, T>> for InternalCrate {
+    fn from(attributes: TableAttributes<'table, T>) -> Self {
         let schema_crate_ref = attributes
             .table
             .table_schema_ref(attributes.workspace)

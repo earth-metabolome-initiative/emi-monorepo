@@ -50,10 +50,7 @@ pub trait TableBuildableLike: TableInsertableLike {
 
     /// Returns the attribute for an extension field of a builder
     /// when the table is extended by another table.
-    fn builder_extension_attribute<'data>(
-        &self,
-        workspace: &Workspace<'data>,
-    ) -> InternalAttribute {
+    fn builder_extension_attribute<'data>(&self, workspace: &Workspace) -> InternalAttribute {
         let schema_crate_ref = self
             .table_schema_ref(workspace)
             .expect("Failed to get the table schema ref for the buildable module");
@@ -81,7 +78,7 @@ pub trait TableBuildableLike: TableInsertableLike {
 
     /// Returns the attribute for an insertable field of a builder
     /// for the underlying insertable object.
-    fn insertable_attribute<'data>(&self, workspace: &Workspace<'data>) -> InternalAttribute {
+    fn insertable_attribute<'data>(&self, workspace: &Workspace) -> InternalAttribute {
         let insertable_ref = self
             .insertable_data_ref(workspace)
             .expect("Failed to get the table schema ref for the buildable module");
@@ -110,14 +107,11 @@ pub trait TableBuildableLike: TableInsertableLike {
     /// * `workspace` - The workspace where the table is defined.
     /// * `database` - The database connection to use to query the table
     ///   buildable.
-    fn buildable<'table, 'data>(
+    fn buildable<'table>(
         &'table self,
-        workspace: &'table Workspace<'data>,
+        workspace: &'table Workspace,
         database: &'table Self::DB,
-    ) -> TableBuildable<'data, 'table, Self>
-    where
-        Self: 'data,
-    {
+    ) -> TableBuildable<'table, Self> {
         TableBuildable::new(self, workspace, database)
     }
 }

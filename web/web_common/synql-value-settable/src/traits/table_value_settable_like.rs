@@ -78,21 +78,18 @@ pub trait TableValueSettableLike: TableModelLike {
     ///
     /// * `workspace` - The workspace where the table is defined.
     /// * `database` - The database connection to use to query the table model.
-    fn value_settable_trait<'table, 'data>(
+    fn value_settable_trait<'table>(
         &'table self,
-        workspace: &'table Workspace<'data>,
+        workspace: &'table Workspace,
         database: &'table Self::DB,
-    ) -> TableValueSettable<'data, 'table, Self>
-    where
-        Self: 'data,
-    {
+    ) -> TableValueSettable<'table, Self> {
         TableValueSettable::new(self, workspace, database)
     }
 
     /// Returns the trait reference for the table value settable trait.
-    fn value_settable_trait_ref<'table, 'data>(
+    fn value_settable_trait_ref<'table>(
         &'table self,
-        workspace: &'table Workspace<'data>,
+        workspace: &'table Workspace,
     ) -> Option<TraitVariantRef> {
         let crate_ref = workspace.internal_crate(&self.table_value_settable_crate_name())?;
         let trait_ref = crate_ref.internal_trait(&self.table_value_settable_trait_name())?;

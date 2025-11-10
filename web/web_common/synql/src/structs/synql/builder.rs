@@ -1,6 +1,6 @@
 //! Submodule providing a builder for the `SynQL` struct.
 
-use std::{fmt::Display, path::Path, sync::Arc};
+use std::{fmt::Display, path::PathBuf, sync::Arc};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -14,7 +14,7 @@ use crate::traits::SynQLDatabaseLike;
 /// Struct to build `SynQL` instances.
 pub struct SynQLBuilder<'a, DB: SynQLDatabaseLike> {
     database: Option<&'a DB>,
-    path: Option<&'a Path>,
+    path: Option<PathBuf>,
     deny_list: Vec<&'a DB::Table>,
     version: (u8, u8, u8),
     edition: u16,
@@ -84,7 +84,7 @@ impl<'a, DB: SynQLDatabaseLike> SynQLBuilder<'a, DB> {
     }
 
     /// Sets the path for the `SynQL` instance.
-    pub fn path(mut self, path: &'a Path) -> Self {
+    pub fn path(mut self, path: PathBuf) -> Self {
         self.path = Some(path);
         self
     }

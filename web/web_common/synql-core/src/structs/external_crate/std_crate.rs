@@ -1,44 +1,38 @@
 //! Submodule implementing the method `std` for the [`ExternalCrate`] struct
 //! which initializes a `ExternalCrate` instance describing the `std` crate.
 
-use std::sync::{Arc, OnceLock};
+use std::sync::Arc;
 
 use common_traits::builder::Builder;
 
 use crate::structs::{ExternalCrate, ExternalType};
 
-static STD_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
-
 impl ExternalCrate {
     /// Initializes a `ExternalCrate` instance describing the `std` crate.
     pub fn std() -> Arc<ExternalCrate> {
-        STD_CRATE
-            .get_or_init(|| {
-                Arc::new(
-                    ExternalCrate::new()
-                        .name("std".to_string())
-                        .unwrap()
-                        .add_types(vec![
-                            Arc::new(ExternalType::string()),
-                            Arc::new(ExternalType::str()),
-                            Arc::new(ExternalType::vec_u8()),
-                            Arc::new(ExternalType::vec_i16()),
-                            Arc::new(ExternalType::vec_i32()),
-                            Arc::new(ExternalType::vec_u32()),
-                            Arc::new(ExternalType::vec_f32()),
-                            Arc::new(ExternalType::vec_f64()),
-                            Arc::new(ExternalType::vec_bool()),
-                            Arc::new(ExternalType::ip_addr()),
-                            Arc::new(ExternalType::mac_addr()),
-                            Arc::new(ExternalType::vec_string()),
-                            Arc::new(ExternalType::system_time()),
-                        ])
-                        .unwrap()
-                        .build()
-                        .unwrap(),
-                )
-            })
-            .clone()
+        Arc::new(
+            ExternalCrate::new()
+                .name("std".to_string())
+                .unwrap()
+                .add_types(vec![
+                    Arc::new(ExternalType::string()),
+                    Arc::new(ExternalType::str()),
+                    Arc::new(ExternalType::vec_u8()),
+                    Arc::new(ExternalType::vec_i16()),
+                    Arc::new(ExternalType::vec_i32()),
+                    Arc::new(ExternalType::vec_u32()),
+                    Arc::new(ExternalType::vec_f32()),
+                    Arc::new(ExternalType::vec_f64()),
+                    Arc::new(ExternalType::vec_bool()),
+                    Arc::new(ExternalType::ip_addr()),
+                    Arc::new(ExternalType::mac_addr()),
+                    Arc::new(ExternalType::vec_string()),
+                    Arc::new(ExternalType::system_time()),
+                ])
+                .unwrap()
+                .build()
+                .unwrap(),
+        )
     }
 }
 

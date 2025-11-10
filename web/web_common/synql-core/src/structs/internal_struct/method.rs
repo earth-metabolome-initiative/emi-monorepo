@@ -47,6 +47,11 @@ impl Method {
         &self.name
     }
 
+    /// Returns a reference to the body of the method.
+    pub fn body(&self) -> Option<&InternalToken> {
+        self.body.as_ref()
+    }
+
     /// Returns whether the method has a body.
     pub fn has_body(&self) -> bool {
         self.body.is_some()

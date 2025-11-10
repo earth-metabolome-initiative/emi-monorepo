@@ -1,7 +1,7 @@
 //! Submodule defining the `SQLWorkspace` trait which allows to generate the
 //! `diesel` workspace from a SQL schema, based on `sql_traits`.
 
-use std::{path::Path, sync::Arc};
+use std::{path::PathBuf, sync::Arc};
 
 use synql_attributes::traits::{TableAttributesLike, TableExtensionAttributesLike};
 use synql_builders::prelude::*;
@@ -23,7 +23,7 @@ pub struct SynQL<'a, DB: SynQLDatabaseLike> {
     /// The underlying database which will be used to generate the workspace.
     database: &'a DB,
     /// The path to the workspace.
-    path: &'a Path,
+    path: PathBuf,
     /// List of tables to be excluded from the workspace, which also imply
     /// excluding all of the tables that depend on them via foreign keys.
     deny_list: Vec<&'a DB::Table>,
@@ -57,7 +57,7 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
     /// Executes the workspace generation.
     pub fn generate(&self) -> std::io::Result<TimeTracker> {
         let mut workspace = Workspace::new()
-            .path(self.path)
+            .path(self.path.clone())
             .name(self.database.catalog_name())
             .expect("Invalid workspace name")
             .external_crates(self.external_crates.iter().cloned())
@@ -66,6 +66,7 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             .diesel_queries()
             .serde()
             .validation_errors()
+            .pgrx_validation()
             .postgis_diesel()
             .rosetta_uuid()
             .version(self.version.0, self.version.1, self.version.2)

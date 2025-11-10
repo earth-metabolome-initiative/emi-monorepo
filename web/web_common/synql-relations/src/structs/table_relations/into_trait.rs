@@ -10,11 +10,11 @@ use synql_core::{
 
 use crate::{structs::TableRelations, traits::TableRelationsLike};
 
-impl<'data, 'table, T> From<TableRelations<'data, 'table, T>> for InternalTrait
+impl<'table, T> From<TableRelations<'table, T>> for InternalTrait
 where
     T: TableRelationsLike + ?Sized,
 {
-    fn from(table_relation: TableRelations<'data, 'table, T>) -> Self {
+    fn from(table_relation: TableRelations<'table, T>) -> Self {
         let extension_of = table_relation.extension_of_trait();
         let model_ref = table_relation.model_ref();
         let schema_crate_ref = table_relation

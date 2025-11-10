@@ -12,12 +12,11 @@ use crate::{
     traits::{BUILDABLE_MODULE_NAME, TableBuildableLike},
 };
 
-impl<'data, 'table, T: TableBuildableLike + ?Sized> From<TableBuildable<'data, 'table, T>>
-    for InternalModule
+impl<'table, T: TableBuildableLike + ?Sized> From<TableBuildable<'table, T>> for InternalModule
 where
     T::DB: InheritableDatabaseLike,
 {
-    fn from(value: TableBuildable<'data, 'table, T>) -> Self {
+    fn from(value: TableBuildable<'table, T>) -> Self {
         let schema_crate_ref = value
             .table
             .table_schema_ref(value.workspace)

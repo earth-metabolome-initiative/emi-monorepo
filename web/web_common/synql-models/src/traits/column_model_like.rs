@@ -16,11 +16,7 @@ pub trait ColumnModelLike: ColumnSynLike {
     ///
     /// * `database` - The database connection to use to query the column model.
     /// * `workspace` - The workspace where the column is defined.
-    fn attribute<'data>(
-        &self,
-        database: &Self::DB,
-        workspace: &Workspace<'data>,
-    ) -> InternalAttribute {
+    fn attribute<'data>(&self, database: &Self::DB, workspace: &Workspace) -> InternalAttribute {
         let mut attribute_type: DataVariantRef = self
             .external_postgres_type(workspace, database)
             .expect("Failed to find external type")

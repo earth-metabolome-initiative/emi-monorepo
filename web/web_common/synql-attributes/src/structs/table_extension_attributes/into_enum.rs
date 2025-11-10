@@ -11,10 +11,10 @@ use crate::{
     traits::{TableAttributesLike, TableExtensionAttributesLike},
 };
 
-impl<'data, 'table, T: TableExtensionAttributesLike + ?Sized>
-    From<TableExtensionAttributes<'data, 'table, T>> for InternalEnum
+impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttributes<'table, T>>
+    for InternalEnum
 {
-    fn from(extension_attributes: TableExtensionAttributes<'data, 'table, T>) -> Self {
+    fn from(extension_attributes: TableExtensionAttributes<'table, T>) -> Self {
         InternalEnum::new()
             .variants(extension_attributes.table.extended_tables(extension_attributes.database).into_iter().map(|extended_table| {
 				let attribute_enum = extended_table.attributes_ref(extension_attributes.workspace).expect(&format!(

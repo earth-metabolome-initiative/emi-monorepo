@@ -16,9 +16,9 @@ use synql_core::{
     traits::{ColumnSynLike, FunctionSynLike},
 };
 
-pub(super) struct TranslateExpression<'local, 'db, 'data, DB: DatabaseLike> {
+pub(super) struct TranslateExpression<'local, 'db, DB: DatabaseLike> {
     check_constraint: &'db DB::CheckConstraint,
-    workspace: &'local Workspace<'data>,
+    workspace: &'local Workspace,
     database: &'db DB,
     contextual_columns: &'local [&'db DB::Column],
 }
@@ -52,13 +52,13 @@ fn invert_operator(op: &BinaryOperator) -> BinaryOperator {
     }
 }
 
-impl<'local, 'db, 'data, DB> TranslateExpression<'local, 'db, 'data, DB>
+impl<'local, 'db, DB> TranslateExpression<'local, 'db, DB>
 where
     DB: DatabaseLike,
 {
     pub(super) fn new(
         check_constraint: &'db DB::CheckConstraint,
-        workspace: &'local Workspace<'data>,
+        workspace: &'local Workspace,
         database: &'db DB,
         contextual_columns: &'local [&'db DB::Column],
     ) -> Self {
@@ -522,7 +522,7 @@ where
 
         let mut internal_token_builder: InternalTokenBuilder = InternalToken::new();
 
-        let map_err = if function_ref.can_fail() {
+        let (maybe_rename_field, map_err) = if function_ref.can_fail() {
             let attributes_enumeration = self.attributes_enumeration();
             internal_token_builder = internal_token_builder.data(attributes_enumeration.clone());
 
@@ -531,35 +531,48 @@ where
                 quote! { #attributes_enumeration::#camel_cased }
             });
 
-            match scoped_columns.len() {
-                1 => {
-                    quote! {
-                        .map_err(|e| e.rename_field(#(#attributes),* ))
-                    }
-                }
-                2 => {
-                    quote! {
-                        .map_err(|e| e.rename_fields(#(#attributes),* ))
-                    }
-                }
-                _ => {
-                    unimplemented!("More than two scoped columns not supported");
-                }
-            }
-        } else {
-            TokenStream::new()
-        };
+            let rename_field_trait = self
+                .workspace
+                .external_trait("ReplaceFieldName")
+                .expect("Failed to get ReplaceFieldName trait for function error mapping");
 
-        let internal_token = internal_token_builder
-            .inherits(args.iter().cloned())
-            .stream(quote! {
-                #function_ref(#(#args),*)#map_err
-            })
-            .build()
-            .unwrap();
+            (
+                Some(quote! {
+                    use #rename_field_trait;
+                }),
+                Some(match scoped_columns.len() {
+                    1 => {
+                        quote! {
+                            .map_err(|e| e.into_field_name(|_|#(#attributes),* ))
+                        }
+                    }
+                    2 => {
+                        quote! {
+                            .map_err(|e| e.into_field_names(|_|#(#attributes),* ))
+                        }
+                    }
+                    _ => {
+                        unimplemented!("More than two scoped columns not supported");
+                    }
+                }),
+            )
+        } else {
+            (None, None)
+        };
 
         let data_variant_ref: DataVariantRef =
             function_ref.return_type().cloned().unwrap_or_else(|| DataVariantRef::unit());
+
+        let internal_token = internal_token_builder
+            .stream(quote! {
+                #maybe_rename_field
+                #function_ref(#(#args),*)#map_err
+            })
+            .data(data_variant_ref.clone())
+            .employed_function(function_ref)
+            .inherits(args)
+            .build()
+            .unwrap();
 
         (internal_token, data_variant_ref)
     }
@@ -658,10 +671,6 @@ where
             return validation_error_token;
         }
 
-        if self.check_constraint.has_functions(self.database) {
-            return quote! {}.into();
-        }
-
         let (internal_token, scoped_columns, returning_type) = self.inner_parse(expr, None);
 
         if !scoped_columns.is_empty() {
@@ -674,7 +683,13 @@ where
             returning_type
         );
 
-        internal_token
+        InternalToken::new()
+            .stream(quote! {
+                #internal_token?;
+            })
+            .inherit(internal_token)
+            .build()
+            .unwrap()
     }
 
     #[allow(clippy::too_many_lines)]
@@ -701,7 +716,7 @@ where
             Expr::Identifier(ident) => {
                 let column = self.column(&ident.value);
                 (
-                    self.formatted_column(column, false).into(),
+                    self.formatted_column(column, true).into(),
                     vec![column],
                     column
                         .external_postgres_type(self.workspace, self.database)

@@ -11,11 +11,11 @@ use synql_core::{
 
 use crate::{structs::SchemaMacro, traits::TableSchema};
 
-impl<'data, 'table, T> From<SchemaMacro<'data, 'table, T>> for InternalToken
+impl<'table, T> From<SchemaMacro<'table, T>> for InternalToken
 where
     T: synql_core::traits::TableSynLike,
 {
-    fn from(schema_macro: SchemaMacro<'data, 'table, T>) -> Self {
+    fn from(schema_macro: SchemaMacro<'table, T>) -> Self {
         let mut columns = Vec::new();
         let mut column_types = Vec::new();
 

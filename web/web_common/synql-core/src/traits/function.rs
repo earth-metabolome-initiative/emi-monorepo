@@ -19,7 +19,7 @@ pub trait FunctionSynLike: FunctionLike {
     /// * `database` - The database where the column is defined.
     fn argument_types<'db, 'data>(
         &'db self,
-        workspace: &'db Workspace<'data>,
+        workspace: &'db Workspace,
         database: &'db Self::DB,
     ) -> impl Iterator<Item = Option<ExternalTypeRef>> + 'db {
         self.normalized_argument_type_names(database)
@@ -35,7 +35,7 @@ pub trait FunctionSynLike: FunctionLike {
     /// * `database` - The database where the column is defined.
     fn return_type<'workspace, 'data>(
         &'data self,
-        workspace: &'workspace Workspace<'data>,
+        workspace: &'workspace Workspace,
         database: &'data Self::DB,
     ) -> Option<ExternalTypeRef> {
         self.normalized_return_type_name(database)
@@ -46,10 +46,7 @@ pub trait FunctionSynLike: FunctionLike {
     ///
     /// # Arguments
     /// * `workspace` - The workspace where the column is defined.
-    fn external_function_ref<'data>(
-        &self,
-        workspace: &Workspace<'data>,
-    ) -> Option<ExternalFunctionRef> {
+    fn external_function_ref(&self, workspace: &Workspace) -> Option<ExternalFunctionRef> {
         workspace.external_function(self.name())
     }
 }

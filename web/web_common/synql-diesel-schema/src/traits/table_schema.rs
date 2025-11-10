@@ -62,25 +62,22 @@ pub trait TableSchema: TableSynLike + Sized {
     /// # Ok(())
     /// # }
     /// ```
-    fn schema_macro<'data, 'table>(
+    fn schema_macro<'table>(
         &'table self,
-        workspace: &'table Workspace<'data>,
+        workspace: &'table Workspace,
         database: &'table Self::DB,
-    ) -> SchemaMacro<'data, 'table, Self>
-    where
-        Self: 'data,
-    {
+    ) -> SchemaMacro<'table, Self> {
         SchemaMacro::new(self, workspace, database)
     }
 
     /// Returns a reference to the schema module ref for the table.
-    fn schema_module<'data>(&self, workspace: &Workspace<'data>) -> Option<InternalModuleRef> {
+    fn schema_module(&self, workspace: &Workspace) -> Option<InternalModuleRef> {
         let crate_ref = self.table_schema_ref(workspace)?;
         Some(InternalModuleRef::new(&crate_ref, crate_ref.module(TABLE_SCHEMA_MODULE_NAME)?))
     }
 
     /// Returns a reference to the schema crate ref for the table.
-    fn table_schema_ref<'data>(&self, workspace: &Workspace<'data>) -> Option<Arc<InternalCrate>> {
+    fn table_schema_ref(&self, workspace: &Workspace) -> Option<Arc<InternalCrate>> {
         workspace.internal_crate(&self.table_schema_crate_name()).cloned()
     }
 

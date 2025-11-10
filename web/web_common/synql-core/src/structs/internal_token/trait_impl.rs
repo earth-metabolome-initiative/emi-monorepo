@@ -261,6 +261,7 @@ impl<'trt> TryFrom<TraitImpl<'trt>> for InternalToken {
                     #(#methods)*
                 }
             })
+            .inherits(methods.iter().filter_map(|method| method.body().cloned()))
             .build()?)
     }
 }

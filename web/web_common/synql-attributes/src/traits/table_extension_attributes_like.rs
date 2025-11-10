@@ -43,14 +43,11 @@ pub trait TableExtensionAttributesLike: TableSchema {
     /// * `workspace` - The workspace where the table is defined.
     /// * `database` - The database connection to use to query the table
     ///   extension attributes.
-    fn extension_attributes<'table, 'data>(
+    fn extension_attributes<'table>(
         &'table self,
-        workspace: &'table Workspace<'data>,
+        workspace: &'table Workspace,
         database: &'table Self::DB,
-    ) -> Option<TableExtensionAttributes<'data, 'table, Self>>
-    where
-        Self: 'data,
-    {
+    ) -> Option<TableExtensionAttributes<'table, Self>> {
         if self.is_extension(database) {
             Some(TableExtensionAttributes::new(self, workspace, database))
         } else {
@@ -59,10 +56,7 @@ pub trait TableExtensionAttributesLike: TableSchema {
     }
 
     /// Returns a reference to the extension attributes enum for the table.
-    fn extension_attributes_enum_ref<'data>(
-        &self,
-        workspace: &Workspace<'data>,
-    ) -> Option<InternalDataRef> {
+    fn extension_attributes_enum_ref(&self, workspace: &Workspace) -> Option<InternalDataRef> {
         let crate_ref = workspace.internal_crate(&self.table_extension_attributes_crate_name())?;
         Some(InternalDataRef::new(
             crate_ref,

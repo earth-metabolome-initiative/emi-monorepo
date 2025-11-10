@@ -17,8 +17,9 @@ pub use trait_impl::TraitImpl;
 
 use crate::{
     structs::{
-        DataVariantRef, ExternalCrate, InternalCrate, Publicness, external_crate::ExternalMacroRef,
-        external_trait::TraitVariantRef, internal_data::InternalModuleRef,
+        DataVariantRef, ExternalCrate, ExternalFunctionRef, InternalCrate, Publicness,
+        external_crate::ExternalMacroRef, external_trait::TraitVariantRef,
+        internal_data::InternalModuleRef,
     },
     traits::{ExternalDependencies, InternalDependencies},
 };
@@ -34,6 +35,8 @@ pub struct InternalToken {
     external_macros: Vec<ExternalMacroRef>,
     /// Traits used in the token stream.
     employed_traits: Vec<TraitVariantRef>,
+    /// Employed functions.
+    employed_functions: Vec<ExternalFunctionRef>,
     /// Traits which are implemented by the token stream.
     implemented_traits: Vec<TraitVariantRef>,
     /// Data used in the token stream.
@@ -156,6 +159,7 @@ impl From<TokenStream> for InternalToken {
             external_macros: Vec::new(),
             employed_traits: Vec::new(),
             implemented_traits: Vec::new(),
+            employed_functions: Vec::new(),
             data: Vec::new(),
             internal_modules: Vec::new(),
         }
@@ -207,6 +211,9 @@ impl ExternalDependencies for InternalToken {
         }
         for data in &self.data {
             dependencies.extend(data.external_dependencies());
+        }
+        for func in &self.employed_functions {
+            dependencies.extend(func.external_dependencies());
         }
         dependencies.sort_unstable();
         dependencies.dedup();

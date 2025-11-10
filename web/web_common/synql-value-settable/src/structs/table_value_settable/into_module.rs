@@ -12,12 +12,12 @@ use crate::{
     traits::{TRAIT_MODULE_NAME, TableValueSettableLike},
 };
 
-impl<'data, 'table, T> From<TableValueSettable<'data, 'table, T>> for InternalModule
+impl<'table, T> From<TableValueSettable<'table, T>> for InternalModule
 where
     T: TableValueSettableLike + ?Sized,
     T::DB: InheritableDatabaseLike,
 {
-    fn from(table_relation: TableValueSettable<'data, 'table, T>) -> Self {
+    fn from(table_relation: TableValueSettable<'table, T>) -> Self {
         let schema_crate_ref = table_relation
             .table
             .table_schema_ref(table_relation.workspace)

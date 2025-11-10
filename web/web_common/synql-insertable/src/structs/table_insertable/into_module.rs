@@ -9,12 +9,11 @@ use synql_core::{
 
 use crate::{structs::TableInsertable, traits::TableInsertableLike};
 
-impl<'data, 'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'data, 'table, T>>
-    for InternalModule
+impl<'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'table, T>> for InternalModule
 where
     T::DB: InheritableDatabaseLike,
 {
-    fn from(value: TableInsertable<'data, 'table, T>) -> Self {
+    fn from(value: TableInsertable<'table, T>) -> Self {
         let module_name = crate::traits::table_insertable_like::INSERTABLE_MODULE_NAME;
         let schema_crate_ref = value
             .table

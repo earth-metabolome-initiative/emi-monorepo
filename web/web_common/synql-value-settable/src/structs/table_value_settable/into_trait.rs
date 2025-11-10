@@ -9,12 +9,12 @@ use synql_core::{
 
 use crate::{structs::TableValueSettable, traits::TableValueSettableLike};
 
-impl<'data, 'table, T> From<TableValueSettable<'data, 'table, T>> for InternalTrait
+impl<'table, T> From<TableValueSettable<'table, T>> for InternalTrait
 where
     T: TableValueSettableLike + ?Sized,
     T::DB: InheritableDatabaseLike,
 {
-    fn from(table_settable: TableValueSettable<'data, 'table, T>) -> Self {
+    fn from(table_settable: TableValueSettable<'table, T>) -> Self {
         let schema_crate_ref = table_settable
             .table
             .table_schema_ref(table_settable.workspace)

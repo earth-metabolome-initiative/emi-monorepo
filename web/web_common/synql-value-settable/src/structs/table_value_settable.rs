@@ -23,26 +23,21 @@ mod into_trait;
 
 #[derive(Debug)]
 /// Struct representing a SynQL table value settable trait.
-pub struct TableValueSettable<'data, 'table, T: TableValueSettableLike + ?Sized> {
+pub struct TableValueSettable<'table, T: TableValueSettableLike + ?Sized> {
     table: &'table T,
-    workspace: &'table Workspace<'data>,
+    workspace: &'table Workspace,
     database: &'table T::DB,
 }
 
-impl<'data, 'table, T: TableValueSettableLike + ?Sized> Clone
-    for TableValueSettable<'data, 'table, T>
-{
+impl<'table, T: TableValueSettableLike + ?Sized> Clone for TableValueSettable<'table, T> {
     fn clone(&self) -> Self {
         Self { table: self.table, workspace: self.workspace, database: self.database }
     }
 }
 
-impl<'data, 'table, T: TableValueSettableLike + ?Sized> Copy
-    for TableValueSettable<'data, 'table, T>
-{
-}
+impl<'table, T: TableValueSettableLike + ?Sized> Copy for TableValueSettable<'table, T> {}
 
-impl<'data, 'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'data, 'table, T> {
+impl<'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'table, T> {
     /// Creates a new `TableValueSettable` instance.
     ///
     /// # Arguments
@@ -50,11 +45,7 @@ impl<'data, 'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'data
     /// * `table` - The table model implementing `TableValueSettableLike`.
     /// * `workspace` - The workspace where the table is defined.
     /// * `database` - The database connection to use to query the table model.
-    pub fn new(
-        table: &'table T,
-        workspace: &'table Workspace<'data>,
-        database: &'table T::DB,
-    ) -> Self {
+    pub fn new(table: &'table T, workspace: &'table Workspace, database: &'table T::DB) -> Self {
         Self { table, workspace, database }
     }
 

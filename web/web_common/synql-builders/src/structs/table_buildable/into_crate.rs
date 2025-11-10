@@ -7,14 +7,12 @@ use synql_core::{
     structs::{Documentation, InternalCrate},
 };
 
-impl<'data, 'table, T: crate::traits::TableBuildableLike + ?Sized>
-    From<super::TableBuildable<'data, 'table, T>> for synql_core::structs::InternalCrate
+impl<'table, T: crate::traits::TableBuildableLike + ?Sized> From<super::TableBuildable<'table, T>>
+    for synql_core::structs::InternalCrate
 where
     T::DB: InheritableDatabaseLike,
 {
-    fn from(
-        buildable: super::TableBuildable<'data, 'table, T>,
-    ) -> synql_core::structs::InternalCrate {
+    fn from(buildable: super::TableBuildable<'table, T>) -> synql_core::structs::InternalCrate {
         let schema_ref = buildable
             .table
             .table_schema_ref(buildable.workspace)

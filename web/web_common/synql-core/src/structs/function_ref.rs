@@ -1,12 +1,16 @@
 //! Submodule providing the `FunctionRef` struct representing a reference to a
 //! function defined in an external crate.
 
-use std::sync::Arc;
+use std::{fmt::Debug, sync::Arc};
 
 use quote::ToTokens;
 
-use crate::structs::{DataVariantRef, ExternalCrate, Method};
+use crate::{
+    structs::{DataVariantRef, ExternalCrate, Method},
+    traits::ExternalDependencies,
+};
 
+#[derive(Clone)]
 /// Struct representing a reference to a function defined in an external crate.
 pub struct ExternalFunctionRef {
     /// The underlying method.
@@ -17,7 +21,22 @@ pub struct ExternalFunctionRef {
     crate_ref: Arc<ExternalCrate>,
 }
 
+impl Debug for ExternalFunctionRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ExternalFunctionRef")
+            .field("method", &self.method)
+            .field("path", &self.path.to_token_stream().to_string())
+            .field("crate_ref", &self.crate_ref.name())
+            .finish()
+    }
+}
+
 impl ExternalFunctionRef {
+    /// Creates a new `ExternalFunctionRef` instance.
+    pub fn new(method: Arc<Method>, path: Arc<syn::Path>, crate_ref: Arc<ExternalCrate>) -> Self {
+        Self { method, path, crate_ref }
+    }
+
     /// Returns the underlying method.
     #[must_use]
     pub fn method(&self) -> &Method {
@@ -26,7 +45,7 @@ impl ExternalFunctionRef {
 
     /// Returns the crate from which the function is referenced.
     #[must_use]
-    pub fn crate_ref(&self) -> &ExternalCrate {
+    pub fn crate_ref(&self) -> &Arc<ExternalCrate> {
         &self.crate_ref
     }
 
@@ -44,5 +63,11 @@ impl ExternalFunctionRef {
 impl ToTokens for ExternalFunctionRef {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         self.path.to_tokens(tokens);
+    }
+}
+
+impl ExternalDependencies for ExternalFunctionRef {
+    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
+        vec![self.crate_ref.clone()]
     }
 }

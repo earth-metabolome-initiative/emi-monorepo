@@ -19,24 +19,24 @@ mod into_module;
 
 #[derive(Debug)]
 /// Struct representing a SynQL table attributes enumeration.
-pub struct TableAttributes<'data, 'table, T: TableAttributesLike + ?Sized> {
+pub struct TableAttributes<'table, T: TableAttributesLike + ?Sized> {
     table: &'table T,
-    workspace: &'table synql_core::structs::Workspace<'data>,
+    workspace: &'table synql_core::structs::Workspace,
     database: &'table T::DB,
 }
 
-impl<'data, 'table, T: TableAttributesLike + ?Sized> Clone for TableAttributes<'data, 'table, T> {
+impl<'table, T: TableAttributesLike + ?Sized> Clone for TableAttributes<'table, T> {
     fn clone(&self) -> Self {
         Self { table: self.table, workspace: self.workspace, database: self.database }
     }
 }
 
-impl<'data, 'table, T: TableAttributesLike + ?Sized> Copy for TableAttributes<'data, 'table, T> {}
+impl<'table, T: TableAttributesLike + ?Sized> Copy for TableAttributes<'table, T> {}
 
-impl<'data, 'table, T: TableAttributesLike + ?Sized> TableAttributes<'data, 'table, T> {
+impl<'table, T: TableAttributesLike + ?Sized> TableAttributes<'table, T> {
     pub(crate) fn new(
         table: &'table T,
-        workspace: &'table synql_core::structs::Workspace<'data>,
+        workspace: &'table synql_core::structs::Workspace,
         database: &'table T::DB,
     ) -> Self {
         Self { table, workspace, database }
@@ -110,10 +110,10 @@ impl<'data, 'table, T: TableAttributesLike + ?Sized> TableAttributes<'data, 'tab
     }
 }
 
-impl<'data, 'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'data, 'table, T>>
+impl<'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'table, T>>
     for InternalDataVariant
 {
-    fn from(attributes: TableAttributes<'data, 'table, T>) -> Self {
+    fn from(attributes: TableAttributes<'table, T>) -> Self {
         let enum_variant: InternalEnum = attributes.into();
         enum_variant.into()
     }

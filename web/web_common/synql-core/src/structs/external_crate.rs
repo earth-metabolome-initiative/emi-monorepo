@@ -1,7 +1,7 @@
 //! Submodule providing a struct defining the crate required by some type found
 //! in the postgres database schema.
 
-use std::{hash::Hash, sync::Arc};
+use std::{fmt::Debug, hash::Hash, sync::Arc};
 
 use proc_macro2::TokenStream;
 use quote::ToTokens;
@@ -9,8 +9,8 @@ use syn::{Ident, Type};
 
 use crate::{
     structs::{
-        DataVariantRef, ExternalFunctionRef, ExternalMacro, ExternalTrait, ExternalType, Trait,
-        external_crate::builder::ExternalCrateBuilder, external_trait::TraitVariantRef,
+        DataVariantRef, ExternalFunctionRef, ExternalMacro, ExternalTrait, ExternalType, Method,
+        Trait, external_crate::builder::ExternalCrateBuilder, external_trait::TraitVariantRef,
     },
     traits::{ExternalDependencies, InternalDependencies},
 };
@@ -21,13 +21,14 @@ mod core_crate;
 mod diesel_crate;
 mod diesel_queries_crate;
 mod helpers;
+mod pgrx_validation;
 mod postgis_diesel_crate;
 mod rosetta_uuid_crate;
 mod serde_crate;
 mod std_crate;
 mod validation_errors_crate;
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 /// Struct defining the crate required by some type found in the postgres
 /// database schema.
 pub struct ExternalCrate {
@@ -40,12 +41,29 @@ pub struct ExternalCrate {
     macros: Vec<ExternalMacro>,
     /// List of the traits defined within the crate.
     traits: Vec<ExternalTrait>,
+    /// Methods defined within the crate.
+    functions: Vec<(Arc<Method>, Arc<syn::Path>)>,
     /// Whether the crate is a dependency.
     version: Option<String>,
     /// Git to the crate, if it is a local dependency.
     git: Option<(String, String)>,
     /// Feature flags required by the crate.
     features: Vec<String>,
+}
+
+impl Debug for ExternalCrate {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ExternalCrate")
+            .field("name", &self.name)
+            .field("types", &self.types)
+            .field("macros", &self.macros)
+            .field("traits", &self.traits)
+            .field("functions", &self.functions.iter().map(|(m, _)| m).collect::<Vec<_>>())
+            .field("version", &self.version)
+            .field("git", &self.git)
+            .field("features", &self.features)
+            .finish()
+    }
 }
 
 impl PartialEq for ExternalCrate {
@@ -73,6 +91,9 @@ impl Hash for ExternalCrate {
         self.name.hash(state);
     }
 }
+
+unsafe impl Send for ExternalCrate {}
+unsafe impl Sync for ExternalCrate {}
 
 impl ExternalCrate {
     /// Inizializes a new `ExternalCrateBuilder`.
@@ -161,8 +182,10 @@ impl ExternalCrate {
     /// # Arguments
     /// * `name` - A string slice representing the name of the external
     ///   function.
-    pub fn external_function_ref(&self, _name: &str) -> Option<ExternalFunctionRef> {
-        todo!("Implement external function ref retrieval")
+    pub fn external_function_ref(&self, name: &str) -> Option<ExternalFunctionRef> {
+        self.functions.iter().find(|(m, _)| m.name() == name).map(|(m, path)| {
+            ExternalFunctionRef::new(m.clone(), path.clone(), Arc::new(self.clone()))
+        })
     }
 
     /// Returns the external type compatible with the provided postgres name, if

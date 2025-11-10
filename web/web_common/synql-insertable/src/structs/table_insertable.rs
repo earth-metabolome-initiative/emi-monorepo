@@ -16,24 +16,24 @@ mod value_settable;
 
 #[derive(Debug)]
 /// Struct representing a SynQL table insertable.
-pub struct TableInsertable<'data, 'table, T: TableLike + ?Sized> {
+pub struct TableInsertable<'table, T: TableLike + ?Sized> {
     table: &'table T,
-    workspace: &'table synql_core::structs::Workspace<'data>,
+    workspace: &'table synql_core::structs::Workspace,
     database: &'table T::DB,
 }
 
-impl<'data, 'table, T: TableLike + ?Sized> Clone for TableInsertable<'data, 'table, T> {
+impl<'table, T: TableLike + ?Sized> Clone for TableInsertable<'table, T> {
     fn clone(&self) -> Self {
         Self { table: self.table, workspace: self.workspace, database: self.database }
     }
 }
 
-impl<'data, 'table, T: TableLike + ?Sized> Copy for TableInsertable<'data, 'table, T> {}
+impl<'table, T: TableLike + ?Sized> Copy for TableInsertable<'table, T> {}
 
-impl<'data, 'table, T: TableInsertableLike + ?Sized> TableInsertable<'data, 'table, T> {
+impl<'table, T: TableInsertableLike + ?Sized> TableInsertable<'table, T> {
     pub(crate) fn new(
         table: &'table T,
-        workspace: &'table synql_core::structs::Workspace<'data>,
+        workspace: &'table synql_core::structs::Workspace,
         database: &'table T::DB,
     ) -> Self {
         Self { table, workspace, database }

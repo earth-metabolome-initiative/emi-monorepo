@@ -25,6 +25,16 @@ pub struct Documentation {
     internal_dependencies: Vec<Arc<InternalCrate>>,
 }
 
+impl Default for Documentation {
+    fn default() -> Self {
+        Self {
+            documentation: String::new(),
+            external_dependencies: Vec::new(),
+            internal_dependencies: Vec::new(),
+        }
+    }
+}
+
 impl Documentation {
     /// Initializes a new `DocumentationBuilder`.
     pub fn new() -> DocumentationBuilder {

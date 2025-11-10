@@ -40,19 +40,16 @@ pub trait TableAttributesLike: TableSchema {
     /// * `workspace` - The workspace where the table is defined.
     /// * `database` - The database connection to use to query the table
     ///   attributes.
-    fn attributes<'table, 'data>(
+    fn attributes<'table>(
         &'table self,
-        workspace: &'table Workspace<'data>,
+        workspace: &'table Workspace,
         database: &'table Self::DB,
-    ) -> TableAttributes<'data, 'table, Self>
-    where
-        Self: 'data,
-    {
+    ) -> TableAttributes<'table, Self> {
         TableAttributes::new(self, workspace, database)
     }
 
     /// Returns a reference to the attributes enum for the table.
-    fn attributes_ref<'data>(&self, workspace: &Workspace<'data>) -> Option<InternalDataRef> {
+    fn attributes_ref(&self, workspace: &Workspace) -> Option<InternalDataRef> {
         let crate_ref = workspace.internal_crate(&self.table_attributes_crate_name())?;
         Some(InternalDataRef::new(
             crate_ref,

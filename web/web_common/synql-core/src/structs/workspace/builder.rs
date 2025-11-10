@@ -1,10 +1,6 @@
 //! Submodule defining a builder for the `Workspace` struct.
 
-use std::{
-    error::Error,
-    fmt::Display,
-    sync::{Arc, OnceLock},
-};
+use std::{error::Error, fmt::Display, path::PathBuf, sync::Arc};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -14,37 +10,25 @@ use common_traits::{
 use crate::structs::{ExternalCrate, Workspace};
 
 /// Builder for the `Workspace` struct.
-pub struct WorkspaceBuilder<'data> {
+pub struct WorkspaceBuilder {
     /// External crates made available within the workspace.
     external_crates: Vec<Arc<ExternalCrate>>,
     /// Name of the workspace.
     name: Option<String>,
     /// Path where the workspace is being created.
-    path: &'data std::path::Path,
+    path: PathBuf,
     /// Version of the workspace.
     version: (u8, u8, u8),
     /// Edition of the workspace.
     edition: u16,
 }
 
-static DEFAULT_WORKSPACE_PATH: OnceLock<std::path::PathBuf> = OnceLock::new();
-
-fn get_default_workspace_path() -> &'static std::path::Path {
-    DEFAULT_WORKSPACE_PATH
-        .get_or_init(|| {
-            std::env::current_dir()
-                .unwrap_or_else(|_| std::path::PathBuf::from("."))
-                .join("synql_workspace")
-        })
-        .as_path()
-}
-
-impl Default for WorkspaceBuilder<'_> {
+impl Default for WorkspaceBuilder {
     fn default() -> Self {
         Self {
             external_crates: Vec::new(),
             name: None,
-            path: get_default_workspace_path(),
+            path: PathBuf::from("synql_workspace"),
             version: (0, 1, 0),
             edition: 2024,
         }
@@ -67,7 +51,7 @@ pub enum WorkspaceAttribute {
 }
 
 impl Display for WorkspaceAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             WorkspaceAttribute::ExternalCrates => write!(f, "external_crates"),
             WorkspaceAttribute::Name => write!(f, "name"),
@@ -89,7 +73,7 @@ pub enum WorkspaceBuilderError {
 }
 
 impl Display for WorkspaceBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
             WorkspaceBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
             WorkspaceBuilderError::InvalidName => write!(f, "Invalid workspace name"),
@@ -106,7 +90,7 @@ impl Error for WorkspaceBuilderError {
     }
 }
 
-impl<'data> WorkspaceBuilder<'data> {
+impl WorkspaceBuilder {
     /// Sets the name of the workspace.
     ///
     /// # Arguments
@@ -124,7 +108,7 @@ impl<'data> WorkspaceBuilder<'data> {
     ///
     /// # Arguments
     /// * `path` - The path where the workspace is being created.
-    pub fn path(mut self, path: &'data std::path::Path) -> Self {
+    pub fn path(mut self, path: std::path::PathBuf) -> Self {
         self.path = path;
         self
     }
@@ -195,6 +179,11 @@ impl<'data> WorkspaceBuilder<'data> {
         self.external_crate(ExternalCrate::validation_errors())
     }
 
+    /// Adds the `pgrx_validation` external crate to the workspace.
+    pub fn pgrx_validation(self) -> Self {
+        self.external_crate(ExternalCrate::pgrx_validation())
+    }
+
     /// Adds the `rosetta_uuid` external crate to the workspace.
     pub fn rosetta_uuid(self) -> Self {
         self.external_crate(ExternalCrate::rosetta_uuid())
@@ -215,19 +204,19 @@ impl<'data> WorkspaceBuilder<'data> {
     }
 }
 
-impl Attributed for WorkspaceBuilder<'_> {
+impl Attributed for WorkspaceBuilder {
     type Attribute = WorkspaceAttribute;
 }
 
-impl IsCompleteBuilder for WorkspaceBuilder<'_> {
+impl IsCompleteBuilder for WorkspaceBuilder {
     fn is_complete(&self) -> bool {
         self.name.is_some()
     }
 }
 
-impl<'data> Builder for WorkspaceBuilder<'data> {
+impl Builder for WorkspaceBuilder {
     type Error = BuilderError<WorkspaceAttribute>;
-    type Object = Workspace<'data>;
+    type Object = Workspace;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         Ok(Workspace {

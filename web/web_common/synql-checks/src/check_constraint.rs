@@ -27,13 +27,13 @@ pub trait CheckConstraintSynLike: CheckConstraintLike {
     /// * `workspace` - The workspace where the generated code will be placed.
     /// * `contextual_columns` - The columns that are in the context where the
     ///   check constraint is applied.
-    fn to_syn<'db, 'data>(
+    fn to_syn<'db>(
         &'db self,
         database: &'db Self::DB,
-        workspace: &Workspace<'data>,
+        workspace: &Workspace,
         contextual_columns: &[&'db <Self::DB as DatabaseLike>::Column],
     ) -> InternalToken {
-        let translator: TranslateExpression<'_, 'db, 'data, <Self as CheckConstraintLike>::DB> =
+        let translator: TranslateExpression<'_, 'db, <Self as CheckConstraintLike>::DB> =
             TranslateExpression::new(self.borrow(), workspace, database, contextual_columns);
 
         let mut translated_expressions: Vec<InternalToken> = Vec::new();
@@ -73,13 +73,14 @@ pub trait CheckConstraintSynLike: CheckConstraintLike {
             } else {
                 quote! { #( #right ),* }
             };
+
             InternalToken::new()
-                .inherits(translated_expressions.iter().cloned())
                 .stream(quote! {
                     if let #formatted_left = #formatted_right {
                         #( #translated_expressions )*
                     }
                 })
+                .inherits(translated_expressions)
                 .build()
                 .unwrap()
         }

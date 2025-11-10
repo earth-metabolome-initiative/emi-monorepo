@@ -8,11 +8,11 @@ use synql_core::{
 
 use crate::{structs::TableModel, traits::TableModelLike};
 
-impl<'data, 'table, T> From<TableModel<'data, 'table, T>> for InternalModule
+impl<'table, T> From<TableModel<'table, T>> for InternalModule
 where
     T: TableModelLike + ?Sized,
 {
-    fn from(table_model: TableModel<'data, 'table, T>) -> Self {
+    fn from(table_model: TableModel<'table, T>) -> Self {
         InternalModule::new()
             .public()
             .name("model")

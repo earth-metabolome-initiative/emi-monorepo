@@ -60,3 +60,15 @@ impl<'a> From<&'a str> for DoubleFieldError<Unspecified> {
         DoubleFieldError::Generic(Unspecified, Unspecified, Box::new(GenericError::from(message)))
     }
 }
+
+impl<FieldName> From<SingleFieldError<FieldName>> for ValidationError<FieldName> {
+    fn from(error: SingleFieldError<FieldName>) -> Self {
+        ValidationError::SingleField(error)
+    }
+}
+
+impl<FieldName> From<DoubleFieldError<FieldName>> for ValidationError<FieldName> {
+    fn from(error: DoubleFieldError<FieldName>) -> Self {
+        ValidationError::DoubleField(error)
+    }
+}

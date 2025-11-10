@@ -11,11 +11,11 @@ use crate::{
     traits::{MODEL_MODULE_NAME, TableModelLike},
 };
 
-impl<'data, 'table, T> From<TableModel<'data, 'table, T>> for InternalCrate
+impl<'table, T> From<TableModel<'table, T>> for InternalCrate
 where
     T: TableModelLike + ?Sized,
 {
-    fn from(table_model: TableModel<'data, 'table, T>) -> Self {
+    fn from(table_model: TableModel<'table, T>) -> Self {
         let schema_crate_ref = table_model
             .table
             .table_schema_ref(table_model.workspace)

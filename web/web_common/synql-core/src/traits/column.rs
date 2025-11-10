@@ -149,7 +149,7 @@ pub trait ColumnSynLike: ColumnLike {
     /// * `workspace` - The workspace where the column is defined.
     fn external_postgres_type<'workspace, 'data>(
         &self,
-        workspace: &'workspace Workspace<'data>,
+        workspace: &'workspace Workspace,
         database: &Self::DB,
     ) -> Option<ExternalTypeRef> {
         workspace.external_postgres_type(&self.normalized_data_type(database))
@@ -158,7 +158,7 @@ pub trait ColumnSynLike: ColumnLike {
     /// Returns the Diesel type of this column.
     fn diesel_type<'workspace, 'data>(
         &self,
-        workspace: &'workspace Workspace<'data>,
+        workspace: &'workspace Workspace,
         database: &Self::DB,
     ) -> Option<Type> {
         let external_type = self.external_postgres_type(workspace, database)?;
@@ -173,7 +173,7 @@ pub trait ColumnSynLike: ColumnLike {
     /// Returns the Rust type of this column.
     fn rust_type<'workspace, 'data>(
         &self,
-        workspace: &'workspace Workspace<'data>,
+        workspace: &'workspace Workspace,
         database: &Self::DB,
     ) -> Option<Type> {
         let external_type = self.external_postgres_type(workspace, database)?;
@@ -194,7 +194,7 @@ pub trait ColumnSynLike: ColumnLike {
     fn supports_copy<'workspace, 'data>(
         &self,
         database: &Self::DB,
-        workspace: &'workspace Workspace<'data>,
+        workspace: &'workspace Workspace,
     ) -> bool {
         match self.external_postgres_type(workspace, database) {
             Some(external_type) => external_type.supports_copy(),

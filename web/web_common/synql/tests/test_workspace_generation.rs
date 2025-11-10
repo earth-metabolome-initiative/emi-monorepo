@@ -41,7 +41,7 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
 
     let synql = SynQL::new()
         .database(&db)
-        .path(workspace_path.as_path())
+        .path(workspace_path.clone())
         .generate_workspace_toml()
         .generate_rustfmt()
         .build()

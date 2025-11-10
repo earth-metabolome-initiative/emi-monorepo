@@ -14,10 +14,10 @@ use crate::{
     },
 };
 
-impl<'data, 'table, T: TableExtensionAttributesLike + ?Sized>
-    From<TableExtensionAttributes<'data, 'table, T>> for InternalModule
+impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttributes<'table, T>>
+    for InternalModule
 {
-    fn from(extension_attributes: TableExtensionAttributes<'data, 'table, T>) -> Self {
+    fn from(extension_attributes: TableExtensionAttributes<'table, T>) -> Self {
         let schema_crate_ref = extension_attributes
             .table
             .table_schema_ref(extension_attributes.workspace)

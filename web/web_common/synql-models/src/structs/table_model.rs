@@ -14,24 +14,24 @@ use crate::traits::TableModelLike;
 
 #[derive(Debug)]
 /// Struct representing a SynQL table model.
-pub struct TableModel<'data, 'table, T: TableModelLike + ?Sized> {
+pub struct TableModel<'table, T: TableModelLike + ?Sized> {
     table: &'table T,
-    workspace: &'table synql_core::structs::Workspace<'data>,
+    workspace: &'table synql_core::structs::Workspace,
     database: &'table T::DB,
 }
 
-impl<'data, 'table, T: TableModelLike + ?Sized> Clone for TableModel<'data, 'table, T> {
+impl<'table, T: TableModelLike + ?Sized> Clone for TableModel<'table, T> {
     fn clone(&self) -> Self {
         Self { table: self.table, workspace: self.workspace, database: self.database }
     }
 }
 
-impl<'data, 'table, T: TableModelLike + ?Sized> Copy for TableModel<'data, 'table, T> {}
+impl<'table, T: TableModelLike + ?Sized> Copy for TableModel<'table, T> {}
 
-impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
+impl<'table, T: TableModelLike + ?Sized> TableModel<'table, T> {
     pub(crate) fn new(
         table: &'table T,
-        workspace: &'table synql_core::structs::Workspace<'data>,
+        workspace: &'table synql_core::structs::Workspace,
         database: &'table T::DB,
     ) -> Self {
         Self { table, workspace, database }
@@ -222,7 +222,7 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
     }
 }
 
-impl<'data, 'table, T> ToTokens for TableModel<'data, 'table, T>
+impl<'table, T> ToTokens for TableModel<'table, T>
 where
     T: TableModelLike + ?Sized,
 {

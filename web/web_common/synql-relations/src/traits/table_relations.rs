@@ -37,19 +37,16 @@ pub trait TableRelationsLike: TableModelLike {
     /// * `database` - The database connection to use to query the table model.
     ///
     /// # Examples
-    fn relations_trait<'table, 'data>(
+    fn relations_trait<'table>(
         &'table self,
-        workspace: &'table Workspace<'data>,
+        workspace: &'table Workspace,
         database: &'table Self::DB,
-    ) -> TableRelations<'data, 'table, Self>
-    where
-        Self: 'data,
-    {
+    ) -> TableRelations<'table, Self> {
         TableRelations::new(self, workspace, database)
     }
 
     /// Returns a reference to the model module ref for the table.
-    fn relations_trait_ref<'data>(&self, workspace: &Workspace<'data>) -> Option<InternalDataRef> {
+    fn relations_trait_ref(&self, workspace: &Workspace) -> Option<InternalDataRef> {
         let crate_ref = workspace.internal_crate(&self.table_relations_crate_name())?;
         Some(InternalDataRef::new(
             crate_ref,

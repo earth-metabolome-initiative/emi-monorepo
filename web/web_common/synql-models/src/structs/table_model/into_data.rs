@@ -12,11 +12,11 @@ use crate::{
     traits::{TableModelLike, column_model_like::ColumnModelLike},
 };
 
-impl<'data, 'table, T> From<TableModel<'data, 'table, T>> for InternalData
+impl<'table, T> From<TableModel<'table, T>> for InternalData
 where
     T: TableModelLike + ?Sized,
 {
-    fn from(table_model: TableModel<'data, 'table, T>) -> Self {
+    fn from(table_model: TableModel<'table, T>) -> Self {
         let table_schema = table_model
             .table
             .schema_module(table_model.workspace)

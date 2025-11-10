@@ -2,7 +2,10 @@
 //! workspace.
 
 mod builder;
-use std::{path::Path, sync::Arc};
+use std::{
+    path::{Path, PathBuf},
+    sync::Arc,
+};
 
 pub use builder::WorkspaceBuilder;
 use rayon::prelude::*;
@@ -18,13 +21,13 @@ use crate::{
 
 #[derive(Debug, Clone)]
 /// Struct defining a Cargo workspace.
-pub struct Workspace<'data> {
+pub struct Workspace {
     /// External crates made available within the workspace.
     external_crates: Vec<Arc<ExternalCrate>>,
     /// Name of the workspace.
     name: String,
     /// Path where the workspace is being created.
-    path: &'data Path,
+    path: PathBuf,
     /// Version of the workspace.
     version: (u8, u8, u8),
     /// Edition of the workspace.
@@ -33,9 +36,9 @@ pub struct Workspace<'data> {
     internal_crates: Vec<Arc<InternalCrate>>,
 }
 
-impl<'data> Workspace<'data> {
+impl Workspace {
     /// Inizializes a new `WorkspaceBuilder`.
-    pub fn new() -> WorkspaceBuilder<'data> {
+    pub fn new() -> WorkspaceBuilder {
         WorkspaceBuilder::default()
     }
 
@@ -51,7 +54,7 @@ impl<'data> Workspace<'data> {
 
     /// Returns the path where the workspace is being created.
     pub fn path(&self) -> &Path {
-        self.path
+        self.path.as_path()
     }
 
     /// Adds a new internal crate to the workspace.
@@ -267,7 +270,7 @@ impl<'data> Workspace<'data> {
         // First, we eliminate all existing files in the workspace path.
         if self.path.exists() {
             // We remove all contents of the directory.
-            for entry in std::fs::read_dir(self.path)? {
+            for entry in std::fs::read_dir(self.path())? {
                 let entry = entry?;
                 let path = entry.path();
                 if path.is_dir() {
@@ -278,7 +281,7 @@ impl<'data> Workspace<'data> {
             }
         }
         // Then, we create the workspace directory.
-        std::fs::create_dir_all(self.path)?;
+        std::fs::create_dir_all(self.path())?;
         // And we start writing each internal crate to disk.
         self.internal_crates
             .par_iter()

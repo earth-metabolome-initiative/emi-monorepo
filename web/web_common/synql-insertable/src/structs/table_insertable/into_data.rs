@@ -9,10 +9,8 @@ use synql_models::traits::ColumnModelLike;
 
 use crate::{structs::TableInsertable, traits::TableInsertableLike};
 
-impl<'data, 'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'data, 'table, T>>
-    for InternalData
-{
-    fn from(insertable: TableInsertable<'data, 'table, T>) -> Self {
+impl<'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'table, T>> for InternalData {
+    fn from(insertable: TableInsertable<'table, T>) -> Self {
         let table_model_ref = insertable
             .table
             .model_ref(insertable.workspace)

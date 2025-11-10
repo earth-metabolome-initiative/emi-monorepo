@@ -119,7 +119,7 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
             Arc::new(cas_codes),
             Arc::new(molecular_formulas),
         ])
-        .path(workspace_path.as_path())
+        .path(workspace_path.clone())
         .generate_workspace_toml()
         .generate_rustfmt()
         .build()
