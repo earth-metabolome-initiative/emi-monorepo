@@ -71,7 +71,7 @@ members = [
   "web/web_common/synql-attributes",
   "web/web_common/synql-value-settable",
   "web/web_common/synql-insertable",
-  "web/web_common/synql-checks",
+  "web/web_common/synql-checks", "web/web_common/synql-insertable-key-settable",
 ]
 
 [workspace.dependencies]
@@ -227,6 +227,7 @@ synql-attributes = { path = "web/web_common/synql-attributes" }
 synql-value-settable = { path = "web/web_common/synql-value-settable" }
 synql-insertable = { path = "web/web_common/synql-insertable" }
 synql-checks = { path = "web/web_common/synql-checks" }
+synql-insertable-key-settable = { path = "web/web_common/synql-insertable-key-settable" }
 snake_case_sanitizer = { path = "utils/snake_case_sanitizer" }
 rmcp = { version = "0.8.1", features = ["server", "transport-io"] }
 tempfile = "3.6.0"
