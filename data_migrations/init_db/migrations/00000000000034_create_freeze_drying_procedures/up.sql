@@ -1,21 +1,21 @@
 CREATE TABLE IF NOT EXISTS freeze_drying_procedure_templates (
 	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL DEFAULT 203.15 CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 203.15 CHECK (kelvin > 0.0),
 	-- Tolerance percentage for the storage temperature.
 	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 5.0 CHECK (
-		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
-		AND must_be_smaller_than_f32(kelvin_tolerance_percentage, 100.0)
+		kelvin_tolerance_percentage > 0.0
+		AND kelvin_tolerance_percentage <= 100.0
 	),
 	-- We use a default of 4 Pa for the pressure in the freeze-drying chamber.
 	pascal REAL NOT NULL DEFAULT 4.0 CHECK (
-		must_be_strictly_positive_f32(pascal)
-		AND must_be_smaller_than_f32(pascal, 500.0)
+		pascal >= 0.0
+		AND pascal <= 500.0
 	),
 	-- We use a default of 3 days (259200 seconds) for the freeze-drying procedure.
 	seconds REAL NOT NULL DEFAULT 259200.0 CHECK (
-		must_be_strictly_greater_than_f32(seconds, 7200.0)
-		AND must_be_strictly_smaller_than_f32(seconds, 604800.0)
+		seconds >= 7200.0
+		AND seconds <= 604800.0
 	),
 	-- The device used for the freeze drying procedure.
 	freeze_dried_with_model INTEGER NOT NULL REFERENCES freeze_dryer_models(id),

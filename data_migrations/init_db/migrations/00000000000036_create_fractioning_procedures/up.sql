@@ -2,11 +2,11 @@ CREATE TABLE IF NOT EXISTS fractioning_procedure_templates (
 	-- Identifier of the fractioning procedure template, which is also a foreign key to the general procedure template.
 	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- Expected amount of the fraction to be collected in kilograms.
-	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
+	kilograms REAL NOT NULL CHECK (kilograms > 0.0),
 	-- The tolerance percentage of the fraction in kilograms.
 	tolerance_percentage REAL NOT NULL CHECK (
-		must_be_strictly_positive_f32(tolerance_percentage)
-		AND must_be_smaller_than_f32(tolerance_percentage, 100.0)
+		tolerance_percentage > 0.0
+		AND tolerance_percentage <= 100.0
 	),
 	-- The model of the scale used to measure the fraction in kilograms.
 	weighed_with_model INTEGER NOT NULL REFERENCES weighing_device_models(id),
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS fractioning_procedures (
 	-- The procedure asset associated to the `fragment_placed_into`.
 	procedure_fragment_placed_into UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
 	-- The actual amount of the fraction collected in kilograms.
-	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
+	kilograms REAL NOT NULL CHECK (kilograms > 0.0),
 	-- The scale used to measure the fraction in kilograms. This field is optional, 
 	-- as the weighing device might not necessarily be tracked.
 	weighed_with UUID REFERENCES weighing_devices(id),

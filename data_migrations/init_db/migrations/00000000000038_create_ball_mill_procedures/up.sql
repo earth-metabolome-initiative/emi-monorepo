@@ -1,27 +1,27 @@
 CREATE TABLE IF NOT EXISTS ball_mill_procedure_templates (
 	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (kelvin > 0.0),
 	-- Tolerance percentage for the storage temperature.
 	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 1.0 CHECK (
-		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
-		AND must_be_smaller_than_f32(kelvin_tolerance_percentage, 100.0)
+		kelvin_tolerance_percentage > 0.0
+		AND kelvin_tolerance_percentage <= 100.0
 	),
 	-- By default, we set it to 150 seconds (2.5 minutes).
 	seconds REAL NOT NULL DEFAULT 150.0 CHECK (
-		must_be_strictly_smaller_than_f32(seconds, 900.0)
-		AND must_be_strictly_greater_than_f32(seconds, 30.0)
+		seconds <= 900.0
+		AND seconds >= 30.0
 	),
 	-- The time in seconds that the ball mill should be used for the procedure.
 	hertz REAL NOT NULL DEFAULT 25.0 CHECK (
-		must_be_strictly_smaller_than_f32(hertz, 50.0)
-		AND must_be_strictly_greater_than_f32(hertz, 15.0)
+		hertz <= 50.0
+		AND hertz >= 15.0
 	),
 	-- The beads model used for the procedure.
 	bead_model INTEGER NOT NULL REFERENCES bead_models(id),
 	procedure_template_bead_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
 	--- The number of beads used in the procedure.
-	number_of_beads SMALLINT NOT NULL DEFAULT 3 CHECK (must_be_strictly_positive_i16(number_of_beads)),
+	number_of_beads SMALLINT NOT NULL DEFAULT 3 CHECK (number_of_beads > 0),
 	-- The device used for the ball mill procedure.
 	milled_with_model INTEGER NOT NULL REFERENCES ball_mill_machine_models(id),
 	procedure_template_milled_with_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,

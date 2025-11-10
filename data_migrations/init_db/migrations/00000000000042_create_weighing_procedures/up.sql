@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS weighing_procedures(
 	-- The procedure asset associated to the `weighed_container`.
 	procedure_weighed_container UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
 	-- The measured weight, which must be strictly positive.
-	kilograms REAL NOT NULL CHECK (must_be_strictly_positive_f32(kilograms)),
+	kilograms REAL NOT NULL CHECK (kilograms > 0.0),
 	-- The weighing device used for weighing. This field is optional as there
 	-- are several situations where the weighing device is not tracked.
 	weighed_with UUID REFERENCES weighing_devices(id),

@@ -12,6 +12,15 @@ impl DataVariantRef {
         Self::External(boolean_type)
     }
 
+    /// Returns a new `f64` data variant reference.
+    pub fn f64() -> Self {
+        let core_crate = ExternalCrate::core();
+        let f64_type = core_crate
+            .external_type(&syn::parse_quote!(f64))
+            .expect("Failed to find the f64 type in core");
+        Self::External(f64_type)
+    }
+
     /// Returns a new `&str` data variant reference.
     pub fn str() -> Self {
         let core_crate = ExternalCrate::std();

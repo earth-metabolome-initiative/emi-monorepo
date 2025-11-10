@@ -4,13 +4,13 @@ CREATE TABLE IF NOT EXISTS container_models (
 CREATE TABLE IF NOT EXISTS volumetric_container_models (
     id INTEGER PRIMARY KEY REFERENCES container_models(id),
     -- The maximum volume of the container in liters.
-    liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters))
+    liters REAL NOT NULL CHECK (liters > 0.0)
 );
 CREATE TABLE IF NOT EXISTS container_compatibility_rules (
     container_model INTEGER NOT NULL REFERENCES container_models(id),
     contained_asset_model INTEGER NOT NULL REFERENCES physical_asset_models(id),
     -- The maximal quantity of the right trackable that can be associated with the left trackable.
-    quantity SMALLINT CHECK (must_be_strictly_positive_i16(quantity)),
+    quantity SMALLINT CHECK (quantity > 0),
     created_by INTEGER NOT NULL REFERENCES users(id),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (container_model, contained_asset_model),

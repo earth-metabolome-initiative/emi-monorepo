@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS storage_procedure_templates (
 	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (kelvin > 0.0),
 	-- Tolerance percentage for the storage temperature.
 	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 1.0 CHECK (
-		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
-		AND must_be_smaller_than_f32(kelvin_tolerance_percentage, 100.0)
+		kelvin_tolerance_percentage > 0.0
+		AND kelvin_tolerance_percentage <= 100.0
 	),
 	-- The container that will be used for storage.
 	stored_into_model INTEGER NOT NULL REFERENCES container_models(id),

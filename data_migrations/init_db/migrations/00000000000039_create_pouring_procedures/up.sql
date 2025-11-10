@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS pouring_procedure_templates (
 	-- to the same procedure template of this pouring procedure template.
 	procedure_template_poured_into_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
 	-- The amount of liquid that is poured into the container.
-	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
+	liters REAL NOT NULL CHECK (liters > 0.0),
 	-- The measuring device must match the procedure template of the procedure.
 	FOREIGN KEY (
 		procedure_template_measured_with_model,

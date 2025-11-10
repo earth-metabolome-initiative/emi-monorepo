@@ -1,21 +1,21 @@
 CREATE TABLE IF NOT EXISTS centrifuge_procedure_templates (
 	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (kelvin > 0.0),
 	-- Tolerance percentage for the storage temperature.
 	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 1.0 CHECK (
-		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
-		AND must_be_smaller_than_f32(kelvin_tolerance_percentage, 100.0)
+		kelvin_tolerance_percentage > 0.0
+		AND kelvin_tolerance_percentage <= 100.0
 	),
 	-- The time in seconds that the centrifuge should be used for the procedure.
 	seconds REAL NOT NULL DEFAULT 120.0 CHECK (
-		must_be_greater_than_f32(seconds, 30.0)
-		AND must_be_smaller_than_f32(seconds, 1800.0)
+		seconds >= 30.0
+		AND seconds <= 1800.0
 	),
 	-- The RPMs (rotations per minute) of the centrifuge.
 	rotation_per_minute REAL NOT NULL DEFAULT 13000.0 CHECK (
-		must_be_greater_than_f32(rotation_per_minute, 5000.0)
-		AND must_be_smaller_than_f32(rotation_per_minute, 30000.0)
+		rotation_per_minute >= 5000.0
+		AND rotation_per_minute <= 30000.0
 	),
 	-- The device used for the centrifuge procedure.
 	centrifuged_with_model INTEGER NOT NULL REFERENCES centrifuge_models(id),

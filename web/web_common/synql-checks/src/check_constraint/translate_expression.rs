@@ -232,6 +232,82 @@ where
                     unimplemented!("Operator {op:?} not supported for single field error mapping");
                 }
             }
+            BinaryOperator::LtEq => {
+                let column_value = self.parse_column_value(column, value).0;
+                let float_value = self.parse_value(value, Some(&DataVariantRef::f64())).0;
+                Some(
+                    InternalToken::new()
+                        .private()
+                        .stream(quote! {
+                            if #formatted_column > #column_value {
+                                return Err(#validation_error::smaller_than_value(
+                                    #table_attribute_enum::#camel_cased,
+                                    #float_value
+                                ));
+                            }
+                        })
+                        .data(table_attribute_enum)
+                        .build()
+                        .unwrap(),
+                )
+            }
+            BinaryOperator::Lt => {
+                let column_value = self.parse_column_value(column, value).0;
+                let float_value = self.parse_value(value, Some(&DataVariantRef::f64())).0;
+                Some(
+                    InternalToken::new()
+                        .private()
+                        .stream(quote! {
+                            if #formatted_column >= #column_value {
+                                return Err(#validation_error::strictly_smaller_than_value(
+                                    #table_attribute_enum::#camel_cased,
+                                    #float_value
+                                ));
+                            }
+                        })
+                        .data(table_attribute_enum)
+                        .build()
+                        .unwrap(),
+                )
+            }
+            BinaryOperator::Gt => {
+                let column_value = self.parse_column_value(column, value).0;
+                let float_value = self.parse_value(value, Some(&DataVariantRef::f64())).0;
+                Some(
+                    InternalToken::new()
+                        .private()
+                        .stream(quote! {
+                            if #formatted_column <= #column_value {
+                                return Err(#validation_error::strictly_greater_than_value(
+                                    #table_attribute_enum::#camel_cased,
+                                    #float_value
+                                ));
+                            }
+                        })
+                        .data(table_attribute_enum)
+                        .build()
+                        .unwrap(),
+                )
+            }
+            BinaryOperator::GtEq => {
+                let column_value = self.parse_column_value(column, value).0;
+                let float_value = self.parse_value(value, Some(&DataVariantRef::f64())).0;
+                Some(
+                    InternalToken::new()
+                        .private()
+                        .stream(quote! {
+                            if #formatted_column < #column_value {
+                                return Err(#validation_error::greater_than_value(
+                                    #table_attribute_enum::#camel_cased,
+                                    #float_value
+                                ));
+                            }
+                        })
+                        .data(table_attribute_enum)
+                        .build()
+                        .unwrap(),
+                )
+            }
             _ => {
                 unimplemented!("Operator {op:?} not supported for single field error mapping");
             }
@@ -486,6 +562,33 @@ where
             function_ref.return_type().cloned().unwrap_or_else(|| DataVariantRef::unit());
 
         (internal_token, data_variant_ref)
+    }
+
+    /// Parses the provided [`Value`](sqlparser::ast::Value) for the provided
+    /// column.
+    ///
+    /// # Arguments
+    ///
+    /// * `column` - The column for which the value is being parsed
+    /// * `value` - The [`Value`](sqlparser::ast::Value) to
+    ///
+    /// # Panics
+    ///
+    /// * If the provided [`Value`](sqlparser::ast::Value) is not supported
+    /// * If the type of the provided column cannot be determined
+    fn parse_column_value(
+        &self,
+        column: &DB::Column,
+        value: &Value,
+    ) -> (proc_macro2::TokenStream, DataVariantRef) {
+        let column_type =
+            column.external_postgres_type(self.workspace, self.database).expect(&format!(
+                "Failed to get type for column `{}.{}` ({})",
+                column.table(self.database).table_name(),
+                column.column_name(),
+                column.normalized_data_type(self.database)
+            ));
+        self.parse_value(value, Some(&column_type.into()))
     }
 
     /// Parses the provided [`Value`](sqlparser::ast::Value) to a

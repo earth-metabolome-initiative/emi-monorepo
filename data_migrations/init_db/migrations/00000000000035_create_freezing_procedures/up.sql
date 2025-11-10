@@ -1,17 +1,14 @@
 CREATE TABLE IF NOT EXISTS freezing_procedure_templates (
 	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- The storage temperature in Kelvin.
-	kelvin REAL NOT NULL DEFAULT 203.15 CHECK (must_be_strictly_positive_f32(kelvin)),
+	kelvin REAL NOT NULL DEFAULT 203.15 CHECK (kelvin > 0.0),
 	-- Tolerance percentage for the storage temperature.
 	kelvin_tolerance_percentage REAL NOT NULL DEFAULT 5.0 CHECK (
-		must_be_strictly_positive_f32(kelvin_tolerance_percentage)
-		AND must_be_smaller_than_f32(kelvin_tolerance_percentage, 100.0)
+		kelvin_tolerance_percentage > 0.0
+		AND kelvin_tolerance_percentage <= 100.0
 	),
 	-- We use a default of 43200 seconds (12 hours) for the freezing procedure.
-	seconds REAL DEFAULT 43200.0 CHECK (
-		must_be_strictly_positive_f32(seconds)
-		AND must_be_strictly_greater_than_f32(seconds, 1800.0)
-	),
+	seconds REAL DEFAULT 43200.0 CHECK (seconds > 1800.0),
 	-- The device used for freezing.
 	frozen_with_model INTEGER NOT NULL REFERENCES freezer_models(id),
 	procedure_template_frozen_with_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,

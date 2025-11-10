@@ -4,12 +4,14 @@ use std::{path::Path, rc::Rc};
 
 use common_traits::prelude::Builder;
 use csqlv::{CSVSchema, CSVSchemaBuilder, SQLGenerationOptions};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use sqlparser::{
     ast::{
         CheckConstraint, ColumnDef, ColumnOption, CreateFunction, CreateTable, Expr,
         ForeignKeyConstraint, IndexColumn, OrderByExpr, Statement, TableConstraint,
         UniqueConstraint, Value, ValueWithSpan,
     },
+    dialect::PostgreSqlDialect,
     parser::{Parser, ParserError},
 };
 
@@ -303,7 +305,7 @@ fn search_sql_documents(path: &Path) -> Vec<std::path::PathBuf> {
             if path.is_dir() {
                 sql_files.extend(search_sql_documents(&path));
             } else if let Some(extension) = path.extension() {
-                if extension == "sql" {
+                if extension == "sql" && path.file_name().unwrap() != "down.sql" {
                     sql_files.push(path);
                 }
             }
@@ -324,12 +326,6 @@ impl TryFrom<&Path> for ParserDB {
         let mut sql_files = search_sql_documents(path);
         sql_files.sort_unstable();
         for sql_file in sql_files {
-            // We exclude `down.sql` files as they are not relevant for
-            // schema definition.
-            if sql_file.file_name().unwrap() == "down.sql" {
-                continue;
-            }
-
             let sql_content = std::fs::read_to_string(&sql_file)
                 .map_err(|e| ParserError::TokenizerError(e.to_string()))?;
             comulative_sql.push_str(&sql_content);
@@ -342,7 +338,7 @@ impl TryFrom<&[&Path]> for ParserDB {
     type Error = sqlparser::parser::ParserError;
 
     fn try_from(paths: &[&Path]) -> Result<Self, Self::Error> {
-        let mut comulative_sql = String::new();
+        let mut sql_documents = Vec::new();
 
         let mut sql_files = Vec::new();
         for path in paths {
@@ -366,31 +362,34 @@ impl TryFrom<&[&Path]> for ParserDB {
                     ))
                 })?;
 
-            comulative_sql.push_str(&schema.to_sql(&SQLGenerationOptions::default()).map_err(
-                |e| {
-                    ParserError::TokenizerError(format!(
-                        "Failed to convert CSV schema to SQL from path {}: {}",
-                        path.display(),
-                        e
-                    ))
-                },
-            )?);
+            sql_documents.push(schema.to_sql(&SQLGenerationOptions::default()).map_err(|e| {
+                ParserError::TokenizerError(format!(
+                    "Failed to convert CSV schema to SQL from path {}: {}",
+                    path.display(),
+                    e
+                ))
+            })?);
         }
 
-        sql_files.dedup();
-
-        for sql_file in sql_files {
-            // We exclude `down.sql` files as they are not relevant for
-            // schema definition.
-            if sql_file.file_name().unwrap() == "down.sql" {
-                continue;
-            }
-
-            let sql_content = std::fs::read_to_string(&sql_file)
+        // First, we handle the IO part sequentially, as it is a I/O-bound task.
+        for sql_document in sql_files {
+            let sql_content = std::fs::read_to_string(&sql_document)
                 .map_err(|e| ParserError::TokenizerError(e.to_string()))?;
-            comulative_sql.push_str(&sql_content);
+            sql_documents.push(sql_content);
         }
 
-        Self::try_from(comulative_sql.as_str())
+        let statements = sql_documents
+            .into_par_iter()
+            .map(|sql_file: String| {
+                let mut parser = sqlparser::parser::Parser::new(&PostgreSqlDialect {})
+                    .try_with_sql(&sql_file)?;
+                parser.parse_statements()
+            })
+            .collect::<Result<Vec<Vec<Statement>>, ParserError>>()?
+            .into_iter()
+            .flatten()
+            .collect::<Vec<Statement>>();
+
+        Ok(Self::from_statements(statements, "unknown_catalog".to_string()))
     }
 }

@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS aliquoting_procedure_templates (
 	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- The amount of liters that should be aliquoted.
-	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
+	liters REAL NOT NULL CHECK (liters > 0.0),
 	-- Source container from which the aliquot is taken.
 	aliquoted_from_model INTEGER NOT NULL REFERENCES volumetric_container_models(id),
 	procedure_template_aliquoted_from_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),

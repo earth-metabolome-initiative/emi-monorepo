@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS supernatant_procedure_templates (
 	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
 	-- The amount of liters that should be transferred
-	liters REAL NOT NULL CHECK (must_be_strictly_positive_f32(liters)),
+	liters REAL NOT NULL CHECK (liters > 0.0),
 	-- The source container from which the supernatant is taken.
 	stratified_source_model INTEGER NOT NULL REFERENCES volumetric_container_models(id),
 	procedure_template_stratified_source_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
