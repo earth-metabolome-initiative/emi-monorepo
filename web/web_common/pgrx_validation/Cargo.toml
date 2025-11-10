@@ -6,9 +6,9 @@ edition = "2024"
 [lib]
 crate-type = ["cdylib", "lib"]
 
-[[bin]]
-name = "pgrx_embed_pgrx_validation"
-path = "./src/bin/pgrx_embed.rs"
+# [[bin]]
+# name = "pgrx_embed_pgrx_validation"
+# path = "./src/bin/pgrx_embed.rs"
 
 [dependencies]
 pgrx = { workspace = true, optional = true }

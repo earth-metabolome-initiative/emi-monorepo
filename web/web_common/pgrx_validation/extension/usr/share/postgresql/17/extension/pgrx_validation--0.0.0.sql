@@ -7,55 +7,7 @@ The ordering of items is not stable, it is driven by a dependency graph.
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/str.rs:40
--- pgrx_validation::str::must_be_distinct
-CREATE  FUNCTION "must_be_distinct"(
-	"left" TEXT, /* &str */
-	"right" TEXT /* &str */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_distinct_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/int.rs:68
--- pgrx_validation::int::must_be_distinct_i16
-CREATE  FUNCTION "must_be_distinct_i16"(
-	"left" smallint, /* i16 */
-	"right" smallint /* i16 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_distinct_i16_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/int.rs:5
--- pgrx_validation::int::must_be_distinct_i32
-CREATE  FUNCTION "must_be_distinct_i32"(
-	"left" INT, /* i32 */
-	"right" INT /* i32 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_distinct_i32_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/uuid.rs:5
--- pgrx_validation::uuid::must_be_distinct_uuid
-CREATE  FUNCTION "must_be_distinct_uuid"(
-	"left" uuid, /* rosetta_uuid::Uuid */
-	"right" uuid /* rosetta_uuid::Uuid */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_distinct_uuid_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/str.rs:6
+-- web/web_common/pgrx_validation/src/str.rs:7
 -- pgrx_validation::str::must_be_email
 CREATE  FUNCTION "must_be_email"(
 	"value" TEXT /* &str */
@@ -77,19 +29,7 @@ AS 'MODULE_PATHNAME', 'must_be_font_awesome_class_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:47
--- pgrx_validation::float::must_be_greater_than_f32
-CREATE  FUNCTION "must_be_greater_than_f32"(
-	"value" real, /* f32 */
-	"lower_bound" real /* f32 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_greater_than_f32_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/str.rs:124
+-- web/web_common/pgrx_validation/src/str.rs:104
 -- pgrx_validation::str::must_be_paragraph
 CREATE  FUNCTION "must_be_paragraph"(
 	"value" TEXT /* &str */
@@ -100,157 +40,7 @@ AS 'MODULE_PATHNAME', 'must_be_paragraph_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/int.rs:112
--- pgrx_validation::int::must_be_positive_i16
-CREATE  FUNCTION "must_be_positive_i16"(
-	"value" smallint /* i16 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_positive_i16_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/int.rs:49
--- pgrx_validation::int::must_be_positive_i32
-CREATE  FUNCTION "must_be_positive_i32"(
-	"value" INT /* i32 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_positive_i32_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:70
--- pgrx_validation::float::must_be_smaller_than_f32
-CREATE  FUNCTION "must_be_smaller_than_f32"(
-	"value" real, /* f32 */
-	"lower_bound" real /* f32 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_smaller_than_f32_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/chrono.rs:5
--- pgrx_validation::chrono::must_be_smaller_than_utc
-CREATE  FUNCTION "must_be_smaller_than_utc"(
-	"left" timestamp with time zone, /* rosetta_timestamp::TimestampUTC */
-	"right" timestamp with time zone /* rosetta_timestamp::TimestampUTC */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_smaller_than_utc_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:93
--- pgrx_validation::float::must_be_strictly_greater_than_f32
-CREATE  FUNCTION "must_be_strictly_greater_than_f32"(
-	"value" real, /* f32 */
-	"lower_bound" real /* f32 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_strictly_greater_than_f32_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:139
--- pgrx_validation::float::must_be_strictly_greater_than_f64
-CREATE  FUNCTION "must_be_strictly_greater_than_f64"(
-	"value" double precision, /* f64 */
-	"lower_bound" double precision /* f64 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_strictly_greater_than_f64_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:5
--- pgrx_validation::float::must_be_strictly_positive_f32
-CREATE  FUNCTION "must_be_strictly_positive_f32"(
-	"value" real /* f32 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_strictly_positive_f32_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:26
--- pgrx_validation::float::must_be_strictly_positive_f64
-CREATE  FUNCTION "must_be_strictly_positive_f64"(
-	"value" double precision /* f64 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_strictly_positive_f64_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/int.rs:91
--- pgrx_validation::int::must_be_strictly_positive_i16
-CREATE  FUNCTION "must_be_strictly_positive_i16"(
-	"value" smallint /* i16 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_strictly_positive_i16_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/int.rs:28
--- pgrx_validation::int::must_be_strictly_positive_i32
-CREATE  FUNCTION "must_be_strictly_positive_i32"(
-	"value" INT /* i32 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_strictly_positive_i32_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:116
--- pgrx_validation::float::must_be_strictly_smaller_than_f32
-CREATE  FUNCTION "must_be_strictly_smaller_than_f32"(
-	"value" real, /* f32 */
-	"lower_bound" real /* f32 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_strictly_smaller_than_f32_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/float.rs:162
--- pgrx_validation::float::must_be_strictly_smaller_than_f64
-CREATE  FUNCTION "must_be_strictly_smaller_than_f64"(
-	"value" double precision, /* f64 */
-	"lower_bound" double precision /* f64 */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_strictly_smaller_than_f64_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/chrono.rs:29
--- pgrx_validation::chrono::must_be_strictly_smaller_than_utc
-CREATE  FUNCTION "must_be_strictly_smaller_than_utc"(
-	"left" timestamp with time zone, /* rosetta_timestamp::TimestampUTC */
-	"right" timestamp with time zone /* rosetta_timestamp::TimestampUTC */
-) RETURNS bool /* bool */
-STRICT
-LANGUAGE c /* Rust */
-AS 'MODULE_PATHNAME', 'must_be_strictly_smaller_than_utc_wrapper';
-/* </end connected objects> */
-
-/* <begin connected objects> */
--- web/web_common/pgrx_validation/src/str.rs:26
+-- web/web_common/pgrx_validation/src/str.rs:23
 -- pgrx_validation::str::must_not_be_empty
 CREATE  FUNCTION "must_not_be_empty"(
 	"value" TEXT /* &str */
@@ -261,7 +51,7 @@ AS 'MODULE_PATHNAME', 'must_not_be_empty_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/str.rs:63
+-- web/web_common/pgrx_validation/src/str.rs:42
 -- pgrx_validation::str::must_not_be_padded
 CREATE  FUNCTION "must_not_be_padded"(
 	"value" TEXT /* &str */
@@ -272,7 +62,7 @@ AS 'MODULE_PATHNAME', 'must_not_be_padded_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/str.rs:82
+-- web/web_common/pgrx_validation/src/str.rs:61
 -- pgrx_validation::str::must_not_contain_consecutive_whitespace
 CREATE  FUNCTION "must_not_contain_consecutive_whitespace"(
 	"value" TEXT /* &str */
@@ -283,7 +73,7 @@ AS 'MODULE_PATHNAME', 'must_not_contain_consecutive_whitespace_wrapper';
 /* </end connected objects> */
 
 /* <begin connected objects> */
--- web/web_common/pgrx_validation/src/str.rs:103
+-- web/web_common/pgrx_validation/src/str.rs:83
 -- pgrx_validation::str::must_not_contain_control_characters
 CREATE  FUNCTION "must_not_contain_control_characters"(
 	"value" TEXT /* &str */

@@ -50,6 +50,9 @@ for line in "${lines_to_comment[@]}"; do
 	fi
 done
 
+# Prints the current `rustc` version for debugging purposes
+rustc --version
+
 # Initialize PGRX for PG 17
 cargo pgrx init --pg17 "$PG_CONFIG_PATH"
 
