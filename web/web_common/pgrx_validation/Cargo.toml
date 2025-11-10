@@ -6,28 +6,23 @@ edition = "2024"
 [lib]
 crate-type = ["cdylib", "lib"]
 
-# [[bin]]
-# name = "pgrx_embed_pgrx_validation"
-# path = "./src/bin/pgrx_embed.rs"
+[[bin]]
+name = "pgrx_embed_pgrx_validation"
+path = "./src/bin/pgrx_embed.rs"
 
 [dependencies]
 pgrx = { workspace = true, optional = true }
-chrono.workspace = true
 pgrx-tests = { workspace = true, optional = true }
 pgrx_validation_derive.workspace = true
 validation_errors.workspace = true
 validator.workspace = true
-rosetta_uuid.workspace = true
 phf.workspace = true
-rosetta_timestamp.workspace = true
 
 [features]
 default = []
 pgrx = [
   "dep:pgrx",
   "pgrx_validation_derive/pgrx",
-  "rosetta_uuid/pgrx",
-  "rosetta_timestamp/pgrx",
 ]
 pg13 = ["pgrx", "pgrx/pg13", "pgrx-tests/pg13"]
 pg14 = ["pgrx", "pgrx/pg14", "pgrx-tests/pg14"]
