@@ -7,10 +7,6 @@ use crate::{structs::Unspecified, traits::ValidationErrorLike};
 pub enum SingleFieldError<FieldName = Unspecified> {
     /// The provided text is empty.
     MustNotBeEmpty(FieldName),
-    /// The numeric value is not strictly positive (0.0, ...]
-    MustBeStrictlyPositive(FieldName),
-    /// The numeric value is not positive [0.0, ...]
-    MustBePositive(FieldName),
     /// The scalar is not strictly greater than the expected amount.
     MustBeStrictlySmallerThan(FieldName, f64),
     /// The scalar is not smaller than the expected amount.

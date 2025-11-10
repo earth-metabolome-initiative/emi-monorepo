@@ -35,7 +35,7 @@ impl<FieldName> ValidationError<FieldName> {
         ValidationError::DoubleField(DoubleFieldError::MustBeDistinct(left_field, right_field))
     }
 
-    /// Creates a new validation error for a field who should be smaller than a
+    /// Creates a new validation error for a field who should be smaller than or equal to
     /// another field.
     ///
     /// # Arguments
@@ -47,6 +47,17 @@ impl<FieldName> ValidationError<FieldName> {
             smaller_field,
             greater_field,
         ))
+    }
+
+    /// Creates a new validation error for a field who should be smaller than or equal to
+    /// a provided value.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `field` - The name of the field that should be smaller.
+    /// * `value` - The value that the field should be smaller than or equal to.
+    pub fn smaller_than_value(field: FieldName, value: f64) -> Self {
+        ValidationError::SingleField(SingleFieldError::MustBeSmallerThan(field, value))
     }
 
     /// Creates a new validation error for a field who should be greater than a
@@ -61,6 +72,18 @@ impl<FieldName> ValidationError<FieldName> {
             greater_field,
             smaller_field,
         ))
+    }
+
+    /// Creates a new validation error for a field who should be greater than or equal to
+    /// a provided value.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `field` - The name of the field that should be greater.
+    /// * `value` - The value that the field should be greater than or equal to.
+    /// 
+    pub fn greater_than_value(field: FieldName, value: f64) -> Self {
+        ValidationError::SingleField(SingleFieldError::MustBeGreaterThan(field, value))
     }
 
     /// Creates a new validation error for a field who should be strictly
@@ -79,6 +102,18 @@ impl<FieldName> ValidationError<FieldName> {
     }
 
     /// Creates a new validation error for a field who should be strictly
+    /// smaller than a provided value.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `field` - The name of the field that should be strictly smaller.
+    /// * `value` - The value that the field should be strictly smaller than.
+    /// 
+    pub fn strictly_smaller_than_value(field: FieldName, value: f64) -> Self {
+        ValidationError::SingleField(SingleFieldError::MustBeStrictlySmallerThan(field, value))
+    }
+
+    /// Creates a new validation error for a field who should be strictly
     /// greater than another field.
     ///
     /// # Arguments
@@ -91,5 +126,17 @@ impl<FieldName> ValidationError<FieldName> {
             greater_equal_field,
             smaller_field,
         ))
+    }
+
+    /// Creates a new validation error for a field who should be strictly
+    /// greater than a provided value.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `field` - The name of the field that should be strictly greater.
+    /// * `value` - The value that the field should be strictly greater than.
+    /// 
+    pub fn strictly_greater_than_value(field: FieldName, value: f64) -> Self {
+        ValidationError::SingleField(SingleFieldError::MustBeStrictlyGreaterThan(field, value))
     }
 }

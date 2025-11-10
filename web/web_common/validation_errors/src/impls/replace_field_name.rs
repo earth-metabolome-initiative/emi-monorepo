@@ -15,10 +15,6 @@ impl<FieldName> ReplaceFieldName for SingleFieldError<FieldName> {
     {
         match self {
             Self::MustNotBeEmpty(field) => SingleFieldError::MustNotBeEmpty(map(field)),
-            Self::MustBeStrictlyPositive(field) => {
-                SingleFieldError::MustBeStrictlyPositive(map(field))
-            }
-            Self::MustBePositive(field) => SingleFieldError::MustBePositive(map(field)),
             Self::MustBeStrictlySmallerThan(field, value) => {
                 SingleFieldError::MustBeStrictlySmallerThan(map(field), value)
             }

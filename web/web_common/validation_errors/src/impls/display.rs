@@ -10,12 +10,6 @@ impl<FieldName: Display> Display for SingleFieldError<FieldName> {
             Self::MustNotBeEmpty(field) => {
                 write!(f, "Field `{field}` must not be empty")
             }
-            Self::MustBeStrictlyPositive(field) => {
-                write!(f, "Field `{field}` must be strictly positive (> 0)")
-            }
-            Self::MustBePositive(field) => {
-                write!(f, "Field `{field}` must be positive (>= 0)")
-            }
             Self::MustBeStrictlySmallerThan(field, value) => {
                 write!(f, "Field `{field}` must be strictly smaller than {value}")
             }
