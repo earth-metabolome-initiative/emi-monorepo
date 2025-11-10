@@ -19,7 +19,7 @@
 /// assert_eq!(normalized, "INT");
 /// ```
 pub fn normalize_postgres_type(pg_type: &str) -> &str {
-    match pg_type.to_lowercase().as_str() {
+    match pg_type.to_lowercase().trim_matches('\"') {
         "int2" | "smallint" | "smallserial" => "SMALLINT",
         "int4" | "integer" | "serial" => "INT",
         "int8" | "bigint" | "bigserial" => "BIGINT",
@@ -28,7 +28,7 @@ pub fn normalize_postgres_type(pg_type: &str) -> &str {
         "numeric" | "decimal" => "numeric",
         "bool" | "boolean" => "boolean",
         "varchar" | "character varying" => "VARCHAR",
-        "char" | "character" => "character",
+        "char" | "character" => "CHAR",
         "text" => "TEXT",
         "date" => "date",
         "timestamp" | "timestamp without time zone" => "timestamp without time zone",

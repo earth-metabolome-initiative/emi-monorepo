@@ -8,7 +8,6 @@ use diesel::{
 
 use crate::models::{CheckConstraint, Column, TableConstraint};
 
-#[pg_cached::auto_cached]
 pub(super) fn columns(
     check_constraint: &CheckConstraint,
     conn: &mut PgConnection,
@@ -44,7 +43,6 @@ pub(super) fn columns(
         .load(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub fn table_constraint(
     check_constraint: &CheckConstraint,
     conn: &mut PgConnection,

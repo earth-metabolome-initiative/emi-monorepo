@@ -9,7 +9,6 @@ use crate::models::{
     CheckConstraint, Column, KeyColumnUsage, PgDescription, PgIndex, PgTrigger, Table,
 };
 
-#[pg_cached::auto_cached]
 pub(crate) fn load_all_tables(
     table_catalog: &str,
     table_schema: &str,
@@ -25,7 +24,6 @@ pub(crate) fn load_all_tables(
         .load::<Table>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(crate) fn load_table(
     conn: &mut PgConnection,
     table_name: &str,
@@ -40,7 +38,6 @@ pub(crate) fn load_table(
         .first::<Table>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(crate) fn columns(
     table: &Table,
     conn: &mut PgConnection,
@@ -54,7 +51,6 @@ pub(crate) fn columns(
         .load::<Column>(conn)
 }
 
-#[pg_cached::auto_cached]
 pub(crate) fn primary_key_columns(
     table: &Table,
     conn: &mut PgConnection,
@@ -113,7 +109,6 @@ pub(crate) fn primary_key_columns(
         .load::<Column>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(crate) fn foreign_keys(
     table: &Table,
     conn: &mut PgConnection,
@@ -148,7 +143,6 @@ pub(crate) fn foreign_keys(
         .load::<KeyColumnUsage>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(crate) fn unique_indices(
     table: &Table,
     conn: &mut PgConnection,
@@ -168,7 +162,6 @@ pub(crate) fn unique_indices(
         .load::<PgIndex>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(crate) fn indices(
     table: &Table,
     conn: &mut PgConnection,
@@ -187,7 +180,6 @@ pub(crate) fn indices(
         .load::<PgIndex>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(crate) fn triggers(
     table: &Table,
     conn: &mut PgConnection,
@@ -204,7 +196,6 @@ pub(crate) fn triggers(
         .load::<PgTrigger>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(crate) fn check_constraints(
     table: &Table,
     conn: &mut PgConnection,
@@ -229,7 +220,6 @@ pub(crate) fn check_constraints(
         .load::<CheckConstraint>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(crate) fn column_by_name(
     table: &Table,
     column_name: &str,
@@ -244,7 +234,6 @@ pub(crate) fn column_by_name(
         .first::<Column>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(super) fn pg_description(
     table: &Table,
     conn: &mut PgConnection,

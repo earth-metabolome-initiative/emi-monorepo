@@ -323,7 +323,7 @@ pub trait ForeignKeyLike:
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// use sqlparser::ast::MatchKind;
+    /// use sqlparser::ast::ConstraintReferenceMatchKind;
     ///
     /// let db = ParserDB::try_from(
     ///     r#"

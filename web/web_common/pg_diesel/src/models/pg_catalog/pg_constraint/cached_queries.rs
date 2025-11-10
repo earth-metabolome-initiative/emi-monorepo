@@ -5,7 +5,6 @@ use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, 
 
 use crate::models::{PgConstraint, PgOperator, PgProc};
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn functions(
     pg_constraint: &PgConstraint,
     conn: &mut PgConnection,
@@ -25,7 +24,6 @@ pub(super) fn functions(
         .load::<PgProc>(conn)?)
 }
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn operators(
     pg_constraint: &PgConstraint,
     conn: &mut PgConnection,

@@ -98,13 +98,13 @@ async fn test_schema_completeness() {
     let crate_root_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
     for table in db.table_dag() {
-        workspace.add_internal_crate(table.schema_macro(&workspace, &db).into());
-        workspace.add_internal_crate(table.model(&workspace, &db).into());
-
         if table.table_name().starts_with("_") {
             // Skip internal tables
             continue;
         }
+
+        workspace.add_internal_crate(table.schema_macro(&workspace, &db).into());
+        workspace.add_internal_crate(table.model(&workspace, &db).into());
 
         let expected_schema_path = crate_root_path
             .join("src")

@@ -95,7 +95,7 @@ impl KeyColumnUsageMetadata {
     }
 
     /// Returns the match kind of the foreign key.
-    pub fn match_kind(&self) -> sqlparser::ast::MatchKind {
+    pub fn match_kind(&self) -> sqlparser::ast::ConstraintReferenceMatchKind {
         self.referential_constraint.match_kind()
     }
 }

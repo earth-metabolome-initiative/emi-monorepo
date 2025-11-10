@@ -5,7 +5,6 @@ use diesel::{ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl};
 
 use crate::models::{PgAttribute, PgType};
 
-#[pg_cached::auto_cached]
 pub(super) fn pg_type(
     pg_attribute: &PgAttribute,
     conn: &mut PgConnection,

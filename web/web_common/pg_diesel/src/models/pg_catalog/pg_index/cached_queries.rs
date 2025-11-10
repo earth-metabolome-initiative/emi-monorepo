@@ -9,7 +9,6 @@ use sqlparser::{ast::Expr, parser::Parser};
 
 use crate::models::{Column, PgIndex, Table};
 
-#[pg_cached::oid_auto_cached]
 pub(crate) fn columns(
     index: &PgIndex,
     conn: &mut PgConnection,
@@ -36,7 +35,6 @@ pub(crate) fn columns(
         .load::<Column>(conn)?)
 }
 
-#[pg_cached::oid_auto_cached]
 pub(crate) fn table(
     index: &PgIndex,
     conn: &mut PgConnection,
@@ -56,7 +54,6 @@ struct IndexExpr {
     expr: Option<String>,
 }
 
-#[pg_cached::oid_auto_cached]
 /// Returns the string expressions for the index, if any.
 pub(crate) fn expression(
     index: &PgIndex,

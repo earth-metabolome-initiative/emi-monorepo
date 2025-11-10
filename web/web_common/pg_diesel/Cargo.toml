@@ -5,9 +5,7 @@ edition = "2024"
 
 [dependencies]
 diesel = { workspace = true, features = ["postgres", "128-column-tables"] }
-cached = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
-pg_cached = { workspace = true }
 sql_traits.workspace = true
 common_traits.workspace = true
 sqlparser.workspace = true
@@ -26,5 +24,3 @@ workspace = true
 [features]
 default = []
 serde = ["dep:serde"]
-cached = ["dep:cached", "pg_cached/cached"]
-io_cached = ["cached", "cached/disk_store", "serde", "pg_cached/io_cached"]

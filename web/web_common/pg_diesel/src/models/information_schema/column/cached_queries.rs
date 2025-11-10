@@ -10,7 +10,6 @@ use crate::models::{
     PgType, Table,
 };
 
-#[pg_cached::auto_cached]
 pub(super) fn foreign_keys(
     column: &Column,
     conn: &mut PgConnection,
@@ -64,7 +63,6 @@ pub(super) fn foreign_keys(
     )
 }
 
-#[pg_cached::auto_cached]
 pub(super) fn check_constraints(
     column: &Column,
     conn: &mut PgConnection,
@@ -98,7 +96,6 @@ pub(super) fn check_constraints(
         .load(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(super) fn table(
     column: &Column,
     conn: &mut PgConnection,
@@ -111,7 +108,6 @@ pub(super) fn table(
         .first::<Table>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(super) fn geometry_column(
     column: &Column,
     conn: &mut PgConnection,
@@ -126,7 +122,6 @@ pub(super) fn geometry_column(
         .optional()?)
 }
 
-#[pg_cached::auto_cached]
 pub(super) fn geography_column(
     column: &Column,
     conn: &mut PgConnection,
@@ -141,7 +136,6 @@ pub(super) fn geography_column(
         .optional()?)
 }
 
-#[pg_cached::auto_cached]
 pub(super) fn pg_type(
     column: &Column,
     conn: &mut PgConnection,
@@ -162,7 +156,6 @@ pub(super) fn pg_type(
         .first::<PgType>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(super) fn pg_description(
     column: &Column,
     conn: &mut PgConnection,

@@ -50,7 +50,7 @@ impl ForeignKeyLike for KeyColumnUsage {
         database.foreign_key_metadata(self).on_delete_cascade()
     }
 
-    fn match_kind(&self, database: &Self::DB) -> sqlparser::ast::MatchKind {
+    fn match_kind(&self, database: &Self::DB) -> sqlparser::ast::ConstraintReferenceMatchKind {
         database.foreign_key_metadata(self).match_kind()
     }
 

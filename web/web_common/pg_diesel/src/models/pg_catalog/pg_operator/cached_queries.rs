@@ -5,7 +5,6 @@ use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, 
 
 use crate::models::{PgExtension, PgOperator, PgProc, PgType};
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn function(
     pg_operator: &PgOperator,
     conn: &mut PgConnection,
@@ -17,7 +16,6 @@ pub(super) fn function(
         .first::<PgProc>(conn)?)
 }
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn extension(
     pg_operator: &PgOperator,
     conn: &mut PgConnection,
@@ -30,7 +28,6 @@ pub(super) fn extension(
         .first::<PgExtension>(conn)?)
 }
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn left_operand_type(
     pg_operator: &PgOperator,
     conn: &mut PgConnection,
@@ -42,7 +39,6 @@ pub(super) fn left_operand_type(
         .first::<PgType>(conn)?)
 }
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn right_operand_type(
     pg_operator: &PgOperator,
     conn: &mut PgConnection,
@@ -54,7 +50,6 @@ pub(super) fn right_operand_type(
         .first::<PgType>(conn)?)
 }
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn result_type(
     pg_operator: &PgOperator,
     conn: &mut PgConnection,

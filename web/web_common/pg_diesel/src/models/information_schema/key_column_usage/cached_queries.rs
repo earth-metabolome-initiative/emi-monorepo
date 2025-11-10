@@ -8,7 +8,6 @@ use diesel::{
 
 use crate::models::{Column, KeyColumnUsage, ReferentialConstraint, Table};
 
-#[pg_cached::auto_cached]
 pub(super) fn referential_constraint(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
@@ -24,7 +23,6 @@ pub(super) fn referential_constraint(
         .first::<ReferentialConstraint>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(super) fn referenced_columns(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
@@ -63,7 +61,6 @@ pub(super) fn referenced_columns(
         .load::<Column>(conn)
 }
 
-#[pg_cached::auto_cached]
 pub(crate) fn host_columns(
     key_column_usage: &KeyColumnUsage,
     conn: &mut PgConnection,
@@ -85,7 +82,6 @@ pub(crate) fn host_columns(
         .load::<Column>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 /// Returns the referenced table associated with this key column usage
 ///
 /// # Arguments

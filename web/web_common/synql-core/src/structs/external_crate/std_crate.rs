@@ -52,6 +52,7 @@ impl ExternalType {
             .postgres_types([
                 "text",
                 "char",
+                "character",
                 "character varying",
                 "varchar",
                 "bpchar",

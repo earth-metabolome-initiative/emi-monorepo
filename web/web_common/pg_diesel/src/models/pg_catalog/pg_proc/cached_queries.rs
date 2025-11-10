@@ -4,7 +4,6 @@ use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, 
 
 use crate::models::{PgExtension, PgProc};
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn extension(
     pg_proc: &PgProc,
     conn: &mut PgConnection,

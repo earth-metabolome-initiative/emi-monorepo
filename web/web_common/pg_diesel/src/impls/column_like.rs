@@ -48,8 +48,8 @@ impl ColumnLike for crate::models::Column {
             || self.is_identity.as_ref().is_some_and(|i| i == "YES")
     }
 
-    fn data_type<'db>(&'db self, _database: &'db Self::DB) -> &'db str {
-        self.data_type_str()
+    fn data_type<'db>(&'db self, database: &'db Self::DB) -> &'db str {
+        &database.column_metadata(self).pg_type().typname
     }
 
     fn is_nullable(&self, _database: &Self::DB) -> bool {

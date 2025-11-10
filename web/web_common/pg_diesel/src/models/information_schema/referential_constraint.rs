@@ -32,11 +32,11 @@ impl ReferentialConstraint {
     }
 
     /// Returns the match kind of the referential constraint
-    pub fn match_kind(&self) -> sqlparser::ast::MatchKind {
+    pub fn match_kind(&self) -> sqlparser::ast::ConstraintReferenceMatchKind {
         match self.match_option.to_uppercase().as_str() {
-            "FULL" => sqlparser::ast::MatchKind::Full,
-            "PARTIAL" => sqlparser::ast::MatchKind::Partial,
-            "SIMPLE" => sqlparser::ast::MatchKind::Simple,
+            "FULL" => sqlparser::ast::ConstraintReferenceMatchKind::Full,
+            "PARTIAL" => sqlparser::ast::ConstraintReferenceMatchKind::Partial,
+            "SIMPLE" => sqlparser::ast::ConstraintReferenceMatchKind::Simple,
             other => unreachable!("Unexpected match option: {other}"),
         }
     }

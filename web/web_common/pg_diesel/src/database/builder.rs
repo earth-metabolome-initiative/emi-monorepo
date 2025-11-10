@@ -1,41 +1,4 @@
 //! Builder pattern for constructing a [`PgDatabase`] instance.
-//!
-//! This module provides [`PgDatabaseBuilder`], which implements a type-safe
-//! builder pattern for loading PostgreSQL metadata from system catalogs into a
-//! [`PgDatabase`] instance.
-//!
-//! ## Builder Pattern
-//!
-//! The builder requires three essential attributes:
-//! - A database connection ([`PgConnection`])
-//! - A catalog (database) name to query
-//! - One or more schema names to include
-//!
-//! ## Type Denylisting
-//!
-//! The builder supports denylisting PostgreSQL types that cannot be mapped to
-//! Diesel types (e.g., `anyarray`, `pg_ndistinct`). Denylisted types are
-//! excluded from column generation.
-//!
-//! ## Error Handling
-//!
-//! The builder can fail with [`PgDatabaseBuildError`] which wraps:
-//! - Builder errors (missing required attributes)
-//! - Diesel errors (database query failures)
-//! - Duplicate denylist type errors
-//!
-//! ## Example
-//!
-//! ```ignore
-//! use pg_diesel::database::PgDatabaseBuilder;
-//!
-//! let db = PgDatabaseBuilder::default()
-//!     .connection(&mut conn)
-//!     .catalog("my_database")
-//!     .schemas(vec!["public".to_owned(), "information_schema".to_owned()])
-//!     .denylist_types(["anyarray", "pg_ndistinct"])?
-//!     .build()?;
-//! ```
 
 use std::{fmt::Display, rc::Rc};
 
@@ -53,34 +16,6 @@ use crate::{
 
 #[derive(Default)]
 /// Builder for constructing a [`PgDatabase`] instance from PostgreSQL metadata.
-///
-/// This builder follows the type-state pattern to ensure all required
-/// attributes are provided before building. It queries the PostgreSQL system
-/// catalogs to load complete metadata about tables, columns, constraints,
-/// indexes, and functions.
-///
-/// ## Required Attributes
-///
-/// - **connection**: A PostgreSQL database connection for querying metadata
-/// - **catalog**: The database name to query (typically the current database)
-/// - **schemas**: One or more schema names to include (e.g., "public",
-///   "pg_catalog")
-///
-/// ## Optional Attributes
-///
-/// - **denylist_types**: PostgreSQL type names to exclude from column
-///   generation
-///
-/// ## Usage
-///
-/// ```ignore
-/// let db = PgDatabaseBuilder::default()
-///     .connection(&mut conn)
-///     .catalog("mydb")
-///     .add_schema("public")
-///     .add_schema("information_schema")
-///     .build()?;
-/// ```
 pub struct PgDatabaseBuilder<'conn> {
     /// Connection to the PostgreSQL database.
     connection: Option<&'conn mut PgConnection>,

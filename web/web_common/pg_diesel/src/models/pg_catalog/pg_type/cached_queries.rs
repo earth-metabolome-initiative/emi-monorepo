@@ -7,7 +7,6 @@ use diesel::{
 
 use crate::models::{PgAttribute, PgEnum, PgExtension, PgType};
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn variants(
     pg_type: &PgType,
     conn: &mut PgConnection,
@@ -21,7 +20,6 @@ pub(super) fn variants(
         .load::<PgEnum>(conn)?)
 }
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn attributes(
     pg_type: &PgType,
     conn: &mut PgConnection,
@@ -35,7 +33,6 @@ pub(super) fn attributes(
         .load::<PgAttribute>(conn)?)
 }
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn extension(
     pg_type: &PgType,
     conn: &mut PgConnection,
@@ -49,7 +46,6 @@ pub(super) fn extension(
         .first::<PgExtension>(conn)?)
 }
 
-#[pg_cached::auto_cached]
 pub(super) fn from_oid(oid: u32, conn: &mut PgConnection) -> Result<PgType, diesel::result::Error> {
     use crate::schema::pg_catalog::pg_type::pg_type;
     Ok(pg_type::table.filter(pg_type::oid.eq(oid)).first::<PgType>(conn)?)

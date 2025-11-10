@@ -149,9 +149,12 @@ impl<'data, 'table, T: TableModelLike + ?Sized> TableModel<'data, 'table, T> {
     }
 
     fn extension_of_impls(&self) -> Vec<InternalToken> {
-        let extension_of_trait =
-            self.workspace.external_trait("ExtensionOf").expect("Failed to get ExtensionOf trait");
-        let read_trait = self.workspace.external_trait("Read").expect("Failed to get Read trait");
+        let Some(extension_of_trait) = self.workspace.external_trait("ExtensionOf") else {
+            return Vec::new();
+        };
+        let Some(read_trait) = self.workspace.external_trait("Read") else {
+            return Vec::new();
+        };
         let identifiable_trait = self
             .workspace
             .external_trait("Identifiable")

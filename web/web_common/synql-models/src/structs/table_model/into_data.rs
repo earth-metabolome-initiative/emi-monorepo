@@ -49,12 +49,15 @@ where
             .unwrap()
             .documentation(
                 Documentation::new()
-                    .documentation(table_model.table.table_doc(table_model.database).expect(
-                        &format!(
-                            "Failed to get documentation for table {}",
-                            table_model.table.table_name(),
-                        ),
-                    ))
+                    .documentation(
+                        table_model
+                            .table
+                            .table_doc(table_model.database)
+                            .map(|s| s.to_owned())
+                            .unwrap_or_else(|| {
+                                format!("TODO!: document table {}", table_model.table.table_name())
+                            }),
+                    )
                     .unwrap()
                     .build()
                     .expect("Failed to build documentation"),

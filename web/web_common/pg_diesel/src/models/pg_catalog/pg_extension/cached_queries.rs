@@ -5,7 +5,6 @@ use diesel::{ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl, 
 
 use crate::models::{PgEnum, PgExtension, PgProc, PgType};
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn enums(
     pg_extension: &PgExtension,
     conn: &mut PgConnection,
@@ -20,7 +19,6 @@ pub(super) fn enums(
         .load(conn)?)
 }
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn types(
     pg_extension: &PgExtension,
     conn: &mut PgConnection,
@@ -33,7 +31,6 @@ pub(super) fn types(
         .load(conn)?)
 }
 
-#[pg_cached::oid_auto_cached]
 pub(super) fn functions(
     pg_extension: &PgExtension,
     conn: &mut PgConnection,

@@ -59,7 +59,6 @@ members = [
   "web/web_common/ws_messages",
   "web/web_common/pg_diesel",
   "web/web_common/synql",
-  "web/web_common/pg_cached",
   "web/web_common/sql_relations",
   "web/web_common/sql_constraints",
   "web/web_common/sql_traits",
@@ -215,7 +214,6 @@ prettyplease = "0.2"
 enumflags2 = "0.7.12"
 guided_procedures = { path = "web/core_structures/guided_procedures" }
 directus_codegen = { path = "data_migrations/directus_migration/directus_codegen" }
-pg_cached = { path = "web/web_common/pg_cached" }
 pg_diesel = { path = "web/web_common/pg_diesel" }
 sql_traits = { path = "web/web_common/sql_traits" }
 sql_relations = { path = "web/web_common/sql_relations" }

@@ -4,8 +4,8 @@ use std::{
 };
 
 use diesel::{
-    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, Queryable,
-    QueryableByName, Selectable, SelectableHelper,
+    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, PgConnection, QueryDsl,
+    Queryable, QueryableByName, Selectable, SelectableHelper,
 };
 use sql_traits::{structs::metadata::CheckMetadata, traits::FunctionLike};
 
@@ -60,7 +60,9 @@ impl CheckConstraint {
     ///
     /// * If an error occurs while querying the database
     pub fn functions(&self, conn: &mut PgConnection) -> Result<Vec<PgProc>, diesel::result::Error> {
-        self.pg_constraint(conn)?.functions(conn)
+        self.pg_constraint(conn)
+            .optional()?
+            .map_or_else(|| Ok(Vec::new()), |constraint| constraint.functions(conn))
     }
 
     /// Returns the vector of [`PgOperator`] operators that are used in the
