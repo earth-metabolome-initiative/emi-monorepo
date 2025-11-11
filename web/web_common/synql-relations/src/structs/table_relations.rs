@@ -3,7 +3,6 @@
 use std::borrow::Borrow;
 
 use quote::quote;
-use syn::Ident;
 use synql_core::{
     prelude::{Builder, ColumnLike, DatabaseLike, ForeignKeyLike},
     structs::{
@@ -70,8 +69,7 @@ impl<'table, T: TableRelationsLike + ?Sized> TableRelations<'table, T> {
         &self,
         foreign_key: &<T::DB as DatabaseLike>::ForeignKey,
     ) -> (Argument, MethodBuilder) {
-        let connection_generic =
-            DataVariantRef::generic(Ident::new("C", proc_macro2::Span::call_site()));
+        let connection_generic = DataVariantRef::generic_str("C");
         let referenced_table: &T = foreign_key.referenced_table(self.database).borrow();
         let referenced_table_model = referenced_table
             .model_ref(self.workspace)

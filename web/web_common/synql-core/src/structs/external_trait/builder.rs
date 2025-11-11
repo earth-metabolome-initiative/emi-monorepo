@@ -1,13 +1,13 @@
 //! Submodule providing a builder for the `ExternalTrait` struct.
 
-use std::fmt::Display;
+use std::{collections::HashMap, fmt::Display};
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
 
-use crate::structs::ExternalTrait;
+use crate::structs::{DataVariantRef, ExternalTrait};
 
 #[derive(Default)]
 /// Builder for the `ExternalTrait` struct.
@@ -17,6 +17,10 @@ pub struct ExternalTraitBuilder {
     /// The [`syn::Path`](syn::Path) representing the trait
     /// within the external crate.
     path: Option<syn::Path>,
+    /// Generic parameters of the trait.
+    generics: Vec<syn::GenericParam>,
+    /// Default values for the generic parameters of the trait.
+    generic_defaults: HashMap<syn::GenericParam, DataVariantRef>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -80,6 +84,42 @@ impl ExternalTraitBuilder {
         self.path = Some(path);
         self
     }
+
+    /// Adds a generic parameter to the trait.
+    ///
+    /// # Arguments
+    /// * `generic` - The generic parameter to add.
+    pub fn generic(mut self, generic: syn::GenericParam) -> Self {
+        if !self.generics.contains(&generic) {
+            self.generics.push(generic);
+        }
+
+        self
+    }
+
+    /// Adds multiple generic parameters to the trait.
+    ///
+    /// # Arguments
+    /// * `generics` - The generic parameters to add.
+    pub fn generics<I>(mut self, generics: I) -> Self
+    where
+        I: IntoIterator<Item = syn::GenericParam>,
+    {
+        for generic in generics {
+            self = self.generic(generic);
+        }
+        self
+    }
+
+    /// Sets a default value for a generic parameter of the trait.
+    ///
+    /// # Arguments
+    /// * `generic` - The generic parameter.
+    /// * `default` - The default value for the generic parameter.
+    pub fn generic_default(mut self, generic: syn::GenericParam, default: DataVariantRef) -> Self {
+        self.generic_defaults.insert(generic, default);
+        self
+    }
 }
 
 impl Display for ExternalTraitAttribute {
@@ -105,10 +145,18 @@ impl Builder for ExternalTraitBuilder {
     type Error = BuilderError<ExternalTraitAttribute>;
     type Object = ExternalTrait;
 
-    fn build(self) -> Result<Self::Object, Self::Error> {
+    fn build(mut self) -> Result<Self::Object, Self::Error> {
+        let generic_defaults = self
+            .generics
+            .iter()
+            .map(|g| self.generic_defaults.remove(g))
+            .collect::<Vec<Option<DataVariantRef>>>();
+
         Ok(ExternalTrait {
             name: self.name.ok_or(BuilderError::IncompleteBuild(ExternalTraitAttribute::Name))?,
             path: self.path.ok_or(BuilderError::IncompleteBuild(ExternalTraitAttribute::Path))?,
+            generics: self.generics,
+            generic_defaults,
         })
     }
 }

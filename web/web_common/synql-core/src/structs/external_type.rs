@@ -7,7 +7,6 @@ use std::{fmt::Debug, hash::Hash, sync::Arc};
 
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
-use syn::Ident;
 pub use traits_mask::Trait;
 
 use crate::{
@@ -18,7 +17,7 @@ use crate::{
     traits::{ExternalDependencies, InternalDependencies},
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 /// Struct defining the type required by some type found in the postgres
 /// database schema.
 pub struct ExternalType {
@@ -36,115 +35,13 @@ pub struct ExternalType {
     /// External traits implemented by the type.
     external_traits: Vec<ExternalTraitRef>,
     /// Generic parameters of the type.
-    generics: Vec<Ident>,
+    generics: Vec<syn::GenericParam>,
     /// Default values for the generic parameters of the type.
     generic_defaults: Vec<Option<DataVariantRef>>,
 }
 
-impl PartialEq for ExternalType {
-    fn eq(&self, other: &Self) -> bool {
-        self.diesel_type.to_token_stream().to_string()
-            == other.diesel_type.to_token_stream().to_string()
-            && self.rust_type.to_token_stream().to_string()
-                == other.rust_type.to_token_stream().to_string()
-            && self.postgres_types == other.postgres_types
-            && self.traits == other.traits
-            && self.external_traits == other.external_traits
-            && self.generics == other.generics
-            && self
-                .generic_defaults
-                .iter()
-                .zip(other.generic_defaults.iter())
-                .all(|(a, b)| a.to_token_stream().to_string() == b.to_token_stream().to_string())
-    }
-}
-
-impl Eq for ExternalType {}
-
-impl PartialOrd for ExternalType {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for ExternalType {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        let diesel_cmp = self
-            .diesel_type
-            .to_token_stream()
-            .to_string()
-            .cmp(&other.diesel_type.to_token_stream().to_string());
-        if diesel_cmp != std::cmp::Ordering::Equal {
-            return diesel_cmp;
-        }
-
-        let rust_cmp = self
-            .rust_type
-            .to_token_stream()
-            .to_string()
-            .cmp(&other.rust_type.to_token_stream().to_string());
-        if rust_cmp != std::cmp::Ordering::Equal {
-            return rust_cmp;
-        }
-
-        let pg_types_cmp = self.postgres_types.cmp(&other.postgres_types);
-        if pg_types_cmp != std::cmp::Ordering::Equal {
-            return pg_types_cmp;
-        }
-
-        let traits_cmp = self.traits.cmp(&other.traits);
-        if traits_cmp != std::cmp::Ordering::Equal {
-            return traits_cmp;
-        }
-
-        let generics_cmp = self.generics.cmp(&other.generics);
-        if generics_cmp != std::cmp::Ordering::Equal {
-            return generics_cmp;
-        }
-
-        for (self_def, other_def) in self.generic_defaults.iter().zip(other.generic_defaults.iter())
-        {
-            let def_cmp = self_def
-                .to_token_stream()
-                .to_string()
-                .cmp(&other_def.to_token_stream().to_string());
-            if def_cmp != std::cmp::Ordering::Equal {
-                return def_cmp;
-            }
-        }
-
-        self.traits.cmp(&other.traits)
-    }
-}
-
-impl Hash for ExternalType {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.diesel_type.to_token_stream().to_string().hash(state);
-        self.rust_type.to_token_stream().to_string().hash(state);
-        self.postgres_types.hash(state);
-        self.traits.hash(state);
-        self.generics.hash(state);
-        for def in &self.generic_defaults {
-            def.to_token_stream().to_string().hash(state);
-        }
-    }
-}
-
 unsafe impl Send for ExternalType {}
 unsafe impl Sync for ExternalType {}
-
-impl Debug for ExternalType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("ExternalType")
-            .field("diesel_type", &self.diesel_type.to_token_stream().to_string())
-            .field("rust_type", &self.rust_type.to_token_stream().to_string())
-            .field("postgres_types", &self.postgres_types)
-            .field("traits", &self.traits)
-            .field("external_traits", &self.external_traits)
-            .field("generics", &self.generics)
-            .finish()
-    }
-}
 
 impl ExternalType {
     /// Inizializes a new `ExternalTypeBuilder`.
@@ -322,7 +219,7 @@ impl ExternalType {
     }
 
     /// Returns an iterator over the generic idents without defaults.
-    pub fn generics_without_defaults(&self) -> impl Iterator<Item = &Ident> {
+    pub fn generics_without_defaults(&self) -> impl Iterator<Item = &syn::GenericParam> + '_ {
         self.generics.iter().enumerate().filter_map(|(i, generic)| {
             if self.generic_defaults[i].is_none() { Some(generic) } else { None }
         })
@@ -335,19 +232,25 @@ impl ExternalType {
             None
         } else {
             let generics_with_defaults =
-                self.generics.iter().zip(self.generic_defaults.iter()).map(|(ident, default)| {
-                    if let Some(default) = default {
-                        quote::quote! { #default }
-                    } else {
-                        quote::quote! { #ident }
-                    }
-                });
+                self.generics.iter().zip(self.generic_defaults.iter()).map(
+                    |(generic_param, default)| {
+                        if let Some(default) = default {
+                            quote::quote! { #default }
+                        } else {
+                            quote::quote! { #generic_param }
+                        }
+                    },
+                );
             Some(quote::quote! { <#(#generics_with_defaults),*> })
         }
     }
 
     /// Sets a generic field to the provided `DataVariantRef`.
-    pub fn set_generic_field(&self, field: &Ident, value: DataVariantRef) -> Option<Self> {
+    pub fn set_generic_field(
+        &self,
+        field: &syn::GenericParam,
+        value: DataVariantRef,
+    ) -> Option<Self> {
         if !self.generics.contains(field) {
             return None;
         }

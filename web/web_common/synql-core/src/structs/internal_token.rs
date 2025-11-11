@@ -59,59 +59,17 @@ impl From<Vec<InternalToken>> for InternalToken {
 
 impl PartialEq for InternalToken {
     fn eq(&self, other: &Self) -> bool {
-        self.stream.to_string() == other.stream.to_string()
-            && self.publicness == other.publicness
+        self.publicness == other.publicness
             && self.external_macros == other.external_macros
             && self.employed_traits == other.employed_traits
             && self.implemented_traits == other.implemented_traits
             && self.data == other.data
             && self.internal_modules == other.internal_modules
+            && self.stream.to_string() == other.stream.to_string()
     }
 }
 
 impl Eq for InternalToken {}
-
-impl PartialOrd for InternalToken {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.cmp(other))
-    }
-}
-
-impl Ord for InternalToken {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        let stream_cmp = self.stream.to_string().cmp(&other.stream.to_string());
-        if stream_cmp != std::cmp::Ordering::Equal {
-            return stream_cmp;
-        }
-
-        let publicness_cmp = self.publicness.cmp(&other.publicness);
-        if publicness_cmp != std::cmp::Ordering::Equal {
-            return publicness_cmp;
-        }
-
-        let external_macros_cmp = self.external_macros.cmp(&other.external_macros);
-        if external_macros_cmp != std::cmp::Ordering::Equal {
-            return external_macros_cmp;
-        }
-
-        let employed_traits_cmp = self.employed_traits.cmp(&other.employed_traits);
-        if employed_traits_cmp != std::cmp::Ordering::Equal {
-            return employed_traits_cmp;
-        }
-
-        let implemented_traits_cmp = self.implemented_traits.cmp(&other.implemented_traits);
-        if implemented_traits_cmp != std::cmp::Ordering::Equal {
-            return implemented_traits_cmp;
-        }
-
-        let internal_data_cmp = self.data.cmp(&other.data);
-        if internal_data_cmp != std::cmp::Ordering::Equal {
-            return internal_data_cmp;
-        }
-
-        self.internal_modules.cmp(&other.internal_modules)
-    }
-}
 
 impl Hash for InternalToken {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
@@ -166,6 +124,12 @@ impl From<TokenStream> for InternalToken {
     }
 }
 
+impl From<syn::GenericParam> for InternalToken {
+    fn from(generic: syn::GenericParam) -> Self {
+        InternalToken::new().private().stream(quote! { #generic }).build().unwrap()
+    }
+}
+
 impl ToTokens for InternalToken {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         self.stream.to_tokens(tokens);
@@ -179,7 +143,7 @@ impl InternalDependencies for InternalToken {
             dependencies.extend(data.internal_dependencies());
         }
         for module in &self.internal_modules {
-            dependencies.push(module.internal_crate());
+            dependencies.extend(module.internal_dependencies());
         }
         for trait_ref in &self.employed_traits {
             dependencies.extend(trait_ref.internal_dependencies());
@@ -190,7 +154,6 @@ impl InternalDependencies for InternalToken {
         for data in &self.data {
             dependencies.extend(data.internal_dependencies());
         }
-
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies
@@ -201,7 +164,7 @@ impl ExternalDependencies for InternalToken {
     fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
         let mut dependencies = Vec::new();
         for ext_macro in &self.external_macros {
-            dependencies.push(Arc::new(ext_macro.external_crate().clone()));
+            dependencies.extend(ext_macro.external_dependencies());
         }
         for trait_ref in &self.employed_traits {
             dependencies.extend(trait_ref.external_dependencies());
@@ -215,6 +178,7 @@ impl ExternalDependencies for InternalToken {
         for func in &self.employed_functions {
             dependencies.extend(func.external_dependencies());
         }
+
         dependencies.sort_unstable();
         dependencies.dedup();
         dependencies

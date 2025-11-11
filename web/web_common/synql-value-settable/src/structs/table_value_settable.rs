@@ -4,7 +4,6 @@
 use quote::quote;
 use sql_relations::{prelude::ColumnLike, traits::InheritableDatabaseLike};
 use sql_traits::traits::DatabaseLike;
-use syn::Ident;
 use synql_attributes::traits::TableAttributesLike;
 use synql_core::{
     prelude::Builder,
@@ -12,6 +11,7 @@ use synql_core::{
         Argument, DataVariantRef, Documentation, InternalToken, Method, WhereClause, Workspace,
     },
     traits::ColumnSynLike,
+    utils::generic_type,
 };
 use synql_diesel_schema::traits::ColumnSchema;
 
@@ -81,12 +81,9 @@ impl<'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'table, T> {
             .workspace
             .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
             .expect("Failed to get ValidationError type ref")
-            .set_generic_field(
-                &Ident::new("FieldName", proc_macro2::Span::call_site()),
-                table_attributes.into(),
-            )
+            .set_generic_field(&generic_type("FieldName"), table_attributes.into())
             .expect("Failed to set generic field for ValidationError");
-        let column_acronym = column.column_acronym_ident();
+        let column_acronym = column.column_acronym_generic();
 
         Method::new()
             .name(column.column_snake_name())
@@ -114,7 +111,6 @@ impl<'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'table, T> {
             )
             .unwrap()
             .generic(column_acronym.clone())
-            .unwrap()
             .argument(
                 Argument::new()
                     .name(column.column_snake_name())

@@ -32,6 +32,12 @@ impl PartialEq for InternalCrate {
 
 impl Eq for InternalCrate {}
 
+impl Hash for InternalCrate {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+    }
+}
+
 impl PartialOrd for InternalCrate {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.name.cmp(&other.name))
@@ -41,12 +47,6 @@ impl PartialOrd for InternalCrate {
 impl Ord for InternalCrate {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.name.cmp(&other.name)
-    }
-}
-
-impl Hash for InternalCrate {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.name.hash(state);
     }
 }
 
@@ -229,6 +229,7 @@ impl InternalDependencies for InternalCrate {
         dependencies.extend(self.documentation.internal_dependencies());
         dependencies.sort_unstable();
         dependencies.dedup();
+
         dependencies
     }
 }

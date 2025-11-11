@@ -1,6 +1,6 @@
 //! Submodule defining a builder for the `Derive` struct.
 
-use std::{error::Error, fmt::Display};
+use std::fmt::Display;
 
 use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
@@ -36,103 +36,60 @@ impl Display for DeriveAttribute {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-/// Enumeration of errors that can occur during the building of a
-/// `Derive`.
-pub enum DeriveBuilderError {
-    /// An error occurred during the building process.
-    Builder(BuilderError<DeriveAttribute>),
-    /// A feature with the same name has already been added.
-    DuplicatedFeature,
-    /// A trait with the same name has already been added.
-    DuplicatedTrait,
-}
-
-impl From<BuilderError<DeriveAttribute>> for DeriveBuilderError {
-    fn from(e: BuilderError<DeriveAttribute>) -> Self {
-        DeriveBuilderError::Builder(e)
-    }
-}
-
-impl Display for DeriveBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            DeriveBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
-            DeriveBuilderError::DuplicatedFeature => {
-                write!(f, "A feature with the same name has already been added")
-            }
-            DeriveBuilderError::DuplicatedTrait => {
-                write!(f, "A trait with the same name has already been added")
-            }
-        }
-    }
-}
-
-impl Error for DeriveBuilderError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            DeriveBuilderError::Builder(e) => Some(e),
-            _ => None,
-        }
-    }
-}
-
 impl DeriveBuilder {
     /// Adds a feature required by the derive.
     ///
     /// # Arguments
     /// * `feature` - The feature to add.
-    pub fn add_feature(mut self, feature: FeatureFlag) -> Result<Self, DeriveBuilderError> {
-        if self.features.contains(&feature) {
-            return Err(DeriveBuilderError::DuplicatedFeature);
+    pub fn add_feature(mut self, feature: FeatureFlag) -> Self {
+        if !self.features.contains(&feature) {
+            self.features.push(feature);
         }
-        self.features.push(feature);
-        Ok(self)
+        self
     }
 
     /// Adds multiple features required by the derive.
     ///
     /// # Arguments
     /// * `features` - The features to add.
-    pub fn add_features<I>(mut self, features: I) -> Result<Self, DeriveBuilderError>
+    pub fn add_features<I>(mut self, features: I) -> Self
     where
         I: IntoIterator<Item = FeatureFlag>,
     {
         for feature in features {
-            self = self.add_feature(feature)?;
+            self = self.add_feature(feature);
         }
-        Ok(self)
+        self
     }
 
     /// Adds a trait implemented by the derive.
     ///
     /// # Arguments
     /// * `trait_ref` - The trait to add.
-    pub fn add_trait<T>(mut self, trait_ref: T) -> Result<Self, DeriveBuilderError>
+    pub fn add_trait<T>(mut self, trait_ref: T) -> Self
     where
         T: Into<TraitVariantRef>,
     {
         let trait_ref = trait_ref.into();
-        if self.traits.contains(&trait_ref) {
-            return Err(DeriveBuilderError::DuplicatedTrait);
+        if !self.traits.contains(&trait_ref) {
+            self.traits.push(trait_ref);
         }
-        self.traits.push(trait_ref);
-        Ok(self)
+        self
     }
 
     /// Adds multiple traits implemented by the derive.
     ///
     /// # Arguments
     /// * `traits` - The traits to add.
-    pub fn add_traits<I, T>(mut self, traits: I) -> Result<Self, DeriveBuilderError>
+    pub fn add_traits<I, T>(mut self, traits: I) -> Self
     where
         I: IntoIterator<Item = T>,
         T: Into<TraitVariantRef>,
     {
         for trait_ref in traits {
-            self = self.add_trait(trait_ref)?;
+            self = self.add_trait(trait_ref);
         }
-        Ok(self)
+        self
     }
 }
 
@@ -148,7 +105,7 @@ impl IsCompleteBuilder for DeriveBuilder {
 }
 
 impl Builder for DeriveBuilder {
-    type Error = DeriveBuilderError;
+    type Error = BuilderError<DeriveAttribute>;
     type Object = Derive;
 
     fn build(self) -> Result<Self::Object, Self::Error> {

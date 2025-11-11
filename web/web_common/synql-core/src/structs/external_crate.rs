@@ -5,7 +5,7 @@ use std::{fmt::Debug, hash::Hash, sync::Arc};
 
 use proc_macro2::TokenStream;
 use quote::ToTokens;
-use syn::{Ident, Type};
+use syn::Type;
 
 use crate::{
     structs::{
@@ -28,7 +28,7 @@ mod serde_crate;
 mod std_crate;
 mod validation_errors_crate;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 /// Struct defining the crate required by some type found in the postgres
 /// database schema.
 pub struct ExternalCrate {
@@ -51,21 +51,6 @@ pub struct ExternalCrate {
     features: Vec<String>,
 }
 
-impl Debug for ExternalCrate {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("ExternalCrate")
-            .field("name", &self.name)
-            .field("types", &self.types)
-            .field("macros", &self.macros)
-            .field("traits", &self.traits)
-            .field("functions", &self.functions.iter().map(|(m, _)| m).collect::<Vec<_>>())
-            .field("version", &self.version)
-            .field("git", &self.git)
-            .field("features", &self.features)
-            .finish()
-    }
-}
-
 impl PartialEq for ExternalCrate {
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
@@ -73,6 +58,12 @@ impl PartialEq for ExternalCrate {
 }
 
 impl Eq for ExternalCrate {}
+
+impl Hash for ExternalCrate {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.name.hash(state);
+    }
+}
 
 impl PartialOrd for ExternalCrate {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
@@ -83,12 +74,6 @@ impl PartialOrd for ExternalCrate {
 impl Ord for ExternalCrate {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         self.name.cmp(&other.name)
-    }
-}
-
-impl Hash for ExternalCrate {
-    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.name.hash(state);
     }
 }
 
@@ -204,7 +189,7 @@ impl ExternalCrate {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a reference to an external crate and one of its types.
 pub struct ExternalTypeRef {
     crate_ref: Arc<ExternalCrate>,
@@ -273,12 +258,16 @@ impl ExternalTypeRef {
     }
 
     /// Returns an iterator over the generic idents without defaults.
-    pub fn generics_without_defaults(&self) -> impl Iterator<Item = &Ident> {
+    pub fn generics_without_defaults(&self) -> impl Iterator<Item = &syn::GenericParam> + '_ {
         self.type_ref.generics_without_defaults()
     }
 
     /// Sets a generic field to the provided `DataVariantRef`.
-    pub fn set_generic_field(&self, field: &Ident, value: DataVariantRef) -> Option<Self> {
+    pub fn set_generic_field(
+        &self,
+        field: &syn::GenericParam,
+        value: DataVariantRef,
+    ) -> Option<Self> {
         Some(Self {
             type_ref: Arc::new(self.type_ref.set_generic_field(field, value)?),
             crate_ref: self.crate_ref.clone(),
@@ -314,7 +303,7 @@ impl ToTokens for ExternalTypeRef {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a reference to an external crate and one of its macros.
 pub struct ExternalMacroRef {
     crate_ref: Arc<ExternalCrate>,
@@ -343,7 +332,19 @@ impl ExternalMacroRef {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+impl ExternalDependencies for ExternalMacroRef {
+    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
+        vec![self.crate_ref.clone()]
+    }
+}
+
+impl InternalDependencies for ExternalMacroRef {
+    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
+        Vec::new()
+    }
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 /// Struct representing a reference to an external crate and one of its traits.
 pub struct ExternalTraitRef {
     crate_ref: Arc<ExternalCrate>,

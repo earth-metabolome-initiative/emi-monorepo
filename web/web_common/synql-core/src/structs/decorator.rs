@@ -13,7 +13,7 @@ use crate::{
     traits::{ExternalDependencies, InternalDependencies},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// A decorator applied to SynQL internal data.
 pub struct Decorator {
     /// Features required by the derive.

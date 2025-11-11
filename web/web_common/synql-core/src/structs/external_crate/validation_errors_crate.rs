@@ -5,9 +5,11 @@
 use std::sync::Arc;
 
 use common_traits::builder::Builder;
-use syn::Ident;
 
-use crate::structs::{DataVariantRef, ExternalCrate, ExternalTrait, ExternalType};
+use crate::{
+    structs::{DataVariantRef, ExternalCrate, ExternalTrait, ExternalType},
+    utils::generic_type,
+};
 
 impl ExternalCrate {
     /// Initializes a `ExternalCrate` instance describing the
@@ -23,7 +25,7 @@ impl ExternalCrate {
                             .rust_type(syn::parse_quote!(
                                 validation_errors::prelude::ValidationError
                             ))
-                            .generic(Ident::new("FieldName", proc_macro2::Span::call_site()))
+                            .generic(generic_type("FieldName"))
                             .build()
                             .unwrap(),
                     ),
@@ -67,10 +69,7 @@ impl ExternalCrate {
             .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
             .unwrap();
         validation_error_type
-            .set_generic_field(
-                &Ident::new("FieldName", proc_macro2::Span::call_site()),
-                unspecified.into(),
-            )
+            .set_generic_field(&generic_type("FieldName"), unspecified.into())
             .unwrap()
             .into()
     }

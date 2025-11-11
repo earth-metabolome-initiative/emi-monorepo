@@ -21,7 +21,7 @@ use crate::{
     utils::RESERVED_RUST_WORDS,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct defining an attribute of a struct model.
 pub struct InternalAttribute {
     /// Publicness of the attribute.
@@ -131,7 +131,7 @@ impl ToTokens for InternalAttribute {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct defining a struct model.
 pub struct InternalStruct {
     /// Attributes of the struct.

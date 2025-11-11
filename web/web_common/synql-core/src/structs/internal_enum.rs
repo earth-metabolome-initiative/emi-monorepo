@@ -18,7 +18,7 @@ use crate::{
     traits::{ExternalDependencies, InternalDependencies},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct defining a variant of an enum model.
 pub struct InternalVariant {
     /// Name of the variant.
@@ -104,7 +104,7 @@ impl ToTokens for InternalVariant {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct defining a enum model.
 pub struct InternalEnum {
     /// Variants of the enum.

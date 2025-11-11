@@ -23,9 +23,10 @@ use crate::{
         external_trait::TraitVariantRef,
     },
     traits::{ExternalDependencies, InternalDependencies},
+    utils::generic_type,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Enum representing the variant of internal data (struct or enum).
 pub enum InternalDataVariant {
     /// Variant representing a struct.
@@ -78,7 +79,7 @@ impl InternalDataVariant {
     }
 }
 
-#[derive(Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 /// Enum representing a variant of internal data, which may be defined within
 /// the workspace or come from an external crate.
 pub enum DataVariantRef {
@@ -91,36 +92,13 @@ pub enum DataVariantRef {
     /// A mutable reference to a data variant ref.
     MutableReference(Option<Lifetime>, Box<DataVariantRef>),
     /// A generic type parameter.
-    Generic(Ident),
+    Generic(syn::GenericParam),
     /// A result type.
     Result(Box<DataVariantRef>, Box<DataVariantRef>),
     /// A option type.
     Option(Box<DataVariantRef>),
     /// A self type, of which sometimes it is known what it is.
     SelfType(Option<Box<DataVariantRef>>),
-}
-
-impl Debug for DataVariantRef {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            DataVariantRef::Internal(internal) => write!(f, "Internal({internal:?})"),
-            DataVariantRef::External(external) => write!(f, "External({external:?})"),
-            DataVariantRef::Reference(_, inner) => write!(f, "Reference({inner:?})"),
-            DataVariantRef::MutableReference(_, inner) => {
-                write!(f, "MutableReference({inner:?})")
-            }
-            DataVariantRef::Generic(ident) => write!(f, "Generic({ident})"),
-            DataVariantRef::Result(left, right) => {
-                write!(f, "Result({left:?}, {right:?})")
-            }
-            DataVariantRef::Option(inner) => {
-                write!(f, "Option({inner:?})")
-            }
-            DataVariantRef::SelfType(inner) => {
-                write!(f, "Self<{inner:?}>")
-            }
-        }
-    }
 }
 
 impl From<InternalDataRef> for DataVariantRef {
@@ -181,8 +159,13 @@ impl crate::traits::ExternalDependencies for DataVariantRef {
 
 impl DataVariantRef {
     /// Creates a new generic `DataVariantRef`.
-    pub fn generic(ident: Ident) -> DataVariantRef {
+    pub fn generic(ident: syn::GenericParam) -> DataVariantRef {
         DataVariantRef::Generic(ident)
+    }
+
+    /// Creates a new generic from the provided `str`.
+    pub fn generic_str(ident_str: &str) -> DataVariantRef {
+        DataVariantRef::Generic(generic_type(ident_str))
     }
 
     /// Returns a reference variant of the data variant.
@@ -197,7 +180,7 @@ impl DataVariantRef {
 
     /// Returns an iterator over the generics without a default used in the
     /// data variant.
-    pub fn generics_without_defaults(&self) -> Vec<&Ident> {
+    pub fn generics_without_defaults(&self) -> Vec<&syn::GenericParam> {
         match self {
             DataVariantRef::Internal(internal) => {
                 internal.data().generics_without_defaults().collect()
@@ -208,9 +191,11 @@ impl DataVariantRef {
             DataVariantRef::Generic(ident) => vec![ident],
             DataVariantRef::Result(left, right) => {
                 let mut generics = left.generics_without_defaults();
-                generics.extend(right.generics_without_defaults());
-                generics.sort_unstable();
-                generics.dedup();
+                for generic in right.generics_without_defaults() {
+                    if !generics.contains(&generic) {
+                        generics.push(generic);
+                    }
+                }
                 generics
             }
             DataVariantRef::Option(inner) => inner.generics_without_defaults(),
@@ -381,7 +366,7 @@ impl DataVariantRef {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a reference to internal data and its crate.
 pub struct InternalDataRef {
     data: Arc<InternalData>,
@@ -546,7 +531,7 @@ impl ToTokens for DataVariantRef {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a reference to internal module and its crate.
 pub struct InternalModuleRef {
     module: Arc<InternalModule>,
@@ -560,6 +545,18 @@ impl ToTokens for InternalModuleRef {
             .module_path(self.module.as_ref())
             .expect("Failed to get module path for internal module ref");
         tokens.extend(quote! {#path});
+    }
+}
+
+impl InternalDependencies for InternalModuleRef {
+    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
+        vec![self.internal_crate.as_ref()]
+    }
+}
+
+impl ExternalDependencies for InternalModuleRef {
+    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
+        Vec::new()
     }
 }
 
@@ -598,7 +595,7 @@ impl InternalModuleRef {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct defining a data model.
 pub struct InternalData {
     /// Publicness of the data.
@@ -616,7 +613,7 @@ pub struct InternalData {
     /// The decorators applied to the data which are not derives.
     decorators: Vec<Decorator>,
     /// The generics used in the data.
-    generics: Vec<Ident>,
+    generics: Vec<syn::GenericParam>,
     /// Defaults for generic type parameters.
     generic_defaults: Vec<Option<DataVariantRef>>,
 }
@@ -666,7 +663,7 @@ impl InternalData {
     }
 
     /// Returns an iterator over the generics for which no default is defined.
-    pub fn generics_without_defaults(&self) -> impl Iterator<Item = &Ident> {
+    pub fn generics_without_defaults(&self) -> impl Iterator<Item = &syn::GenericParam> {
         self.generics
             .iter()
             .zip(self.generic_defaults.iter())

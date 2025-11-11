@@ -30,9 +30,9 @@ pub struct ExternalTypeBuilder {
     /// External traits implemented by the type.
     external_traits: Vec<ExternalTraitRef>,
     /// Generic parameters of the type.
-    generics: Vec<syn::Ident>,
+    generics: Vec<syn::GenericParam>,
     /// Default values for the generic parameters of the type.
-    generic_defaults: HashMap<syn::Ident, DataVariantRef>,
+    generic_defaults: HashMap<syn::GenericParam, DataVariantRef>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -260,7 +260,7 @@ impl ExternalTypeBuilder {
     ///
     /// # Arguments
     /// * `generic` - The generic parameter to add.
-    pub fn generic(mut self, generic: syn::Ident) -> Self {
+    pub fn generic(mut self, generic: syn::GenericParam) -> Self {
         if !self.generics.contains(&generic) {
             self.generics.push(generic);
         }
@@ -274,7 +274,7 @@ impl ExternalTypeBuilder {
     /// * `generics` - The generic parameters to add.
     pub fn generics<I>(mut self, generics: I) -> Self
     where
-        I: IntoIterator<Item = syn::Ident>,
+        I: IntoIterator<Item = syn::GenericParam>,
     {
         for generic in generics {
             self = self.generic(generic);
@@ -287,7 +287,7 @@ impl ExternalTypeBuilder {
     /// # Arguments
     /// * `generic` - The generic parameter.
     /// * `default` - The default value for the generic parameter.
-    pub fn generic_default(mut self, generic: syn::Ident, default: DataVariantRef) -> Self {
+    pub fn generic_default(mut self, generic: syn::GenericParam, default: DataVariantRef) -> Self {
         self.generic_defaults.insert(generic, default);
         self
     }

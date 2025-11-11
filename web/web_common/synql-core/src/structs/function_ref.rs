@@ -10,7 +10,7 @@ use crate::{
     traits::ExternalDependencies,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 /// Struct representing a reference to a function defined in an external crate.
 pub struct ExternalFunctionRef {
     /// The underlying method.
@@ -19,16 +19,6 @@ pub struct ExternalFunctionRef {
     path: Arc<syn::Path>,
     /// The crate from which the function is referenced.
     crate_ref: Arc<ExternalCrate>,
-}
-
-impl Debug for ExternalFunctionRef {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("ExternalFunctionRef")
-            .field("method", &self.method)
-            .field("path", &self.path.to_token_stream().to_string())
-            .field("crate_ref", &self.crate_ref.name())
-            .finish()
-    }
 }
 
 impl ExternalFunctionRef {

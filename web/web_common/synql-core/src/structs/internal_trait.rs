@@ -18,7 +18,7 @@ use crate::{
     traits::{ExternalDependencies, InternalDependencies},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a rust trait.
 pub struct InternalTrait {
     /// Name of the trait.
@@ -32,7 +32,7 @@ pub struct InternalTrait {
     /// Where statements for the trait.
     where_statements: Vec<WhereClause>,
     /// Generics for the trait.
-    generics: Vec<Ident>,
+    generics: Vec<syn::GenericParam>,
     /// Super traits for the trait.
     super_traits: Vec<InternalToken>,
 }
@@ -134,7 +134,21 @@ impl InternalTrait {
                         proc_macro2::Span::call_site(),
                     )
                 };
-                if self.generics.contains(&tentative_generic) {
+                // Check if the tentative generic identifier matches any existing generic
+                // parameter
+                if self.generics.iter().any(|param| {
+                    match param {
+                        syn::GenericParam::Type(type_param) => {
+                            type_param.ident == tentative_generic
+                        }
+                        syn::GenericParam::Lifetime(lifetime_param) => {
+                            lifetime_param.lifetime.ident == tentative_generic
+                        }
+                        syn::GenericParam::Const(const_param) => {
+                            const_param.ident == tentative_generic
+                        }
+                    }
+                }) {
                     continue;
                 }
                 break 'outer tentative_generic;

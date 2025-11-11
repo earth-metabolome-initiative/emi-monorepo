@@ -7,7 +7,6 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 use strum::IntoEnumIterator;
-use syn::Ident;
 
 use crate::structs::{
     DataVariantRef, Decorator, Derive, Documentation, ExternalCrate, InternalData,
@@ -32,9 +31,9 @@ pub struct InternalDataBuilder {
     /// The decorators applied to the data.
     decorators: Vec<Decorator>,
     /// Generics used in the data.
-    generics: Vec<Ident>,
+    generics: Vec<syn::GenericParam>,
     /// Generic defaults for the data.
-    generic_defaults: HashMap<Ident, DataVariantRef>,
+    generic_defaults: HashMap<syn::GenericParam, DataVariantRef>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -90,10 +89,8 @@ pub enum InternalDataBuilderError {
     DuplicatedDerive,
     /// A decorator with the same token has already been added.
     DuplicatedDecorator,
-    /// A generic with the same name has already been added.
-    DuplicatedGeneric(String),
     /// A generic default was specified for a generic that does not exist.
-    GenericDefaultForNonexistentGeneric(Ident),
+    GenericDefaultForNonexistentGeneric(syn::GenericParam),
 }
 
 impl Display for InternalDataBuilderError {
@@ -110,13 +107,10 @@ impl Display for InternalDataBuilderError {
             InternalDataBuilderError::DuplicatedDecorator => {
                 write!(f, "A decorator with the same token has already been added")
             }
-            InternalDataBuilderError::DuplicatedGeneric(name) => {
-                write!(f, "A generic with the name '{name}' has already been added")
-            }
             InternalDataBuilderError::GenericDefaultForNonexistentGeneric(ident) => {
                 write!(
                     f,
-                    "A generic default was specified for a generic that does not exist: {ident}",
+                    "A generic default was specified for a generic that does not exist: {ident:?}",
                 )
             }
         }
@@ -273,26 +267,25 @@ impl InternalDataBuilder {
     ///
     /// # Arguments
     /// * `generic` - The generic to add.
-    pub fn generic(mut self, generic: Ident) -> Result<Self, InternalDataBuilderError> {
-        if self.generics.iter().any(|g| g == &generic) {
-            return Err(InternalDataBuilderError::DuplicatedGeneric(generic.to_string()));
+    pub fn generic(mut self, generic: syn::GenericParam) -> Self {
+        if !self.generics.contains(&generic) {
+            self.generics.push(generic);
         }
-        self.generics.push(generic);
-        Ok(self)
+        self
     }
 
     /// Adds multiple generics to the data.
     ///
     /// # Arguments
     /// * `generics` - The generics to add.
-    pub fn generics<I>(mut self, generics: I) -> Result<Self, InternalDataBuilderError>
+    pub fn generics<I>(mut self, generics: I) -> Self
     where
-        I: IntoIterator<Item = Ident>,
+        I: IntoIterator<Item = syn::GenericParam>,
     {
         for generic in generics {
-            self = self.generic(generic)?;
+            self = self.generic(generic);
         }
-        Ok(self)
+        self
     }
 
     /// Adds a type default for a generic.
@@ -306,10 +299,10 @@ impl InternalDataBuilder {
     /// * If the generic does not exist.
     pub fn generic_default(
         mut self,
-        generic: Ident,
+        generic: syn::GenericParam,
         default: DataVariantRef,
     ) -> Result<Self, InternalDataBuilderError> {
-        if !self.generics.iter().any(|g| g == &generic) {
+        if !self.generics.contains(&generic) {
             return Err(InternalDataBuilderError::GenericDefaultForNonexistentGeneric(generic));
         }
         self.generic_defaults.insert(generic, default);
@@ -346,9 +339,7 @@ impl Builder for InternalDataBuilder {
             if variant.supports_trait(&trait_variant.into())
                 && !self.traits.iter().any(|t| t.implements_trait(&trait_variant.into()))
             {
-                derive_builder = derive_builder
-                    .add_trait(trait_variant)
-                    .expect("It is not possible to double-add a trait here");
+                derive_builder = derive_builder.add_trait(trait_variant);
             }
         }
         if let Ok(derive) = derive_builder.build() {
@@ -361,9 +352,7 @@ impl Builder for InternalDataBuilder {
             if variant.supports_trait(&serde_trait)
                 && !self.traits.iter().any(|t| t.implements_trait(&serde_trait))
             {
-                serde_derive = serde_derive
-                    .add_trait(serde_trait)
-                    .expect("It is not possible to double-add a trait here");
+                serde_derive = serde_derive.add_trait(serde_trait);
             }
         }
         if let Ok(derive) = serde_derive.build() {

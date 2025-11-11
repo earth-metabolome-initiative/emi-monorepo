@@ -11,7 +11,7 @@ use crate::{
     traits::{ExternalDependencies, InternalDependencies},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a where clause in a method or type definition.
 pub struct WhereClause {
     /// Left-hand side of the where clause.

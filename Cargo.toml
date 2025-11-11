@@ -71,7 +71,8 @@ members = [
   "web/web_common/synql-attributes",
   "web/web_common/synql-value-settable",
   "web/web_common/synql-insertable",
-  "web/web_common/synql-checks", "web/web_common/synql-insertable-key-settable",
+  "web/web_common/synql-checks",
+  "web/web_common/synql-insertable-key-settable",
 ]
 
 [workspace.dependencies]
@@ -84,7 +85,7 @@ actix-cors = { version = "0.7.1" }
 actix-ws = { version = "0.3.0" }
 init_migration = { path = "data_migrations/init_migration" }
 init_db = { path = "data_migrations/init_db" }
-syn = { version = "2.0", features = ["full", "visit-mut"] }
+syn = { version = "2.0.110", features = ["full", "visit-mut", "extra-traits"] }
 quote = "1.0"
 proc-macro2 = "1.0"
 num_cpus = "1.17.0"

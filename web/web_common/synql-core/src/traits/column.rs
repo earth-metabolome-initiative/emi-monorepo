@@ -38,8 +38,11 @@ pub trait ColumnSynLike: ColumnLike {
     }
 
     /// Returns the uppercased acronym ident of this column.
-    fn column_acronym_ident(&self) -> Ident {
-        Ident::new(&self.column_acronym(), proc_macro2::Span::call_site())
+    fn column_acronym_generic(&self) -> syn::GenericParam {
+        syn::GenericParam::Type(syn::TypeParam::from(Ident::new(
+            &self.column_acronym(),
+            proc_macro2::Span::call_site(),
+        )))
     }
 
     /// Returns the snake-cased name of this column.

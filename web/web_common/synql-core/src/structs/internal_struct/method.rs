@@ -8,7 +8,6 @@ use std::sync::Arc;
 pub use argument::Argument;
 pub use builder::MethodBuilder;
 use quote::ToTokens;
-use syn::Ident;
 pub use where_clause::WhereClause;
 
 use crate::{
@@ -16,7 +15,7 @@ use crate::{
     traits::{ExternalDependencies, InternalDependencies},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a rust method.
 pub struct Method {
     /// Arguments of the method.
@@ -36,7 +35,7 @@ pub struct Method {
     /// Error documentation of the method.
     error_documentations: Vec<Documentation>,
     /// Generics of the method.
-    generics: Vec<Ident>,
+    generics: Vec<syn::GenericParam>,
     /// Where clauses of the method.
     where_clauses: Vec<WhereClause>,
 }
@@ -102,7 +101,11 @@ impl Method {
         } else {
             format!(
                 "<{}>",
-                self.generics.iter().map(|ident| ident.to_string()).collect::<Vec<_>>().join(", ")
+                self.generics
+                    .iter()
+                    .map(|ident| ident.to_token_stream().to_string())
+                    .collect::<Vec<_>>()
+                    .join(", ")
             )
         };
         format!("fn {}{generics}({args}){return_type}", self.name)

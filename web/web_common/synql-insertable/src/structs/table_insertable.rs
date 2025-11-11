@@ -45,11 +45,7 @@ impl<'table, T: TableInsertableLike + ?Sized> TableInsertable<'table, T> {
             self.workspace.external_trait("Insertable").expect("Failed to get Insertable trait"),
         ];
 
-        Derive::new()
-            .add_traits(traits)
-            .expect("Failed to add Insertable trait to derive")
-            .build()
-            .expect("Failed to build Insertable derive")
+        Derive::new().add_traits(traits).build().expect("Failed to build Insertable derive")
     }
 
     /// Returns the table decorator for the insertable struct.

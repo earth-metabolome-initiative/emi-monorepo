@@ -6,7 +6,6 @@ use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
-use syn::Ident;
 
 use crate::structs::{
     Argument, Documentation, InternalToken, Method, Publicness, WhereClause,
@@ -31,7 +30,7 @@ pub struct MethodBuilder {
     /// Documentation of the method.
     documentation: Option<Documentation>,
     /// Generics of the method.
-    generics: Vec<Ident>,
+    generics: Vec<syn::GenericParam>,
     /// Where clauses of the method.
     where_clauses: Vec<WhereClause>,
     /// Error documentations of the method.
@@ -259,26 +258,25 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `generic` - The generic to add.
-    pub fn generic(mut self, generic: Ident) -> Result<Self, MethodBuilderError> {
-        if self.generics.iter().any(|g| g == &generic) {
-            return Err(MethodBuilderError::DuplicatedGeneric);
+    pub fn generic(mut self, generic: syn::GenericParam) -> Self {
+        if !self.generics.contains(&generic) {
+            self.generics.push(generic);
         }
-        self.generics.push(generic);
-        Ok(self)
+        self
     }
 
     /// Adds multiple generics to the method.
     ///
     /// # Arguments
     /// * `generics` - The generics to add.
-    pub fn generics<I>(mut self, generics: I) -> Result<Self, MethodBuilderError>
+    pub fn generics<I>(mut self, generics: I) -> Self
     where
-        I: IntoIterator<Item = Ident>,
+        I: IntoIterator<Item = syn::GenericParam>,
     {
         for generic in generics {
-            self = self.generic(generic)?;
+            self = self.generic(generic);
         }
-        Ok(self)
+        self
     }
 
     /// Adds a where clause to the method.

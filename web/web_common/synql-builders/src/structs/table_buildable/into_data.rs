@@ -4,6 +4,7 @@
 use synql_core::{
     prelude::Builder,
     structs::{Documentation, InternalData},
+    utils::generic_type,
 };
 
 use crate::{structs::TableBuildable, traits::TableBuildableLike};
@@ -35,9 +36,8 @@ impl<'table, T: TableBuildableLike + ?Sized> From<TableBuildable<'table, T>> for
                     .table
                     .extended_tables(buildable.database)
                     .into_iter()
-                    .map(|t| t.table_singular_camel_ident()),
+                    .map(|t| generic_type(&t.table_singular_camel_name())),
             )
-            .unwrap()
             .variant(buildable.into())
             .build()
             .expect("Failed to build insertable data")

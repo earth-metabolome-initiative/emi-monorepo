@@ -13,7 +13,7 @@ use crate::{
     utils::RESERVED_RUST_WORDS,
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a rust method argument.
 pub struct Argument {
     /// Name of the argument.

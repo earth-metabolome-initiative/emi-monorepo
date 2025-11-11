@@ -69,7 +69,7 @@ pub trait TableBuildableLike: TableInsertableLike {
                     .build()
                     .unwrap(),
             )
-            .ty(DataVariantRef::generic(self.table_singular_camel_ident()))
+            .ty(DataVariantRef::generic_str(&self.table_singular_camel_name()))
             .name(self.table_singular_snake_name())
             .unwrap()
             .build()

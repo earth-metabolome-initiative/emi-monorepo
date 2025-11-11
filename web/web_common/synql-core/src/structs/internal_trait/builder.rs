@@ -26,7 +26,7 @@ pub struct InternalTraitBuilder {
     /// Where statements for the trait.
     where_statements: Vec<WhereClause>,
     /// Generics for the trait.
-    generics: Vec<syn::Ident>,
+    generics: Vec<syn::GenericParam>,
     /// Super traits for the trait.
     super_traits: Vec<InternalToken>,
 }
@@ -189,11 +189,13 @@ impl InternalTraitBuilder {
     ///
     /// # Arguments
     /// * `generic` - The generic to add.
-    pub fn generic(mut self, generic: syn::Ident) -> Result<Self, InternalTraitBuilderError> {
-        if self.generics.contains(&generic) {
-            return Err(InternalTraitBuilderError::DuplicateGeneric(generic.to_string()));
+    pub fn generic(
+        mut self,
+        generic: syn::GenericParam,
+    ) -> Result<Self, InternalTraitBuilderError> {
+        if !self.generics.contains(&generic) {
+            self.generics.push(generic);
         }
-        self.generics.push(generic);
         Ok(self)
     }
 
@@ -203,7 +205,7 @@ impl InternalTraitBuilder {
     /// * `generics` - The generics to add.
     pub fn generics<I>(mut self, generics: I) -> Result<Self, InternalTraitBuilderError>
     where
-        I: IntoIterator<Item = syn::Ident>,
+        I: IntoIterator<Item = syn::GenericParam>,
     {
         for generic in generics {
             self = self.generic(generic)?;

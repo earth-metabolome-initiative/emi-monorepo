@@ -81,11 +81,7 @@ impl<'table, T: TableModelLike + ?Sized> TableModel<'table, T> {
             );
         }
 
-        Derive::new()
-            .add_traits(traits)
-            .expect("Failed to add Selectable trait to derive")
-            .build()
-            .expect("Failed to build Selectable derive")
+        Derive::new().add_traits(traits).build().expect("Failed to build Selectable derive")
     }
 
     fn belongs_to_decorators(&self) -> Vec<Decorator> {
@@ -152,6 +148,9 @@ impl<'table, T: TableModelLike + ?Sized> TableModel<'table, T> {
         let Some(extension_of_trait) = self.workspace.external_trait("ExtensionOf") else {
             return Vec::new();
         };
+        let Some(ancestor_trait) = self.workspace.external_trait("Ancestor") else {
+            return Vec::new();
+        };
         let Some(read_trait) = self.workspace.external_trait("Read") else {
             return Vec::new();
         };
@@ -165,11 +164,12 @@ impl<'table, T: TableModelLike + ?Sized> TableModel<'table, T> {
             InternalToken::new()
                 .private()
                 .stream(quote! {
-                    impl<C> #extension_of_trait<#table_model, C> for #table_model {
+                    impl #extension_of_trait<#table_model> for #table_model {
                         type ExtendedType<'data> = &'data Self
                         where
                             Self: 'data;
-
+                    }
+                    impl<C> #ancestor_trait<#table_model, C> for #table_model {
                         fn ancestor(
                             &self,
                             _connection: &mut C,

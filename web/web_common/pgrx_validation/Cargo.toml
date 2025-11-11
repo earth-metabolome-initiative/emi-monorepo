@@ -20,10 +20,7 @@ phf.workspace = true
 
 [features]
 default = []
-pgrx = [
-  "dep:pgrx",
-  "pgrx_validation_derive/pgrx",
-]
+pgrx = ["dep:pgrx", "pgrx_validation_derive/pgrx"]
 pg13 = ["pgrx", "pgrx/pg13", "pgrx-tests/pg13"]
 pg14 = ["pgrx", "pgrx/pg14", "pgrx-tests/pg14"]
 pg15 = ["pgrx", "pgrx/pg15", "pgrx-tests/pg15"]
