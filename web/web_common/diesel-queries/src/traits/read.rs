@@ -5,10 +5,10 @@ use diesel::{
     associations::HasTable,
     query_dsl::methods::{FindDsl, LimitDsl, LoadQuery},
 };
-
-use crate::traits::IdentifiableRef;
 /// The `Read` trait
-pub trait Read<C>: Sized + IdentifiableRef
+pub trait Read<C>: Sized
+where
+    for<'a> &'a Self: Identifiable,
 {
     /// Loads the row in a table.
     ///
@@ -21,7 +21,7 @@ pub trait Read<C>: Sized + IdentifiableRef
     ///
     /// * Returns an error if loading the row fails.
     fn read(
-        primary_key: <Self as IdentifiableRef>::Id<'_>,
+        primary_key: <&Self as Identifiable>::Id,
         conn: &mut C,
     ) -> Result<Self, diesel::result::Error>;
 }
