@@ -57,7 +57,7 @@ cas_codes = { version = "0.1.0", features = ["pgrx", "pg17"] }
 USER_ID=$(id -u) GROUP_ID=$(id -g) docker compose up
 ```
 
-**Step 2:** Copy extension files to PostgreSQL:
+**Step 2:** Copy extension files to `PostgreSQL`:
 
 ```bash
 # Copy the shared library
@@ -70,7 +70,7 @@ sudo cp extension/usr/share/postgresql/17/extension/cas_codes.control /usr/share
 sudo cp extension/usr/share/postgresql/17/extension/cas_codes--0.1.0.sql /usr/share/postgresql/17/extension/
 ```
 
-**Step 3:** Enable in PostgreSQL:
+**Step 3:** Enable in `PostgreSQL`:
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS cas_codes;
