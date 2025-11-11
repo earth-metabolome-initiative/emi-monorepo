@@ -187,6 +187,59 @@ pub trait ForeignKeyLike:
     where
         Self: 'db;
 
+    /// Returns the host column associated with the foreign key if it consists
+    /// of a single column; returns `None` if the foreign key is composite.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the foreign
+    ///   key belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
+    /// CREATE TABLE host_table (
+    ///   id INT,
+    /// FOREIGN KEY (id) REFERENCES referenced_table(id)
+    /// );
+    /// CREATE TABLE composite_fk_table (
+    /// ref_id1 INT,
+    /// ref_id2 INT,
+    /// PRIMARY KEY (ref_id1, ref_id2),
+    /// FOREIGN KEY (ref_id1, ref_id2) REFERENCES composite_fk_table(ref_id1, ref_id2)
+    /// );
+    /// "#,
+    /// )?;
+    ///
+    /// let host_table = db.table(None, "host_table").unwrap();
+    /// let foreign_key = host_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// let host_column = foreign_key.host_column(&db).expect("Should have a single host column");
+    /// assert_eq!(host_column.column_name(), "id");
+    /// let composite_fk_table = db.table(None, "composite_fk_table").unwrap();
+    /// let composite_foreign_key =
+    ///     composite_fk_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// assert!(
+    ///     composite_foreign_key.host_column(&db).is_none(),
+    ///     "Composite foreign key should not have a single host column"
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn host_column<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> Option<&'db <Self::DB as DatabaseLike>::Column> {
+        let mut host_columns = self.host_columns(database);
+        let first_column = host_columns.next()?;
+        if host_columns.next().is_none() { Some(first_column) } else { None }
+    }
+
     /// Returns whether the current foreign key is the only key in the
     /// host table which employs the same set of host columns.
     ///
@@ -525,6 +578,61 @@ pub trait ForeignKeyLike:
     ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>
     where
         Self: 'db;
+
+    /// Returns the referenced column associated with the foreign key if it
+    /// consists of a single column; returns `None` if the foreign key is
+    /// composite.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the foreign
+    ///   key belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
+    /// CREATE TABLE host_table (
+    ///   ref_id INT,
+    ///   FOREIGN KEY (ref_id) REFERENCES referenced_table(id)
+    /// );
+    /// CREATE TABLE composite_fk_table (
+    ///   ref_id1 INT,
+    ///   ref_id2 INT,
+    ///   PRIMARY KEY (ref_id1, ref_id2),
+    ///   FOREIGN KEY (ref_id1, ref_id2) REFERENCES composite_fk_table(ref_id1, ref_id2)
+    /// );
+    /// "#,
+    /// )?;
+    ///
+    /// let host_table = db.table(None, "host_table").unwrap();
+    /// let foreign_key = host_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// let referenced_column =
+    ///     foreign_key.referenced_column(&db).expect("Should have a single referenced column");
+    /// assert_eq!(referenced_column.column_name(), "id");
+    /// let composite_fk_table = db.table(None, "composite_fk_table").unwrap();
+    /// let composite_foreign_key =
+    ///     composite_fk_table.foreign_keys(&db).next().expect("Should have a foreign key");
+    /// assert!(
+    ///     composite_foreign_key.referenced_column(&db).is_none(),
+    ///     "Composite foreign key should not have a single referenced column"
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn referenced_column<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> Option<&'db <Self::DB as DatabaseLike>::Column> {
+        let mut referenced_columns = self.referenced_columns(database);
+        let first_column = referenced_columns.next()?;
+        if referenced_columns.next().is_none() { Some(first_column) } else { None }
+    }
 
     /// Returns whether the foreign key is self-referential, i.e., the host
     /// table is the same as the referenced table.

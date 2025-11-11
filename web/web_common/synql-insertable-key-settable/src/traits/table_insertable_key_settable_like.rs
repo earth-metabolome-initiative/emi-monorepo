@@ -1,7 +1,7 @@
 //! Submodule providing the `TableInsertableKeySettableLike` trait for SynQL
 //! table models.
 
-use sql_traits::traits::{DatabaseLike, ForeignKeyLike};
+use sql_traits::traits::{ColumnLike, DatabaseLike, ForeignKeyLike};
 use syn::Ident;
 use synql_core::structs::{TraitVariantRef, Workspace};
 use synql_models::traits::TableModelLike;
@@ -63,11 +63,10 @@ pub trait TableInsertableKeySettableLike: TableModelLike {
     ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey> {
         let mut covered_columns: Vec<&'db <Self::DB as DatabaseLike>::Column> = vec![];
         self.foreign_keys(database).filter(move |foreign_key| {
-            if foreign_key.is_composite(database) {
+            let Some(host_column) = foreign_key.host_column(database) else {
                 return false;
-            }
-            let host_column = foreign_key.host_columns(database).next().unwrap();
-            if covered_columns.contains(&host_column) {
+            };
+            if covered_columns.contains(&host_column) || host_column.is_generated() {
                 return false;
             }
             covered_columns.push(host_column);

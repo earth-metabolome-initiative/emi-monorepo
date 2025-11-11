@@ -51,6 +51,11 @@ impl Method {
         self.body.as_ref()
     }
 
+    /// Returns an iterator over the where clauses of the method.
+    pub fn where_clauses(&self) -> impl Iterator<Item = &WhereClause> {
+        self.where_clauses.iter()
+    }
+
     /// Returns whether the method has a body.
     pub fn has_body(&self) -> bool {
         self.body.is_some()

@@ -25,6 +25,16 @@ impl WhereClause {
     pub fn new() -> WhereClauseBuilder {
         WhereClauseBuilder::default()
     }
+
+    /// Returns a reference to the left-hand side of the where clause.
+    pub fn left(&self) -> &InternalToken {
+        &self.left
+    }
+
+    /// Returns a reference to the right-hand side of the where clause.
+    pub fn right(&self) -> &InternalToken {
+        &self.right
+    }
 }
 
 impl InternalDependencies for WhereClause {

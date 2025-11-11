@@ -3,7 +3,7 @@
 
 use std::{borrow::Borrow, fmt::Debug};
 
-use sqlparser::ast::Expr;
+use sqlparser::ast::{Expr, Ident};
 
 use crate::traits::{DatabaseLike, Metadata, column::ColumnLike, function_like::FunctionLike};
 
@@ -273,5 +273,99 @@ pub trait CheckConstraintLike:
         column: &<Self::DB as DatabaseLike>::Column,
     ) -> bool {
         self.columns(database).any(|col| col == column)
+    }
+
+    /// Returns whether the check constraint is a mutual nullability constraint.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query the table
+    ///  from.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"CREATE TABLE my_table (
+    ///         col1 INT,
+    ///         col2 INT,
+    ///         col3 INT,
+    ///         CHECK ((col1 IS NULL AND col2 IS NULL) OR (col2 IS NOT NULL AND col1 IS NOT NULL)),
+    ///         CHECK ((col1 IS NULL AND col2 IS NULL AND col3 IS NULL) OR (col1 IS NOT NULL AND col3 IS NOT NULL AND col2 IS NOT NULL)),
+    ///         CHECK ((col3 IS NULL OR col3 IS NULL) OR (col3 IS NOT NULL AND col1 IS NOT NULL)),
+    ///         CHECK (col1 IS NOT NULL),
+    ///         CHECK (col1 > 0),
+    ///         CHECK (col2 < 100)
+    ///     );"#,
+    /// )?;
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let check_constraints: Vec<_> = table.check_constraints(&db).collect();
+    /// let [cc1, cc2, cc3, cc4, cc5, cc6] = &check_constraints.as_slice() else {
+    ///     panic!("Expected six check constraints");
+    /// };
+    /// assert!(cc1.is_mutual_nullability_constraint(&db));
+    /// assert!(cc2.is_mutual_nullability_constraint(&db));
+    /// assert!(!cc3.is_mutual_nullability_constraint(&db));
+    /// assert!(!cc4.is_mutual_nullability_constraint(&db));
+    /// assert!(!cc5.is_mutual_nullability_constraint(&db));
+    /// assert!(!cc6.is_mutual_nullability_constraint(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn is_mutual_nullability_constraint(&self, database: &Self::DB) -> bool {
+        use sqlparser::ast::{BinaryOperator, Expr};
+
+        let expr = self.expression(database);
+
+        // Must be an OR expression
+        let Expr::BinaryOp { left, op: BinaryOperator::Or, right } = expr else {
+            return false;
+        };
+
+        // Helper to extract column names from nullability checks in an AND chain
+        fn extract_null_columns(expr: &Expr, is_null: bool) -> Option<Vec<&Ident>> {
+            match expr {
+                Expr::IsNull(col_expr) if is_null => {
+                    if let Expr::Identifier(ident) = col_expr.as_ref() {
+                        Some(vec![ident])
+                    } else {
+                        None
+                    }
+                }
+                Expr::IsNotNull(col_expr) if !is_null => {
+                    if let Expr::Identifier(ident) = col_expr.as_ref() {
+                        Some(vec![ident])
+                    } else {
+                        None
+                    }
+                }
+                Expr::BinaryOp { left, op: BinaryOperator::And, right } => {
+                    let mut left_cols = extract_null_columns(left, is_null)?;
+                    left_cols.extend(extract_null_columns(right, is_null)?);
+                    left_cols.sort_unstable();
+                    left_cols.dedup();
+                    Some(left_cols)
+                }
+                Expr::Nested(inner) => extract_null_columns(inner, is_null),
+                _ => None,
+            }
+        }
+
+        // Left side should be all NULL checks, right side all NOT NULL checks (or vice
+        // versa)
+        if let (Some(null_cols), Some(not_null_cols)) =
+            (extract_null_columns(left, true), extract_null_columns(right, false))
+        {
+            null_cols == not_null_cols && null_cols.len() >= 2
+        } else if let (Some(not_null_cols), Some(null_cols)) =
+            (extract_null_columns(left, false), extract_null_columns(right, true))
+        {
+            null_cols == not_null_cols && null_cols.len() >= 2
+        } else {
+            false
+        }
     }
 }

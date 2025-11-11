@@ -5,7 +5,7 @@ use std::borrow::Borrow;
 
 use quote::quote;
 use sql_relations::traits::InheritableDatabaseLike;
-use sql_traits::traits::ColumnLike;
+use sql_traits::traits::{CheckConstraintLike, ColumnLike};
 use synql_checks::prelude::CheckConstraintSynLike;
 use synql_core::{
     prelude::Builder,
@@ -39,6 +39,9 @@ where
                 let contextual_columns = &[column.borrow()];
                 let check_constraints = column
                     .check_constraints(self.database)
+                    .filter(|check_constraint| {
+                        !check_constraint.is_mutual_nullability_constraint(self.database)
+                    })
                     .map(|check_constraint| {
                         check_constraint.to_syn(self.database, self.workspace, contextual_columns)
                     })

@@ -12,6 +12,7 @@ use crate::traits::TableInsertableLike;
 mod into_crate;
 mod into_data;
 mod into_module;
+mod key_settable;
 mod value_settable;
 
 #[derive(Debug)]

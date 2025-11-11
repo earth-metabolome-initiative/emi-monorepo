@@ -17,7 +17,7 @@ use synql_core::{
 use synql_diesel_schema::traits::{ColumnSchema, TableSchema};
 use synql_models::traits::TableModelLike;
 
-use crate::traits::TableInsertableKeySettableLike;
+use crate::traits::{ColumnInsertableKeySettableLike, TableInsertableKeySettableLike};
 
 mod into_crate;
 mod into_module;
@@ -70,7 +70,7 @@ impl<'table, T: TableInsertableKeySettableLike + ?Sized> TableInsertableKeySetta
         &self,
         foreign_key: &'table <T::DB as DatabaseLike>::ForeignKey,
     ) -> Method {
-        let host_column = foreign_key.host_columns(self.database).next().unwrap();
+        let host_column = foreign_key.host_column(self.database).unwrap();
 
         let host_table_schema_ref = host_column
             .table(self.database)
@@ -119,7 +119,7 @@ impl<'table, T: TableInsertableKeySettableLike + ?Sized> TableInsertableKeySetta
         let mut return_type = DataVariantRef::self_type(None);
         let mut error_documentation = None;
 
-        if host_column.has_check_constraints(self.database) {
+        if host_column.has_insertable_key_settable_check_constraints(self.database) {
             let table_attributes = self
                 .table
                 .attributes_ref(self.workspace)

@@ -261,6 +261,7 @@ impl<'trt> TryFrom<TraitImpl<'trt>> for InternalToken {
                     #(#methods)*
                 }
             })
+            .inherits(methods.iter().flat_map(|method| method.where_clauses().flat_map(|clause| vec![clause.left().clone(), clause.right().clone()])))
             .inherits(methods.iter().filter_map(|method| method.body().cloned()))
             .build()?)
     }

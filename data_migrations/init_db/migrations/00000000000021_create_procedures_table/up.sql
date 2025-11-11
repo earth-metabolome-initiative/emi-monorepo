@@ -4,21 +4,16 @@ CREATE TABLE IF NOT EXISTS procedures (
 	-- The procedure template of this procedure.
 	procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template),
 	-- The parent procedure (if any) of this procedure.
-	parent_procedure UUID REFERENCES procedures(procedure) ON DELETE CASCADE CHECK (
-		procedure <> parent_procedure
-	),
+	parent_procedure UUID REFERENCES procedures(procedure) ON DELETE CASCADE CHECK (procedure <> parent_procedure),
 	-- The parent procedure template (if any) of this procedure.
 	parent_procedure_template INTEGER REFERENCES procedure_templates(procedure_template) CHECK (
 		procedure_template <> parent_procedure_template
 	),
 	-- The predecessor procedure (if any) of this procedure.
-	predecessor_procedure UUID REFERENCES procedures(procedure) ON DELETE CASCADE CHECK (
-		procedure <> predecessor_procedure
-	),
+	predecessor_procedure UUID REFERENCES procedures(procedure) ON DELETE CASCADE CHECK (procedure <> predecessor_procedure),
 	-- The predecessor procedure template (if any) of this procedure.
 	predecessor_procedure_template INTEGER REFERENCES procedure_templates(procedure_template) CHECK (
-		procedure_template <>
-			predecessor_procedure_template
+		procedure_template <> predecessor_procedure_template
 	),
 	-- The name of the most concrete table this procedure is associated with.
 	most_concrete_table TEXT NOT NULL,
@@ -80,8 +75,14 @@ CREATE TABLE IF NOT EXISTS procedures (
 	),
 	-- We check that if the previous procedure is specified, then the parent procedure must also be specified.
 	CHECK (
-		(predecessor_procedure IS NULL)
-		OR (parent_procedure IS NOT NULL)
+		(
+			predecessor_procedure IS NULL
+			AND parent_procedure IS NULL
+		)
+		OR (
+			parent_procedure IS NOT NULL
+			AND predecessor_procedure IS NOT NULL
+		)
 	)
 );
 CREATE TABLE IF NOT EXISTS procedure_assets (
