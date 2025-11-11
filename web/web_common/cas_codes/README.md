@@ -1,43 +1,89 @@
-# Chemical Abstracts Service (CAS) code
+# CAS Codes
 
+[![Crates.io](https://img.shields.io/crates/v/cas_codes)](https://crates.io/crates/cas_codes)
+[![Documentation](https://docs.rs/cas_codes/badge.svg)](https://docs.rs/cas_codes)
 [![PGRX Build](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-build-cas_codes.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/pgrx-build-cas_codes.yml)
 [![Clippy](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-clippy-cas_codes.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-clippy-cas_codes.yml)
 [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-cas_codes.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-cas_codes.yml)
 
-Rust crate providing a structured representation of [CAS Registry Numbers (CAS RN)](https://en.wikipedia.org/wiki/CAS_Registry_Number) and related functionality.
+A Rust library for parsing and validating [Chemical Abstracts Service (CAS) Registry Numbers](https://en.wikipedia.org/wiki/CAS_Registry_Number).
+
+## Features
+
+- Parse and validate CAS numbers with checksum verification
+- Zero-cost abstractions (stored as `u32`)
+- Optional Serde, PostgreSQL, and Diesel integration
+
+## Installation
+
+```toml
+[dependencies]
+cas_codes = "0.1.0"
+
+# With optional features
+cas_codes = { version = "0.1.0", features = ["serde", "pgrx"] }
+```
 
 ## Usage
-
-To use this crate, add the following to your `Cargo.toml`:
-
-TODO: Add toml when published
-
-## Example
-
-Here is a simple example of how to use the `cas_codes` crate:
 
 ```rust
 use cas_codes::CAS;
 
-// Create a CAS object from a string, in this case
-// the water CAS number.
-let cas = CAS::try_from("7732-18-5").unwrap();
-
+let cas = CAS::try_from("7732-18-5")?; // Water
 assert_eq!(cas.first(), 7732);
 assert_eq!(cas.second(), 18);
 assert_eq!(cas.check_digit(), 5);
-assert_eq!(cas.digits().collect::<Vec<_>>(), vec![5, 8, 1, 2, 3, 7, 7]);
 assert_eq!(cas.to_string(), "7732-18-5");
+
+# Ok::<(), cas_codes::errors::Error>(())
 ```
 
-## Building the PGRX extension
+## PostgreSQL Extension
 
-This crate can be optionally built and used as a `PostgreSQL` extension. The extension is built using the [pgrx](https://github.com/pgcentralfoundation/pgrx) crate, which provides a framework for building `PostgreSQL` extensions in Rust.
+The crate can be built as a PostgreSQL extension using PGRX:
 
-To build this extension, just run the following docker build command:
+```toml
+[dependencies]
+cas_codes = { version = "0.1.0", features = ["pgrx", "pg17"] }
+```
+
+**Note**: Currently uses PostgreSQL's varlena type since PGRX doesn't yet support custom fixed-size types. Future PGRX versions will enable more efficient fixed-size storage.
+
+### Using the Extension
+
+1. Build and install the extension:
 
 ```bash
 USER_ID=$(id -u) GROUP_ID=$(id -g) docker compose up
 ```
 
-Note that the `USER_ID` and `GROUP_ID` environment variables are used to set the user and group IDs inside the Docker container to match those of the host system. This is important for file permissions when mounting volumes and avoid writing out files with root permissions.
+1. Enable in PostgreSQL:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS cas_codes;
+```
+
+1. Use the CAS type:
+
+```sql
+-- Create a table with CAS numbers
+CREATE TABLE reagents (
+    id SERIAL PRIMARY KEY,
+    name TEXT NOT NULL,
+    cas_number CAS NOT NULL UNIQUE,
+    purity REAL CHECK (purity > 0 AND purity <= 100)
+);
+```
+
+### Diesel ORM Integration
+
+For use with Diesel ORM:
+
+```toml
+[dependencies]
+cas_codes = { version = "0.1.0", features = ["postgres"] }
+```
+
+## License
+
+MIT Licensed. See [CONTRIBUTING.md](../../CONTRIBUTING.md) for guidelines.

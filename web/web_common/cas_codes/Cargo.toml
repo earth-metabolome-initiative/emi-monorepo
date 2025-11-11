@@ -1,10 +1,25 @@
 [package]
 name = "cas_codes"
 version = "0.1.0"
-edition = "2024"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+description = "A Rust library for parsing, validating, and working with Chemical Abstracts Service (CAS) Registry Numbers"
+repository.workspace = true
+documentation = "https://docs.rs/cas_codes"
+homepage = "https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/cas_codes"
+readme = "README.md"
+keywords = ["chemistry", "cas", "registry", "validation", "chemical"]
+categories = ["science", "parsing", "data-structures"]
+exclude = [
+    "cas_codes.tsv",
+    "docker-compose.yaml", 
+    "extension/",
+    ".dockerignore"
+]
 
-# [lib]
-# crate-type = ["cdylib", "lib"]
+[lib]
+crate-type = ["cdylib", "lib"]
 
 [[bin]]
 name = "pgrx_embed_cas_codes"
@@ -22,10 +37,9 @@ csv.workspace = true
 [features]
 default = ["serde"]
 serde = ["dep:serde"]
-diesel = ["dep:diesel"]
-diesel_pgrx = ["dep:diesel_pgrx", "diesel"]
-sqlite = ["diesel/sqlite", "diesel_pgrx/sqlite", "diesel_pgrx"]
-postgres = ["diesel/postgres", "diesel_pgrx/postgres", "diesel_pgrx"]
+diesel = ["dep:diesel_pgrx", "dep:diesel"]
+sqlite = ["diesel/sqlite", "diesel_pgrx/sqlite", "diesel"]
+postgres = ["diesel/postgres", "diesel_pgrx/postgres", "diesel"]
 
 pgrx = ["dep:pgrx", "serde"]
 pg13 = ["pgrx", "pgrx/pg13"]

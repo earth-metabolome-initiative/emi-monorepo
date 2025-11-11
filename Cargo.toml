@@ -116,9 +116,9 @@ yew-agent = { git = "https://github.com/yewstack/yew.git", branch = "master" }
 strum_macros = "0.27"
 zip = "5.1.1"
 reference_docker = { path = "web/web_common/reference_docker" }
-pgrx = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
-pgrx-tests = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
-pgrx-sql-entity-graph = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
+pgrx = { version = "0.16.1" }
+pgrx-tests = { version = "0.16.1" }
+pgrx-sql-entity-graph = { version = "0.16.1" }
 image = "0.25.8"
 rand = { version = "0.9.2" }
 gloo = "0.11.0"
@@ -232,4 +232,4 @@ debug = false # Include debug info.
 debug = true
 
 [profile.release]
-debug = true
+debug = false

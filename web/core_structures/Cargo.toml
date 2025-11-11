@@ -17,7 +17,7 @@ pgrx_validation.workspace = true
 infer.workspace = true
 iso_codes = { workspace = true, features = ["diesel_pgrx"] }
 validation_errors.workspace = true
-cas_codes = { workspace = true, features = ["diesel_pgrx"] }
+cas_codes = { workspace = true, features = ["diesel"] }
 molecular_formulas = { workspace = true, features = ["diesel_pgrx"] }
 media_types = { workspace = true, features = ["diesel_pgrx"] }
 yew = { workspace = true, optional = true }
