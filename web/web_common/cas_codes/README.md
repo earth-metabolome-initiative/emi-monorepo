@@ -12,7 +12,7 @@ A Rust library for parsing and validating [Chemical Abstracts Service (CAS) Regi
 
 - Parse and validate CAS numbers with checksum verification
 - Zero-cost abstractions (stored as `u32`)
-- Optional Serde, PostgreSQL, and Diesel integration
+- Optional Serde, `PostgreSQL`, and Diesel integration
 
 ## Installation
 
@@ -38,32 +38,45 @@ assert_eq!(cas.to_string(), "7732-18-5");
 # Ok::<(), cas_codes::errors::Error>(())
 ```
 
-## PostgreSQL Extension
+## `PostgreSQL` Extension
 
-The crate can be built as a PostgreSQL extension using PGRX:
+The crate can be built as a `PostgreSQL` extension using PGRX:
 
 ```toml
 [dependencies]
 cas_codes = { version = "0.1.0", features = ["pgrx", "pg17"] }
 ```
 
-**Note**: Currently uses PostgreSQL's varlena type since PGRX doesn't yet support custom fixed-size types. Future PGRX versions will enable more efficient fixed-size storage.
+**Note**: Currently uses `PostgreSQL`'s varlena type since PGRX doesn't yet support custom fixed-size types. Future PGRX versions will enable more efficient fixed-size storage.
 
 ### Using the Extension
 
-1. Build and install the extension:
+**Step 1:** Build the extension:
 
 ```bash
 USER_ID=$(id -u) GROUP_ID=$(id -g) docker compose up
 ```
 
-1. Enable in PostgreSQL:
+**Step 2:** Copy extension files to PostgreSQL:
+
+```bash
+# Copy the shared library
+sudo cp extension/usr/lib/postgresql/17/lib/cas_codes.so /usr/lib/postgresql/17/lib/
+
+# Copy the control file  
+sudo cp extension/usr/share/postgresql/17/extension/cas_codes.control /usr/share/postgresql/17/extension/
+
+# Copy the SQL file
+sudo cp extension/usr/share/postgresql/17/extension/cas_codes--0.1.0.sql /usr/share/postgresql/17/extension/
+```
+
+**Step 3:** Enable in PostgreSQL:
 
 ```sql
 CREATE EXTENSION IF NOT EXISTS cas_codes;
 ```
 
-1. Use the CAS type:
+**Step 4:** Use the CAS type:
 
 ```sql
 -- Create a table with CAS numbers
@@ -84,6 +97,20 @@ For use with Diesel ORM:
 cas_codes = { version = "0.1.0", features = ["postgres"] }
 ```
 
+Example Diesel table definition:
+
+```rust
+#[cfg(feature = "diesel")]
+diesel::table! {
+    reagents(id) {
+        id -> diesel::sql_types::Integer,
+        name -> diesel::sql_types::Text,
+        purity -> diesel::sql_types::Float,
+        cas_code -> ::cas_codes::diesel_impls::CAS,
+    }
+}
+```
+
 ## License
 
-MIT Licensed. See [CONTRIBUTING.md](../../CONTRIBUTING.md) for guidelines.
+MIT Licensed.
