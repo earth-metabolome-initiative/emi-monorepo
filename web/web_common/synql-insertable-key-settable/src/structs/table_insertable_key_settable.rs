@@ -5,6 +5,7 @@ use sql_traits::{
     prelude::ColumnLike,
     traits::{DatabaseLike, ForeignKeyLike, TableLike},
 };
+use synql_attributes::traits::TableAttributesLike;
 use synql_core::{
     prelude::Builder,
     structs::{
@@ -115,6 +116,30 @@ impl<'table, T: TableInsertableKeySettableLike + ?Sized> TableInsertableKeySetta
 
         let argument_type = DataVariantRef::generic(host_column.column_acronym_generic());
 
+        let mut return_type = DataVariantRef::self_type(None);
+        let mut error_documentation = None;
+
+        if host_column.has_check_constraints(self.database) {
+            let table_attributes = self
+                .table
+                .attributes_ref(self.workspace)
+                .expect("Failed to retrieve table attributes");
+
+            let validation_error = self
+                .workspace
+                .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
+                .expect("Failed to get ValidationError type ref")
+                .set_generic_field(&generic_type("FieldName"), table_attributes.into())
+                .expect("Failed to set generic field for ValidationError");
+            return_type = DataVariantRef::result(return_type, validation_error);
+            error_documentation = Some(Documentation::new()
+                .documentation(format!(
+                    "Returns a [`ValidationError`](validation_errors::prelude::ValidationError) if the provided value for column {} is invalid.",
+                    host_column.column_schema_doc_path(self.database)
+                ))
+                .expect("Failed to set the error documentation").internal_dependency(host_table_schema_ref.clone()).build().unwrap());
+        }
+
         Method::new()
             .name(host_column.column_snake_name())
             .expect("Failed to set the method name")
@@ -187,7 +212,8 @@ impl<'table, T: TableInsertableKeySettableLike + ?Sized> TableInsertableKeySetta
                     .expect("Failed to build where clause"),
             ])
             .unwrap()
-            .return_type(DataVariantRef::self_type(None))
+            .error_documentations(error_documentation)
+            .return_type(return_type)
             .build()
             .expect("Failed to build the setter method")
     }
