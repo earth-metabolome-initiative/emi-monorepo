@@ -55,10 +55,6 @@ pub enum DocumentationBuilderError {
     /// An internal crate dependency was specified but does not appear in the
     /// documentation string.
     UnexpectedInternalCrateDependency(String, String),
-    /// A duplicated external crate dependency was added.
-    DuplicatedExternalCrateDependency,
-    /// A duplicated internal crate dependency was added.
-    DuplicatedInternalCrateDependency,
 }
 
 impl Display for DocumentationBuilderError {
@@ -85,12 +81,6 @@ impl Display for DocumentationBuilderError {
                     f,
                     "Internal crate dependency '{crate_name}' does not appear in the documentation string: {documentation}",
                 )
-            }
-            DocumentationBuilderError::DuplicatedExternalCrateDependency => {
-                write!(f, "A duplicated external crate dependency was added")
-            }
-            DocumentationBuilderError::DuplicatedInternalCrateDependency => {
-                write!(f, "A duplicated internal crate dependency was added")
             }
         }
     }
@@ -132,64 +122,50 @@ impl DocumentationBuilder {
     ///
     /// # Arguments
     /// * `external_crate` - The external crate dependency.
-    pub fn external_dependency(
-        mut self,
-        external_crate: Arc<ExternalCrate>,
-    ) -> Result<Self, DocumentationBuilderError> {
-        if self.external_dependencies.iter().any(|c| c.name() == external_crate.name()) {
-            return Err(DocumentationBuilderError::DuplicatedExternalCrateDependency);
+    pub fn external_dependency(mut self, external_crate: Arc<ExternalCrate>) -> Self {
+        if !self.external_dependencies.contains(&external_crate) {
+            self.external_dependencies.push(external_crate);
         }
-        self.external_dependencies.push(external_crate);
-        Ok(self)
+        self
     }
 
     /// Adds multiple external crate dependencies to the documentation.
     ///
     /// # Arguments
     /// * `external_crates` - The external crate dependencies.
-    pub fn external_dependencies<I>(
-        mut self,
-        external_crates: I,
-    ) -> Result<Self, DocumentationBuilderError>
+    pub fn external_dependencies<I>(mut self, external_crates: I) -> Self
     where
         I: IntoIterator<Item = Arc<ExternalCrate>>,
     {
         for external_crate in external_crates {
-            self = self.external_dependency(external_crate)?;
+            self = self.external_dependency(external_crate);
         }
-        Ok(self)
+        self
     }
 
     /// Adds an internal crate dependency to the documentation.
     ///
     /// # Arguments
     /// * `internal_crate` - The internal crate dependency.
-    pub fn internal_dependency(
-        mut self,
-        internal_crate: Arc<InternalCrate>,
-    ) -> Result<Self, DocumentationBuilderError> {
-        if self.internal_dependencies.iter().any(|c| c.name() == internal_crate.name()) {
-            return Err(DocumentationBuilderError::DuplicatedInternalCrateDependency);
+    pub fn internal_dependency(mut self, internal_crate: Arc<InternalCrate>) -> Self {
+        if !self.internal_dependencies.contains(&internal_crate) {
+            self.internal_dependencies.push(internal_crate);
         }
-        self.internal_dependencies.push(internal_crate);
-        Ok(self)
+        self
     }
 
     /// Adds multiple internal crate dependencies to the documentation.
     ///
     /// # Arguments
     /// * `internal_crates` - The internal crate dependencies.
-    pub fn internal_dependencies<I>(
-        mut self,
-        internal_crates: I,
-    ) -> Result<Self, DocumentationBuilderError>
+    pub fn internal_dependencies<I>(mut self, internal_crates: I) -> Self
     where
         I: IntoIterator<Item = Arc<InternalCrate>>,
     {
         for internal_crate in internal_crates {
-            self = self.internal_dependency(internal_crate)?;
+            self = self.internal_dependency(internal_crate);
         }
-        Ok(self)
+        self
     }
 }
 

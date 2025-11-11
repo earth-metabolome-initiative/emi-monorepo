@@ -8,6 +8,7 @@ use synql_builders::prelude::*;
 use synql_core::structs::Workspace;
 use synql_diesel_schema::prelude::*;
 use synql_insertable::traits::TableInsertableLike;
+use synql_insertable_key_settable::prelude::*;
 use synql_models::traits::TableModelLike;
 use synql_relations::prelude::*;
 use synql_value_settable::prelude::*;
@@ -108,6 +109,12 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             workspace
                 .add_internal_crate(table.value_settable_trait(&workspace, self.database).into());
             time_tracker.add_or_extend_completed_task(value_settable_trait_task);
+
+            let insertable_key_settable_trait_task = Task::new("insertable_key_settable_trait");
+            workspace.add_internal_crate(
+                table.insertable_key_settable_trait(&workspace, self.database).into(),
+            );
+            time_tracker.add_or_extend_completed_task(insertable_key_settable_trait_task);
 
             let insertable_task = Task::new("insertable");
             workspace.add_internal_crate(table.insertable(&workspace, self.database).into());

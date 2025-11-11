@@ -136,7 +136,7 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
     let cargo_toml = workspace_path.join("Cargo.toml");
     assert!(cargo_toml.exists(), "Cargo.toml should be created");
 
-    let fmt_task = Task::new("Formatting and Checking Generated Workspace");
+    let fmt_task = Task::new("Formatting Workspace");
     // Runs the `cargo fmt` command in the specified directory.
     let output = Command::new("cargo").arg("fmt").current_dir(&workspace_path).output()?;
     tracking_test.add_completed_task(fmt_task);

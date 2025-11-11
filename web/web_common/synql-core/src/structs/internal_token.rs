@@ -130,6 +130,12 @@ impl From<syn::GenericParam> for InternalToken {
     }
 }
 
+impl From<DataVariantRef> for InternalToken {
+    fn from(data: DataVariantRef) -> Self {
+        InternalToken::new().private().stream(quote! { #data }).data(data).build().unwrap()
+    }
+}
+
 impl ToTokens for InternalToken {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         self.stream.to_tokens(tokens);

@@ -25,7 +25,6 @@ impl<'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'table, T>> f
                     ))
                     .unwrap()
                     .internal_dependency(schema_crate_ref)
-                    .unwrap()
                     .build()
                     .unwrap(),
             )

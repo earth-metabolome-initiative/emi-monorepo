@@ -31,7 +31,6 @@ impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttrib
                     ))
                     .unwrap()
                     .internal_dependency(schema_crate_ref)
-                    .unwrap()
                     .build()
                     .unwrap(),
             )

@@ -97,7 +97,6 @@ impl<'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'table, T> {
                     ))
                     .expect("Failed to set the method documentation")
                     .internal_dependency(table_schema_ref.clone())
-                    .unwrap()
                     .build()
                     .expect("Failed to build the method documentation"),
             )
@@ -156,7 +155,7 @@ impl<'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'table, T> {
                     "Returns a [`ValidationError`](validation_errors::prelude::ValidationError) if the provided value for column {} is invalid.",
                     column.column_schema_doc_path(self.database)
                 ))
-                .expect("Failed to set the error documentation").internal_dependency(table_schema_ref).unwrap().build().unwrap())
+                .expect("Failed to set the error documentation").internal_dependency(table_schema_ref).build().unwrap())
             .build()
             .expect("Failed to build the setter method")
     }

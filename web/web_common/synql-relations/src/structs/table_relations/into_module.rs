@@ -37,7 +37,7 @@ where
                 table_relation.table.table_relations_trait_name(),
                 model_ref.data().name(),
                 table_relation.table.table_schema_doc_path()
-            )).unwrap().internal_dependency(schema_crate_ref).unwrap().build().unwrap())
+            )).unwrap().internal_dependency(schema_crate_ref).build().unwrap())
             .public()
             .internal_trait(internal_trait)
             .expect("Failed to add the internal data to module")

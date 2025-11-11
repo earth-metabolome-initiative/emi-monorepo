@@ -63,7 +63,6 @@ impl<'table, T: TableAttributesLike + TableExtensionAttributesLike + ?Sized>
                             ))
                             .expect("Failed to set documentation for attribute variant")
                             .internal_dependency(schema_crate_ref.clone())
-                            .unwrap()
                             .build()
                             .expect("Failed to build documentation for attribute variant"),
                     )

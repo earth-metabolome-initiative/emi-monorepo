@@ -329,13 +329,56 @@ pub trait ColumnLike:
     /// let host_table = db.table(None, "host_table").unwrap();
     /// let id_column = host_table.column("id", &db).unwrap();
     /// let name_column = host_table.column("name", &db).unwrap();
-    /// assert!(id_column.is_foreign_key(&db), "id column should be a foreign key");
-    /// assert!(!name_column.is_foreign_key(&db), "name column should not be a foreign key");
+    /// assert!(id_column.is_part_of_foreign_key(&db), "id column should be a foreign key");
+    /// assert!(!name_column.is_part_of_foreign_key(&db), "name column should not be a foreign key");
     /// # Ok(())
     /// # }
     /// ```
-    fn is_foreign_key(&self, database: &Self::DB) -> bool {
+    fn is_part_of_foreign_key(&self, database: &Self::DB) -> bool {
         self.foreign_keys(database).next().is_some()
+    }
+
+    /// Returns the non-composite foreign keys associated with this column.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query foreign
+    ///  keys from.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE referenced_table (id INT PRIMARY KEY);
+    /// CREATE TABLE host_table (
+    ///    id INT,
+    ///    name TEXT,
+    ///    FOREIGN KEY (id) REFERENCES referenced_table(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let host_table = db.table(None, "host_table").unwrap();
+    /// let id_column = host_table.column("id", &db).expect("Column 'id' should exist");
+    /// let name_column = host_table.column("name", &db).expect("Column 'name' should exist");
+    /// let id_fks = id_column.non_composite_foreign_keys(&db).collect::<Vec<_>>();
+    /// let name_fks = name_column.non_composite_foreign_keys(&db).collect::<Vec<_>>();
+    /// assert_eq!(id_fks.len(), 1);
+    /// assert_eq!(name_fks.len(), 0);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn non_composite_foreign_keys<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey>
+    where
+        Self: 'db,
+    {
+        self.foreign_keys(database).filter(move |fk| !fk.is_composite(database))
     }
 
     /// Returns whether the column is compatible with another column.

@@ -174,6 +174,20 @@ impl ExternalTrait {
     }
 }
 
+impl InternalDependencies for ExternalTrait {
+    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
+        let mut internal_dependencies = self
+            .generic_defaults()
+            .iter()
+            .filter_map(|default| default.as_ref())
+            .flat_map(|data_variant_ref| data_variant_ref.internal_dependencies())
+            .collect::<Vec<_>>();
+        internal_dependencies.sort_unstable();
+        internal_dependencies.dedup();
+        internal_dependencies
+    }
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 /// Enum representing a trait implemented for some internal data,
 /// which may be defined within the workspace or come from an external crate.
@@ -266,7 +280,7 @@ impl InternalDependencies for TraitVariantRef {
             TraitVariantRef::Internal(_, crate_def) => {
                 crate_def.into_iter().map(AsRef::as_ref).collect()
             }
-            TraitVariantRef::External(_) => vec![],
+            TraitVariantRef::External(external) => external.internal_dependencies(),
         }
     }
 }

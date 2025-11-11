@@ -1,19 +1,20 @@
 //! Submodule defining the `TableInsertableKeySettable` struct for generating
 //! settable traits.
 
-use quote::quote;
-use sql_relations::{prelude::ColumnLike, traits::InheritableDatabaseLike};
-use sql_traits::traits::DatabaseLike;
-use syn::Ident;
-use synql_attributes::traits::TableAttributesLike;
+use sql_traits::{
+    prelude::ColumnLike,
+    traits::{DatabaseLike, ForeignKeyLike, TableLike},
+};
 use synql_core::{
     prelude::Builder,
     structs::{
         Argument, DataVariantRef, Documentation, InternalToken, Method, WhereClause, Workspace,
     },
     traits::ColumnSynLike,
+    utils::generic_type,
 };
-use synql_diesel_schema::traits::ColumnSchema;
+use synql_diesel_schema::traits::{ColumnSchema, TableSchema};
+use synql_models::traits::TableModelLike;
 
 use crate::traits::TableInsertableKeySettableLike;
 
@@ -57,48 +58,75 @@ impl<'table, T: TableInsertableKeySettableLike + ?Sized> TableInsertableKeySetta
 
     /// Generates the setter methods for all value-settable columns in the
     /// table.
-    fn insertable_key_setter_methods(&self) -> impl Iterator<Item = Method> + '_
-    where
-        T::DB: InheritableDatabaseLike,
-    {
+    fn insertable_key_setter_methods(&self) -> impl Iterator<Item = Method> + '_ {
         self.table
-            .insertable_key_settable_columns(self.database)
-            .map(|column| self.insertable_key_setter_method(column))
+            .insertable_key_settable_foreign_keys(self.database)
+            .map(|foreign_key| self.insertable_key_setter_method(foreign_key))
     }
 
     /// Generates the setter method for a column.
     fn insertable_key_setter_method(
         &self,
-        column: &'table <T::DB as DatabaseLike>::Column,
+        foreign_key: &'table <T::DB as DatabaseLike>::ForeignKey,
     ) -> Method {
-        let table_schema_ref = self
-            .table
+        let host_column = foreign_key.host_columns(self.database).next().unwrap();
+
+        let host_table_schema_ref = host_column
+            .table(self.database)
             .table_schema_ref(self.workspace)
             .expect("Failed to get the table schema ref for the table relations");
 
-        let column_type =
-            column.external_postgres_type(self.workspace, self.database).expect(&format!(
-                "Failed to get the external type for column `{}.{}`",
-                self.table.table_name(),
-                column.column_name()
-            ));
+        let referenced_tables = host_column
+            .non_composite_foreign_keys(self.database)
+            .map(|fk| fk.referenced_table(self.database))
+            .collect::<Vec<_>>();
 
-        let extension_of =
-            self.workspace.external_trait("ExtensionOf").expect("Failed to get ExtensionOf trait");
+        assert!(
+            !referenced_tables.is_empty(),
+            "Expected at least one referenced table for foreign key column {}.{}",
+            host_column.table(self.database).table_name(),
+            host_column.column_name()
+        );
+
+        let (referenced_table, other_referenced_tables) = referenced_tables.split_first().unwrap();
+
+        let mca_referenced_table = referenced_table
+            .most_recent_common_ancestor(self.database, other_referenced_tables)
+            .unwrap();
+
+        let mca_referenced_table_model_ref = mca_referenced_table
+            .model_ref(self.workspace)
+            .expect("Failed to get the table model ref for the referenced table");
+
+        let extension_of = self
+            .workspace
+            .external_trait("ExtensionOf")
+            .expect("Failed to get ExtensionOf trait")
+            .set_generic_field(
+                &generic_type("Extended"),
+                mca_referenced_table_model_ref.clone().into(),
+            )
+            .unwrap();
+
+        let identifiable = self
+            .workspace
+            .external_trait("Identifiable")
+            .expect("Failed to get Identifiable trait");
+
+        let argument_type = DataVariantRef::generic(host_column.column_acronym_generic());
 
         Method::new()
-            .name(column.column_snake_name())
+            .name(host_column.column_snake_name())
             .expect("Failed to set the method name")
             .private()
             .documentation(
                 Documentation::new()
                     .documentation(format!(
-                        "Sets the value of the {} column.",
-                        column.column_schema_doc_path(self.database)
+                        "Sets the foreign key(s) from the {} column.",
+                        host_column.column_schema_doc_path(self.database),
                     ))
                     .expect("Failed to set the method documentation")
-                    .internal_dependency(table_schema_ref.clone())
-                    .unwrap()
+                    .internal_dependency(host_table_schema_ref.clone())
                     .build()
                     .expect("Failed to build the method documentation"),
             )
@@ -111,18 +139,18 @@ impl<'table, T: TableInsertableKeySettableLike + ?Sized> TableInsertableKeySetta
                     .expect("Failed to build self argument"),
             )
             .unwrap()
-            .generic(column.column_acronym_generic())
+            .generic(host_column.column_acronym_generic())
             .argument(
                 Argument::new()
-                    .name(column.column_snake_name())
+                    .name(host_column.column_snake_name())
                     .expect("Failed to set the argument name")
-                    .arg_type(DataVariantRef::generic(column.column_acronym_generic()))
+                    .arg_type(argument_type.reference(None))
                     .documentation(
                         Documentation::new()
-                            .documentation(column.column_doc(self.database).expect(&format!(
+                            .documentation(host_column.column_doc(self.database).expect(&format!(
                                 "Failed to get the documentation for column `{}.{}`",
                                 self.table.table_name(),
-                                column.column_name()
+                                host_column.column_name()
                             )))
                             .expect("Failed to set the argument documentation")
                             .build()
@@ -132,17 +160,32 @@ impl<'table, T: TableInsertableKeySettableLike + ?Sized> TableInsertableKeySetta
                     .expect("Failed to build the argument"),
             )
             .expect("Failed to add argument to method")
-            .where_clauses([WhereClause::new()
-                .left(column.column_acronym_generic())
-                .right(
-                    InternalToken::new()
-                        .data(column_type.clone().into())
-                        .stream(quote! {})
-                        .build()
-                        .expect("Failed to build the right side of the where clause"),
-                )
-                .build()
-                .expect("Failed to build where clause")])
+            .where_clauses([
+                WhereClause::new()
+                    .left(argument_type.clone())
+                    .right(
+                        InternalToken::new()
+                            .stream(extension_of.format_with_generics())
+                            .employed_trait(extension_of.into())
+                            .build()
+                            .expect("Failed to build the right side of the where clause"),
+                    )
+                    .build()
+                    .expect("Failed to build where clause"),
+                WhereClause::new()
+                    .left(quote::quote! {for<'a> &'a #argument_type})
+                    .right(
+                        InternalToken::new()
+                            .stream(quote::quote! {
+                                #identifiable<Id=<&'a #mca_referenced_table_model_ref as #identifiable>::Id>
+                            })
+                            .employed_trait(identifiable.into())
+                            .build()
+                            .expect("Failed to build the right side of the where clause"),
+                    )
+                    .build()
+                    .expect("Failed to build where clause"),
+            ])
             .unwrap()
             .return_type(DataVariantRef::self_type(None))
             .build()

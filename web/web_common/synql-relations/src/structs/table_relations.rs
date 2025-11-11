@@ -6,8 +6,8 @@ use quote::quote;
 use synql_core::{
     prelude::{Builder, ColumnLike, DatabaseLike, ForeignKeyLike},
     structs::{
-        Argument, DataVariantRef, Documentation, ExternalTraitRef, InternalDataRef, InternalToken,
-        Method, MethodBuilder, WhereClause,
+        Argument, DataVariantRef, Documentation, InternalDataRef, InternalToken, Method,
+        MethodBuilder, WhereClause,
     },
     traits::{ColumnSynLike, ForeignKeySynLike},
 };
@@ -49,13 +49,6 @@ impl<'table, T: TableRelationsLike + ?Sized> TableRelations<'table, T> {
         database: &'table T::DB,
     ) -> Self {
         Self { table, workspace, database }
-    }
-
-    /// Returns a reference to the `ExtensionOf` trait.
-    fn extension_of_trait(&self) -> ExternalTraitRef {
-        self.workspace
-            .external_trait("ExtensionOf")
-            .expect("Failed to get ExtensionOf trait from workspace")
     }
 
     /// Returns a reference to the `ModelRef` of the current table.
@@ -103,7 +96,6 @@ impl<'table, T: TableRelationsLike + ?Sized> TableRelations<'table, T> {
                         .internal_dependencies(
                             foreign_key.internal_crate_references(self.workspace, self.database),
                         )
-                        .unwrap()
                         .build()
                         .unwrap(),
                 )

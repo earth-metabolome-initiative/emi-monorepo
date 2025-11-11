@@ -371,6 +371,12 @@ impl ExternalDependencies for ExternalTraitRef {
     }
 }
 
+impl InternalDependencies for ExternalTraitRef {
+    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
+        self.trait_ref.internal_dependencies()
+    }
+}
+
 impl ToTokens for ExternalTraitRef {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         tokens.extend(self.trait_ref.path().to_token_stream());
@@ -401,5 +407,33 @@ impl ExternalTraitRef {
     /// Returns whether the trait is implemented for typeless enums.
     pub fn implemented_for_typeless_enum(&self) -> bool {
         self.trait_ref.implemented_for_typeless_enum()
+    }
+
+    /// Returns an iterator over the generic idents without defaults.
+    pub fn generics_without_defaults(&self) -> impl Iterator<Item = &syn::GenericParam> + '_ {
+        self.trait_ref.generics_without_defaults()
+    }
+
+    /// Formats the variant including the generics, if any, with defaults.
+    pub fn generics_with_defaults(&self) -> Option<TokenStream> {
+        self.trait_ref.generics_with_defaults()
+    }
+
+    /// Formats with the generics, if any, with defaults.
+    pub fn format_with_generics(&self) -> TokenStream {
+        let generics = self.trait_ref.generics_with_defaults();
+        quote::quote! { #self #generics }
+    }
+
+    /// Sets a generic field to the provided `DataVariantRef`.
+    pub fn set_generic_field(
+        &self,
+        field: &syn::GenericParam,
+        value: DataVariantRef,
+    ) -> Option<Self> {
+        Some(Self {
+            trait_ref: Arc::new(self.trait_ref.set_generic_field(field, value)?),
+            crate_ref: self.crate_ref.clone(),
+        })
     }
 }

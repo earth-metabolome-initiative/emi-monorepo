@@ -1368,6 +1368,79 @@ pub trait TableLike:
             referenced_table == other || referenced_table.depends_on(database, other)
         })
     }
+
+    /// Returns the most recent common ancestor table between the current table
+    /// and all of the provided tables, if any.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    /// * `others` - A slice of other tables to check against.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE grandparent_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES grandparent_table(id));
+    /// CREATE TABLE child_table1 (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES parent_table(id));
+    /// CREATE TABLE child_table2 (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES parent_table(id));
+    /// CREATE TABLE unrelated_table (id INT PRIMARY KEY, name TEXT);
+    /// "#,
+    /// )?;
+    /// let child_table1 = db.table(None, "child_table1").unwrap();
+    /// let child_table2 = db.table(None, "child_table2").unwrap();
+    /// let parent_table = db.table(None, "parent_table").unwrap();
+    /// let grandparent_table = db.table(None, "grandparent_table").unwrap();
+    /// let unrelated_table = db.table(None, "unrelated_table").unwrap();
+    /// assert_eq!(child_table1.most_recent_common_ancestor(&db, &[child_table2]), Some(parent_table));
+    /// assert_eq!(child_table1.most_recent_common_ancestor(&db, &[parent_table]), Some(parent_table));
+    /// assert_eq!(
+    ///     child_table1.most_recent_common_ancestor(&db, &[grandparent_table]),
+    ///     Some(grandparent_table)
+    /// );
+    /// assert_eq!(child_table1.most_recent_common_ancestor(&db, &[unrelated_table]), None);
+    /// assert_eq!(
+    ///     child_table1.most_recent_common_ancestor(&db, &[child_table2, parent_table]),
+    ///     Some(parent_table)
+    /// );
+    /// assert_eq!(
+    ///     child_table1.most_recent_common_ancestor(&db, &[child_table2, grandparent_table]),
+    ///     Some(grandparent_table)
+    /// );
+    /// assert_eq!(child_table1.most_recent_common_ancestor(&db, &[]), Some(child_table1));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn most_recent_common_ancestor<'db>(
+        &'db self,
+        database: &'db Self::DB,
+        others: &[&'db Self],
+    ) -> Option<&'db Self>
+    where
+        Self: 'db,
+    {
+        if others.iter().all(|&other| other == self || other.is_descendant_of(database, self)) {
+            return Some(self);
+        }
+
+        for extended_table in self.extended_tables(database) {
+            if let Some(common_ancestor) =
+                extended_table.most_recent_common_ancestor(database, others)
+            {
+                return Some(common_ancestor);
+            }
+        }
+
+        None
+    }
 }
 
 impl<T: TableLike> TableLike for &T

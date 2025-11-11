@@ -1,11 +1,11 @@
 //! Submodule implementing the `From` trait to convert a `TableRelations`
 //! into an `InternalTrait`.
 
-use quote::quote;
 use sql_relations::traits::VerticalSameAsForeignKeyLike;
 use synql_core::{
     prelude::{Builder, DatabaseLike, ForeignKeyLike},
     structs::{Documentation, InternalToken, InternalTrait},
+    utils::generic_type,
 };
 
 use crate::{structs::TableRelations, traits::TableRelationsLike};
@@ -15,8 +15,13 @@ where
     T: TableRelationsLike + ?Sized,
 {
     fn from(table_relation: TableRelations<'table, T>) -> Self {
-        let extension_of = table_relation.extension_of_trait();
         let model_ref = table_relation.model_ref();
+        let ancestor = table_relation
+            .workspace
+            .external_trait("Ancestor")
+            .expect("Failed to get ExtensionOf trait from workspace")
+            .set_generic_field(&generic_type("Extended"), model_ref.clone().into())
+            .unwrap();
         let schema_crate_ref = table_relation
             .table
             .table_schema_ref(table_relation.workspace)
@@ -33,7 +38,6 @@ where
                 ))
                 .unwrap()
                 .internal_dependency(schema_crate_ref)
-                .unwrap()
                 .build()
                 .unwrap())
             .generic(syn::parse_quote! {C})
@@ -41,8 +45,8 @@ where
             .super_trait(
                 InternalToken::new()
                     .private()
-                    .stream(quote! {#extension_of<#model_ref, C>})
-                    .employed_trait(extension_of.into())
+                    .stream(ancestor.format_with_generics())
+                    .employed_trait(ancestor.into())
                     .data(model_ref.into())
                     .build()
                     .unwrap(),

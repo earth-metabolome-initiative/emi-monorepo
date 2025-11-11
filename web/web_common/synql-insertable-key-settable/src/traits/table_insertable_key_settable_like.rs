@@ -1,11 +1,7 @@
 //! Submodule providing the `TableInsertableKeySettableLike` trait for SynQL
 //! table models.
 
-use sql_relations::{
-    prelude::ColumnLike,
-    traits::{InheritableDatabaseLike, MostConcreteColumnLike},
-};
-use sql_traits::traits::DatabaseLike;
+use sql_traits::traits::{DatabaseLike, ForeignKeyLike};
 use syn::Ident;
 use synql_core::structs::{TraitVariantRef, Workspace};
 use synql_models::traits::TableModelLike;
@@ -61,17 +57,21 @@ pub trait TableInsertableKeySettableLike: TableModelLike {
 
     /// Returns an iterator over the insertable key settable columns for the
     /// table.
-    fn insertable_key_settable_columns<'db>(
+    fn insertable_key_settable_foreign_keys<'db>(
         &'db self,
         database: &'db Self::DB,
-    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>
-    where
-        Self::DB: InheritableDatabaseLike,
-    {
-        self.columns(database).filter(move |column| {
-            !column.is_generated()
-                && !column.is_most_concrete(database)
-                && column.is_foreign_key(database)
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey> {
+        let mut covered_columns: Vec<&'db <Self::DB as DatabaseLike>::Column> = vec![];
+        self.foreign_keys(database).filter(move |foreign_key| {
+            if foreign_key.is_composite(database) {
+                return false;
+            }
+            let host_column = foreign_key.host_columns(database).next().unwrap();
+            if covered_columns.contains(&host_column) {
+                return false;
+            }
+            covered_columns.push(host_column);
+            true
         })
     }
 
@@ -102,3 +102,5 @@ pub trait TableInsertableKeySettableLike: TableModelLike {
         Some(TraitVariantRef::Internal(trait_ref.clone(), Some(crate_ref.clone())))
     }
 }
+
+impl<T: TableModelLike + ?Sized> TableInsertableKeySettableLike for T {}

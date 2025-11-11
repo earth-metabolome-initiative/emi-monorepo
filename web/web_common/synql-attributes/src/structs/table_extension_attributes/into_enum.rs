@@ -36,7 +36,6 @@ impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttrib
                             ))
                             .expect("Failed to set documentation for extension attribute variant")
                             .internal_dependency(extended_schema_crate_ref)
-                            .unwrap()
                             .build()
                             .expect("Failed to build documentation for extension attribute variant"),
                     )

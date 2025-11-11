@@ -192,14 +192,16 @@ impl<'table, T: TableModelLike + ?Sized> TableModel<'table, T> {
                 InternalToken::new()
                     .private()
                     .stream(quote! {
-                        impl<C> #extension_of_trait<#extended_table_model, C> for #table_model
-                        where
-                            #extended_table_model: #read_trait<C>,
+                        impl #extension_of_trait<#extended_table_model> for #table_model
                         {
                             type ExtendedType<'data> = #extended_table_model
                             where
                                 Self: 'data;
-
+                        }
+                        impl<C> #ancestor_trait<#extended_table_model, C> for #table_model
+                        where
+                            #extended_table_model: #read_trait<C>,
+                        {
                             fn ancestor(
                                 &self,
                                 connection: &mut C,

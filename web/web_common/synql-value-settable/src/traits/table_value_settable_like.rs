@@ -67,7 +67,7 @@ pub trait TableValueSettableLike: TableModelLike {
         self.columns(database).filter(move |column| {
             !(column.is_generated()
                 || column.is_most_concrete(database)
-                || column.is_foreign_key(database))
+                || column.is_part_of_foreign_key(database))
         })
     }
 

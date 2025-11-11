@@ -31,7 +31,6 @@ where
                     ))
                     .unwrap()
                     .internal_dependency(schema_crate_ref)
-                    .unwrap()
                     .build()
                     .unwrap(),
             )
