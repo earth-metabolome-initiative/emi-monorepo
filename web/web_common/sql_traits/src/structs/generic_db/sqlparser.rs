@@ -8,7 +8,7 @@ use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use sqlparser::{
     ast::{
         CheckConstraint, ColumnDef, ColumnOption, CreateFunction, CreateTable, Expr,
-        ForeignKeyConstraint, IndexColumn, OrderByExpr, Statement, TableConstraint,
+        ForeignKeyConstraint, IndexColumn, OrderByExpr, OrderByOptions, Statement, TableConstraint,
         UniqueConstraint, Value, ValueWithSpan,
     },
     dialect::PostgreSqlDialect,
@@ -50,6 +50,8 @@ impl ParserDB {
     ///
     /// Panics if a statement other than `CREATE TABLE` or `CREATE FUNCTION` is
     /// encountered, or if the builder fails to build the database.
+    #[must_use]
+    #[allow(clippy::too_many_lines)]
     pub fn from_statements(statements: Vec<Statement>, catalog_name: String) -> Self {
         let mut builder = GenericDBBuilder::new().catalog_name(catalog_name);
 
@@ -66,7 +68,7 @@ impl ParserDB {
                         table_metadata.add_column(column_rc.clone());
                     }
                     for column in table_metadata.clone().column_rcs() {
-                        for option in column.attribute().options.iter() {
+                        for option in &column.attribute().options {
                             match option.option.clone() {
                                 ColumnOption::Check(check_constraint) => {
                                     let check_rc = Rc::new(TableAttribute::new(
@@ -109,7 +111,7 @@ impl ParserDB {
                                     unique_constraint.columns.push(IndexColumn {
                                         column: OrderByExpr {
                                             expr: Expr::Identifier(column.attribute().name.clone()),
-                                            options: Default::default(),
+                                            options: OrderByOptions::default(),
                                             with_fill: None,
                                         },
                                         operator_class: None,
@@ -212,14 +214,12 @@ impl ParserDB {
                             TableConstraint::PrimaryKey(pk) => {
                                 let mut primary_key_columns = Vec::new();
                                 for col_name in &pk.columns {
-                                    let column_name = match &col_name.column.expr {
-                                        Expr::Identifier(ident) => ident,
-                                        _ => {
-                                            unreachable!(
-                                                "Unexpected expression in primary key column: {:?}",
-                                                col_name
-                                            )
-                                        }
+                                    let Expr::Identifier(column_name) = &col_name.column.expr
+                                    else {
+                                        unreachable!(
+                                            "Unexpected expression in primary key column: {:?}",
+                                            col_name
+                                        )
                                     };
                                     primary_key_columns.extend(
                                         table_metadata
@@ -260,20 +260,12 @@ impl ParserDB {
                 }
                 Statement::CreateOperator(_)
                 | Statement::CreateOperatorClass(_)
-                | Statement::CreateOperatorFamily(_) => {
-                    // At the moment, we ignore CREATE OPERATOR statements.
-                }
-                Statement::CreateType { .. } => {
-                    // At the moment, we ignore CREATE TYPE statements.
-                }
-                Statement::CreateExtension(_) => {
-                    // At the moment, we ignore CREATE EXTENSION statements.
-                }
-                Statement::CreateIndex(_) => {
-                    // At the moment, we ignore CREATE INDEX statements.
-                }
-                Statement::CreateTrigger(_) => {
-                    // At the moment, we ignore CREATE TRIGGER statements.
+                | Statement::CreateOperatorFamily(_)
+                | Statement::CreateType { .. }
+                | Statement::CreateExtension(_)
+                | Statement::CreateIndex(_)
+                | Statement::CreateTrigger(_) => {
+                    // At the moment, we ignore these CREATE statements.
                 }
                 _ => {
                     unimplemented!("Unsupported statement found: {statement:?}");
@@ -304,16 +296,17 @@ fn search_sql_documents(path: &Path) -> Vec<std::path::PathBuf> {
             let path = entry.path();
             if path.is_dir() {
                 sql_files.extend(search_sql_documents(&path));
-            } else if let Some(extension) = path.extension() {
-                if extension == "sql" && path.file_name().unwrap() != "down.sql" {
-                    sql_files.push(path);
-                }
+            } else if let Some(extension) = path.extension()
+                && extension == "sql"
+                && path.file_name().unwrap() != "down.sql"
+            {
+                sql_files.push(path);
             }
         }
-    } else if let Some(extension) = path.extension() {
-        if extension == "sql" {
-            sql_files.push(path.to_path_buf());
-        }
+    } else if let Some(extension) = path.extension()
+        && extension == "sql"
+    {
+        sql_files.push(path.to_path_buf());
     }
     sql_files
 }

@@ -27,7 +27,7 @@ impl<T, A> TableAttribute<T, A> {
     /// given attribute.
     #[inline]
     pub fn new(table: Rc<T>, attribute: A) -> Self {
-        Self { table, attribute }
+        Self { attribute, table }
     }
 
     /// Returns a reference to the table.

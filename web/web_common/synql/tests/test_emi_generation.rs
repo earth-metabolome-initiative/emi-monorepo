@@ -42,8 +42,8 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
     tracking_test.add_completed_task(task);
 
     let temp_dir = tempfile::tempdir().expect("Unable to create temporary directory");
-    // let workspace_path = temp_dir.path().join("synql_workspace");
-    let workspace_path = std::path::PathBuf::from("../../../../emi_local");
+    let workspace_path = temp_dir.path().join("synql_workspace");
+    // let workspace_path = std::path::PathBuf::from("../../../../emi_local");
 
     let iso_codes = ExternalCrate::new()
         .name("iso_codes")?
@@ -107,22 +107,20 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap()
         .build()?;
 
-    for _ in 0..1 {
-        let synql = SynQL::new()
-            .database(&db)
-            .external_crates([
-                Arc::new(iso_codes.clone()),
-                Arc::new(media_types.clone()),
-                Arc::new(cas_codes.clone()),
-                Arc::new(molecular_formulas.clone()),
-            ])
-            .path(workspace_path.clone())
-            .generate_workspace_toml()
-            .generate_rustfmt()
-            .build()
-            .expect("Unable to build SynQL instance");
-        tracking_test.extend(synql.generate().expect("Unable to generate workspace"));
-    }
+    let synql = SynQL::new()
+        .database(&db)
+        .external_crates([
+            Arc::new(iso_codes.clone()),
+            Arc::new(media_types.clone()),
+            Arc::new(cas_codes.clone()),
+            Arc::new(molecular_formulas.clone()),
+        ])
+        .path(workspace_path.clone())
+        .generate_workspace_toml()
+        .generate_rustfmt()
+        .build()
+        .expect("Unable to build SynQL instance");
+    tracking_test.extend(synql.generate().expect("Unable to generate workspace"));
 
     // We print the report
     report(&tracking_test);

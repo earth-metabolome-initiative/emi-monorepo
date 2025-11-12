@@ -40,45 +40,31 @@ pub(super) fn columns_in_expression<DB: DatabaseLike>(
             result.extend(columns_in_expression::<DB>(low, columns));
             result.extend(columns_in_expression::<DB>(high, columns));
         }
-        Expr::UnaryOp { expr, .. } => {
-            result.extend(columns_in_expression::<DB>(expr, columns));
-        }
-        Expr::Cast { expr, .. } => {
+        Expr::UnaryOp { expr, .. }
+        | Expr::Cast { expr, .. }
+        | Expr::IsNull(expr)
+        | Expr::IsNotNull(expr) => {
             result.extend(columns_in_expression::<DB>(expr, columns));
         }
         Expr::Function(func) => {
-            match &func.args {
-                sqlparser::ast::FunctionArguments::List(args) => {
-                    for arg in args.args.iter() {
-                        match arg {
-                            sqlparser::ast::FunctionArg::Named { arg, .. } => {
-                                match arg {
-                                    sqlparser::ast::FunctionArgExpr::Expr(expr) => {
-                                        result.extend(columns_in_expression::<DB>(expr, columns));
-                                    }
-                                    _ => {}
-                                }
-                            }
-                            sqlparser::ast::FunctionArg::Unnamed(func_arg_expr) => {
-                                match func_arg_expr {
-                                    sqlparser::ast::FunctionArgExpr::Expr(expr) => {
-                                        result.extend(columns_in_expression::<DB>(expr, columns));
-                                    }
-                                    sqlparser::ast::FunctionArgExpr::Wildcard => {}
-                                    sqlparser::ast::FunctionArgExpr::QualifiedWildcard(_) => {}
-                                }
-                            }
-                            _ => {}
+            if let sqlparser::ast::FunctionArguments::List(args) = &func.args {
+                for arg in &args.args {
+                    match arg {
+                        sqlparser::ast::FunctionArg::Named {
+                            arg: sqlparser::ast::FunctionArgExpr::Expr(expr),
+                            ..
                         }
+                        | sqlparser::ast::FunctionArg::Unnamed(
+                            sqlparser::ast::FunctionArgExpr::Expr(expr),
+                        ) => {
+                            result.extend(columns_in_expression::<DB>(expr, columns));
+                        }
+                        sqlparser::ast::FunctionArg::ExprNamed { .. }
+                        | sqlparser::ast::FunctionArg::Named { .. }
+                        | sqlparser::ast::FunctionArg::Unnamed(_) => {}
                     }
                 }
-                _ => {}
             }
-        }
-        Expr::Case { .. } => {
-            // Case expressions can be complex - for now, skip detailed analysis
-            // This would require proper handling of operand, conditions,
-            // results, and else_result
         }
         Expr::InList { expr, list, .. } => {
             result.extend(columns_in_expression::<DB>(expr, columns));
@@ -91,23 +77,6 @@ pub(super) fn columns_in_expression<DB: DatabaseLike>(
             // Note: We don't traverse into subqueries as they have their own
             // column scope
         }
-        Expr::IsNull(expr) | Expr::IsNotNull(expr) => {
-            result.extend(columns_in_expression::<DB>(expr, columns));
-        }
-        Expr::Exists { .. } => {
-            // EXISTS subqueries have their own column scope, so we don't
-            // traverse into them
-        }
-        Expr::Subquery(_) => {
-            // Subqueries have their own scope, so we don't traverse into them
-        }
-        // Literal values don't contain column references
-        Expr::Value(_)
-        | Expr::TypedString { .. }
-        | Expr::Wildcard(_)
-        | Expr::QualifiedWildcard(_, _) => {}
-
-        // For any other expression types, we do nothing (safe default)
         _ => {}
     }
 
@@ -116,7 +85,7 @@ pub(super) fn columns_in_expression<DB: DatabaseLike>(
     result
         .into_iter()
         .filter(|col| {
-            let ptr = Rc::as_ptr(col) as *const ();
+            let ptr = Rc::as_ptr(col).cast::<()>();
             seen.insert(ptr)
         })
         .collect()

@@ -69,7 +69,7 @@ pub trait ColumnLike:
     fn data_type<'db>(&'db self, database: &'db Self::DB) -> &'db str;
 
     /// Returns whether the data type of the column is generative, i.e., it
-    /// generates values automatically (e.g., SERIAL in PostgreSQL).
+    /// generates values automatically (e.g., SERIAL in `PostgreSQL`).
     ///
     /// # Example
     ///
@@ -160,7 +160,7 @@ pub trait ColumnLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to query the column
-    ///  data type from.
+    ///   data type from.
     ///
     /// # Example
     ///
@@ -347,7 +347,7 @@ pub trait ColumnLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to query foreign
-    ///  keys from.
+    ///   keys from.
     ///
     /// # Example
     ///
@@ -530,7 +530,7 @@ pub trait ColumnLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to query check
-    ///  constraints from.
+    ///   constraints from.
     ///
     /// # Example
     ///
@@ -569,7 +569,7 @@ pub trait ColumnLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to query check
-    ///  constraints from.
+    ///   constraints from.
     ///
     /// # Example
     ///

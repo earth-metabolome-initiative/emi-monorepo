@@ -81,7 +81,7 @@ pub trait FunctionLike: Metadata + Debug + Clone + Hash + Ord + Eq {
     /// # }
     /// ```
     fn normalized_argument_type_names<'db>(&'db self, database: &'db Self::DB) -> Vec<&'db str> {
-        self.argument_type_names(database).into_iter().map(normalize_postgres_type).collect()
+        self.argument_type_names(database).map(normalize_postgres_type).collect()
     }
 
     /// Returns the return type name of the function as a string.

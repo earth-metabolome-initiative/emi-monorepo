@@ -148,59 +148,60 @@ impl InternalCrate {
     pub fn write_toml(&self, workspace: &Workspace, path: &std::path::Path) -> std::io::Result<()> {
         use std::io::Write;
 
-        use toml_edit::{DocumentMut, InlineTable, Value};
-
         let cargo_toml_path = path.join("Cargo.toml");
         let (major, minor, edit) = workspace.version();
 
-        // Create a new TOML document
-        let mut doc = DocumentMut::new();
+        let mut buffer = std::fs::File::create(cargo_toml_path)?;
 
-        // Add [package] section
-        doc["package"]["name"] = toml_edit::value(&self.name);
-        doc["package"]["version"] = toml_edit::value(format!("{major}.{minor}.{edit}"));
-        doc["package"]["edition"] = toml_edit::value(workspace.edition().to_string());
+        // Write [package] section
+        writeln!(buffer, "[package]")?;
+        writeln!(buffer, "name = \"{}\"", self.name)?;
+        writeln!(buffer, "version = \"{}.{}.{}\"", major, minor, edit)?;
+        writeln!(buffer, "edition = \"{}\"", workspace.edition())?;
+        writeln!(buffer)?;
 
-        // Add [dependencies] section
+        // Collect and sort dependencies
         let mut internal_dependencies = self.internal_dependencies().collect::<Vec<_>>();
         internal_dependencies.sort_unstable();
         internal_dependencies.dedup();
-
-        for dep in internal_dependencies {
-            let dep_name = dep.name();
-
-            // We add as a prefix "../" to the path to indicate that the dependency is
-            // located in the parent directory of the current crate.
-            let crate_path = Path::new("..").join(dep_name);
-
-            let mut dep_table = InlineTable::new();
-            dep_table.insert("version", Value::from(format!("{major}.{minor}.{edit}")));
-            dep_table.insert("path", Value::from(crate_path.display().to_string()));
-            doc["dependencies"][dep_name] = toml_edit::value(dep_table);
-        }
 
         let mut external_dependencies = self.external_dependencies().collect::<Vec<_>>();
         external_dependencies.sort_unstable();
         external_dependencies.dedup();
 
-        for dep in external_dependencies {
-            if !dep.is_dependency() {
-                continue;
+        // Write [dependencies] section if there are any
+        if !internal_dependencies.is_empty() || !external_dependencies.is_empty() {
+            writeln!(buffer, "[dependencies]")?;
+
+            for dep in internal_dependencies {
+                let dep_name = dep.name();
+                let crate_path = Path::new("..").join(dep_name);
+                writeln!(
+                    buffer,
+                    "{} = {{ version = \"{}.{}.{}\", path = \"{}\" }}",
+                    dep_name,
+                    major,
+                    minor,
+                    edit,
+                    crate_path.display()
+                )?;
             }
-            let dep_name = dep.name();
-            let mut dep_table = InlineTable::new();
-            dep_table.insert("workspace", Value::from(true));
-            doc["dependencies"][dep_name] = toml_edit::value(dep_table);
+
+            for dep in external_dependencies {
+                if !dep.is_dependency() {
+                    continue;
+                }
+                writeln!(buffer, "{} = {{ workspace = true }}", dep.name())?;
+            }
+
+            writeln!(buffer)?;
         }
 
-        // Add [lints] section
-        let mut lints_table = InlineTable::new();
-        lints_table.insert("workspace", Value::from(true));
-        doc["lints"] = toml_edit::value(lints_table);
+        // Write [lints] section
+        writeln!(buffer, "[lints]")?;
+        writeln!(buffer, "workspace = true")?;
 
-        // Write to file
-        let mut buffer = std::fs::File::create(cargo_toml_path)?;
-        write!(buffer, "{}", doc)
+        Ok(())
     }
 
     /// Writes the crate to disk at the provided path.

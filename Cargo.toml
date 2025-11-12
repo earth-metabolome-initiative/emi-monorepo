@@ -237,7 +237,6 @@ snake_case_sanitizer = { path = "utils/snake_case_sanitizer" }
 rmcp = { version = "0.8.1", features = ["server", "transport-io"] }
 tempfile = "3.6.0"
 insta = "1.43.2"
-toml_edit = "0.23.7"
 diesel-queries = { path = "web/web_common/diesel-queries" }
 
 [workspace.lints.rust]

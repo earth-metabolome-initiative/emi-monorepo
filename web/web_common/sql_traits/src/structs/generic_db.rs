@@ -53,11 +53,13 @@ where
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("GenericDB")
             .field("catalog_name", &self.catalog_name)
+            .field("timezone", &self.timezone)
             .field("tables", &self.tables.len())
             .field("columns", &self.columns.len())
             .field("unique_indices", &self.unique_indices.len())
             .field("foreign_keys", &self.foreign_keys.len())
             .field("functions", &self.functions.len())
+            .field("check_constraints", &self.check_constraints.len())
             .finish()
     }
 }
@@ -95,6 +97,8 @@ where
     Ch: CheckConstraintLike,
 {
     /// Creates a new `GenericDBBuilder` instance.
+    #[must_use]
+    #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericDBBuilder<T, C, U, F, Func, Ch> {
         GenericDBBuilder::default()
     }
@@ -176,6 +180,7 @@ where
     }
 
     /// Returns a reference to the catalog name.
+    #[must_use]
     #[inline]
     pub fn catalog_name(&self) -> &str {
         &self.catalog_name

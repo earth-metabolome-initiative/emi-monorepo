@@ -136,12 +136,10 @@ pub trait DatabaseLike: Clone + Debug {
                         if referenced_table == *table {
                             return None;
                         }
-                        Some(tables_ref.binary_search(&referenced_table).expect(&format!(
-                            "Referenced table '{}' not found in database '{}' - Tables are {:?}",
+                        Some(tables_ref.binary_search(&referenced_table).unwrap_or_else(|_| panic!("Referenced table '{}' not found in database '{}' - Tables are {:?}",
                             referenced_table.table_name(),
                             self.catalog_name(),
-                            tables_ref.iter().map(|t| t.table_name()).collect::<Vec<&str>>()
-                        )))
+                            tables_ref.iter().map(|t| t.table_name()).collect::<Vec<&str>>())))
                     })
                     .map(move |referenced_table_number| (referenced_table_number, table_number))
             })

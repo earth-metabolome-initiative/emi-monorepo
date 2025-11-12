@@ -21,34 +21,23 @@ pub(super) fn functions_in_expression<DB: DatabaseLike>(
             result.extend(functions.iter().filter(|f| f.name() == function_name.as_str()).cloned());
 
             // Recursively check function arguments for nested function calls
-            match &func.args {
-                sqlparser::ast::FunctionArguments::List(args) => {
-                    for arg in args.args.iter() {
-                        match arg {
-                            sqlparser::ast::FunctionArg::Named { arg, .. } => {
-                                match arg {
-                                    sqlparser::ast::FunctionArgExpr::Expr(expr) => {
-                                        result
-                                            .extend(functions_in_expression::<DB>(expr, functions));
-                                    }
-                                    _ => {}
-                                }
-                            }
-                            sqlparser::ast::FunctionArg::Unnamed(func_arg_expr) => {
-                                match func_arg_expr {
-                                    sqlparser::ast::FunctionArgExpr::Expr(expr) => {
-                                        result
-                                            .extend(functions_in_expression::<DB>(expr, functions));
-                                    }
-                                    sqlparser::ast::FunctionArgExpr::Wildcard
-                                    | sqlparser::ast::FunctionArgExpr::QualifiedWildcard(_) => {}
-                                }
-                            }
-                            _ => {}
+            if let sqlparser::ast::FunctionArguments::List(args) = &func.args {
+                for arg in &args.args {
+                    match arg {
+                        sqlparser::ast::FunctionArg::Named {
+                            arg: sqlparser::ast::FunctionArgExpr::Expr(expr),
+                            ..
                         }
+                        | sqlparser::ast::FunctionArg::Unnamed(
+                            sqlparser::ast::FunctionArgExpr::Expr(expr),
+                        ) => {
+                            result.extend(functions_in_expression::<DB>(expr, functions));
+                        }
+                        sqlparser::ast::FunctionArg::ExprNamed { .. }
+                        | sqlparser::ast::FunctionArg::Named { .. }
+                        | sqlparser::ast::FunctionArg::Unnamed(_) => {}
                     }
                 }
-                _ => {}
             }
         }
         Expr::BinaryOp { left, right, .. } => {
@@ -63,16 +52,11 @@ pub(super) fn functions_in_expression<DB: DatabaseLike>(
             result.extend(functions_in_expression::<DB>(low, functions));
             result.extend(functions_in_expression::<DB>(high, functions));
         }
-        Expr::UnaryOp { expr, .. } => {
+        Expr::UnaryOp { expr, .. }
+        | Expr::Cast { expr, .. }
+        | Expr::IsNull(expr)
+        | Expr::IsNotNull(expr) => {
             result.extend(functions_in_expression::<DB>(expr, functions));
-        }
-        Expr::Cast { expr, .. } => {
-            result.extend(functions_in_expression::<DB>(expr, functions));
-        }
-        Expr::Case { .. } => {
-            // Case expressions can be complex - for now, skip detailed analysis
-            // This would require proper handling of operand, conditions,
-            // results, and else_result
         }
         Expr::InList { expr, list, .. } => {
             result.extend(functions_in_expression::<DB>(expr, functions));
@@ -85,25 +69,6 @@ pub(super) fn functions_in_expression<DB: DatabaseLike>(
             // Note: We don't traverse into subqueries as they have their own
             // scope
         }
-        Expr::IsNull(expr) | Expr::IsNotNull(expr) => {
-            result.extend(functions_in_expression::<DB>(expr, functions));
-        }
-        Expr::Exists { .. } => {
-            // EXISTS subqueries have their own scope, so we don't traverse into
-            // them
-        }
-        Expr::Subquery(_) => {
-            // Subqueries have their own scope, so we don't traverse into them
-        }
-        // Literal values and identifiers don't contain function calls
-        Expr::Value(_)
-        | Expr::TypedString { .. }
-        | Expr::Identifier(_)
-        | Expr::CompoundIdentifier(_)
-        | Expr::Wildcard(_)
-        | Expr::QualifiedWildcard(_, _) => {}
-
-        // For any other expression types, we do nothing (safe default)
         _ => {}
     }
 
@@ -112,7 +77,7 @@ pub(super) fn functions_in_expression<DB: DatabaseLike>(
     result
         .into_iter()
         .filter(|func| {
-            let ptr = Rc::as_ptr(func) as *const ();
+            let ptr = Rc::as_ptr(func).cast::<()>();
             seen.insert(ptr)
         })
         .collect()

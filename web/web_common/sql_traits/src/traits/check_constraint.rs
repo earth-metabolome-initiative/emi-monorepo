@@ -7,6 +7,32 @@ use sqlparser::ast::{Expr, Ident};
 
 use crate::traits::{DatabaseLike, Metadata, column::ColumnLike, function_like::FunctionLike};
 
+/// Helper to extract column names from nullability checks in an AND chain
+fn extract_null_columns(expr: &Expr, is_null: bool) -> Option<Vec<&Ident>> {
+    use sqlparser::ast::BinaryOperator;
+    match expr {
+        Expr::IsNull(col_expr) if is_null => {
+            if let Expr::Identifier(ident) = col_expr.as_ref() {
+                Some(vec![ident])
+            } else {
+                None
+            }
+        }
+        Expr::IsNotNull(col_expr) if !is_null => {
+            if let Expr::Identifier(ident) = col_expr.as_ref() { Some(vec![ident]) } else { None }
+        }
+        Expr::BinaryOp { left, op: BinaryOperator::And, right } => {
+            let mut left_cols = extract_null_columns(left, is_null)?;
+            left_cols.extend(extract_null_columns(right, is_null)?);
+            left_cols.sort_unstable();
+            left_cols.dedup();
+            Some(left_cols)
+        }
+        Expr::Nested(inner) => extract_null_columns(inner, is_null),
+        _ => None,
+    }
+}
+
 /// A check constraint is a rule that specifies a condition that must be met
 /// for data to be inserted or updated in a table. This trait represents such
 /// a check constraint in a database-agnostic way.
@@ -95,7 +121,7 @@ pub trait CheckConstraintLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to query the columns
-    ///  from.
+    ///   from.
     /// * `name` - The name of the column to retrieve.
     ///
     /// # Example
@@ -170,8 +196,7 @@ pub trait CheckConstraintLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to query the
-    ///   functions
-    ///  from.
+    ///   functions from.
     /// * `name` - The name of the function to retrieve.
     ///
     /// # Example
@@ -208,8 +233,7 @@ pub trait CheckConstraintLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to query the
-    ///   functions
-    ///  from.
+    ///   functions from.
     ///
     /// # Example
     ///
@@ -282,7 +306,7 @@ pub trait CheckConstraintLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to query the table
-    ///  from.
+    ///   from.
     ///
     /// # Example
     ///
@@ -326,35 +350,6 @@ pub trait CheckConstraintLike:
         let Expr::BinaryOp { left, op: BinaryOperator::Or, right } = expr else {
             return false;
         };
-
-        // Helper to extract column names from nullability checks in an AND chain
-        fn extract_null_columns(expr: &Expr, is_null: bool) -> Option<Vec<&Ident>> {
-            match expr {
-                Expr::IsNull(col_expr) if is_null => {
-                    if let Expr::Identifier(ident) = col_expr.as_ref() {
-                        Some(vec![ident])
-                    } else {
-                        None
-                    }
-                }
-                Expr::IsNotNull(col_expr) if !is_null => {
-                    if let Expr::Identifier(ident) = col_expr.as_ref() {
-                        Some(vec![ident])
-                    } else {
-                        None
-                    }
-                }
-                Expr::BinaryOp { left, op: BinaryOperator::And, right } => {
-                    let mut left_cols = extract_null_columns(left, is_null)?;
-                    left_cols.extend(extract_null_columns(right, is_null)?);
-                    left_cols.sort_unstable();
-                    left_cols.dedup();
-                    Some(left_cols)
-                }
-                Expr::Nested(inner) => extract_null_columns(inner, is_null),
-                _ => None,
-            }
-        }
 
         // Left side should be all NULL checks, right side all NOT NULL checks (or vice
         // versa)

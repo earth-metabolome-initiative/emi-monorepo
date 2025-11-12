@@ -150,64 +150,69 @@ impl Workspace {
     pub fn write_rustfmt(&self) -> std::io::Result<()> {
         use std::io::Write;
 
-        use toml_edit::{DocumentMut, Item};
-        let mut doc = DocumentMut::new();
-
-        doc["edition"] = Item::from(self.edition.to_string());
-        doc["max_width"] = Item::from(100);
-        doc["use_small_heuristics"] = Item::from("Max");
-        doc["reorder_imports"] = Item::from(true);
-        doc["group_imports"] = Item::from("StdExternalCrate");
-        doc["imports_granularity"] = Item::from("Crate");
-        doc["reorder_modules"] = Item::from(true);
-        doc["wrap_comments"] = Item::from(true);
-        doc["format_code_in_doc_comments"] = Item::from(true);
-        doc["comment_width"] = Item::from(80);
-        doc["normalize_comments"] = Item::from(true);
-        doc["normalize_doc_attributes"] = Item::from(false);
-        doc["force_multiline_blocks"] = Item::from(true);
-        doc["fn_single_line"] = Item::from(false);
-        doc["where_single_line"] = Item::from(false);
-
         let rustfmt_path = self.path.join("rustfmt.toml");
         let mut buffer = std::fs::File::create(rustfmt_path)?;
-        write!(buffer, "{}", doc)
+
+        writeln!(buffer, "edition = \"{}\"", self.edition)?;
+        writeln!(buffer, "max_width = 100")?;
+        writeln!(buffer, "use_small_heuristics = \"Max\"")?;
+        writeln!(buffer, "reorder_imports = true")?;
+        writeln!(buffer, "group_imports = \"StdExternalCrate\"")?;
+        writeln!(buffer, "imports_granularity = \"Crate\"")?;
+        writeln!(buffer, "reorder_modules = true")?;
+        writeln!(buffer, "wrap_comments = true")?;
+        writeln!(buffer, "format_code_in_doc_comments = true")?;
+        writeln!(buffer, "comment_width = 80")?;
+        writeln!(buffer, "normalize_comments = true")?;
+        writeln!(buffer, "normalize_doc_attributes = false")?;
+        writeln!(buffer, "force_multiline_blocks = true")?;
+        writeln!(buffer, "fn_single_line = false")?;
+        writeln!(buffer, "where_single_line = false")?;
+
+        Ok(())
     }
 
     /// Writes the workspace TOML.
     pub fn write_toml(&self) -> std::io::Result<()> {
         use std::io::Write;
 
-        use toml_edit::{Array, DocumentMut, Value};
-
         let toml_path = self.path.join("Cargo.toml");
+        let mut buffer = std::fs::File::create(toml_path)?;
 
-        // Create a new TOML document
-        let mut doc = DocumentMut::new();
+        // Write [workspace] section
+        writeln!(buffer, "[workspace]")?;
+        writeln!(buffer, "resolver = \"2\"")?;
 
-        // Add [workspace] section
-        doc["workspace"]["resolver"] = toml_edit::value("2");
-
-        // Add [workspace.package] section
-        doc["workspace"]["package"]["edition"] = toml_edit::value(self.edition.to_string());
-
-        // Add members array
-        let mut members = Array::new();
-        for internal_crate in &self.internal_crates {
-            let crate_path = internal_crate.name().to_string();
-            members.push(crate_path);
+        // Write members array
+        write!(buffer, "members = [")?;
+        for (i, internal_crate) in self.internal_crates.iter().enumerate() {
+            if i > 0 {
+                write!(buffer, ", ")?;
+            }
+            write!(buffer, "\"{}\"", internal_crate.name())?;
         }
-        doc["workspace"]["members"] = toml_edit::value(members);
+        writeln!(buffer, "]")?;
+        writeln!(buffer)?;
 
-        // Add [workspace.dependencies] section
+        // Write [workspace.package] section
+        writeln!(buffer, "[workspace.package]")?;
+        writeln!(buffer, "edition = \"{}\"", self.edition)?;
+        writeln!(buffer)?;
+
+        // Write [workspace.dependencies] section
+        writeln!(buffer, "[workspace.dependencies]")?;
+
+        // Write internal crate dependencies
         for internal_crate in &self.internal_crates {
-            let crate_name = internal_crate.name();
-            let mut dep_table = toml_edit::InlineTable::new();
-            dep_table.insert("path", Value::from(crate_name));
-            doc["workspace"]["dependencies"][crate_name] = toml_edit::value(dep_table);
+            writeln!(
+                buffer,
+                "{} = {{ path = \"{}\" }}",
+                internal_crate.name(),
+                internal_crate.name()
+            )?;
         }
 
-        // Add external dependencies that are required
+        // Collect and sort external dependencies
         let mut external_deps: Vec<_> = self
             .internal_crates
             .iter()
@@ -217,57 +222,62 @@ impl Workspace {
         external_deps.sort_unstable();
         external_deps.dedup();
 
+        // Write external dependencies
         for external_crate in external_deps {
             if !external_crate.is_dependency() {
                 continue;
             }
-            let mut dep_table = toml_edit::InlineTable::new();
-            let dep_name = external_crate.name();
 
-            // Create table with version and features
+            let dep_name = external_crate.name();
+            write!(buffer, "{} = {{ ", dep_name)?;
+
+            let mut parts = Vec::new();
+
             if let Some(version) = external_crate.version() {
-                dep_table.insert("version", Value::from(version));
+                parts.push(format!("version = \"{}\"", version));
             }
 
             if let Some((repository, branch)) = external_crate.git() {
-                dep_table.insert("git", Value::from(repository));
-                dep_table.insert("branch", Value::from(branch));
+                parts.push(format!("git = \"{}\"", repository));
+                parts.push(format!("branch = \"{}\"", branch));
             }
 
-            let mut features_array = Array::new();
-            for feature in external_crate.features() {
-                features_array.push(feature.as_str());
+            let features = external_crate.features();
+            if !features.is_empty() {
+                let features_str =
+                    features.iter().map(|f| format!("\"{}\"", f)).collect::<Vec<_>>().join(", ");
+                parts.push(format!("features = [{}]", features_str));
             }
-            dep_table.insert("features", Value::from(features_array));
 
-            doc["workspace"]["dependencies"][dep_name] = toml_edit::value(dep_table);
+            write!(buffer, "{}", parts.join(", "))?;
+            writeln!(buffer, " }}")?;
         }
+        writeln!(buffer)?;
 
-        // Add [workspace.lints] section
-        doc["workspace"]["lints"]["rust"]["missing_docs"] = toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rust"]["unused_macro_rules"] = toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rust"]["unused_doc_comments"] = toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rust"]["unconditional_recursion"] = toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rust"]["unreachable_patterns"] = toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rust"]["unused_import_braces"] = toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rust"]["unused_must_use"] = toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rust"]["deprecated"] = toml_edit::value("deny");
-        doc["workspace"]["lints"]["rustdoc"]["broken_intra_doc_links"] = toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rustdoc"]["bare_urls"] = toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rustdoc"]["invalid_codeblock_attributes"] =
-            toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rustdoc"]["invalid_html_tags"] = toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rustdoc"]["missing_crate_level_docs"] =
-            toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rustdoc"]["unescaped_backticks"] = toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rustdoc"]["redundant_explicit_links"] =
-            toml_edit::value("forbid");
-        doc["workspace"]["lints"]["rustdoc"]["invalid_rust_codeblocks"] =
-            toml_edit::value("forbid");
+        // Write [workspace.lints.rust] section
+        writeln!(buffer, "[workspace.lints.rust]")?;
+        writeln!(buffer, "missing_docs = \"forbid\"")?;
+        writeln!(buffer, "unused_macro_rules = \"forbid\"")?;
+        writeln!(buffer, "unused_doc_comments = \"forbid\"")?;
+        writeln!(buffer, "unconditional_recursion = \"forbid\"")?;
+        writeln!(buffer, "unreachable_patterns = \"forbid\"")?;
+        writeln!(buffer, "unused_import_braces = \"forbid\"")?;
+        writeln!(buffer, "unused_must_use = \"forbid\"")?;
+        writeln!(buffer, "deprecated = \"deny\"")?;
+        writeln!(buffer)?;
 
-        // Write to file
-        let mut buffer = std::fs::File::create(toml_path)?;
-        write!(buffer, "{}", doc)
+        // Write [workspace.lints.rustdoc] section
+        writeln!(buffer, "[workspace.lints.rustdoc]")?;
+        writeln!(buffer, "broken_intra_doc_links = \"forbid\"")?;
+        writeln!(buffer, "bare_urls = \"forbid\"")?;
+        writeln!(buffer, "invalid_codeblock_attributes = \"forbid\"")?;
+        writeln!(buffer, "invalid_html_tags = \"forbid\"")?;
+        writeln!(buffer, "missing_crate_level_docs = \"forbid\"")?;
+        writeln!(buffer, "unescaped_backticks = \"forbid\"")?;
+        writeln!(buffer, "redundant_explicit_links = \"forbid\"")?;
+        writeln!(buffer, "invalid_rust_codeblocks = \"forbid\"")?;
+
+        Ok(())
     }
 
     /// Writes the workspace to disk.

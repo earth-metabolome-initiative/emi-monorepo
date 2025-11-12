@@ -247,7 +247,7 @@ pub trait ForeignKeyLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to which the foreign
-    /// key belongs.
+    ///   key belongs.
     ///
     /// # Example
     ///
@@ -301,7 +301,7 @@ pub trait ForeignKeyLike:
     ///
     /// # Arguments
     /// * `database` - A reference to the database instance to which the foreign
-    /// key belongs.
+    ///   key belongs.
     ///
     /// # Example
     ///

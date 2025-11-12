@@ -1,14 +1,14 @@
-//! Submodule providing a function for normalizing PostgreSQL data types.
+//! Submodule providing a function for normalizing `PostgreSQL` data types.
 
-/// Normalizes PostgreSQL data types to a standard representation.
+/// Normalizes `PostgreSQL` data types to a standard representation.
 ///
 /// # Arguments
 ///
-/// * `pg_type`: The PostgreSQL data type as a string slice.
+/// * `pg_type`: The `PostgreSQL` data type as a string slice.
 ///
 /// # Returns
 ///
-/// The normalized PostgreSQL data type as a string slice.
+/// The normalized `PostgreSQL` data type as a string slice.
 ///
 /// # Examples
 ///

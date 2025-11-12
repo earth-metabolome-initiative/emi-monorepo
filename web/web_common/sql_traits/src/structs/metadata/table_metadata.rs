@@ -45,6 +45,7 @@ impl<T: TableLike> TableMetadata<T> {
     }
 
     /// Returns a slice of the Rc of columns of the table.
+    #[must_use]
     #[inline]
     pub fn column_rc_slice(&self) -> &[Rc<<T::DB as DatabaseLike>::Column>] {
         &self.columns

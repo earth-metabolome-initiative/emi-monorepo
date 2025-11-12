@@ -36,8 +36,8 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
 	"#,
     )?;
     let temp_dir = tempfile::tempdir().expect("Unable to create temporary directory");
-    // let workspace_path = temp_dir.path().join("synql_workspace");
-    let workspace_path = std::path::PathBuf::from("../../../../local");
+    let workspace_path = temp_dir.path().join("synql_workspace");
+    // let workspace_path = std::path::PathBuf::from("../../../../local");
 
     let synql = SynQL::new()
         .database(&db)

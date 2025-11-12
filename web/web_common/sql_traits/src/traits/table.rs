@@ -89,7 +89,7 @@ pub trait TableLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to which the table
-    /// belongs.
+    ///   belongs.
     ///
     /// # Example
     ///
@@ -121,7 +121,7 @@ pub trait TableLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to which the table
-    /// belongs.
+    ///   belongs.
     ///
     /// # Example
     ///
@@ -284,9 +284,7 @@ pub trait TableLike:
     ) -> &'db <Self::DB as DatabaseLike>::Column {
         let mut pk_columns = self.primary_key_columns(database);
         let pk_column = pk_columns.next().expect("Table has no primary key column");
-        if pk_columns.next().is_some() {
-            panic!("Table has a composite primary key");
-        }
+        assert!(pk_columns.next().is_none(), "Table has a composite primary key");
         pk_column
     }
 
@@ -296,7 +294,7 @@ pub trait TableLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to which the table
-    /// belongs.
+    ///   belongs.
     ///
     /// # Example
     ///
@@ -326,7 +324,7 @@ pub trait TableLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to which the table
-    /// belongs.
+    ///   belongs.
     ///
     /// # Example
     ///
@@ -667,10 +665,7 @@ pub trait TableLike:
     /// ```
     #[inline]
     fn has_non_self_referential_foreign_keys(&self, database: &Self::DB) -> bool {
-        self.foreign_keys(database)
-            .filter(move |fk| !fk.is_self_referential(database))
-            .next()
-            .is_some()
+        self.foreign_keys(database).any(move |fk| !fk.is_self_referential(database))
     }
 
     /// Iterates over the foreign keys in the current table which refer to
@@ -679,7 +674,7 @@ pub trait TableLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to which the table
-    /// belongs.
+    ///   belongs.
     /// * `table` - A reference to the table whose ancestors are to be
     ///   considered.
     ///
@@ -927,7 +922,7 @@ pub trait TableLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to which the table
-    ///  belongs.
+    ///   belongs.
     /// * `table` - A reference to the table to check for extensions.
     ///
     /// # Example
@@ -1271,7 +1266,7 @@ pub trait TableLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to which the table
-    ///  belongs.
+    ///   belongs.
     ///
     /// # Example
     ///
@@ -1300,7 +1295,7 @@ pub trait TableLike:
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to which the table
-    ///  belongs.
+    ///   belongs.
     ///
     /// # Example
     ///

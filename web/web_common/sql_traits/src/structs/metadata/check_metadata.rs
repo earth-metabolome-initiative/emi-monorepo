@@ -32,12 +32,14 @@ impl<U: CheckConstraintLike> CheckMetadata<U> {
     }
 
     /// Returns a reference to the expression defining the constraint.
+    #[must_use]
     #[inline]
     pub fn expression(&self) -> &Expr {
         &self.expression
     }
 
     /// Returns a reference to the table on which the constraint is defined.
+    #[must_use]
     #[inline]
     pub fn table(&self) -> &<U::DB as DatabaseLike>::Table {
         &self.table
