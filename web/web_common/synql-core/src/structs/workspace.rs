@@ -284,7 +284,7 @@ impl Workspace {
         std::fs::create_dir_all(self.path())?;
         // And we start writing each internal crate to disk.
         self.internal_crates
-            .par_iter()
+            .iter()
             .map(|internal_crate: &Arc<InternalCrate>| internal_crate.write_to_disk(self))
             .collect::<Result<Vec<()>, std::io::Error>>()?;
         Ok(())
