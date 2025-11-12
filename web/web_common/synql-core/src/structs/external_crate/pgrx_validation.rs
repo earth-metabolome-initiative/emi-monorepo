@@ -2,11 +2,13 @@
 //! [`ExternalCrate`] struct which initializes a `ExternalCrate` instance
 //! describing the `pgrx_validation` crate.
 
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use common_traits::builder::Builder;
 
 use crate::structs::{Argument, DataVariantRef, Documentation, ExternalCrate, Method};
+
+static PGRX_VALIDATION_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
 
 impl ExternalCrate {
     /// Standard return type for validation functions.
@@ -38,33 +40,39 @@ impl ExternalCrate {
         )
     }
 
-    /// Initializes a `ExternalCrate` instance describing the
+    /// Returns the cached `ExternalCrate` instance describing the
     /// `pgrx_validation` crate.
     pub fn pgrx_validation() -> Arc<ExternalCrate> {
-        Arc::new(
-            ExternalCrate::new()
-                .name("pgrx_validation".to_string())
-                .unwrap()
-                .add_functions([
-                    (
-                        Self::str_method("must_be_font_awesome_class"),
-                        Arc::new(syn::parse_quote!(pgrx_validation::must_be_font_awesome_class)),
-                    ),
-                    (
-                        Self::str_method("must_be_paragraph"),
-                        Arc::new(syn::parse_quote!(pgrx_validation::must_be_paragraph)),
-                    ),
-                    (
-                        Self::str_method("must_be_email"),
-                        Arc::new(syn::parse_quote!(pgrx_validation::must_be_email)),
-                    ),
-                ])
-                .git(
-                    "https://github.com/earth-metabolome-initiative/emi-monorepo",
-                    "postgres-crate",
+        PGRX_VALIDATION_CRATE
+            .get_or_init(|| {
+                Arc::new(
+                    ExternalCrate::new()
+                        .name("pgrx_validation")
+                        .unwrap()
+                        .add_functions([
+                            (
+                                Self::str_method("must_be_font_awesome_class"),
+                                Arc::new(syn::parse_quote!(
+                                    pgrx_validation::must_be_font_awesome_class
+                                )),
+                            ),
+                            (
+                                Self::str_method("must_be_paragraph"),
+                                Arc::new(syn::parse_quote!(pgrx_validation::must_be_paragraph)),
+                            ),
+                            (
+                                Self::str_method("must_be_email"),
+                                Arc::new(syn::parse_quote!(pgrx_validation::must_be_email)),
+                            ),
+                        ])
+                        .git(
+                            "https://github.com/earth-metabolome-initiative/emi-monorepo",
+                            "postgres-crate",
+                        )
+                        .build()
+                        .unwrap(),
                 )
-                .build()
-                .unwrap(),
-        )
+            })
+            .clone()
     }
 }

@@ -20,6 +20,7 @@ mod chrono_crate;
 mod core_crate;
 mod diesel_crate;
 mod diesel_queries_crate;
+mod either_crate;
 mod helpers;
 mod pgrx_validation;
 mod postgis_diesel_crate;

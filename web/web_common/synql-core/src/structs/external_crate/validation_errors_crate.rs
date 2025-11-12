@@ -2,7 +2,7 @@
 //! [`ExternalCrate`] struct which initializes a `ExternalCrate` instance
 //! describing the `validation_errors` crate.
 
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use common_traits::builder::Builder;
 
@@ -11,52 +11,62 @@ use crate::{
     utils::generic_type,
 };
 
+static VALIDATION_ERRORS_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
+
 impl ExternalCrate {
-    /// Initializes a `ExternalCrate` instance describing the
+    /// Returns the cached `ExternalCrate` instance describing the
     /// `validation_errors` crate.
     pub fn validation_errors() -> Arc<ExternalCrate> {
-        Arc::new(
-            ExternalCrate::new()
-                .name("validation_errors".to_string())
-                .unwrap()
-                .add_types([
-                    Arc::new(
-                        ExternalType::new()
-                            .rust_type(syn::parse_quote!(
-                                validation_errors::prelude::ValidationError
-                            ))
-                            .generic(generic_type("FieldName"))
-                            .build()
-                            .unwrap(),
-                    ),
-                    Arc::new(
-                        ExternalType::new()
-                            .rust_type(syn::parse_quote!(validation_errors::prelude::Unspecified))
-                            .supports_copy()
-                            .supports_default()
-                            .supports_hash()
-                            .supports_ord()
-                            .build()
-                            .unwrap(),
-                    ),
-                ])
-                .unwrap()
-                .add_trait(
-                    ExternalTrait::new()
-                        .name("ReplaceFieldName")
+        VALIDATION_ERRORS_CRATE
+            .get_or_init(|| {
+                Arc::new(
+                    ExternalCrate::new()
+                        .name("validation_errors")
                         .unwrap()
-                        .path(syn::parse_quote!(validation_errors::prelude::ReplaceFieldName))
+                        .add_types([
+                            Arc::new(
+                                ExternalType::new()
+                                    .rust_type(syn::parse_quote!(
+                                        validation_errors::prelude::ValidationError
+                                    ))
+                                    .generic(generic_type("FieldName"))
+                                    .build()
+                                    .unwrap(),
+                            ),
+                            Arc::new(
+                                ExternalType::new()
+                                    .rust_type(syn::parse_quote!(
+                                        validation_errors::prelude::Unspecified
+                                    ))
+                                    .supports_copy()
+                                    .supports_default()
+                                    .supports_hash()
+                                    .supports_ord()
+                                    .build()
+                                    .unwrap(),
+                            ),
+                        ])
+                        .unwrap()
+                        .add_trait(
+                            ExternalTrait::new()
+                                .name("ReplaceFieldName")
+                                .unwrap()
+                                .path(syn::parse_quote!(
+                                    validation_errors::prelude::ReplaceFieldName
+                                ))
+                                .build()
+                                .unwrap(),
+                        )
+                        .unwrap()
+                        .git(
+                            "https://github.com/earth-metabolome-initiative/emi-monorepo",
+                            "postgres-crate",
+                        )
                         .build()
                         .unwrap(),
                 )
-                .unwrap()
-                .git(
-                    "https://github.com/earth-metabolome-initiative/emi-monorepo",
-                    "postgres-crate",
-                )
-                .build()
-                .unwrap(),
-        )
+            })
+            .clone()
     }
 
     /// Returns the `ValidationError` parametrized with the `Unspecified` type.

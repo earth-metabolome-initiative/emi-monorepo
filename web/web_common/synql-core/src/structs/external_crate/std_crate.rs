@@ -1,43 +1,49 @@
 //! Submodule implementing the method `std` for the [`ExternalCrate`] struct
 //! which initializes a `ExternalCrate` instance describing the `std` crate.
 
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use common_traits::builder::Builder;
 
 use crate::structs::{ExternalCrate, ExternalType};
 
+static STD_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
+
 impl ExternalCrate {
-    /// Initializes a `ExternalCrate` instance describing the `std` crate.
+    /// Returns the cached `ExternalCrate` instance describing the `std` crate.
     pub fn std() -> Arc<ExternalCrate> {
-        Arc::new(
-            ExternalCrate::new()
-                .name("std".to_string())
-                .unwrap()
-                .add_types(vec![
-                    Arc::new(ExternalType::string()),
-                    Arc::new(ExternalType::str()),
-                    Arc::new(ExternalType::vec_u8()),
-                    Arc::new(ExternalType::vec_i16()),
-                    Arc::new(ExternalType::vec_i32()),
-                    Arc::new(ExternalType::vec_u32()),
-                    Arc::new(ExternalType::vec_f32()),
-                    Arc::new(ExternalType::vec_f64()),
-                    Arc::new(ExternalType::vec_bool()),
-                    Arc::new(ExternalType::ip_addr()),
-                    Arc::new(ExternalType::mac_addr()),
-                    Arc::new(ExternalType::vec_string()),
-                    Arc::new(ExternalType::system_time()),
-                ])
-                .unwrap()
-                .build()
-                .unwrap(),
-        )
+        STD_CRATE
+            .get_or_init(|| {
+                Arc::new(
+                    ExternalCrate::new()
+                        .name("std")
+                        .unwrap()
+                        .add_types(vec![
+                            Arc::new(ExternalType::string()),
+                            Arc::new(ExternalType::str()),
+                            Arc::new(ExternalType::vec_u8()),
+                            Arc::new(ExternalType::vec_i16()),
+                            Arc::new(ExternalType::vec_i32()),
+                            Arc::new(ExternalType::vec_u32()),
+                            Arc::new(ExternalType::vec_f32()),
+                            Arc::new(ExternalType::vec_f64()),
+                            Arc::new(ExternalType::vec_bool()),
+                            Arc::new(ExternalType::ip_addr()),
+                            Arc::new(ExternalType::mac_addr()),
+                            Arc::new(ExternalType::vec_string()),
+                            Arc::new(ExternalType::system_time()),
+                        ])
+                        .unwrap()
+                        .build()
+                        .unwrap(),
+                )
+            })
+            .clone()
     }
 }
 
 impl ExternalType {
-    /// Returns a `ExternalType` instance describing the `String` type from the
+    /// Returns an `ExternalType` instance describing the `String` type from the
     /// `std` crate.
     fn string() -> Self {
         ExternalType::new()
@@ -67,8 +73,8 @@ impl ExternalType {
             .unwrap()
     }
 
-    /// Returns a `ExternalType` instance describing the `str` type from the
-    /// `str` crate.
+    /// Returns an `ExternalType` instance describing the `str` type from the
+    /// `std` crate.
     fn str() -> Self {
         ExternalType::new()
             .rust_type(syn::parse_quote!(str))
@@ -81,8 +87,8 @@ impl ExternalType {
             .unwrap()
     }
 
-    /// Returns a `ExternalType` instance describing the `Vec<u8>` type from the
-    /// `std` crate.
+    /// Returns an `ExternalType` instance describing the `Vec<u8>` type from
+    /// the `std` crate.
     fn vec_u8() -> Self {
         ExternalType::new()
             .diesel_type(syn::parse_quote!(diesel::sql_types::Binary))
@@ -98,7 +104,7 @@ impl ExternalType {
             .unwrap()
     }
 
-    /// Returns a ` ExternalType` instance describing the `Vec<i16>` type from
+    /// Returns an `ExternalType` instance describing the `Vec<i16>` type from
     /// the `std` crate.
     fn vec_i16() -> Self {
         ExternalType::new()
@@ -115,7 +121,7 @@ impl ExternalType {
             .unwrap()
     }
 
-    /// Returns a ` ExternalType` instance describing the `Vec<i32>` type from
+    /// Returns an `ExternalType` instance describing the `Vec<i32>` type from
     /// the `std` crate.
     fn vec_i32() -> Self {
         ExternalType::new()
@@ -132,7 +138,7 @@ impl ExternalType {
             .unwrap()
     }
 
-    /// Returns a ` ExternalType` instance describing the `Vec<u32>` type from
+    /// Returns an `ExternalType` instance describing the `Vec<u32>` type from
     /// the `std` crate.
     fn vec_u32() -> Self {
         ExternalType::new()
@@ -149,7 +155,7 @@ impl ExternalType {
             .unwrap()
     }
 
-    /// Returns a ` ExternalType` instance describing the `Vec<f32>` type from
+    /// Returns an `ExternalType` instance describing the `Vec<f32>` type from
     /// the `std` crate.
     fn vec_f32() -> Self {
         ExternalType::new()
@@ -166,7 +172,7 @@ impl ExternalType {
             .unwrap()
     }
 
-    /// Returns a ` ExternalType` instance describing the `Vec<f64>` type from
+    /// Returns an `ExternalType` instance describing the `Vec<f64>` type from
     /// the `std` crate.
     fn vec_f64() -> Self {
         ExternalType::new()
@@ -183,7 +189,7 @@ impl ExternalType {
             .unwrap()
     }
 
-    /// Returns a ` ExternalType` instance describing the `Vec<bool>` type from
+    /// Returns an `ExternalType` instance describing the `Vec<bool>` type from
     /// the `std` crate.
     fn vec_bool() -> Self {
         ExternalType::new()
@@ -226,8 +232,8 @@ impl ExternalType {
             .unwrap()
     }
 
-    /// Returns a `ExternalType` instance describing the `std::net::IpAddr` type
-    /// from the `std` crate.
+    /// Returns an `ExternalType` instance describing the `std::net::IpAddr`
+    /// type from the `std` crate.
     fn ip_addr() -> Self {
         ExternalType::new()
             .diesel_type(syn::parse_quote!(diesel::sql_types::Inet))
@@ -243,7 +249,7 @@ impl ExternalType {
             .unwrap()
     }
 
-    /// Returns a `ExternalType` instance describing the `std::net::MacAddr`
+    /// Returns an `ExternalType` instance describing the `std::net::MacAddr`
     /// type from the `std` crate.
     fn mac_addr() -> Self {
         ExternalType::new()
@@ -260,8 +266,8 @@ impl ExternalType {
             .unwrap()
     }
 
-    /// Returns a `ExternalType` instance describing the `std::time::SystemTime`
-    /// type from the `std` crate.
+    /// Returns an `ExternalType` instance describing the
+    /// `std::time::SystemTime` type from the `std` crate.
     fn system_time() -> Self {
         ExternalType::new()
             .diesel_type(syn::parse_quote!(diesel::sql_types::Timestamp))

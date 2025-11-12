@@ -17,6 +17,7 @@ synql-insertable.workspace = true
 synql-builders.workspace = true
 synql-value-settable.workspace = true
 synql-insertable-key-settable.workspace = true
+synql-buildable-key-settable.workspace = true
 chrono.workspace = true
 time_requirements.workspace = true
 

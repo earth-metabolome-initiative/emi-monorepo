@@ -1,0 +1,13 @@
+[package]
+name = "synql-builders-metadata"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+synql-core.workspace = true
+synql-insertable.workspace = true
+synql-diesel-schema.workspace = true
+synql-models.workspace = true
+
+[lints]
+workspace = true

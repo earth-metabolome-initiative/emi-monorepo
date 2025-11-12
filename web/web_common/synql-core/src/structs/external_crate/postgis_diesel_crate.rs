@@ -2,38 +2,44 @@
 //! struct which initializes a `ExternalCrate` instance describing the
 //! `postgis_diesel` crate.
 
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use common_traits::builder::Builder;
 
 use crate::structs::{ExternalCrate, ExternalType};
 
+static POSTGIS_DIESEL_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
+
 impl ExternalCrate {
-    /// Initializes a `ExternalCrate` instance describing the `postgis_diesel`
-    /// crate.
-    pub fn postgis_diesel() -> Arc<Self> {
-        Arc::from(
-            ExternalCrate::new()
-                .name("postgis_diesel")
-                .unwrap()
-                .features(["serde", "diesel", "postgres", "sqlite"])
-                .add_types(vec![
-                    Arc::new(ExternalType::point()),
-                    Arc::new(ExternalType::linestring()),
-                    Arc::new(ExternalType::polygon()),
-                    Arc::new(ExternalType::multipoint()),
-                    Arc::new(ExternalType::multilinestring()),
-                    Arc::new(ExternalType::multipolygon()),
-                    Arc::new(ExternalType::geometrycollection()),
-                    Arc::new(ExternalType::geometry()),
-                    Arc::new(ExternalType::geography()),
-                ])
-                .unwrap()
-                // .version("3.0.2")
-                .git("https://github.com/LucaCappelletti94/postgis-diesel", "master")
-                .build()
-                .expect("Failed to build ExternalCrate for postgis_diesel"),
-        )
+    /// Returns the cached `ExternalCrate` instance describing the
+    /// `postgis_diesel` crate.
+    pub fn postgis_diesel() -> Arc<ExternalCrate> {
+        POSTGIS_DIESEL_CRATE
+            .get_or_init(|| {
+                Arc::new(
+                    ExternalCrate::new()
+                        .name("postgis_diesel")
+                        .unwrap()
+                        .features(["serde", "diesel", "postgres", "sqlite"])
+                        .add_types(vec![
+                            Arc::new(ExternalType::point()),
+                            Arc::new(ExternalType::linestring()),
+                            Arc::new(ExternalType::polygon()),
+                            Arc::new(ExternalType::multipoint()),
+                            Arc::new(ExternalType::multilinestring()),
+                            Arc::new(ExternalType::multipolygon()),
+                            Arc::new(ExternalType::geometrycollection()),
+                            Arc::new(ExternalType::geometry()),
+                            Arc::new(ExternalType::geography()),
+                        ])
+                        .unwrap()
+                        // .version("3.0.2")
+                        .git("https://github.com/LucaCappelletti94/postgis-diesel", "master")
+                        .build()
+                        .expect("Failed to build ExternalCrate for postgis_diesel"),
+                )
+            })
+            .clone()
     }
 }
 

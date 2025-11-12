@@ -9,6 +9,7 @@ synql-core.workspace = true
 synql-models.workspace = true
 synql-diesel-schema.workspace = true
 synql-insertable.workspace = true
+synql-builders-metadata.workspace = true
 sql_relations.workspace = true
 quote.workspace = true
 proc-macro2.workspace = true

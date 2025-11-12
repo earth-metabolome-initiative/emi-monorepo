@@ -42,20 +42,19 @@ where
     /// let left_table = db.table(None, "left").unwrap();
     /// let name_column = left_table.column("name", &db).expect("Column 'name' should exist");
     /// let age_column = left_table.column("age", &db).expect("Column 'age' should exist");
-    /// assert_eq!(name_column.horizontal_same_as_foreign_keys(&db, left_table).count(), 1);
-    /// assert_eq!(age_column.horizontal_same_as_foreign_keys(&db, left_table).count(), 1);
+    /// assert_eq!(name_column.horizontal_same_as_foreign_keys(&db).count(), 1);
+    /// assert_eq!(age_column.horizontal_same_as_foreign_keys(&db).count(), 1);
     /// # Ok(())
     /// # }
     /// ```
     fn horizontal_same_as_foreign_keys<'db>(
         &'db self,
         database: &'db Self::DB,
-        host_table: &'db <Self::DB as DatabaseLike>::Table,
     ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey> {
         use crate::traits::same_as::HorizontalSameAsTableLike;
-        HorizontalSameAsTableLike::horizontal_same_as_foreign_keys(host_table, database).filter(
-            move |fk| fk.host_columns(database).map(Borrow::borrow).any(|col: &Self| col == self),
-        )
+        self.table(database).horizontal_same_as_foreign_keys(database).filter(move |fk| {
+            fk.host_columns(database).map(Borrow::borrow).any(|col: &Self| col == self)
+        })
     }
 }
 
