@@ -73,6 +73,7 @@ members = [
   "web/web_common/synql-insertable",
   "web/web_common/synql-checks",
   "web/web_common/synql-insertable-key-settable",
+  "web/web_common/synql-buildable-key-settable",
 ]
 
 [workspace.dependencies]
@@ -229,6 +230,7 @@ synql-value-settable = { path = "web/web_common/synql-value-settable" }
 synql-insertable = { path = "web/web_common/synql-insertable" }
 synql-checks = { path = "web/web_common/synql-checks" }
 synql-insertable-key-settable = { path = "web/web_common/synql-insertable-key-settable" }
+synql-buildable-key-settable = { path = "web/web_common/synql-buildable-key-settable" }
 snake_case_sanitizer = { path = "utils/snake_case_sanitizer" }
 rmcp = { version = "0.8.1", features = ["server", "transport-io"] }
 tempfile = "3.6.0"
@@ -260,9 +262,9 @@ debug = false # Include debug info.
 debug = true
 
 [profile.release]
-opt-level = 3           # Highest LLVM optimization level
-lto = "fat"             # Full Link Time Optimization across all crates
-codegen-units = 1       # Forces single codegen unit (enables deeper cross-function inlining)
+opt-level = 3     # Highest LLVM optimization level
+lto = "fat"       # Full Link Time Optimization across all crates
+codegen-units = 1 # Forces single codegen unit (enables deeper cross-function inlining)
 debug = true
 
 [profile.ultra]
