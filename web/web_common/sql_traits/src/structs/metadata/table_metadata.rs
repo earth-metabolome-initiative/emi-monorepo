@@ -33,11 +33,13 @@ impl<T: TableLike> Default for TableMetadata<T> {
 
 impl<T: TableLike> TableMetadata<T> {
     /// Returns an iterator over the references of columns of the table.
+    #[inline]
     pub fn columns(&self) -> impl Iterator<Item = &<T::DB as DatabaseLike>::Column> {
         self.columns.iter().map(std::convert::AsRef::as_ref)
     }
 
     /// Returns an iterator over the Rc of columns of the table.
+    #[inline]
     pub fn column_rcs(&self) -> impl Iterator<Item = &Rc<<T::DB as DatabaseLike>::Column>> {
         self.columns.iter()
     }
@@ -49,6 +51,7 @@ impl<T: TableLike> TableMetadata<T> {
     }
 
     /// Returns an iterator over the check constraints of the table.
+    #[inline]
     pub fn check_constraints(
         &self,
     ) -> impl Iterator<Item = &<T::DB as DatabaseLike>::CheckConstraint> {
@@ -56,6 +59,7 @@ impl<T: TableLike> TableMetadata<T> {
     }
 
     /// Returns an iterator over the Rc of check constraints of the table.
+    #[inline]
     pub fn check_constraint_rcs(
         &self,
     ) -> impl Iterator<Item = &Rc<<T::DB as DatabaseLike>::CheckConstraint>> {
@@ -63,11 +67,13 @@ impl<T: TableLike> TableMetadata<T> {
     }
 
     /// Returns an iterator over the unique indices of the table.
+    #[inline]
     pub fn unique_indices(&self) -> impl Iterator<Item = &<T::DB as DatabaseLike>::UniqueIndex> {
         self.unique_indices.iter().map(std::convert::AsRef::as_ref)
     }
 
     /// Returns an iterator over the Rc of unique indices of the table.
+    #[inline]
     pub fn unique_index_rcs(
         &self,
     ) -> impl Iterator<Item = &Rc<<T::DB as DatabaseLike>::UniqueIndex>> {
@@ -75,11 +81,13 @@ impl<T: TableLike> TableMetadata<T> {
     }
 
     /// Returns an iterator over the foreign keys of the table.
+    #[inline]
     pub fn foreign_keys(&self) -> impl Iterator<Item = &<T::DB as DatabaseLike>::ForeignKey> {
         self.foreign_keys.iter().map(std::convert::AsRef::as_ref)
     }
 
     /// Returns an iterator over the Rc of foreign keys of the table.
+    #[inline]
     pub fn foreign_key_rcs(
         &self,
     ) -> impl Iterator<Item = &Rc<<T::DB as DatabaseLike>::ForeignKey>> {
@@ -88,6 +96,7 @@ impl<T: TableLike> TableMetadata<T> {
 
     /// Returns an iterator over the columns composing the primary key of the
     /// table.
+    #[inline]
     pub fn primary_key_columns(&self) -> impl Iterator<Item = &<T::DB as DatabaseLike>::Column> {
         self.primary_key.iter().map(std::convert::AsRef::as_ref)
     }
@@ -97,6 +106,7 @@ impl<T: TableLike> TableMetadata<T> {
     /// # Arguments
     ///
     /// * `column` - The column to add.
+    #[inline]
     pub fn add_column(&mut self, column: Rc<<T::DB as DatabaseLike>::Column>) {
         self.columns.push(column);
     }
@@ -106,6 +116,7 @@ impl<T: TableLike> TableMetadata<T> {
     /// # Arguments
     ///
     /// * `constraint` - The check constraint to add.
+    #[inline]
     pub fn add_check_constraint(
         &mut self,
         constraint: Rc<<T::DB as DatabaseLike>::CheckConstraint>,
@@ -118,6 +129,7 @@ impl<T: TableLike> TableMetadata<T> {
     /// # Arguments
     ///
     /// * `index` - The unique index to add.
+    #[inline]
     pub fn add_unique_index(&mut self, index: Rc<<T::DB as DatabaseLike>::UniqueIndex>) {
         self.unique_indices.push(index);
     }
@@ -127,6 +139,7 @@ impl<T: TableLike> TableMetadata<T> {
     /// # Arguments
     ///
     /// * `fk` - The foreign key to add.
+    #[inline]
     pub fn add_foreign_key(&mut self, fk: Rc<<T::DB as DatabaseLike>::ForeignKey>) {
         self.foreign_keys.push(fk);
     }

@@ -15,6 +15,7 @@ impl Metadata for CreateTable {
 impl TableLike for CreateTable {
     type DB = ParserDB;
 
+    #[inline]
     fn table_name(&self) -> &str {
         let object_name_parts = &self.name.0;
         let last_object_name_parts = &object_name_parts[object_name_parts.len() - 1];
@@ -26,6 +27,7 @@ impl TableLike for CreateTable {
         }
     }
 
+    #[inline]
     fn table_doc<'db>(&'db self, _database: &'db Self::DB) -> Option<&'db str>
     where
         Self: 'db,

@@ -16,16 +16,19 @@ pub const ATTRIBUTES_MODULE_NAME: &str = "attributes";
 pub trait TableAttributesLike: TableSchema {
     /// Returns the name of the crate which will contain the attributes enum
     /// for the table.
+    #[inline]
     fn table_attributes_crate_name(&self) -> String {
         format!("{}_attributes", self.table_singular_snake_name())
     }
 
     /// Returns the name of the attributes enum for the table.
+    #[inline]
     fn table_attributes_name(&self) -> String {
         format!("{}Attribute", self.table_singular_camel_name())
     }
 
     /// Returns the ident of the attributes enum for the table.
+    #[inline]
     fn table_attributes_ident(&self) -> Ident {
         Ident::new(&self.table_attributes_name(), proc_macro2::Span::call_site())
     }
@@ -40,6 +43,7 @@ pub trait TableAttributesLike: TableSchema {
     /// * `workspace` - The workspace where the table is defined.
     /// * `database` - The database connection to use to query the table
     ///   attributes.
+    #[inline]
     fn attributes<'table>(
         &'table self,
         workspace: &'table Workspace,

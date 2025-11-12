@@ -42,6 +42,8 @@ pub struct SynQL<'a, DB: SynQLDatabaseLike> {
 
 impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
     /// Create a new `SynQL` instance from a given database.
+    #[must_use]
+    #[inline]
     pub fn new() -> SynQLBuilder<'a, DB> {
         SynQLBuilder::default()
     }

@@ -24,14 +24,17 @@ where
     type UniqueIndex = U;
     type CheckConstraint = Ch;
 
+    #[inline]
     fn catalog_name(&self) -> &str {
         &self.catalog_name
     }
 
+    #[inline]
     fn number_of_tables(&self) -> usize {
         self.tables.len()
     }
 
+    #[inline]
     fn timezone(&self) -> Option<&str> {
         self.timezone.as_deref()
     }
@@ -45,10 +48,12 @@ where
             .map(|index| self.tables[index].0.as_ref())
     }
 
+    #[inline]
     fn tables(&self) -> impl Iterator<Item = &Self::Table> {
         self.tables.iter().map(|(table, _)| table.as_ref())
     }
 
+    #[inline]
     fn functions(&self) -> impl Iterator<Item = &Self::Function> {
         self.functions.iter().map(|(func, _)| func.as_ref())
     }

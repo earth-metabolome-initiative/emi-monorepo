@@ -190,6 +190,7 @@ pub fn to_diesel_macro(&self) -> TokenStream {
 }
 
 #[must_use]
+#[inline]
 /// Returns the `CamelCased` name of the `PgType`.
 pub fn camelcased_name(&self) -> String {
     self.typname
@@ -205,6 +206,7 @@ pub fn camelcased_name(&self) -> String {
 }
 
 #[must_use]
+#[inline]
 /// Returns the `CamelCased` name of the [`PgType`] for the Postgres
 /// binding.
 pub fn pg_binding_name(&self) -> String {
@@ -212,6 +214,7 @@ pub fn pg_binding_name(&self) -> String {
 }
 
 #[must_use]
+#[inline]
 /// Returns the `CamelCased` Ident of the [`PgType`] for the Diesel binding.
 pub fn pg_binding_ident(&self) -> Ident {
     Ident::new(&self.pg_binding_name(), proc_macro2::Span::call_site())

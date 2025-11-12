@@ -17,6 +17,7 @@ pub struct UniqueIndexMetadata<U: UniqueIndexLike> {
 
 impl<U: UniqueIndexLike> UniqueIndexMetadata<U> {
     /// Creates a new `UniqueIndexMetadata` instance.
+    #[inline]
     pub fn new(expression: Expr, table: Rc<<U::DB as DatabaseLike>::Table>) -> Self {
         Self { expression, table }
     }

@@ -19,6 +19,7 @@ where
 {
     /// Returns the name of the crate which will contain the diesel model for
     /// the table.
+    #[inline]
     fn table_model_crate_name(&self) -> String {
         format!("{}_model", self.table_singular_snake_name())
     }

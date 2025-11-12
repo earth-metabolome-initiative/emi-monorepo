@@ -84,6 +84,7 @@ pub trait UniqueIndexLike: Metadata + Ord + Eq + Debug + Clone {
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn is_simple(&self, database: &Self::DB) -> bool {
         let expr = self.expression(database);
         let inner_expr = match expr {

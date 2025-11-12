@@ -111,6 +111,7 @@ pub trait TableLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn has_generated_columns(&self, database: &Self::DB) -> bool {
         self.columns(database).any(ColumnLike::is_generated)
     }
@@ -134,6 +135,7 @@ pub trait TableLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn number_of_columns(&self, database: &Self::DB) -> usize {
         self.columns(database).count()
     }
@@ -159,6 +161,7 @@ pub trait TableLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn column<'db>(
         &'db self,
         name: &str,
@@ -201,6 +204,7 @@ pub trait TableLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn has_column(&self, column: &<Self::DB as DatabaseLike>::Column, database: &Self::DB) -> bool {
         TableLike::columns(self, database).any(|col| col == column)
     }
@@ -408,6 +412,7 @@ pub trait TableLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn has_primary_key(&self, database: &Self::DB) -> bool {
         self.primary_key_columns(database).next().is_some()
     }
@@ -474,6 +479,7 @@ pub trait TableLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn has_non_primary_key_columns(&self, database: &Self::DB) -> bool {
         self.non_primary_key_columns(database).next().is_some()
     }
@@ -628,6 +634,7 @@ pub trait TableLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn has_foreign_keys(&self, database: &Self::DB) -> bool {
         self.foreign_keys(database).next().is_some()
     }
@@ -658,6 +665,7 @@ pub trait TableLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn has_non_self_referential_foreign_keys(&self, database: &Self::DB) -> bool {
         self.foreign_keys(database)
             .filter(move |fk| !fk.is_self_referential(database))

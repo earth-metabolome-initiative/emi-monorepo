@@ -14,14 +14,17 @@ impl Metadata for TableAttribute<CreateTable, CheckConstraint> {
 impl CheckConstraintLike for TableAttribute<CreateTable, CheckConstraint> {
     type DB = ParserDB;
 
+    #[inline]
     fn expression<'db>(&'db self, _database: &'db Self::DB) -> &'db Expr {
         self.attribute().expr.as_ref()
     }
 
+    #[inline]
     fn table<'db>(&'db self, database: &'db Self::DB) -> &'db <Self::DB as DatabaseLike>::Table {
         database.check_constraint_metadata(self).table()
     }
 
+    #[inline]
     fn columns<'db>(
         &'db self,
         database: &'db Self::DB,
@@ -29,6 +32,7 @@ impl CheckConstraintLike for TableAttribute<CreateTable, CheckConstraint> {
         database.check_constraint_metadata(self).columns()
     }
 
+    #[inline]
     fn functions<'db>(
         &'db self,
         database: &'db Self::DB,

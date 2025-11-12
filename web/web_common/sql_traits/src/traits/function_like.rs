@@ -134,6 +134,7 @@ pub trait FunctionLike: Metadata + Debug + Clone + Hash + Ord + Eq {
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn normalized_return_type_name<'db>(&'db self, database: &'db Self::DB) -> Option<&'db str> {
         self.return_type_name(database).map(normalize_postgres_type)
     }

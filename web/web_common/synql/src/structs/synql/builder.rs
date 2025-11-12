@@ -73,59 +73,78 @@ impl Display for SynQLAttribute {
 
 impl<'a, DB: SynQLDatabaseLike> SynQLBuilder<'a, DB> {
     /// Creates a new `SynQLBuilder` instance.
+    #[must_use]
+    #[inline]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Sets the database for the `SynQL` instance.
+    #[must_use]
+    #[inline]
     pub fn database(mut self, database: &'a DB) -> Self {
         self.database = Some(database);
         self
     }
 
     /// Sets the path for the `SynQL` instance.
+    #[must_use]
+    #[inline]
     pub fn path(mut self, path: PathBuf) -> Self {
         self.path = Some(path);
         self
     }
 
     /// Sets the deny list for the `SynQL` instance.
+    #[must_use]
+    #[inline]
     pub fn deny_list(mut self, deny_list: Vec<&'a DB::Table>) -> Self {
         self.deny_list = deny_list;
         self
     }
 
     /// Adds a table to the deny list.
+    #[must_use]
+    #[inline]
     pub fn deny(mut self, table: &'a DB::Table) -> Self {
         self.deny_list.push(table);
         self
     }
 
     /// Sets the version for the `SynQL` instance.
+    #[must_use]
+    #[inline]
     pub fn version(mut self, major: u8, minor: u8, patch: u8) -> Self {
         self.version = (major, minor, patch);
         self
     }
 
     /// Sets the edition for the `SynQL` instance.
+    #[must_use]
+    #[inline]
     pub fn edition(mut self, edition: u16) -> Self {
         self.edition = edition;
         self
     }
 
     /// Sets to generate the workspace TOML.
+    #[must_use]
+    #[inline]
     pub fn generate_workspace_toml(mut self) -> Self {
         self.generate_workspace_toml = true;
         self
     }
 
     /// Adds an external crate to the workspace.
+    #[must_use]
+    #[inline]
     pub fn external_crate(mut self, external_crate: Arc<ExternalCrate>) -> Self {
         self.external_crates.push(external_crate);
         self
     }
 
     /// Adds several external crates to the workspace.
+    #[must_use]
     pub fn external_crates<I>(mut self, external_crates: I) -> Self
     where
         I: IntoIterator<Item = Arc<ExternalCrate>>,
@@ -137,6 +156,8 @@ impl<'a, DB: SynQLDatabaseLike> SynQLBuilder<'a, DB> {
     }
 
     /// Sets to generate the rustfmt configuration file.
+    #[must_use]
+    #[inline]
     pub fn generate_rustfmt(mut self) -> Self {
         self.generate_rustfmt = true;
         self

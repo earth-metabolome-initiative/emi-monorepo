@@ -27,6 +27,7 @@ pub trait TableBuildableLike: TableInsertableLike {
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn table_buildable_crate_name(&self) -> String {
         format!("{}_builders", self.table_singular_snake_name())
     }
@@ -44,6 +45,7 @@ pub trait TableBuildableLike: TableInsertableLike {
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn table_buildable_name(&self) -> String {
         format!("{}Builder", self.table_singular_camel_name())
     }
@@ -106,6 +108,7 @@ pub trait TableBuildableLike: TableInsertableLike {
     /// * `workspace` - The workspace where the table is defined.
     /// * `database` - The database connection to use to query the table
     ///   buildable.
+    #[inline]
     fn buildable<'table>(
         &'table self,
         workspace: &'table Workspace,

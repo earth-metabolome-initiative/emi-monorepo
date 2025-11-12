@@ -14,10 +14,12 @@ impl Metadata for TableAttribute<CreateTable, ForeignKeyConstraint> {
 impl ForeignKeyLike for TableAttribute<CreateTable, ForeignKeyConstraint> {
     type DB = ParserDB;
 
+    #[inline]
     fn foreign_key_name(&self) -> Option<&str> {
         self.attribute().name.as_ref().map(|s| s.value.as_str())
     }
 
+    #[inline]
     fn host_table<'db>(
         &'db self,
         _database: &'db Self::DB,
@@ -49,10 +51,12 @@ impl ForeignKeyLike for TableAttribute<CreateTable, ForeignKeyConstraint> {
             })
     }
 
+    #[inline]
     fn on_delete_cascade(&self, _database: &Self::DB) -> bool {
         matches!(self.attribute().on_delete, Some(sqlparser::ast::ReferentialAction::Cascade))
     }
 
+    #[inline]
     fn match_kind(&self, _database: &Self::DB) -> ConstraintReferenceMatchKind {
         self.attribute().match_kind.unwrap_or(ConstraintReferenceMatchKind::Simple)
     }

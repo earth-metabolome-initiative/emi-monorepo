@@ -94,12 +94,14 @@ where
 {
     /// Creates a new `GenericDBBuilder` instance.
     #[must_use]
+    #[inline]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Sets the timezone for the database.
     #[must_use]
+    #[inline]
     pub fn timezone(mut self, timezone: String) -> Self {
         self.timezone = Some(timezone);
         self
@@ -107,6 +109,7 @@ where
 
     /// Sets the catalog name for the database.
     #[must_use]
+    #[inline]
     pub fn catalog_name(mut self, catalog_name: String) -> Self {
         self.catalog_name = Some(catalog_name);
         self
@@ -135,6 +138,7 @@ where
 
     /// Adds a column with its metadata to the builder.
     #[must_use]
+    #[inline]
     pub fn add_column(mut self, column: Rc<C>, metadata: C::Meta) -> Self {
         self.columns.push((column, metadata));
         self
@@ -142,6 +146,7 @@ where
 
     /// Adds multiple columns with their metadata to the builder.
     #[must_use]
+    #[inline]
     pub fn add_columns(mut self, columns: impl IntoIterator<Item = (Rc<C>, C::Meta)>) -> Self {
         self.columns.extend(columns);
         self
@@ -149,6 +154,7 @@ where
 
     /// Adds a unique index with its metadata to the builder.
     #[must_use]
+    #[inline]
     pub fn add_unique_index(mut self, index: Rc<U>, metadata: U::Meta) -> Self {
         self.unique_indices.push((index, metadata));
         self
@@ -156,6 +162,7 @@ where
 
     /// Adds multiple unique indices with their metadata to the builder.
     #[must_use]
+    #[inline]
     pub fn add_unique_indices(
         mut self,
         indices: impl IntoIterator<Item = (Rc<U>, U::Meta)>,
@@ -166,6 +173,7 @@ where
 
     /// Adds a foreign key with its metadata to the builder.
     #[must_use]
+    #[inline]
     pub fn add_foreign_key(mut self, key: Rc<F>, metadata: F::Meta) -> Self {
         self.foreign_keys.push((key, metadata));
         self
@@ -173,6 +181,7 @@ where
 
     /// Adds multiple foreign keys with their metadata to the builder.
     #[must_use]
+    #[inline]
     pub fn add_foreign_keys(mut self, keys: impl IntoIterator<Item = (Rc<F>, F::Meta)>) -> Self {
         self.foreign_keys.extend(keys);
         self
@@ -180,6 +189,7 @@ where
 
     /// Adds a function with its metadata to the builder.
     #[must_use]
+    #[inline]
     pub fn add_function(mut self, function: Rc<Func>, metadata: Func::Meta) -> Self {
         self.functions.push((function, metadata));
         self
@@ -187,6 +197,7 @@ where
 
     /// Adds multiple functions with their metadata to the builder.
     #[must_use]
+    #[inline]
     pub fn add_functions(
         mut self,
         functions: impl IntoIterator<Item = (Rc<Func>, Func::Meta)>,

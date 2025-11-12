@@ -119,6 +119,7 @@ pub trait ColumnLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn is_primary_key(&self, database: &Self::DB) -> bool {
         let table: &<Self::DB as DatabaseLike>::Table = ColumnLike::table(self, database);
         table.is_primary_key_column(database, self.borrow())
@@ -149,6 +150,7 @@ pub trait ColumnLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn normalized_data_type<'db>(&'db self, database: &'db Self::DB) -> &'db str {
         normalize_postgres_type(self.data_type(database))
     }
@@ -178,6 +180,7 @@ pub trait ColumnLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn is_textual(&self, database: &Self::DB) -> bool {
         matches!(self.normalized_data_type(database), "TEXT" | "VARCHAR" | "CHAR")
     }
@@ -334,6 +337,7 @@ pub trait ColumnLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn is_part_of_foreign_key(&self, database: &Self::DB) -> bool {
         self.foreign_keys(database).next().is_some()
     }
@@ -585,6 +589,7 @@ pub trait ColumnLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn has_check_constraints(&self, database: &Self::DB) -> bool {
         self.check_constraints(database).next().is_some()
     }

@@ -260,4 +260,16 @@ debug = false # Include debug info.
 debug = true
 
 [profile.release]
+opt-level = 3           # Highest LLVM optimization level
+lto = "fat"             # Full Link Time Optimization across all crates
+codegen-units = 1       # Forces single codegen unit (enables deeper cross-function inlining)
 debug = true
+
+[profile.ultra]
+inherits = "release"
+panic = "abort"         # Removes unwinding code paths for smaller & faster binaries
+strip = "symbols"       # Remove all debug symbols (since 1.69+)
+incremental = false     # Disable incremental compilation (forces full optimization)
+debug = false           # Don’t generate debug info
+overflow-checks = false # Skip integer overflow checks (unsafe but faster)
+rpath = false           # Disable runtime search paths for dynamic libs

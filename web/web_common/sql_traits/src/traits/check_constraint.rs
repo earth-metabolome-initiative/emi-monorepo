@@ -123,6 +123,7 @@ pub trait CheckConstraintLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn column<'db>(
         &'db self,
         database: &'db Self::DB,
@@ -230,6 +231,7 @@ pub trait CheckConstraintLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn has_functions(&self, database: &Self::DB) -> bool {
         self.functions(database).next().is_some()
     }

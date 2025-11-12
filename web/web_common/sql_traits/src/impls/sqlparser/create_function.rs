@@ -16,6 +16,7 @@ impl Metadata for CreateFunction {
 impl FunctionLike for CreateFunction {
     type DB = ParserDB;
 
+    #[inline]
     fn name(&self) -> &str {
         match self.name.0.last() {
             Some(ObjectNamePart::Identifier(ident)) => &ident.value,
@@ -24,6 +25,7 @@ impl FunctionLike for CreateFunction {
         }
     }
 
+    #[inline]
     fn argument_type_names<'db>(
         &'db self,
         _database: &'db Self::DB,
@@ -33,6 +35,7 @@ impl FunctionLike for CreateFunction {
             .flat_map(|args| args.iter().map(|arg| normalize_sqlparser_type(&arg.data_type)))
     }
 
+    #[inline]
     fn return_type_name<'db>(&'db self, _database: &'db Self::DB) -> Option<&'db str> {
         self.return_type.as_ref().map(normalize_sqlparser_type)
     }

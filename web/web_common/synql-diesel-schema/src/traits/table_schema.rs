@@ -17,6 +17,7 @@ pub const TABLE_SCHEMA_MODULE_NAME: &str = "schema";
 pub trait TableSchema: TableSynLike + Sized {
     /// Returns the name of the crate which will contain the diesel schema for
     /// the table.
+    #[inline]
     fn table_schema_crate_name(&self) -> String {
         format!("{}_schema", self.table_snake_name())
     }
@@ -62,6 +63,7 @@ pub trait TableSchema: TableSynLike + Sized {
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn schema_macro<'table>(
         &'table self,
         workspace: &'table Workspace,
@@ -98,6 +100,7 @@ pub trait TableSchema: TableSynLike + Sized {
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn table_schema_doc_path(&self) -> String {
         format!(
             "[`{}`]({}::{TABLE_SCHEMA_MODULE_NAME}::{})",

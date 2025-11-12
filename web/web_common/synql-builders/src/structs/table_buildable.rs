@@ -38,6 +38,7 @@ impl<'table, T: TableBuildableLike + ?Sized> TableBuildable<'table, T> {
     /// * `workspace` - The workspace where the table is defined.
     /// * `database` - The database connection to use to query the table
     ///   buildable.
+    #[inline]
     pub fn new(table: &'table T, workspace: &'table Workspace, database: &'table T::DB) -> Self {
         Self { table, workspace, database }
     }

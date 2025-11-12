@@ -83,6 +83,7 @@ pub trait DatabaseLike: Clone + Debug {
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn has_tables(&self) -> bool {
         self.tables().next().is_some()
     }

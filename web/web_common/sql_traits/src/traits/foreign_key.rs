@@ -231,6 +231,7 @@ pub trait ForeignKeyLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn host_column<'db>(
         &'db self,
         database: &'db Self::DB,
@@ -365,6 +366,7 @@ pub trait ForeignKeyLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn is_composite(&self, database: &Self::DB) -> bool {
         self.host_columns(database).nth(1).is_some()
     }
@@ -426,6 +428,7 @@ pub trait ForeignKeyLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn match_full(&self, database: &Self::DB) -> bool {
         matches!(self.match_kind(database), ConstraintReferenceMatchKind::Full)
     }

@@ -21,6 +21,7 @@ pub struct CheckMetadata<U: CheckConstraintLike> {
 
 impl<U: CheckConstraintLike> CheckMetadata<U> {
     /// Creates a new `CheckMetadata` instance.
+    #[inline]
     pub fn new(
         expression: Expr,
         table: Rc<<U::DB as DatabaseLike>::Table>,
@@ -43,11 +44,13 @@ impl<U: CheckConstraintLike> CheckMetadata<U> {
     }
 
     /// Returns an iterator over the columns involved in the constraint.
+    #[inline]
     pub fn columns(&self) -> impl Iterator<Item = &<U::DB as DatabaseLike>::Column> {
         self.columns.iter().map(std::convert::AsRef::as_ref)
     }
 
     /// Returns an iterator over the functions involved in the constraint.
+    #[inline]
     pub fn functions(&self) -> impl Iterator<Item = &<U::DB as DatabaseLike>::Function> {
         self.functions.iter().map(std::convert::AsRef::as_ref)
     }

@@ -25,6 +25,7 @@ where
 impl<T, A> TableAttribute<T, A> {
     /// Creates a new `TableAttribute` associating the given table with the
     /// given attribute.
+    #[inline]
     pub fn new(table: Rc<T>, attribute: A) -> Self {
         Self { table, attribute }
     }
