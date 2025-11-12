@@ -82,7 +82,7 @@ impl Report {
                 "The slowest task was `{}` which took {} ({:.2}% of all time).",
                 task.name(),
                 HumanTime::from(task.time()).to_text_en(Accuracy::Precise, Tense::Present),
-                task.time().num_seconds() as f64 / total_time.num_seconds() as f64 * 100.0,
+                task.precise_percentage_over(total_time),
             )
         })
     }
@@ -229,15 +229,12 @@ impl Report {
     #[allow(clippy::cast_precision_loss)]
     /// Returns the text of the report.
     fn text(&self, depth: usize) -> String {
-        let total_time = self.time_tracker.total_time().num_seconds() as f64;
+        let total_time = self.time_tracker.total_time();
         let rows = self.time_tracker.tasks().map(|task| {
             TableRow {
                 name: task.name(),
                 time: HumanTime::from(task.time()).to_text_en(Accuracy::Precise, Tense::Present),
-                percentage: format!(
-                    "{:.2}%",
-                    task.time().num_seconds() as f64 / total_time * 100.0
-                ),
+                percentage: format!("{:.2}%", task.precise_percentage_over(total_time)),
                 comment: self.task_comment(task).unwrap_or_default(),
             }
         });

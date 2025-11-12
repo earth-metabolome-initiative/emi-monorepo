@@ -60,6 +60,33 @@ impl CompletedTask {
     pub fn extend(&mut self, other: &CompletedTask) {
         self.end += other.time();
     }
+
+    /// Returns the most precise percentage over the provided `TimeDelta`.
+    ///
+    /// # Arguments
+    ///
+    /// * `total_time` - The total time to calculate the percentage over.
+    ///
+    /// # Implementation Note
+    ///
+    /// This methods attempts to use the most precise method available to
+    /// calculate the percentage. It first tries to use nanoseconds, then
+    /// microseconds, then milliseconds, and finally seconds, depending on
+    /// whether the conversion is lossless.
+    #[must_use]
+    pub fn precise_percentage_over(&self, total_time: chrono::TimeDelta) -> f64 {
+        if let Some(nanos) = self.time().num_nanoseconds() {
+            if let Some(total_nanos) = total_time.num_nanoseconds() {
+                return nanos as f64 / total_nanos as f64 * 100.0;
+            }
+        }
+        if let Some(micros) = self.time().num_microseconds() {
+            if let Some(total_micros) = total_time.num_microseconds() {
+                return micros as f64 / total_micros as f64 * 100.0;
+            }
+        }
+        self.time().num_milliseconds() as f64 / total_time.num_milliseconds() as f64 * 100.0
+    }
 }
 
 impl Ord for CompletedTask {

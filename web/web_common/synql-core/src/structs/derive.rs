@@ -3,8 +3,6 @@
 
 mod builder;
 
-use std::sync::Arc;
-
 pub use builder::DeriveBuilder;
 use quote::{ToTokens, quote};
 
@@ -30,36 +28,18 @@ impl Derive {
 }
 
 impl ExternalDependencies for Derive {
-    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
-        let mut crates = self
-            .traits
-            .iter()
-            .filter_map(|t| {
-                if let TraitVariantRef::External(ext_trait_ref) = t {
-                    Some(Arc::new(ext_trait_ref.external_crate().clone()))
-                } else {
-                    None
-                }
-            })
-            .collect::<Vec<_>>();
-        crates.sort_unstable();
-        crates.dedup();
-        crates
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        self.traits.iter().flat_map(|t| t.external_dependencies())
     }
 }
 
 impl InternalDependencies for Derive {
-    fn internal_dependencies(&self) -> Vec<&super::InternalCrate> {
-        let mut crates = self
-            .traits
-            .iter()
-            .filter_map(|t| {
-                if let TraitVariantRef::Internal(_, krate) = t { krate.as_deref() } else { None }
-            })
-            .collect::<Vec<_>>();
-        crates.sort_unstable();
-        crates.dedup();
-        crates
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &super::InternalCrate> {
+        self.traits.iter().filter_map(|t| {
+            if let TraitVariantRef::Internal(_, krate) = t { krate.as_deref() } else { None }
+        })
     }
 }
 

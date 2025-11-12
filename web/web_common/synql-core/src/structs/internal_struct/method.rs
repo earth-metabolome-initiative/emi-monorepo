@@ -3,7 +3,6 @@
 mod argument;
 mod builder;
 mod where_clause;
-use std::sync::Arc;
 
 pub use argument::Argument;
 pub use builder::MethodBuilder;
@@ -205,45 +204,43 @@ impl ToTokens for Method {
 }
 
 impl InternalDependencies for Method {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
-        let mut dependencies = Vec::new();
-        if let Some(return_type) = &self.return_type {
-            dependencies.extend(return_type.internal_dependencies());
-        }
-        for arg in &self.arguments {
-            dependencies.extend(arg.internal_dependencies());
-        }
-        for where_clause in &self.where_clauses {
-            dependencies.extend(where_clause.internal_dependencies());
-        }
-        dependencies.extend(self.documentation.internal_dependencies());
-        for error_doc in &self.error_documentations {
-            dependencies.extend(error_doc.internal_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
+        self.return_type
+            .iter()
+            .flat_map(|return_type| return_type.internal_dependencies())
+            .chain(self.arguments.iter().flat_map(|arg| arg.internal_dependencies()))
+            .chain(
+                self.where_clauses
+                    .iter()
+                    .flat_map(|where_clause| where_clause.internal_dependencies()),
+            )
+            .chain(self.documentation.internal_dependencies())
+            .chain(
+                self.error_documentations
+                    .iter()
+                    .flat_map(|error_doc| error_doc.internal_dependencies()),
+            )
     }
 }
 
 impl ExternalDependencies for Method {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        let mut dependencies = Vec::new();
-        if let Some(return_type) = &self.return_type {
-            dependencies.extend(return_type.external_dependencies());
-        }
-        for arg in &self.arguments {
-            dependencies.extend(arg.external_dependencies());
-        }
-        for where_clause in &self.where_clauses {
-            dependencies.extend(where_clause.external_dependencies());
-        }
-        dependencies.extend(self.documentation.external_dependencies());
-        for error_doc in &self.error_documentations {
-            dependencies.extend(error_doc.external_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
+        self.return_type
+            .iter()
+            .flat_map(|return_type| return_type.external_dependencies())
+            .chain(self.arguments.iter().flat_map(|arg| arg.external_dependencies()))
+            .chain(
+                self.where_clauses
+                    .iter()
+                    .flat_map(|where_clause| where_clause.external_dependencies()),
+            )
+            .chain(self.documentation.external_dependencies())
+            .chain(
+                self.error_documentations
+                    .iter()
+                    .flat_map(|error_doc| error_doc.external_dependencies()),
+            )
     }
 }

@@ -3,8 +3,6 @@
 
 mod builder;
 
-use std::sync::Arc;
-
 pub use builder::DecoratorBuilder;
 use quote::{ToTokens, quote};
 
@@ -30,13 +28,15 @@ impl Decorator {
 }
 
 impl ExternalDependencies for Decorator {
-    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
         self.token.external_dependencies()
     }
 }
 
 impl InternalDependencies for Decorator {
-    fn internal_dependencies(&self) -> Vec<&super::InternalCrate> {
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &super::InternalCrate> {
         self.token.internal_dependencies()
     }
 }

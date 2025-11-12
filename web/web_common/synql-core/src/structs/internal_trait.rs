@@ -2,8 +2,6 @@
 
 mod builder;
 
-use std::sync::Arc;
-
 pub use builder::InternalTraitBuilder;
 use common_traits::prelude::Builder;
 use proc_macro2::TokenStream;
@@ -168,46 +166,42 @@ impl InternalTrait {
 }
 
 impl InternalDependencies for InternalTrait {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        let mut dependencies = Vec::new();
-        for method in &self.methods {
-            dependencies.extend(method.internal_dependencies());
-        }
-        for super_trait in &self.super_traits {
-            dependencies.extend(super_trait.internal_dependencies());
-        }
-        for where_clause in &self.where_statements {
-            dependencies.extend(where_clause.internal_dependencies());
-        }
-        for super_trait in &self.super_traits {
-            dependencies.extend(super_trait.internal_dependencies());
-        }
-        dependencies.extend(self.documentation.internal_dependencies());
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        self.methods
+            .iter()
+            .flat_map(|method| method.internal_dependencies())
+            .chain(
+                self.super_traits
+                    .iter()
+                    .flat_map(|super_trait| super_trait.internal_dependencies()),
+            )
+            .chain(
+                self.where_statements
+                    .iter()
+                    .flat_map(|where_clause| where_clause.internal_dependencies()),
+            )
+            .chain(self.documentation.internal_dependencies())
     }
 }
 
 impl ExternalDependencies for InternalTrait {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        let mut dependencies = Vec::new();
-        for method in &self.methods {
-            dependencies.extend(method.external_dependencies());
-        }
-        for super_trait in &self.super_traits {
-            dependencies.extend(super_trait.external_dependencies());
-        }
-        for where_clause in &self.where_statements {
-            dependencies.extend(where_clause.external_dependencies());
-        }
-        for super_trait in &self.super_traits {
-            dependencies.extend(super_trait.external_dependencies());
-        }
-        dependencies.extend(self.documentation.external_dependencies());
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
+        self.methods
+            .iter()
+            .flat_map(|method| method.external_dependencies())
+            .chain(
+                self.super_traits
+                    .iter()
+                    .flat_map(|super_trait| super_trait.external_dependencies()),
+            )
+            .chain(
+                self.where_statements
+                    .iter()
+                    .flat_map(|where_clause| where_clause.external_dependencies()),
+            )
+            .chain(self.documentation.external_dependencies())
     }
 }
 

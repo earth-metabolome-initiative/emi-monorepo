@@ -3,7 +3,7 @@
 
 mod builder;
 
-use std::{hash::Hash, sync::Arc};
+use std::hash::Hash;
 
 pub use builder::InternalTokenBuilder;
 use common_traits::prelude::Builder;
@@ -143,50 +143,38 @@ impl ToTokens for InternalToken {
 }
 
 impl InternalDependencies for InternalToken {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        let mut dependencies = Vec::new();
-        for data in &self.data {
-            dependencies.extend(data.internal_dependencies());
-        }
-        for module in &self.internal_modules {
-            dependencies.extend(module.internal_dependencies());
-        }
-        for trait_ref in &self.employed_traits {
-            dependencies.extend(trait_ref.internal_dependencies());
-        }
-        for trait_ref in &self.implemented_traits {
-            dependencies.extend(trait_ref.internal_dependencies());
-        }
-        for data in &self.data {
-            dependencies.extend(data.internal_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        self.data
+            .iter()
+            .flat_map(|data| data.internal_dependencies())
+            .chain(self.internal_modules.iter().flat_map(|module| module.internal_dependencies()))
+            .chain(
+                self.employed_traits.iter().flat_map(|trait_ref| trait_ref.internal_dependencies()),
+            )
+            .chain(
+                self.implemented_traits
+                    .iter()
+                    .flat_map(|trait_ref| trait_ref.internal_dependencies()),
+            )
     }
 }
 
 impl ExternalDependencies for InternalToken {
-    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
-        let mut dependencies = Vec::new();
-        for ext_macro in &self.external_macros {
-            dependencies.extend(ext_macro.external_dependencies());
-        }
-        for trait_ref in &self.employed_traits {
-            dependencies.extend(trait_ref.external_dependencies());
-        }
-        for trait_ref in &self.implemented_traits {
-            dependencies.extend(trait_ref.external_dependencies());
-        }
-        for data in &self.data {
-            dependencies.extend(data.external_dependencies());
-        }
-        for func in &self.employed_functions {
-            dependencies.extend(func.external_dependencies());
-        }
-
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        self.external_macros
+            .iter()
+            .flat_map(|ext_macro| ext_macro.external_dependencies())
+            .chain(
+                self.employed_traits.iter().flat_map(|trait_ref| trait_ref.external_dependencies()),
+            )
+            .chain(
+                self.implemented_traits
+                    .iter()
+                    .flat_map(|trait_ref| trait_ref.external_dependencies()),
+            )
+            .chain(self.data.iter().flat_map(|data| data.external_dependencies()))
+            .chain(self.employed_functions.iter().flat_map(|func| func.external_dependencies()))
     }
 }

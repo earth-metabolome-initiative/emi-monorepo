@@ -5,7 +5,7 @@ use std::borrow::Borrow;
 
 use quote::quote;
 use sql_relations::traits::InheritableDatabaseLike;
-use sql_traits::traits::{CheckConstraintLike, ColumnLike, ForeignKeyLike};
+use sql_traits::traits::ForeignKeyLike;
 use synql_checks::prelude::CheckConstraintSynLike;
 use synql_core::{
     prelude::Builder,

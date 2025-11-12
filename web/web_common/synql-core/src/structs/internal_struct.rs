@@ -4,8 +4,6 @@ mod internal_attribute_builder;
 mod internal_struct_builder;
 mod method;
 
-use std::sync::Arc;
-
 pub use internal_attribute_builder::InternalAttributeBuilder;
 pub use internal_struct_builder::InternalStructBuilder;
 pub use method::{Argument, Method, MethodBuilder, WhereClause};
@@ -97,22 +95,16 @@ impl InternalAttribute {
 }
 
 impl InternalDependencies for InternalAttribute {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        let mut dependencies = self.ty.internal_dependencies();
-        dependencies.extend(self.documentation.internal_dependencies());
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        self.ty.internal_dependencies().chain(self.documentation.internal_dependencies())
     }
 }
 
 impl ExternalDependencies for InternalAttribute {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        let mut dependencies = self.ty.external_dependencies();
-        dependencies.extend(self.documentation.external_dependencies());
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
+        self.ty.external_dependencies().chain(self.documentation.external_dependencies())
     }
 }
 
@@ -172,21 +164,15 @@ impl ToTokens for InternalStruct {
 }
 
 impl InternalDependencies for InternalStruct {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        let mut deps: Vec<&InternalCrate> =
-            self.attributes.iter().flat_map(|attr| attr.internal_dependencies()).collect();
-        deps.sort_unstable();
-        deps.dedup();
-        deps
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        self.attributes.iter().flat_map(|attr| attr.internal_dependencies())
     }
 }
 
 impl ExternalDependencies for InternalStruct {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        let mut deps: Vec<Arc<crate::structs::ExternalCrate>> =
-            self.attributes.iter().flat_map(|attr| attr.external_dependencies()).collect();
-        deps.sort_unstable();
-        deps.dedup();
-        deps
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
+        self.attributes.iter().flat_map(|attr| attr.external_dependencies())
     }
 }

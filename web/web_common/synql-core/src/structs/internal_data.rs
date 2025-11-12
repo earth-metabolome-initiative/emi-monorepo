@@ -48,20 +48,24 @@ impl From<InternalEnum> for InternalDataVariant {
 }
 
 impl ExternalDependencies for InternalDataVariant {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        match self {
-            InternalDataVariant::StructVariant(s) => s.external_dependencies(),
-            InternalDataVariant::EnumVariant(e) => e.external_dependencies(),
-        }
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
+        let vec: Vec<&crate::structs::ExternalCrate> = match self {
+            InternalDataVariant::StructVariant(s) => s.external_dependencies().collect(),
+            InternalDataVariant::EnumVariant(e) => e.external_dependencies().collect(),
+        };
+        vec.into_iter()
     }
 }
 
 impl InternalDependencies for InternalDataVariant {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
-        match self {
-            InternalDataVariant::StructVariant(s) => s.internal_dependencies(),
-            InternalDataVariant::EnumVariant(e) => e.internal_dependencies(),
-        }
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
+        let vec: Vec<&crate::structs::InternalCrate> = match self {
+            InternalDataVariant::StructVariant(s) => s.internal_dependencies().collect(),
+            InternalDataVariant::EnumVariant(e) => e.internal_dependencies().collect(),
+        };
+        vec.into_iter()
     }
 }
 
@@ -120,40 +124,40 @@ impl From<ExternalTypeRef> for DataVariantRef {
 }
 
 impl InternalDependencies for DataVariantRef {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
-        match self {
-            DataVariantRef::Internal(internal) => internal.internal_dependencies(),
-            DataVariantRef::External(external) => external.internal_dependencies(),
-            DataVariantRef::Reference(_, inner) => inner.internal_dependencies(),
-            DataVariantRef::MutableReference(_, inner) => inner.internal_dependencies(),
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
+        let vec: Vec<&crate::structs::InternalCrate> = match self {
+            DataVariantRef::Internal(internal) => internal.internal_dependencies().collect(),
+            DataVariantRef::External(external) => external.internal_dependencies().collect(),
+            DataVariantRef::Reference(_, inner) => inner.internal_dependencies().collect(),
+            DataVariantRef::MutableReference(_, inner) => inner.internal_dependencies().collect(),
             DataVariantRef::Generic(_) => vec![],
             DataVariantRef::Result(left, right) => {
-                let mut crates = left.internal_dependencies();
-                crates.extend(right.internal_dependencies());
-                crates
+                left.internal_dependencies().chain(right.internal_dependencies()).collect()
             }
-            DataVariantRef::Option(inner) => inner.internal_dependencies(),
-            DataVariantRef::SelfType(inner) => inner.internal_dependencies(),
-        }
+            DataVariantRef::Option(inner) => inner.internal_dependencies().collect(),
+            DataVariantRef::SelfType(inner) => inner.internal_dependencies().collect(),
+        };
+        vec.into_iter()
     }
 }
 
 impl crate::traits::ExternalDependencies for DataVariantRef {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        match self {
-            DataVariantRef::Internal(internal) => internal.external_dependencies(),
-            DataVariantRef::External(external) => external.external_dependencies(),
-            DataVariantRef::Reference(_, inner) => inner.external_dependencies(),
-            DataVariantRef::MutableReference(_, inner) => inner.external_dependencies(),
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
+        let vec: Vec<&crate::structs::ExternalCrate> = match self {
+            DataVariantRef::Internal(internal) => internal.external_dependencies().collect(),
+            DataVariantRef::External(external) => external.external_dependencies().collect(),
+            DataVariantRef::Reference(_, inner) => inner.external_dependencies().collect(),
+            DataVariantRef::MutableReference(_, inner) => inner.external_dependencies().collect(),
             DataVariantRef::Generic(_) => vec![],
             DataVariantRef::Result(left, right) => {
-                let mut crates = left.external_dependencies();
-                crates.extend(right.external_dependencies());
-                crates
+                left.external_dependencies().chain(right.external_dependencies()).collect()
             }
-            DataVariantRef::Option(inner) => inner.external_dependencies(),
-            DataVariantRef::SelfType(inner) => inner.external_dependencies(),
-        }
+            DataVariantRef::Option(inner) => inner.external_dependencies().collect(),
+            DataVariantRef::SelfType(inner) => inner.external_dependencies().collect(),
+        };
+        vec.into_iter()
     }
 }
 
@@ -401,26 +405,22 @@ impl From<InternalData> for InternalDataRef {
 }
 
 impl InternalDependencies for InternalDataRef {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        let mut dependencies = self.data.internal_dependencies();
-        if let Some(internal_crate) = &self.internal_crate {
-            dependencies.push(internal_crate.as_ref());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        self.data
+            .internal_dependencies()
+            .chain(self.internal_crate.iter().map(|internal_crate| internal_crate.as_ref()))
     }
 }
 
 impl ExternalDependencies for InternalDataRef {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        let mut dependencies = self.data.external_dependencies();
-        if let Some(internal_crate) = &self.internal_crate {
-            dependencies.extend(internal_crate.external_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
+        self.data.external_dependencies().chain(
+            self.internal_crate
+                .iter()
+                .flat_map(|internal_crate| internal_crate.external_dependencies()),
+        )
     }
 }
 
@@ -549,14 +549,16 @@ impl ToTokens for InternalModuleRef {
 }
 
 impl InternalDependencies for InternalModuleRef {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        vec![self.internal_crate.as_ref()]
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        std::iter::once(self.internal_crate.as_ref())
     }
 }
 
 impl ExternalDependencies for InternalModuleRef {
-    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
-        Vec::new()
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        std::iter::empty()
     }
 }
 
@@ -720,53 +722,27 @@ impl ToTokens for InternalData {
 }
 
 impl ExternalDependencies for InternalData {
-    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
-        let mut crates = self
-            .traits
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        self.traits
             .iter()
             .flat_map(ExternalDependencies::external_dependencies)
-            .collect::<Vec<_>>();
-
-        for derive in &self.derives {
-            crates.extend(derive.external_dependencies());
-        }
-
-        for decorator in &self.decorators {
-            crates.extend(decorator.external_dependencies());
-        }
-
-        crates.extend(self.variant.external_dependencies());
-
-        crates.extend(self.documentation.external_dependencies());
-
-        crates.sort_unstable();
-        crates.dedup();
-        crates
+            .chain(self.derives.iter().flat_map(|derive| derive.external_dependencies()))
+            .chain(self.decorators.iter().flat_map(|decorator| decorator.external_dependencies()))
+            .chain(self.variant.external_dependencies())
+            .chain(self.documentation.external_dependencies())
     }
 }
 
 impl InternalDependencies for InternalData {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        let mut crates = self
-            .traits
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        self.traits
             .iter()
             .flat_map(InternalDependencies::internal_dependencies)
-            .collect::<Vec<_>>();
-
-        for derive in &self.derives {
-            crates.extend(derive.internal_dependencies());
-        }
-
-        for decorator in &self.decorators {
-            crates.extend(decorator.internal_dependencies());
-        }
-
-        crates.extend(self.variant.internal_dependencies());
-
-        crates.extend(self.documentation.internal_dependencies());
-
-        crates.sort_unstable();
-        crates.dedup();
-        crates
+            .chain(self.derives.iter().flat_map(|derive| derive.internal_dependencies()))
+            .chain(self.decorators.iter().flat_map(|decorator| decorator.internal_dependencies()))
+            .chain(self.variant.internal_dependencies())
+            .chain(self.documentation.internal_dependencies())
     }
 }

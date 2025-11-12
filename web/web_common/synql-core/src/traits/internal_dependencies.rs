@@ -3,25 +3,24 @@
 
 use crate::structs::InternalCrate;
 
-/// Returns the sorted unique internal crate dependencies associated to
+/// Returns the internal crate dependencies associated to
 /// the object.
 pub trait InternalDependencies {
-    /// Returns the sorted unique internal crate dependencies associated to
+    /// Returns the internal crate dependencies associated to
     /// the object.
-    fn internal_dependencies(&self) -> Vec<&InternalCrate>;
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate>;
 }
 
 impl<T: InternalDependencies> InternalDependencies for Option<T> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        match self {
-            Some(inner) => inner.internal_dependencies(),
-            None => vec![],
-        }
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        self.into_iter().flat_map(|item| item.internal_dependencies())
     }
 }
 
 impl<T: InternalDependencies> InternalDependencies for Box<T> {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
         self.as_ref().internal_dependencies()
     }
 }

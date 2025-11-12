@@ -1,7 +1,6 @@
 //! Submodule defining a `WhereClause` struct.
 
 mod builder;
-use std::sync::Arc;
 
 pub use builder::WhereClauseBuilder;
 use quote::ToTokens;
@@ -38,18 +37,16 @@ impl WhereClause {
 }
 
 impl InternalDependencies for WhereClause {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        let mut deps = self.left.internal_dependencies();
-        deps.extend(self.right.internal_dependencies());
-        deps
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        self.left.internal_dependencies().chain(self.right.internal_dependencies())
     }
 }
 
 impl ExternalDependencies for WhereClause {
-    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
-        let mut deps = self.left.external_dependencies();
-        deps.extend(self.right.external_dependencies());
-        deps
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        self.left.external_dependencies().chain(self.right.external_dependencies())
     }
 }
 

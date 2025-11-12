@@ -3,8 +3,6 @@
 mod internal_enum_builder;
 mod internal_variant_builder;
 
-use std::sync::Arc;
-
 pub use internal_enum_builder::InternalEnumBuilder;
 pub use internal_variant_builder::InternalVariantBuilder;
 use quote::ToTokens;
@@ -12,7 +10,7 @@ use syn::Ident;
 
 use crate::{
     structs::{
-        Documentation, InternalCrate, external_trait::TraitVariantRef,
+        Documentation, ExternalCrate, InternalCrate, external_trait::TraitVariantRef,
         internal_data::DataVariantRef,
     },
     traits::{ExternalDependencies, InternalDependencies},
@@ -65,22 +63,16 @@ impl InternalVariant {
 }
 
 impl InternalDependencies for InternalVariant {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        let mut dependencies = self.ty.internal_dependencies();
-        dependencies.extend(self.doc.internal_dependencies());
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        self.ty.internal_dependencies().chain(self.doc.internal_dependencies())
     }
 }
 
 impl ExternalDependencies for InternalVariant {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        let mut dependencies = self.ty.external_dependencies();
-        dependencies.extend(self.doc.external_dependencies());
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        self.ty.external_dependencies().chain(self.doc.external_dependencies())
     }
 }
 
@@ -112,26 +104,16 @@ pub struct InternalEnum {
 }
 
 impl InternalDependencies for InternalEnum {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
-        let mut dependencies = Vec::new();
-        for variant in &self.variants {
-            dependencies.extend(variant.internal_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
+        self.variants.iter().flat_map(|variant| variant.internal_dependencies())
     }
 }
 
 impl ExternalDependencies for InternalEnum {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        let mut dependencies = Vec::new();
-        for variant in &self.variants {
-            dependencies.extend(variant.external_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        self.variants.iter().flat_map(|variant| variant.external_dependencies())
     }
 }
 

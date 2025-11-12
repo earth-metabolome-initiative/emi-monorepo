@@ -57,7 +57,8 @@ impl ToTokens for ExternalFunctionRef {
 }
 
 impl ExternalDependencies for ExternalFunctionRef {
-    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
-        vec![self.crate_ref.clone()]
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        std::iter::once(self.crate_ref.as_ref())
     }
 }

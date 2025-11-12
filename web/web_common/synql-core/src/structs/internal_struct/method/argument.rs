@@ -2,13 +2,12 @@
 //! argument.
 
 mod builder;
-use std::sync::Arc;
 
 pub use builder::ArgumentBuilder;
 use quote::ToTokens;
 
 use crate::{
-    structs::{Documentation, internal_data::DataVariantRef},
+    structs::{Documentation, ExternalCrate, InternalCrate, internal_data::DataVariantRef},
     traits::{ExternalDependencies, InternalDependencies},
     utils::RESERVED_RUST_WORDS,
 };
@@ -99,25 +98,19 @@ impl ToTokens for Argument {
 }
 
 impl InternalDependencies for Argument {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
-        let mut dependencies = self.arg_type.internal_dependencies();
-        if let Some(doc) = &self.documentation {
-            dependencies.extend(doc.internal_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        self.arg_type.internal_dependencies().chain(
+            self.documentation.as_ref().into_iter().flat_map(|doc| doc.internal_dependencies()),
+        )
     }
 }
 
 impl ExternalDependencies for Argument {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        let mut dependencies = self.arg_type.external_dependencies();
-        if let Some(doc) = &self.documentation {
-            dependencies.extend(doc.external_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        self.arg_type.external_dependencies().chain(
+            self.documentation.as_ref().into_iter().flat_map(|doc| doc.external_dependencies()),
+        )
     }
 }

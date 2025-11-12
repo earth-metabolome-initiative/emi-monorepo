@@ -56,14 +56,16 @@ impl Documentation {
 }
 
 impl ExternalDependencies for Documentation {
-    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
-        self.external_dependencies.clone()
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        self.external_dependencies.iter().map(|c| c.as_ref())
     }
 }
 
 impl InternalDependencies for Documentation {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        self.internal_dependencies.iter().map(|c| c.as_ref()).collect()
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        self.internal_dependencies.iter().map(|c| c.as_ref())
     }
 }
 
@@ -105,13 +107,15 @@ impl ModuleDocumentation {
 }
 
 impl ExternalDependencies for ModuleDocumentation {
-    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
         self.documentation.external_dependencies()
     }
 }
 
 impl InternalDependencies for ModuleDocumentation {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
         self.documentation.internal_dependencies()
     }
 }

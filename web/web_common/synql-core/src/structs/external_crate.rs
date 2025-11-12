@@ -282,17 +282,15 @@ impl ExternalTypeRef {
 }
 
 impl ExternalDependencies for ExternalTypeRef {
-    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
-        let mut dependencies = vec![self.crate_ref.clone()];
-        dependencies.extend(self.type_ref.external_dependencies());
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        std::iter::once(self.crate_ref.as_ref()).chain(self.type_ref.external_dependencies())
     }
 }
 
 impl InternalDependencies for ExternalTypeRef {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
         self.type_ref.internal_dependencies()
     }
 }
@@ -333,14 +331,16 @@ impl ExternalMacroRef {
 }
 
 impl ExternalDependencies for ExternalMacroRef {
-    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
-        vec![self.crate_ref.clone()]
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        std::iter::once(self.crate_ref.as_ref())
     }
 }
 
 impl InternalDependencies for ExternalMacroRef {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
-        Vec::new()
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
+        std::iter::empty()
     }
 }
 
@@ -366,13 +366,15 @@ impl From<Trait> for ExternalTraitRef {
 }
 
 impl ExternalDependencies for ExternalTraitRef {
-    fn external_dependencies(&self) -> Vec<Arc<ExternalCrate>> {
-        vec![self.crate_ref.clone()]
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
+        std::iter::once(self.crate_ref.as_ref())
     }
 }
 
 impl InternalDependencies for ExternalTraitRef {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
         self.trait_ref.internal_dependencies()
     }
 }

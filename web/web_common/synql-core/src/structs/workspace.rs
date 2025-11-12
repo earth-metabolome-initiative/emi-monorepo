@@ -8,7 +8,7 @@ use std::{
 };
 
 pub use builder::WorkspaceBuilder;
-use rayon::prelude::*;
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use syn::Type;
 
 use crate::{
@@ -205,10 +205,12 @@ impl Workspace {
         }
 
         // Add external dependencies that are required
-        let mut external_deps = Vec::new();
-        for internal_crate in &self.internal_crates {
-            external_deps.extend(internal_crate.external_dependencies());
-        }
+        let mut external_deps: Vec<_> = self
+            .internal_crates
+            .iter()
+            .flat_map(|internal_crate| internal_crate.external_dependencies())
+            .collect();
+
         external_deps.sort_unstable();
         external_deps.dedup();
 
@@ -284,7 +286,7 @@ impl Workspace {
         std::fs::create_dir_all(self.path())?;
         // And we start writing each internal crate to disk.
         self.internal_crates
-            .iter()
+            .par_iter()
             .map(|internal_crate: &Arc<InternalCrate>| internal_crate.write_to_disk(self))
             .collect::<Result<Vec<()>, std::io::Error>>()?;
         Ok(())

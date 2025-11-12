@@ -162,7 +162,10 @@ impl InternalCrate {
         doc["package"]["edition"] = toml_edit::value(workspace.edition().to_string());
 
         // Add [dependencies] section
-        let internal_dependencies = self.internal_dependencies();
+        let mut internal_dependencies = self.internal_dependencies().collect::<Vec<_>>();
+        internal_dependencies.sort_unstable();
+        internal_dependencies.dedup();
+
         for dep in internal_dependencies {
             let dep_name = dep.name();
 
@@ -176,7 +179,10 @@ impl InternalCrate {
             doc["dependencies"][dep_name] = toml_edit::value(dep_table);
         }
 
-        let external_dependencies = self.external_dependencies();
+        let mut external_dependencies = self.external_dependencies().collect::<Vec<_>>();
+        external_dependencies.sort_unstable();
+        external_dependencies.dedup();
+
         for dep in external_dependencies {
             if !dep.is_dependency() {
                 continue;
@@ -221,28 +227,21 @@ impl InternalCrate {
 }
 
 impl InternalDependencies for InternalCrate {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        let mut dependencies = Vec::new();
-        for module in &self.modules {
-            dependencies.extend(module.internal_dependencies());
-        }
-        dependencies.extend(self.documentation.internal_dependencies());
-        dependencies.sort_unstable();
-        dependencies.dedup();
-
-        dependencies
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        self.modules
+            .iter()
+            .flat_map(|module| module.internal_dependencies())
+            .chain(self.documentation.internal_dependencies())
     }
 }
 
 impl ExternalDependencies for InternalCrate {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        let mut dependencies = Vec::new();
-        for module in &self.modules {
-            dependencies.extend(module.external_dependencies());
-        }
-        dependencies.extend(self.documentation.external_dependencies());
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
+        self.modules
+            .iter()
+            .flat_map(|module| module.external_dependencies())
+            .chain(self.documentation.external_dependencies())
     }
 }

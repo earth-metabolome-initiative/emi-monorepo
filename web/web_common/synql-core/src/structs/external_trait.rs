@@ -175,16 +175,12 @@ impl ExternalTrait {
 }
 
 impl InternalDependencies for ExternalTrait {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
-        let mut internal_dependencies = self
-            .generic_defaults()
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
+        self.generic_defaults()
             .iter()
             .filter_map(|default| default.as_ref())
             .flat_map(|data_variant_ref| data_variant_ref.internal_dependencies())
-            .collect::<Vec<_>>();
-        internal_dependencies.sort_unstable();
-        internal_dependencies.dedup();
-        internal_dependencies
     }
 }
 
@@ -266,22 +262,28 @@ impl TraitVariantRef {
 }
 
 impl ExternalDependencies for TraitVariantRef {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        match self {
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
+        let vec: Vec<&crate::structs::ExternalCrate> = match self {
             TraitVariantRef::Internal(_, _) => vec![],
-            TraitVariantRef::External(ext_trait_ref) => ext_trait_ref.external_dependencies(),
-        }
+            TraitVariantRef::External(ext_trait_ref) => {
+                ext_trait_ref.external_dependencies().collect()
+            }
+        };
+        vec.into_iter()
     }
 }
 
 impl InternalDependencies for TraitVariantRef {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        match self {
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        let vec: Vec<&InternalCrate> = match self {
             TraitVariantRef::Internal(_, crate_def) => {
-                crate_def.into_iter().map(AsRef::as_ref).collect()
+                crate_def.iter().map(AsRef::as_ref).collect()
             }
-            TraitVariantRef::External(external) => external.internal_dependencies(),
-        }
+            TraitVariantRef::External(external) => external.internal_dependencies().collect(),
+        };
+        vec.into_iter()
     }
 }
 

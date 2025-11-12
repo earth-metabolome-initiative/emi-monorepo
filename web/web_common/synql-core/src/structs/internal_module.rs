@@ -149,46 +149,42 @@ impl InternalModule {
 }
 
 impl InternalDependencies for InternalModule {
-    fn internal_dependencies(&self) -> Vec<&InternalCrate> {
-        let mut dependencies = Vec::new();
-        for submodule in &self.submodules {
-            dependencies.extend(submodule.internal_dependencies());
-        }
-        for data in &self.data {
-            dependencies.extend(data.internal_dependencies());
-        }
-        for internal_trait in &self.internal_traits {
-            dependencies.extend(internal_trait.internal_dependencies());
-        }
-        for token in &self.internal_tokens {
-            dependencies.extend(token.internal_dependencies());
-        }
-        dependencies.extend(self.documentation.internal_dependencies());
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
+        let vec: Vec<&InternalCrate> = self
+            .submodules
+            .iter()
+            .flat_map(|submodule| submodule.internal_dependencies())
+            .chain(self.data.iter().flat_map(|data| data.internal_dependencies()))
+            .chain(
+                self.internal_traits
+                    .iter()
+                    .flat_map(|internal_trait| internal_trait.internal_dependencies()),
+            )
+            .chain(self.internal_tokens.iter().flat_map(|token| token.internal_dependencies()))
+            .chain(self.documentation.internal_dependencies())
+            .collect();
+        vec.into_iter()
     }
 }
 
 impl ExternalDependencies for InternalModule {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        let mut dependencies = Vec::new();
-        for submodule in &self.submodules {
-            dependencies.extend(submodule.external_dependencies());
-        }
-        for data in &self.data {
-            dependencies.extend(data.external_dependencies());
-        }
-        for internal_trait in &self.internal_traits {
-            dependencies.extend(internal_trait.external_dependencies());
-        }
-        for token in &self.internal_tokens {
-            dependencies.extend(token.external_dependencies());
-        }
-        dependencies.extend(self.documentation.external_dependencies());
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
+        let vec: Vec<&crate::structs::ExternalCrate> = self
+            .submodules
+            .iter()
+            .flat_map(|submodule| submodule.external_dependencies())
+            .chain(self.data.iter().flat_map(|data| data.external_dependencies()))
+            .chain(
+                self.internal_traits
+                    .iter()
+                    .flat_map(|internal_trait| internal_trait.external_dependencies()),
+            )
+            .chain(self.internal_tokens.iter().flat_map(|token| token.external_dependencies()))
+            .chain(self.documentation.external_dependencies())
+            .collect();
+        vec.into_iter()
     }
 }
 

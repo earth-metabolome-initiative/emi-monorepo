@@ -23,12 +23,8 @@ fn report(time_tracker: &TimeTracker) {
 #[test]
 fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
     // We get the cargo toml.
-    let mut workspace_root = std::env::var("CARGO_MANIFEST_DIR")
-        .expect("CARGO_MANIFEST_DIR environment variable not set");
-
     // And we adequately move to the emi-monorepo root.
-    workspace_root.push_str("/../../..");
-
+    let workspace_root = "../../../";
     let mut tracking_test = TimeTracker::new("EMI Workspace Generation Test");
 
     let task = Task::new("Database Parsing");
@@ -111,20 +107,22 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap()
         .build()?;
 
-    let synql = SynQL::new()
-        .database(&db)
-        .external_crates([
-            Arc::new(iso_codes),
-            Arc::new(media_types),
-            Arc::new(cas_codes),
-            Arc::new(molecular_formulas),
-        ])
-        .path(workspace_path.clone())
-        .generate_workspace_toml()
-        .generate_rustfmt()
-        .build()
-        .expect("Unable to build SynQL instance");
-    tracking_test.extend(synql.generate().expect("Unable to generate workspace"));
+    for _ in 0..1 {
+        let synql = SynQL::new()
+            .database(&db)
+            .external_crates([
+                Arc::new(iso_codes.clone()),
+                Arc::new(media_types.clone()),
+                Arc::new(cas_codes.clone()),
+                Arc::new(molecular_formulas.clone()),
+            ])
+            .path(workspace_path.clone())
+            .generate_workspace_toml()
+            .generate_rustfmt()
+            .build()
+            .expect("Unable to build SynQL instance");
+        tracking_test.extend(synql.generate().expect("Unable to generate workspace"));
+    }
 
     // We print the report
     report(&tracking_test);

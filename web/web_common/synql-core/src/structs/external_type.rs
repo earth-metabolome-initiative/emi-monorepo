@@ -3,7 +3,7 @@
 
 mod builder;
 mod traits_mask;
-use std::{fmt::Debug, hash::Hash, sync::Arc};
+use std::{fmt::Debug, hash::Hash};
 
 use proc_macro2::TokenStream;
 use quote::{ToTokens, quote};
@@ -268,25 +268,15 @@ impl ExternalType {
 }
 
 impl ExternalDependencies for ExternalType {
-    fn external_dependencies(&self) -> Vec<Arc<crate::structs::ExternalCrate>> {
-        let mut dependencies = Vec::new();
-        for default in &self.generic_defaults {
-            dependencies.extend(default.external_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
+        self.generic_defaults.iter().flat_map(|default| default.external_dependencies())
     }
 }
 
 impl InternalDependencies for ExternalType {
-    fn internal_dependencies(&self) -> Vec<&crate::structs::InternalCrate> {
-        let mut dependencies = Vec::new();
-        for default in &self.generic_defaults {
-            dependencies.extend(default.internal_dependencies());
-        }
-        dependencies.sort_unstable();
-        dependencies.dedup();
-        dependencies
+    #[inline]
+    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
+        self.generic_defaults.iter().flat_map(|default| default.internal_dependencies())
     }
 }
