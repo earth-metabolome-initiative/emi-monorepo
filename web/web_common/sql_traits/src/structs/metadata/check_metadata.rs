@@ -31,22 +31,24 @@ impl<U: CheckConstraintLike> CheckMetadata<U> {
     }
 
     /// Returns a reference to the expression defining the constraint.
+    #[inline]
     pub fn expression(&self) -> &Expr {
         &self.expression
     }
 
     /// Returns a reference to the table on which the constraint is defined.
+    #[inline]
     pub fn table(&self) -> &<U::DB as DatabaseLike>::Table {
         &self.table
     }
 
     /// Returns an iterator over the columns involved in the constraint.
     pub fn columns(&self) -> impl Iterator<Item = &<U::DB as DatabaseLike>::Column> {
-        self.columns.iter().map(|col| col.as_ref())
+        self.columns.iter().map(std::convert::AsRef::as_ref)
     }
 
     /// Returns an iterator over the functions involved in the constraint.
     pub fn functions(&self) -> impl Iterator<Item = &<U::DB as DatabaseLike>::Function> {
-        self.functions.iter().map(|func| func.as_ref())
+        self.functions.iter().map(std::convert::AsRef::as_ref)
     }
 }

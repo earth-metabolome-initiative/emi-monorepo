@@ -3,6 +3,8 @@
 use sqlparser::ast::{DataType, ObjectName, ObjectNamePart, TimezoneInfo};
 
 /// Normalizes SQLParser data types to a standard representation.
+#[must_use]
+#[inline]
 pub fn normalize_sqlparser_type(sqlparser_type: &DataType) -> &str {
     match sqlparser_type {
         DataType::Uuid => "UUID",

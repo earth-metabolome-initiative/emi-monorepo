@@ -20,7 +20,9 @@ impl TableLike for CreateTable {
         let last_object_name_parts = &object_name_parts[object_name_parts.len() - 1];
         match last_object_name_parts {
             sqlparser::ast::ObjectNamePart::Identifier(Ident { value, .. }) => value.as_str(),
-            _ => panic!("Unexpected object name part in CreateTable: {:?}", last_object_name_parts),
+            sqlparser::ast::ObjectNamePart::Function(_) => {
+                panic!("Unexpected object name part in CreateTable: {last_object_name_parts:?}")
+            }
         }
     }
 
@@ -40,7 +42,9 @@ impl TableLike for CreateTable {
                 sqlparser::ast::ObjectNamePart::Identifier(Ident { value, .. }) => {
                     Some(value.as_str())
                 }
-                _ => panic!("Unexpected object name part in CreateTable: {:?}", schema_part),
+                sqlparser::ast::ObjectNamePart::Function(_) => {
+                    panic!("Unexpected object name part in CreateTable: {schema_part:?}")
+                }
             }
         } else {
             None

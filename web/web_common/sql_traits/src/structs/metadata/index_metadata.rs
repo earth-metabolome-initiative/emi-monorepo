@@ -22,11 +22,13 @@ impl<U: UniqueIndexLike> UniqueIndexMetadata<U> {
     }
 
     /// Returns a reference to the expression defining the index.
+    #[inline]
     pub fn expression(&self) -> &Expr {
         &self.expression
     }
 
     /// Returns a reference to the table on which the index is defined.
+    #[inline]
     pub fn table(&self) -> &<U::DB as DatabaseLike>::Table {
         &self.table
     }

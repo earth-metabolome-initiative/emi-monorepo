@@ -44,9 +44,9 @@ impl ForeignKeyLike for TableAttribute<CreateTable, ForeignKeyConstraint> {
             .find(|table: &&<Self::DB as DatabaseLike>::Table| {
                 table.table_name() == referenced_table_name
             })
-            .expect(&format!(
-                "Referenced table `{referenced_table_name}` not found for foreign key"
-            ))
+            .unwrap_or_else(|| {
+                panic!("Referenced table `{referenced_table_name}` not found for foreign key")
+            })
     }
 
     fn on_delete_cascade(&self, _database: &Self::DB) -> bool {
@@ -54,7 +54,7 @@ impl ForeignKeyLike for TableAttribute<CreateTable, ForeignKeyConstraint> {
     }
 
     fn match_kind(&self, _database: &Self::DB) -> ConstraintReferenceMatchKind {
-        self.attribute().match_kind.clone().unwrap_or(ConstraintReferenceMatchKind::Simple)
+        self.attribute().match_kind.unwrap_or(ConstraintReferenceMatchKind::Simple)
     }
 
     fn host_columns<'db>(

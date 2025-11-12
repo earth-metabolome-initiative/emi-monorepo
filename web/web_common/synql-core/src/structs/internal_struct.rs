@@ -56,11 +56,13 @@ impl InternalAttribute {
     }
 
     /// Returns the publicness of the attribute.
+    #[inline]
     pub fn pubness(&self) -> &Publicness {
         &self.pubness
     }
 
     /// Returns the name of the attribute.
+    #[inline]
     pub fn name(&self) -> &str {
         &self.name
     }
@@ -75,11 +77,13 @@ impl InternalAttribute {
     }
 
     /// Returns the documentation of the attribute.
+    #[inline]
     pub fn documentation(&self) -> &Documentation {
         &self.documentation
     }
 
     /// Returns the type of the attribute.
+    #[inline]
     pub fn ty(&self) -> &DataVariantRef {
         &self.ty
     }
@@ -137,6 +141,7 @@ impl InternalStruct {
     }
 
     /// Returns a reference to the attributes of the struct.
+    #[inline]
     pub fn attributes(&self) -> &Vec<InternalAttribute> {
         &self.attributes
     }

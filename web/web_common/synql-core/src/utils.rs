@@ -14,6 +14,7 @@ pub const RESERVED_RUST_WORDS: [&str; 49] = [
 ];
 
 /// Returns whether the provided name is a reserved Rust word.
+#[inline]
 pub fn is_reserved_rust_word(name: &str) -> bool {
     debug_assert!(
         RESERVED_RUST_WORDS.windows(2).all(|w| w[0] < w[1]),
@@ -26,6 +27,7 @@ pub fn is_reserved_rust_word(name: &str) -> bool {
 pub const RESERVED_DIESEL_WORDS: [&str; 1] = ["columns"];
 
 /// Creates a generic type parameter with the provided name.
+#[inline]
 pub fn generic_type(name: &str) -> syn::GenericParam {
     syn::GenericParam::Type(syn::TypeParam::from(syn::Ident::new(
         name,

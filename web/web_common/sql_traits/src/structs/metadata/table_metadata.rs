@@ -34,7 +34,7 @@ impl<T: TableLike> Default for TableMetadata<T> {
 impl<T: TableLike> TableMetadata<T> {
     /// Returns an iterator over the references of columns of the table.
     pub fn columns(&self) -> impl Iterator<Item = &<T::DB as DatabaseLike>::Column> {
-        self.columns.iter().map(|col| col.as_ref())
+        self.columns.iter().map(std::convert::AsRef::as_ref)
     }
 
     /// Returns an iterator over the Rc of columns of the table.
@@ -43,6 +43,7 @@ impl<T: TableLike> TableMetadata<T> {
     }
 
     /// Returns a slice of the Rc of columns of the table.
+    #[inline]
     pub fn column_rc_slice(&self) -> &[Rc<<T::DB as DatabaseLike>::Column>] {
         &self.columns
     }
@@ -51,7 +52,7 @@ impl<T: TableLike> TableMetadata<T> {
     pub fn check_constraints(
         &self,
     ) -> impl Iterator<Item = &<T::DB as DatabaseLike>::CheckConstraint> {
-        self.check_constraints.iter().map(|cc| cc.as_ref())
+        self.check_constraints.iter().map(std::convert::AsRef::as_ref)
     }
 
     /// Returns an iterator over the Rc of check constraints of the table.
@@ -63,7 +64,7 @@ impl<T: TableLike> TableMetadata<T> {
 
     /// Returns an iterator over the unique indices of the table.
     pub fn unique_indices(&self) -> impl Iterator<Item = &<T::DB as DatabaseLike>::UniqueIndex> {
-        self.unique_indices.iter().map(|idx| idx.as_ref())
+        self.unique_indices.iter().map(std::convert::AsRef::as_ref)
     }
 
     /// Returns an iterator over the Rc of unique indices of the table.
@@ -75,7 +76,7 @@ impl<T: TableLike> TableMetadata<T> {
 
     /// Returns an iterator over the foreign keys of the table.
     pub fn foreign_keys(&self) -> impl Iterator<Item = &<T::DB as DatabaseLike>::ForeignKey> {
-        self.foreign_keys.iter().map(|fk| fk.as_ref())
+        self.foreign_keys.iter().map(std::convert::AsRef::as_ref)
     }
 
     /// Returns an iterator over the Rc of foreign keys of the table.
@@ -88,7 +89,7 @@ impl<T: TableLike> TableMetadata<T> {
     /// Returns an iterator over the columns composing the primary key of the
     /// table.
     pub fn primary_key_columns(&self) -> impl Iterator<Item = &<T::DB as DatabaseLike>::Column> {
-        self.primary_key.iter().map(|col| col.as_ref())
+        self.primary_key.iter().map(std::convert::AsRef::as_ref)
     }
 
     /// Adds a column to the table metadata.

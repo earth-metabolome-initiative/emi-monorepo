@@ -42,6 +42,7 @@ impl Publicness {
     /// assert!(!Publicness::Crate.is_public());
     /// assert!(!Publicness::Restricted.is_public());
     /// ```
+    #[inline]
     pub fn is_public(&self) -> bool {
         matches!(self, Publicness::Public)
     }

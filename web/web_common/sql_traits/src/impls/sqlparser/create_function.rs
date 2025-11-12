@@ -34,6 +34,6 @@ impl FunctionLike for CreateFunction {
     }
 
     fn return_type_name<'db>(&'db self, _database: &'db Self::DB) -> Option<&'db str> {
-        self.return_type.as_ref().map(|rt| normalize_sqlparser_type(rt))
+        self.return_type.as_ref().map(normalize_sqlparser_type)
     }
 }

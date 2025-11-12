@@ -87,27 +87,32 @@ impl ExternalCrate {
     }
 
     /// Returns a reference to the name of the crate.
+    #[inline]
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns whether the crate is a dependency.
+    #[inline]
     pub fn is_dependency(&self) -> bool {
         self.version.is_some() || self.git.is_some()
     }
 
     /// Returns the version of the crate if it is a dependency.
+    #[inline]
     pub fn version(&self) -> Option<&str> {
         self.version.as_deref()
     }
 
     /// Returns the git repository and branch of the crate if it is a
     /// dependency.
+    #[inline]
     pub fn git(&self) -> Option<(&str, &str)> {
         self.git.as_ref().map(|(repo, branch)| (repo.as_str(), branch.as_str()))
     }
 
     /// Returns the feature flags required by the crate.
+    #[inline]
     pub fn features(&self) -> &[String] {
         &self.features
     }
@@ -198,37 +203,44 @@ pub struct ExternalTypeRef {
 
 impl ExternalTypeRef {
     /// Returns a reference to the name of the crate.
+    #[inline]
     pub fn crate_name(&self) -> &str {
         self.crate_ref.name()
     }
 
     /// Returns a reference to the diesel type.
+    #[inline]
     pub fn diesel_type(&self) -> Option<&syn::Type> {
         self.type_ref.diesel_type()
     }
 
     /// Returns a reference to the rust type.
+    #[inline]
     pub fn rust_type(&self) -> &syn::Type {
         self.type_ref.rust_type()
     }
 
     /// Returns a reference to the external crate.
+    #[inline]
     pub fn external_crate(&self) -> &ExternalCrate {
         &self.crate_ref
     }
 
     /// Returns whether the crate is a dependency.
+    #[inline]
     pub fn is_dependency(&self) -> bool {
         self.crate_ref.is_dependency()
     }
 
     /// Returns the version of the crate if it is a dependency.
+    #[inline]
     pub fn version(&self) -> Option<&str> {
         self.crate_ref.version()
     }
 
     /// Returns the git repository and branch of the crate if it is a
     /// dependency.
+    #[inline]
     pub fn git(&self) -> Option<(&str, &str)> {
         self.crate_ref.git()
     }

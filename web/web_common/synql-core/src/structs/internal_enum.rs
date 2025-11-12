@@ -34,16 +34,19 @@ impl InternalVariant {
     }
 
     /// Returns the ident of the variant.
+    #[inline]
     pub fn ident(&self) -> &Ident {
         &self.name
     }
 
     /// Returns the documentation comment of the variant.
+    #[inline]
     pub fn doc(&self) -> &Documentation {
         &self.doc
     }
 
     /// Returns the type of the variant.
+    #[inline]
     pub fn ty(&self) -> Option<&DataVariantRef> {
         self.ty.as_ref()
     }
@@ -124,6 +127,7 @@ impl InternalEnum {
     }
 
     /// Returns a reference to the variants of the enum.
+    #[inline]
     pub fn variants(&self) -> &Vec<InternalVariant> {
         &self.variants
     }

@@ -93,23 +93,27 @@ where
     Ch: CheckConstraintLike,
 {
     /// Creates a new `GenericDBBuilder` instance.
+    #[must_use]
     pub fn new() -> Self {
         Self::default()
     }
 
     /// Sets the timezone for the database.
+    #[must_use]
     pub fn timezone(mut self, timezone: String) -> Self {
         self.timezone = Some(timezone);
         self
     }
 
     /// Sets the catalog name for the database.
+    #[must_use]
     pub fn catalog_name(mut self, catalog_name: String) -> Self {
         self.catalog_name = Some(catalog_name);
         self
     }
 
     /// Adds a table with its metadata to the builder.
+    #[must_use]
     pub fn add_table(mut self, table: Rc<T>, metadata: T::Meta) -> Self {
         assert!(
             self.tables.iter().all(|(existing_table, _)| existing_table.as_ref() != table.as_ref()),
@@ -123,30 +127,35 @@ where
     }
 
     /// Adds multiple tables with their metadata to the builder.
+    #[must_use]
     pub fn add_tables(mut self, tables: impl IntoIterator<Item = (Rc<T>, T::Meta)>) -> Self {
         self.tables.extend(tables);
         self
     }
 
     /// Adds a column with its metadata to the builder.
+    #[must_use]
     pub fn add_column(mut self, column: Rc<C>, metadata: C::Meta) -> Self {
         self.columns.push((column, metadata));
         self
     }
 
     /// Adds multiple columns with their metadata to the builder.
+    #[must_use]
     pub fn add_columns(mut self, columns: impl IntoIterator<Item = (Rc<C>, C::Meta)>) -> Self {
         self.columns.extend(columns);
         self
     }
 
     /// Adds a unique index with its metadata to the builder.
+    #[must_use]
     pub fn add_unique_index(mut self, index: Rc<U>, metadata: U::Meta) -> Self {
         self.unique_indices.push((index, metadata));
         self
     }
 
     /// Adds multiple unique indices with their metadata to the builder.
+    #[must_use]
     pub fn add_unique_indices(
         mut self,
         indices: impl IntoIterator<Item = (Rc<U>, U::Meta)>,
@@ -156,24 +165,28 @@ where
     }
 
     /// Adds a foreign key with its metadata to the builder.
+    #[must_use]
     pub fn add_foreign_key(mut self, key: Rc<F>, metadata: F::Meta) -> Self {
         self.foreign_keys.push((key, metadata));
         self
     }
 
     /// Adds multiple foreign keys with their metadata to the builder.
+    #[must_use]
     pub fn add_foreign_keys(mut self, keys: impl IntoIterator<Item = (Rc<F>, F::Meta)>) -> Self {
         self.foreign_keys.extend(keys);
         self
     }
 
     /// Adds a function with its metadata to the builder.
+    #[must_use]
     pub fn add_function(mut self, function: Rc<Func>, metadata: Func::Meta) -> Self {
         self.functions.push((function, metadata));
         self
     }
 
     /// Adds multiple functions with their metadata to the builder.
+    #[must_use]
     pub fn add_functions(
         mut self,
         functions: impl IntoIterator<Item = (Rc<Func>, Func::Meta)>,
@@ -183,11 +196,13 @@ where
     }
 
     /// Returns a vector of function Rc references.
+    #[must_use]
     pub fn function_rc_vec(&self) -> Vec<Rc<Func>> {
         self.functions.iter().map(|(func_rc, _)| func_rc.clone()).collect()
     }
 
     /// Adds a check constraint with its metadata to the builder.
+    #[must_use]
     pub fn add_check_constraint(mut self, constraint: Rc<Ch>, metadata: Ch::Meta) -> Self {
         self.check_constraints.push((constraint, metadata));
         self
@@ -238,7 +253,10 @@ where
             .ok_or(BuilderError::IncompleteBuild(GenericDBAttribute::CatalogName))?;
 
         self.tables.sort_unstable_by_key(|(table, _)| {
-            (table.table_schema().map(|s| s.to_string()), table.table_name().to_string())
+            (
+                table.table_schema().map(std::string::ToString::to_string),
+                table.table_name().to_string(),
+            )
         });
 
         self.columns.sort_unstable_by(|(a, _), (b, _)| a.as_ref().cmp(b.as_ref()));

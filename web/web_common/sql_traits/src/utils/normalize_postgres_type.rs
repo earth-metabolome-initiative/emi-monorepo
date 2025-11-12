@@ -18,6 +18,8 @@
 /// let normalized = normalize_postgres_type("INT4");
 /// assert_eq!(normalized, "INT");
 /// ```
+#[must_use]
+#[inline]
 pub fn normalize_postgres_type(pg_type: &str) -> &str {
     match pg_type.to_lowercase().trim_matches('\"') {
         "int2" | "smallint" | "smallserial" => "SMALLINT",

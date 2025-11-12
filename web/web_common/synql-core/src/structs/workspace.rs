@@ -43,16 +43,19 @@ impl Workspace {
     }
 
     /// Returns the version tuple of the workspace.
+    #[inline]
     pub fn version(&self) -> (u8, u8, u8) {
         self.version
     }
 
     /// Returns the edition of the workspace.
+    #[inline]
     pub fn edition(&self) -> u16 {
         self.edition
     }
 
     /// Returns the path where the workspace is being created.
+    #[inline]
     pub fn path(&self) -> &Path {
         self.path.as_path()
     }

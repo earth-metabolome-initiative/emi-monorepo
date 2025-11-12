@@ -42,11 +42,13 @@ impl InternalTrait {
     }
 
     /// Returns the name of the module.
+    #[inline]
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns the ident of the module.
+    #[inline]
     pub fn ident(&self) -> Ident {
         syn::Ident::new(&self.name, proc_macro2::Span::call_site())
     }
@@ -62,11 +64,13 @@ impl InternalTrait {
     }
 
     /// Returns the publicness of the module.
+    #[inline]
     pub fn publicness(&self) -> &Publicness {
         &self.publicness
     }
 
     /// Returns whether the module is public.
+    #[inline]
     pub fn is_public(&self) -> bool {
         self.publicness.is_public()
     }
@@ -77,6 +81,7 @@ impl InternalTrait {
     }
 
     /// Returns the methods defined by the trait.
+    #[inline]
     pub fn methods(&self) -> &Vec<Method> {
         &self.methods
     }

@@ -103,8 +103,16 @@ where
     pub fn table_metadata(&self, table: &T) -> &T::Meta {
         self.tables
             .binary_search_by_key(
-                &(table.table_schema().map(|s| s.to_string()), table.table_name().to_string()),
-                |(t, _)| (t.table_schema().map(|s| s.to_string()), t.table_name().to_string()),
+                &(
+                    table.table_schema().map(std::string::ToString::to_string),
+                    table.table_name().to_string(),
+                ),
+                |(t, _)| {
+                    (
+                        t.table_schema().map(std::string::ToString::to_string),
+                        t.table_name().to_string(),
+                    )
+                },
             )
             .map(|index| &self.tables[index].1)
             .expect("Table not found in GenericDB")
@@ -147,6 +155,7 @@ where
     /// # Arguments
     ///
     /// * `name` - The name of the function to retrieve.
+    #[must_use]
     pub fn function(&self, name: &str) -> Option<&Func> {
         self.functions
             .binary_search_by(|(f, _)| f.name().cmp(name))
@@ -167,6 +176,7 @@ where
     }
 
     /// Returns a reference to the catalog name.
+    #[inline]
     pub fn catalog_name(&self) -> &str {
         &self.catalog_name
     }

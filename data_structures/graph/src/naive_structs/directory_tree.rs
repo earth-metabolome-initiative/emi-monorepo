@@ -22,15 +22,15 @@ pub struct DirectoryTree {
     graph: DiGraph<PathBuf>,
 }
 
-fn recursive_build_tree<'path>(
-    path: &'path Path,
+fn recursive_build_tree(
+    path: &Path,
     path_id: usize,
     nodes: &mut Vec<PathBuf>,
     edges: &mut Vec<(usize, usize)>,
 ) {
     if let Ok(entries) = path.read_dir() {
         let mut entries = entries.flatten().collect::<Vec<_>>();
-        entries.sort_by_key(|e| e.path());
+        entries.sort_by_key(std::fs::DirEntry::path);
         for entry in entries {
             let child_path = entry.path();
             let child_id = nodes.len();

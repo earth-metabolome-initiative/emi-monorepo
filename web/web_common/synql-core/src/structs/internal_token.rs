@@ -99,11 +99,13 @@ impl InternalToken {
     }
 
     /// Returns whether the token stream is public.
+    #[inline]
     pub fn is_public(&self) -> bool {
         self.publicness.is_public()
     }
 
     /// Returns whether it implements the given trait.
+    #[inline]
     pub fn implements_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         self.implemented_traits.contains(trait_ref)
     }

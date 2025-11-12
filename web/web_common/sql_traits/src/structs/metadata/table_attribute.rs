@@ -30,11 +30,13 @@ impl<T, A> TableAttribute<T, A> {
     }
 
     /// Returns a reference to the table.
+    #[inline]
     pub fn table(&self) -> &T {
         &self.table
     }
 
     /// Returns a reference to the attribute.
+    #[inline]
     pub fn attribute(&self) -> &A {
         &self.attribute
     }

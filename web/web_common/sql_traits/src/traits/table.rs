@@ -112,7 +112,7 @@ pub trait TableLike:
     /// # }
     /// ```
     fn has_generated_columns(&self, database: &Self::DB) -> bool {
-        self.columns(database).any(|col| col.is_generated())
+        self.columns(database).any(ColumnLike::is_generated)
     }
 
     /// Returns the number of columns in the table.
@@ -313,7 +313,7 @@ pub trait TableLike:
     /// # }
     /// ```
     fn has_generated_primary_key(&self, database: &Self::DB) -> bool {
-        self.primary_key_columns(database).all(|col| col.is_generated())
+        self.primary_key_columns(database).all(ColumnLike::is_generated)
             && self.has_primary_key(database)
     }
 
