@@ -267,6 +267,7 @@ debug = true
 debug = true
 
 [profile.ultra]
+inherits = "release"
 opt-level = 3     # Highest LLVM optimization level
 lto = "fat"       # Full Link Time Optimization across all crates
 codegen-units = 1 # Forces single codegen unit (enables deeper cross-function inlining)
