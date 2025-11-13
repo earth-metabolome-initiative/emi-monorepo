@@ -46,6 +46,11 @@ impl Argument {
         self.name == "self" && self.arg_type().is_self_type()
     }
 
+    /// Returns whether the argument is a mutable self argument.
+    pub fn is_mut_self(&self) -> bool {
+        self.is_self() && self.arg_type().is_mutable_reference()
+    }
+
     /// Makes the argument mutable.
     pub fn make_mutable(&mut self) {
         self.mutable = true;

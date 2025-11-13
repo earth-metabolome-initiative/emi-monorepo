@@ -205,8 +205,46 @@ impl ToTokens for Method {
         let mut main_documentation = self.documentation.clone();
         main_documentation.extend(&documentation.join("\n"));
 
+        // Automatically determine if method should have #[inline] attribute
+        // A method should be inlined if it has a body and the body is small (simple
+        // delegation or trivial logic)
+        let should_inline = if let Some(body) = &self.body {
+            let body_str = body.to_token_stream().to_string();
+            // Parse and format the body to get proper line count
+            // We parse as a file since prettyplease::unparse only works with syn::File
+            let formatted_body = match syn::parse_file(&body_str) {
+                Ok(syntax_tree) => prettyplease::unparse(&syntax_tree),
+                Err(_) => body_str.clone(),
+            };
+            // Consider a method small enough for inlining if:
+            // - Body has 5 or fewer non-empty lines
+            // - Or unformatted body is less than 200 characters
+            let line_count = formatted_body.lines().filter(|line| !line.trim().is_empty()).count();
+            line_count <= 5 || body_str.len() < 200
+        } else {
+            false
+        };
+
+        // Automatically determine if method should have #[must_use] attribute
+        // A method should have must_use if it:
+        // - Returns a value (not unit type)
+        // - Has a body (is not a trait method declaration)
+        // - Does NOT return Result or Option (these types already have #[must_use])
+        // - Does NOT take &mut self (mutation methods may return secondary values that
+        //   don't need to be used)
+        let should_must_use = self.return_type.is_some()
+            && self.body.is_some()
+            && !self.return_type.as_ref().map_or(false, |rt| rt.is_option() || rt.is_result())
+            && !self.arguments.iter().any(|arg| arg.is_mut_self());
+
+        let inline_attr = should_inline.then(|| quote::quote! { #[inline] });
+
+        let must_use_attr = should_must_use.then(|| quote::quote! { #[must_use] });
+
         tokens.extend(quote::quote! {
             #main_documentation
+            #inline_attr
+            #must_use_attr
 			#pubness_tokens #async_tokens fn #name_ident #formatted_generics (#(#arguments_tokens),*) #return_type_tokens #formatted_where #formatted_body
 		});
     }
