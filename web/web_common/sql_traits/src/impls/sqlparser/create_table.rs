@@ -36,6 +36,7 @@ impl TableLike for CreateTable {
         Some("Undocumented table")
     }
 
+    #[inline]
     fn table_schema(&self) -> Option<&str> {
         let object_name_parts = &self.name.0;
         if object_name_parts.len() > 1 {
@@ -60,7 +61,7 @@ impl TableLike for CreateTable {
     where
         Self: 'db,
     {
-        database.table_metadata(self).columns()
+        database.table_metadata(self).expect("Table must exist in database").columns()
     }
 
     fn primary_key_columns<'db>(
@@ -70,7 +71,7 @@ impl TableLike for CreateTable {
     where
         Self: 'db,
     {
-        database.table_metadata(self).primary_key_columns()
+        database.table_metadata(self).expect("Table must exist in database").primary_key_columns()
     }
 
     fn unique_indices<'db>(
@@ -80,7 +81,7 @@ impl TableLike for CreateTable {
     where
         Self: 'db,
     {
-        database.table_metadata(self).unique_indices()
+        database.table_metadata(self).expect("Table must exist in database").unique_indices()
     }
 
     fn check_constraints<'db>(
@@ -90,7 +91,7 @@ impl TableLike for CreateTable {
     where
         Self: 'db,
     {
-        database.table_metadata(self).check_constraints()
+        database.table_metadata(self).expect("Table must exist in database").check_constraints()
     }
 
     fn foreign_keys<'db>(
@@ -100,6 +101,6 @@ impl TableLike for CreateTable {
     where
         Self: 'db,
     {
-        database.table_metadata(self).foreign_keys()
+        database.table_metadata(self).expect("Table must exist in database").foreign_keys()
     }
 }

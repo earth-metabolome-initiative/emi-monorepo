@@ -33,7 +33,10 @@ impl ForeignKeyLike for KeyColumnUsage {
         &self,
         database: &'db Self::DB,
     ) -> &'db <Self::DB as sql_traits::traits::DatabaseLike>::Table {
-        database.foreign_key_metadata(self).referenced_table()
+        database
+            .foreign_key_metadata(self)
+            .expect("Foreign key must exist in database")
+            .referenced_table()
     }
 
     fn host_table<'db>(
@@ -43,15 +46,24 @@ impl ForeignKeyLike for KeyColumnUsage {
     where
         Self: 'db,
     {
-        database.foreign_key_metadata(self).host_table()
+        database
+            .foreign_key_metadata(self)
+            .expect("Foreign key must exist in database")
+            .host_table()
     }
 
     fn on_delete_cascade(&self, database: &Self::DB) -> bool {
-        database.foreign_key_metadata(self).on_delete_cascade()
+        database
+            .foreign_key_metadata(self)
+            .expect("Foreign key must exist in database")
+            .on_delete_cascade()
     }
 
     fn match_kind(&self, database: &Self::DB) -> sqlparser::ast::ConstraintReferenceMatchKind {
-        database.foreign_key_metadata(self).match_kind()
+        database
+            .foreign_key_metadata(self)
+            .expect("Foreign key must exist in database")
+            .match_kind()
     }
 
     fn host_columns<'db>(
@@ -61,7 +73,11 @@ impl ForeignKeyLike for KeyColumnUsage {
     where
         Self: 'db,
     {
-        database.foreign_key_metadata(self).host_columns().iter()
+        database
+            .foreign_key_metadata(self)
+            .expect("Foreign key must exist in database")
+            .host_columns()
+            .iter()
     }
 
     fn referenced_columns<'db>(
@@ -71,6 +87,10 @@ impl ForeignKeyLike for KeyColumnUsage {
     where
         Self: 'db,
     {
-        database.foreign_key_metadata(self).referenced_columns().iter()
+        database
+            .foreign_key_metadata(self)
+            .expect("Foreign key must exist in database")
+            .referenced_columns()
+            .iter()
     }
 }

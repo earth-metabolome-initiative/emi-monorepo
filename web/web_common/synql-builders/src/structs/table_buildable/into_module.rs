@@ -42,6 +42,8 @@ where
             .expect("Failed to add buildable struct to buildable module")
             .internal_token(value.value_settable_impl())
             .internal_tokens(value.ancestor_value_settable_impls())
+            .internal_token(value.key_settable_impl())
+            .internal_tokens(value.ancestor_key_settable_impls())
             .build()
             .expect("Failed to build buildable module")
     }

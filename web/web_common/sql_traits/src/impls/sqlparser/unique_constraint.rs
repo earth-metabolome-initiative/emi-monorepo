@@ -27,6 +27,6 @@ impl UniqueIndexLike for TableAttribute<CreateTable, UniqueConstraint> {
     where
         Self: 'db,
     {
-        database.index_metadata(self).expression()
+        database.index_metadata(self).expect("Unique index must exist in database").expression()
     }
 }

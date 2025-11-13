@@ -241,6 +241,7 @@ where
     Func: FunctionLike,
     Ch: CheckConstraintLike,
 {
+    #[inline]
     fn is_complete(&self) -> bool {
         self.catalog_name.is_some()
     }

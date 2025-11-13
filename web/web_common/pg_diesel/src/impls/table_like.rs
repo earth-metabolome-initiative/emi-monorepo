@@ -36,7 +36,11 @@ impl TableLike for crate::models::Table {
     where
         Self: 'db,
     {
-        database.table_metadata(self).description().map(|desc| desc.description.as_str())
+        database
+            .table_metadata(self)
+            .expect("Table must exist in database")
+            .description()
+            .map(|desc| desc.description.as_str())
     }
 
     fn columns<'db>(
@@ -46,7 +50,7 @@ impl TableLike for crate::models::Table {
     where
         Self: 'db,
     {
-        database.table_metadata(self).columns()
+        database.table_metadata(self).expect("Table must exist in database").columns()
     }
 
     fn primary_key_columns<'db>(
@@ -56,7 +60,7 @@ impl TableLike for crate::models::Table {
     where
         Self: 'db,
     {
-        database.table_metadata(self).primary_key_columns()
+        database.table_metadata(self).expect("Table must exist in database").primary_key_columns()
     }
 
     fn foreign_keys<'db>(
@@ -66,7 +70,7 @@ impl TableLike for crate::models::Table {
     where
         Self: 'db,
     {
-        database.table_metadata(self).foreign_keys()
+        database.table_metadata(self).expect("Table must exist in database").foreign_keys()
     }
 
     fn check_constraints<'db>(
@@ -76,7 +80,7 @@ impl TableLike for crate::models::Table {
     where
         Self: 'db,
     {
-        database.table_metadata(self).check_constraints()
+        database.table_metadata(self).expect("Table must exist in database").check_constraints()
     }
 
     fn unique_indices<'db>(
@@ -86,6 +90,6 @@ impl TableLike for crate::models::Table {
     where
         Self: 'db,
     {
-        database.table_metadata(self).unique_indices()
+        database.table_metadata(self).expect("Table must exist in database").unique_indices()
     }
 }

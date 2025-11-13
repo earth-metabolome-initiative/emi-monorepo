@@ -72,10 +72,14 @@ impl InternalDependencies for Documentation {
 impl ToTokens for Documentation {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         // Split documentation by newlines to create separate doc attributes
-        let documentation = &self.documentation;
-        tokens.extend(quote::quote! {
-            #[doc = #documentation]
-        });
+        // This ensures proper formatting with line breaks in the rendered documentation
+        for line in self.documentation.lines() {
+            let line_with_space_before =
+                if line.starts_with(' ') { line.to_string() } else { format!(" {}", line) };
+            tokens.extend(quote::quote! {
+                #[doc = #line_with_space_before]
+            });
+        }
     }
 }
 
@@ -123,9 +127,13 @@ impl InternalDependencies for ModuleDocumentation {
 impl ToTokens for ModuleDocumentation {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         // For modules, use inner doc attributes (#![doc = ...])
-        let doc_string = self.documentation.documentation();
-        tokens.extend(quote::quote! {
-            #![doc = #doc_string]
-        });
+        // Split documentation by newlines to create separate doc attributes
+        for line in self.documentation.documentation().lines() {
+            let line_with_space_before =
+                if line.starts_with(' ') { line.to_string() } else { format!(" {}", line) };
+            tokens.extend(quote::quote! {
+                #![doc = #line_with_space_before]
+            });
+        }
     }
 }

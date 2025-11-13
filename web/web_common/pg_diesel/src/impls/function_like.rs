@@ -34,12 +34,17 @@ impl FunctionLike for PgProc {
     ) -> impl Iterator<Item = &'db str> {
         database
             .function_metadata(self)
+            .expect("Function must exist in database")
             .argument_types()
             .iter()
             .map(|pg_type| pg_type.typname.as_str())
     }
 
     fn return_type_name<'db>(&'db self, database: &'db Self::DB) -> Option<&'db str> {
-        database.function_metadata(self).return_type().map(|pg_type| pg_type.typname.as_str())
+        database
+            .function_metadata(self)
+            .expect("Function must exist in database")
+            .return_type()
+            .map(|pg_type| pg_type.typname.as_str())
     }
 }

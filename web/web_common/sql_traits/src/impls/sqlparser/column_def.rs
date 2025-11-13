@@ -42,6 +42,7 @@ impl ColumnLike for TableAttribute<CreateTable, ColumnDef> {
         GENERATED_TYPES.contains(&self.attribute().data_type.to_string().as_str())
     }
 
+    #[inline]
     fn is_nullable(&self, database: &Self::DB) -> bool {
         !self
             .attribute()

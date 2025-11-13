@@ -251,16 +251,16 @@ pub trait TableLike:
     where
         Self: 'db;
 
-    /// Returns the primary key column of the table.
+    /// Returns the single primary key column of the table, if it exists and is
+    /// non-composite.
+    ///
+    /// Returns `None` if the table has no primary key or if the primary key is
+    /// composite.
     ///
     /// # Arguments
     ///
     /// * `database` - A reference to the database instance to which the table
     ///   belongs.
-    ///
-    /// # Panics
-    ///
-    /// * If the table does not have exactly one primary key column.
     ///
     /// # Example
     ///
@@ -270,22 +270,28 @@ pub trait TableLike:
     /// let db = ParserDB::try_from(
     ///     r#"
     /// CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE composite_pk (id1 INT, id2 INT, PRIMARY KEY (id1, id2));
     /// "#,
     /// )?;
     /// let table = db.table(None, "my_table").unwrap();
-    /// let pk_column = table.primary_key_column(&db);
+    /// let pk_column = table.primary_key_column(&db).unwrap();
     /// assert_eq!(pk_column.column_name(), "id");
+    ///
+    /// let composite_table = db.table(None, "composite_pk").unwrap();
+    /// assert!(composite_table.primary_key_column(&db).is_none());
     /// # Ok(())
     /// # }
     /// ```
     fn primary_key_column<'db>(
         &'db self,
         database: &'db Self::DB,
-    ) -> &'db <Self::DB as DatabaseLike>::Column {
+    ) -> Option<&'db <Self::DB as DatabaseLike>::Column> {
         let mut pk_columns = self.primary_key_columns(database);
-        let pk_column = pk_columns.next().expect("Table has no primary key column");
-        assert!(pk_columns.next().is_none(), "Table has a composite primary key");
-        pk_column
+        let pk_column = pk_columns.next()?;
+        if pk_columns.next().is_some() {
+            return None; // Composite primary key
+        }
+        Some(pk_column)
     }
 
     /// Returns whether the primary key of the table is generated (i.e.,

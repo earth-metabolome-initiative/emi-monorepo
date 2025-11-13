@@ -279,6 +279,7 @@ pub trait ForeignKeyLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn shares_host_tables(&self, database: &Self::DB) -> bool {
         let mut host_columns: Vec<_> = self.host_columns(database).collect();
         host_columns.sort_unstable();
@@ -324,6 +325,7 @@ pub trait ForeignKeyLike:
     /// # Ok(())
     /// # }
     /// ```
+    #[inline]
     fn number_of_host_columns(&self, database: &Self::DB) -> usize {
         self.host_columns(database).count()
     }

@@ -206,7 +206,6 @@ impl InternalCrate {
 
     /// Writes the crate to disk at the provided path.
     pub fn write_to_disk(&self, workspace: &Workspace) -> std::io::Result<()> {
-        use std::io::Write;
         // We create the crate directory.
         let crate_path = workspace.path().join(&self.name);
         std::fs::create_dir_all(&crate_path)?;
@@ -217,8 +216,15 @@ impl InternalCrate {
         std::fs::create_dir_all(&src_path)?;
         // We write the lib.rs file.
         let lib_path = src_path.join("lib.rs");
-        let mut buffer = std::fs::File::create(lib_path)?;
-        write!(buffer, "{}", self.to_token_stream())?;
+        let token_stream = self.to_token_stream().to_string();
+        let syntax_tree = syn::parse_file(&token_stream).map_err(|e| {
+            std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                format!("Failed to parse generated code: {}", e),
+            )
+        })?;
+        let formatted = prettyplease::unparse(&syntax_tree);
+        std::fs::write(&lib_path, formatted)?;
         // We write each module to disk.
         for module in &self.modules {
             module.write_to_disk(&src_path)?;

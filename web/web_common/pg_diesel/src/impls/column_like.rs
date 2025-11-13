@@ -29,7 +29,11 @@ impl ColumnLike for crate::models::Column {
     where
         Self: 'db,
     {
-        database.column_metadata(self).description().map(|desc| desc.description.as_str())
+        database
+            .column_metadata(self)
+            .expect("Column must exist in database")
+            .description()
+            .map(|desc| desc.description.as_str())
     }
 
     fn table<'db>(
@@ -39,7 +43,7 @@ impl ColumnLike for crate::models::Column {
     where
         Self: 'db,
     {
-        database.column_metadata(self).table()
+        database.column_metadata(self).expect("Column must exist in database").table()
     }
 
     fn is_generated(&self) -> bool {
@@ -49,7 +53,7 @@ impl ColumnLike for crate::models::Column {
     }
 
     fn data_type<'db>(&'db self, database: &'db Self::DB) -> &'db str {
-        &database.column_metadata(self).pg_type().typname
+        &database.column_metadata(self).expect("Column must exist in database").pg_type().typname
     }
 
     fn is_nullable(&self, _database: &Self::DB) -> bool {

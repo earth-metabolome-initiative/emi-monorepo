@@ -21,7 +21,10 @@ impl CheckConstraintLike for TableAttribute<CreateTable, CheckConstraint> {
 
     #[inline]
     fn table<'db>(&'db self, database: &'db Self::DB) -> &'db <Self::DB as DatabaseLike>::Table {
-        database.check_constraint_metadata(self).table()
+        database
+            .check_constraint_metadata(self)
+            .expect("Check constraint must exist in database")
+            .table()
     }
 
     #[inline]
@@ -29,14 +32,20 @@ impl CheckConstraintLike for TableAttribute<CreateTable, CheckConstraint> {
         &'db self,
         database: &'db Self::DB,
     ) -> impl Iterator<Item = &'db <Self::DB as crate::prelude::DatabaseLike>::Column> {
-        database.check_constraint_metadata(self).columns()
+        database
+            .check_constraint_metadata(self)
+            .expect("Check constraint must exist in database")
+            .columns()
     }
 
     #[inline]
     fn functions<'db>(
         &'db self,
         database: &'db Self::DB,
-    ) -> impl Iterator<Item = &'db <Self::DB as crate::prelude::DatabaseLike>::Function> + 'db {
-        database.check_constraint_metadata(self).functions()
+    ) -> impl Iterator<Item = &'db <Self::DB as crate::prelude::DatabaseLike>::Function> {
+        database
+            .check_constraint_metadata(self)
+            .expect("Check constraint must exist in database")
+            .functions()
     }
 }

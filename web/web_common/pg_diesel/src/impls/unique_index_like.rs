@@ -33,13 +33,13 @@ impl UniqueIndexLike for PgIndex {
     where
         Self: 'db,
     {
-        database.index_metadata(self).table()
+        database.index_metadata(self).expect("Unique index must exist in database").table()
     }
 
     fn expression<'db>(&'db self, database: &'db Self::DB) -> &'db Expr
     where
         Self: 'db,
     {
-        database.index_metadata(self).expression()
+        database.index_metadata(self).expect("Unique index must exist in database").expression()
     }
 }

@@ -164,7 +164,7 @@ impl Workspace {
         writeln!(buffer, "format_code_in_doc_comments = true")?;
         writeln!(buffer, "comment_width = 80")?;
         writeln!(buffer, "normalize_comments = true")?;
-        writeln!(buffer, "normalize_doc_attributes = false")?;
+        writeln!(buffer, "normalize_doc_attributes = true")?;
         writeln!(buffer, "force_multiline_blocks = true")?;
         writeln!(buffer, "fn_single_line = false")?;
         writeln!(buffer, "where_single_line = false")?;

@@ -41,9 +41,9 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
     assert!(db.has_tables(), "Database should have tables");
     tracking_test.add_completed_task(task);
 
-    let temp_dir = tempfile::tempdir().expect("Unable to create temporary directory");
-    let workspace_path = temp_dir.path().join("synql_workspace");
-    // let workspace_path = std::path::PathBuf::from("../../../../emi_local");
+    // let workspace_path = tempfile::tempdir().expect("Unable to create temporary
+    // directory");
+    let workspace_path = std::path::PathBuf::from("../../../../emi_local");
 
     let iso_codes = ExternalCrate::new()
         .name("iso_codes")?

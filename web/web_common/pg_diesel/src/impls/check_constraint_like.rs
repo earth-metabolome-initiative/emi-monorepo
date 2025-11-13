@@ -23,21 +23,30 @@ impl CheckConstraintLike for CheckConstraint {
     type DB = PgDatabase;
 
     fn expression<'db>(&'db self, database: &'db Self::DB) -> &'db sqlparser::ast::Expr {
-        database.check_constraint_metadata(self).expression()
+        database
+            .check_constraint_metadata(self)
+            .expect("Check constraint must exist in database")
+            .expression()
     }
 
     fn table<'db>(
         &'db self,
         database: &'db Self::DB,
     ) -> &'db <Self::DB as sql_traits::prelude::DatabaseLike>::Table {
-        database.check_constraint_metadata(self).table()
+        database
+            .check_constraint_metadata(self)
+            .expect("Check constraint must exist in database")
+            .table()
     }
 
     fn columns<'db>(
         &'db self,
         database: &'db Self::DB,
     ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::prelude::DatabaseLike>::Column> {
-        database.check_constraint_metadata(self).columns()
+        database
+            .check_constraint_metadata(self)
+            .expect("Check constraint must exist in database")
+            .columns()
     }
 
     fn functions<'db>(
@@ -45,6 +54,9 @@ impl CheckConstraintLike for CheckConstraint {
         database: &'db Self::DB,
     ) -> impl Iterator<Item = &'db <Self::DB as sql_traits::prelude::DatabaseLike>::Function> + 'db
     {
-        database.check_constraint_metadata(self).functions()
+        database
+            .check_constraint_metadata(self)
+            .expect("Check constraint must exist in database")
+            .functions()
     }
 }

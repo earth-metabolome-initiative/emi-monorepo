@@ -103,8 +103,9 @@ where
         GenericDBBuilder::default()
     }
 
-    /// Returns a reference to the metadata of the specified table.
-    pub fn table_metadata(&self, table: &T) -> &T::Meta {
+    /// Returns a reference to the metadata of the specified table, if it exists
+    /// in the database.
+    pub fn table_metadata(&self, table: &T) -> Option<&T::Meta> {
         self.tables
             .binary_search_by_key(
                 &(
@@ -118,40 +119,44 @@ where
                     )
                 },
             )
+            .ok()
             .map(|index| &self.tables[index].1)
-            .expect("Table not found in GenericDB")
     }
 
-    /// Returns a reference to the metadata of the specified column.
-    pub fn column_metadata(&self, column: &C) -> &C::Meta {
+    /// Returns a reference to the metadata of the specified column, if it
+    /// exists in the database.
+    pub fn column_metadata(&self, column: &C) -> Option<&C::Meta> {
         self.columns
             .binary_search_by(|(c, _)| c.as_ref().cmp(column))
+            .ok()
             .map(|index| &self.columns[index].1)
-            .expect("Column not found in GenericDB")
     }
 
-    /// Returns a reference to the metadata of the specified unique index.
-    pub fn index_metadata(&self, index: &U) -> &U::Meta {
+    /// Returns a reference to the metadata of the specified unique index, if it
+    /// exists in the database.
+    pub fn index_metadata(&self, index: &U) -> Option<&U::Meta> {
         self.unique_indices
             .binary_search_by(|(i, _)| i.as_ref().cmp(index))
+            .ok()
             .map(|index| &self.unique_indices[index].1)
-            .expect("Index not found in GenericDB")
     }
 
-    /// Returns a reference to the metadata of the specified check constraint.
-    pub fn check_constraint_metadata(&self, constraint: &Ch) -> &Ch::Meta {
+    /// Returns a reference to the metadata of the specified check constraint,
+    /// if it exists in the database.
+    pub fn check_constraint_metadata(&self, constraint: &Ch) -> Option<&Ch::Meta> {
         self.check_constraints
             .binary_search_by(|(c, _)| c.as_ref().cmp(constraint))
+            .ok()
             .map(|index| &self.check_constraints[index].1)
-            .expect("Check constraint not found in GenericDB")
     }
 
-    /// Returns a reference to the metadata of the specified foreign key.
-    pub fn foreign_key_metadata(&self, key: &F) -> &F::Meta {
+    /// Returns a reference to the metadata of the specified foreign key, if it
+    /// exists in the database.
+    pub fn foreign_key_metadata(&self, key: &F) -> Option<&F::Meta> {
         self.foreign_keys
             .binary_search_by(|(k, _)| k.as_ref().cmp(key))
+            .ok()
             .map(|index| &self.foreign_keys[index].1)
-            .expect("Foreign key not found in GenericDB")
     }
 
     /// Returns a reference of the function by name.
@@ -167,16 +172,17 @@ where
             .map(|index| self.functions[index].0.as_ref())
     }
 
-    /// Returns a reference to the metadata of the specified function.
+    /// Returns a reference to the metadata of the specified function, if it
+    /// exists in the database.
     ///
     /// # Arguments
     ///
     /// * `function` - The function to retrieve metadata for.
-    pub fn function_metadata(&self, function: &Func) -> &Func::Meta {
+    pub fn function_metadata(&self, function: &Func) -> Option<&Func::Meta> {
         self.functions
             .binary_search_by(|(f, _)| f.name().cmp(function.name()))
+            .ok()
             .map(|index| &self.functions[index].1)
-            .expect("Function not found in GenericDB")
     }
 
     /// Returns a reference to the catalog name.

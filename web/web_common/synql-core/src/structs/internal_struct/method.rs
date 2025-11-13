@@ -46,6 +46,12 @@ impl Method {
         &self.name
     }
 
+    /// Returns the ident of the method.
+    #[inline]
+    pub fn ident(&self) -> syn::Ident {
+        syn::Ident::new(&self.name, proc_macro2::Span::call_site())
+    }
+
     /// Returns a reference to the body of the method.
     #[inline]
     pub fn body(&self) -> Option<&InternalToken> {
@@ -178,7 +184,7 @@ impl ToTokens for Method {
 
         if self.has_non_self_arguments() {
             documentation.push(String::default());
-            documentation.push("# Arguments".to_string());
+            documentation.push(" # Arguments".to_string());
             for arg in self.non_self_arguments() {
                 documentation.push(format!(
                     " * `{}` - {}",

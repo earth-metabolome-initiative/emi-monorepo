@@ -42,26 +42,31 @@ impl InternalModule {
     }
 
     /// Returns the name of the module.
+    #[inline]
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns the ident of the module.
+    #[inline]
     pub fn ident(&self) -> Ident {
         syn::Ident::new(&self.name, proc_macro2::Span::call_site())
     }
 
     /// Returns the publicness of the module.
+    #[inline]
     pub fn publicness(&self) -> &Publicness {
         &self.publicness
     }
 
     /// Returns whether the module is public.
+    #[inline]
     pub fn is_public(&self) -> bool {
         self.publicness.is_public()
     }
 
     /// Returns whether the module has submodules.
+    #[inline]
     pub fn has_submodules(&self) -> bool {
         !self.submodules.is_empty()
     }
@@ -136,7 +141,15 @@ impl InternalModule {
     /// * `path` - The path where to write the module.
     pub fn write_to_disk(&self, path: &std::path::Path) -> std::io::Result<()> {
         let module_path = path.join(format!("{}.rs", self.name()));
-        std::fs::write(&module_path, self.to_token_stream().to_string())?;
+        let token_stream = self.to_token_stream().to_string();
+        let syntax_tree = syn::parse_file(&token_stream).map_err(|e| {
+            std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                format!("Failed to parse generated code: {}", e),
+            )
+        })?;
+        let formatted = prettyplease::unparse(&syntax_tree);
+        std::fs::write(&module_path, formatted)?;
         let module_directory = path.join(self.name());
         if self.has_submodules() {
             std::fs::create_dir_all(&module_directory)?;

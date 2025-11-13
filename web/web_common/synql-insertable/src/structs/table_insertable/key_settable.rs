@@ -37,9 +37,10 @@ where
             .methods(self.table.insertable_key_settable_foreign_keys(self.database).map(
                 |foreign_key| {
                     let host_column = foreign_key.host_column(self.database).unwrap();
-                    let builder: MethodBuilder = trait_ref
+                    let method = trait_ref
                         .method(&host_column.column_snake_name())
-                        .expect("Failed to get ValueSettable method definition")
+                        .expect("Failed to get InsertableKeySettable method definition");
+                    let builder: MethodBuilder = method
                         .clone()
                         .into();
                     let snake_case_ident = host_column.column_snake_ident();
@@ -61,25 +62,23 @@ where
                         (None, Some(quote! { .clone() }))
                     };
 
+                    let return_statement = if method.can_fail() {
+                        quote! { Ok(self) }
+                    } else {
+                        quote! { self }
+                    };
+
                     builder
                         .make_mut_self()
                         .unwrap()
                         .body(
                             InternalToken::new()
-                                .stream(if check_constraints.is_empty() {
-                                    quote! {
-                                        use #identiable;
-                                        self.#snake_case_ident = Some(#maybe_deref #snake_case_ident.id() #maybe_clone);
-                                        self
-                                    }
-                                } else {
-                                    quote! {
-                                        use #identiable;
-                                        let #snake_case_ident = #maybe_deref #snake_case_ident.id() #maybe_clone;
-                                        #(#check_constraints)*
-                                        self.#snake_case_ident = Some(#snake_case_ident);
-                                        Ok(self)
-                                    }
+                                .stream(quote! {
+                                    use #identiable;
+                                    let #snake_case_ident = #maybe_deref #snake_case_ident.id() #maybe_clone;
+                                    #(#check_constraints)*
+                                    self.#snake_case_ident = Some(#snake_case_ident);
+                                    #return_statement
                                 })
                                 .inherits(check_constraints)
                                 .build()
