@@ -215,6 +215,7 @@ impl From<Trait> for TraitVariantRef {
 }
 
 impl TraitVariantRef {
+    #[inline]
     /// Returns the name of the trait.
     pub fn name(&self) -> &str {
         match self {
@@ -223,6 +224,7 @@ impl TraitVariantRef {
         }
     }
 
+    #[inline]
     /// Returns whether the trait is implemented for typeless enums.
     pub fn implemented_for_typeless_enum(&self) -> bool {
         match self {
@@ -233,6 +235,7 @@ impl TraitVariantRef {
         }
     }
 
+    #[inline]
     /// Returns whether the trait defines the provided method.
     pub fn defines_method(&self, method: &Method) -> bool {
         match self {
@@ -241,6 +244,7 @@ impl TraitVariantRef {
         }
     }
 
+    #[inline]
     /// Returns a reference to the slice of methods defined by the trait.
     pub fn methods(&self) -> &[Method] {
         match self {
@@ -249,11 +253,13 @@ impl TraitVariantRef {
         }
     }
 
+    #[inline]
     /// Returns a reference to the method with the provided name, if it exists.
     pub fn method(&self, name: &str) -> Option<&Method> {
         self.methods().iter().find(|method| method.name() == name)
     }
 
+    #[inline]
     /// Returns the [`TraitImpl`] struct to implement the trait for the provided
     /// type.
     pub fn impl_for_type<'trt>(&'trt self, type_token: &'trt DataVariantRef) -> TraitImpl<'trt> {

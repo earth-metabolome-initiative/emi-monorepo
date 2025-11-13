@@ -46,14 +46,22 @@ impl ExternalCrate {
 
     /// Returns an `Either` `ExternalType` instance parametrized with the
     /// provided left and right types.
-    pub fn either_of(left: DataVariantRef, right: DataVariantRef) -> DataVariantRef {
+    pub fn either_of(
+        left: Option<DataVariantRef>,
+        right: Option<DataVariantRef>,
+    ) -> DataVariantRef {
         let either_crate = Self::either();
-        let either_type = either_crate.external_type(&syn::parse_quote!(either::Either)).unwrap();
-        either_type
-            .set_generic_field(&generic_type("L"), left)
-            .unwrap()
-            .set_generic_field(&generic_type("R"), right)
-            .unwrap()
-            .into()
+        let mut either_type =
+            either_crate.external_type(&syn::parse_quote!(either::Either)).unwrap();
+
+        if let Some(left) = left {
+            either_type = either_type.set_generic_field(&generic_type("L"), left).unwrap();
+        }
+
+        if let Some(right) = right {
+            either_type = either_type.set_generic_field(&generic_type("R"), right).unwrap();
+        }
+
+        either_type.into()
     }
 }

@@ -184,7 +184,8 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
 
         let builder_type = referenced_table.builder_ref(self.workspace).unwrap();
         let generic_type = DataVariantRef::generic(host_column.column_acronym_generic());
-        let either = ExternalCrate::either_of(builder_type.into(), generic_type.reference(None));
+        let either =
+            ExternalCrate::either_of(Some(builder_type.into()), Some(generic_type.reference(None)));
 
         Method::new()
             .name(host_column.column_snake_name())
