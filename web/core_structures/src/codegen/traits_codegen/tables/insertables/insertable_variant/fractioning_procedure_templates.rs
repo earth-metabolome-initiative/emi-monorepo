@@ -201,14 +201,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateWeighedWithModel,
                         )
                     })?;
                 procedure_template_weighed_with_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateWeighedWithModel,
                         )
                     })?
@@ -226,14 +226,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateFragmentContainerModel,
                         )
                     })?;
                 procedure_template_fragment_container_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateFragmentContainerModel,
                         )
                     })?
@@ -251,14 +251,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateFragmentPlacedIntoModel,
                         )
                     })?;
                 procedure_template_fragment_placed_into_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateAttribute::ProcedureTemplateFragmentPlacedIntoModel,
                         )
                     })?

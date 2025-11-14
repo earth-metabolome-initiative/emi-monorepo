@@ -97,6 +97,7 @@ impl<DB: DatabaseLike> TableConstraint for NonRedundantExtensionDag<DB> {
 
     fn table_error_information(
         &self,
+        _database: &Self::Database,
         context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         ConstraintErrorInfo::new()
@@ -136,7 +137,9 @@ impl<DB: DatabaseLike> TableConstraint for NonRedundantExtensionDag<DB> {
                 if other_extended_table.is_descendant_of(database, extended_table)
                     || extended_table == other_extended_table
                 {
-                    return Err(crate::error::Error::Table(self.table_error_information(table)));
+                    return Err(crate::error::Error::Table(
+                        self.table_error_information(database, table),
+                    ));
                 }
             }
         }

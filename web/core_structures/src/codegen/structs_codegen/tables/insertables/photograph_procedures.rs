@@ -1036,7 +1036,7 @@ where
                 procedure_template,
             )
             .map_err(|err| {
-                err.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                err.replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
@@ -1096,7 +1096,7 @@ where
                     photographed_asset,
                 )
                 .map_err(|e| {
-                    e.into_field_name(|attribute| {
+                    e.replace_field_name(|attribute| {
                         <Self as common_traits::builder::Attributed>::Attribute::ProcedurePhotographedAsset(
                             attribute,
                         )
@@ -1158,7 +1158,7 @@ where
                     procedure_template_photographed_asset_model,
                 )
                 .map_err(|e| {
-                    e.into_field_name(|attribute| {
+                    e.replace_field_name(|attribute| {
                         <Self as common_traits::builder::Attributed>::Attribute::ProcedurePhotographedAsset(
                             attribute,
                         )
@@ -1246,7 +1246,7 @@ where
                         photographed_asset,
                     )
                     .map_err(|e| {
-                        e.into_field_name(|attribute| {
+                        e.replace_field_name(|attribute| {
                             <Self as common_traits::builder::Attributed>::Attribute::ProcedurePhotographedAsset(
                                 attribute,
                             )
@@ -1292,7 +1292,7 @@ where
                         procedure_template_photographed_asset_model,
                     )
                     .map_err(|e| {
-                        e.into_field_name(|attribute| {
+                        e.replace_field_name(|attribute| {
                             <Self as common_traits::builder::Attributed>::Attribute::ProcedurePhotographedAsset(
                                 attribute,
                             )
@@ -1359,7 +1359,7 @@ where
                     photographed_with,
                 )
                 .map_err(|e| {
-                    e.into_field_name(|attribute| {
+                    e.replace_field_name(|attribute| {
                         <Self as common_traits::builder::Attributed>::Attribute::ProcedurePhotographedWith(
                             attribute,
                         )
@@ -1421,7 +1421,7 @@ where
                     procedure_template_photographed_with_model,
                 )
                 .map_err(|e| {
-                    e.into_field_name(|attribute| {
+                    e.replace_field_name(|attribute| {
                         <Self as common_traits::builder::Attributed>::Attribute::ProcedurePhotographedWith(
                             attribute,
                         )
@@ -1509,7 +1509,7 @@ where
                         photographed_with,
                     )
                     .map_err(|e| {
-                        e.into_field_name(|attribute| {
+                        e.replace_field_name(|attribute| {
                             <Self as common_traits::builder::Attributed>::Attribute::ProcedurePhotographedWith(
                                 attribute,
                             )
@@ -1555,7 +1555,7 @@ where
                         procedure_template_photographed_with_model,
                     )
                     .map_err(|e| {
-                        e.into_field_name(|attribute| {
+                        e.replace_field_name(|attribute| {
                             <Self as common_traits::builder::Attributed>::Attribute::ProcedurePhotographedWith(
                                 attribute,
                             )
@@ -1618,7 +1618,7 @@ where
                     photograph,
                 )
                 .map_err(|e| {
-                    e.into_field_name(|attribute| {
+                    e.replace_field_name(|attribute| {
                         <Self as common_traits::builder::Attributed>::Attribute::ProcedurePhotograph(
                             attribute,
                         )
@@ -1679,7 +1679,7 @@ where
                     procedure_template_photograph_model,
                 )
                 .map_err(|e| {
-                    e.into_field_name(|attribute| {
+                    e.replace_field_name(|attribute| {
                         <Self as common_traits::builder::Attributed>::Attribute::ProcedurePhotograph(
                             attribute,
                         )
@@ -1767,7 +1767,7 @@ where
                         photograph,
                     )
                     .map_err(|e| {
-                        e.into_field_name(|attribute| {
+                        e.replace_field_name(|attribute| {
                             <Self as common_traits::builder::Attributed>::Attribute::ProcedurePhotograph(
                                 attribute,
                             )
@@ -1812,7 +1812,7 @@ where
                         procedure_template_photograph_model,
                     )
                     .map_err(|e| {
-                        e.into_field_name(|attribute| {
+                        e.replace_field_name(|attribute| {
                             <Self as common_traits::builder::Attributed>::Attribute::ProcedurePhotograph(
                                 attribute,
                             )
@@ -1862,7 +1862,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1915,7 +1915,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1936,7 +1936,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1959,7 +1959,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1980,7 +1980,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1998,7 +1998,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2019,7 +2019,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2037,7 +2037,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -2058,7 +2058,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;

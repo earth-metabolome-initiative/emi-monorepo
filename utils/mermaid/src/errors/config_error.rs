@@ -54,7 +54,7 @@ impl From<ConfigError<GenericConfigurationAttribute>>
         match error {
             ConfigError::EmptyTitle => ConfigError::EmptyTitle,
             ConfigError::Builder(builder_error) => {
-                ConfigError::Builder(builder_error.into_field_name(From::from))
+                ConfigError::Builder(builder_error.replace_field_name(From::from))
             }
         }
     }
@@ -67,7 +67,7 @@ impl From<ConfigError<GenericConfigurationAttribute>>
         match error {
             ConfigError::EmptyTitle => ConfigError::EmptyTitle,
             ConfigError::Builder(builder_error) => {
-                ConfigError::Builder(builder_error.into_field_name(From::from))
+                ConfigError::Builder(builder_error.replace_field_name(From::from))
             }
         }
     }

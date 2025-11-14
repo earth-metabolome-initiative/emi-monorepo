@@ -167,14 +167,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedWithModel,
                         )
                     })?;
                 procedure_template_geolocated_with_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedWithModel,
                         )
                     })?
@@ -192,14 +192,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedAssetModel,
                         )
                     })?;
                 procedure_template_geolocated_asset_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureTemplateAttribute::ProcedureTemplateGeolocatedAssetModel,
                         )
                     })?

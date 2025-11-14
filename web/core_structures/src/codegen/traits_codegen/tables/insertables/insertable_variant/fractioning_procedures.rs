@@ -254,14 +254,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute::ProcedureFragmentContainer,
                         )
                     })?;
                 procedure_fragment_container
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute::ProcedureFragmentContainer,
                         )
                     })?
@@ -277,14 +277,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute::ProcedureFragmentPlacedInto,
                         )
                     })?;
                 procedure_fragment_placed_into
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute::ProcedureFragmentPlacedInto,
                         )
                     })?
@@ -300,14 +300,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute::ProcedureWeighedWith,
                         )
                     })?;
                 procedure_weighed_with
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FractioningProcedureAttribute::ProcedureWeighedWith,
                         )
                     })?

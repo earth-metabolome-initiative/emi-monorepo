@@ -225,14 +225,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::CappingProcedureAttribute::ProcedureCappedContainer,
                         )
                     })?;
                 procedure_capped_container
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::CappingProcedureAttribute::ProcedureCappedContainer,
                         )
                     })?
@@ -248,14 +248,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::CappingProcedureAttribute::ProcedureCappedWith,
                         )
                     })?;
                 procedure_capped_with
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::CappingProcedureAttribute::ProcedureCappedWith,
                         )
                     })?

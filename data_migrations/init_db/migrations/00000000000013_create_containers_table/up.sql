@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS container_models (
 );
 CREATE TABLE IF NOT EXISTS volumetric_container_models (
     id INTEGER PRIMARY KEY REFERENCES container_models(id),
-    -- The maximum volume of the container in liters.
-    liters REAL NOT NULL CHECK (liters > 0.0)
+    -- Volume in liters. The maximum volume of the container.
+    volume REAL NOT NULL CHECK (volume > 0.0)
 );
 CREATE TABLE IF NOT EXISTS container_compatibility_rules (
     container_model INTEGER NOT NULL REFERENCES container_models(id),

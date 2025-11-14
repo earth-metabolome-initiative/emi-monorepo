@@ -214,14 +214,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateAttribute::ProcedureTemplateStratifiedSourceModel,
                         )
                     })?;
                 procedure_template_stratified_source_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateAttribute::ProcedureTemplateStratifiedSourceModel,
                         )
                     })?
@@ -239,14 +239,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateAttribute::ProcedureTemplateSupernatantDestinationModel,
                         )
                     })?;
                 procedure_template_supernatant_destination_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateAttribute::ProcedureTemplateSupernatantDestinationModel,
                         )
                     })?
@@ -264,14 +264,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateAttribute::ProcedureTemplateTransferredWithModel,
                         )
                     })?;
                 procedure_template_transferred_with_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateAttribute::ProcedureTemplateTransferredWithModel,
                         )
                     })?
@@ -289,14 +289,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateAttribute::ProcedureTemplatePipetteTipModel,
                         )
                     })?;
                 procedure_template_pipette_tip_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateAttribute::ProcedureTemplatePipetteTipModel,
                         )
                     })?

@@ -256,17 +256,17 @@ pub enum InsertError<FieldName: TableField> {
 impl<FieldName: TableField> InsertError<FieldName> {
     /// Converts the `InsertError` into a new `InsertError` with a different
     /// field name.
-    pub fn into_field_name<F, NewFieldName>(self, convert: F) -> InsertError<NewFieldName>
+    pub fn replace_field_name<F, NewFieldName>(self, convert: F) -> InsertError<NewFieldName>
     where
         F: Fn(FieldName) -> NewFieldName,
         NewFieldName: TableField<Table = FieldName::Table>,
     {
         match self {
             InsertError::BuilderError(error) => {
-                InsertError::BuilderError(error.into_field_name(convert))
+                InsertError::BuilderError(error.replace_field_name(convert))
             }
             InsertError::ValidationError(error) => {
-                InsertError::ValidationError(error.into_field_name(convert))
+                InsertError::ValidationError(error.replace_field_name(convert))
             }
             InsertError::DieselError(error) => InsertError::DieselError(error),
             InsertError::ForeignKeyViolation {

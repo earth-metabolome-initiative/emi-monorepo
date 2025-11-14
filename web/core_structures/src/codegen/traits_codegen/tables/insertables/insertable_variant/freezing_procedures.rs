@@ -229,14 +229,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureFrozenContainer,
                         )
                     })?;
                 procedure_frozen_container
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureFrozenContainer,
                         )
                     })?
@@ -252,14 +252,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureFrozenWith,
                         )
                     })?;
                 procedure_frozen_with
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FreezingProcedureAttribute::ProcedureFrozenWith,
                         )
                     })?

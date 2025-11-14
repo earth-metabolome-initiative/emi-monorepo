@@ -920,7 +920,7 @@ where
                     stratified_source_model,
                 )
                 .map_err(|e| {
-                    e.into_field_name(|attribute| {
+                    e.replace_field_name(|attribute| {
                         <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateStratifiedSourceModel(
                             attribute,
                         )
@@ -1000,7 +1000,7 @@ where
                         stratified_source_model,
                     )
                     .map_err(|e| {
-                        e.into_field_name(|attribute| {
+                        e.replace_field_name(|attribute| {
                             <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateStratifiedSourceModel(
                                 attribute,
                             )
@@ -1064,7 +1064,7 @@ where
                     supernatant_destination_model,
                 )
                 .map_err(|e| {
-                    e.into_field_name(|attribute| {
+                    e.replace_field_name(|attribute| {
                         <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateSupernatantDestinationModel(
                             attribute,
                         )
@@ -1146,7 +1146,7 @@ where
                         supernatant_destination_model,
                     )
                     .map_err(|e| {
-                        e.into_field_name(|attribute| {
+                        e.replace_field_name(|attribute| {
                             <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateSupernatantDestinationModel(
                                 attribute,
                             )
@@ -1210,7 +1210,7 @@ where
                     transferred_with_model,
                 )
                 .map_err(|e| {
-                    e.into_field_name(|attribute| {
+                    e.replace_field_name(|attribute| {
                         <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateTransferredWithModel(
                             attribute,
                         )
@@ -1290,7 +1290,7 @@ where
                         transferred_with_model,
                     )
                     .map_err(|e| {
-                        e.into_field_name(|attribute| {
+                        e.replace_field_name(|attribute| {
                             <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplateTransferredWithModel(
                                 attribute,
                             )
@@ -1354,7 +1354,7 @@ where
                     pipette_tip_model,
                 )
                 .map_err(|e| {
-                    e.into_field_name(|attribute| {
+                    e.replace_field_name(|attribute| {
                         <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplatePipetteTipModel(
                             attribute,
                         )
@@ -1434,7 +1434,7 @@ where
                         pipette_tip_model,
                     )
                     .map_err(|e| {
-                        e.into_field_name(|attribute| {
+                        e.replace_field_name(|attribute| {
                             <Self as common_traits::builder::Attributed>::Attribute::ProcedureTemplatePipetteTipModel(
                                 attribute,
                             )
@@ -1478,7 +1478,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1497,7 +1497,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1515,7 +1515,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1536,7 +1536,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1554,7 +1554,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1575,7 +1575,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;
@@ -1594,7 +1594,7 @@ where
             )
             .map_err(|e| {
                 e
-                    .into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
+                    .replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                         attribute.into(),
                     ))
             })?;

@@ -34,6 +34,8 @@ impl<'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'table, T>> f
             .unwrap()
             .add_traits(attributes.from_extension_impl())
             .unwrap()
+            .add_traits(attributes.from_impls())
+            .unwrap()
             .build()
             .expect("Failed to build attributes enum")
     }

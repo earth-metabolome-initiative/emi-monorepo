@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS weighing_procedure_templates (
 	-- Identifier of the weighing procedure template, which is also a a foreign key to the general procedure template table.
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	id INTEGER PRIMARY KEY REFERENCES procedure_templates(id) ON DELETE CASCADE,
 	-- The sample container model is the one that is being weighed.
 	weighed_container_model INTEGER NOT NULL REFERENCES volumetric_container_models(id),
 	-- The sample container model should always be an asset model that is compatible with the procedure template.
@@ -22,28 +22,28 @@ CREATE TABLE IF NOT EXISTS weighing_procedure_templates (
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_weighed_container_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_weighed_container_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_weighed_with_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_weighed_with_model
 	)
 );
 CREATE TABLE IF NOT EXISTS weighing_procedures(
-	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
+	id UUID PRIMARY KEY REFERENCES procedures(id) ON DELETE CASCADE,
 	-- We enforce that the model of this procedure must be a weighing procedure template.
-	procedure_template INTEGER NOT NULL REFERENCES weighing_procedure_templates(procedure_template),
+	weighing_procedure_template INTEGER NOT NULL REFERENCES weighing_procedure_templates(id),
 	-- The container being weighed, which must be a volumetric container model.
 	weighed_container UUID NOT NULL REFERENCES volumetric_containers(id),
 	-- The procedure template asset model associated to the `weighed_container`.
 	procedure_template_weighed_container_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure asset associated to the `weighed_container`.
 	procedure_weighed_container UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
-	-- The measured weight, which must be strictly positive.
-	kilograms REAL NOT NULL CHECK (kilograms > 0.0),
+	-- Mass in kilograms. The measured weight, which must be strictly positive.
+	mass REAL NOT NULL CHECK (mass > 0.0),
 	-- The weighing device used for weighing. This field is optional as there
 	-- are several situations where the weighing device is not tracked.
 	weighed_with UUID REFERENCES weighing_devices(id),
@@ -53,21 +53,21 @@ CREATE TABLE IF NOT EXISTS weighing_procedures(
 	procedure_weighed_with UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure is a weighing procedure without the possibility of a mistake.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (id, weighing_procedure_template) REFERENCES procedures(id, procedure_template),
 	-- The `procedure_template_weighed_with_model` must be the same as in the `weighing_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		weighing_procedure_template,
 		procedure_template_weighed_container_model
 	) REFERENCES weighing_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_weighed_container_model
 	),
 	-- The `procedure_template_weighed_container_model` must be the same as in the `weighing_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		weighing_procedure_template,
 		procedure_template_weighed_with_model
 	) REFERENCES weighing_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_weighed_with_model
 	),
 	-- We check that the `procedure_weighed_container` is associated to the `weighed_container`.

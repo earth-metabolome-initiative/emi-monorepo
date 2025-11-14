@@ -5,7 +5,7 @@
 use std::hash::{DefaultHasher, Hash, Hasher};
 
 use common_traits::builder::Builder;
-use sql_traits::traits::{DatabaseLike, ForeignKeyLike, TableLike};
+use sql_traits::traits::{ColumnLike, DatabaseLike, ForeignKeyLike, TableLike};
 
 use crate::{
     error::ConstraintErrorInfo,
@@ -58,16 +58,96 @@ impl<DB: DatabaseLike> TableConstraint for UniqueForeignKey<DB> {
 
     fn table_error_information(
         &self,
+        database: &Self::Database,
         context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
+        // Find the duplicate foreign keys to provide detailed error information
+        let constraints = context.foreign_keys(database).collect::<Vec<_>>();
+        let mut signatures_with_fks: Vec<_> = constraints
+            .iter()
+            .map(|fk| {
+                let mut hasher = DefaultHasher::new();
+                for host_col in fk.host_columns(database) {
+                    host_col.hash(&mut hasher);
+                }
+                let referenced_table = fk.referenced_table(database);
+                referenced_table.hash(&mut hasher);
+                for referenced_col in fk.referenced_columns(database) {
+                    referenced_col.hash(&mut hasher);
+                }
+                (hasher.finish(), *fk)
+            })
+            .collect();
+
+        signatures_with_fks.sort_unstable_by_key(|(sig, _)| *sig);
+
+        // Find the first duplicate
+        let mut duplicate_fks = Vec::new();
+        for window in signatures_with_fks.windows(2) {
+            if let [(sig1, fk1), (sig2, fk2)] = window {
+                if sig1 == sig2 {
+                    duplicate_fks.push(*fk1);
+                    duplicate_fks.push(*fk2);
+                    break;
+                }
+            }
+        }
+
+        let table_name = context.table_name();
+
+        if duplicate_fks.is_empty() {
+            // Fallback for generic case
+            return ConstraintErrorInfo::new()
+                .constraint("UniqueForeignKey")
+                .unwrap()
+                .object(table_name.to_owned())
+                .unwrap()
+                .message(format!("Table '{}' has duplicate foreign keys", table_name))
+                .unwrap()
+                .resolution("Ensure all foreign keys in the table are unique".to_string())
+                .unwrap()
+                .build()
+                .unwrap()
+                .into();
+        }
+
+        // Build detailed error message with the duplicate foreign keys
+        let mut fk_details = Vec::new();
+        for fk in &duplicate_fks {
+            let host_cols: Vec<_> = fk.host_columns(database).map(|c| c.column_name()).collect();
+            let referenced_table = fk.referenced_table(database);
+            let referenced_cols: Vec<_> =
+                fk.referenced_columns(database).map(|c| c.column_name()).collect();
+
+            fk_details.push(format!(
+                "FOREIGN KEY ({}) REFERENCES {} ({})",
+                host_cols.join(", "),
+                referenced_table.table_name(),
+                referenced_cols.join(", ")
+            ));
+        }
+
+        let message = format!(
+            "Table '{}' has {} duplicate foreign key definitions:\n  - {}\nBoth foreign keys reference the same columns and target table",
+            table_name,
+            duplicate_fks.len(),
+            fk_details.join("\n  - ")
+        );
+
+        let resolution = format!(
+            "Remove one of the duplicate foreign key constraints from table '{}'. Keep only one: {}",
+            table_name,
+            fk_details.first().unwrap()
+        );
+
         ConstraintErrorInfo::new()
             .constraint("UniqueForeignKey")
             .unwrap()
-            .object(context.table_name().to_owned())
+            .object(table_name.to_owned())
             .unwrap()
-            .message(format!("Table '{}' has non-unique foreign key", context.table_name()))
+            .message(message)
             .unwrap()
-            .resolution("Ensure all foreign keys in the table are unique".to_string())
+            .resolution(resolution)
             .unwrap()
             .build()
             .unwrap()
@@ -102,7 +182,9 @@ impl<DB: DatabaseLike> TableConstraint for UniqueForeignKey<DB> {
             if let [sig1, sig2] = window
                 && sig1 == sig2
             {
-                return Err(crate::error::Error::Table(self.table_error_information(table)));
+                return Err(crate::error::Error::Table(
+                    self.table_error_information(database, table),
+                ));
             }
         }
 

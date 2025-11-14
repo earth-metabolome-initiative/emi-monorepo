@@ -11,8 +11,15 @@ pub trait TableConstraint {
     type Database: DatabaseLike;
 
     /// Returns information about the failure of this constraint.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query additional
+    ///   information needed for the error message.
+    /// * `context` - The table that failed the constraint.
     fn table_error_information(
         &self,
+        database: &Self::Database,
         context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn ConstraintFailureInformation>;
 

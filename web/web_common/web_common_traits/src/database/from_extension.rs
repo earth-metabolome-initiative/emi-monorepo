@@ -21,7 +21,7 @@ where
     Y: TableField<Table = X::Table>,
 {
     fn from_extension(err: InsertError<X>) -> Self {
-        err.into_field_name(Y::from_extension)
+        err.replace_field_name(Y::from_extension)
     }
 }
 
@@ -30,6 +30,6 @@ where
     Y: FromExtension<EmptyTuple> + TableField,
 {
     fn from_extension(err: BuilderError<EmptyTuple>) -> Self {
-        err.into_field_name(Y::from_extension).into()
+        err.replace_field_name(Y::from_extension).into()
     }
 }

@@ -222,14 +222,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PackagingProcedureAttribute::ProcedureSample,
                         )
                     })?;
                 procedure_sample
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PackagingProcedureAttribute::ProcedureSample,
                         )
                     })?
@@ -245,14 +245,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PackagingProcedureAttribute::ProcedurePackagedWith,
                         )
                     })?;
                 procedure_packaged_with
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PackagingProcedureAttribute::ProcedurePackagedWith,
                         )
                     })?

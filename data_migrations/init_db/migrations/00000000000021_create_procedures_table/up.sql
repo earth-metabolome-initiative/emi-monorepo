@@ -1,18 +1,18 @@
 CREATE TABLE IF NOT EXISTS procedures (
 	-- The ID of this procedure.
-	procedure UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	-- The procedure template of this procedure.
-	procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template),
+	procedure_template INTEGER NOT NULL REFERENCES procedure_templates(id),
 	-- The parent procedure (if any) of this procedure.
-	parent_procedure UUID REFERENCES procedures(procedure) ON DELETE CASCADE CHECK (procedure <> parent_procedure),
+	parent_procedure UUID REFERENCES procedures(id) ON DELETE CASCADE CHECK (id <> parent_procedure),
 	-- The parent procedure template (if any) of this procedure.
-	parent_procedure_template INTEGER REFERENCES procedure_templates(procedure_template) CHECK (
+	parent_procedure_template INTEGER REFERENCES procedure_templates(id) CHECK (
 		procedure_template <> parent_procedure_template
 	),
 	-- The predecessor procedure (if any) of this procedure.
-	predecessor_procedure UUID REFERENCES procedures(procedure) ON DELETE CASCADE CHECK (procedure <> predecessor_procedure),
+	predecessor_procedure UUID REFERENCES procedures(id) ON DELETE CASCADE CHECK (id <> predecessor_procedure),
 	-- The predecessor procedure template (if any) of this procedure.
-	predecessor_procedure_template INTEGER REFERENCES procedure_templates(procedure_template) CHECK (
+	predecessor_procedure_template INTEGER REFERENCES procedure_templates(id) CHECK (
 		procedure_template <> predecessor_procedure_template
 	),
 	-- The name of the most concrete table this procedure is associated with.
@@ -29,16 +29,16 @@ CREATE TABLE IF NOT EXISTS procedures (
 	CHECK (created_at <= updated_at),
 	-- We create an index on (procedure_template, parent_procedure_template) to allow for foreign
 	-- keys from the concrete procedures to check that the procedure template is correctly aligned.
-	UNIQUE (procedure, procedure_template),
+	UNIQUE (id, procedure_template),
 	-- We enforce that if a parent procedure and parent procedure template are specified,
 	-- then the parent procedure must indeed be of the specified parent procedure template.
-	FOREIGN KEY (parent_procedure, parent_procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (parent_procedure, parent_procedure_template) REFERENCES procedures(id, procedure_template),
 	-- We enforce that if a predecessor procedure and predecessor procedure template are specified,
 	-- then the predecessor procedure must indeed be of the specified predecessor procedure template.
 	FOREIGN KEY (
 		predecessor_procedure,
 		predecessor_procedure_template
-	) REFERENCES procedures(procedure, procedure_template),
+	) REFERENCES procedures(id, procedure_template),
 	-- We enforce that if a parent procedure template is specified, then the parent procedure template
 	-- must indeed be a valid parent procedure template for the specified procedure template.
 	FOREIGN KEY (parent_procedure_template, procedure_template) REFERENCES parent_procedure_templates(parent, child),
@@ -89,9 +89,9 @@ CREATE TABLE IF NOT EXISTS procedure_assets (
 	-- The ID of this procedure asset.
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	-- The ID of the procedure this asset is used in.
-	procedure UUID NOT NULL REFERENCES procedures(procedure),
+	procedure UUID NOT NULL REFERENCES procedures(id),
 	-- The procedure template of the procedure this asset is used in.
-	procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template),
+	procedure_template INTEGER NOT NULL REFERENCES procedure_templates(id),
 	-- The asset model of the asset used in this procedure.
 	asset_model INTEGER NOT NULL REFERENCES asset_models(id),
 	-- The specific asset used in this procedure (if any).
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS procedure_assets (
 	-- The ancestor asset model defined in the procedure template asset.
 	ancestor_model INTEGER NOT NULL REFERENCES asset_models(id),
 	-- The procedure template must match the procedure template of the procedure.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (id, procedure_template) REFERENCES procedures(id, procedure_template),
 	-- The procedure template asset must must be compatible with the procedure template of the procedure.
 	FOREIGN KEY (
 		procedure_template_asset_model,
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS procedure_assets (
 -- by being `based_on` the current procedure template asset model.
 CREATE OR REPLACE FUNCTION inherit_procedure_assets() RETURNS TRIGGER AS $$ BEGIN
 INSERT INTO procedure_assets (
-		procedure,
+		id,
 		procedure_template,
 		asset_model,
 		asset,

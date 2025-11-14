@@ -9,6 +9,7 @@ synql-core.workspace = true
 synql-models.workspace = true
 synql-diesel-schema.workspace = true
 synql-insertable.workspace = true
+synql-attributes.workspace = true
 synql-builders-metadata.workspace = true
 synql-insertable-key-settable.workspace = true
 synql-buildable-key-settable.workspace = true

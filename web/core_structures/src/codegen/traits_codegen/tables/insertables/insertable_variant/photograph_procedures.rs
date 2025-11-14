@@ -236,14 +236,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureAttribute::ProcedurePhotographedAsset,
                         )
                     })?;
                 procedure_photographed_asset
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureAttribute::ProcedurePhotographedAsset,
                         )
                     })?
@@ -259,14 +259,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureAttribute::ProcedurePhotographedWith,
                         )
                     })?;
                 procedure_photographed_with
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureAttribute::ProcedurePhotographedWith,
                         )
                     })?
@@ -282,14 +282,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureAttribute::ProcedurePhotograph,
                         )
                     })?;
                 procedure_photograph
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureAttribute::ProcedurePhotograph,
                         )
                     })?

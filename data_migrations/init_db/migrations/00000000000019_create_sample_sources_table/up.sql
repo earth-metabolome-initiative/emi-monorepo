@@ -3,6 +3,6 @@ CREATE TABLE IF NOT EXISTS sample_source_models (
 );
 CREATE TABLE IF NOT EXISTS sample_sources (
   id UUID PRIMARY KEY REFERENCES physical_assets(id),
-  model INTEGER NOT NULL REFERENCES sample_source_models(id),
-  FOREIGN KEY (id, model) REFERENCES assets(id, model)
+  sample_source_model INTEGER NOT NULL REFERENCES sample_source_models(id),
+  FOREIGN KEY (id, sample_source_model) REFERENCES physical_assets(id, physical_asset_model)
 );

@@ -80,6 +80,7 @@ impl<DB: DatabaseLike> TableConstraint for PluralTableName<DB> {
 
     fn table_error_information(
         &self,
+        _database: &Self::Database,
         context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         let table_name = context.table_name();
@@ -114,7 +115,7 @@ impl<DB: DatabaseLike> TableConstraint for PluralTableName<DB> {
 
     fn validate_table(
         &self,
-        _database: &Self::Database,
+        database: &Self::Database,
         table: &<Self::Database as DatabaseLike>::Table,
     ) -> Result<(), crate::error::Error> {
         let table_name = table.table_name();
@@ -128,7 +129,7 @@ impl<DB: DatabaseLike> TableConstraint for PluralTableName<DB> {
         if pluralized == last_segment {
             Ok(())
         } else {
-            Err(crate::error::Error::Table(self.table_error_information(table)))
+            Err(crate::error::Error::Table(self.table_error_information(database, table)))
         }
     }
 }

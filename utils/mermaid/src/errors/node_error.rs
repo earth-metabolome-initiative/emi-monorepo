@@ -37,7 +37,7 @@ impl From<NodeError<GenericNodeAttribute>> for NodeError<FlowchartNodeAttribute>
             NodeError::InvalidId(id) => NodeError::InvalidId(id),
             NodeError::DuplicateNode(node) => NodeError::DuplicateNode(node),
             NodeError::Builder(builder_error) => {
-                NodeError::Builder(builder_error.into_field_name(From::from))
+                NodeError::Builder(builder_error.replace_field_name(From::from))
             }
         }
     }
@@ -51,7 +51,7 @@ impl From<NodeError<GenericNodeAttribute>> for NodeError<ERNodeAttribute> {
             NodeError::InvalidId(id) => NodeError::InvalidId(id),
             NodeError::DuplicateNode(node) => NodeError::DuplicateNode(node),
             NodeError::Builder(builder_error) => {
-                NodeError::Builder(builder_error.into_field_name(From::from))
+                NodeError::Builder(builder_error.replace_field_name(From::from))
             }
         }
     }
@@ -65,7 +65,7 @@ impl From<NodeError<GenericNodeAttribute>> for NodeError<ClassNodeAttribute> {
             NodeError::InvalidId(id) => NodeError::InvalidId(id),
             NodeError::DuplicateNode(node) => NodeError::DuplicateNode(node),
             NodeError::Builder(builder_error) => {
-                NodeError::Builder(builder_error.into_field_name(From::from))
+                NodeError::Builder(builder_error.replace_field_name(From::from))
             }
         }
     }

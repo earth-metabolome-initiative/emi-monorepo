@@ -194,14 +194,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute::ProcedureTemplateMeasuredWithModel,
                         )
                     })?;
                 procedure_template_measured_with_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute::ProcedureTemplateMeasuredWithModel,
                         )
                     })?
@@ -219,14 +219,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute::ProcedureTemplatePouredFromModel,
                         )
                     })?;
                 procedure_template_poured_from_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute::ProcedureTemplatePouredFromModel,
                         )
                     })?
@@ -244,14 +244,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute::ProcedureTemplatePouredIntoModel,
                         )
                     })?;
                 procedure_template_poured_into_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PouringProcedureTemplateAttribute::ProcedureTemplatePouredIntoModel,
                         )
                     })?

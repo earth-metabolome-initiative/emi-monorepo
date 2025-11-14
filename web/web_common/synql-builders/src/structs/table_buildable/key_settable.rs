@@ -9,6 +9,7 @@ use sql_relations::{
     traits::{InheritableDatabaseLike, TriangularSameAsForeignKeyLike, VerticalSameAsColumnLike},
 };
 use sql_traits::traits::DatabaseLike;
+use synql_attributes::prelude::*;
 use synql_buildable_key_settable::traits::TableBuildableKeySettableLike;
 use synql_core::{
     prelude::Builder,
@@ -84,18 +85,11 @@ where
     fn foreign_key_impl(&self, fk: &<T::DB as DatabaseLike>::ForeignKey) -> InternalToken {
         let host_column = fk.host_column(self.database).unwrap();
         let host_column_ident = host_column.column_snake_ident();
-        let trait_ref = self
-            .table
-            .buildable_key_settable_trait_ref(self.workspace)
-            .expect("Failed to get BuildableKeySettable trait ref");
-        let method = trait_ref
-            .method(&host_column.column_snake_name())
-            .expect("Failed to get BuildableKeySettable method definition");
-        let method_ident = method.ident();
-        let question_mark = method.can_fail().then(|| quote! { ? });
         let insertable_ident = self.table.table_singular_snake_ident();
         let maybe_clone = (!host_column.supports_copy(self.database, self.workspace))
             .then(|| quote! { .clone() });
+        let attributes_ref = self.table.attributes_ref(self.workspace).unwrap();
+        let replace_field_name_trait = self.workspace.external_trait("ReplaceFieldName").unwrap();
 
         let vertical_same_as = host_column
             .dominant_vertical_same_as_columns(self.database)
@@ -116,16 +110,32 @@ where
                         host_column.column_name()
                     ));
                 let method_ident = method.ident();
-                let question_mark = method.can_fail().then(|| quote! { ? });
+                let question_mark = method.can_fail().then(|| quote! { .replace_field_name(#attributes_ref::from)? });
+                let maybe_use_replace_field_name_trait = method.can_fail().then(|| quote! {
+                    use #replace_field_name_trait;
+                });
                 InternalToken::new()
                     .stream(quote::quote! {
                         use #ancestor_trait_ref;
+                        #maybe_use_replace_field_name_trait
                         self = self.#method_ident(#host_column_ident #maybe_clone)#question_mark;
                     })
+                    .employed_traits(method.can_fail().then(|| replace_field_name_trait.clone().into()))
                     .build()
                     .unwrap()
             })
             .collect::<Vec<InternalToken>>();
+
+        let iks_trait_ref = self
+            .table
+            .insertable_key_settable_trait_ref(self.workspace)
+            .expect("Failed to get BuildableKeySettable trait ref");
+
+        let method = iks_trait_ref
+            .method(&host_column.column_snake_name())
+            .expect("Failed to get BuildableKeySettable method definition");
+        let method_ident = method.ident();
+        let question_mark = method.can_fail().then(|| quote! { ? });
 
         InternalToken::new()
             .stream(quote::quote! {

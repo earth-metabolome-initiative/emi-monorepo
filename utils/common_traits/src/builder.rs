@@ -81,7 +81,7 @@ pub enum BuilderError<A> {
 impl<FieldName> BuilderError<FieldName> {
     /// Converts the `BuilderError` into a new `BuilderError` with a different
     /// field name.
-    pub fn into_field_name<F, NewFieldName>(self, convert: F) -> BuilderError<NewFieldName>
+    pub fn replace_field_name<F, NewFieldName>(self, convert: F) -> BuilderError<NewFieldName>
     where
         F: Fn(FieldName) -> NewFieldName,
     {

@@ -48,6 +48,7 @@ impl<DB: DatabaseLike> TableConstraint for LowercaseTableName<DB> {
 
     fn table_error_information(
         &self,
+        _database: &Self::Database,
         context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         ConstraintErrorInfo::new()
@@ -66,13 +67,13 @@ impl<DB: DatabaseLike> TableConstraint for LowercaseTableName<DB> {
 
     fn validate_table(
         &self,
-        _database: &Self::Database,
+        database: &Self::Database,
         table: &<Self::Database as DatabaseLike>::Table,
     ) -> Result<(), crate::error::Error> {
         if table.table_name().chars().all(|c| !c.is_alphabetic() || c.is_lowercase()) {
             Ok(())
         } else {
-            Err(crate::error::Error::Table(self.table_error_information(table)))
+            Err(crate::error::Error::Table(self.table_error_information(database, table)))
         }
     }
 }

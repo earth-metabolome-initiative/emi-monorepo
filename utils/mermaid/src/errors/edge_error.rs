@@ -47,7 +47,7 @@ impl From<EdgeError<GenericEdgeAttribute>> for EdgeError<FlowchartEdgeAttribute>
             EdgeError::SourceNodeNotFound(node) => EdgeError::SourceNodeNotFound(node),
             EdgeError::DestinationNodeNotFound(node) => EdgeError::DestinationNodeNotFound(node),
             EdgeError::Builder(builder_error) => {
-                EdgeError::Builder(builder_error.into_field_name(From::from))
+                EdgeError::Builder(builder_error.replace_field_name(From::from))
             }
         }
     }
@@ -66,7 +66,7 @@ impl From<EdgeError<GenericEdgeAttribute>> for EdgeError<ClassEdgeAttribute> {
             EdgeError::SourceNodeNotFound(node) => EdgeError::SourceNodeNotFound(node),
             EdgeError::DestinationNodeNotFound(node) => EdgeError::DestinationNodeNotFound(node),
             EdgeError::Builder(builder_error) => {
-                EdgeError::Builder(builder_error.into_field_name(From::from))
+                EdgeError::Builder(builder_error.replace_field_name(From::from))
             }
         }
     }

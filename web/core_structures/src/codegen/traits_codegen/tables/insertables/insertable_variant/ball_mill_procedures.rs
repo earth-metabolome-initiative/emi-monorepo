@@ -261,14 +261,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::ProcedureBead,
                         )
                     })?;
                 procedure_bead
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::ProcedureBead,
                         )
                     })?
@@ -284,14 +284,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::ProcedureMilledWith,
                         )
                     })?;
                 procedure_milled_with
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::ProcedureMilledWith,
                         )
                     })?
@@ -307,14 +307,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::ProcedureMilledContainer,
                         )
                     })?;
                 procedure_milled_container
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::ProcedureMilledContainer,
                         )
                     })?

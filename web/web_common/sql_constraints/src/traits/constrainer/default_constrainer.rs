@@ -26,8 +26,6 @@ use crate::{
 /// - [`LowercaseTableName`]: Ensures table names are lowercase
 /// - [`SnakeCaseTableName`]: Ensures table names follow `snake_case` convention
 /// - [`PluralTableName`]: Ensures table names are plural
-/// - [`NonCompositePrimaryKeyNamedId`]: Ensures non-composite primary keys are
-///   named "id"
 /// - [`NoForbiddenColumnInExtension`]: Prevents forbidden columns in extended
 ///   tables
 /// - [`NonRedundantExtensionDag`]: Ensures no redundant edges in extension
@@ -40,6 +38,8 @@ use crate::{
 ///
 /// ## Column Constraints
 /// - [`LowercaseColumnName`]: Ensures column names are lowercase
+/// - [`NonCompositePrimaryKeyNamedId`]: Ensures non-composite primary keys are
+///   named "id"
 /// - [`SnakeCaseColumnName`]: Ensures column names follow `snake_case`
 ///   convention
 /// - [`SingularColumnName`]: Ensures column names are singular
@@ -73,8 +73,9 @@ where
         constrainer.register_table_constraint(Box::new(LowercaseTableName::default()));
         constrainer.register_table_constraint(Box::new(SnakeCaseTableName::default()));
         constrainer.register_table_constraint(Box::new(PluralTableName::default()));
-        constrainer.register_table_constraint(Box::new(NonCompositePrimaryKeyNamedId::default()));
-        constrainer.register_table_constraint(Box::new(NoForbiddenColumnInExtension::new("id")));
+        constrainer.register_table_constraint(Box::new(NoForbiddenColumnInExtension::new(
+            "most_concrete_table",
+        )));
         constrainer.register_table_constraint(Box::new(NonRedundantExtensionDag::default()));
         constrainer.register_table_constraint(Box::new(UniqueCheckConstraint::default()));
         constrainer
@@ -84,6 +85,7 @@ where
 
         // Register all column constraints
         constrainer.register_column_constraint(Box::new(LowercaseColumnName::default()));
+        constrainer.register_column_constraint(Box::new(NonCompositePrimaryKeyNamedId::default()));
         constrainer.register_column_constraint(Box::new(SnakeCaseColumnName::default()));
         constrainer.register_column_constraint(Box::new(SingularColumnName::default()));
 

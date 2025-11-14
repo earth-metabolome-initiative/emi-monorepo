@@ -14,8 +14,6 @@ mod unique_foreign_key;
 pub use unique_foreign_key::UniqueForeignKey;
 mod has_primary_key;
 pub use has_primary_key::HasPrimaryKey;
-mod non_composite_primary_key_named_id;
-pub use non_composite_primary_key_named_id::NonCompositePrimaryKeyNamedId;
 mod no_forbidden_column_in_extension;
 pub use no_forbidden_column_in_extension::NoForbiddenColumnInExtension;
 mod non_redundant_extension_dag;

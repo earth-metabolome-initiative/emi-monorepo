@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS aliquoting_procedure_templates (
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
-	-- The amount of liters that should be aliquoted.
-	liters REAL NOT NULL CHECK (liters > 0.0),
+	id INTEGER PRIMARY KEY REFERENCES procedure_templates(id) ON DELETE CASCADE,
+	-- The volume in liters that should be aliquoted.
+	volume REAL NOT NULL CHECK (volume > 0.0),
 	-- Source container from which the aliquot is taken.
 	aliquoted_from_model INTEGER NOT NULL REFERENCES volumetric_container_models(id),
 	procedure_template_aliquoted_from_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
@@ -35,32 +35,32 @@ CREATE TABLE IF NOT EXISTS aliquoting_procedure_templates (
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_aliquoted_from_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_aliquoted_from_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_aliquoted_into_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_aliquoted_into_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_aliquoted_with_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_aliquoted_with_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_pipette_tip_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_pipette_tip_model
 	)
 );
 CREATE TABLE IF NOT EXISTS aliquoting_procedures (
-	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
+	id UUID PRIMARY KEY REFERENCES procedures(id) ON DELETE CASCADE,
 	-- We enforce that the model of this procedure must be an aliquoting procedure template.
-	procedure_template INTEGER NOT NULL REFERENCES aliquoting_procedure_templates(procedure_template),
+	aliquoting_procedure_template INTEGER NOT NULL REFERENCES aliquoting_procedure_templates(id),
 	-- The identifier of the instrument used for aliquoting.
 	aliquoted_with UUID REFERENCES pipettes(id),
 	-- The identifier of the instrument model used for aliquoting.
@@ -89,41 +89,41 @@ CREATE TABLE IF NOT EXISTS aliquoting_procedures (
 	procedure_aliquoted_into UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure is an aliquoting procedure without the possibility of a mistake.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (id, aliquoting_procedure_template) REFERENCES procedures(id, procedure_template),
 	-- The procedure template asset model describing the `aliquoted_with` must be the same one
 	-- as the one in the procedure template.
 	FOREIGN KEY (
-		procedure_template,
+		aliquoting_procedure_template,
 		procedure_template_aliquoted_with_model
 	) REFERENCES aliquoting_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_aliquoted_with_model
 	),
 	-- The procedure template asset model describing the `pipette_tip_model` must be the same one
 	-- as the one in the procedure template.
 	FOREIGN KEY (
-		procedure_template,
+		aliquoting_procedure_template,
 		procedure_template_pipette_tip_model
 	) REFERENCES aliquoting_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_pipette_tip_model
 	),
 	-- The procedure template asset model describing the `aliquoted_from` must be the same one
 	-- as the one in the procedure template.
 	FOREIGN KEY (
-		procedure_template,
+		aliquoting_procedure_template,
 		procedure_template_aliquoted_from_model
 	) REFERENCES aliquoting_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_aliquoted_from_model
 	),
 	-- The procedure template asset model describing the `aliquoted_into` must be the same one
 	-- as the one in the procedure template.
 	FOREIGN KEY (
-		procedure_template,
+		aliquoting_procedure_template,
 		procedure_template_aliquoted_into_model
 	) REFERENCES aliquoting_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_aliquoted_into_model
 	),
 	-- We enforce that the procedure template asset model reported in the procedure is indeed

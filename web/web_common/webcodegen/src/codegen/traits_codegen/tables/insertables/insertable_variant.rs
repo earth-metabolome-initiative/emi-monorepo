@@ -285,7 +285,7 @@ impl Table {
                                     #builder_ident,
                                     #column_ident
                                 ).map_err(|err| {
-                                    err.into_field_name(#insertable_enum::#camel_cased_column_ident)
+                                    err.replace_field_name(#insertable_enum::#camel_cased_column_ident)
                                 })?;
                             })
                         })
@@ -308,7 +308,7 @@ impl Table {
                             #builder_ident,
                             #column_ident
                         ).map_err(|err| {
-                            err.into_field_name(#insertable_enum::#camel_cased_column_ident)
+                            err.replace_field_name(#insertable_enum::#camel_cased_column_ident)
                         })?;
                     });
                 }
@@ -338,7 +338,7 @@ impl Table {
                         let #local_column_ident = self.#local_column_ident
                             .mint_primary_key(user_id, conn)
                             .map_err(|err| {
-                                err.into_field_name(#insertable_enum::#camel_cased_column_ident)
+                                err.replace_field_name(#insertable_enum::#camel_cased_column_ident)
                             })?;
                     }
                 }
@@ -353,7 +353,7 @@ impl Table {
                                 #local_column_ident
                                     .mint_primary_key(user_id, conn)
                                     .map_err(|err| {
-                                        err.into_field_name(#insertable_enum::#camel_cased_column_ident)
+                                        err.replace_field_name(#insertable_enum::#camel_cased_column_ident)
                                     })?
                             }
                         };

@@ -128,7 +128,7 @@ impl Table {
                     quote! {
                         self.#foreign_key_ident = <#foreign_table_ident as #setter_trait>::#setter_method(
                             self.#foreign_key_ident, #snake_case_ident
-                        ).map_err(|e| e.into_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(attribute.into())))?;
+                        ).map_err(|e| e.replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(attribute.into())))?;
                         Ok(self)
                     },
                 ))

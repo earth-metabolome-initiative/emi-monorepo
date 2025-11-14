@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS geolocation_procedure_templates (
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	id INTEGER PRIMARY KEY REFERENCES procedure_templates(id) ON DELETE CASCADE,
 	-- The device used for geolocation.
 	geolocated_with_model INTEGER NOT NULL REFERENCES positioning_device_models(id),
 	procedure_template_geolocated_with_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
@@ -18,21 +18,21 @@ CREATE TABLE IF NOT EXISTS geolocation_procedure_templates (
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_geolocated_with_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_geolocated_with_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_geolocated_asset_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_geolocated_asset_model
 	)
 );
 CREATE TABLE IF NOT EXISTS geolocation_procedures (
-	-- Identifier of the geolocation procedure, which is also a foreign key to the general procedure.
-	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
+	-- Identifier of the geolocation id, which is also a foreign key to the general procedure.
+	id UUID PRIMARY KEY REFERENCES procedures(id) ON DELETE CASCADE,
 	-- The template of this procedure should be a geolocation procedure template.
-	procedure_template INTEGER NOT NULL REFERENCES geolocation_procedure_templates(procedure_template),
+	geolocation_procedure_template INTEGER NOT NULL REFERENCES geolocation_procedure_templates(id),
 	-- The asset being geolocated, which must be a physical asset.
 	geolocated_asset UUID NOT NULL REFERENCES physical_assets(id),
 	-- The procedure template asset model associated to the `geolocated_asset`.
@@ -48,21 +48,21 @@ CREATE TABLE IF NOT EXISTS geolocation_procedures (
 	-- The latitude and longitude of the geolocation.
 	location GEOGRAPHY(POINT, 4326) NOT NULL,
 	-- We enforce that the current `geolocation` has indeed the same `geolocation_template`.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (id, geolocation_procedure_template) REFERENCES procedures(id, procedure_template),
 	-- The `procedure_template_geolocated_with_model` must be the same as in the `geolocation_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		geolocation_procedure_template,
 		procedure_template_geolocated_with_model
 	) REFERENCES geolocation_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_geolocated_with_model
 	),
 	-- The `procedure_template_geolocated_asset_model` must be the same as in the `geolocation_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		geolocation_procedure_template,
 		procedure_template_geolocated_asset_model
 	) REFERENCES geolocation_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_geolocated_asset_model
 	),
 	-- We check that the `procedure_geolocated_asset` has the same `procedure_template_geolocated_asset_model`.

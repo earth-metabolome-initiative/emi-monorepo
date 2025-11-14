@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS temporary_user (
+CREATE TABLE IF NOT EXISTS temporary_users (
     id SERIAL PRIMARY KEY,
     email text NOT NULL CHECK (must_be_email(email)),
     login_provider_id SMALLINT NOT NULL REFERENCES login_providers (id) ON DELETE CASCADE,

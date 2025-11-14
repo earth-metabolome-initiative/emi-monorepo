@@ -287,14 +287,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute::ProcedureAliquotedWith,
                         )
                     })?;
                 procedure_aliquoted_with
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute::ProcedureAliquotedWith,
                         )
                     })?
@@ -310,14 +310,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute::ProcedurePipetteTip,
                         )
                     })?;
                 procedure_pipette_tip
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute::ProcedurePipetteTip,
                         )
                     })?
@@ -333,14 +333,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute::ProcedureAliquotedFrom,
                         )
                     })?;
                 procedure_aliquoted_from
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute::ProcedureAliquotedFrom,
                         )
                     })?
@@ -356,14 +356,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute::ProcedureAliquotedInto,
                         )
                     })?;
                 procedure_aliquoted_into
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureAttribute::ProcedureAliquotedInto,
                         )
                     })?

@@ -2,7 +2,8 @@
 use quote::quote;
 use synql_core::{
     prelude::Builder,
-    structs::{InternalDataVariant, InternalEnum, InternalToken},
+    structs::{InternalDataVariant, InternalEnum, InternalToken, TraitVariantRef},
+    utils::generic_type,
 };
 
 use crate::traits::{TableAttributesLike, TableExtensionAttributesLike};
@@ -73,6 +74,43 @@ impl<'table, T: TableExtensionAttributesLike + TableAttributesLike + ?Sized>
             })
             .build()
             .unwrap()
+    }
+
+    fn from_impls(&self) -> Vec<InternalToken> {
+        let enum_ident = self.table.table_extension_attributes_ident();
+
+        let from_trait =
+            self.workspace.external_trait("From").expect("Core crate must have From trait");
+
+        self.table
+            .extended_tables(self.database)
+            .into_iter()
+            .map(|extended_table| {
+                let extended_table_camel_ident = extended_table.table_singular_camel_ident();
+                let extended_table_attributes =
+                    extended_table.attributes_ref(self.workspace).unwrap();
+
+                let attr_from_trait: TraitVariantRef = from_trait
+                    .set_generic_field(&generic_type("T"), extended_table_attributes.clone().into())
+                    .unwrap()
+                    .into();
+
+                let attr_from_trait_with_generic = attr_from_trait.format_with_generics();
+
+                InternalToken::new()
+                    .private()
+                    .stream(quote! {
+                        impl #attr_from_trait_with_generic for #enum_ident {
+                            fn from(attrs: #extended_table_attributes) -> Self {
+                                Self::#extended_table_camel_ident(attrs)
+                            }
+                        }
+                    })
+                    .implemented_trait(attr_from_trait)
+                    .build()
+                    .unwrap()
+            })
+            .collect()
     }
 }
 

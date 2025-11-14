@@ -306,14 +306,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute::ProcedureStratifiedSource,
                         )
                     })?;
                 procedure_stratified_source
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute::ProcedureStratifiedSource,
                         )
                     })?
@@ -331,14 +331,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute::ProcedureSupernatantDestination,
                         )
                     })?;
                 procedure_supernatant_destination
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute::ProcedureSupernatantDestination,
                         )
                     })?
@@ -354,14 +354,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute::ProcedureTransferredWith,
                         )
                     })?;
                 procedure_transferred_with
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute::ProcedureTransferredWith,
                         )
                     })?
@@ -377,14 +377,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute::ProcedurePipetteTip,
                         )
                     })?;
                 procedure_pipette_tip
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute::ProcedurePipetteTip,
                         )
                     })?

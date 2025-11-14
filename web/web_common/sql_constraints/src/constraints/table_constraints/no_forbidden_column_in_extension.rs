@@ -118,22 +118,29 @@ impl<DB: DatabaseLike> TableConstraint for NoForbiddenColumnInExtension<DB> {
 
     fn table_error_information(
         &self,
+        database: &Self::Database,
         context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
+        let table_name = context.table_name();
+        let extended_tables = context.extended_tables(database);
+        let extended_table_names: Vec<_> = extended_tables.iter().map(|t| t.table_name()).collect();
+
         ConstraintErrorInfo::new()
             .constraint("NoForbiddenColumnInExtension")
             .unwrap()
-            .object(context.table_name().to_owned())
+            .object(table_name.to_owned())
             .unwrap()
             .message(format!(
-                "Table '{}' extends other tables but has a forbidden column named '{}'",
-                context.table_name(),
+                "Table '{}' extends {} ({}) but has a forbidden column named '{}'",
+                table_name,
+                if extended_table_names.len() == 1 { "table" } else { "tables" },
+                extended_table_names.join(", "),
                 self.forbidden_name
             ))
             .unwrap()
             .resolution(format!(
-                "Rename or remove the '{}' column from the table",
-                self.forbidden_name
+                "Rename or remove the '{}' column from table '{}' (extension tables should not define this column)",
+                self.forbidden_name, table_name
             ))
             .unwrap()
             .build()
@@ -158,7 +165,9 @@ impl<DB: DatabaseLike> TableConstraint for NoForbiddenColumnInExtension<DB> {
         for column in table.columns(database) {
             let column_name_lower = column.column_name().to_lowercase();
             if column_name_lower == forbidden_name_lower {
-                return Err(crate::error::Error::Table(self.table_error_information(table)));
+                return Err(crate::error::Error::Table(
+                    self.table_error_information(database, table),
+                ));
             }
         }
 

@@ -8,7 +8,7 @@ pub trait ReplaceFieldName {
     type Replaced<NewFieldName>;
 
     /// Converts the error into the provided new attribute type.
-    fn into_field_name<Map, NewFieldName>(self, map: Map) -> Self::Replaced<NewFieldName>
+    fn replace_field_name<Map, NewFieldName>(self, map: Map) -> Self::Replaced<NewFieldName>
     where
         Map: Fn(Self::FieldName) -> NewFieldName;
 }

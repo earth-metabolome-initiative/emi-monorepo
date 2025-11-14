@@ -245,14 +245,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureAttribute::ProcedureCentrifugedContainer,
                         )
                     })?;
                 procedure_centrifuged_container
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureAttribute::ProcedureCentrifugedContainer,
                         )
                     })?
@@ -268,14 +268,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureAttribute::ProcedureCentrifugedWith,
                         )
                     })?;
                 procedure_centrifuged_with
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::CentrifugeProcedureAttribute::ProcedureCentrifugedWith,
                         )
                     })?

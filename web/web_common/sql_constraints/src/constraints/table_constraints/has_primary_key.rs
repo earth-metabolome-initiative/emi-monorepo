@@ -49,6 +49,7 @@ impl<DB: DatabaseLike> TableConstraint for HasPrimaryKey<DB> {
 
     fn table_error_information(
         &self,
+        _database: &Self::Database,
         context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         ConstraintErrorInfo::new()
@@ -73,7 +74,7 @@ impl<DB: DatabaseLike> TableConstraint for HasPrimaryKey<DB> {
         if table.has_primary_key(database) {
             Ok(())
         } else {
-            Err(crate::error::Error::Table(self.table_error_information(table)))
+            Err(crate::error::Error::Table(self.table_error_information(database, table)))
         }
     }
 }

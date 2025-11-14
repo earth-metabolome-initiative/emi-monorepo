@@ -2,7 +2,7 @@
 //! that column names are lowercase.
 
 use common_traits::builder::Builder;
-use sql_traits::traits::{ColumnLike, DatabaseLike};
+use sql_traits::traits::{ColumnLike, DatabaseLike, TableLike};
 
 use crate::{
     error::ConstraintErrorInfo,
@@ -47,27 +47,39 @@ impl<C: ColumnLike> ColumnConstraint for LowercaseColumnName<C> {
     type Column = C;
     fn column_error_information(
         &self,
+        database: &<Self::Column as ColumnLike>::DB,
         column: &Self::Column,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
+        let table = column.table(database);
+        let table_name = table.table_name();
+        let column_name = column.column_name();
+
         ConstraintErrorInfo::new()
             .constraint("LowercaseColumnName")
             .unwrap()
-            .object(column.column_name().to_owned())
+            .object(format!("{}.{}", table_name, column_name))
             .unwrap()
-            .message(format!("Column name '{}' is not lowercase", column.column_name()))
+            .message(format!("Column '{}' in table '{}' is not lowercase", column_name, table_name))
             .unwrap()
-            .resolution("Rename the column to be all lowercase".to_string())
+            .resolution(format!(
+                "Rename column '{}' in table '{}' to be all lowercase",
+                column_name, table_name
+            ))
             .unwrap()
             .build()
             .unwrap()
             .into()
     }
 
-    fn validate_column(&self, column: &Self::Column) -> Result<(), crate::error::Error> {
+    fn validate_column(
+        &self,
+        database: &<Self::Column as ColumnLike>::DB,
+        column: &Self::Column,
+    ) -> Result<(), crate::error::Error> {
         if column.column_name().chars().all(|c| !c.is_alphabetic() || c.is_lowercase()) {
             Ok(())
         } else {
-            Err(crate::error::Error::Column(self.column_error_information(column)))
+            Err(crate::error::Error::Column(self.column_error_information(database, column)))
         }
     }
 }

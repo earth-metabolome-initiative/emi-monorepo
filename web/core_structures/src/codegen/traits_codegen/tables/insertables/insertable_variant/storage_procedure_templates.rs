@@ -181,14 +181,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute::ProcedureTemplateStoredIntoModel,
                         )
                     })?;
                 procedure_template_stored_into_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute::ProcedureTemplateStoredIntoModel,
                         )
                     })?
@@ -206,14 +206,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute::ProcedureTemplateStoredAssetModel,
                         )
                     })?;
                 procedure_template_stored_asset_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute::ProcedureTemplateStoredAssetModel,
                         )
                     })?

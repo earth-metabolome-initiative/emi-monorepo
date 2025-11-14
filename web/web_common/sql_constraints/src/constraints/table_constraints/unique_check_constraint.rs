@@ -52,6 +52,7 @@ impl<DB: DatabaseLike> TableConstraint for UniqueCheckConstraint<DB> {
 
     fn table_error_information(
         &self,
+        _database: &Self::Database,
         context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         ConstraintErrorInfo::new()
@@ -77,7 +78,9 @@ impl<DB: DatabaseLike> TableConstraint for UniqueCheckConstraint<DB> {
         constraints.sort_unstable_by_key(|c| c.expression(database));
         for window in constraints.windows(2) {
             if window[0].expression(database) == window[1].expression(database) {
-                return Err(crate::error::Error::Table(self.table_error_information(table)));
+                return Err(crate::error::Error::Table(
+                    self.table_error_information(database, table),
+                ));
             }
         }
         Ok(())

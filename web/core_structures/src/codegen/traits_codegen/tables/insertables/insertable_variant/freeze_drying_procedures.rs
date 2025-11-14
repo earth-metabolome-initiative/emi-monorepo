@@ -248,14 +248,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureAttribute::ProcedureFreezeDriedContainer,
                         )
                     })?;
                 procedure_freeze_dried_container
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureAttribute::ProcedureFreezeDriedContainer,
                         )
                     })?
@@ -271,14 +271,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureAttribute::ProcedureFreezeDriedWith,
                         )
                     })?;
                 procedure_freeze_dried_with
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::FreezeDryingProcedureAttribute::ProcedureFreezeDriedWith,
                         )
                     })?

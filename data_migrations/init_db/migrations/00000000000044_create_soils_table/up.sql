@@ -3,6 +3,6 @@ CREATE TABLE IF NOT EXISTS soil_models (
 );
 CREATE TABLE IF NOT EXISTS soils (
   id UUID PRIMARY KEY REFERENCES sample_sources(id),
-  model INTEGER NOT NULL REFERENCES soil_models(id),
-  FOREIGN KEY (id, model) REFERENCES assets(id, model)
+  soil_model INTEGER NOT NULL REFERENCES soil_models(id),
+  FOREIGN KEY (id, soil_model) REFERENCES sample_sources(id, sample_source_model)
 );

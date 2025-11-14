@@ -1,17 +1,17 @@
 //! Submodule providing the `NonCompositePrimaryKeyNamedId` constraint, which
-//! enforces that if a table has a non-composite primary key, the column must be
-//! named "id".
+//! enforces that if a column is a non-composite primary key, it must be named
+//! "id".
 
 use common_traits::builder::Builder;
 use sql_traits::traits::{ColumnLike, DatabaseLike, TableLike};
 
 use crate::{
     error::ConstraintErrorInfo,
-    traits::{Constrainer, GenericConstrainer, TableConstraint},
+    traits::{ColumnConstraint, Constrainer, GenericConstrainer},
 };
 
-/// Struct defining a constraint that enforces that if a table has a
-/// non-composite primary key, the column must be named "id".
+/// Struct defining a constraint that enforces that if a column is a
+/// non-composite primary key, it must be named "id".
 ///
 /// # Example
 ///
@@ -38,66 +38,80 @@ use crate::{
 /// .unwrap();
 /// assert!(constrainer.validate_schema(&valid_composite_schema).is_ok());
 /// ```
-pub struct NonCompositePrimaryKeyNamedId<DB>(std::marker::PhantomData<DB>);
+pub struct NonCompositePrimaryKeyNamedId<C>(std::marker::PhantomData<C>);
 
-impl<DB> Default for NonCompositePrimaryKeyNamedId<DB> {
+impl<C> Default for NonCompositePrimaryKeyNamedId<C> {
     fn default() -> Self {
         Self(std::marker::PhantomData)
     }
 }
 
-impl<DB: DatabaseLike + 'static> From<NonCompositePrimaryKeyNamedId<DB>>
+impl<DB: DatabaseLike + 'static> From<NonCompositePrimaryKeyNamedId<DB::Column>>
     for GenericConstrainer<DB>
 {
-    fn from(constraint: NonCompositePrimaryKeyNamedId<DB>) -> Self {
+    fn from(constraint: NonCompositePrimaryKeyNamedId<DB::Column>) -> Self {
         let mut constrainer = GenericConstrainer::default();
-        constrainer.register_table_constraint(Box::new(constraint));
+        constrainer.register_column_constraint(Box::new(constraint));
         constrainer
     }
 }
 
-impl<DB: DatabaseLike> TableConstraint for NonCompositePrimaryKeyNamedId<DB> {
-    type Database = DB;
+impl<C: ColumnLike> ColumnConstraint for NonCompositePrimaryKeyNamedId<C> {
+    type Column = C;
 
-    fn table_error_information(
+    fn column_error_information(
         &self,
-        context: &<Self::Database as DatabaseLike>::Table,
+        database: &<Self::Column as ColumnLike>::DB,
+        column: &Self::Column,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
+        let column_name = column.column_name();
+        let table = column.table(database);
+        let table_name = table.table_name();
+
         ConstraintErrorInfo::new()
             .constraint("NonCompositePrimaryKeyNamedId")
             .unwrap()
-            .object(context.table_name().to_owned())
+            .object(format!("{}.{}", table_name, column_name))
             .unwrap()
             .message(format!(
-                "Table '{}' has a non-composite primary key, but the column is not named 'id'",
-                context.table_name()
+                "Column '{}' in table '{}' is a non-composite primary key but is not named 'id'",
+                column_name, table_name
             ))
             .unwrap()
-            .resolution("Rename the primary key column to 'id'".to_string())
+            .resolution(format!(
+                "Rename the primary key column '{}' to 'id' in table '{}'",
+                column_name, table_name
+            ))
             .unwrap()
             .build()
             .unwrap()
             .into()
     }
 
-    fn validate_table(
+    fn validate_column(
         &self,
-        database: &Self::Database,
-        table: &<Self::Database as DatabaseLike>::Table,
+        database: &<Self::Column as ColumnLike>::DB,
+        column: &Self::Column,
     ) -> Result<(), crate::error::Error> {
+        // Check if this column is a primary key
+        if !column.is_primary_key(database) {
+            return Ok(());
+        }
+
+        // Get the table to check if it has a composite primary key
+        let table = column.table(database);
         let pk_columns: Vec<_> = table.primary_key_columns(database).collect();
 
-        // If there's no primary key or it's composite, the constraint doesn't apply
-        if pk_columns.is_empty() || pk_columns.len() > 1 {
+        // If the primary key is composite, the constraint doesn't apply
+        if pk_columns.len() > 1 {
             return Ok(());
         }
 
         // Single primary key column must be named "id"
-        let pk_column = pk_columns[0];
-        if pk_column.column_name() == "id" {
+        if column.column_name() == "id" {
             Ok(())
         } else {
-            Err(crate::error::Error::Table(self.table_error_information(table)))
+            Err(crate::error::Error::Column(self.column_error_information(database, column)))
         }
     }
 }

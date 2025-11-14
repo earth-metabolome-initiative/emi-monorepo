@@ -71,9 +71,11 @@ pub trait Constrainer: Default {
     /// Returns an error if any column constraint is violated.
     fn encounter_column(
         &self,
+        database: &Self::Database,
         column: &<Self::Database as DatabaseLike>::Column,
     ) -> Result<(), Error> {
-        self.column_constraints().try_for_each(|constraint| constraint.validate_column(column))
+        self.column_constraints()
+            .try_for_each(|constraint| constraint.validate_column(database, column))
     }
 
     /// Encounters a foreign key and applies all registered foreign key
@@ -101,7 +103,7 @@ pub trait Constrainer: Default {
         for table in database.tables() {
             self.encounter_table(database, table)?;
             for column in table.columns(database) {
-                self.encounter_column(column)?;
+                self.encounter_column(database, column)?;
             }
             for foreign_key in table.foreign_keys(database) {
                 self.encounter_foreign_key(database, foreign_key)?;

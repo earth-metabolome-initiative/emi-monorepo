@@ -126,7 +126,8 @@ impl ExternalTrait {
             let generics_with_defaults =
                 self.generics.iter().zip(self.generic_defaults.iter()).map(|(ident, default)| {
                     if let Some(default) = default {
-                        quote::quote! { #default }
+                        let default_with_generics = default.format_with_generics();
+                        quote::quote! { #default_with_generics }
                     } else {
                         quote::quote! { #ident }
                     }

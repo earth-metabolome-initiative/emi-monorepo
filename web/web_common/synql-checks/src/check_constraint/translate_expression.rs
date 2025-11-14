@@ -483,12 +483,12 @@ where
                 Some(match scoped_columns.len() {
                     1 => {
                         quote! {
-                            .map_err(|e| e.into_field_name(|_|#(#attributes),* ))
+                            .map_err(|e| e.replace_field_name(|_|#(#attributes),* ))
                         }
                     }
                     2 => {
                         quote! {
-                            .map_err(|e| e.into_field_names(|_|#(#attributes),* ))
+                            .map_err(|e| e.replace_field_names(|_|#(#attributes),* ))
                         }
                     }
                     _ => {

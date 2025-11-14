@@ -9,7 +9,7 @@ impl<FieldName> ReplaceFieldName for SingleFieldError<FieldName> {
     type FieldName = FieldName;
     type Replaced<NewFieldName> = SingleFieldError<NewFieldName>;
 
-    fn into_field_name<Map, NewFieldName>(self, map: Map) -> Self::Replaced<NewFieldName>
+    fn replace_field_name<Map, NewFieldName>(self, map: Map) -> Self::Replaced<NewFieldName>
     where
         Map: Fn(Self::FieldName) -> NewFieldName,
     {
@@ -36,7 +36,7 @@ impl<FieldName> ReplaceFieldName for DoubleFieldError<FieldName> {
     type FieldName = FieldName;
     type Replaced<NewFieldName> = DoubleFieldError<NewFieldName>;
 
-    fn into_field_name<Map, NewFieldName>(self, map: Map) -> Self::Replaced<NewFieldName>
+    fn replace_field_name<Map, NewFieldName>(self, map: Map) -> Self::Replaced<NewFieldName>
     where
         Map: Fn(Self::FieldName) -> NewFieldName,
     {
@@ -67,13 +67,28 @@ impl<FieldName> ReplaceFieldName for ValidationError<FieldName> {
     type FieldName = FieldName;
     type Replaced<NewFieldName> = ValidationError<NewFieldName>;
 
-    fn into_field_name<Map, NewFieldName>(self, map: Map) -> Self::Replaced<NewFieldName>
+    fn replace_field_name<Map, NewFieldName>(self, map: Map) -> Self::Replaced<NewFieldName>
     where
         Map: Fn(Self::FieldName) -> NewFieldName,
     {
         match self {
-            Self::SingleField(error) => ValidationError::SingleField(error.into_field_name(map)),
-            Self::DoubleField(error) => ValidationError::DoubleField(error.into_field_name(map)),
+            Self::SingleField(error) => ValidationError::SingleField(error.replace_field_name(map)),
+            Self::DoubleField(error) => ValidationError::DoubleField(error.replace_field_name(map)),
+        }
+    }
+}
+
+impl<O, E: ReplaceFieldName> ReplaceFieldName for Result<O, E> {
+    type FieldName = E::FieldName;
+    type Replaced<NewFieldName> = Result<O, E::Replaced<NewFieldName>>;
+
+    fn replace_field_name<Map, NewFieldName>(self, map: Map) -> Self::Replaced<NewFieldName>
+    where
+        Map: Fn(Self::FieldName) -> NewFieldName,
+    {
+        match self {
+            Ok(value) => Ok(value),
+            Err(err) => Err(err.replace_field_name(map)),
         }
     }
 }

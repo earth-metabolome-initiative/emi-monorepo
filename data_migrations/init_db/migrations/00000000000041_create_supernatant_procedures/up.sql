@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS supernatant_procedure_templates (
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
-	-- The amount of liters that should be transferred
-	liters REAL NOT NULL CHECK (liters > 0.0),
+	id INTEGER PRIMARY KEY REFERENCES procedure_templates(id) ON DELETE CASCADE,
+	-- Volume in liters. The amount that should be transferred.
+	volume REAL NOT NULL CHECK (volume > 0.0),
 	-- The source container from which the supernatant is taken.
 	stratified_source_model INTEGER NOT NULL REFERENCES volumetric_container_models(id),
 	procedure_template_stratified_source_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
@@ -35,32 +35,32 @@ CREATE TABLE IF NOT EXISTS supernatant_procedure_templates (
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_stratified_source_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_stratified_source_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_supernatant_destination_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_supernatant_destination_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_transferred_with_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_transferred_with_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_pipette_tip_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_pipette_tip_model
 	)
 );
 CREATE TABLE IF NOT EXISTS supernatant_procedures (
-	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
+	id UUID PRIMARY KEY REFERENCES procedures(id) ON DELETE CASCADE,
 	-- We enforce that the model of this procedure must be a supernatant procedure template.
-	procedure_template INTEGER NOT NULL REFERENCES supernatant_procedure_templates(procedure_template),
+	supernatant_procedure_template INTEGER NOT NULL REFERENCES supernatant_procedure_templates(id),
 	-- The source container from which the supernatant is taken.
 	stratified_source UUID NOT NULL REFERENCES volumetric_containers(id),
 	-- The procedure template asset model associated to the `stratified_source`.
@@ -89,37 +89,37 @@ CREATE TABLE IF NOT EXISTS supernatant_procedures (
 	procedure_pipette_tip UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure is a supernatant procedure without the possibility of a mistake.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (id, supernatant_procedure_template) REFERENCES procedures(id, procedure_template),
 	-- The `procedure_template_stratified_source_model` must be the same as in the `supernatant_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		supernatant_procedure_template,
 		procedure_template_stratified_source_model
 	) REFERENCES supernatant_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_stratified_source_model
 	),
 	-- The `procedure_template_supernatant_destination_model` must be the same as in the `supernatant_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		supernatant_procedure_template,
 		procedure_template_supernatant_destination_model
 	) REFERENCES supernatant_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_supernatant_destination_model
 	),
 	-- The `procedure_template_transferred_with_model` must be the same as in the `supernatant_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		supernatant_procedure_template,
 		procedure_template_transferred_with_model
 	) REFERENCES supernatant_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_transferred_with_model
 	),
 	-- The `procedure_template_pipette_tip_model` must be the same as in the `supernatant_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		supernatant_procedure_template,
 		procedure_template_pipette_tip_model
 	) REFERENCES supernatant_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_pipette_tip_model
 	),
 	-- We check that the `procedure_stratified_source` is associated to the `stratified_source`.
@@ -159,7 +159,5 @@ CREATE TABLE IF NOT EXISTS supernatant_procedures (
 	FOREIGN KEY (
 		procedure_transferred_with,
 		transferred_with_model
-	) REFERENCES procedure_assets(id, asset_model),
-	-- We check that the `procedure_pipette_tip` is associated to the `pipette_tip_model`.
-	FOREIGN KEY (procedure_pipette_tip, pipette_tip_model) REFERENCES procedure_assets(id, asset_model)
+	) REFERENCES procedure_assets(id, asset_model)
 );

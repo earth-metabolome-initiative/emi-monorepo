@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS ball_mill_procedure_templates (
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	id INTEGER PRIMARY KEY REFERENCES procedure_templates(id) ON DELETE CASCADE,
 	-- The storage temperature in Kelvin.
 	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (kelvin > 0.0),
 	-- Tolerance percentage for the storage temperature.
@@ -7,12 +7,12 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedure_templates (
 		kelvin_tolerance_percentage > 0.0
 		AND kelvin_tolerance_percentage <= 100.0
 	),
-	-- By default, we set it to 150 seconds (2.5 minutes).
-	seconds REAL NOT NULL DEFAULT 150.0 CHECK (
-		seconds <= 900.0
-		AND seconds >= 30.0
+	-- Duration in seconds. By default, we set it to 150 seconds (2.5 minutes).
+	duration REAL NOT NULL DEFAULT 150.0 CHECK (
+		duration <= 900.0
+		AND duration >= 30.0
 	),
-	-- The time in seconds that the ball mill should be used for the procedure.
+	-- The frequency in hertz at which the ball mill should operate during the procedure.
 	hertz REAL NOT NULL DEFAULT 25.0 CHECK (
 		hertz <= 50.0
 		AND hertz >= 15.0
@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedure_templates (
 	-- The beads model used for the procedure.
 	bead_model INTEGER NOT NULL REFERENCES bead_models(id),
 	procedure_template_bead_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
-	--- The number of beads used in the procedure.
-	number_of_beads SMALLINT NOT NULL DEFAULT 3 CHECK (number_of_beads > 0),
+	--- The count of beads used in the procedure.
+	bead_count SMALLINT NOT NULL DEFAULT 3 CHECK (bead_count > 0),
 	-- The device used for the ball mill procedure.
 	milled_with_model INTEGER NOT NULL REFERENCES ball_mill_machine_models(id),
 	procedure_template_milled_with_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
@@ -48,25 +48,25 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedure_templates (
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_bead_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_bead_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_milled_with_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_milled_with_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_milled_container_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_milled_container_model
 	)
 );
 CREATE TABLE IF NOT EXISTS ball_mill_procedures (
-	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
-	procedure_template INTEGER NOT NULL REFERENCES ball_mill_procedure_templates(procedure_template),
+	id UUID PRIMARY KEY REFERENCES procedures(id) ON DELETE CASCADE,
+	ball_mill_procedure_template INTEGER NOT NULL REFERENCES ball_mill_procedure_templates(id),
 	-- The beads model used for the procedure.
 	bead_model INTEGER NOT NULL REFERENCES bead_models(id),
 	-- The procedure template asset model associated to the `bead_model`.
@@ -92,32 +92,32 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedures (
 	procedure_milled_container UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure is a ball mill procedure without the possibility of a mistake.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (id, ball_mill_procedure_template) REFERENCES procedures(id, procedure_template),
 	-- The procedure template asset model describing the `bead_model` must be the same one
 	-- as the one in the procedure template.
 	FOREIGN KEY (
-		procedure_template,
+		ball_mill_procedure_template,
 		procedure_template_bead_model
 	) REFERENCES ball_mill_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_bead_model
 	),
 	-- The procedure template asset model describing the `milled_with_model` must be the same one
 	-- as the one in the procedure template.
 	FOREIGN KEY (
-		procedure_template,
+		ball_mill_procedure_template,
 		procedure_template_milled_with_model
 	) REFERENCES ball_mill_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_milled_with_model
 	),
 	-- The procedure template asset model describing the `milled_container_model` must be the same one
 	-- as the one in the procedure template.
 	FOREIGN KEY (
-		procedure_template,
+		ball_mill_procedure_template,
 		procedure_template_milled_container_model
 	) REFERENCES ball_mill_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_milled_container_model
 	),
 	-- We enforce that the procedure template asset model reported in the procedure is indeed

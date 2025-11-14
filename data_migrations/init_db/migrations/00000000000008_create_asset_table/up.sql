@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS physical_asset_models (
 );
 CREATE TABLE IF NOT EXISTS physical_assets (
     id UUID PRIMARY KEY REFERENCES assets(id) ON DELETE CASCADE,
-    model INTEGER NOT NULL REFERENCES physical_asset_models(id) ON DELETE CASCADE,
-    FOREIGN KEY (id, model) REFERENCES assets(id, model)
+    physical_asset_model INTEGER NOT NULL REFERENCES physical_asset_models(id) ON DELETE CASCADE,
+    FOREIGN KEY (id, physical_asset_model) REFERENCES assets(id, model)
 );
 CREATE TABLE IF NOT EXISTS digital_asset_models (
     id INTEGER PRIMARY KEY REFERENCES asset_models(id) ON DELETE CASCADE,
@@ -43,8 +43,8 @@ CREATE TABLE IF NOT EXISTS digital_asset_models (
 );
 CREATE TABLE IF NOT EXISTS digital_assets (
     id UUID PRIMARY KEY REFERENCES assets(id) ON DELETE CASCADE,
-    model INTEGER NOT NULL REFERENCES digital_asset_models(id) ON DELETE CASCADE,
-    FOREIGN KEY (id, model) REFERENCES assets(id, model)
+    digital_asset_model INTEGER NOT NULL REFERENCES digital_asset_models(id) ON DELETE CASCADE,
+    FOREIGN KEY (id, digital_asset_model) REFERENCES assets(id, model)
 );
 CREATE TABLE IF NOT EXISTS asset_compatibility_rules (
     left_asset_model INTEGER NOT NULL REFERENCES asset_models(id) ON DELETE CASCADE,

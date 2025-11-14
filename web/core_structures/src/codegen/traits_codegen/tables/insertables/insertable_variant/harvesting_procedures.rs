@@ -215,14 +215,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::HarvestingProcedureAttribute::ProcedureSampleSource,
                         )
                     })?;
                 procedure_sample_source
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::HarvestingProcedureAttribute::ProcedureSampleSource,
                         )
                     })?
@@ -236,14 +236,14 @@ where
                         procedure,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::HarvestingProcedureAttribute::ProcedureSample,
                         )
                     })?;
                 procedure_sample
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::HarvestingProcedureAttribute::ProcedureSample,
                         )
                     })?

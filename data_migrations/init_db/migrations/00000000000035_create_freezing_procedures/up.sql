@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS freezing_procedure_templates (
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	id INTEGER PRIMARY KEY REFERENCES procedure_templates(id) ON DELETE CASCADE,
 	-- The storage temperature in Kelvin.
 	kelvin REAL NOT NULL DEFAULT 203.15 CHECK (kelvin > 0.0),
 	-- Tolerance percentage for the storage temperature.
@@ -7,8 +7,8 @@ CREATE TABLE IF NOT EXISTS freezing_procedure_templates (
 		kelvin_tolerance_percentage > 0.0
 		AND kelvin_tolerance_percentage <= 100.0
 	),
-	-- We use a default of 43200 seconds (12 hours) for the freezing procedure.
-	seconds REAL DEFAULT 43200.0 CHECK (seconds > 1800.0),
+	-- Duration in seconds. We use a default of 43200 seconds (12 hours) for the freezing procedure.
+	duration REAL DEFAULT 43200.0 CHECK (duration > 1800.0),
 	-- The device used for freezing.
 	frozen_with_model INTEGER NOT NULL REFERENCES freezer_models(id),
 	procedure_template_frozen_with_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
@@ -30,21 +30,21 @@ CREATE TABLE IF NOT EXISTS freezing_procedure_templates (
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_frozen_with_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_frozen_with_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_frozen_container_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_frozen_container_model
 	)
 );
 CREATE TABLE IF NOT EXISTS freezing_procedures (
-	-- Identifier of the freezing procedure, which is also a foreign key to the general procedure.
-	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
+	-- Identifier of the freezing id, which is also a foreign key to the general procedure.
+	id UUID PRIMARY KEY REFERENCES procedures(id) ON DELETE CASCADE,
 	-- The template of this procedure should be a freezing procedure template.
-	procedure_template INTEGER NOT NULL REFERENCES freezing_procedure_templates(procedure_template),
+	freezing_procedure_template INTEGER NOT NULL REFERENCES freezing_procedure_templates(id),
 	-- The container that is being frozen, which must be a volumetric container.
 	frozen_container UUID NOT NULL REFERENCES volumetric_containers(id),
 	-- The model of the container being frozen, which must be a container model.
@@ -62,21 +62,21 @@ CREATE TABLE IF NOT EXISTS freezing_procedures (
 	-- The procedure asset associated to the `frozen_with`.
 	procedure_frozen_with UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
 	-- We enforce that the current `freezing_procedure_templates` has indeed the same `freezing_procedure_templates_template`.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (id, freezing_procedure_template) REFERENCES procedures(id, procedure_template),
 	-- The `procedure_template_frozen_with_model` must be the same as in the `freezing_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		freezing_procedure_template,
 		procedure_template_frozen_with_model
 	) REFERENCES freezing_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_frozen_with_model
 	),
 	-- The `procedure_template_frozen_container_model` must be the same as in the `freezing_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		freezing_procedure_template,
 		procedure_template_frozen_container_model
 	) REFERENCES freezing_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_frozen_container_model
 	),
 	-- We check that the `frozen_with_model` is compatible with the `frozen_container_model`.

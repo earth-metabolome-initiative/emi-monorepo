@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS projects (
     color_id SMALLINT NOT NULL DEFAULT 1,
     parent_project_id INTEGER,
     budget REAL,
-    expenses REAL,
+    -- Total cost incurred by the project
+    cost REAL,
     created_by INTEGER NOT NULL REFERENCES users(id),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_by INTEGER NOT NULL REFERENCES users(id),

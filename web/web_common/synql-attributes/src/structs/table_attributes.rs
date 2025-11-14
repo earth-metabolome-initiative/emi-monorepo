@@ -1,10 +1,14 @@
 //! Submodule defining the `TableAttributes` struct.
+use std::borrow::Borrow;
+
 use quote::quote;
+use sql_traits::traits::ForeignKeyLike;
 use syn::Ident;
 use synql_core::{
     prelude::Builder,
-    structs::{InternalDataVariant, InternalEnum, InternalToken},
+    structs::{InternalDataVariant, InternalEnum, InternalToken, TraitVariantRef},
     traits::ColumnSynLike,
+    utils::generic_type,
 };
 
 use crate::traits::{
@@ -107,6 +111,94 @@ impl<'table, T: TableAttributesLike + ?Sized> TableAttributes<'table, T> {
                 .build()
                 .unwrap(),
         )
+    }
+
+    /// Implements the `From` traits for conversions of extension attributes
+    /// or column attributes which are uncertain i.e. there is no multiple
+    /// options of possible sources.
+    ///
+    /// # Implementation details
+    ///
+    /// * If an extended table does not appear as a possible target of a column
+    ///   foreign key, then it is possible to convert from the column attribute
+    ///   directly to the extended table attributes.
+    /// * If a table which is NOT an extended table appears as a possible target
+    ///   of a column singleton foreign key, i.e. a foreign key which is the
+    ///   only foreign key referencing its target table, then it is possible to
+    ///   convert from the column attribute directly to the target table
+    ///   attributes.
+    fn from_impls(&self) -> Vec<InternalToken> {
+        let mut from_impls = Vec::new();
+
+        let validation_error = self
+            .workspace
+            .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
+            .expect("Workspace must have ValidationError type");
+
+        let replace_field_name_trait = self
+            .workspace
+            .external_trait("ReplaceFieldName")
+            .expect("Workspace must have ReplaceFieldName trait");
+
+        let from_trait =
+            self.workspace.external_trait("From").expect("Core crate must have From trait");
+
+        for extended_table in self.table.extended_tables(self.database) {
+            // If there exists a foreign key from this table to the extended table
+            // which is not a host primary key reference, then we cannot have a
+            // direct conversion from the column attribute to the extended table
+            // attributes.
+            if self.table.foreign_keys(self.database).any(|fk| {
+                let referenced_table: &T = fk.referenced_table(self.database).borrow();
+                !fk.is_host_primary_key(self.database) && referenced_table == extended_table
+            }) {
+                continue;
+            }
+
+            let extended_table_attributes = extended_table.attributes_ref(self.workspace).unwrap();
+            let enum_ident = self.table.table_attributes_ident();
+
+            let left = validation_error
+                .set_generic_field(
+                    &generic_type("FieldName"),
+                    extended_table_attributes.clone().into(),
+                )
+                .unwrap();
+            let validation_from =
+                from_trait.set_generic_field(&generic_type("T"), left.clone().into()).unwrap();
+
+            let from_trait: TraitVariantRef = from_trait
+                .set_generic_field(&generic_type("T"), extended_table_attributes.clone().into())
+                .unwrap()
+                .into();
+
+            let from_trait_with_generic = from_trait.format_with_generics();
+            let validation_from_with_generic = validation_from.format_with_generics();
+
+            from_impls.push(
+                InternalToken::new()
+                    .private()
+                    .stream(quote! {
+                        impl #from_trait_with_generic for #enum_ident {
+                            fn from(attrs: #extended_table_attributes) -> Self {
+                                Self::Extension(attrs.into())
+                            }
+                        }
+                        impl #validation_from_with_generic for #validation_error<#enum_ident> {
+                            fn from(err: #left) -> Self {
+                                use #replace_field_name_trait;
+                                err.replace_field_name(#enum_ident::from)
+                            }
+                        }
+                    })
+                    .implemented_traits([from_trait, validation_from.into()])
+                    .employed_trait(replace_field_name_trait.clone().into())
+                    .build()
+                    .unwrap(),
+            );
+        }
+
+        from_impls
     }
 }
 

@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS packaging_procedure_templates (
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	id INTEGER PRIMARY KEY REFERENCES procedure_templates(id) ON DELETE CASCADE,
 	packaged_with_model INTEGER NOT NULL REFERENCES packaging_models(id),
 	procedure_template_packaged_with_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
 	sample_model INTEGER NOT NULL REFERENCES physical_asset_models(id),
@@ -19,21 +19,21 @@ CREATE TABLE IF NOT EXISTS packaging_procedure_templates (
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_packaged_with_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_packaged_with_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_sample_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_sample_model
 	)
 );
 CREATE TABLE IF NOT EXISTS packaging_procedures (
 	-- The extended `procedure`.
-	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
+	id UUID PRIMARY KEY REFERENCES procedures(id) ON DELETE CASCADE,
 	-- The procedure template of the extended `procedure`.
-	procedure_template INTEGER NOT NULL REFERENCES packaging_procedure_templates(procedure_template),
+	packaging_procedure_template INTEGER NOT NULL REFERENCES packaging_procedure_templates(id),
 	-- The sample being packaged, which must be a physical asset.
 	sample UUID NOT NULL REFERENCES physical_assets(id),
 	-- The model of the sample being packaged, which must be a physical asset model.
@@ -50,21 +50,21 @@ CREATE TABLE IF NOT EXISTS packaging_procedures (
 	procedure_packaged_with UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure is a packaging procedure.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (id, packaging_procedure_template) REFERENCES procedures(id, procedure_template),
 	-- The `procedure_template_packaged_with_model` must be the same as in the `packaging_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		packaging_procedure_template,
 		procedure_template_packaged_with_model
 	) REFERENCES packaging_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_packaged_with_model
 	),
 	-- The `procedure_template_sample_model` must be the same as in the `packaging_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		packaging_procedure_template,
 		procedure_template_sample_model
 	) REFERENCES packaging_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_sample_model
 	),
 	-- We check that the `procedure_sample` is associated to the `sample`.

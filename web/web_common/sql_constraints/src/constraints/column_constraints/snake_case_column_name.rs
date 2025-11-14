@@ -3,7 +3,7 @@
 
 use common_traits::builder::Builder;
 use snake_case_sanitizer::Sanitizer;
-use sql_traits::traits::{ColumnLike, DatabaseLike};
+use sql_traits::traits::{ColumnLike, DatabaseLike, TableLike};
 
 use crate::{
     error::ConstraintErrorInfo,
@@ -66,8 +66,11 @@ impl<C: ColumnLike> ColumnConstraint for SnakeCaseColumnName<C> {
 
     fn column_error_information(
         &self,
+        database: &<Self::Column as ColumnLike>::DB,
         column: &Self::Column,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
+        let table = column.table(database);
+        let table_name = table.table_name();
         let column_name = column.column_name();
         let sanitizer =
             Sanitizer::default().remove_leading_underscores().remove_trailing_underscores();
@@ -88,14 +91,14 @@ impl<C: ColumnLike> ColumnConstraint for SnakeCaseColumnName<C> {
         ConstraintErrorInfo::new()
             .constraint("SnakeCaseColumnName")
             .unwrap()
-            .object(column_name.to_owned())
+            .object(format!("{}.{}", table_name, column_name))
             .unwrap()
             .message(format!(
-                "Column '{column_name}' violates snake_case naming convention: {issue}"
+                "Column '{column_name}' in table '{table_name}' violates snake_case naming convention: {issue}"
             ))
             .unwrap()
             .resolution(format!(
-                "Change '{column_name}' to '{expected_name}' (use lowercase letters and single underscores only)"
+                "Change '{column_name}' to '{expected_name}' in table '{table_name}' (use lowercase letters and single underscores only)"
             ))
             .unwrap()
             .build()
@@ -103,7 +106,11 @@ impl<C: ColumnLike> ColumnConstraint for SnakeCaseColumnName<C> {
             .into()
     }
 
-    fn validate_column(&self, column: &Self::Column) -> Result<(), crate::error::Error> {
+    fn validate_column(
+        &self,
+        database: &<Self::Column as ColumnLike>::DB,
+        column: &Self::Column,
+    ) -> Result<(), crate::error::Error> {
         let column_name = column.column_name();
         let sanitizer =
             Sanitizer::default().remove_leading_underscores().remove_trailing_underscores();
@@ -111,7 +118,7 @@ impl<C: ColumnLike> ColumnConstraint for SnakeCaseColumnName<C> {
         // Check if the name matches its snake_case conversion
         match sanitizer.to_snake_case(column_name) {
             Ok(snake_case_name) if snake_case_name == column_name => Ok(()),
-            _ => Err(crate::error::Error::Column(self.column_error_information(column))),
+            _ => Err(crate::error::Error::Column(self.column_error_information(database, column))),
         }
     }
 }

@@ -66,6 +66,7 @@ impl<DB: DatabaseLike> TableConstraint for SnakeCaseTableName<DB> {
 
     fn table_error_information(
         &self,
+        _database: &Self::Database,
         context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         let table_name = context.table_name();
@@ -105,7 +106,7 @@ impl<DB: DatabaseLike> TableConstraint for SnakeCaseTableName<DB> {
 
     fn validate_table(
         &self,
-        _database: &Self::Database,
+        database: &Self::Database,
         table: &<Self::Database as DatabaseLike>::Table,
     ) -> Result<(), crate::error::Error> {
         let table_name = table.table_name();
@@ -115,7 +116,7 @@ impl<DB: DatabaseLike> TableConstraint for SnakeCaseTableName<DB> {
         // Check if the name matches its snake_case conversion
         match sanitizer.to_snake_case(table_name) {
             Ok(snake_case_name) if snake_case_name == table_name => Ok(()),
-            _ => Err(crate::error::Error::Table(self.table_error_information(table))),
+            _ => Err(crate::error::Error::Table(self.table_error_information(database, table))),
         }
     }
 }

@@ -187,14 +187,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureTemplateAttribute::ProcedureTemplatePhotographedWithModel,
                         )
                     })?;
                 procedure_template_photographed_with_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureTemplateAttribute::ProcedureTemplatePhotographedWithModel,
                         )
                     })?
@@ -212,14 +212,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureTemplateAttribute::ProcedureTemplatePhotographedAssetModel,
                         )
                     })?;
                 procedure_template_photographed_asset_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureTemplateAttribute::ProcedureTemplatePhotographedAssetModel,
                         )
                     })?
@@ -237,14 +237,14 @@ where
                         procedure_template,
                     )
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureTemplateAttribute::ProcedureTemplatePhotographModel,
                         )
                     })?;
                 procedure_template_photograph_model
                     .mint_primary_key(user_id, conn)
                     .map_err(|err| {
-                        err.into_field_name(
+                        err.replace_field_name(
                             crate::codegen::structs_codegen::tables::insertables::PhotographProcedureTemplateAttribute::ProcedureTemplatePhotographModel,
                         )
                     })?

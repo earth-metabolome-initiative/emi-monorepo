@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS pouring_procedure_templates (
 	-- Identifier of the pouring procedure template, which is also a foreign key to the general procedure template.
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	id INTEGER PRIMARY KEY REFERENCES procedure_templates(id) ON DELETE CASCADE,
 	-- The device model used to measure the liquid volume.
 	measured_with_model INTEGER NOT NULL REFERENCES volume_measuring_device_models(id),
 	-- The associated procedure asset model for the measuring device.
@@ -15,8 +15,8 @@ CREATE TABLE IF NOT EXISTS pouring_procedure_templates (
 	-- The associated procedure asset model for the destination container. It is always associated
 	-- to the same procedure template of this pouring procedure template.
 	procedure_template_poured_into_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
-	-- The amount of liquid that is poured into the container.
-	liters REAL NOT NULL CHECK (liters > 0.0),
+	-- Volume in liters. The amount of liquid that is poured into the container.
+	volume REAL NOT NULL CHECK (volume > 0.0),
 	-- The measuring device must match the procedure template of the procedure.
 	FOREIGN KEY (
 		procedure_template_measured_with_model,
@@ -33,27 +33,27 @@ CREATE TABLE IF NOT EXISTS pouring_procedure_templates (
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_measured_with_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_measured_with_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_poured_from_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_poured_from_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_poured_into_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_poured_into_model
 	)
 );
 CREATE TABLE IF NOT EXISTS pouring_procedures (
 	-- The extended `procedure`.
-	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
+	id UUID PRIMARY KEY REFERENCES procedures(id) ON DELETE CASCADE,
 	-- The procedure template of the extended `procedure`.
-	procedure_template INTEGER NOT NULL REFERENCES pouring_procedure_templates(procedure_template),
+	pouring_procedure_template INTEGER NOT NULL REFERENCES pouring_procedure_templates(id),
 	-- The container from which the liquid is poured.
 	poured_from UUID NOT NULL REFERENCES volumetric_containers(id),
 	-- The procedure template asset model associated to the `poured_from`.
@@ -74,29 +74,29 @@ CREATE TABLE IF NOT EXISTS pouring_procedures (
 	procedure_poured_into UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure is a packaging procedure.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (id, pouring_procedure_template) REFERENCES procedures(id, procedure_template),
 	-- The `procedure_template_measured_with_model` must be the same as in the `pouring_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		pouring_procedure_template,
 		procedure_template_measured_with_model
 	) REFERENCES pouring_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_measured_with_model
 	),
 	-- The `procedure_template_poured_from_model` must be the same as in the `pouring_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		pouring_procedure_template,
 		procedure_template_poured_from_model
 	) REFERENCES pouring_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_poured_from_model
 	),
 	-- The `procedure_template_poured_into_model` must be the same as in the `pouring_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		pouring_procedure_template,
 		procedure_template_poured_into_model
 	) REFERENCES pouring_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_poured_into_model
 	),
 	-- We check that the `procedure_poured_from` is associated to the `poured_from`.

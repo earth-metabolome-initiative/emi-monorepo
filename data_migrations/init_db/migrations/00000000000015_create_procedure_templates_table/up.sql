@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS procedure_templates (
 	-- Identifier of the procedure template
-	procedure_template SERIAL PRIMARY KEY,
+	id SERIAL PRIMARY KEY,
 	-- The most concrete table variant descendant of this procedure template,
 	-- which allows for rapidly determining the type of a procedure template
 	-- without having to execute multiple queries.
@@ -25,9 +25,9 @@ CREATE TABLE IF NOT EXISTS procedure_templates (
 CREATE TABLE IF NOT EXISTS parent_procedure_templates (
 	PRIMARY KEY (parent, child),
 	-- The parent procedure template
-	parent INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	parent INTEGER NOT NULL REFERENCES procedure_templates(id) ON DELETE CASCADE,
 	-- The child procedure template
-	child INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE CHECK (parent <> child),
+	child INTEGER NOT NULL REFERENCES procedure_templates(id) ON DELETE CASCADE CHECK (parent <> child),
 	-- The user who created this relationship
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	-- The timestamp when this relationship was created
@@ -36,11 +36,11 @@ CREATE TABLE IF NOT EXISTS parent_procedure_templates (
 CREATE TABLE IF NOT EXISTS next_procedure_templates (
 	PRIMARY KEY (parent, predecessor, successor),
 	-- The parent procedure template
-	parent INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	parent INTEGER NOT NULL REFERENCES procedure_templates(id) ON DELETE CASCADE,
 	-- The predecessor procedure template
-	predecessor INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	predecessor INTEGER NOT NULL REFERENCES procedure_templates(id) ON DELETE CASCADE,
 	-- The successor procedure template
-	successor INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE CHECK (predecessor <> successor),
+	successor INTEGER NOT NULL REFERENCES procedure_templates(id) ON DELETE CASCADE CHECK (predecessor <> successor),
 	-- The user who created this relationship
 	created_by INTEGER NOT NULL REFERENCES users(id),
 	-- The timestamp when this relationship was created
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS procedure_template_asset_models (
 	-- The name of the procedure template asset model
 	name TEXT NOT NULL CHECK (must_be_paragraph(name)),
 	-- Procedure template this asset model is associated with
-	procedure_template INTEGER NOT NULL REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	procedure_template INTEGER NOT NULL REFERENCES procedure_templates(id) ON DELETE CASCADE,
 	-- Optional reference to a procedure template asset model from another procedure template
 	-- which this procedure template asset model is based on
 	based_on INTEGER REFERENCES procedure_template_asset_models(id),

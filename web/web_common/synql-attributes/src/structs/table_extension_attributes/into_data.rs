@@ -12,7 +12,6 @@ impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttrib
     for InternalData
 {
     fn from(extension_attributes: TableExtensionAttributes<'table, T>) -> Self {
-        let display_impl = extension_attributes.display_impl();
         let extension_attributes_clone = extension_attributes.clone();
         let schema_crate_ref = extension_attributes
             .table
@@ -35,7 +34,9 @@ impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttrib
                     .unwrap(),
             )
             .variant(extension_attributes_clone.into())
-            .add_trait(display_impl)
+            .add_trait(extension_attributes.display_impl())
+            .unwrap()
+            .add_traits(extension_attributes.from_impls())
             .unwrap()
             .build()
             .unwrap()

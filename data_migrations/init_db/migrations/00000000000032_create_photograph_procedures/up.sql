@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS photograph_procedure_templates (
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	id INTEGER PRIMARY KEY REFERENCES procedure_templates(id) ON DELETE CASCADE,
 	-- The device used for photograph.
 	photographed_with_model INTEGER NOT NULL REFERENCES camera_models(id),
 	procedure_template_photographed_with_model INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
@@ -23,27 +23,27 @@ CREATE TABLE IF NOT EXISTS photograph_procedure_templates (
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_photographed_with_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_photographed_with_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_photographed_asset_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_photographed_asset_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_photograph_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_photograph_model
 	)
 );
 CREATE TABLE IF NOT EXISTS photograph_procedures (
-	-- Identifier of the photograph procedure, which is also a foreign key to the general procedure.
-	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
+	-- Identifier of the photograph id, which is also a foreign key to the general procedure.
+	id UUID PRIMARY KEY REFERENCES procedures(id) ON DELETE CASCADE,
 	-- The template of this procedure should be a photograph procedure template.
-	procedure_template INTEGER NOT NULL REFERENCES photograph_procedure_templates(procedure_template),
+	photograph_procedure_template INTEGER NOT NULL REFERENCES photograph_procedure_templates(id),
 	-- The asset being photographed, which must be a physical asset.
 	photographed_asset UUID REFERENCES physical_assets(id),
 	-- The procedure template asset model associated to the `photographed_asset`.
@@ -63,29 +63,29 @@ CREATE TABLE IF NOT EXISTS photograph_procedures (
 	-- The procedure asset associated to the `photograph`.
 	procedure_photograph UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
 	-- We enforce that the current `photograph` has indeed the same `photograph_template`.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (id, photograph_procedure_template) REFERENCES procedures(id, procedure_template),
 	-- The `procedure_template_photographed_with_model` must be the same as in the `photograph_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		photograph_procedure_template,
 		procedure_template_photographed_with_model
 	) REFERENCES photograph_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_photographed_with_model
 	),
 	-- The `procedure_template_photographed_asset_model` must be the same as in the `photograph_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		photograph_procedure_template,
 		procedure_template_photographed_asset_model
 	) REFERENCES photograph_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_photographed_asset_model
 	),
 	-- The `procedure_template_photograph_model` must be the same as in the `photograph_procedure_templates`.
 	FOREIGN KEY (
-		procedure_template,
+		photograph_procedure_template,
 		procedure_template_photograph_model
 	) REFERENCES photograph_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_photograph_model
 	),
 	-- We check that the `procedure_photographed_with` is associated to the same `procedure_template_photographed_with_model`.

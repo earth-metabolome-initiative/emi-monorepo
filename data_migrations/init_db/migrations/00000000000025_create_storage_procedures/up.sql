@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS storage_procedure_templates (
-	procedure_template INTEGER PRIMARY KEY REFERENCES procedure_templates(procedure_template) ON DELETE CASCADE,
+	id INTEGER PRIMARY KEY REFERENCES procedure_templates(id) ON DELETE CASCADE,
 	-- The storage temperature in Kelvin.
 	kelvin REAL NOT NULL DEFAULT 293.15 CHECK (kelvin > 0.0),
 	-- Tolerance percentage for the storage temperature.
@@ -28,21 +28,21 @@ CREATE TABLE IF NOT EXISTS storage_procedure_templates (
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_stored_into_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_stored_into_model
 	),
 	-- We create a unique index to allow for foreign keys checking that there exist a `procedure_template_stored_asset_model`
 	-- for the current `procedure_template`.
 	UNIQUE (
-		procedure_template,
+		id,
 		procedure_template_stored_asset_model
 	)
 );
 CREATE TABLE IF NOT EXISTS storage_procedures (
-	-- Identifier of the storage procedure, which is also a foreign key to the general procedure.
-	procedure UUID PRIMARY KEY REFERENCES procedures(procedure) ON DELETE CASCADE,
+	-- Identifier of the storage id, which is also a foreign key to the general procedure.
+	id UUID PRIMARY KEY REFERENCES procedures(id) ON DELETE CASCADE,
 	-- The template of this procedure should be a storage procedure template.
-	procedure_template INTEGER NOT NULL REFERENCES storage_procedure_templates(procedure_template),
+	storage_procedure_template INTEGER NOT NULL REFERENCES storage_procedure_templates(id),
 	-- The asset being stored, which must be a physical asset.
 	stored_asset UUID NOT NULL REFERENCES physical_assets(id),
 	-- The model of the asset being stored, which must be a physical asset model.
@@ -60,23 +60,23 @@ CREATE TABLE IF NOT EXISTS storage_procedures (
 	-- The procedure asset describing the `stored_into`.
 	procedure_stored_into UUID NOT NULL REFERENCES procedure_assets(id),
 	-- The current procedure must be a storage procedure.
-	FOREIGN KEY (procedure, procedure_template) REFERENCES procedures(procedure, procedure_template),
+	FOREIGN KEY (id, storage_procedure_template) REFERENCES procedures(id, procedure_template),
 	-- The procedure template asset model describing the `stored_asset` must be the same one
 	-- as the one in the procedure template.
 	FOREIGN KEY (
-		procedure_template,
+		storage_procedure_template,
 		procedure_template_stored_asset_model
 	) REFERENCES storage_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_stored_asset_model
 	),
 	-- The procedure template asset model describing the `stored_into` must be the same one
 	-- as the one in the procedure template.
 	FOREIGN KEY (
-		procedure_template,
+		storage_procedure_template,
 		procedure_template_stored_into_model
 	) REFERENCES storage_procedure_templates(
-		procedure_template,
+		id,
 		procedure_template_stored_into_model
 	),
 	-- The procedure template asset model and the procedure asset describing the `stored_asset`

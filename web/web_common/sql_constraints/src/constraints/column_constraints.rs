@@ -2,6 +2,8 @@
 
 mod lowercase_column_name;
 pub use lowercase_column_name::LowercaseColumnName;
+mod non_composite_primary_key_named_id;
+pub use non_composite_primary_key_named_id::NonCompositePrimaryKeyNamedId;
 mod snake_case_column_name;
 pub use snake_case_column_name::SnakeCaseColumnName;
 mod singular_column_name;
