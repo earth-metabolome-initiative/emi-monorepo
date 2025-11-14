@@ -39,6 +39,15 @@ impl ExternalCrate {
                                 .build()
                                 .unwrap(),
                             ExternalTrait::new()
+                                .name("TableIsExtensionOf")
+                                .unwrap()
+                                .path(syn::parse_quote!(
+                                    diesel_queries::prelude::TableIsExtensionOf
+                                ))
+                                .generic(generic_type("Extended"))
+                                .build()
+                                .unwrap(),
+                            ExternalTrait::new()
                                 .name("Ancestor")
                                 .unwrap()
                                 .path(syn::parse_quote!(diesel_queries::prelude::Ancestor))

@@ -102,6 +102,7 @@ where
     fn mandatory_triangular_impl(&self, fk: &<T::DB as DatabaseLike>::ForeignKey) -> InternalToken {
         let host_column = fk.host_column(self.database).unwrap();
         let host_column_ident = host_column.column_snake_ident();
+
         InternalToken::new()
             .stream(quote::quote! {
                 self.#host_column_ident = Some(#host_column_ident);

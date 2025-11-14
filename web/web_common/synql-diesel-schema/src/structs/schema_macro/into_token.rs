@@ -158,10 +158,25 @@ where
             macros.push(allow_tables_to_appear_in_same_query);
         }
 
+        let table_is_extension_of_trait = schema_macro
+            .workspace
+            .external_trait("TableIsExtensionOf")
+            .expect("Failed to find the TableIsExtensionOf trait");
+
+        for extended_table in schema_macro.table.extended_tables(schema_macro.database) {
+            let schema_module = extended_table.schema_module(schema_macro.workspace).unwrap();
+            let extended_table_ident = extended_table.table_snake_ident();
+            token_stream.extend(quote! {
+                impl #table_is_extension_of_trait<#schema_module::#extended_table_ident> for #table_name_ident {}
+            });
+            internal_modules.push(schema_module);
+        }
+
         InternalToken::new()
             .public()
             .external_macros(macros)
             .internal_modules(internal_modules)
+            .employed_trait(table_is_extension_of_trait.into())
             .datas(column_types)
             .stream(token_stream)
             .build()
