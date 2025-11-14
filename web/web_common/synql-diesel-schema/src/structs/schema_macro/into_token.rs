@@ -19,6 +19,8 @@ where
         let mut columns = Vec::new();
         let mut column_types = Vec::new();
 
+        let mut builder = InternalToken::new();
+
         for column in schema_macro.table.columns(schema_macro.database) {
             let column_attribute = column.column_snake_ident();
             let column_type = column
@@ -102,7 +104,6 @@ where
             }
         };
 
-        let mut internal_modules = Vec::new();
         for referenced_table in schema_macro.table.non_self_referenced_tables(schema_macro.database)
         {
             let crate_ref = schema_macro
@@ -119,7 +120,7 @@ where
                 diesel::allow_tables_to_appear_in_same_query!(#table_name_ident, #referenced_table_name_ident);
             });
 
-            internal_modules.push(
+            builder = builder.internal_module(
                 referenced_table.schema_module(schema_macro.workspace).expect(&format!(
                     "Failed to get the schema module for the referenced table `{}` while building the schema macro for table `{}`.",
                     referenced_table.table_name(),
@@ -158,25 +159,28 @@ where
             macros.push(allow_tables_to_appear_in_same_query);
         }
 
-        let table_is_extension_of_trait = schema_macro
-            .workspace
-            .external_trait("TableIsExtensionOf")
-            .expect("Failed to find the TableIsExtensionOf trait");
+        if schema_macro.table.is_extension(schema_macro.database) {
+            let table_is_extension_of_trait = schema_macro
+                .workspace
+                .external_trait("TableIsExtensionOf")
+                .expect("Failed to find the TableIsExtensionOf trait");
 
-        for extended_table in schema_macro.table.extended_tables(schema_macro.database) {
-            let schema_module = extended_table.schema_module(schema_macro.workspace).unwrap();
-            let extended_table_ident = extended_table.table_snake_ident();
-            token_stream.extend(quote! {
-                impl #table_is_extension_of_trait<#schema_module::#extended_table_ident> for #table_name_ident {}
-            });
-            internal_modules.push(schema_module);
+            for extended_table in
+                schema_macro.table.ancestral_extended_tables(schema_macro.database)
+            {
+                let schema_module = extended_table.schema_module(schema_macro.workspace).unwrap();
+                let extended_table_ident = extended_table.table_snake_ident();
+                token_stream.extend(quote! {
+                    impl #table_is_extension_of_trait<#schema_module::#extended_table_ident::table> for #table_name_ident::table {}
+                });
+                builder = builder.internal_module(schema_module);
+            }
+            builder = builder.employed_trait(table_is_extension_of_trait.into());
         }
 
-        InternalToken::new()
+        builder
             .public()
             .external_macros(macros)
-            .internal_modules(internal_modules)
-            .employed_trait(table_is_extension_of_trait.into())
             .datas(column_types)
             .stream(token_stream)
             .build()
