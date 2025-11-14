@@ -50,6 +50,44 @@ where
     {
         self.foreign_keys(database).filter(|fk| fk.is_vertical_same_as(database))
     }
+
+    /// Returns whether the table has any vertical same-as relationships.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - The database context in which the table exists.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_relations::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE parent (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
+    /// CREATE TABLE child (
+    /// 	id INT PRIMARY KEY REFERENCES parent(id),
+    /// 	name TEXT,
+    ///     FOREIGN KEY (id, name) REFERENCES parent(id, name)
+    /// );
+    /// "#,
+    /// )?;
+    /// let child_table = db.table(None, "child").unwrap();
+    /// let parent_table = db.table(None, "parent").unwrap();
+    /// assert!(
+    ///     child_table.has_vertically_same_as(&db),
+    ///     "Expected child table to have vertical same-as relationship"
+    /// );
+    /// assert!(
+    ///     !parent_table.has_vertically_same_as(&db),
+    ///     "Expected parent table to not have vertical same-as relationship"
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_vertically_same_as(&self, database: &Self::DB) -> bool {
+        self.vertical_same_as_foreign_keys(database).next().is_some()
+    }
 }
 
 impl<T> VerticalSameAsTableLike for T

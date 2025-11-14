@@ -9,18 +9,18 @@ pub trait HasHorizontalSameAs<Referenced: diesel::Column, Key: diesel::Column>:
 }
 
 /// Trait for handling same-as updates between Diesel model builders.
-pub trait HasVerticalSameAsHelper<Referenced: diesel::Column>: diesel::Column {}
+pub trait IsVerticallySameAsHelper<Referenced: diesel::Column>: diesel::Column {}
 
-impl<Referenced: diesel::Column, T: diesel::Column> HasVerticalSameAsHelper<Referenced> for T where
+impl<Referenced: diesel::Column, T: diesel::Column> IsVerticallySameAsHelper<Referenced> for T where
     T::Table: TableIsExtensionOf<<Referenced as diesel::Column>::Table>
 {
 }
 
 /// Trait defining the existance of a vertical same-as relationship.
-pub trait HasVerticalSameAs<Referenced: diesel::Column>: diesel::Column {}
+pub trait IsVerticallySameAs<Referenced: diesel::Column>: diesel::Column {}
 
 /// Trait for handling same-as updates between Diesel model builders.
-pub trait VerticalSameAs<L: diesel::Column, R: diesel::Column>: SetColumn<L> {
+pub trait VerticalSameAs<L: IsVerticallySameAs<R>, R: diesel::Column>: SetColumn<L> {
     /// Sets the current model's fields to be the same as another model's
     /// fields.
     fn vertically_same_as<Other>(self, other: &Other) -> Result<Self, Self::Error>

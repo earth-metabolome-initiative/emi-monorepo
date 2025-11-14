@@ -48,6 +48,15 @@ impl ExternalCrate {
                                 .build()
                                 .unwrap(),
                             ExternalTrait::new()
+                                .name("IsVerticallySameAs")
+                                .unwrap()
+                                .path(syn::parse_quote!(
+                                    diesel_queries::prelude::IsVerticallySameAs
+                                ))
+                                .generic(generic_type("Extended"))
+                                .build()
+                                .unwrap(),
+                            ExternalTrait::new()
                                 .name("Ancestor")
                                 .unwrap()
                                 .path(syn::parse_quote!(diesel_queries::prelude::Ancestor))

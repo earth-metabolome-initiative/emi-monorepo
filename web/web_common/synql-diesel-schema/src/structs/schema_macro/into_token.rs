@@ -2,6 +2,7 @@
 //! an `InternalToken`.
 
 use quote::quote;
+use sql_relations::prelude::*;
 use sql_traits::traits::ForeignKeyLike;
 use synql_core::{
     prelude::{Builder, ColumnLike},
@@ -176,6 +177,28 @@ where
                 builder = builder.internal_module(schema_module);
             }
             builder = builder.employed_trait(table_is_extension_of_trait.into());
+        }
+
+        if schema_macro.table.has_vertically_same_as(schema_macro.database) {
+            let vertically_same_as_trait = schema_macro
+                .workspace
+                .external_trait("IsVerticallySameAs")
+                .expect("Failed to find the VerticallySameAs trait");
+
+            for fk in schema_macro.table.vertical_same_as_foreign_keys(schema_macro.database) {
+                let referenced_table = fk.referenced_table(schema_macro.database);
+                let referenced_table_ident = referenced_table.table_snake_ident();
+                let referenced_schema_module =
+                    referenced_table.schema_module(schema_macro.workspace).unwrap();
+                let (host_column, referenced_column) =
+                    fk.vertical_same_as_column_pair(schema_macro.database).unwrap();
+                let host_column_ident = host_column.column_snake_ident();
+                let referenced_column_ident = referenced_column.column_snake_ident();
+                token_stream.extend(quote! {
+                    impl #vertically_same_as_trait<#referenced_schema_module::#referenced_table_ident::#referenced_column_ident> for #table_name_ident::#host_column_ident {}
+                });
+            }
+            builder = builder.employed_trait(vertically_same_as_trait.into());
         }
 
         builder
