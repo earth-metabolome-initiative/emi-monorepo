@@ -91,12 +91,13 @@ impl InternalTrait {
         let mut clauses = self.where_clauses.clone();
         if include_super_traits {
             for super_trait in &self.super_traits {
+                let super_trait_with_generics = super_trait.format_with_generics();
                 clauses.push(
                     WhereClause::new()
                         .left(DataVariantRef::self_type(None))
                         .right(
                             InternalToken::new()
-                                .stream(quote::quote! {#super_trait})
+                                .stream(quote::quote! {#super_trait_with_generics})
                                 .employed_trait(super_trait.clone())
                                 .build()
                                 .unwrap(),

@@ -130,16 +130,6 @@ impl<'table, T: TableAttributesLike + ?Sized> TableAttributes<'table, T> {
     fn from_impls(&self) -> Vec<InternalToken> {
         let mut from_impls = Vec::new();
 
-        let validation_error = self
-            .workspace
-            .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
-            .expect("Workspace must have ValidationError type");
-
-        let replace_field_name_trait = self
-            .workspace
-            .external_trait("ReplaceFieldName")
-            .expect("Workspace must have ReplaceFieldName trait");
-
         let from_trait =
             self.workspace.external_trait("From").expect("Core crate must have From trait");
 
@@ -150,7 +140,9 @@ impl<'table, T: TableAttributesLike + ?Sized> TableAttributes<'table, T> {
             // attributes.
             if self.table.foreign_keys(self.database).any(|fk| {
                 let referenced_table: &T = fk.referenced_table(self.database).borrow();
-                !fk.is_host_primary_key(self.database) && referenced_table == extended_table
+                !fk.is_host_primary_key(self.database)
+                    && !fk.is_composite(self.database)
+                    && referenced_table == extended_table
             }) {
                 continue;
             }
@@ -158,22 +150,12 @@ impl<'table, T: TableAttributesLike + ?Sized> TableAttributes<'table, T> {
             let extended_table_attributes = extended_table.attributes_ref(self.workspace).unwrap();
             let enum_ident = self.table.table_attributes_ident();
 
-            let left = validation_error
-                .set_generic_field(
-                    &generic_type("FieldName"),
-                    extended_table_attributes.clone().into(),
-                )
-                .unwrap();
-            let validation_from =
-                from_trait.set_generic_field(&generic_type("T"), left.clone().into()).unwrap();
-
             let from_trait: TraitVariantRef = from_trait
                 .set_generic_field(&generic_type("T"), extended_table_attributes.clone().into())
                 .unwrap()
                 .into();
 
             let from_trait_with_generic = from_trait.format_with_generics();
-            let validation_from_with_generic = validation_from.format_with_generics();
 
             from_impls.push(
                 InternalToken::new()
@@ -184,15 +166,8 @@ impl<'table, T: TableAttributesLike + ?Sized> TableAttributes<'table, T> {
                                 Self::Extension(attrs.into())
                             }
                         }
-                        impl #validation_from_with_generic for #validation_error<#enum_ident> {
-                            fn from(err: #left) -> Self {
-                                use #replace_field_name_trait;
-                                err.replace_field_name(#enum_ident::from)
-                            }
-                        }
                     })
-                    .implemented_traits([from_trait, validation_from.into()])
-                    .employed_trait(replace_field_name_trait.clone().into())
+                    .implemented_trait(from_trait)
                     .build()
                     .unwrap(),
             );

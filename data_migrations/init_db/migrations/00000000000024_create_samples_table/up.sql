@@ -13,5 +13,5 @@ CREATE TABLE IF NOT EXISTS samples (
   sample_source_model INTEGER NOT NULL REFERENCES sample_source_models(id),
   FOREIGN KEY (id, sample_model) REFERENCES assets(id, model),
   FOREIGN KEY (sample_model, sample_source_model) REFERENCES sample_models(id, sample_source_model),
-  FOREIGN KEY (sample_source, sample_source_model) REFERENCES assets(id, sample_source_model)
+  FOREIGN KEY (sample_source, sample_source_model) REFERENCES assets(id, model)
 );

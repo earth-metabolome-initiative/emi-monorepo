@@ -1,7 +1,7 @@
 //! Submodule implementing the `From` trait to convert a `TableRelations`
 //! into an `InternalTrait`.
 
-use sql_relations::traits::VerticalSameAsForeignKeyLike;
+use sql_relations::traits::{HorizontalSameAsForeignKeyLike, VerticalSameAsForeignKeyLike};
 use synql_core::{
     prelude::{Builder, DatabaseLike, ForeignKeyLike},
     structs::{Documentation, InternalTrait},
@@ -51,7 +51,7 @@ where
                     .foreign_keys(table_relation.database)
                     // We filter out foreign keys that start from the primary key of the host table,
                     // as those should be handled by the `Read` trait implementation.
-                    .filter(|fk| !fk.is_host_primary_key(table_relation.database) && !fk.is_vertical_same_as(table_relation.database))
+                    .filter(|fk| !fk.is_host_primary_key(table_relation.database) && !fk.is_vertical_same_as(table_relation.database) && !fk.is_horizontal_same_as(table_relation.database))
                     // Temporarely, we only support foreign keys that reference primary keys.
                     .filter(|fk| fk.is_referenced_primary_key(table_relation.database))
                     .map(|fk: &<T::DB as DatabaseLike>::ForeignKey| {

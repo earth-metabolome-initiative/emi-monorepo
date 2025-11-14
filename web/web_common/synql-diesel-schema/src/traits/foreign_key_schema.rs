@@ -52,17 +52,17 @@ pub trait ForeignKeySchema: ForeignKeySynLike + Sized {
         <Self::DB as DatabaseLike>::Table: TableSchema,
         <Self::DB as DatabaseLike>::Column: ColumnSchema,
     {
-        self.host_columns(database)
-            .zip(self.referenced_columns(database))
-            .map(|(host_col, ref_col)| {
-                format!(
-                    "{} -> {}",
-                    host_col.column_schema_doc_path(database),
-                    ref_col.column_schema_doc_path(database)
-                )
-            })
-            .collect::<Vec<_>>()
-            .join(", ")
+        format!(
+            "({}) -> ({})",
+            self.host_columns(database)
+                .map(|col| col.column_schema_doc_path(database))
+                .collect::<Vec<_>>()
+                .join(", "),
+            self.referenced_columns(database)
+                .map(|col| col.column_schema_doc_path(database))
+                .collect::<Vec<_>>()
+                .join(", ")
+        )
     }
 
     /// Returns the vector of unique crate references necessary for the
