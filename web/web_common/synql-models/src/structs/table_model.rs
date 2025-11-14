@@ -160,28 +160,7 @@ impl<'table, T: TableModelLike + ?Sized> TableModel<'table, T> {
             .expect("Failed to get Identifiable trait");
         let table_model = self.table.table_singular_camel_ident();
 
-        let mut extension_of_impls = vec![
-            InternalToken::new()
-                .private()
-                .stream(quote! {
-                    impl #extension_of_trait<#table_model> for #table_model {
-                        type ExtendedType<'data> = &'data Self
-                        where
-                            Self: 'data;
-                    }
-                    impl<C> #ancestor_trait<#table_model, C> for #table_model {
-                        fn ancestor(
-                            &self,
-                            _connection: &mut C,
-                        ) -> Result<Self::ExtendedType<'_>, diesel::result::Error> {
-                            Ok(self)
-                        }
-                    }
-                })
-                .implemented_trait(extension_of_trait.clone().into())
-                .build()
-                .unwrap(),
-        ];
+        let mut extension_of_impls = Vec::new();
 
         for extended_table in self.table.ancestral_extended_tables(self.database) {
             let extended_table_model = extended_table

@@ -41,3 +41,15 @@ pub trait Ancestor<Extended: HasTable, C>: ExtensionOf<Extended> {
     fn ancestor(&self, connection: &mut C)
     -> Result<Self::ExtendedType<'_>, diesel::result::Error>;
 }
+
+impl<T, C> Ancestor<T, C> for T
+where
+    T: ExtensionOfHelper<T>,
+{
+    fn ancestor(
+        &self,
+        _connection: &mut C,
+    ) -> Result<Self::ExtendedType<'_>, diesel::result::Error> {
+        Ok(self)
+    }
+}
