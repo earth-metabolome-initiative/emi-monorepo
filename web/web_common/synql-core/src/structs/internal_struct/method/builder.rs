@@ -35,6 +35,8 @@ pub struct MethodBuilder {
     where_clauses: Vec<WhereClause>,
     /// Error documentations of the method.
     error_documentations: Vec<Documentation>,
+    /// Whether the method is a trait implementation method.
+    is_trait_implementation: bool,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -60,6 +62,8 @@ pub enum MethodAttribute {
     WhereClauses,
     /// Error documentation of the method.
     ErrorDocumentation,
+    /// Whether the method is a trait implementation method.
+    IsTraitImplementation,
 }
 
 impl Display for MethodAttribute {
@@ -75,6 +79,9 @@ impl Display for MethodAttribute {
             MethodAttribute::Generics => write!(f, "generics"),
             MethodAttribute::WhereClauses => write!(f, "where_clauses"),
             MethodAttribute::ErrorDocumentation => write!(f, "error_documentation"),
+            MethodAttribute::IsTraitImplementation => {
+                write!(f, "is_trait_implementation")
+            }
         }
     }
 }
@@ -177,6 +184,12 @@ impl MethodBuilder {
     /// Sets the method as private.
     pub fn private(mut self) -> Self {
         self.publicness = Some(Publicness::Private);
+        self
+    }
+
+    /// Sets whether the method is a trait implementation method.
+    pub fn trait_implementation(mut self, is_trait_implementation: bool) -> Self {
+        self.is_trait_implementation = is_trait_implementation;
         self
     }
 
@@ -372,6 +385,7 @@ impl Builder for MethodBuilder {
             generics: self.generics,
             where_clauses: self.where_clauses,
             error_documentations: self.error_documentations,
+            is_trait_implementation: self.is_trait_implementation,
         })
     }
 }
@@ -389,6 +403,7 @@ impl From<Method> for MethodBuilder {
             generics: method.generics,
             where_clauses: method.where_clauses,
             error_documentations: method.error_documentations,
+            is_trait_implementation: method.is_trait_implementation,
         }
     }
 }

@@ -72,7 +72,7 @@ impl<'trt> TraitImpl<'trt> {
     /// * If the provided method has a visibility other than private.
     /// * If the provided method is incompatible with the curresponding method
     ///   in the trait.
-    pub fn method(mut self, method: Method) -> Result<Self, TraitImplError> {
+    pub fn method(mut self, mut method: Method) -> Result<Self, TraitImplError> {
         if self.methods.iter().any(|m| m.name() == method.name()) {
             return Err(TraitImplError::MethodAlreadyDefined(method.signature()));
         }
@@ -82,6 +82,8 @@ impl<'trt> TraitImpl<'trt> {
         if !method.has_body() {
             return Err(TraitImplError::MethodWithoutBody(method.signature()));
         }
+
+        method.set_as_trait_implementation();
 
         self.methods.push(method);
         Ok(self)

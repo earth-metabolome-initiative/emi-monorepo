@@ -37,6 +37,8 @@ pub struct Method {
     generics: Vec<syn::GenericParam>,
     /// Where clauses of the method.
     where_clauses: Vec<WhereClause>,
+    /// Whether the method is a trait implementation method.
+    is_trait_implementation: bool,
 }
 
 impl Method {
@@ -67,6 +69,17 @@ impl Method {
     #[inline]
     pub fn has_body(&self) -> bool {
         self.body.is_some()
+    }
+
+    /// Returns whether the method is a trait implementation method.
+    #[inline]
+    pub fn is_trait_implementation(&self) -> bool {
+        self.is_trait_implementation
+    }
+
+    /// Sets as a trait implementation method.
+    pub fn set_as_trait_implementation(&mut self) {
+        self.is_trait_implementation = true;
     }
 }
 
@@ -202,8 +215,13 @@ impl ToTokens for Method {
             }
         }
 
-        let mut main_documentation = self.documentation.clone();
-        main_documentation.extend(&documentation.join("\n"));
+        let main_documentation = if self.is_trait_implementation() {
+            None
+        } else {
+            let mut main_documentation = self.documentation.clone();
+            main_documentation.extend(&documentation.join("\n"));
+            Some(main_documentation)
+        };
 
         // Automatically determine if method should have #[inline] attribute
         // A method should be inlined if it has a body and the body is small (simple
@@ -233,7 +251,7 @@ impl ToTokens for Method {
         // - Does NOT take &mut self (mutation methods may return secondary values that
         //   don't need to be used)
         let should_must_use = self.return_type.is_some()
-            && self.body.is_some()
+            && !self.is_trait_implementation()
             && !self.return_type.as_ref().map_or(false, |rt| rt.is_option() || rt.is_result())
             && !self.arguments.iter().any(|arg| arg.is_mut_self());
 
