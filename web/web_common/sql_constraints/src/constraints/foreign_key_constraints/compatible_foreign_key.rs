@@ -93,7 +93,7 @@ impl<DB: DatabaseLike> ForeignKeyConstraint for CompatibleForeignKey<DB> {
         for (host_column, referenced_column) in
             foreign_key.host_columns(database).zip(foreign_key.referenced_columns(database))
         {
-            if !host_column.is_compatible_with(database, &referenced_column) {
+            if !host_column.is_compatible_with(database, referenced_column) {
                 return Err(crate::error::Error::ForeignKey(
                     ConstraintErrorInfo::new()
                         .constraint("CompatibleForeignKey")

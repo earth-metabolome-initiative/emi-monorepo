@@ -17,6 +17,10 @@ pub trait TableConstraint {
     ) -> Box<dyn ConstraintFailureInformation>;
 
     /// Validates that the given table satisfies the constraint.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the table violates this constraint.
     fn validate_table(
         &self,
         database: &Self::Database,

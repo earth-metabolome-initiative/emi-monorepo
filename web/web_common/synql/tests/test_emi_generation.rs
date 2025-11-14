@@ -10,6 +10,7 @@ use std::{
     sync::Arc,
 };
 
+use sql_constraints::prelude::*;
 use synql::prelude::*;
 use synql_core::structs::{ExternalCrate, ExternalType};
 use time_requirements::{prelude::TimeTracker, report::Report, task::Task};
@@ -40,6 +41,12 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
     )?;
     assert!(db.has_tables(), "Database should have tables");
     tracking_test.add_completed_task(task);
+
+    // Validate the database schema with all available constraints
+    let validation_task = Task::new("Schema Validation");
+    let constrainer = DefaultConstrainer::<ParserDB>::default();
+    constrainer.validate_schema(&db).expect("Database schema should pass all constraints");
+    tracking_test.add_completed_task(validation_task);
 
     // let workspace_path = tempfile::tempdir().expect("Unable to create temporary
     // directory");

@@ -4,7 +4,7 @@
 use sql_relations::traits::VerticalSameAsForeignKeyLike;
 use synql_core::{
     prelude::{Builder, DatabaseLike, ForeignKeyLike},
-    structs::{Documentation, InternalToken, InternalTrait},
+    structs::{Documentation, InternalTrait},
     utils::generic_type,
 };
 
@@ -43,15 +43,8 @@ where
             .generic(syn::parse_quote! {C})
             .unwrap()
             .super_trait(
-                InternalToken::new()
-                    .private()
-                    .stream(ancestor.format_with_generics())
-                    .employed_trait(ancestor.into())
-                    .data(model_ref.into())
-                    .build()
-                    .unwrap(),
+                ancestor.into()
             )
-            .unwrap()
             .methods(
                 table_relation
                     .table

@@ -99,10 +99,10 @@ impl<DB: DatabaseLike> TableConstraint for UniqueForeignKey<DB> {
         signatures.sort_unstable();
 
         for window in signatures.windows(2) {
-            if let [sig1, sig2] = window {
-                if sig1 == sig2 {
-                    return Err(crate::error::Error::Table(self.table_error_information(table)));
-                }
+            if let [sig1, sig2] = window
+                && sig1 == sig2
+            {
+                return Err(crate::error::Error::Table(self.table_error_information(table)));
             }
         }
 

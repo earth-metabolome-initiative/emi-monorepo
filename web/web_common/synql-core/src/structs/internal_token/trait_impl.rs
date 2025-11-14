@@ -44,7 +44,7 @@ impl<'trt> TraitImpl<'trt> {
             trait_ref,
             methods: Vec::new(),
             data: None,
-            where_clauses: Vec::new(),
+            where_clauses: trait_ref.where_clauses(true),
         }
     }
 

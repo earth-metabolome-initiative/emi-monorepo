@@ -38,8 +38,13 @@ impl Default for Inflector {
 impl Inflector {
     #[must_use]
     /// Returns the plural form of a word.
+    ///
+    /// If the word is already plural (singularizing it would change it),
+    /// the word is returned unchanged.
     pub fn pluralize(&self, word: &str) -> String {
-        pluralizer::pluralize(word, 5, false)
+        let singular = self.singularize(word);
+        // If singularizing changes the word, it was already plural
+        if singular == word { pluralizer::pluralize(word, 5, false) } else { word.to_string() }
     }
 
     #[must_use]
@@ -70,6 +75,12 @@ mod tests {
         assert_eq!(Inflector::default().pluralize("identity_generation"), "identity_generations");
         assert_eq!(Inflector::default().pluralize("identity_start"), "identity_starts");
         assert_eq!(Inflector::default().pluralize("identity_increment"), "identity_increments");
+        // Test that already plural forms remain unchanged
+        assert_eq!(Inflector::default().pluralize("spectra"), "spectra");
+        assert_eq!(Inflector::default().pluralize("taxa"), "taxa");
+        assert_eq!(Inflector::default().pluralize("matrices"), "matrices");
+        assert_eq!(Inflector::default().pluralize("users"), "users");
+        assert_eq!(Inflector::default().pluralize("houses"), "houses");
     }
 
     #[test]

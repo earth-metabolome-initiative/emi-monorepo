@@ -37,7 +37,6 @@ where
             .methods(table_settable.value_setter_methods())
             .expect("Failed to set the internal trait methods")
             .sized()
-            .unwrap()
             .build()
             .expect("Failed to convert internal trait builder into internal trait")
     }

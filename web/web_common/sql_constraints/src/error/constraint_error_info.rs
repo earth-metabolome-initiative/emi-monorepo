@@ -22,7 +22,9 @@ pub struct ConstraintErrorInfo {
 }
 
 impl ConstraintErrorInfo {
-    /// Create a new `ConstraintErrorInfo` using the builder pattern.
+    /// Creates a new constraint error info builder.
+    #[must_use]
+    #[allow(clippy::new_ret_no_self)]
     pub fn new() -> builder::ConstraintErrorInfoBuilder {
         builder::ConstraintErrorInfoBuilder::default()
     }
@@ -42,7 +44,7 @@ impl Display for ConstraintErrorInfo {
             self.constraint, self.object, self.message
         )?;
         if let Some(resolution) = &self.resolution {
-            write!(f, "\nResolution: {}", resolution)?;
+            write!(f, "\nResolution: {resolution}")?;
         }
         Ok(())
     }

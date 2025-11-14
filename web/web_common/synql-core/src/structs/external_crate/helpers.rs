@@ -2,7 +2,9 @@
 
 use quote::ToTokens;
 
-use crate::structs::{ExternalType, ExternalTypeRef};
+use crate::structs::{
+    ExternalCrate, ExternalTraitRef, ExternalType, ExternalTypeRef, TraitVariantRef,
+};
 
 impl ExternalTypeRef {
     /// Returns true if the `ExternalTypeRef` is of boolean type.
@@ -13,6 +15,24 @@ impl ExternalTypeRef {
     /// Returns true if the `ExternalTypeRef` is of numeric type.
     pub fn is_numeric(&self) -> bool {
         self.type_ref.is_numeric()
+    }
+}
+
+impl ExternalTraitRef {
+    /// Returns the `Sized` trait reference from the `std` crate.
+    pub fn sized() -> Self {
+        let std_crate = ExternalCrate::std();
+        let sized_trait = std_crate
+            .external_trait_ref("Sized")
+            .expect("Failed to get the `Sized` trait from the `std` crate");
+        sized_trait.into()
+    }
+}
+
+impl TraitVariantRef {
+    /// Returns the `Sized` trait variant reference.
+    pub fn sized() -> Self {
+        ExternalTraitRef::sized().into()
     }
 }
 

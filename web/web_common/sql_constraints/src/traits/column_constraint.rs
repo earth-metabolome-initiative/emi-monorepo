@@ -17,5 +17,9 @@ pub trait ColumnConstraint {
     ) -> Box<dyn crate::traits::ConstraintFailureInformation>;
 
     /// Validates that the given column satisfies the constraint.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the column violates this constraint.
     fn validate_column(&self, column: &Self::Column) -> Result<(), Error>;
 }

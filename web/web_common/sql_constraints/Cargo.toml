@@ -7,6 +7,8 @@ edition = "2024"
 sqlparser.workspace = true
 common_traits.workspace = true
 sql_traits.workspace = true
+inflector.workspace = true
+snake_case_sanitizer.workspace = true
 
 [lints]
 workspace = true

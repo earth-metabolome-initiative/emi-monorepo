@@ -1,10 +1,12 @@
 //! Submodule implementing the generation of the `*BuildableKeySettable` trait
 //! for the `TableBuildable` struct.
 
+use std::borrow::Borrow;
+
 use quote::quote;
 use sql_relations::{
-    prelude::ForeignKeyLike,
-    traits::{InheritableDatabaseLike, TriangularSameAsForeignKeyLike},
+    prelude::{ColumnLike, ForeignKeyLike},
+    traits::{InheritableDatabaseLike, TriangularSameAsForeignKeyLike, VerticalSameAsColumnLike},
 };
 use sql_traits::traits::DatabaseLike;
 use synql_buildable_key_settable::traits::TableBuildableKeySettableLike;
@@ -81,7 +83,7 @@ where
 
     fn foreign_key_impl(&self, fk: &<T::DB as DatabaseLike>::ForeignKey) -> InternalToken {
         let host_column = fk.host_column(self.database).unwrap();
-        let method_ident = host_column.column_snake_ident();
+        let host_column_ident = host_column.column_snake_ident();
         let trait_ref = self
             .table
             .buildable_key_settable_trait_ref(self.workspace)
@@ -89,12 +91,48 @@ where
         let method = trait_ref
             .method(&host_column.column_snake_name())
             .expect("Failed to get BuildableKeySettable method definition");
+        let method_ident = method.ident();
         let question_mark = method.can_fail().then(|| quote! { ? });
         let insertable_ident = self.table.table_singular_snake_ident();
+        let maybe_clone = (!host_column.supports_copy(self.database, self.workspace))
+            .then(|| quote! { .clone() });
+
+        let vertical_same_as = host_column
+            .dominant_vertical_same_as_columns(self.database)
+            .into_iter()
+            .map(|c| {
+                let ancestor_table: &T = c.table(self.database).borrow();
+                let ancestor_trait_ref = ancestor_table
+                    .buildable_key_settable_trait_ref(self.workspace)
+                    .expect("Failed to get BuildableKeySettable trait ref");
+                let method = ancestor_trait_ref
+                    .method(&c.column_snake_name())
+                    .expect(&format!(
+                        "Failed to get {} method definition for vertical same column `{}.{}` of `{}.{}`",
+                        ancestor_trait_ref.name(),
+                        ancestor_table.table_name(),
+                        c.column_name(),
+                        self.table.table_name(),
+                        host_column.column_name()
+                    ));
+                let method_ident = method.ident();
+                let question_mark = method.can_fail().then(|| quote! { ? });
+                InternalToken::new()
+                    .stream(quote::quote! {
+                        use #ancestor_trait_ref;
+                        self = self.#method_ident(#host_column_ident #maybe_clone)#question_mark;
+                    })
+                    .build()
+                    .unwrap()
+            })
+            .collect::<Vec<InternalToken>>();
+
         InternalToken::new()
             .stream(quote::quote! {
-                self.#insertable_ident = self.#insertable_ident.#method_ident(#method_ident)#question_mark;
+                #(#vertical_same_as)*
+                self.#insertable_ident = self.#insertable_ident.#method_ident(#host_column_ident)#question_mark;
             })
+            .inherits(vertical_same_as)
             .build()
             .unwrap()
     }

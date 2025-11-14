@@ -9,7 +9,7 @@ use common_traits::{
 use quote::ToTokens;
 
 use crate::structs::{
-    Documentation, InternalToken, InternalTrait, Publicness, WhereClause, internal_struct::Method,
+    Documentation, InternalTrait, Publicness, TraitVariantRef, WhereClause, internal_struct::Method,
 };
 
 #[derive(Default)]
@@ -23,12 +23,12 @@ pub struct InternalTraitBuilder {
     methods: Vec<Method>,
     /// Trait documentation.
     documentation: Option<Documentation>,
-    /// Where statements for the trait.
-    where_statements: Vec<WhereClause>,
+    /// Where clauses for the trait.
+    where_clauses: Vec<WhereClause>,
     /// Generics for the trait.
     generics: Vec<syn::GenericParam>,
     /// Super traits for the trait.
-    super_traits: Vec<InternalToken>,
+    super_traits: Vec<TraitVariantRef>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -78,8 +78,6 @@ pub enum InternalTraitBuilderError {
     DuplicateWhereClause(String),
     /// Duplicate generic found.
     DuplicateGeneric(String),
-    /// Duplicate super trait found.
-    DuplicateSuperTrait(String),
 }
 
 impl Display for InternalTraitBuilderError {
@@ -95,9 +93,6 @@ impl Display for InternalTraitBuilderError {
             }
             InternalTraitBuilderError::DuplicateGeneric(generic) => {
                 write!(f, "Duplicate generic found in trait: {}", generic)
-            }
-            InternalTraitBuilderError::DuplicateSuperTrait(trait_name) => {
-                write!(f, "Duplicate super trait found in trait: {}", trait_name)
             }
         }
     }
@@ -221,12 +216,12 @@ impl InternalTraitBuilder {
         mut self,
         where_clause: WhereClause,
     ) -> Result<Self, InternalTraitBuilderError> {
-        if self.where_statements.contains(&where_clause) {
+        if self.where_clauses.contains(&where_clause) {
             return Err(InternalTraitBuilderError::DuplicateWhereClause(
                 where_clause.to_token_stream().to_string(),
             ));
         }
-        self.where_statements.push(where_clause);
+        self.where_clauses.push(where_clause);
         Ok(self)
     }
 
@@ -248,42 +243,30 @@ impl InternalTraitBuilder {
     ///
     /// # Arguments
     /// * `super_trait` - The super trait to add.
-    pub fn super_trait(
-        mut self,
-        super_trait: InternalToken,
-    ) -> Result<Self, InternalTraitBuilderError> {
-        if self.super_traits.contains(&super_trait) {
-            return Err(InternalTraitBuilderError::DuplicateSuperTrait(
-                super_trait.to_token_stream().to_string(),
-            ));
+    pub fn super_trait(mut self, super_trait: TraitVariantRef) -> Self {
+        if !self.super_traits.contains(&super_trait) {
+            self.super_traits.push(super_trait);
         }
-        self.super_traits.push(super_trait);
-        Ok(self)
+        self
     }
 
     /// Adds several super traits to the trait.
     ///
     /// # Arguments
     /// * `super_traits` - The super traits to add.
-    pub fn super_traits<I>(mut self, super_traits: I) -> Result<Self, InternalTraitBuilderError>
+    pub fn super_traits<I>(mut self, super_traits: I) -> Self
     where
-        I: IntoIterator<Item = InternalToken>,
+        I: IntoIterator<Item = TraitVariantRef>,
     {
         for super_trait in super_traits {
-            self = self.super_trait(super_trait)?;
+            self = self.super_trait(super_trait);
         }
-        Ok(self)
+        self
     }
 
     /// Adds the `Sized` super-trait to the trait.
-    pub fn sized(self) -> Result<Self, InternalTraitBuilderError> {
-        self.super_trait(
-            InternalToken::new()
-                .private()
-                .stream(quote::quote! { Sized })
-                .build()
-                .expect("Failed to build InternalToken for Sized super-trait"),
-        )
+    pub fn sized(self) -> Self {
+        self.super_trait(TraitVariantRef::sized())
     }
 }
 
@@ -311,7 +294,7 @@ impl Builder for InternalTraitBuilder {
             documentation: self
                 .documentation
                 .ok_or(BuilderError::IncompleteBuild(InternalTraitAttribute::Documentation))?,
-            where_statements: self.where_statements,
+            where_clauses: self.where_clauses,
             generics: self.generics,
             super_traits: self.super_traits,
         })

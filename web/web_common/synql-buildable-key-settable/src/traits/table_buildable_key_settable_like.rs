@@ -66,7 +66,10 @@ pub trait TableBuildableKeySettableLike: TableModelLike {
             let Some(host_column) = foreign_key.host_column(database) else {
                 return false;
             };
-            if covered_columns.contains(&host_column) || host_column.is_generated() {
+            if covered_columns.contains(&host_column)
+                || host_column.is_generated()
+                || host_column.is_primary_key(database)
+            {
                 return false;
             }
             covered_columns.push(host_column);

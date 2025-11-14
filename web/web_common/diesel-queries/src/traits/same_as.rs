@@ -18,15 +18,3 @@ impl<Referenced: diesel::Column, T: diesel::Column> IsVerticallySameAsHelper<Ref
 
 /// Trait defining the existance of a vertical same-as relationship.
 pub trait IsVerticallySameAs<Referenced: diesel::Column>: diesel::Column {}
-
-/// Trait for handling same-as updates between Diesel model builders.
-pub trait VerticalSameAs<L: IsVerticallySameAs<R>, R: diesel::Column>: SetColumn<L> {
-    /// Sets the current model's fields to be the same as another model's
-    /// fields.
-    fn vertically_same_as<Other>(self, other: &Other) -> Result<Self, Self::Error>
-    where
-        Other: GetColumn<R, ColumnType = Self::ColumnType>,
-    {
-        if let Some(value) = other.get_column() { self.set_column(value.clone()) } else { Ok(self) }
-    }
-}

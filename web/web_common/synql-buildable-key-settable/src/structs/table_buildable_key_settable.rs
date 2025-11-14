@@ -1,6 +1,7 @@
 //! Submodule defining the `TableBuildableKeySettable` struct for generating
 //! settable traits.
 
+use proc_macro2::TokenStream;
 use sql_relations::prelude::TriangularSameAsForeignKeyLike;
 use sql_traits::{
     prelude::ColumnLike,
@@ -294,19 +295,8 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
             .most_recent_common_ancestor(self.database, other_referenced_tables)
             .unwrap();
 
-        let mca_referenced_table_model_ref = mca_referenced_table
-            .model_ref(self.workspace)
-            .expect("Failed to get the table model ref for the referenced table");
-
-        let extension_of = self
-            .workspace
-            .external_trait("ExtensionOf")
-            .expect("Failed to get ExtensionOf trait")
-            .set_generic_field(
-                &generic_type("Extended"),
-                mca_referenced_table_model_ref.clone().into(),
-            )
-            .unwrap();
+        let extension_of =
+            self.workspace.external_trait("ExtensionOf").expect("Failed to get ExtensionOf trait");
 
         let identifiable = self
             .workspace
@@ -338,6 +328,10 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
                 ))
                 .expect("Failed to set the error documentation").internal_dependency(host_table_schema_ref.clone()).build().unwrap());
         }
+
+        let mca_model_ref = mca_referenced_table
+            .model_ref(self.workspace)
+            .expect("Failed to get the table model ref for the referenced table");
 
         Method::new()
             .name(host_column.column_snake_name())
@@ -384,32 +378,64 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
                     .expect("Failed to build the argument"),
             )
             .expect("Failed to add argument to method")
-            .where_clauses([
+            .where_clause(
                 WhereClause::new()
                     .left(argument_type.clone())
-                    .right(
+                    .right({
+                        let mut data = Vec::new();
+                        let stream = mca_referenced_table
+                                    .ancestral_extended_tables(self.database)
+                                    .into_iter()
+                                    .chain([mca_referenced_table])
+                                    .map(|ancestor_table| {
+                                        let ancestor_model_ref = ancestor_table
+                                            .model_ref(self.workspace)
+                                            .expect("Failed to get the table model ref for the referenced table");
+                                        let extension_of = extension_of
+                                            .set_generic_field(
+                                                &generic_type("Extended"),
+                                                ancestor_model_ref.clone().into(),
+                                            )
+                                            .unwrap();
+                                        data.push(ancestor_model_ref.into());
+                                        extension_of.format_with_generics()
+                                    })
+                                    .fold(TokenStream::new(), |mut init, f| {
+                                        if !init.is_empty() {
+                                            init.extend(quote::quote! { + });
+                                        }
+                                        init.extend(f);
+                                        init
+                                    });
+
                         InternalToken::new()
-                            .stream(extension_of.format_with_generics())
+                            .stream(
+                                stream
+                            )
+                            .datas(data)
                             .employed_trait(extension_of.into())
                             .build()
-                            .expect("Failed to build the right side of the where clause"),
+                            .expect("Failed to build the right side of the where clause")},
                     )
                     .build()
                     .expect("Failed to build where clause"),
+            )
+            .unwrap()
+            .where_clause(
                 WhereClause::new()
                     .left(quote::quote! {for<'a> &'a #argument_type})
                     .right(
                         InternalToken::new()
                             .stream(quote::quote! {
-                                #identifiable<Id=<&'a #mca_referenced_table_model_ref as #identifiable>::Id>
+                                #identifiable<Id=<&'a #mca_model_ref as #identifiable>::Id>
                             })
-                            .employed_trait(identifiable.into())
+                            .employed_trait(identifiable.clone().into())
                             .build()
                             .expect("Failed to build the right side of the where clause"),
                     )
                     .build()
                     .expect("Failed to build where clause"),
-            ])
+            )
             .unwrap()
             .error_documentations(error_documentation)
             .return_type(return_type)

@@ -78,17 +78,24 @@ pub trait ColumnLike:
     /// use sql_traits::prelude::*;
     ///
     /// let db = ParserDB::try_from(
-    ///     "CREATE TABLE my_table (id SERIAL, name TEXT, age INT, bigg_id BIGSERIAL);",
+    ///     r#"CREATE TABLE parent (id SERIAL, name TEXT, age INT, bigg_id BIGSERIAL);
+    ///     CREATE TABLE child (parent_id INT PRIMARY KEY REFERENCES parent(id), other TEXT);"#,
     /// )?;
-    /// let table = db.table(None, "my_table").unwrap();
+    /// let table = db.table(None, "parent").unwrap();
+    /// let child_table = db.table(None, "child").unwrap();
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// let age_column = table.column("age", &db).expect("Column 'age' should exist");
     /// let bigg_id_column = table.column("bigg_id", &db).expect("Column 'bigg_id' should exist");
+    /// let parent_id_column =
+    ///     child_table.column("parent_id", &db).expect("Column 'parent_id' should exist");
+    /// let other_column = child_table.column("other", &db).expect("Column 'other' should exist");
     /// assert!(id_column.is_generated(), "id column should be generative");
     /// assert!(!name_column.is_generated(), "name column should not be generative");
     /// assert!(!age_column.is_generated(), "age column should not be generative");
     /// assert!(bigg_id_column.is_generated(), "bigg_id column should be generative");
+    /// assert!(!parent_id_column.is_generated(), "parent_id column should be generative");
+    /// assert!(!other_column.is_generated(), "other column should not be generative");
     /// # Ok(())
     /// # }
     /// ```
@@ -304,6 +311,49 @@ pub trait ColumnLike:
         ColumnLike::table(self, database).foreign_keys(database).filter(move |fk| {
             fk.host_columns(database).map(Borrow::borrow).any(|col: &Self| col == self)
         })
+    }
+
+    /// Returns the extension foreign keys associated with this column.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query foreign
+    ///   keys from.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE parent (id INT PRIMARY KEY);
+    /// CREATE TABLE child (
+    ///     parent_id INT PRIMARY KEY REFERENCES parent(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let parent_table = db.table(None, "parent").unwrap();
+    /// let child_table = db.table(None, "child").unwrap();
+    /// let parent_id_column =
+    ///     child_table.column("parent_id", &db).expect("Column 'parent_id' should exist");
+    /// let ext_fks = parent_id_column.extension_foreign_keys(&db).collect::<Vec<_>>();
+    /// assert_eq!(ext_fks.len(), 1);
+    /// let id_column = parent_table.column("id", &db).expect("Column 'id' should exist");
+    /// let id_fks = id_column.extension_foreign_keys(&db).collect::<Vec<_>>();
+    /// assert_eq!(id_fks.len(), 0);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn extension_foreign_keys<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::ForeignKey>
+    where
+        Self: 'db,
+    {
+        self.foreign_keys(database).filter(move |fk| fk.is_extension_foreign_key(database))
     }
 
     /// Returns whether the column is a foreign key, i.e. it is part of any

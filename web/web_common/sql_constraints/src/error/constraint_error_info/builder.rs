@@ -127,10 +127,10 @@ impl std::error::Error for ConstraintErrorInfoBuilderError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             ConstraintErrorInfoBuilderError::Builder(err) => Some(err),
-            ConstraintErrorInfoBuilderError::EmptyConstraint => None,
-            ConstraintErrorInfoBuilderError::EmptyMessage => None,
-            ConstraintErrorInfoBuilderError::EmptyObject => None,
-            ConstraintErrorInfoBuilderError::EmptyResolution => None,
+            ConstraintErrorInfoBuilderError::EmptyConstraint
+            | ConstraintErrorInfoBuilderError::EmptyMessage
+            | ConstraintErrorInfoBuilderError::EmptyObject
+            | ConstraintErrorInfoBuilderError::EmptyResolution => None,
         }
     }
 }

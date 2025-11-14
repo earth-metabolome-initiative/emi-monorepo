@@ -10,7 +10,7 @@ use syn::Ident;
 
 use crate::{
     structs::{
-        Documentation, InternalCrate, InternalToken, Publicness,
+        DataVariantRef, Documentation, InternalCrate, InternalToken, Publicness, TraitVariantRef,
         internal_struct::{Method, WhereClause},
     },
     traits::{ExternalDependencies, InternalDependencies},
@@ -28,11 +28,11 @@ pub struct InternalTrait {
     /// Trait documentation.
     documentation: Documentation,
     /// Where statements for the trait.
-    where_statements: Vec<WhereClause>,
+    where_clauses: Vec<WhereClause>,
     /// Generics for the trait.
     generics: Vec<syn::GenericParam>,
     /// Super traits for the trait.
-    super_traits: Vec<InternalToken>,
+    super_traits: Vec<TraitVariantRef>,
 }
 
 impl InternalTrait {
@@ -86,17 +86,35 @@ impl InternalTrait {
         &self.methods
     }
 
+    /// Returns the where clauses, optionally including super-traits.
+    pub fn where_clauses(&self, include_super_traits: bool) -> Vec<WhereClause> {
+        let mut clauses = self.where_clauses.clone();
+        if include_super_traits {
+            for super_trait in &self.super_traits {
+                clauses.push(
+                    WhereClause::new()
+                        .left(DataVariantRef::self_type(None))
+                        .right(
+                            InternalToken::new()
+                                .stream(quote::quote! {#super_trait})
+                                .employed_trait(super_trait.clone())
+                                .build()
+                                .unwrap(),
+                        )
+                        .build()
+                        .unwrap(),
+                );
+            }
+        }
+        clauses
+    }
+
     /// Returns the formatted where constraints for the trait, including
     /// optionally the super-traits applied to Self.
     pub fn formatted_where_constraints(&self, include_super_traits: bool) -> Option<TokenStream> {
         let mut constraints = Vec::new();
-        for where_clause in &self.where_statements {
+        for where_clause in self.where_clauses(include_super_traits) {
             constraints.push(where_clause.to_token_stream());
-        }
-        if include_super_traits {
-            for super_trait in &self.super_traits {
-                constraints.push(quote::quote! { Self: #super_trait });
-            }
         }
         if constraints.is_empty() { None } else { Some(quote::quote! { where #(#constraints),* }) }
     }
@@ -182,7 +200,7 @@ impl InternalDependencies for InternalTrait {
                     .flat_map(|super_trait| super_trait.internal_dependencies()),
             )
             .chain(
-                self.where_statements
+                self.where_clauses
                     .iter()
                     .flat_map(|where_clause| where_clause.internal_dependencies()),
             )
@@ -202,7 +220,7 @@ impl ExternalDependencies for InternalTrait {
                     .flat_map(|super_trait| super_trait.external_dependencies()),
             )
             .chain(
-                self.where_statements
+                self.where_clauses
                     .iter()
                     .flat_map(|where_clause| where_clause.external_dependencies()),
             )
@@ -224,8 +242,9 @@ impl ToTokens for InternalTrait {
         let maybe_supertraits = if self.super_traits.is_empty() {
             quote::quote! {}
         } else {
-            let super_traits = &self.super_traits;
-            quote::quote! { : #(#super_traits)+* }
+            let formatted_super_traits =
+                self.super_traits.iter().map(|st| st.format_with_generics());
+            quote::quote! { : #(#formatted_super_traits)+* }
         };
 
         tokens.extend(quote::quote! {

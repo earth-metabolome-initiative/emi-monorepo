@@ -30,9 +30,7 @@ CREATE TABLE IF NOT EXISTS assets (
     UNIQUE (name, model)
 );
 CREATE TABLE IF NOT EXISTS physical_asset_models (
-    id INTEGER PRIMARY KEY REFERENCES asset_models(id) ON DELETE CASCADE,
-    parent_model INTEGER REFERENCES physical_asset_models(id) ON DELETE CASCADE,
-    FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
+    id INTEGER PRIMARY KEY REFERENCES asset_models(id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS physical_assets (
     id UUID PRIMARY KEY REFERENCES assets(id) ON DELETE CASCADE,
@@ -41,9 +39,7 @@ CREATE TABLE IF NOT EXISTS physical_assets (
 );
 CREATE TABLE IF NOT EXISTS digital_asset_models (
     id INTEGER PRIMARY KEY REFERENCES asset_models(id) ON DELETE CASCADE,
-    parent_model INTEGER REFERENCES digital_asset_models(id) ON DELETE CASCADE,
-    mime_type MediaType NOT NULL,
-    FOREIGN KEY (id, parent_model) REFERENCES asset_models(id, parent_model)
+    mime_type MediaType NOT NULL
 );
 CREATE TABLE IF NOT EXISTS digital_assets (
     id UUID PRIMARY KEY REFERENCES assets(id) ON DELETE CASCADE,

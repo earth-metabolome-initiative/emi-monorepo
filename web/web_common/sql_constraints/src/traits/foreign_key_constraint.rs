@@ -12,6 +12,10 @@ pub trait ForeignKeyConstraint {
     type Database: DatabaseLike;
 
     /// Validates that the given foreign key satisfies the constraint.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the foreign key violates this constraint.
     fn validate_foreign_key(
         &self,
         database: &Self::Database,

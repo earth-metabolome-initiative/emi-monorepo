@@ -5,6 +5,7 @@ mod builder;
 use std::{fmt::Debug, hash::Hash, sync::Arc};
 
 use builder::ExternalTraitBuilder;
+use common_traits::builder::Builder;
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 
@@ -76,6 +77,16 @@ impl ExternalTrait {
     /// Inizializes a new `ExternalTraitBuilder`.
     pub fn new() -> ExternalTraitBuilder {
         ExternalTraitBuilder::default()
+    }
+
+    /// Returns a new `Sized` trait definition.
+    pub fn sized() -> ExternalTrait {
+        ExternalTrait::new()
+            .name("Sized")
+            .unwrap()
+            .path(syn::parse_quote! { std::marker::Sized })
+            .build()
+            .unwrap()
     }
 
     /// Returns the name of the trait.
@@ -259,11 +270,37 @@ impl TraitVariantRef {
         self.methods().iter().find(|method| method.name() == name)
     }
 
+    /// Returns the where clauses, optionally including super-traits.
+    pub fn where_clauses(&self, include_super_traits: bool) -> Vec<crate::structs::WhereClause> {
+        match self {
+            TraitVariantRef::Internal(trait_def, _crate_def) => {
+                trait_def.where_clauses(include_super_traits)
+            }
+            TraitVariantRef::External(_) => vec![],
+        }
+    }
+
     #[inline]
     /// Returns the [`TraitImpl`] struct to implement the trait for the provided
     /// type.
     pub fn impl_for_type<'trt>(&'trt self, type_token: &'trt DataVariantRef) -> TraitImpl<'trt> {
         TraitImpl::new(self).for_type(type_token)
+    }
+
+    #[inline]
+    /// Formats the trait variant reference with generics.
+    pub fn format_with_generics(&self) -> TokenStream {
+        let mut tokens = proc_macro2::TokenStream::new();
+        self.to_tokens(&mut tokens);
+        match self {
+            TraitVariantRef::Internal(trait_def, _crate_def) => {
+                tokens.extend(trait_def.formatted_generics());
+            }
+            TraitVariantRef::External(external) => {
+                tokens.extend(external.generics_with_defaults());
+            }
+        }
+        tokens.into()
     }
 }
 

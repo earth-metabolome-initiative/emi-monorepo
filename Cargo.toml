@@ -220,6 +220,7 @@ directus_codegen = { path = "data_migrations/directus_migration/directus_codegen
 pg_diesel = { path = "web/web_common/pg_diesel" }
 sql_traits = { path = "web/web_common/sql_traits" }
 sql_relations = { path = "web/web_common/sql_relations" }
+sql_constraints = { path = "web/web_common/sql_constraints" }
 synql = { path = "web/web_common/synql" }
 synql-core = { path = "web/web_common/synql-core" }
 synql-diesel-schema = { path = "web/web_common/synql-diesel-schema" }

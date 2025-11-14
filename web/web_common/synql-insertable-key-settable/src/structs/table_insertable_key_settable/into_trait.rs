@@ -35,7 +35,6 @@ where
             .methods(value.insertable_key_setter_methods())
             .expect("Failed to set the internal trait methods")
             .sized()
-            .unwrap()
             .build()
             .expect("Failed to convert internal trait builder into internal trait")
     }

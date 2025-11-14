@@ -55,26 +55,26 @@ impl<DB: DatabaseLike> ForeignKeyConstraint for LowercaseForeignKeyName<DB> {
         _database: &Self::Database,
         foreign_key: &<Self::Database as DatabaseLike>::ForeignKey,
     ) -> Result<(), crate::prelude::Error> {
-        if let Some(name) = foreign_key.foreign_key_name() {
-            if name.chars().any(|c| c.is_uppercase()) {
-                return Err(crate::error::Error::ForeignKey(
-                    ConstraintErrorInfo::new()
-                        .constraint("LowercaseForeignKeyName")
-                        .unwrap()
-                        .object(foreign_key.foreign_key_name().unwrap().to_owned())
-                        .unwrap()
-                        .message(format!(
-                            "Foreign key name '{}' is not lowercase",
-                            foreign_key.foreign_key_name().unwrap()
-                        ))
-                        .unwrap()
-                        .resolution("Rename the foreign key to be all lowercase".to_string())
-                        .unwrap()
-                        .build()
-                        .unwrap()
-                        .into(),
-                ));
-            }
+        if let Some(name) = foreign_key.foreign_key_name()
+            && name.chars().any(char::is_uppercase)
+        {
+            return Err(crate::error::Error::ForeignKey(
+                ConstraintErrorInfo::new()
+                    .constraint("LowercaseForeignKeyName")
+                    .unwrap()
+                    .object(foreign_key.foreign_key_name().unwrap().to_owned())
+                    .unwrap()
+                    .message(format!(
+                        "Foreign key name '{}' is not lowercase",
+                        foreign_key.foreign_key_name().unwrap()
+                    ))
+                    .unwrap()
+                    .resolution("Rename the foreign key to be all lowercase".to_string())
+                    .unwrap()
+                    .build()
+                    .unwrap()
+                    .into(),
+            ));
         }
         Ok(())
     }

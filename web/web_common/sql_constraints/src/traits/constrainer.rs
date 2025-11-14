@@ -6,8 +6,10 @@ use crate::{
     traits::{ColumnConstraint, ForeignKeyConstraint, TableConstraint},
 };
 
-mod generic_constrainer;
+pub mod generic_constrainer;
 pub use generic_constrainer::GenericConstrainer;
+pub mod default_constrainer;
+pub use default_constrainer::DefaultConstrainer;
 use sql_traits::traits::{DatabaseLike, TableLike};
 
 /// Trait for types that define a constrainer object.
@@ -49,6 +51,10 @@ pub trait Constrainer: Default {
     ) -> impl Iterator<Item = &dyn ForeignKeyConstraint<Database = Self::Database>>;
 
     /// Encounters a table and applies all registered table constraints to it.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if any table constraint is violated.
     fn encounter_table(
         &self,
         database: &Self::Database,
@@ -59,6 +65,10 @@ pub trait Constrainer: Default {
     }
 
     /// Encounters a column and applies all registered column constraints to it.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if any column constraint is violated.
     fn encounter_column(
         &self,
         column: &<Self::Database as DatabaseLike>::Column,
@@ -68,6 +78,10 @@ pub trait Constrainer: Default {
 
     /// Encounters a foreign key and applies all registered foreign key
     /// constraints to it.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if any foreign key constraint is violated.
     fn encounter_foreign_key(
         &self,
         database: &Self::Database,
@@ -79,6 +93,10 @@ pub trait Constrainer: Default {
 
     /// Validates the provided schema by applying all registered constraints to
     /// its DB entities.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if any constraint is violated.
     fn validate_schema(&self, database: &Self::Database) -> Result<(), Error> {
         for table in database.tables() {
             self.encounter_table(database, table)?;
