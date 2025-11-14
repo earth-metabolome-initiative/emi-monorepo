@@ -27,6 +27,13 @@ pub trait ExtensionOf<Extended: HasTable>: ExtensionOfHelper<Extended> {
         Self: 'data;
 }
 
+impl<T: ExtensionOfHelper<T>> ExtensionOf<T> for T {
+    type ExtendedType<'data>
+        = &'data T
+    where
+        Self: 'data;
+}
+
 /// Trait representing an object that can retrieve its ancestor
 /// (the extended object) from a database connection.
 pub trait Ancestor<Extended: HasTable, C>: ExtensionOf<Extended> {
