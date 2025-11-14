@@ -73,15 +73,21 @@ where
                     (
                         Expr::Identifier(Ident { value: ident, .. }),
                         Expr::Value(ValueWithSpan { value, .. }),
-                    ) => self.map_expr_to_single_field_error(ident, value, op),
+                    ) => Some(self.map_expr_to_single_field_error(ident, value, op)),
                     (
                         Expr::Value(ValueWithSpan { value, .. }),
                         Expr::Identifier(Ident { value: ident, .. }),
-                    ) => self.map_expr_to_single_field_error(ident, value, &invert_operator(op)),
+                    ) => {
+                        Some(self.map_expr_to_single_field_error(
+                            ident,
+                            value,
+                            &invert_operator(op),
+                        ))
+                    }
                     (
                         Expr::Identifier(Ident { value: left_ident, .. }),
                         Expr::Identifier(Ident { value: right_ident, .. }),
-                    ) => self.map_expr_to_double_field_error(left_ident, right_ident, op),
+                    ) => Some(self.map_expr_to_double_field_error(left_ident, right_ident, op)),
                     _ => None,
                 }
             }
@@ -94,7 +100,7 @@ where
         left: &str,
         right: &str,
         op: &BinaryOperator,
-    ) -> Option<InternalToken> {
+    ) -> InternalToken {
         let left_column = self.column(left);
         let right_column = self.column(right);
         let formatted_left = self.formatted_column(left_column, true);
@@ -106,96 +112,63 @@ where
             .workspace
             .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
             .unwrap();
-        match op {
+        let stream = match op {
             BinaryOperator::NotEq => {
-                Some(
-                    InternalToken::new()
-                        .private()
-                        .stream(quote! {
-                            if #formatted_left == #formatted_right {
-                                return Err(#validation_error::equal(
-                                    #table_attribute_enum::#left_camel_cased,
-                                    #table_attribute_enum::#right_camel_cased
-                                ));
-                            }
-                        })
-                        .data(table_attribute_enum)
-                        .build()
-                        .unwrap(),
-                )
+                quote! {
+                    if #formatted_left == #formatted_right {
+                        return Err(#validation_error::equal(
+                            #table_attribute_enum::#left_camel_cased,
+                            #table_attribute_enum::#right_camel_cased
+                        ));
+                    }
+                }
             }
             BinaryOperator::LtEq => {
-                Some(
-                    InternalToken::new()
-                        .private()
-                        .stream(quote! {
-                            if #formatted_left > #formatted_right {
-                                return Err(#validation_error::smaller_than(
-                                    #table_attribute_enum::#left_camel_cased,
-                                    #table_attribute_enum::#right_camel_cased
-                                ));
-                            }
-                        })
-                        .data(table_attribute_enum)
-                        .build()
-                        .unwrap(),
-                )
+                quote! {
+                    if #formatted_left > #formatted_right {
+                        return Err(#validation_error::smaller_than(
+                            #table_attribute_enum::#left_camel_cased,
+                            #table_attribute_enum::#right_camel_cased
+                        ));
+                    }
+                }
             }
             BinaryOperator::Lt => {
-                Some(
-                    InternalToken::new()
-                        .private()
-                        .stream(quote! {
-                            if #formatted_left >= #formatted_right {
-                                return Err(#validation_error::strictly_smaller_than(
-                                    #table_attribute_enum::#left_camel_cased,
-                                    #table_attribute_enum::#right_camel_cased
-                                ));
-                            }
-                        })
-                        .data(table_attribute_enum)
-                        .build()
-                        .unwrap(),
-                )
+                quote! {
+                    if #formatted_left >= #formatted_right {
+                        return Err(#validation_error::strictly_smaller_than(
+                            #table_attribute_enum::#left_camel_cased,
+                            #table_attribute_enum::#right_camel_cased
+                        ));
+                    }
+                }
             }
             BinaryOperator::Gt => {
-                Some(
-                    InternalToken::new()
-                        .private()
-                        .stream(quote! {
-                            if #formatted_left <= #formatted_right {
-                                return Err(#validation_error::strictly_greater_than(
-                                    #table_attribute_enum::#left_camel_cased,
-                                    #table_attribute_enum::#right_camel_cased
-                                ));
-                            }
-                        })
-                        .data(table_attribute_enum)
-                        .build()
-                        .unwrap(),
-                )
+                quote! {
+                    if #formatted_left <= #formatted_right {
+                        return Err(#validation_error::strictly_greater_than(
+                            #table_attribute_enum::#left_camel_cased,
+                            #table_attribute_enum::#right_camel_cased
+                        ));
+                    }
+                }
             }
             BinaryOperator::GtEq => {
-                Some(
-                    InternalToken::new()
-                        .private()
-                        .stream(quote! {
-                            if #formatted_left < #formatted_right {
-                                return Err(#validation_error::greater_than(
-                                    #table_attribute_enum::#left_camel_cased,
-                                    #table_attribute_enum::#right_camel_cased
-                                ));
-                            }
-                        })
-                        .data(table_attribute_enum)
-                        .build()
-                        .unwrap(),
-                )
+                quote! {
+                    if #formatted_left < #formatted_right {
+                        return Err(#validation_error::greater_than(
+                            #table_attribute_enum::#left_camel_cased,
+                            #table_attribute_enum::#right_camel_cased
+                        ));
+                    }
+                }
             }
             _ => {
                 unimplemented!("Operator {op:?} not supported for double field error mapping");
             }
-        }
+        };
+
+        InternalToken::new().private().stream(stream).data(table_attribute_enum).build().unwrap()
     }
 
     fn map_expr_to_single_field_error(
@@ -203,31 +176,25 @@ where
         ident: &str,
         value: &Value,
         op: &BinaryOperator,
-    ) -> Option<InternalToken> {
+    ) -> InternalToken {
         let column = self.column(ident);
         let formatted_column = self.formatted_column(column, false);
         let table_attribute_enum = self.attributes_enumeration();
         let camel_cased = column.column_camel_ident();
         let validation_error = self
             .workspace
-            .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))?;
-        match op {
+            .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
+            .unwrap();
+        let stream = match op {
             BinaryOperator::NotEq => {
                 if column.is_textual(self.database)
                     && value == &Value::SingleQuotedString("".to_string())
                 {
-                    Some(
-                        InternalToken::new()
-                            .private()
-                            .stream(quote! {
-                                if #formatted_column.is_empty() {
-                                    return Err(#validation_error::empty(#table_attribute_enum::#camel_cased));
-                                }
-                            })
-                            .data(table_attribute_enum)
-                            .build()
-                            .unwrap(),
-                    )
+                    quote! {
+                        if #formatted_column.is_empty() {
+                            return Err(#validation_error::empty(#table_attribute_enum::#camel_cased));
+                        }
+                    }
                 } else {
                     unimplemented!("Operator {op:?} not supported for single field error mapping");
                 }
@@ -235,83 +202,56 @@ where
             BinaryOperator::LtEq => {
                 let column_value = self.parse_column_value(column, value).0;
                 let float_value = self.parse_value(value, Some(&DataVariantRef::f64())).0;
-                Some(
-                    InternalToken::new()
-                        .private()
-                        .stream(quote! {
-                            if #formatted_column > #column_value {
-                                return Err(#validation_error::smaller_than_value(
-                                    #table_attribute_enum::#camel_cased,
-                                    #float_value
-                                ));
-                            }
-                        })
-                        .data(table_attribute_enum)
-                        .build()
-                        .unwrap(),
-                )
+                quote! {
+                    if #formatted_column > #column_value {
+                        return Err(#validation_error::smaller_than_value(
+                            #table_attribute_enum::#camel_cased,
+                            #float_value
+                        ));
+                    }
+                }
             }
             BinaryOperator::Lt => {
                 let column_value = self.parse_column_value(column, value).0;
                 let float_value = self.parse_value(value, Some(&DataVariantRef::f64())).0;
-                Some(
-                    InternalToken::new()
-                        .private()
-                        .stream(quote! {
-                            if #formatted_column >= #column_value {
-                                return Err(#validation_error::strictly_smaller_than_value(
-                                    #table_attribute_enum::#camel_cased,
-                                    #float_value
-                                ));
-                            }
-                        })
-                        .data(table_attribute_enum)
-                        .build()
-                        .unwrap(),
-                )
+                quote! {
+                    if #formatted_column >= #column_value {
+                        return Err(#validation_error::strictly_smaller_than_value(
+                            #table_attribute_enum::#camel_cased,
+                            #float_value
+                        ));
+                    }
+                }
             }
             BinaryOperator::Gt => {
                 let column_value = self.parse_column_value(column, value).0;
                 let float_value = self.parse_value(value, Some(&DataVariantRef::f64())).0;
-                Some(
-                    InternalToken::new()
-                        .private()
-                        .stream(quote! {
-                            if #formatted_column <= #column_value {
-                                return Err(#validation_error::strictly_greater_than_value(
-                                    #table_attribute_enum::#camel_cased,
-                                    #float_value
-                                ));
-                            }
-                        })
-                        .data(table_attribute_enum)
-                        .build()
-                        .unwrap(),
-                )
+                quote! {
+                    if #formatted_column <= #column_value {
+                        return Err(#validation_error::strictly_greater_than_value(
+                            #table_attribute_enum::#camel_cased,
+                            #float_value
+                        ));
+                    }
+                }
             }
             BinaryOperator::GtEq => {
                 let column_value = self.parse_column_value(column, value).0;
                 let float_value = self.parse_value(value, Some(&DataVariantRef::f64())).0;
-                Some(
-                    InternalToken::new()
-                        .private()
-                        .stream(quote! {
-                            if #formatted_column < #column_value {
-                                return Err(#validation_error::greater_than_value(
-                                    #table_attribute_enum::#camel_cased,
-                                    #float_value
-                                ));
-                            }
-                        })
-                        .data(table_attribute_enum)
-                        .build()
-                        .unwrap(),
-                )
+                quote! {
+                    if #formatted_column < #column_value {
+                        return Err(#validation_error::greater_than_value(
+                            #table_attribute_enum::#camel_cased,
+                            #float_value
+                        ));
+                    }
+                }
             }
             _ => {
                 unimplemented!("Operator {op:?} not supported for single field error mapping");
             }
-        }
+        };
+        InternalToken::new().private().stream(stream).data(table_attribute_enum).build().unwrap()
     }
 
     /// Returns whether the provided column is contextual.
