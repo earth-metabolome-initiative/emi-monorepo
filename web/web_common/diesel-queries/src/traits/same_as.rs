@@ -1,6 +1,6 @@
 //! Handles same-as updates for Diesel model builders.
 
-use crate::traits::{GetColumn, SetColumn, extension_of::TableIsExtensionOf};
+use crate::traits::extension_of::TableIsExtensionOf;
 
 /// Trait defining the existance of an horizontal same-as relationship.
 pub trait HasHorizontalSameAs<Referenced: diesel::Column, Key: diesel::Column>:
