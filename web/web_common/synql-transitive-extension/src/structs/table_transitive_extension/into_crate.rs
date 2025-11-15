@@ -25,7 +25,7 @@ where
             .expect("Failed to set the crate name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Crate providing the [`{trait_name}`](crate::{TRAIT_MODULE_NAME}::{trait_name}) trait for the {} table.",
                         transitive_ext.table.table_schema_doc_path(),
                         trait_name = transitive_ext.table.table_transitive_extension_trait_name(),

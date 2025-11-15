@@ -110,7 +110,7 @@ impl Builder for DeriveBuilder {
 
     fn build(self) -> Result<Self::Object, Self::Error> {
         if self.traits.is_empty() {
-            return Err(BuilderError::IncompleteBuild(DeriveAttribute::Traits).into());
+            return Err(BuilderError::IncompleteBuild(DeriveAttribute::Traits));
         }
         Ok(Derive { features: self.features, traits: self.traits })
     }

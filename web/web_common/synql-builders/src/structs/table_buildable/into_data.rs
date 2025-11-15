@@ -21,7 +21,7 @@ impl<'table, T: TableBuildableLike + ?Sized> From<TableBuildable<'table, T>> for
             .expect("Failed to set buildable struct name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Buildable struct variant of {}.",
                         table_model_ref.documentation_path()
                     ))

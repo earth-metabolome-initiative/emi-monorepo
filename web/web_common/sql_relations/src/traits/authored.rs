@@ -46,7 +46,7 @@ pub trait AuthoredTableLike: TableLike<DB = <Self as AuthoredTableLike>::Authore
             {
                 return Some(column);
             }
-        };
+        }
         if recursive {
             for parent in self.extended_tables(database) {
                 if let Some(col) = parent.created_by(database, true) {
@@ -79,7 +79,7 @@ pub trait AuthoredTableLike: TableLike<DB = <Self as AuthoredTableLike>::Authore
             {
                 return Some(column);
             }
-        };
+        }
         if recursive {
             for parent in self.extended_tables(database) {
                 if let Some(col) = parent.updated_by(database, true) {

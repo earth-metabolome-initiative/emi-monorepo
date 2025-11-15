@@ -87,7 +87,7 @@ impl<'table, T: TableRelationsLike + ?Sized> TableRelations<'table, T> {
                 .private()
                 .documentation(
                     Documentation::new()
-                        .documentation(format!(
+                        .documentation(&format!(
                             "Returns the {} referenced to by the foreign key ({}).",
                             referenced_table_model.documentation_path(),
                             foreign_key.documentation_schema_repr(self.database)

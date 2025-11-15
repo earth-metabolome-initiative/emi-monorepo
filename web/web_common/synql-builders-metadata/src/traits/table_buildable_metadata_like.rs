@@ -57,7 +57,7 @@ pub trait TableBuildableMetadataLike: TableInsertableLike {
             .private()
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Extension field to the ancestral {} table.",
                         self.table_schema_doc_path()
                     ))

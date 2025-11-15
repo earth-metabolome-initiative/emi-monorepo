@@ -223,7 +223,7 @@ where
 
         while changed {
             changed = false;
-            for ancestor in vertical_extension_tables.iter() {
+            for ancestor in &vertical_extension_tables {
                 for ancestor_column in ancestor.columns(database) {
                     let ancestor_column: &Self = ancestor_column.borrow();
                     // If the ancestor node is already in the reachable set, skip it.

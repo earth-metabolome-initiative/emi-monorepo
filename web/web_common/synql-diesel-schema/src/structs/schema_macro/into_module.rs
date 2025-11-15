@@ -19,7 +19,7 @@ where
             .public()
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Diesel schema for the `{}` table.",
                         schema_macro.table.table_name()
                     ))

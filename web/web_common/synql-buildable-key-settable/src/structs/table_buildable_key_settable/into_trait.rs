@@ -19,11 +19,11 @@ where
             .expect("Failed to get the table schema ref for the table relations");
         let mut builder = InternalTrait::new()
             .public()
-            .name(value.table.table_buildable_key_settable_trait_name())
+            .name(&value.table.table_buildable_key_settable_trait_name())
             .expect("Failed to set the internal trait name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Trait providing methods to set the key values of a {} table.",
                         value.table.table_schema_doc_path()
                     ))

@@ -6,7 +6,7 @@ use sql_traits::structs::ParserDB;
 use crate::traits::InheritableDatabaseLike;
 
 impl InheritableDatabaseLike for ParserDB {
-    fn most_concrete_table_column_name(&self) -> &str {
+    fn most_concrete_table_column_name(&self) -> &'static str {
         "most_concrete_table"
     }
 }

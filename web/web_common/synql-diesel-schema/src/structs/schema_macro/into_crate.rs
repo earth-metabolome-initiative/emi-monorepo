@@ -18,7 +18,7 @@ where
             .expect("Invalid crate name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Diesel schema crate for the `{}` table.",
                         schema_macro.table.table_name()
                     ))

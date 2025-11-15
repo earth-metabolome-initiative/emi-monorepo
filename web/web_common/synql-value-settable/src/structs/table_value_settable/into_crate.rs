@@ -27,7 +27,7 @@ where
             .expect("Failed to set the crate name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Crate providing the [`{table_value_settable_trait_name}`](crate::{TRAIT_MODULE_NAME}::{table_value_settable_trait_name}) trait for the {} table.",
                         table_relation.table.table_schema_doc_path(),
                         table_value_settable_trait_name=table_relation.table.table_value_settable_trait_name(),

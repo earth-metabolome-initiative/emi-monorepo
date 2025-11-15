@@ -26,7 +26,7 @@ where
             .public()
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Submodule providing the [`{}`] insertable struct for the {} table.",
                         value.table.table_insertable_name(),
                         value.table.table_schema_doc_path()

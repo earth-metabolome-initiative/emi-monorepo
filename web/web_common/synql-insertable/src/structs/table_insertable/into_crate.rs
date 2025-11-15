@@ -27,7 +27,7 @@ where
             .expect("Failed to set the crate name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Crate providing the [`{table_insertable_name}`](crate::{INSERTABLE_MODULE_NAME}::{table_insertable_name}) trait for the {} table.",
                         insertable.table.table_schema_doc_path(),
                         table_insertable_name=insertable.table.table_insertable_name(),

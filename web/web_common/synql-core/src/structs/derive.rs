@@ -30,7 +30,7 @@ impl Derive {
 impl ExternalDependencies for Derive {
     #[inline]
     fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
-        self.traits.iter().flat_map(|t| t.external_dependencies())
+        self.traits.iter().flat_map(ExternalDependencies::external_dependencies)
     }
 }
 
@@ -51,14 +51,14 @@ impl ToTokens for Derive {
                 derive( #(#traits),* )
             }
         };
-        if !self.features.is_empty() {
+        if self.features.is_empty() {
+            tokens.extend(quote! {
+                #[#derive_statement]
+            });
+        } else {
             let features = &self.features;
             tokens.extend(quote! {
                 #[cfg_attr(all( #(#features),* ), #derive_statement)]
-            });
-        } else {
-            tokens.extend(quote! {
-                #[#derive_statement]
             });
         }
     }

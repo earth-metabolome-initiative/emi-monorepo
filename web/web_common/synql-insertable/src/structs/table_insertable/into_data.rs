@@ -26,7 +26,7 @@ impl<'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'table, T>> f
             .expect("Failed to add table decorator to insertable struct")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Insertable struct variant of {}.",
                         table_model_ref.documentation_path()
                     ))

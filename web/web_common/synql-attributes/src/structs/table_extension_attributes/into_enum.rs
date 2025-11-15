@@ -30,7 +30,7 @@ impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttrib
                     .name(extended_table_camel_ident)
                     .doc(
                         Documentation::new()
-                            .documentation(format!(
+                            .documentation(&format!(
                                 "Extension for the extended {} table.",
                                 extended_table.table_schema_doc_path()
                             ))

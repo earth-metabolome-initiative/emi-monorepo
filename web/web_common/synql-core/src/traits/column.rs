@@ -150,20 +150,16 @@ pub trait ColumnSynLike: ColumnLike {
     /// # Arguments
     ///
     /// * `workspace` - The workspace where the column is defined.
-    fn external_postgres_type<'workspace, 'data>(
+    fn external_postgres_type(
         &self,
-        workspace: &'workspace Workspace,
+        workspace: &Workspace,
         database: &Self::DB,
     ) -> Option<ExternalTypeRef> {
-        workspace.external_postgres_type(&self.normalized_data_type(database))
+        workspace.external_postgres_type(self.normalized_data_type(database))
     }
 
     /// Returns the Diesel type of this column.
-    fn diesel_type<'workspace, 'data>(
-        &self,
-        workspace: &'workspace Workspace,
-        database: &Self::DB,
-    ) -> Option<Type> {
+    fn diesel_type(&self, workspace: &Workspace, database: &Self::DB) -> Option<Type> {
         let external_type = self.external_postgres_type(workspace, database)?;
         let diesel_type = external_type.diesel_type()?;
         if self.is_nullable(database) {
@@ -174,11 +170,7 @@ pub trait ColumnSynLike: ColumnLike {
     }
 
     /// Returns the Rust type of this column.
-    fn rust_type<'workspace, 'data>(
-        &self,
-        workspace: &'workspace Workspace,
-        database: &Self::DB,
-    ) -> Option<Type> {
+    fn rust_type(&self, workspace: &Workspace, database: &Self::DB) -> Option<Type> {
         let external_type = self.external_postgres_type(workspace, database)?;
         let rust_type = external_type.rust_type();
         if self.is_nullable(database) {
@@ -194,14 +186,10 @@ pub trait ColumnSynLike: ColumnLike {
     ///
     /// * `database` - The database connection to use to query the column type.
     /// * `workspace` - The workspace where the column is defined.
-    fn supports_copy<'workspace, 'data>(
-        &self,
-        database: &Self::DB,
-        workspace: &'workspace Workspace,
-    ) -> bool {
+    fn supports_copy(&self, database: &Self::DB, workspace: &Workspace) -> bool {
         match self.external_postgres_type(workspace, database) {
             Some(external_type) => external_type.supports_copy(),
-            None => return false,
+            None => false,
         }
     }
 }

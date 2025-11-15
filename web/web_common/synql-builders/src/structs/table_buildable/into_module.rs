@@ -28,7 +28,7 @@ where
             .public()
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Submodule providing the [`{}`] buildable struct for the {} table.",
                         value.table.table_buildable_name(),
                         value.table.table_schema_doc_path()

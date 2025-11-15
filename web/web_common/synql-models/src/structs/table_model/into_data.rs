@@ -50,7 +50,7 @@ where
             .documentation(
                 Documentation::new()
                     .documentation(
-                        table_model
+                        &table_model
                             .table
                             .table_doc(table_model.database)
                             .map(|s| s.to_owned())

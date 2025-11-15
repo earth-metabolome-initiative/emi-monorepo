@@ -91,7 +91,7 @@ impl<'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'table, T> {
             .private()
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Sets the value of the {} column.",
                         column.column_schema_doc_path(self.database)
                     ))
@@ -151,7 +151,7 @@ impl<'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'table, T> {
             .unwrap()
             .return_type(DataVariantRef::result(DataVariantRef::self_type(None), validation_error))
             .error_documentation(Documentation::new()
-                .documentation(format!(
+                .documentation(&format!(
                     "Returns a [`ValidationError`](validation_errors::prelude::ValidationError) if the provided value for column {} is invalid.",
                     column.column_schema_doc_path(self.database)
                 ))

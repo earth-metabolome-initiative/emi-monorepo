@@ -14,7 +14,7 @@ pub trait ExternalDependencies {
 impl<T: ExternalDependencies> ExternalDependencies for Option<T> {
     #[inline]
     fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
-        self.as_ref().into_iter().flat_map(|item| item.external_dependencies())
+        self.as_ref().into_iter().flat_map(ExternalDependencies::external_dependencies)
     }
 }
 

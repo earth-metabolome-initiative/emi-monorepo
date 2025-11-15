@@ -111,7 +111,7 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
             .private()
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Sets the foreign key(s) from the {} column.",
                         host_column.column_schema_doc_path(self.database),
                     ))
@@ -194,7 +194,7 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
             .private()
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Sets the foreign key(s) from the {} column.",
                         host_column.column_schema_doc_path(self.database),
                     ))
@@ -319,7 +319,7 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
                 .expect("Failed to set generic field for ValidationError");
             return_type = DataVariantRef::result(return_type, validation_error);
             error_documentation = Some(Documentation::new()
-                .documentation(format!(
+                .documentation(&format!(
                     "Returns a [`ValidationError`](validation_errors::prelude::ValidationError) if the provided value for column {} is invalid.",
                     host_column.column_schema_doc_path(self.database)
                 ))
@@ -343,7 +343,7 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
             .private()
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Sets the foreign key(s) from the {} column.",
                         host_column.column_schema_doc_path(self.database),
                     ))

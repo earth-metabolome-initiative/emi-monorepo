@@ -14,7 +14,7 @@ pub trait InternalDependencies {
 impl<T: InternalDependencies> InternalDependencies for Option<T> {
     #[inline]
     fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
-        self.into_iter().flat_map(|item| item.internal_dependencies())
+        self.iter().flat_map(InternalDependencies::internal_dependencies)
     }
 }
 

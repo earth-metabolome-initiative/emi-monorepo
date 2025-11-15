@@ -78,7 +78,7 @@ where
     {
         if let Some(column) = self.column(database.most_concrete_table_column_name(), database) {
             return Some(column);
-        };
+        }
         if recursive {
             for parent in self.extended_tables(database) {
                 if let Some(col) = parent.most_concrete_column(database, true) {

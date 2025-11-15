@@ -301,7 +301,7 @@ impl TraitVariantRef {
                 tokens.extend(external.generics_with_defaults());
             }
         }
-        tokens.into()
+        tokens
     }
 }
 

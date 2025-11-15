@@ -77,7 +77,7 @@ impl InternalTrait {
 
     /// Returns whether all methods have a default implementation.
     pub fn all_methods_have_default_impl(&self) -> bool {
-        self.methods.iter().all(|method| method.has_body())
+        self.methods.iter().all(Method::has_body)
     }
 
     /// Returns the methods defined by the trait.
@@ -152,7 +152,7 @@ impl InternalTrait {
                     syn::Ident::new(&letter.to_string(), proc_macro2::Span::call_site())
                 } else {
                     syn::Ident::new(
-                        &format!("{}{}", letter, number_of_loops),
+                        &format!("{letter}{number_of_loops}"),
                         proc_macro2::Span::call_site(),
                     )
                 };
@@ -194,17 +194,9 @@ impl InternalDependencies for InternalTrait {
     fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
         self.methods
             .iter()
-            .flat_map(|method| method.internal_dependencies())
-            .chain(
-                self.super_traits
-                    .iter()
-                    .flat_map(|super_trait| super_trait.internal_dependencies()),
-            )
-            .chain(
-                self.where_clauses
-                    .iter()
-                    .flat_map(|where_clause| where_clause.internal_dependencies()),
-            )
+            .flat_map(InternalDependencies::internal_dependencies)
+            .chain(self.super_traits.iter().flat_map(InternalDependencies::internal_dependencies))
+            .chain(self.where_clauses.iter().flat_map(InternalDependencies::internal_dependencies))
             .chain(self.documentation.internal_dependencies())
     }
 }
@@ -214,17 +206,9 @@ impl ExternalDependencies for InternalTrait {
     fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
         self.methods
             .iter()
-            .flat_map(|method| method.external_dependencies())
-            .chain(
-                self.super_traits
-                    .iter()
-                    .flat_map(|super_trait| super_trait.external_dependencies()),
-            )
-            .chain(
-                self.where_clauses
-                    .iter()
-                    .flat_map(|where_clause| where_clause.external_dependencies()),
-            )
+            .flat_map(ExternalDependencies::external_dependencies)
+            .chain(self.super_traits.iter().flat_map(ExternalDependencies::external_dependencies))
+            .chain(self.where_clauses.iter().flat_map(ExternalDependencies::external_dependencies))
             .chain(self.documentation.external_dependencies())
     }
 }
@@ -244,7 +228,7 @@ impl ToTokens for InternalTrait {
             quote::quote! {}
         } else {
             let formatted_super_traits =
-                self.super_traits.iter().map(|st| st.format_with_generics());
+                self.super_traits.iter().map(TraitVariantRef::format_with_generics);
             quote::quote! { : #(#formatted_super_traits)+* }
         };
 

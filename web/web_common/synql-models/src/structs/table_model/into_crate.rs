@@ -25,7 +25,7 @@ where
             .expect("Failed to set the crate name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Crate providing the [`{table_singular_camel_name}`](crate::{MODEL_MODULE_NAME}::{table_singular_camel_name}) data model for the {} table.",
                         table_model.table.table_schema_doc_path(),
                         table_singular_camel_name=table_model.table.table_singular_camel_name(),

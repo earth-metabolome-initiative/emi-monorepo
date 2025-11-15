@@ -17,7 +17,7 @@ pub trait FunctionSynLike: FunctionLike {
     ///
     /// * `workspace` - The workspace where the column is defined.
     /// * `database` - The database where the column is defined.
-    fn argument_types<'db, 'data>(
+    fn argument_types<'db>(
         &'db self,
         workspace: &'db Workspace,
         database: &'db Self::DB,
@@ -33,9 +33,9 @@ pub trait FunctionSynLike: FunctionLike {
     /// # Arguments
     /// * `workspace` - The workspace where the column is defined.
     /// * `database` - The database where the column is defined.
-    fn return_type<'workspace, 'data>(
+    fn return_type<'data>(
         &'data self,
-        workspace: &'workspace Workspace,
+        workspace: &Workspace,
         database: &'data Self::DB,
     ) -> Option<ExternalTypeRef> {
         self.normalized_return_type_name(database)

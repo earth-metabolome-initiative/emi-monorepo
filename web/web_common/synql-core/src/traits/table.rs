@@ -208,7 +208,7 @@ where
         &'db self,
         database: &'db Self::DB,
     ) -> impl Iterator<Item = Ident> + 'db {
-        self.primary_key_columns(database).map(move |col| col.column_snake_ident())
+        self.primary_key_columns(database).map(ColumnSynLike::column_snake_ident)
     }
 }
 

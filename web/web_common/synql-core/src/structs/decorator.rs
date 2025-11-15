@@ -44,14 +44,14 @@ impl InternalDependencies for Decorator {
 impl ToTokens for Decorator {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let token = &self.token;
-        if !self.features.is_empty() {
+        if self.features.is_empty() {
+            tokens.extend(quote! {
+                #[#token]
+            });
+        } else {
             let features = &self.features;
             tokens.extend(quote! {
                 #[cfg_attr(all( #(#features),* ), #token)]
-            });
-        } else {
-            tokens.extend(quote! {
-                #[#token]
             });
         }
     }

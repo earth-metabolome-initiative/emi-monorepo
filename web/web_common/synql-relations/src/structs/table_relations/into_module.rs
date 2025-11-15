@@ -32,7 +32,7 @@ where
             .public()
             .name(TRAIT_MODULE_NAME)
             .expect("Failed to set the module name")
-            .documentation(Documentation::new().documentation(format!(
+            .documentation(Documentation::new().documentation(&format!(
                 "Submodule providing the [`{}`] trait for the [`{}`]({model_ref}) struct and the {} table.",
                 table_relation.table.table_relations_trait_name(),
                 model_ref.data().name(),

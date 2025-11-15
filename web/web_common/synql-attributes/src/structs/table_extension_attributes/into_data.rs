@@ -24,7 +24,7 @@ impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttrib
             .public()
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Enumeration of the extension attributes of the {} table.",
                         extension_attributes.table.table_schema_doc_path()
                     ))

@@ -52,7 +52,7 @@ pub enum DecoratorBuilderError {
 impl Display for DecoratorBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            DecoratorBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            DecoratorBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             DecoratorBuilderError::DuplicatedFeature => {
                 write!(f, "A feature with the same name has already been added")
             }

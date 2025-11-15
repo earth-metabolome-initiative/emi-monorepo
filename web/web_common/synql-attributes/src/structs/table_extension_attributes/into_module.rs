@@ -26,7 +26,7 @@ impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttrib
             .name(EXTENSION_ATTRIBUTES_MODULE_NAME)
             .expect("Failed to set extension attributes module name")
             .public()
-            .documentation(Documentation::new().documentation(format!(
+            .documentation(Documentation::new().documentation(&format!(
                 "Submodule providing the extension attributes enumeration for the {} table.",
                 extension_attributes.table.table_schema_doc_path()
             )).unwrap().internal_dependency(schema_crate_ref).build().unwrap())

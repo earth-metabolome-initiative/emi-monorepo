@@ -28,10 +28,10 @@ where
             .expect("Failed to get the table schema ref for the table relations");
         InternalTrait::new()
             .public()
-            .name(table_relation.table.table_relations_trait_name())
+            .name(&table_relation.table.table_relations_trait_name())
             .expect("Failed to set the internal trait name")
             .documentation(Documentation::new()
-                .documentation(format!(
+                .documentation(&format!(
                     "Trait providing methods to access the relations of the {} struct for the {} table.",
                     model_ref.documentation_path(),
                     table_relation.table.table_schema_doc_path()
@@ -41,7 +41,6 @@ where
                 .build()
                 .unwrap())
             .generic(syn::parse_quote! {C})
-            .unwrap()
             .super_trait(
                 ancestor.into()
             )

@@ -27,7 +27,7 @@ where
             .expect("Failed to set the module name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Submodule providing the [`{}`] trait for the {} table.",
                         value.table.table_insertable_key_settable_trait_name(),
                         value.table.table_schema_doc_path()

@@ -57,7 +57,7 @@ impl<'table, T: TableAttributesLike + TableExtensionAttributesLike + ?Sized>
                     .name(column.column_camel_ident())
                     .doc(
                         Documentation::new()
-                            .documentation(format!(
+                            .documentation(&format!(
                                 "Attribute representing the {} column.",
                                 column.column_schema_doc_path(attributes.database)
                             ))

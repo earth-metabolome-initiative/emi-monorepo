@@ -58,14 +58,14 @@ impl Documentation {
 impl ExternalDependencies for Documentation {
     #[inline]
     fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
-        self.external_dependencies.iter().map(|c| c.as_ref())
+        self.external_dependencies.iter().map(std::convert::AsRef::as_ref)
     }
 }
 
 impl InternalDependencies for Documentation {
     #[inline]
     fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
-        self.internal_dependencies.iter().map(|c| c.as_ref())
+        self.internal_dependencies.iter().map(std::convert::AsRef::as_ref)
     }
 }
 
@@ -75,7 +75,7 @@ impl ToTokens for Documentation {
         // This ensures proper formatting with line breaks in the rendered documentation
         for line in self.documentation.lines() {
             let line_with_space_before =
-                if line.starts_with(' ') { line.to_string() } else { format!(" {}", line) };
+                if line.starts_with(' ') { line.to_string() } else { format!(" {line}") };
             tokens.extend(quote::quote! {
                 #[doc = #line_with_space_before]
             });
@@ -130,7 +130,7 @@ impl ToTokens for ModuleDocumentation {
         // Split documentation by newlines to create separate doc attributes
         for line in self.documentation.documentation().lines() {
             let line_with_space_before =
-                if line.starts_with(' ') { line.to_string() } else { format!(" {}", line) };
+                if line.starts_with(' ') { line.to_string() } else { format!(" {line}") };
             tokens.extend(quote::quote! {
                 #![doc = #line_with_space_before]
             });

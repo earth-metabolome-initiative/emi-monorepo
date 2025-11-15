@@ -37,7 +37,7 @@ impl<'table, T: TableBuildableLike + ?Sized> From<TableBuildable<'table, T>> for
                         .private()
                         .documentation(
                             Documentation::new()
-                                .documentation(format!(
+                                .documentation(&format!(
                                     "Underlying {} triangular builder field to the {} column.",
                                     if fk
                                         .triangular_same_as(buildable.database)

@@ -83,16 +83,16 @@ pub enum InternalTraitBuilderError {
 impl Display for InternalTraitBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            InternalTraitBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            InternalTraitBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             InternalTraitBuilderError::InvalidName => write!(f, "Invalid trait name"),
             InternalTraitBuilderError::DuplicateMethodName(name) => {
-                write!(f, "Duplicate method name found in trait: {}", name)
+                write!(f, "Duplicate method name found in trait: {name}")
             }
             InternalTraitBuilderError::DuplicateWhereClause(clause) => {
-                write!(f, "Duplicate where clause found in trait: {}", clause)
+                write!(f, "Duplicate where clause found in trait: {clause}")
             }
             InternalTraitBuilderError::DuplicateGeneric(generic) => {
-                write!(f, "Duplicate generic found in trait: {}", generic)
+                write!(f, "Duplicate generic found in trait: {generic}")
             }
         }
     }
@@ -112,7 +112,7 @@ impl InternalTraitBuilder {
     ///
     /// # Arguments
     /// * `name` - The name of the trait.
-    pub fn name<S: ToString>(mut self, name: S) -> Result<Self, InternalTraitBuilderError> {
+    pub fn name<S: ToString>(mut self, name: &S) -> Result<Self, InternalTraitBuilderError> {
         let name = name.to_string();
         if name.trim().is_empty()
             || name.contains(' ')
@@ -184,14 +184,11 @@ impl InternalTraitBuilder {
     ///
     /// # Arguments
     /// * `generic` - The generic to add.
-    pub fn generic(
-        mut self,
-        generic: syn::GenericParam,
-    ) -> Result<Self, InternalTraitBuilderError> {
+    pub fn generic(mut self, generic: syn::GenericParam) -> Self {
         if !self.generics.contains(&generic) {
             self.generics.push(generic);
         }
-        Ok(self)
+        self
     }
 
     /// Adds several generics to the trait.
@@ -203,7 +200,7 @@ impl InternalTraitBuilder {
         I: IntoIterator<Item = syn::GenericParam>,
     {
         for generic in generics {
-            self = self.generic(generic)?;
+            self = self.generic(generic);
         }
         Ok(self)
     }

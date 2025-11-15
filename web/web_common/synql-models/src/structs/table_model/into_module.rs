@@ -19,7 +19,7 @@ where
             .expect("Failed to set the module name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Submodule providing the [`{}`] data model for the `{}` table.",
                         table_model.table.table_singular_camel_name(),
                         table_model.table.table_name()

@@ -11,7 +11,7 @@ use sql_traits::traits::{ColumnLike, ForeignKeyLike};
 pub trait ForeignKeySynLike: ForeignKeyLike {
     /// Returns the name of the getter method associated with this constraint.
     fn foreign_key_getter_name(&self, database: &Self::DB) -> String {
-        self.host_columns(database).map(|column| column.column_name()).collect::<Vec<_>>().join("_")
+        self.host_columns(database).map(ColumnLike::column_name).collect::<Vec<_>>().join("_")
     }
 }
 

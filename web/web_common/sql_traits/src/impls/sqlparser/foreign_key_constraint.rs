@@ -96,11 +96,13 @@ impl ForeignKeyLike for TableAttribute<CreateTable, ForeignKeyConstraint> {
             referenced_table
                 .columns(database)
                 .find(|col: &&<Self::DB as DatabaseLike>::Column| &col.attribute().name == col_name)
-                .expect(&format!(
-                    "Referenced column `{}` not found in table `{}` for foreign key",
-                    col_name,
-                    referenced_table.table_name()
-                ))
+                .unwrap_or_else(|| {
+                    panic!(
+                        "Referenced column `{}` not found in table `{}` for foreign key",
+                        col_name,
+                        referenced_table.table_name()
+                    )
+                })
         })
     }
 }

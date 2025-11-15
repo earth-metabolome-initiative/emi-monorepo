@@ -19,7 +19,7 @@ impl<'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'table, T>> f
             .expect("Failed to set attributes crate name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Crate containing the attributes enumeration for the {} table.",
                         attributes.table.table_schema_doc_path()
                     ))

@@ -76,7 +76,7 @@ impl Translator for ColumnOptionDef {
                         name: name.clone(),
                         index_name: index_name.clone(),
                         columns: columns.clone(),
-                        match_kind: match_kind.clone(),
+                        match_kind: *match_kind,
                         foreign_table: foreign_table.clone(),
                         referred_columns: referred_columns.clone(),
                         on_delete: on_delete

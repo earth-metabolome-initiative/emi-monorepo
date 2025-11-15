@@ -30,7 +30,7 @@ pub trait ColumnModelLike: ColumnSynLike {
             .expect("Failed to set name")
             .documentation(
                 Documentation::new()
-                    .documentation(self.column_doc(database).map(|s| s.to_owned()).unwrap_or_else(
+                    .documentation(&self.column_doc(database).map(|s| s.to_owned()).unwrap_or_else(
                         || format!("TODO!: document column {}", self.column_name(),),
                     ))
                     .unwrap()

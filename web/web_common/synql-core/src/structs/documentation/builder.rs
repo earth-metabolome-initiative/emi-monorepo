@@ -60,7 +60,7 @@ pub enum DocumentationBuilderError {
 impl Display for DocumentationBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            DocumentationBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            DocumentationBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             DocumentationBuilderError::InvalidDocumentation => {
                 write!(f, "Invalid documentation string (empty or whitespace only)")
             }
@@ -106,9 +106,9 @@ impl DocumentationBuilder {
     ///
     /// # Arguments
     /// * `documentation` - The documentation string.
-    pub fn documentation<S: ToString>(
+    pub fn documentation<S: ToString + ?Sized>(
         mut self,
-        documentation: S,
+        documentation: &S,
     ) -> Result<Self, DocumentationBuilderError> {
         let documentation = documentation.to_string();
         if documentation.trim().is_empty() {

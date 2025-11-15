@@ -21,11 +21,11 @@ where
         let extensin_of = transitive_ext.workspace.external_trait("ExtensionOf").unwrap();
         InternalTrait::new()
             .public()
-            .name(transitive_ext.table.table_transitive_extension_trait_name())
+            .name(&transitive_ext.table.table_transitive_extension_trait_name())
             .expect("Failed to set the internal trait name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Marker trait indicating that a type is an extension of the {table_schema_ref} table.\n\n\
                         This trait is automatically implemented for all tables that directly or \
                         indirectly extend the {table_schema_ref} table. It captures the transitive closure of the extension \

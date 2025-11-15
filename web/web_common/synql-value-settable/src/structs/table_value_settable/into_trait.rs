@@ -21,11 +21,11 @@ where
             .expect("Failed to get the table schema ref for the table relations");
         InternalTrait::new()
             .public()
-            .name(table_settable.table.table_value_settable_trait_name())
+            .name(&table_settable.table.table_value_settable_trait_name())
             .expect("Failed to set the internal trait name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Trait providing methods to set the value values of a {} table.",
                         table_settable.table.table_schema_doc_path()
                     ))

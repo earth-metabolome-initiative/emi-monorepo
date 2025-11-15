@@ -21,7 +21,7 @@ impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttrib
             .expect("Failed to set extension attributes crate name")
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Crate containing the extension attributes enumeration for the {} table.",
                         extension_attributes.table.table_schema_doc_path()
                     ))

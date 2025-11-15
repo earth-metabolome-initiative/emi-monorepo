@@ -23,7 +23,7 @@ impl<'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'table, T>> f
             .public()
             .documentation(
                 Documentation::new()
-                    .documentation(format!(
+                    .documentation(&format!(
                         "Submodule providing the attributes enumeration for the {} table.",
                         attributes.table.table_schema_doc_path()
                     ))

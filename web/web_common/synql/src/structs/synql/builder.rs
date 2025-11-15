@@ -23,7 +23,7 @@ pub struct SynQLBuilder<'a, DB: SynQLDatabaseLike> {
     external_crates: Vec<Arc<ExternalCrate>>,
 }
 
-impl<'a, DB: SynQLDatabaseLike> Default for SynQLBuilder<'a, DB> {
+impl<DB: SynQLDatabaseLike> Default for SynQLBuilder<'_, DB> {
     fn default() -> Self {
         SynQLBuilder {
             database: None,
@@ -164,11 +164,11 @@ impl<'a, DB: SynQLDatabaseLike> SynQLBuilder<'a, DB> {
     }
 }
 
-impl<'a, DB: SynQLDatabaseLike> Attributed for SynQLBuilder<'a, DB> {
+impl<DB: SynQLDatabaseLike> Attributed for SynQLBuilder<'_, DB> {
     type Attribute = SynQLAttribute;
 }
 
-impl<'a, DB: SynQLDatabaseLike> IsCompleteBuilder for SynQLBuilder<'a, DB> {
+impl<DB: SynQLDatabaseLike> IsCompleteBuilder for SynQLBuilder<'_, DB> {
     fn is_complete(&self) -> bool {
         self.database.is_some() && self.path.is_some()
     }
