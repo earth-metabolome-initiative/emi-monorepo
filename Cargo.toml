@@ -67,14 +67,19 @@ members = [
   "web/web_common/synql-models",
   "web/web_common/synql-builders",
   "web/web_common/synql-relations",
+  "web/web_common/synql-transitive-extension",
   "web/web_common/diesel-queries",
   "web/web_common/synql-attributes",
   "web/web_common/synql-value-settable",
   "web/web_common/synql-insertable",
   "web/web_common/synql-checks",
   "web/web_common/synql-insertable-key-settable",
-  "web/web_common/synql-buildable-key-settable", "web/web_common/synql-builders-metadata",
+  "web/web_common/synql-buildable-key-settable",
+  "web/web_common/synql-builders-metadata",
 ]
+
+[workspace.package]
+edition = "2024"
 
 [workspace.dependencies]
 actix-web = { version = "4.11", features = ["cookies", "openssl"] }
@@ -228,6 +233,7 @@ synql-models = { path = "web/web_common/synql-models" }
 synql-builders = { path = "web/web_common/synql-builders" }
 synql-builders-metadata = { path = "web/web_common/synql-builders-metadata" }
 synql-relations = { path = "web/web_common/synql-relations" }
+synql-transitive-extension = { path = "web/web_common/synql-transitive-extension" }
 synql-attributes = { path = "web/web_common/synql-attributes" }
 synql-value-settable = { path = "web/web_common/synql-value-settable" }
 synql-insertable = { path = "web/web_common/synql-insertable" }
@@ -268,9 +274,9 @@ debug = true
 
 [profile.ultra]
 inherits = "release"
-opt-level = 3     # Highest LLVM optimization level
-lto = "fat"       # Full Link Time Optimization across all crates
-codegen-units = 1 # Forces single codegen unit (enables deeper cross-function inlining)
+opt-level = 3           # Highest LLVM optimization level
+lto = "fat"             # Full Link Time Optimization across all crates
+codegen-units = 1       # Forces single codegen unit (enables deeper cross-function inlining)
 panic = "abort"         # Removes unwinding code paths for smaller & faster binaries
 strip = "symbols"       # Remove all debug symbols (since 1.69+)
 incremental = false     # Disable incremental compilation (forces full optimization)

@@ -1,7 +1,7 @@
 [package]
 name = "csqlv"
 version = "0.1.0"
-edition = "2024"
+edition.workspace = true
 
 [dependencies]
 csv = "1.3.1"

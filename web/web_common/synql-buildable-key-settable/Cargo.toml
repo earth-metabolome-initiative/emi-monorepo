@@ -1,7 +1,7 @@
 [package]
 name = "synql-buildable-key-settable"
 version = "0.1.0"
-edition = "2024"
+edition.workspace = true
 
 [dependencies]
 sql_traits.workspace = true
@@ -12,6 +12,7 @@ synql-attributes.workspace = true
 synql-insertable-key-settable.workspace = true
 synql-builders-metadata.workspace = true
 synql-models.workspace = true
+synql-transitive-extension.workspace = true
 quote.workspace = true
 proc-macro2.workspace = true
 synql-diesel-schema.workspace = true

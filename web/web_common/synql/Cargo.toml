@@ -1,7 +1,7 @@
 [package]
 name = "synql"
 version = "0.1.0"
-edition = "2024"
+edition.workspace = true
 
 [dependencies]
 common_traits.workspace = true
@@ -18,6 +18,7 @@ synql-builders.workspace = true
 synql-value-settable.workspace = true
 synql-insertable-key-settable.workspace = true
 synql-buildable-key-settable.workspace = true
+synql-transitive-extension.workspace = true
 chrono.workspace = true
 time_requirements.workspace = true
 

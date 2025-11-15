@@ -1,7 +1,7 @@
 [package]
 name = "web_common_traits"
 version = "0.1.0"
-edition = "2024"
+edition.workspace = true
 
 [dependencies]
 rosetta_uuid = { workspace = true, features = ["serde"] }

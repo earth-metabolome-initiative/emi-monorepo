@@ -1,7 +1,7 @@
 [package]
 name = "init_db"
 version = "0.1.0"
-edition = "2024"
+edition.workspace = true
 
 [dependencies]
 taxonomy_fetcher.workspace = true

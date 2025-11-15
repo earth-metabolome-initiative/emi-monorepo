@@ -1,7 +1,6 @@
 //! Submodule defining the `TableBuildableKeySettable` struct for generating
 //! settable traits.
 
-use proc_macro2::TokenStream;
 use sql_relations::prelude::TriangularSameAsForeignKeyLike;
 use sql_traits::{
     prelude::ColumnLike,
@@ -20,6 +19,7 @@ use synql_core::{
 };
 use synql_diesel_schema::traits::{ColumnSchema, TableSchema};
 use synql_models::traits::TableModelLike;
+use synql_transitive_extension::traits::TableTransitiveExtensionLike;
 
 use crate::traits::{ColumnBuildableKeySettableLike, TableBuildableKeySettableLike};
 
@@ -295,9 +295,6 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
             .most_recent_common_ancestor(self.database, other_referenced_tables)
             .unwrap();
 
-        let extension_of =
-            self.workspace.external_trait("ExtensionOf").expect("Failed to get ExtensionOf trait");
-
         let identifiable = self
             .workspace
             .external_trait("Identifiable")
@@ -332,6 +329,13 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
         let mca_model_ref = mca_referenced_table
             .model_ref(self.workspace)
             .expect("Failed to get the table model ref for the referenced table");
+
+        let transitive_extension_trait_ref =
+            mca_referenced_table.transitive_extension_trait_ref(self.workspace).expect(&format!(
+                "Failed to get the transitive extension trait ref for the most recent common ancestor table `{}` for current table `{}`",
+                mca_referenced_table.table_name(),
+                self.table.table_name()
+            ));
 
         Method::new()
             .name(host_column.column_snake_name())
@@ -382,41 +386,12 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
                 WhereClause::new()
                     .left(argument_type.clone())
                     .right({
-                        let mut data = Vec::new();
-                        let stream = mca_referenced_table
-                                    .ancestral_extended_tables(self.database)
-                                    .into_iter()
-                                    .chain([mca_referenced_table])
-                                    .map(|ancestor_table| {
-                                        let ancestor_model_ref = ancestor_table
-                                            .model_ref(self.workspace)
-                                            .expect("Failed to get the table model ref for the referenced table");
-                                        let extension_of = extension_of
-                                            .set_generic_field(
-                                                &generic_type("Extended"),
-                                                ancestor_model_ref.clone().into(),
-                                            )
-                                            .unwrap();
-                                        data.push(ancestor_model_ref.into());
-                                        extension_of.format_with_generics()
-                                    })
-                                    .fold(TokenStream::new(), |mut init, f| {
-                                        if !init.is_empty() {
-                                            init.extend(quote::quote! { + });
-                                        }
-                                        init.extend(f);
-                                        init
-                                    });
-
                         InternalToken::new()
-                            .stream(
-                                stream
-                            )
-                            .datas(data)
-                            .employed_trait(extension_of.into())
+                            .stream(quote::quote!{#transitive_extension_trait_ref})
+                            .employed_trait(transitive_extension_trait_ref)
                             .build()
-                            .expect("Failed to build the right side of the where clause")},
-                    )
+                            .expect("Failed to build the right side of the where clause with transitive extension trait")                        
+                    })
                     .build()
                     .expect("Failed to build where clause"),
             )
@@ -430,6 +405,7 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
                                 #identifiable<Id=<&'a #mca_model_ref as #identifiable>::Id>
                             })
                             .employed_trait(identifiable.clone().into())
+                            .data(mca_model_ref.clone().into())
                             .build()
                             .expect("Failed to build the right side of the where clause"),
                     )

@@ -12,6 +12,7 @@ use synql_insertable::traits::TableInsertableLike;
 use synql_insertable_key_settable::prelude::*;
 use synql_models::traits::TableModelLike;
 use synql_relations::prelude::*;
+use synql_transitive_extension::prelude::*;
 use synql_value_settable::prelude::*;
 
 mod builder;
@@ -85,6 +86,8 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
                 continue;
             }
 
+            println!("Generating workspace components for table '{}'", table.table_name());
+
             let schema_macro_task = Task::new("schema_macro");
             workspace.add_internal_crate(table.schema_macro(&workspace, self.database).into());
             time_tracker.add_or_extend_completed_task(schema_macro_task);
@@ -92,6 +95,11 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             let model_task = Task::new("model");
             workspace.add_internal_crate(table.model(&workspace, self.database).into());
             time_tracker.add_or_extend_completed_task(model_task);
+
+            let transitive_extension_task = Task::new("transitive_extension_trait");
+            workspace
+                .add_internal_crate(table.transitive_extension(&workspace, self.database).into());
+            time_tracker.add_or_extend_completed_task(transitive_extension_task);
 
             let relations_trait_task = Task::new("relations_trait");
             workspace.add_internal_crate(table.relations_trait(&workspace, self.database).into());

@@ -39,6 +39,11 @@ expression: normalized_output
         /src
             /lib.rs
             /relations.rs
+    /comment_transitive_extension
+        /Cargo.toml
+        /src
+            /lib.rs
+            /transitive_extension.rs
     /comment_value_settable
         /Cargo.toml
         /src
@@ -89,6 +94,11 @@ expression: normalized_output
         /src
             /lib.rs
             /relations.rs
+    /extended_comment_transitive_extension
+        /Cargo.toml
+        /src
+            /lib.rs
+            /transitive_extension.rs
     /extended_comment_value_settable
         /Cargo.toml
         /src
@@ -135,6 +145,11 @@ expression: normalized_output
         /src
             /lib.rs
             /relations.rs
+    /user_transitive_extension
+        /Cargo.toml
+        /src
+            /lib.rs
+            /transitive_extension.rs
     /user_value_settable
         /Cargo.toml
         /src
