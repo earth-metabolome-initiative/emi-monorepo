@@ -29,24 +29,28 @@ pub struct InternalVariant {
 
 impl InternalVariant {
     /// Initializes a new `InternalVariantBuilder`.
+    #[must_use]
     pub fn new() -> InternalVariantBuilder {
         InternalVariantBuilder::default()
     }
 
     /// Returns the ident of the variant.
     #[inline]
+    #[must_use]
     pub fn ident(&self) -> &Ident {
         &self.name
     }
 
     /// Returns the documentation comment of the variant.
     #[inline]
+    #[must_use]
     pub fn doc(&self) -> &Documentation {
         &self.doc
     }
 
     /// Returns the type of the variant.
     #[inline]
+    #[must_use]
     pub fn ty(&self) -> Option<&DataVariantRef> {
         self.ty.as_ref()
     }
@@ -56,6 +60,8 @@ impl InternalVariant {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait variant to check support for.
+    #[inline]
+    #[must_use]
     pub fn supports_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         if let Some(ty) = &self.ty {
             ty.supports_trait(trait_ref)
@@ -109,25 +115,27 @@ pub struct InternalEnum {
 impl InternalDependencies for InternalEnum {
     #[inline]
     fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
-        self.variants.iter().flat_map(|variant| variant.internal_dependencies())
+        self.variants.iter().flat_map(InternalVariant::internal_dependencies)
     }
 }
 
 impl ExternalDependencies for InternalEnum {
     #[inline]
     fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
-        self.variants.iter().flat_map(|variant| variant.external_dependencies())
+        self.variants.iter().flat_map(crate::traits::ExternalDependencies::external_dependencies)
     }
 }
 
 impl InternalEnum {
     /// Initializes a new `InternalEnumBuilder`.
+    #[must_use]
     pub fn new() -> InternalEnumBuilder {
         InternalEnumBuilder::default()
     }
 
     /// Returns a reference to the variants of the enum.
     #[inline]
+    #[must_use]
     pub fn variants(&self) -> &Vec<InternalVariant> {
         &self.variants
     }
@@ -137,6 +145,8 @@ impl InternalEnum {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait variant to check support for.
+    #[inline]
+    #[must_use]
     pub fn supports_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         self.variants.iter().all(|variant| variant.supports_trait(trait_ref))
     }

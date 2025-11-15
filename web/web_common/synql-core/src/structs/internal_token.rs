@@ -85,6 +85,7 @@ impl Hash for InternalToken {
 
 impl InternalToken {
     /// Initializes a new `InternalTokenBuilder`.
+    #[must_use]
     pub fn new() -> InternalTokenBuilder {
         InternalTokenBuilder::default()
     }
@@ -94,18 +95,21 @@ impl InternalToken {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait to implement.
-    pub fn implements<'trt>(trait_ref: &'trt TraitVariantRef) -> TraitImpl<'trt> {
+    #[must_use]
+    pub fn implements(trait_ref: &TraitVariantRef) -> TraitImpl<'_> {
         TraitImpl::new(trait_ref)
     }
 
     /// Returns whether the token stream is public.
     #[inline]
+    #[must_use]
     pub fn is_public(&self) -> bool {
         self.publicness.is_public()
     }
 
     /// Returns whether it implements the given trait.
     #[inline]
+    #[must_use]
     pub fn implements_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         self.implemented_traits.contains(trait_ref)
     }
@@ -149,15 +153,17 @@ impl InternalDependencies for InternalToken {
     fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
         self.data
             .iter()
-            .flat_map(|data| data.internal_dependencies())
-            .chain(self.internal_modules.iter().flat_map(|module| module.internal_dependencies()))
+            .flat_map(InternalDependencies::internal_dependencies)
             .chain(
-                self.employed_traits.iter().flat_map(|trait_ref| trait_ref.internal_dependencies()),
+                self.internal_modules.iter().flat_map(InternalDependencies::internal_dependencies),
+            )
+            .chain(
+                self.employed_traits.iter().flat_map(InternalDependencies::internal_dependencies),
             )
             .chain(
                 self.implemented_traits
                     .iter()
-                    .flat_map(|trait_ref| trait_ref.internal_dependencies()),
+                    .flat_map(InternalDependencies::internal_dependencies),
             )
     }
 }
@@ -167,16 +173,20 @@ impl ExternalDependencies for InternalToken {
     fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
         self.external_macros
             .iter()
-            .flat_map(|ext_macro| ext_macro.external_dependencies())
+            .flat_map(ExternalDependencies::external_dependencies)
             .chain(
-                self.employed_traits.iter().flat_map(|trait_ref| trait_ref.external_dependencies()),
+                self.employed_traits.iter().flat_map(ExternalDependencies::external_dependencies),
             )
             .chain(
                 self.implemented_traits
                     .iter()
-                    .flat_map(|trait_ref| trait_ref.external_dependencies()),
+                    .flat_map(ExternalDependencies::external_dependencies),
             )
-            .chain(self.data.iter().flat_map(|data| data.external_dependencies()))
-            .chain(self.employed_functions.iter().flat_map(|func| func.external_dependencies()))
+            .chain(self.data.iter().flat_map(ExternalDependencies::external_dependencies))
+            .chain(
+                self.employed_functions
+                    .iter()
+                    .flat_map(ExternalDependencies::external_dependencies),
+            )
     }
 }

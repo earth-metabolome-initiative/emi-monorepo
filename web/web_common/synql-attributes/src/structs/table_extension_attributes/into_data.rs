@@ -19,7 +19,7 @@ impl<'table, T: TableExtensionAttributesLike + ?Sized> From<TableExtensionAttrib
             .expect("Failed to get table schema crate ref for attributes enum");
 
         InternalData::new()
-            .name(extension_attributes.table.table_extension_attributes_name())
+            .name(&extension_attributes.table.table_extension_attributes_name())
             .expect("Failed to set extension attributes enum name")
             .public()
             .documentation(

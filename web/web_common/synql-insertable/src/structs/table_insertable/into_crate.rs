@@ -23,7 +23,7 @@ where
             .table_schema_ref(insertable.workspace)
             .expect("Failed to get the table schema ref for the table");
         InternalCrate::new()
-            .name(insertable.table.table_insertable_crate_name())
+            .name(&insertable.table.table_insertable_crate_name())
             .expect("Failed to set the crate name")
             .documentation(
                 Documentation::new()

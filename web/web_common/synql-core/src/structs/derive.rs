@@ -22,6 +22,7 @@ pub struct Derive {
 
 impl Derive {
     /// Initializes a new `DeriveBuilder`.
+    #[must_use]
     pub fn new() -> DeriveBuilder {
         DeriveBuilder::default()
     }

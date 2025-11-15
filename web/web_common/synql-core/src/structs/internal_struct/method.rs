@@ -26,7 +26,7 @@ pub struct Method {
     /// The body of the method.
     body: Option<InternalToken>,
     /// Whether the method is asynchronous.
-    async_method: bool,
+    is_async: bool,
     /// The return type of the method.
     return_type: Option<DataVariantRef>,
     /// Documentation of the method.
@@ -41,21 +41,27 @@ pub struct Method {
     is_trait_implementation: bool,
 }
 
+unsafe impl Send for Method {}
+unsafe impl Sync for Method {}
+
 impl Method {
     /// Returns the name of the method.
     #[inline]
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns the ident of the method.
     #[inline]
+    #[must_use]
     pub fn ident(&self) -> syn::Ident {
         syn::Ident::new(&self.name, proc_macro2::Span::call_site())
     }
 
     /// Returns a reference to the body of the method.
     #[inline]
+    #[must_use]
     pub fn body(&self) -> Option<&InternalToken> {
         self.body.as_ref()
     }
@@ -67,12 +73,14 @@ impl Method {
 
     /// Returns whether the method has a body.
     #[inline]
+    #[must_use]
     pub fn has_body(&self) -> bool {
         self.body.is_some()
     }
 
     /// Returns whether the method is a trait implementation method.
     #[inline]
+    #[must_use]
     pub fn is_trait_implementation(&self) -> bool {
         self.is_trait_implementation
     }
@@ -85,6 +93,7 @@ impl Method {
 
 impl Method {
     /// Initializes a new `MethodBuilder`.
+    #[must_use]
     pub fn new() -> MethodBuilder {
         MethodBuilder::default()
     }
@@ -95,6 +104,7 @@ impl Method {
     }
 
     /// Returns the return type of the method.
+    #[must_use]
     pub fn return_type(&self) -> Option<&DataVariantRef> {
         self.return_type.as_ref()
     }
@@ -105,11 +115,13 @@ impl Method {
     }
 
     /// Returns whether the method has non-self arguments.
+    #[must_use]
     pub fn has_non_self_arguments(&self) -> bool {
         self.non_self_arguments().next().is_some()
     }
 
     /// Returns the method signature as a string.
+    #[must_use]
     pub fn signature(&self) -> String {
         let args = self
             .arguments
@@ -118,7 +130,7 @@ impl Method {
             .collect::<Vec<_>>()
             .join(", ");
         let return_type = if let Some(ret_type) = &self.return_type {
-            format!(" -> {}", ret_type.to_token_stream().to_string())
+            format!(" -> {}", ret_type.to_token_stream())
         } else {
             String::new()
         };
@@ -139,15 +151,19 @@ impl Method {
 
     /// Returns whether the method can fail, (i.e. has a return type of
     /// `Result`).
+    #[must_use]
     pub fn can_fail(&self) -> bool {
-        self.return_type.as_ref().map_or(false, |ret_type| ret_type.is_result())
+        self.return_type
+            .as_ref()
+            .is_some_and(crate::structs::internal_data::DataVariantRef::is_result)
     }
 
     /// Returns whether the method is compatible with the provided method
     /// signature.
+    #[must_use]
     pub fn is_compatible_with(&self, other: &Method) -> bool {
         self.arguments.iter().zip(other.arguments.iter()).all(|(a, b)| a.is_compatible_with(b))
-            && self.async_method == other.async_method
+            && self.is_async == other.is_async
             && self.return_type == other.return_type
             && self.generics == other.generics
             && self.where_clauses == other.where_clauses
@@ -158,13 +174,16 @@ impl ToTokens for Method {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let name_ident = syn::Ident::new(&self.name, proc_macro2::Span::call_site());
         let pubness_tokens = self.publicness.to_token_stream();
-        let async_tokens = if self.async_method {
+        let async_tokens = if self.is_async {
             quote::quote! { async }
         } else {
             quote::quote! {}
         };
-        let arguments_tokens =
-            self.arguments.iter().map(|arg| arg.to_token_stream()).collect::<Vec<_>>();
+        let arguments_tokens = self
+            .arguments
+            .iter()
+            .map(crate::structs::internal_struct::method::Argument::to_token_stream)
+            .collect::<Vec<_>>();
         let return_type_tokens = if let Some(return_type) = &self.return_type {
             let ty_tokens = return_type.format_with_generics();
             quote::quote! { -> #ty_tokens }
@@ -173,11 +192,11 @@ impl ToTokens for Method {
         };
         let body_tokens = self.body.to_token_stream();
 
-        let formatted_generics = if !self.generics.is_empty() {
+        let formatted_generics = if self.generics.is_empty() {
+            quote::quote! {}
+        } else {
             let generics_idents = &self.generics;
             quote::quote! { <#(#generics_idents),*> }
-        } else {
-            quote::quote! {}
         };
 
         let formatted_where = if self.where_clauses.is_empty() {
@@ -196,7 +215,9 @@ impl ToTokens for Method {
                 documentation.push(format!(
                     " * `{}` - {}",
                     arg.name(),
-                    arg.documentation().map(|d| d.documentation()).unwrap_or_default()
+                    arg.documentation()
+                        .map(crate::structs::documentation::Documentation::documentation)
+                        .unwrap_or_default()
                 ));
             }
         }
@@ -220,7 +241,7 @@ impl ToTokens for Method {
         // Automatically determine if method should have #[inline] attribute
         // A method should be inlined if it has a body and the body is small (simple
         // delegation or trivial logic)
-        let (should_inline, formatted_body) = if let Some(_) = &self.body {
+        let (should_inline, formatted_body) = if self.body.is_some() {
             (body_tokens.to_string().len() < 300, quote::quote! { { #body_tokens } })
         } else {
             (false, quote::quote! {;})
@@ -234,8 +255,11 @@ impl ToTokens for Method {
         //   don't need to be used)
         let should_must_use = self.return_type.is_some()
             && !self.is_trait_implementation()
-            && !self.return_type.as_ref().map_or(false, |rt| rt.is_option() || rt.is_result())
-            && !self.arguments.iter().any(|arg| arg.is_mut_self());
+            && !self.return_type.as_ref().is_some_and(|rt| rt.is_option() || rt.is_result())
+            && !self
+                .arguments
+                .iter()
+                .any(crate::structs::internal_struct::method::Argument::is_mut_self);
 
         let inline_attr = should_inline.then(|| quote::quote! { #[inline] });
 
@@ -255,18 +279,22 @@ impl InternalDependencies for Method {
     fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
         self.return_type
             .iter()
-            .flat_map(|return_type| return_type.internal_dependencies())
-            .chain(self.arguments.iter().flat_map(|arg| arg.internal_dependencies()))
+            .flat_map(crate::traits::InternalDependencies::internal_dependencies)
+            .chain(
+                self.arguments.iter().flat_map(
+                    crate::structs::internal_struct::method::Argument::internal_dependencies,
+                ),
+            )
             .chain(
                 self.where_clauses
                     .iter()
-                    .flat_map(|where_clause| where_clause.internal_dependencies()),
+                    .flat_map(crate::traits::InternalDependencies::internal_dependencies),
             )
             .chain(self.documentation.internal_dependencies())
             .chain(
                 self.error_documentations
                     .iter()
-                    .flat_map(|error_doc| error_doc.internal_dependencies()),
+                    .flat_map(crate::traits::InternalDependencies::internal_dependencies),
             )
     }
 }
@@ -276,18 +304,22 @@ impl ExternalDependencies for Method {
     fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
         self.return_type
             .iter()
-            .flat_map(|return_type| return_type.external_dependencies())
-            .chain(self.arguments.iter().flat_map(|arg| arg.external_dependencies()))
+            .flat_map(crate::traits::ExternalDependencies::external_dependencies)
+            .chain(
+                self.arguments.iter().flat_map(
+                    crate::structs::internal_struct::method::Argument::external_dependencies,
+                ),
+            )
             .chain(
                 self.where_clauses
                     .iter()
-                    .flat_map(|where_clause| where_clause.external_dependencies()),
+                    .flat_map(crate::traits::ExternalDependencies::external_dependencies),
             )
             .chain(self.documentation.external_dependencies())
             .chain(
                 self.error_documentations
                     .iter()
-                    .flat_map(|error_doc| error_doc.external_dependencies()),
+                    .flat_map(crate::traits::ExternalDependencies::external_dependencies),
             )
     }
 }

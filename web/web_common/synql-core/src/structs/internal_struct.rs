@@ -34,12 +34,14 @@ pub struct InternalAttribute {
 
 impl InternalAttribute {
     /// Initializes a new `InternalAttributeBuilder`.
+    #[must_use]
     pub fn new() -> InternalAttributeBuilder {
         InternalAttributeBuilder::default()
     }
 
     /// Returns a variant of the current attribute with the type
     /// made optional.
+    #[must_use]
     pub fn optional(&self) -> InternalAttribute {
         let mut new_attr = self.clone();
         if !new_attr.ty.is_option() {
@@ -50,6 +52,7 @@ impl InternalAttribute {
 
     /// Sets the publicness of the attribute to private and returns
     /// the modified attribute.
+    #[must_use]
     pub fn private(mut self) -> InternalAttribute {
         self.pubness = Publicness::Private;
         self
@@ -57,17 +60,21 @@ impl InternalAttribute {
 
     /// Returns the publicness of the attribute.
     #[inline]
+    #[must_use]
     pub fn pubness(&self) -> &Publicness {
         &self.pubness
     }
 
     /// Returns the name of the attribute.
     #[inline]
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns the ident of the attribute.
+    #[inline]
+    #[must_use]
     pub fn ident(&self) -> Ident {
         if RESERVED_RUST_WORDS.contains(&self.name()) {
             Ident::new_raw(&self.name, proc_macro2::Span::call_site())
@@ -78,12 +85,14 @@ impl InternalAttribute {
 
     /// Returns the documentation of the attribute.
     #[inline]
+    #[must_use]
     pub fn documentation(&self) -> &Documentation {
         &self.documentation
     }
 
     /// Returns the type of the attribute.
     #[inline]
+    #[must_use]
     pub fn ty(&self) -> &DataVariantRef {
         &self.ty
     }
@@ -93,6 +102,8 @@ impl InternalAttribute {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait variant to check support for.
+    #[inline]
+    #[must_use]
     pub fn supports_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         self.ty.supports_trait(trait_ref)
     }
@@ -136,12 +147,14 @@ pub struct InternalStruct {
 
 impl InternalStruct {
     /// Initializes a new `InternalStructBuilder`.
+    #[must_use]
     pub fn new() -> InternalStructBuilder {
         InternalStructBuilder::default()
     }
 
     /// Returns a reference to the attributes of the struct.
     #[inline]
+    #[must_use]
     pub fn attributes(&self) -> &Vec<InternalAttribute> {
         &self.attributes
     }
@@ -151,6 +164,8 @@ impl InternalStruct {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait variant to check support for.
+    #[inline]
+    #[must_use]
     pub fn supports_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         self.attributes.iter().all(|attr| attr.supports_trait(trait_ref))
     }
@@ -171,13 +186,13 @@ impl ToTokens for InternalStruct {
 impl InternalDependencies for InternalStruct {
     #[inline]
     fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
-        self.attributes.iter().flat_map(|attr| attr.internal_dependencies())
+        self.attributes.iter().flat_map(InternalAttribute::internal_dependencies)
     }
 }
 
 impl ExternalDependencies for InternalStruct {
     #[inline]
     fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
-        self.attributes.iter().flat_map(|attr| attr.external_dependencies())
+        self.attributes.iter().flat_map(crate::traits::ExternalDependencies::external_dependencies)
     }
 }

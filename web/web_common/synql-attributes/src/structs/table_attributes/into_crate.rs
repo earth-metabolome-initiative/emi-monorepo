@@ -15,7 +15,7 @@ impl<'table, T: TableAttributesLike + ?Sized> From<TableAttributes<'table, T>> f
             .table_schema_ref(attributes.workspace)
             .expect("Failed to get table schema crate ref for attributes enum");
         InternalCrate::new()
-            .name(attributes.table.table_attributes_crate_name())
+            .name(&attributes.table.table_attributes_crate_name())
             .expect("Failed to set attributes crate name")
             .documentation(
                 Documentation::new()

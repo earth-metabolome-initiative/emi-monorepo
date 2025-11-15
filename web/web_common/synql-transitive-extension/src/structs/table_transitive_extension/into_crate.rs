@@ -21,7 +21,7 @@ where
             .table_schema_ref(transitive_ext.workspace)
             .expect("Failed to get the table schema ref for the table transitive extension");
         InternalCrate::new()
-            .name(transitive_ext.table.table_transitive_extension_crate_name())
+            .name(&transitive_ext.table.table_transitive_extension_crate_name())
             .expect("Failed to set the crate name")
             .documentation(
                 Documentation::new()

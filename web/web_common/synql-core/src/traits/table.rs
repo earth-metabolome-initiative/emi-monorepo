@@ -67,8 +67,8 @@ where
     /// use synql_core::prelude::*;
     /// let db = ParserDB::try_from(
     ///     r#"
-    /// 	CREATE TABLE my_table (id INT);
-    /// 	CREATE TABLE MyTable (id INT);
+    ///         CREATE TABLE my_table (id INT);
+    ///         CREATE TABLE MyTable (id INT);
     /// "#,
     /// )?;
     /// let table1 = db.table(None, "my_table").unwrap();
@@ -120,7 +120,12 @@ where
     /// # }
     /// ```
     fn table_singular_snake_ident(&self) -> Ident {
-        Ident::new(&self.table_singular_snake_name(), proc_macro2::Span::call_site())
+        let snake_name = self.table_singular_snake_name();
+        if is_reserved_rust_word(&snake_name) {
+            Ident::new_raw(&snake_name, proc_macro2::Span::call_site())
+        } else {
+            Ident::new(&snake_name, proc_macro2::Span::call_site())
+        }
     }
 
     /// Returns the camel-cased name of this table.

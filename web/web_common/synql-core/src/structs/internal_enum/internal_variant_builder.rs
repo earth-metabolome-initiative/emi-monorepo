@@ -61,7 +61,7 @@ impl From<BuilderError<InternalVariantAttribute>> for InternalVariantBuilderErro
 impl Display for InternalVariantBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            InternalVariantBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            InternalVariantBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
         }
     }
 }

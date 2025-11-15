@@ -258,6 +258,7 @@ deprecated = "deny"
 [workspace.lints.clippy]
 unreadable_literal = "allow"
 missing_panics_doc = "allow"
+new_ret_no_self = "allow"
 struct_excessive_bools = "allow"
 should_panic_without_expect = "allow"
 doc_markdown = "allow"

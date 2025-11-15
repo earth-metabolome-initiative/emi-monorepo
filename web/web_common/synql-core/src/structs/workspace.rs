@@ -25,6 +25,7 @@ pub struct Workspace {
     /// External crates made available within the workspace.
     external_crates: Vec<Arc<ExternalCrate>>,
     /// Name of the workspace.
+    #[allow(dead_code)]
     name: String,
     /// Path where the workspace is being created.
     path: PathBuf,
@@ -38,24 +39,28 @@ pub struct Workspace {
 
 impl Workspace {
     /// Inizializes a new `WorkspaceBuilder`.
+    #[must_use]
     pub fn new() -> WorkspaceBuilder {
         WorkspaceBuilder::default()
     }
 
     /// Returns the version tuple of the workspace.
     #[inline]
+    #[must_use]
     pub fn version(&self) -> (u8, u8, u8) {
         self.version
     }
 
     /// Returns the edition of the workspace.
     #[inline]
+    #[must_use]
     pub fn edition(&self) -> u16 {
         self.edition
     }
 
     /// Returns the path where the workspace is being created.
     #[inline]
+    #[must_use]
     pub fn path(&self) -> &Path {
         self.path.as_path()
     }
@@ -66,13 +71,9 @@ impl Workspace {
     }
 
     /// Returns the internal crate with the given name, if any.
+    #[must_use]
     pub fn internal_crate(&self, name: &str) -> Option<&Arc<InternalCrate>> {
-        for internal_crate in &self.internal_crates {
-            if internal_crate.name() == name {
-                return Some(internal_crate);
-            }
-        }
-        None
+        self.internal_crates.iter().find(|internal_crate| internal_crate.name() == name)
     }
 
     /// Returns the external macro ref corresponding to the provided name, if
@@ -80,6 +81,7 @@ impl Workspace {
     ///
     /// # Arguments
     /// * `name` - A string slice representing the name of the external macro.
+    #[must_use]
     pub fn external_macro(&self, name: &str) -> Option<ExternalMacroRef> {
         for ext_crate in &self.external_crates {
             if let Some(ext_macro) = ext_crate.external_macro(name) {
@@ -94,6 +96,7 @@ impl Workspace {
     ///
     /// # Arguments
     /// * `name` - A string slice representing the name of the external trait.
+    #[must_use]
     pub fn external_trait(&self, name: &str) -> Option<ExternalTraitRef> {
         for ext_crate in &self.external_crates {
             if let Some(ext_trait) = ext_crate.external_trait_ref(name) {
@@ -108,6 +111,7 @@ impl Workspace {
     ///
     /// # Arguments
     /// * `postgres_type` - A string slice representing the postgres type.
+    #[must_use]
     pub fn external_postgres_type(&self, postgres_type: &str) -> Option<ExternalTypeRef> {
         for ext_crate in &self.external_crates {
             if let Some(ext_type) = ext_crate.external_postgres_type(postgres_type) {
@@ -122,6 +126,7 @@ impl Workspace {
     ///
     /// # Arguments
     /// * `ident` - A reference to the type.
+    #[must_use]
     pub fn external_type(&self, ident: &Type) -> Option<ExternalTypeRef> {
         for ext_crate in &self.external_crates {
             if let Some(ext_type) = ext_crate.external_type(ident) {
@@ -137,6 +142,7 @@ impl Workspace {
     /// # Arguments
     /// * `name` - A string slice representing the name of the external
     ///   function.
+    #[must_use]
     pub fn external_function(&self, name: &str) -> Option<ExternalFunctionRef> {
         for ext_crate in &self.external_crates {
             if let Some(ext_function) = ext_crate.external_function_ref(name) {
@@ -147,6 +153,10 @@ impl Workspace {
     }
 
     /// Writes the formatting rules for the workspace.
+    ///
+    /// # Errors
+    ///
+    /// Returns an `std::io::Error` if writing to the file fails.
     pub fn write_rustfmt(&self) -> std::io::Result<()> {
         use std::io::Write;
 
@@ -173,6 +183,10 @@ impl Workspace {
     }
 
     /// Writes the workspace TOML.
+    ///
+    /// # Errors
+    ///
+    /// Returns an `std::io::Error` if writing to the file fails.
     pub fn write_toml(&self) -> std::io::Result<()> {
         use std::io::Write;
 
@@ -229,24 +243,24 @@ impl Workspace {
             }
 
             let dep_name = external_crate.name();
-            write!(buffer, "{} = {{ ", dep_name)?;
+            write!(buffer, "{dep_name} = {{ ")?;
 
             let mut parts = Vec::new();
 
             if let Some(version) = external_crate.version() {
-                parts.push(format!("version = \"{}\"", version));
+                parts.push(format!("version = \"{version}\""));
             }
 
             if let Some((repository, branch)) = external_crate.git() {
-                parts.push(format!("git = \"{}\"", repository));
-                parts.push(format!("branch = \"{}\"", branch));
+                parts.push(format!("git = \"{repository}\""));
+                parts.push(format!("branch = \"{branch}\""));
             }
 
             let features = external_crate.features();
             if !features.is_empty() {
                 let features_str =
-                    features.iter().map(|f| format!("\"{}\"", f)).collect::<Vec<_>>().join(", ");
-                parts.push(format!("features = [{}]", features_str));
+                    features.iter().map(|f| format!("\"{f}\"")).collect::<Vec<_>>().join(", ");
+                parts.push(format!("features = [{features_str}]"));
             }
 
             write!(buffer, "{}", parts.join(", "))?;
@@ -281,6 +295,10 @@ impl Workspace {
     }
 
     /// Writes the workspace to disk.
+    ///
+    /// # Errors
+    ///
+    /// Returns an `std::io::Error` if any file operation fails.
     pub fn write_to_disk(&self) -> std::io::Result<()> {
         // First, we eliminate all existing files in the workspace path.
         if self.path.exists() {

@@ -75,11 +75,13 @@ unsafe impl Sync for ExternalTrait {}
 
 impl ExternalTrait {
     /// Inizializes a new `ExternalTraitBuilder`.
+    #[must_use]
     pub fn new() -> ExternalTraitBuilder {
         ExternalTraitBuilder::default()
     }
 
     /// Returns a new `Sized` trait definition.
+    #[must_use]
     pub fn sized() -> ExternalTrait {
         ExternalTrait::new()
             .name("Sized")
@@ -90,22 +92,26 @@ impl ExternalTrait {
     }
 
     /// Returns the name of the trait.
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns the [`syn::Path`](syn::Path) representing the trait
     /// within the external crate.
+    #[must_use]
     pub fn path(&self) -> &syn::Path {
         &self.path
     }
 
     /// Returns the generics parameters for the trait.
+    #[must_use]
     pub fn generics(&self) -> &[syn::GenericParam] {
         &self.generics
     }
 
     /// Returns the generic default values for the trait.
+    #[must_use]
     pub fn generic_defaults(&self) -> &[Option<DataVariantRef>] {
         &self.generic_defaults
     }
@@ -119,6 +125,7 @@ impl ExternalTrait {
 
     /// Returns the formatted generics, with defaults in place of the generic
     /// where they exist.
+    #[must_use]
     pub fn generics_with_defaults(&self) -> Option<TokenStream> {
         if self.generics.is_empty() {
             None
@@ -137,6 +144,7 @@ impl ExternalTrait {
     }
 
     /// Sets a generic field to the provided `DataVariantRef`.
+    #[must_use]
     pub fn set_generic_field(
         &self,
         field: &syn::GenericParam,
@@ -158,6 +166,7 @@ impl ExternalTrait {
     }
 
     /// Returns whether the trait is implemented for typeless enums.
+    #[must_use]
     pub fn implemented_for_typeless_enum(&self) -> bool {
         if self.path.to_token_stream().to_string() == quote::quote! { serde::Serialize }.to_string()
         {
@@ -192,7 +201,7 @@ impl InternalDependencies for ExternalTrait {
         self.generic_defaults()
             .iter()
             .filter_map(|default| default.as_ref())
-            .flat_map(|data_variant_ref| data_variant_ref.internal_dependencies())
+            .flat_map(InternalDependencies::internal_dependencies)
     }
 }
 
@@ -229,6 +238,7 @@ impl From<Trait> for TraitVariantRef {
 impl TraitVariantRef {
     #[inline]
     /// Returns the name of the trait.
+    #[must_use]
     pub fn name(&self) -> &str {
         match self {
             TraitVariantRef::Internal(trait_def, _crate_def) => trait_def.name(),
@@ -238,6 +248,7 @@ impl TraitVariantRef {
 
     #[inline]
     /// Returns whether the trait is implemented for typeless enums.
+    #[must_use]
     pub fn implemented_for_typeless_enum(&self) -> bool {
         match self {
             TraitVariantRef::Internal(_, _) => false,
@@ -249,6 +260,7 @@ impl TraitVariantRef {
 
     #[inline]
     /// Returns whether the trait defines the provided method.
+    #[must_use]
     pub fn defines_method(&self, method: &Method) -> bool {
         match self {
             TraitVariantRef::Internal(trait_def, _crate_def) => trait_def.defines_method(method),
@@ -258,6 +270,7 @@ impl TraitVariantRef {
 
     #[inline]
     /// Returns a reference to the slice of methods defined by the trait.
+    #[must_use]
     pub fn methods(&self) -> &[Method] {
         match self {
             TraitVariantRef::Internal(trait_def, _crate_def) => trait_def.methods(),
@@ -267,11 +280,13 @@ impl TraitVariantRef {
 
     #[inline]
     /// Returns a reference to the method with the provided name, if it exists.
+    #[must_use]
     pub fn method(&self, name: &str) -> Option<&Method> {
         self.methods().iter().find(|method| method.name() == name)
     }
 
     /// Returns the where clauses, optionally including super-traits.
+    #[must_use]
     pub fn where_clauses(&self, include_super_traits: bool) -> Vec<crate::structs::WhereClause> {
         match self {
             TraitVariantRef::Internal(trait_def, _crate_def) => {
@@ -284,12 +299,14 @@ impl TraitVariantRef {
     #[inline]
     /// Returns the [`TraitImpl`] struct to implement the trait for the provided
     /// type.
+    #[must_use]
     pub fn impl_for_type<'trt>(&'trt self, type_token: &'trt DataVariantRef) -> TraitImpl<'trt> {
         TraitImpl::new(self).for_type(type_token)
     }
 
     #[inline]
     /// Formats the trait variant reference with generics.
+    #[must_use]
     pub fn format_with_generics(&self) -> TokenStream {
         let mut tokens = proc_macro2::TokenStream::new();
         self.to_tokens(&mut tokens);

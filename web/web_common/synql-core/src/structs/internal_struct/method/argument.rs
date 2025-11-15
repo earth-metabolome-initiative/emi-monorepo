@@ -27,26 +27,31 @@ pub struct Argument {
 
 impl Argument {
     /// Returns the name of the argument.
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns the documentation of the argument.
+    #[must_use]
     pub fn documentation(&self) -> Option<&Documentation> {
         self.documentation.as_ref()
     }
 
     /// Returns the type of the argument.
+    #[must_use]
     pub fn arg_type(&self) -> &DataVariantRef {
         &self.arg_type
     }
 
     /// Returns whether the argument is a self argument.
+    #[must_use]
     pub fn is_self(&self) -> bool {
         self.name == "self" && self.arg_type().is_self_type()
     }
 
     /// Returns whether the argument is a mutable self argument.
+    #[must_use]
     pub fn is_mut_self(&self) -> bool {
         self.is_self() && self.arg_type().is_mutable_reference()
     }
@@ -57,6 +62,7 @@ impl Argument {
     }
 
     /// Returns the ident of the argument.
+    #[must_use]
     pub fn ident(&self) -> syn::Ident {
         if RESERVED_RUST_WORDS.contains(&self.name()) {
             syn::Ident::new_raw(&self.name, proc_macro2::Span::call_site())
@@ -66,6 +72,7 @@ impl Argument {
     }
 
     /// Returns whether the argument is compatible with another argument.
+    #[must_use]
     pub fn is_compatible_with(&self, other: &Argument) -> bool {
         self.name == other.name && self.arg_type == other.arg_type
     }
@@ -73,6 +80,7 @@ impl Argument {
 
 impl Argument {
     /// Initializes a new `ArgumentBuilder`.
+    #[must_use]
     pub fn new() -> ArgumentBuilder {
         ArgumentBuilder::default()
     }
@@ -106,7 +114,10 @@ impl InternalDependencies for Argument {
     #[inline]
     fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
         self.arg_type.internal_dependencies().chain(
-            self.documentation.as_ref().into_iter().flat_map(|doc| doc.internal_dependencies()),
+            self.documentation
+                .as_ref()
+                .into_iter()
+                .flat_map(crate::structs::documentation::Documentation::internal_dependencies),
         )
     }
 }
@@ -115,7 +126,10 @@ impl ExternalDependencies for Argument {
     #[inline]
     fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
         self.arg_type.external_dependencies().chain(
-            self.documentation.as_ref().into_iter().flat_map(|doc| doc.external_dependencies()),
+            self.documentation
+                .as_ref()
+                .into_iter()
+                .flat_map(crate::traits::ExternalDependencies::external_dependencies),
         )
     }
 }

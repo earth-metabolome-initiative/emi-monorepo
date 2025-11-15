@@ -17,7 +17,7 @@ impl<'table, T: TableBuildableLike + ?Sized> From<TableBuildable<'table, T>> for
             .expect("Failed to get the table model ref for the buildable data");
         InternalData::new()
             .public()
-            .name(buildable.table.table_buildable_name())
+            .name(&buildable.table.table_buildable_name())
             .expect("Failed to set buildable struct name")
             .documentation(
                 Documentation::new()

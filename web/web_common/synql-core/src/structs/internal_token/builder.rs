@@ -78,7 +78,7 @@ impl From<BuilderError<InternalTokenAttribute>> for InternalTokenBuilderError {
 impl Display for InternalTokenBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            InternalTokenBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            InternalTokenBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             InternalTokenBuilderError::ExternalMacroNotFound(name) => {
                 write!(f, "External macro '{name}' not found in token stream")
             }
@@ -109,18 +109,21 @@ impl InternalTokenBuilder {
     ///
     /// # Arguments
     /// * `publicness` - The publicness of the token stream.
+    #[must_use]
     pub fn publicness(mut self, publicness: Publicness) -> Self {
         self.publicness = publicness;
         self
     }
 
     /// Set the stream as public.
+    #[must_use]
     pub fn public(mut self) -> Self {
         self.publicness = Publicness::Public;
         self
     }
 
     /// Set the stream as private.
+    #[must_use]
     pub fn private(mut self) -> Self {
         self.publicness = Publicness::Private;
         self
@@ -130,12 +133,14 @@ impl InternalTokenBuilder {
     ///
     /// # Arguments
     /// * `stream` - The token stream.
+    #[must_use]
     pub fn stream(mut self, stream: TokenStream) -> Self {
         self.stream = Some(stream);
         self
     }
 
     /// Inherits properties from another `InternalToken`.
+    #[must_use]
     pub fn inherit(mut self, other: InternalToken) -> Self {
         if other.is_public() {
             self = self.public();
@@ -151,6 +156,7 @@ impl InternalTokenBuilder {
     }
 
     /// Inherits properties from several `InternalToken`s
+    #[must_use]
     pub fn inherits<I>(mut self, others: I) -> Self
     where
         I: IntoIterator<Item = InternalToken>,
@@ -165,6 +171,7 @@ impl InternalTokenBuilder {
     ///
     /// # Arguments
     /// * `external_macro` - The external macro reference.
+    #[must_use]
     pub fn external_macro(mut self, external_macro: ExternalMacroRef) -> Self {
         if !self.external_macros.contains(&external_macro) {
             self.external_macros.push(external_macro);
@@ -180,6 +187,7 @@ impl InternalTokenBuilder {
     /// # Errors
     ///
     /// Returns an error if any duplicate external macros are detected.
+    #[must_use]
     pub fn external_macros<I>(mut self, external_macros: I) -> Self
     where
         I: IntoIterator<Item = ExternalMacroRef>,
@@ -194,6 +202,7 @@ impl InternalTokenBuilder {
     ///
     /// # Arguments
     /// * `employed_trait` - The employed trait.
+    #[must_use]
     pub fn employed_trait(mut self, employed_trait: TraitVariantRef) -> Self {
         if !self.employed_traits.contains(&employed_trait) {
             self.employed_traits.push(employed_trait);
@@ -202,6 +211,7 @@ impl InternalTokenBuilder {
     }
 
     /// Adds several traits employed by the token stream.
+    #[must_use]
     pub fn employed_traits<I>(mut self, employed_traits: I) -> Self
     where
         I: IntoIterator<Item = TraitVariantRef>,
@@ -220,6 +230,7 @@ impl InternalTokenBuilder {
     /// # Errors
     ///
     /// * If the implemented trait is already present.
+    #[must_use]
     pub fn implemented_trait(mut self, implemented_trait: TraitVariantRef) -> Self {
         if !self.implemented_traits.contains(&implemented_trait) {
             self.implemented_traits.push(implemented_trait);
@@ -228,6 +239,7 @@ impl InternalTokenBuilder {
     }
 
     /// Adds several traits implemented by the token stream.
+    #[must_use]
     pub fn implemented_traits<I>(mut self, implemented_traits: I) -> Self
     where
         I: IntoIterator<Item = TraitVariantRef>,
@@ -243,6 +255,7 @@ impl InternalTokenBuilder {
     /// # Arguments
     ///
     /// * `data` - The internal data reference.
+    #[must_use]
     pub fn data(mut self, data: DataVariantRef) -> Self {
         if !self.data.contains(&data) {
             self.data.push(data);
@@ -251,6 +264,7 @@ impl InternalTokenBuilder {
     }
 
     /// Adds several internal data references to the token stream.
+    #[must_use]
     pub fn datas<I>(mut self, data: I) -> Self
     where
         I: IntoIterator<Item = DataVariantRef>,
@@ -266,6 +280,7 @@ impl InternalTokenBuilder {
     /// # Arguments
     ///
     /// * `internal_module` - The internal module reference.
+    #[must_use]
     pub fn internal_module(mut self, internal_module: InternalModuleRef) -> Self {
         if !self.internal_modules.contains(&internal_module) {
             self.internal_modules.push(internal_module);
@@ -274,6 +289,7 @@ impl InternalTokenBuilder {
     }
 
     /// Adds internal module references to the token stream.
+    #[must_use]
     pub fn internal_modules<I>(mut self, internal_modules: I) -> Self
     where
         I: IntoIterator<Item = InternalModuleRef>,
@@ -285,12 +301,14 @@ impl InternalTokenBuilder {
     }
 
     /// Adds an employed function reference to the token stream.
+    #[must_use]
     pub fn employed_function(mut self, employed_function: ExternalFunctionRef) -> Self {
         self.employed_functions.push(employed_function);
         self
     }
 
     /// Adds several employed function references to the token stream.
+    #[must_use]
     pub fn employed_functions<I>(mut self, employed_functions: I) -> Self
     where
         I: IntoIterator<Item = ExternalFunctionRef>,

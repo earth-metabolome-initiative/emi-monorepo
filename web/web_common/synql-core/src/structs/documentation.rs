@@ -14,7 +14,8 @@ use crate::{
     traits::{ExternalDependencies, InternalDependencies},
 };
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[allow(clippy::struct_field_names)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
 /// Struct defining documentation for various structs, enums, traits, etc.
 pub struct Documentation {
     /// The documentation string.
@@ -25,23 +26,17 @@ pub struct Documentation {
     internal_dependencies: Vec<Arc<InternalCrate>>,
 }
 
-impl Default for Documentation {
-    fn default() -> Self {
-        Self {
-            documentation: String::new(),
-            external_dependencies: Vec::new(),
-            internal_dependencies: Vec::new(),
-        }
-    }
-}
+// Default is derived above
 
 impl Documentation {
     /// Initializes a new `DocumentationBuilder`.
+    #[must_use]
     pub fn new() -> DocumentationBuilder {
         DocumentationBuilder::default()
     }
 
     /// Returns the documentation string.
+    #[must_use]
     pub fn documentation(&self) -> &str {
         &self.documentation
     }
@@ -100,11 +95,13 @@ impl From<Documentation> for ModuleDocumentation {
 
 impl ModuleDocumentation {
     /// Returns a reference to the underlying documentation.
+    #[must_use]
     pub fn documentation(&self) -> &Documentation {
         &self.documentation
     }
 
     /// Returns the documentation string.
+    #[must_use]
     pub fn documentation_string(&self) -> &str {
         self.documentation.documentation()
     }

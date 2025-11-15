@@ -106,7 +106,7 @@ impl<'table, T: TableRelationsLike + ?Sized> TableRelations<'table, T> {
                         .build()
                         .unwrap(),
                 )
-                .name(foreign_key.foreign_key_getter_name(self.database))
+                .name(&foreign_key.foreign_key_getter_name(self.database))
                 .expect("Failed to set the method name")
                 .argument(
                     Argument::new()

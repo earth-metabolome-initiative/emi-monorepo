@@ -61,6 +61,7 @@ impl AsRef<str> for Trait {
 
 impl Trait {
     /// Returns the full path of the trait.
+    #[must_use]
     pub fn path(&self) -> syn::Path {
         match self {
             Trait::Copy => syn::parse_str("Copy").unwrap(),

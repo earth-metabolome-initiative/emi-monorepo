@@ -4,6 +4,8 @@ use crate::structs::{DataVariantRef, ExternalCrate};
 
 impl DataVariantRef {
     /// Returns a new boolean data variant reference.
+    #[inline]
+    #[must_use]
     pub fn bool() -> Self {
         let core_crate = ExternalCrate::core();
         let boolean_type = core_crate
@@ -13,6 +15,8 @@ impl DataVariantRef {
     }
 
     /// Returns a new `f64` data variant reference.
+    #[inline]
+    #[must_use]
     pub fn f64() -> Self {
         let core_crate = ExternalCrate::core();
         let f64_type = core_crate
@@ -22,6 +26,8 @@ impl DataVariantRef {
     }
 
     /// Returns a new `&str` data variant reference.
+    #[inline]
+    #[must_use]
     pub fn str() -> Self {
         let core_crate = ExternalCrate::std();
         let str_type = core_crate
@@ -31,6 +37,8 @@ impl DataVariantRef {
     }
 
     /// Returns a new `Unit` data variant reference.
+    #[inline]
+    #[must_use]
     pub fn unit() -> Self {
         let core_crate = ExternalCrate::core();
         let unit_type = core_crate
@@ -40,6 +48,8 @@ impl DataVariantRef {
     }
 
     /// Returns a new `Unit` `Result` with the given error type.
+    #[inline]
+    #[must_use]
     pub fn unit_result(error_type: DataVariantRef) -> Self {
         Self::result(Self::unit(), error_type)
     }

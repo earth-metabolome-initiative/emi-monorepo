@@ -12,6 +12,7 @@ pub struct FeatureFlag {
 
 impl FeatureFlag {
     /// Returns the name of the feature flag.
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }

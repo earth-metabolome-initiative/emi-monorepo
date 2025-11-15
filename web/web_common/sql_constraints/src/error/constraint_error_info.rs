@@ -24,7 +24,6 @@ pub struct ConstraintErrorInfo {
 impl ConstraintErrorInfo {
     /// Creates a new constraint error info builder.
     #[must_use]
-    #[allow(clippy::new_ret_no_self)]
     pub fn new() -> builder::ConstraintErrorInfoBuilder {
         builder::ConstraintErrorInfoBuilder::default()
     }

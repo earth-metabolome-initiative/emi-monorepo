@@ -50,7 +50,7 @@ impl From<BuilderError<InternalEnumAttribute>> for InternalEnumBuilderError {
 impl Display for InternalEnumBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            InternalEnumBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            InternalEnumBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             InternalEnumBuilderError::DuplicatedVariant => {
                 write!(f, "A variant with the same identifier has already been added")
             }
@@ -62,7 +62,7 @@ impl Error for InternalEnumBuilderError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             InternalEnumBuilderError::Builder(e) => Some(e),
-            _ => None,
+            InternalEnumBuilderError::DuplicatedVariant => None,
         }
     }
 }

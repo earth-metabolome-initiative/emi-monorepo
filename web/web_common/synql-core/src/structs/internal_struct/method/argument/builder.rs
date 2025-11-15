@@ -59,7 +59,7 @@ pub enum ArgumentBuilderError {
 impl Display for ArgumentBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            ArgumentBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            ArgumentBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             ArgumentBuilderError::InvalidName => write!(f, "Invalid argument name"),
         }
     }
@@ -69,7 +69,7 @@ impl Error for ArgumentBuilderError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             ArgumentBuilderError::Builder(e) => Some(e),
-            _ => None,
+            ArgumentBuilderError::InvalidName => None,
         }
     }
 }
@@ -79,7 +79,7 @@ impl ArgumentBuilder {
     ///
     /// # Arguments
     /// * `name` - The name of the argument.
-    pub fn name<S: ToString>(mut self, name: S) -> Result<Self, ArgumentBuilderError> {
+    pub fn name<S: ToString + ?Sized>(mut self, name: &S) -> Result<Self, ArgumentBuilderError> {
         let name = name.to_string();
         if name.trim().is_empty()
             || (!name.starts_with("self")
@@ -130,7 +130,10 @@ impl IsCompleteBuilder for ArgumentBuilder {
     fn is_complete(&self) -> bool {
         self.name.is_some()
             && self.arg_type.is_some()
-            && (self.arg_type.as_ref().map_or(true, |ty| ty.is_self_type())
+            && (self
+                .arg_type
+                .as_ref()
+                .is_none_or(crate::structs::internal_data::DataVariantRef::is_self_type)
                 || self.documentation.is_some())
     }
 }

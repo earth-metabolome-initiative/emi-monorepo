@@ -19,7 +19,7 @@ where
             .expect("Failed to get table schema ref");
 
         InternalCrate::new()
-            .name(buildable.table.table_buildable_crate_name())
+            .name(&buildable.table.table_buildable_crate_name())
             .unwrap()
             .documentation(Documentation::new().documentation(&format!(
 				"Crate containing the buildable struct and associated traits for the {} table.",

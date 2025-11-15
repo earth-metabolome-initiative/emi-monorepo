@@ -18,11 +18,13 @@ unsafe impl Sync for ExternalMacro {}
 
 impl ExternalMacro {
     /// Inizializes a new `ExternalMacroBuilder`.
+    #[must_use]
     pub fn new() -> ExternalMacroBuilder {
         ExternalMacroBuilder::default()
     }
 
     /// Returns the name of the macro.
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }

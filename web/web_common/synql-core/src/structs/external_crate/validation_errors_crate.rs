@@ -70,6 +70,7 @@ impl ExternalCrate {
     }
 
     /// Returns the `ValidationError` parametrized with the `Unspecified` type.
+    #[must_use]
     pub fn unspecified_validation_error_type() -> DataVariantRef {
         let validation_errors = Self::validation_errors();
         let unspecified = validation_errors

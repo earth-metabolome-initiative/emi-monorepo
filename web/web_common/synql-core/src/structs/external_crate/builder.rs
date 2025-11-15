@@ -27,7 +27,7 @@ pub struct ExternalCrateBuilder {
     /// The feature flags required by the crate.
     features: Vec<String>,
     /// The functions provided by the crate.
-    functions: Vec<(Arc<Method>, Arc<syn::Path>)>,
+    functions: Vec<(Arc<Method>, syn::Path)>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -83,7 +83,7 @@ pub enum ExternalCrateBuilderError {
 impl Display for ExternalCrateBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ExternalCrateBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            ExternalCrateBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             ExternalCrateBuilderError::InvalidName => write!(f, "Invalid crate name"),
             ExternalCrateBuilderError::DuplicatedPostgresType => {
                 write!(
@@ -115,7 +115,10 @@ impl ExternalCrateBuilder {
     ///
     /// # Arguments
     /// * `name` - The name of the crate.
-    pub fn name<S: ToString>(mut self, name: S) -> Result<Self, ExternalCrateBuilderError> {
+    pub fn name<S: ToString + ?Sized>(
+        mut self,
+        name: &S,
+    ) -> Result<Self, ExternalCrateBuilderError> {
         let name = name.to_string();
         if name.trim().is_empty() || name.contains(' ') {
             return Err(ExternalCrateBuilderError::InvalidName);
@@ -156,13 +159,13 @@ impl ExternalCrateBuilder {
     }
 
     /// Sets whether the crate is a dependency.
-    pub fn version<S: ToString>(mut self, version: S) -> Self {
+    pub fn version<S: ToString + ?Sized>(mut self, version: &S) -> Self {
         self.version = Some(version.to_string());
         self
     }
 
     /// Sets the git to the crate, if it is a local dependency.
-    pub fn git<S: ToString>(mut self, repository: S, branch: S) -> Self {
+    pub fn git<S: ToString + ?Sized>(mut self, repository: &S, branch: &S) -> Self {
         self.git = Some((repository.to_string(), branch.to_string()));
         self
     }
@@ -241,11 +244,11 @@ impl ExternalCrateBuilder {
         Ok(self)
     }
 
-    /// Adds a feature required by the crate.
+    /// Adds a feature to the crate.
     ///
     /// # Arguments
     /// * `feature` - The feature to add.
-    pub fn feature<S: ToString>(mut self, feature: S) -> Self {
+    pub fn feature<S: ToString + ?Sized>(mut self, feature: &S) -> Self {
         let feature = feature.to_string();
         if !self.features.contains(&feature) {
             self.features.push(feature);
@@ -263,7 +266,7 @@ impl ExternalCrateBuilder {
         S: ToString,
     {
         for feature in features {
-            self = self.feature(feature);
+            self = self.feature(&feature);
         }
         self
     }
@@ -274,7 +277,7 @@ impl ExternalCrateBuilder {
     ///
     /// * `method` - The method signature of the function.
     /// * `path` - The path to the function.
-    pub fn add_function(mut self, method: Arc<Method>, path: Arc<syn::Path>) -> Self {
+    pub fn add_function(mut self, method: Arc<Method>, path: syn::Path) -> Self {
         for function in &self.functions {
             if function.0 == method {
                 return self;
@@ -291,7 +294,7 @@ impl ExternalCrateBuilder {
     /// * `functions` - The functions to add.
     pub fn add_functions<I>(mut self, functions: I) -> Self
     where
-        I: IntoIterator<Item = (Arc<Method>, Arc<syn::Path>)>,
+        I: IntoIterator<Item = (Arc<Method>, syn::Path)>,
     {
         for (method, path) in functions {
             self = self.add_function(method, path);

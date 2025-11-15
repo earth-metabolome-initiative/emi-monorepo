@@ -46,7 +46,6 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
     /// Create a new `SynQL` instance from a given database.
     #[must_use]
     #[inline]
-    #[allow(clippy::new_ret_no_self)]
     pub fn new() -> SynQLBuilder<'a, DB> {
         SynQLBuilder::default()
     }
@@ -68,7 +67,7 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
     pub fn generate(&self) -> std::io::Result<TimeTracker> {
         let mut workspace = Workspace::new()
             .path(self.path.clone())
-            .name(self.database.catalog_name())
+            .name(&self.database.catalog_name())
             .expect("Invalid workspace name")
             .external_crates(self.external_crates.iter().cloned())
             .core()

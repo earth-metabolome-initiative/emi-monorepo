@@ -57,7 +57,7 @@ pub enum InternalCrateBuilderError {
 impl Display for InternalCrateBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            InternalCrateBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            InternalCrateBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             InternalCrateBuilderError::InvalidName => write!(f, "Invalid crate name"),
             InternalCrateBuilderError::DuplicatedModuleName => {
                 write!(f, "A module with the same name has already been added to the crate")
@@ -80,7 +80,7 @@ impl InternalCrateBuilder {
     ///
     /// # Arguments
     /// * `name` - The name of the crate.
-    pub fn name<S: ToString>(mut self, name: S) -> Result<Self, InternalCrateBuilderError> {
+    pub fn name<S: ToString>(mut self, name: &S) -> Result<Self, InternalCrateBuilderError> {
         let name = name.to_string();
         if name.trim().is_empty()
             || name.contains(' ')

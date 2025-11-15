@@ -26,7 +26,7 @@ pub trait ColumnModelLike: ColumnSynLike {
         }
 
         InternalAttribute::new()
-            .name(self.column_snake_name())
+            .name(&self.column_snake_name())
             .expect("Failed to set name")
             .documentation(
                 Documentation::new()

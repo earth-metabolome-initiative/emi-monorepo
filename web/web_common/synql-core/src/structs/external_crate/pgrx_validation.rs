@@ -52,17 +52,15 @@ impl ExternalCrate {
                         .add_functions([
                             (
                                 Self::str_method("must_be_font_awesome_class"),
-                                Arc::new(syn::parse_quote!(
-                                    pgrx_validation::must_be_font_awesome_class
-                                )),
+                                syn::parse_quote!(pgrx_validation::must_be_font_awesome_class),
                             ),
                             (
                                 Self::str_method("must_be_paragraph"),
-                                Arc::new(syn::parse_quote!(pgrx_validation::must_be_paragraph)),
+                                syn::parse_quote!(pgrx_validation::must_be_paragraph),
                             ),
                             (
                                 Self::str_method("must_be_email"),
-                                Arc::new(syn::parse_quote!(pgrx_validation::must_be_email)),
+                                syn::parse_quote!(pgrx_validation::must_be_email),
                             ),
                         ])
                         .git(

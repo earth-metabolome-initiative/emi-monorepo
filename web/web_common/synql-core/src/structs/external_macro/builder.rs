@@ -35,7 +35,7 @@ pub enum ExternalMacroBuilderError {
 impl Display for ExternalMacroBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ExternalMacroBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            ExternalMacroBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             ExternalMacroBuilderError::InvalidName => write!(f, "Invalid macro name"),
         }
     }

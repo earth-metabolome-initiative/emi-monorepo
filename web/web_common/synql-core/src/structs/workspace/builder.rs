@@ -75,7 +75,7 @@ pub enum WorkspaceBuilderError {
 impl Display for WorkspaceBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            WorkspaceBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            WorkspaceBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             WorkspaceBuilderError::InvalidName => write!(f, "Invalid workspace name"),
         }
     }
@@ -85,7 +85,7 @@ impl Error for WorkspaceBuilderError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             WorkspaceBuilderError::Builder(e) => Some(e),
-            _ => None,
+            WorkspaceBuilderError::InvalidName => None,
         }
     }
 }
@@ -95,7 +95,7 @@ impl WorkspaceBuilder {
     ///
     /// # Arguments
     /// * `name` - The name of the workspace.
-    pub fn name<S: ToString>(mut self, name: S) -> Result<Self, WorkspaceBuilderError> {
+    pub fn name<S: ToString>(mut self, name: &S) -> Result<Self, WorkspaceBuilderError> {
         let name = name.to_string();
         if name.trim().is_empty() || name.contains(' ') {
             return Err(WorkspaceBuilderError::InvalidName);

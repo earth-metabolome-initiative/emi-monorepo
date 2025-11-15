@@ -38,6 +38,10 @@ impl<T: ExtensionOfHelper<T>> ExtensionOf<T> for T {
 /// (the extended object) from a database connection.
 pub trait Ancestor<Extended: HasTable, C>: ExtensionOf<Extended> {
     /// Returns the extended object.
+    ///
+    /// # Errors
+    ///
+    /// Returns a `diesel::result::Error` if the database query fails.
     fn ancestor(&self, connection: &mut C)
     -> Result<Self::ExtendedType<'_>, diesel::result::Error>;
 }

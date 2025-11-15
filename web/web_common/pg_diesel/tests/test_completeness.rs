@@ -86,7 +86,7 @@ async fn test_schema_completeness() {
         .expect("Failed to build database");
 
     let mut workspace = Workspace::new()
-        .name(database_name)
+        .name(&database_name)
         .unwrap()
         .core()
         .std()

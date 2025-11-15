@@ -37,36 +37,42 @@ pub struct InternalModule {
 
 impl InternalModule {
     /// Initializes a new `InternalModuleBuilder`.
+    #[must_use]
     pub fn new() -> InternalModuleBuilder {
         InternalModuleBuilder::default()
     }
 
     /// Returns the name of the module.
     #[inline]
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns the ident of the module.
     #[inline]
+    #[must_use]
     pub fn ident(&self) -> Ident {
         syn::Ident::new(&self.name, proc_macro2::Span::call_site())
     }
 
     /// Returns the publicness of the module.
     #[inline]
+    #[must_use]
     pub fn publicness(&self) -> &Publicness {
         &self.publicness
     }
 
     /// Returns whether the module is public.
     #[inline]
+    #[must_use]
     pub fn is_public(&self) -> bool {
         self.publicness.is_public()
     }
 
     /// Returns whether the module has submodules.
     #[inline]
+    #[must_use]
     pub fn has_submodules(&self) -> bool {
         !self.submodules.is_empty()
     }
@@ -77,6 +83,7 @@ impl InternalModule {
     /// # Arguments
     ///
     /// * `module` - The sub-module to get the path for.
+    #[must_use]
     pub fn submodule_path(&self, module: &InternalModule) -> Option<syn::Path> {
         if module == self {
             return Some(syn::Path::from(self.ident()));
@@ -96,15 +103,18 @@ impl InternalModule {
 
     /// Returns whether the module contains public items (submodules, data,
     /// other tokens).
+    #[inline]
+    #[must_use]
     pub fn contains_public_items(&self) -> bool {
         self.is_public()
-            && (self.submodules.iter().any(|m| m.contains_public_items() && m.is_public())
+            && (self.submodules.iter().any(InternalModule::contains_public_items)
                 || self.data.iter().any(|d| d.is_public())
-                || self.internal_tokens.iter().any(|t| t.is_public()))
+                || self.internal_tokens.iter().any(InternalToken::is_public))
     }
 
     /// Returns a reference to the internal data with the given name if it
     /// exists in the module.
+    #[must_use]
     pub fn internal_data(&self, name: &str) -> Option<&Arc<InternalData>> {
         for data in &self.data {
             if data.name() == name {
@@ -121,6 +131,7 @@ impl InternalModule {
 
     /// Returns a reference to the internal trait with the given name if it
     /// exists in the module.
+    #[must_use]
     pub fn internal_trait(&self, name: &str) -> Option<&Arc<InternalTrait>> {
         for internal_trait in &self.internal_traits {
             if internal_trait.name() == name {
@@ -139,13 +150,16 @@ impl InternalModule {
     ///
     /// # Arguments
     /// * `path` - The path where to write the module.
+    ///
+    /// # Errors
+    /// * If an I/O error occurs while writing the file.
     pub fn write_to_disk(&self, path: &std::path::Path) -> std::io::Result<()> {
         let module_path = path.join(format!("{}.rs", self.name()));
         let token_stream = self.to_token_stream().to_string();
         let syntax_tree = syn::parse_file(&token_stream).map_err(|e| {
             std::io::Error::new(
                 std::io::ErrorKind::InvalidData,
-                format!("Failed to parse generated code: {}", e),
+                format!("Failed to parse generated code: {e}"),
             )
         })?;
         let formatted = prettyplease::unparse(&syntax_tree);
@@ -167,14 +181,18 @@ impl InternalDependencies for InternalModule {
         let vec: Vec<&InternalCrate> = self
             .submodules
             .iter()
-            .flat_map(|submodule| submodule.internal_dependencies())
+            .flat_map(InternalModule::internal_dependencies)
             .chain(self.data.iter().flat_map(|data| data.internal_dependencies()))
             .chain(
                 self.internal_traits
                     .iter()
                     .flat_map(|internal_trait| internal_trait.internal_dependencies()),
             )
-            .chain(self.internal_tokens.iter().flat_map(|token| token.internal_dependencies()))
+            .chain(
+                self.internal_tokens
+                    .iter()
+                    .flat_map(crate::traits::InternalDependencies::internal_dependencies),
+            )
             .chain(self.documentation.internal_dependencies())
             .collect();
         vec.into_iter()
@@ -187,14 +205,18 @@ impl ExternalDependencies for InternalModule {
         let vec: Vec<&crate::structs::ExternalCrate> = self
             .submodules
             .iter()
-            .flat_map(|submodule| submodule.external_dependencies())
+            .flat_map(InternalModule::external_dependencies)
             .chain(self.data.iter().flat_map(|data| data.external_dependencies()))
             .chain(
                 self.internal_traits
                     .iter()
                     .flat_map(|internal_trait| internal_trait.external_dependencies()),
             )
-            .chain(self.internal_tokens.iter().flat_map(|token| token.external_dependencies()))
+            .chain(
+                self.internal_tokens
+                    .iter()
+                    .flat_map(crate::traits::ExternalDependencies::external_dependencies),
+            )
             .chain(self.documentation.external_dependencies())
             .collect();
         vec.into_iter()
@@ -216,9 +238,9 @@ impl ToTokens for InternalModule {
                 #publicness use #name::*;
             }
         });
-        let data = self.data.iter().map(|d| d.as_ref());
+        let data = self.data.iter().map(std::convert::AsRef::as_ref);
         let internal_tokens = &self.internal_tokens;
-        let internal_traits = self.internal_traits.iter().map(|t| t.as_ref());
+        let internal_traits = self.internal_traits.iter().map(std::convert::AsRef::as_ref);
         let documentation = &self.documentation;
         tokens.extend(quote! {
             #documentation
@@ -229,6 +251,6 @@ impl ToTokens for InternalModule {
 
             #(#internal_traits)*
             #(#internal_tokens)*
-        })
+        });
     }
 }

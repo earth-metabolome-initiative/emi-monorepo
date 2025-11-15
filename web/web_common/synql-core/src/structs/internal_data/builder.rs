@@ -90,13 +90,13 @@ pub enum InternalDataBuilderError {
     /// A decorator with the same token has already been added.
     DuplicatedDecorator,
     /// A generic default was specified for a generic that does not exist.
-    GenericDefaultForNonexistentGeneric(syn::GenericParam),
+    GenericDefaultForNonexistentGeneric(Box<syn::GenericParam>),
 }
 
 impl Display for InternalDataBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            InternalDataBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            InternalDataBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             InternalDataBuilderError::InvalidName => write!(f, "Invalid data name"),
             InternalDataBuilderError::DuplicatedTrait => {
                 write!(f, "A trait with the same name has already been added")
@@ -131,7 +131,10 @@ impl InternalDataBuilder {
     ///
     /// # Arguments
     /// * `name` - The name of the data.
-    pub fn name<S: ToString>(mut self, name: S) -> Result<Self, InternalDataBuilderError> {
+    pub fn name<S: ToString + ?Sized>(
+        mut self,
+        name: &S,
+    ) -> Result<Self, InternalDataBuilderError> {
         let name = name.to_string();
         if name.trim().is_empty()
             || name.contains(' ')
@@ -303,7 +306,9 @@ impl InternalDataBuilder {
         default: DataVariantRef,
     ) -> Result<Self, InternalDataBuilderError> {
         if !self.generics.contains(&generic) {
-            return Err(InternalDataBuilderError::GenericDefaultForNonexistentGeneric(generic));
+            return Err(InternalDataBuilderError::GenericDefaultForNonexistentGeneric(Box::new(
+                generic,
+            )));
         }
         self.generic_defaults.insert(generic, default);
         Ok(self)
@@ -362,10 +367,7 @@ impl Builder for InternalDataBuilder {
         let generic_defaults = self
             .generics
             .iter()
-            .map(|g| {
-                let default = self.generic_defaults.remove(g);
-                default
-            })
+            .map(|g| self.generic_defaults.remove(g))
             .collect::<Vec<Option<DataVariantRef>>>();
 
         Ok(InternalData {
@@ -376,7 +378,7 @@ impl Builder for InternalDataBuilder {
             documentation: self
                 .documentation
                 .ok_or(BuilderError::IncompleteBuild(InternalDataAttribute::Documentation))?,
-            variant: variant,
+            variant,
             traits: self.traits,
             derives: self.derives,
             decorators: self.decorators,

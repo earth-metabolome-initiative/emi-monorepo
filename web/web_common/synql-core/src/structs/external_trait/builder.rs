@@ -45,7 +45,7 @@ pub enum ExternalTraitBuilderError {
 impl Display for ExternalTraitBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ExternalTraitBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            ExternalTraitBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             ExternalTraitBuilderError::InvalidName => write!(f, "Invalid trait name"),
         }
     }
@@ -55,7 +55,7 @@ impl core::error::Error for ExternalTraitBuilderError {
     fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
         match self {
             ExternalTraitBuilderError::Builder(e) => Some(e),
-            _ => None,
+            ExternalTraitBuilderError::InvalidName => None,
         }
     }
 }

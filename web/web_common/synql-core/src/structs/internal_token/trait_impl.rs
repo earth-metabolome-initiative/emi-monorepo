@@ -38,6 +38,7 @@ impl<'trt> TraitImpl<'trt> {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait to implement.
+    #[must_use]
     pub fn new(trait_ref: &'trt TraitVariantRef) -> Self {
         Self {
             builder: InternalToken::new(),
@@ -52,6 +53,7 @@ impl<'trt> TraitImpl<'trt> {
     ///
     /// # Arguments
     /// * `data` - The type for which the trait is being implemented.
+    #[must_use]
     pub fn for_type(mut self, data: &'trt DataVariantRef) -> Self {
         self.data = Some(data);
         self
@@ -94,6 +96,16 @@ impl<'trt> TraitImpl<'trt> {
     /// # Arguments
     ///
     /// * `methods` - The methods to add.
+    ///
+    /// # Errors
+    ///
+    /// * If any provided method is already defined.
+    /// * If any provided method does not belong to the trait being implemented.
+    /// * If any provided method is missing the body.
+    /// * If any provided method has a documentation field.
+    /// * If any provided method has a visibility other than private.
+    /// * If any provided method is incompatible with the corresponding method
+    ///   in the trait.
     pub fn methods<I>(mut self, methods: I) -> Result<Self, TraitImplError>
     where
         I: IntoIterator<Item = Method>,
@@ -145,22 +157,18 @@ pub enum TraitImplError {
 impl Display for TraitImplError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            TraitImplError::Builder(err) => write!(f, "TraitImpl builder error: {}", err),
+            TraitImplError::Builder(err) => write!(f, "TraitImpl builder error: {err}"),
             TraitImplError::RequiredMethodMissing(method_name) => {
-                write!(f, "Required method '{}' is missing for trait implementation", method_name)
+                write!(f, "Required method '{method_name}' is missing for trait implementation")
             }
             TraitImplError::MethodWithoutBody(method_name) => {
-                write!(f, "Method '{}' was provided without a body", method_name)
+                write!(f, "Method '{method_name}' was provided without a body")
             }
             TraitImplError::MethodSignatureMismatch(method_name) => {
-                write!(f, "Method '{}' has a signature incompatible with the trait", method_name)
+                write!(f, "Method '{method_name}' has a signature incompatible with the trait")
             }
             TraitImplError::MethodAlreadyDefined(method_name) => {
-                write!(
-                    f,
-                    "Method '{}' was already defined in the trait implementation",
-                    method_name
-                )
+                write!(f, "Method '{method_name}' was already defined in the trait implementation")
             }
             TraitImplError::MissingDataType => {
                 write!(f, "The data type for which the trait is being implemented is missing")
@@ -168,8 +176,7 @@ impl Display for TraitImplError {
             TraitImplError::DuplicateWhereClause(where_clause) => {
                 write!(
                     f,
-                    "The where clause '{}' was duplicated in the trait implementation",
-                    where_clause
+                    "The where clause '{where_clause}' was duplicated in the trait implementation"
                 )
             }
         }
@@ -198,11 +205,11 @@ impl From<BuilderError<InternalTokenAttribute>> for TraitImplError {
     }
 }
 
-impl<'trt> Attributed for TraitImpl<'trt> {
+impl Attributed for TraitImpl<'_> {
     type Attribute = InternalTokenAttribute;
 }
 
-impl<'trt> IsCompleteBuilder for TraitImpl<'trt> {
+impl IsCompleteBuilder for TraitImpl<'_> {
     fn is_complete(&self) -> bool {
         self.builder.is_complete()
     }
@@ -226,7 +233,7 @@ impl<'trt> TryFrom<TraitImpl<'trt>> for InternalToken {
 
         let mut unique_types: HashSet<DataVariantRef> = HashSet::new();
         let methods = value.methods;
-        for provided_method in methods.iter() {
+        for provided_method in &methods {
             for arg in provided_method.arguments() {
                 unique_types.insert(arg.arg_type().clone());
             }

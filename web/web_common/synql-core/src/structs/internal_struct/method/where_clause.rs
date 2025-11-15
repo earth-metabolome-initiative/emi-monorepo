@@ -21,16 +21,19 @@ pub struct WhereClause {
 
 impl WhereClause {
     /// Initializes a new `WhereClauseBuilder`.
+    #[must_use]
     pub fn new() -> WhereClauseBuilder {
         WhereClauseBuilder::default()
     }
 
     /// Returns a reference to the left-hand side of the where clause.
+    #[must_use]
     pub fn left(&self) -> &InternalToken {
         &self.left
     }
 
     /// Returns a reference to the right-hand side of the where clause.
+    #[must_use]
     pub fn right(&self) -> &InternalToken {
         &self.right
     }
@@ -58,8 +61,8 @@ impl ToTokens for WhereClause {
     }
 }
 
-impl ToString for WhereClause {
-    fn to_string(&self) -> String {
-        self.to_token_stream().to_string()
+impl std::fmt::Display for WhereClause {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.to_token_stream())
     }
 }

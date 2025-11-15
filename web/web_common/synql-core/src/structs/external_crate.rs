@@ -43,7 +43,7 @@ pub struct ExternalCrate {
     /// List of the traits defined within the crate.
     traits: Vec<ExternalTrait>,
     /// Methods defined within the crate.
-    functions: Vec<(Arc<Method>, Arc<syn::Path>)>,
+    functions: Vec<(Arc<Method>, syn::Path)>,
     /// Whether the crate is a dependency.
     version: Option<String>,
     /// Git to the crate, if it is a local dependency.
@@ -68,7 +68,7 @@ impl Hash for ExternalCrate {
 
 impl PartialOrd for ExternalCrate {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(self.name.cmp(&other.name))
+        Some(self.cmp(other))
     }
 }
 
@@ -83,24 +83,28 @@ unsafe impl Sync for ExternalCrate {}
 
 impl ExternalCrate {
     /// Inizializes a new `ExternalCrateBuilder`.
+    #[must_use]
     pub fn new() -> ExternalCrateBuilder {
         ExternalCrateBuilder::default()
     }
 
     /// Returns a reference to the name of the crate.
     #[inline]
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    /// Returns whether the crate is a dependency.
+    /// Returns true if the crate is a dependency.
     #[inline]
+    #[must_use]
     pub fn is_dependency(&self) -> bool {
         self.version.is_some() || self.git.is_some()
     }
 
     /// Returns the version of the crate if it is a dependency.
     #[inline]
+    #[must_use]
     pub fn version(&self) -> Option<&str> {
         self.version.as_deref()
     }
@@ -108,12 +112,14 @@ impl ExternalCrate {
     /// Returns the git repository and branch of the crate if it is a
     /// dependency.
     #[inline]
+    #[must_use]
     pub fn git(&self) -> Option<(&str, &str)> {
         self.git.as_ref().map(|(repo, branch)| (repo.as_str(), branch.as_str()))
     }
 
     /// Returns the feature flags required by the crate.
     #[inline]
+    #[must_use]
     pub fn features(&self) -> &[String] {
         &self.features
     }
@@ -122,6 +128,7 @@ impl ExternalCrate {
     ///
     /// # Arguments
     /// * `name` - A string slice representing the name of the external type.
+    #[must_use]
     pub fn external_type(self: &Arc<Self>, ident: &Type) -> Option<ExternalTypeRef> {
         self.types
             .iter()
@@ -135,6 +142,7 @@ impl ExternalCrate {
     ///
     /// # Arguments
     /// * `name` - A string slice representing the name of the external macro.
+    #[must_use]
     pub fn external_macro(self: &Arc<Self>, name: &str) -> Option<ExternalMacroRef> {
         self.macros
             .iter()
@@ -146,6 +154,7 @@ impl ExternalCrate {
     ///
     /// # Arguments
     /// * `name` - A string slice representing the name of the external trait.
+    #[must_use]
     pub fn external_trait(&self, name: &str) -> Option<&ExternalTrait> {
         self.traits.iter().find(|t| t.name() == name)
     }
@@ -159,10 +168,11 @@ impl ExternalCrate {
         })
     }
 
-    /// Returns the external trait ref with the provided name, if any.
+    /// Returns the external trait reference with the provided name, if any.
     ///
     /// # Arguments
     /// * `name` - A string slice representing the name of the external trait.
+    #[must_use]
     pub fn external_trait_ref(self: &Arc<Self>, name: &str) -> Option<ExternalTraitRef> {
         self.external_trait(name)
             .map(|t| ExternalTraitRef { crate_ref: self.clone(), trait_ref: Arc::new(t.clone()) })
@@ -173,6 +183,7 @@ impl ExternalCrate {
     /// # Arguments
     /// * `name` - A string slice representing the name of the external
     ///   function.
+    #[must_use]
     pub fn external_function_ref(&self, name: &str) -> Option<ExternalFunctionRef> {
         self.functions.iter().find(|(m, _)| m.name() == name).map(|(m, path)| {
             ExternalFunctionRef::new(m.clone(), path.clone(), Arc::new(self.clone()))
@@ -184,6 +195,7 @@ impl ExternalCrate {
     ///
     /// # Arguments
     /// * `postgres_type` - The postgres type to find a compatible type for.
+    #[must_use]
     pub fn external_postgres_type(
         self: &Arc<Self>,
         postgres_type: &str,
@@ -205,36 +217,42 @@ pub struct ExternalTypeRef {
 impl ExternalTypeRef {
     /// Returns a reference to the name of the crate.
     #[inline]
+    #[must_use]
     pub fn crate_name(&self) -> &str {
         self.crate_ref.name()
     }
 
     /// Returns a reference to the diesel type.
     #[inline]
+    #[must_use]
     pub fn diesel_type(&self) -> Option<&syn::Type> {
         self.type_ref.diesel_type()
     }
 
     /// Returns a reference to the rust type.
     #[inline]
+    #[must_use]
     pub fn rust_type(&self) -> &syn::Type {
         self.type_ref.rust_type()
     }
 
     /// Returns a reference to the external crate.
     #[inline]
+    #[must_use]
     pub fn external_crate(&self) -> &ExternalCrate {
         &self.crate_ref
     }
 
-    /// Returns whether the crate is a dependency.
+    /// Returns true if the crate is a dependency.
     #[inline]
+    #[must_use]
     pub fn is_dependency(&self) -> bool {
         self.crate_ref.is_dependency()
     }
 
     /// Returns the version of the crate if it is a dependency.
     #[inline]
+    #[must_use]
     pub fn version(&self) -> Option<&str> {
         self.crate_ref.version()
     }
@@ -242,25 +260,29 @@ impl ExternalTypeRef {
     /// Returns the git repository and branch of the crate if it is a
     /// dependency.
     #[inline]
+    #[must_use]
     pub fn git(&self) -> Option<(&str, &str)> {
         self.crate_ref.git()
     }
 
-    /// Returns whether the type supports the given trait.
+    /// Returns true if the type supports the provided trait.
     ///
     /// # Arguments
     ///
     /// * `trait_ref` - The trait variant to check support for.
+    #[must_use]
     pub fn supports_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         self.type_ref.supports(trait_ref)
     }
 
     /// Returns whether the type supports the `Copy` trait in Rust.
+    #[must_use]
     pub fn supports_copy(&self) -> bool {
         self.type_ref.supports(&Trait::Copy.into())
     }
 
-    /// Returns whether the type is a `Unit` type.
+    /// Returns whether the type is a unit type.
+    #[must_use]
     pub fn is_unit(&self) -> bool {
         self.type_ref.is_unit()
     }
@@ -276,6 +298,7 @@ impl ExternalTypeRef {
     }
 
     /// Sets a generic field to the provided `DataVariantRef`.
+    #[must_use]
     pub fn set_generic_field(
         &self,
         field: &syn::GenericParam,
@@ -287,7 +310,8 @@ impl ExternalTypeRef {
         })
     }
 
-    /// Formats the variant including the generics, if any, with defaults.
+    /// Formats the type with its generics.
+    #[must_use]
     pub fn format_with_generics(&self) -> TokenStream {
         let generics = self.type_ref.generics_with_defaults();
         quote::quote! { #self #generics }
@@ -370,7 +394,7 @@ impl From<Trait> for ExternalTraitRef {
         Self {
             trait_ref: Arc::new(
                 core.external_trait(trait_def.as_ref())
-                    .expect(&format!("Trait `{trait_def}` should exist"))
+                    .unwrap_or_else(|| panic!("Trait `{trait_def}` should exist"))
                     .clone(),
             ),
             crate_ref: core,
@@ -400,26 +424,31 @@ impl ToTokens for ExternalTraitRef {
 
 impl ExternalTraitRef {
     /// Returns a reference to the name of the crate.
+    #[must_use]
     pub fn crate_name(&self) -> &str {
         self.crate_ref.name()
     }
 
     /// Returns a reference to the name of the trait.
+    #[must_use]
     pub fn name(&self) -> &str {
         self.trait_ref.name()
     }
 
     /// Returns a reference to the external crate.
+    #[must_use]
     pub fn external_crate(&self) -> &ExternalCrate {
         &self.crate_ref
     }
 
     /// Returns a reference to the external trait.
+    #[must_use]
     pub fn external_trait(&self) -> &ExternalTrait {
         &self.trait_ref
     }
 
     /// Returns whether the trait is implemented for typeless enums.
+    #[must_use]
     pub fn implemented_for_typeless_enum(&self) -> bool {
         self.trait_ref.implemented_for_typeless_enum()
     }
@@ -430,17 +459,20 @@ impl ExternalTraitRef {
     }
 
     /// Formats the variant including the generics, if any, with defaults.
+    #[must_use]
     pub fn generics_with_defaults(&self) -> Option<TokenStream> {
         self.trait_ref.generics_with_defaults()
     }
 
     /// Formats with the generics, if any, with defaults.
+    #[must_use]
     pub fn format_with_generics(&self) -> TokenStream {
         let generics = self.trait_ref.generics_with_defaults();
         quote::quote! { #self #generics }
     }
 
     /// Sets a generic field to the provided `DataVariantRef`.
+    #[must_use]
     pub fn set_generic_field(
         &self,
         field: &syn::GenericParam,

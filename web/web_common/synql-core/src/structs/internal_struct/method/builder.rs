@@ -24,7 +24,7 @@ pub struct MethodBuilder {
     /// The body of the method.
     body: Option<InternalToken>,
     /// Whether the method is asynchronous.
-    async_method: bool,
+    is_async: bool,
     /// The return type of the method.
     return_type: Option<DataVariantRef>,
     /// Documentation of the method.
@@ -113,7 +113,7 @@ impl From<BuilderError<MethodAttribute>> for MethodBuilderError {
 impl Display for MethodBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            MethodBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            MethodBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             MethodBuilderError::InvalidName => write!(f, "Invalid method name"),
             MethodBuilderError::DuplicatedArgument => {
                 write!(f, "An argument with the same name has already been added")
@@ -145,7 +145,10 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `name` - The name of the method.
-    pub fn name<S: ToString>(mut self, name: S) -> Result<Self, MethodBuilderError> {
+    ///
+    /// # Errors
+    /// * `MethodBuilderError::InvalidName` - If the name is invalid.
+    pub fn name<S: ToString + ?Sized>(mut self, name: &S) -> Result<Self, MethodBuilderError> {
         let name = name.to_string();
         if name.trim().is_empty()
             || name.contains(' ')
@@ -161,6 +164,7 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `documentation` - The documentation of the method.
+    #[must_use]
     pub fn documentation(mut self, documentation: Documentation) -> Self {
         self.documentation = Some(documentation);
         self
@@ -170,24 +174,28 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `publicness` - The publicness of the method.
+    #[must_use]
     pub fn publicness(mut self, publicness: Publicness) -> Self {
         self.publicness = Some(publicness);
         self
     }
 
     /// Sets the method as public.
+    #[must_use]
     pub fn public(mut self) -> Self {
         self.publicness = Some(Publicness::Public);
         self
     }
 
     /// Sets the method as private.
+    #[must_use]
     pub fn private(mut self) -> Self {
         self.publicness = Some(Publicness::Private);
         self
     }
 
     /// Sets whether the method is a trait implementation method.
+    #[must_use]
     pub fn trait_implementation(mut self, is_trait_implementation: bool) -> Self {
         self.is_trait_implementation = is_trait_implementation;
         self
@@ -197,6 +205,7 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `body` - The body of the method.
+    #[must_use]
     pub fn body<T>(mut self, body: T) -> Self
     where
         T: Into<InternalToken>,
@@ -209,8 +218,9 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `async_method` - Whether the method is asynchronous.
+    #[must_use]
     pub fn async_method(mut self, async_method: bool) -> Self {
-        self.async_method = async_method;
+        self.is_async = async_method;
         self
     }
 
@@ -218,6 +228,7 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `return_type` - The return type of the method.
+    #[must_use]
     pub fn return_type<T>(mut self, return_type: T) -> Self
     where
         T: Into<DataVariantRef>,
@@ -230,6 +241,10 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `argument` - The argument to add.
+    ///
+    /// # Errors
+    /// * `MethodBuilderError::DuplicatedArgument` - If an argument with the
+    ///   same name already exists.
     pub fn argument(mut self, argument: Argument) -> Result<Self, MethodBuilderError> {
         if self.arguments.iter().any(|a| a.name() == argument.name()) {
             return Err(MethodBuilderError::DuplicatedArgument);
@@ -242,6 +257,10 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `arguments` - The arguments to add.
+    ///
+    /// # Errors
+    /// * `MethodBuilderError::DuplicatedArgument` - If an argument with the
+    ///   same name already exists.
     pub fn arguments<I>(mut self, arguments: I) -> Result<Self, MethodBuilderError>
     where
         I: IntoIterator<Item = Argument>,
@@ -271,6 +290,7 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `generic` - The generic to add.
+    #[must_use]
     pub fn generic(mut self, generic: syn::GenericParam) -> Self {
         if !self.generics.contains(&generic) {
             self.generics.push(generic);
@@ -282,6 +302,7 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `generics` - The generics to add.
+    #[must_use]
     pub fn generics<I>(mut self, generics: I) -> Self
     where
         I: IntoIterator<Item = syn::GenericParam>,
@@ -296,6 +317,10 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `where_clause` - The where clause to add.
+    ///
+    /// # Errors
+    /// * `MethodBuilderError::DuplicatedWhereClause` - If a where clause with
+    ///   the same content already exists.
     pub fn where_clause(mut self, where_clause: WhereClause) -> Result<Self, MethodBuilderError> {
         if self.where_clauses.iter().any(|w| w == &where_clause) {
             return Err(MethodBuilderError::DuplicatedWhereClause);
@@ -308,6 +333,10 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `where_clauses` - The where clauses to add.
+    ///
+    /// # Errors
+    /// * `MethodBuilderError::DuplicatedWhereClause` - If a where clause with
+    ///   the same content already exists.
     pub fn where_clauses<I>(mut self, where_clauses: I) -> Result<Self, MethodBuilderError>
     where
         I: IntoIterator<Item = WhereClause>,
@@ -322,6 +351,7 @@ impl MethodBuilder {
     ///
     /// # Arguments
     /// * `error_documentation` - The error documentation of the method.
+    #[must_use]
     pub fn error_documentation(mut self, error_documentation: Documentation) -> Self {
         self.error_documentations.push(error_documentation);
         self
@@ -332,6 +362,7 @@ impl MethodBuilder {
     /// # Arguments
     ///
     /// * `error_documentations` - The error documentations of the method.
+    #[must_use]
     pub fn error_documentations<I>(mut self, error_documentations: I) -> Self
     where
         I: IntoIterator<Item = Documentation>,
@@ -358,11 +389,14 @@ impl Builder for MethodBuilder {
     type Object = Method;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
-        if self.return_type.as_ref().map_or(false, |rt| rt.is_result())
+        if self
+            .return_type
+            .as_ref()
+            .is_some_and(crate::structs::internal_data::DataVariantRef::is_result)
             && self.error_documentations.is_empty()
         {
             return Err(BuilderError::IncompleteBuild(MethodAttribute::ErrorDocumentation).into());
-        } else if self.return_type.as_ref().map_or(true, |rt| !rt.is_result())
+        } else if self.return_type.as_ref().is_none_or(|rt| !rt.is_result())
             && !self.error_documentations.is_empty()
         {
             return Err(
@@ -377,7 +411,7 @@ impl Builder for MethodBuilder {
                 .publicness
                 .ok_or(BuilderError::IncompleteBuild(MethodAttribute::Publicness))?,
             body: self.body,
-            async_method: self.async_method,
+            is_async: self.is_async,
             return_type: self.return_type,
             documentation: self
                 .documentation
@@ -397,7 +431,7 @@ impl From<Method> for MethodBuilder {
             name: Some(method.name),
             publicness: Some(method.publicness),
             body: method.body,
-            async_method: method.async_method,
+            is_async: method.is_async,
             return_type: method.return_type,
             documentation: Some(method.documentation),
             generics: method.generics,

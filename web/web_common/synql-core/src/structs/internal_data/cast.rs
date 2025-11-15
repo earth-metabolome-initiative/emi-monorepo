@@ -6,13 +6,16 @@ use crate::structs::DataVariantRef;
 
 impl DataVariantRef {
     /// Casts a string value to the appropriate type for this data variant.
+    ///
+    /// # Errors
+    /// * If the data variant is not an external type.
     pub fn cast(&self, value: &str) -> Result<TokenStream, syn::Error> {
         if let DataVariantRef::External(external_type) = self {
             return external_type.cast(value);
         }
         Err(syn::Error::new_spanned(
             quote::quote! { #value },
-            format!("Cannot cast value to non-external type variant: {:?}", self),
+            format!("Cannot cast value to non-external type variant: {self:?}"),
         ))
     }
 }

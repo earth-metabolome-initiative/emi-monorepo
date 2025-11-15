@@ -86,7 +86,7 @@ impl<'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'table, T> {
         let column_acronym = column.column_acronym_generic();
 
         Method::new()
-            .name(column.column_snake_name())
+            .name(&column.column_snake_name())
             .expect("Failed to set the method name")
             .private()
             .documentation(
@@ -112,7 +112,7 @@ impl<'table, T: TableValueSettableLike + ?Sized> TableValueSettable<'table, T> {
             .generic(column_acronym.clone())
             .argument(
                 Argument::new()
-                    .name(column.column_snake_name())
+                    .name(&column.column_snake_name())
                     .expect("Failed to set the argument name")
                     .arg_type(DataVariantRef::generic(column_acronym.clone()))
                     .documentation(

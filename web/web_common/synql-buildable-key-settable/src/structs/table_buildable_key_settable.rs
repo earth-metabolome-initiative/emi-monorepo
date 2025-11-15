@@ -106,7 +106,7 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
         let builder_type = referenced_table.builder_ref(self.workspace).unwrap();
 
         Method::new()
-            .name(host_column.column_snake_name())
+            .name(&host_column.column_snake_name())
             .expect("Failed to set the method name")
             .private()
             .documentation(
@@ -132,7 +132,7 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
             .generic(host_column.column_acronym_generic())
             .argument(
                 Argument::new()
-                    .name(host_column.column_snake_name())
+                    .name(&host_column.column_snake_name())
                     .expect("Failed to set the argument name")
                     .arg_type(builder_type)
                     .documentation(
@@ -189,7 +189,7 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
             ExternalCrate::either_of(Some(builder_type.into()), Some(generic_type.reference(None)));
 
         Method::new()
-            .name(host_column.column_snake_name())
+            .name(&host_column.column_snake_name())
             .expect("Failed to set the method name")
             .private()
             .documentation(
@@ -215,7 +215,7 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
             .generic(host_column.column_acronym_generic())
             .argument(
                 Argument::new()
-                    .name(host_column.column_snake_name())
+                    .name(&host_column.column_snake_name())
                     .expect("Failed to set the argument name")
                     .arg_type(either)
                     .documentation(
@@ -338,7 +338,7 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
             ));
 
         Method::new()
-            .name(host_column.column_snake_name())
+            .name(&host_column.column_snake_name())
             .expect("Failed to set the method name")
             .private()
             .documentation(
@@ -364,7 +364,7 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
             .generic(host_column.column_acronym_generic())
             .argument(
                 Argument::new()
-                    .name(host_column.column_snake_name())
+                    .name(&host_column.column_snake_name())
                     .expect("Failed to set the argument name")
                     .arg_type(argument_type.reference(None))
                     .documentation(

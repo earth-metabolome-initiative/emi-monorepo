@@ -37,23 +37,27 @@ pub struct InternalTrait {
 
 impl InternalTrait {
     /// Initializes a new `InternalTraitBuilder`.
+    #[must_use]
     pub fn new() -> InternalTraitBuilder {
         InternalTraitBuilder::default()
     }
 
     /// Returns the name of the module.
     #[inline]
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns the ident of the module.
     #[inline]
+    #[must_use]
     pub fn ident(&self) -> Ident {
         syn::Ident::new(&self.name, proc_macro2::Span::call_site())
     }
 
     /// Returns the appropriately formatted generics for the trait.
+    #[must_use]
     pub fn formatted_generics(&self) -> Option<TokenStream> {
         if self.generics.is_empty() {
             None
@@ -65,12 +69,14 @@ impl InternalTrait {
 
     /// Returns the publicness of the module.
     #[inline]
+    #[must_use]
     pub fn publicness(&self) -> &Publicness {
         &self.publicness
     }
 
     /// Returns whether the module is public.
     #[inline]
+    #[must_use]
     pub fn is_public(&self) -> bool {
         self.publicness.is_public()
     }
@@ -82,11 +88,13 @@ impl InternalTrait {
 
     /// Returns the methods defined by the trait.
     #[inline]
+    #[must_use]
     pub fn methods(&self) -> &Vec<Method> {
         &self.methods
     }
 
     /// Returns the where clauses, optionally including super-traits.
+    #[must_use]
     pub fn where_clauses(&self, include_super_traits: bool) -> Vec<WhereClause> {
         let mut clauses = self.where_clauses.clone();
         if include_super_traits {
@@ -112,6 +120,7 @@ impl InternalTrait {
 
     /// Returns the formatted where constraints for the trait, including
     /// optionally the super-traits applied to Self.
+    #[must_use]
     pub fn formatted_where_constraints(&self, include_super_traits: bool) -> Option<TokenStream> {
         let mut constraints = Vec::new();
         for where_clause in self.where_clauses(include_super_traits) {
@@ -121,11 +130,13 @@ impl InternalTrait {
     }
 
     /// Returns the requested method by name.
+    #[must_use]
     pub fn get_method_by_name(&self, name: &str) -> Option<&Method> {
         self.methods.iter().find(|method| method.name() == name)
     }
 
     /// Returns whether the trait defines the provided method.
+    #[must_use]
     pub fn defines_method(&self, method: &Method) -> bool {
         let Some(curresponding_method) = self.get_method_by_name(method.name()) else {
             return false;
@@ -134,6 +145,7 @@ impl InternalTrait {
     }
 
     /// Returns the auto-blanket for the trait, if it can be generated.
+    #[must_use]
     pub fn auto_blanket(&self) -> Option<InternalToken> {
         if !self.all_methods_have_default_impl() {
             return None;

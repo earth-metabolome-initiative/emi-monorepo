@@ -14,7 +14,7 @@ where
 {
     fn from(schema_macro: SchemaMacro<'table, T>) -> Self {
         InternalCrate::new()
-            .name(schema_macro.table.table_schema_crate_name())
+            .name(&schema_macro.table.table_schema_crate_name())
             .expect("Invalid crate name")
             .documentation(
                 Documentation::new()

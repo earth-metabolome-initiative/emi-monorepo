@@ -24,7 +24,7 @@ where
         let snake_case_ident = table_model.table.table_snake_ident();
         InternalData::new()
             .public()
-            .name(table_model.table.table_singular_camel_name())
+            .name(&table_model.table.table_singular_camel_name())
             .expect("Failed to set name")
             .derive(table_model.diesel_derives())
             .expect("Failed to add derives")

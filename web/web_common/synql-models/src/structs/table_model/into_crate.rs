@@ -21,7 +21,7 @@ where
             .table_schema_ref(table_model.workspace)
             .expect("Failed to get the table schema ref for the table relations");
         InternalCrate::new()
-            .name(table_model.table.table_model_crate_name())
+            .name(&table_model.table.table_model_crate_name())
             .expect("Failed to set the crate name")
             .documentation(
                 Documentation::new()

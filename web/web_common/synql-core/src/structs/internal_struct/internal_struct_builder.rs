@@ -44,7 +44,7 @@ pub enum InternalStructBuilderError {
 impl Display for InternalStructBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            InternalStructBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            InternalStructBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             InternalStructBuilderError::DuplicatedAttribute => {
                 write!(f, "An attribute with the same identifier has already been added")
             }
@@ -56,7 +56,7 @@ impl Error for InternalStructBuilderError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             InternalStructBuilderError::Builder(e) => Some(e),
-            _ => None,
+            InternalStructBuilderError::DuplicatedAttribute => None,
         }
     }
 }

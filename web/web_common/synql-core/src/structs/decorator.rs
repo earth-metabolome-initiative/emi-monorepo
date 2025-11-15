@@ -22,6 +22,7 @@ pub struct Decorator {
 
 impl Decorator {
     /// Initializes a new `DecoratorBuilder`.
+    #[must_use]
     pub fn new() -> DecoratorBuilder {
         DecoratorBuilder::default()
     }

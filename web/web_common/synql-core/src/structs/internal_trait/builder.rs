@@ -195,14 +195,14 @@ impl InternalTraitBuilder {
     ///
     /// # Arguments
     /// * `generics` - The generics to add.
-    pub fn generics<I>(mut self, generics: I) -> Result<Self, InternalTraitBuilderError>
+    pub fn generics<I>(mut self, generics: I) -> Self
     where
         I: IntoIterator<Item = syn::GenericParam>,
     {
         for generic in generics {
             self = self.generic(generic);
         }
-        Ok(self)
+        self
     }
 
     /// Adds a where clause to the trait.

@@ -55,7 +55,7 @@ impl<'table, T: TableBuildableLike + ?Sized> From<TableBuildable<'table, T>> for
                                 .unwrap(),
                         )
                         .ty(referenced_builder_ref.optional())
-                        .name(host_column.column_snake_name())
+                        .name(&host_column.column_snake_name())
                         .unwrap()
                         .build()
                         .unwrap()

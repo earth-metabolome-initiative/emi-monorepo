@@ -18,7 +18,7 @@ impl<'table, T: TableInsertableLike + ?Sized> From<TableInsertable<'table, T>> f
         let struct_name = insertable.table.table_insertable_name();
         InternalData::new()
             .public()
-            .name(struct_name)
+            .name(&struct_name)
             .expect("Failed to set insertable struct name")
             .derive(insertable.diesel_derives())
             .expect("Failed to add derives to insertable struct")

@@ -85,7 +85,7 @@ pub enum InternalModuleBuilderError {
 impl Display for InternalModuleBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            InternalModuleBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            InternalModuleBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             InternalModuleBuilderError::InvalidName => write!(f, "Invalid module name"),
             InternalModuleBuilderError::DuplicatedSubmoduleName => {
                 write!(f, "A submodule with the same name has already been added to the module")
@@ -117,7 +117,10 @@ impl InternalModuleBuilder {
     ///
     /// # Arguments
     /// * `name` - The name of the module.
-    pub fn name<S: ToString>(mut self, name: S) -> Result<Self, InternalModuleBuilderError> {
+    pub fn name<S: ToString + ?Sized>(
+        mut self,
+        name: &S,
+    ) -> Result<Self, InternalModuleBuilderError> {
         let name = name.to_string();
         if name.trim().is_empty()
             || name.contains(' ')

@@ -70,11 +70,13 @@ impl InternalDependencies for InternalDataVariant {
 }
 
 impl InternalDataVariant {
-    /// Returns whether the underlying variant supports the given trait.
+    /// Returns whether the data variant supports the given trait.
     ///
     /// # Arguments
     ///
     /// * `trait_variant` - The trait variant to check support for.
+    #[inline]
+    #[must_use]
     pub fn supports_trait(&self, trait_variant: &TraitVariantRef) -> bool {
         match self {
             InternalDataVariant::StructVariant(s) => s.supports_trait(trait_variant),
@@ -96,7 +98,7 @@ pub enum DataVariantRef {
     /// A mutable reference to a data variant ref.
     MutableReference(Option<Lifetime>, Box<DataVariantRef>),
     /// A generic type parameter.
-    Generic(syn::GenericParam),
+    Generic(Box<syn::GenericParam>),
     /// A result type.
     Result(Box<DataVariantRef>, Box<DataVariantRef>),
     /// A option type.
@@ -129,14 +131,14 @@ impl InternalDependencies for DataVariantRef {
         let vec: Vec<&crate::structs::InternalCrate> = match self {
             DataVariantRef::Internal(internal) => internal.internal_dependencies().collect(),
             DataVariantRef::External(external) => external.internal_dependencies().collect(),
-            DataVariantRef::Reference(_, inner) => inner.internal_dependencies().collect(),
-            DataVariantRef::MutableReference(_, inner) => inner.internal_dependencies().collect(),
-            DataVariantRef::Generic(_) => vec![],
+            DataVariantRef::Option(inner)
+            | DataVariantRef::Reference(_, inner)
+            | DataVariantRef::MutableReference(_, inner)
+            | DataVariantRef::SelfType(Some(inner)) => inner.internal_dependencies().collect(),
+            DataVariantRef::Generic(_) | DataVariantRef::SelfType(None) => vec![],
             DataVariantRef::Result(left, right) => {
                 left.internal_dependencies().chain(right.internal_dependencies()).collect()
             }
-            DataVariantRef::Option(inner) => inner.internal_dependencies().collect(),
-            DataVariantRef::SelfType(inner) => inner.internal_dependencies().collect(),
         };
         vec.into_iter()
     }
@@ -148,14 +150,14 @@ impl crate::traits::ExternalDependencies for DataVariantRef {
         let vec: Vec<&crate::structs::ExternalCrate> = match self {
             DataVariantRef::Internal(internal) => internal.external_dependencies().collect(),
             DataVariantRef::External(external) => external.external_dependencies().collect(),
-            DataVariantRef::Reference(_, inner) => inner.external_dependencies().collect(),
-            DataVariantRef::MutableReference(_, inner) => inner.external_dependencies().collect(),
-            DataVariantRef::Generic(_) => vec![],
+            DataVariantRef::Option(inner)
+            | DataVariantRef::Reference(_, inner)
+            | DataVariantRef::MutableReference(_, inner)
+            | DataVariantRef::SelfType(Some(inner)) => inner.external_dependencies().collect(),
+            DataVariantRef::Generic(_) | DataVariantRef::SelfType(None) => vec![],
             DataVariantRef::Result(left, right) => {
                 left.external_dependencies().chain(right.external_dependencies()).collect()
             }
-            DataVariantRef::Option(inner) => inner.external_dependencies().collect(),
-            DataVariantRef::SelfType(inner) => inner.external_dependencies().collect(),
         };
         vec.into_iter()
     }
@@ -163,36 +165,46 @@ impl crate::traits::ExternalDependencies for DataVariantRef {
 
 impl DataVariantRef {
     /// Creates a new generic `DataVariantRef`.
+    #[inline]
+    #[must_use]
     pub fn generic(ident: syn::GenericParam) -> DataVariantRef {
-        DataVariantRef::Generic(ident)
+        DataVariantRef::Generic(Box::new(ident))
     }
 
     /// Creates a new generic from the provided `str`.
+    #[inline]
+    #[must_use]
     pub fn generic_str(ident_str: &str) -> DataVariantRef {
-        DataVariantRef::Generic(generic_type(ident_str))
+        DataVariantRef::Generic(Box::new(generic_type(ident_str)))
     }
 
     /// Returns a reference variant of the data variant.
+    #[inline]
+    #[must_use]
     pub fn reference(&self, lifetime: Option<Lifetime>) -> DataVariantRef {
         DataVariantRef::Reference(lifetime, Box::new(self.clone()))
     }
 
     /// Returns a mutable reference variant of the data variant.
+    #[inline]
+    #[must_use]
     pub fn mutable_reference(&self, lifetime: Option<Lifetime>) -> DataVariantRef {
         DataVariantRef::MutableReference(lifetime, Box::new(self.clone()))
     }
 
     /// Returns an iterator over the generics without a default used in the
     /// data variant.
+    #[must_use]
     pub fn generics_without_defaults(&self) -> Vec<&syn::GenericParam> {
         match self {
             DataVariantRef::Internal(internal) => {
                 internal.data().generics_without_defaults().collect()
             }
             DataVariantRef::External(external) => external.generics_without_defaults().collect(),
-            DataVariantRef::Reference(_, inner) => inner.generics_without_defaults(),
-            DataVariantRef::MutableReference(_, inner) => inner.generics_without_defaults(),
-            DataVariantRef::Generic(ident) => vec![ident],
+            DataVariantRef::Reference(_, inner)
+            | DataVariantRef::MutableReference(_, inner)
+            | DataVariantRef::Option(inner) => inner.generics_without_defaults(),
+            DataVariantRef::Generic(ident) => vec![ident.as_ref()],
             DataVariantRef::Result(left, right) => {
                 let mut generics = left.generics_without_defaults();
                 for generic in right.generics_without_defaults() {
@@ -202,7 +214,6 @@ impl DataVariantRef {
                 }
                 generics
             }
-            DataVariantRef::Option(inner) => inner.generics_without_defaults(),
             DataVariantRef::SelfType(inner) => {
                 if let Some(inner) = inner {
                     inner.generics_without_defaults()
@@ -214,11 +225,15 @@ impl DataVariantRef {
     }
 
     /// Formats the variant including the generics, if any, with defaults.
+    #[must_use]
     pub fn format_with_generics(&self) -> TokenStream {
         match self {
             Self::External(external) => external.format_with_generics(),
             Self::Internal(internal) => internal.format_with_generics(),
-            Self::Generic(generic) => quote! {#generic},
+            Self::Generic(generic) => {
+                let g = generic.as_ref();
+                quote! {#g}
+            }
             Self::Reference(_, inner) => {
                 let inner_tokens = inner.format_with_generics();
                 quote! { & #inner_tokens }
@@ -244,10 +259,12 @@ impl DataVariantRef {
 
     /// Returns the dereferenced variant if it is a reference or mutable
     /// reference, otherwise returns itself.
+    #[must_use]
     pub fn dereference(&self) -> &DataVariantRef {
         match self {
-            DataVariantRef::Reference(_, inner) => inner.as_ref(),
-            DataVariantRef::MutableReference(_, inner) => inner.as_ref(),
+            DataVariantRef::Reference(_, inner) | DataVariantRef::MutableReference(_, inner) => {
+                inner.as_ref()
+            }
             _ => self,
         }
     }
@@ -257,6 +274,7 @@ impl DataVariantRef {
     /// # Arguments
     ///
     /// * `trait_ref` - The trait variant to check support for.
+    #[must_use]
     pub fn supports_trait(&self, trait_ref: &TraitVariantRef) -> bool {
         match self {
             Self::Internal(internal) => internal.data().variant().supports_trait(trait_ref),
@@ -276,21 +294,25 @@ impl DataVariantRef {
     }
 
     /// Returns whether the variant is a mutable reference.
+    #[must_use]
     pub fn is_mutable_reference(&self) -> bool {
         matches!(self, Self::MutableReference(_, _))
     }
 
     /// Returns whether the variant is a reference.
+    #[must_use]
     pub fn is_reference(&self) -> bool {
         matches!(self, Self::Reference(_, _))
     }
 
     /// Returns whether it is a `Result` variant.
+    #[must_use]
     pub fn is_result(&self) -> bool {
         matches!(self, Self::Result(_, _))
     }
 
     /// Returns whether it is a `Unit` variant.
+    #[must_use]
     pub fn is_unit(&self) -> bool {
         match self {
             Self::External(external) => external.is_unit(),
@@ -299,6 +321,7 @@ impl DataVariantRef {
     }
 
     /// Returns whether it is a `Unit` `Result` variant.
+    #[must_use]
     pub fn is_unit_result(&self) -> bool {
         match self {
             Self::Result(left, _) => left.is_unit(),
@@ -307,6 +330,7 @@ impl DataVariantRef {
     }
 
     /// Returns the err variant if it is a `Result` variant.
+    #[must_use]
     pub fn result_err(&self) -> Option<&DataVariantRef> {
         match self {
             Self::Result(_, err) => Some(err.as_ref()),
@@ -315,11 +339,13 @@ impl DataVariantRef {
     }
 
     /// Returns whether it is an `Option` variant.
+    #[must_use]
     pub fn is_option(&self) -> bool {
         matches!(self, Self::Option(_))
     }
 
     /// Returns whether it is a `Self` type variant.
+    #[must_use]
     pub fn is_self_type(&self) -> bool {
         matches!(self, Self::SelfType(_))
             || matches!(self, Self::Reference(_, inner) if inner.is_self_type())
@@ -344,6 +370,7 @@ impl DataVariantRef {
     /// # Arguments
     ///
     /// * `inner` - The inner variant of the `Option`.
+    #[must_use]
     pub fn optional(&self) -> DataVariantRef {
         DataVariantRef::Option(Box::new(self.clone()))
     }
@@ -361,6 +388,7 @@ impl DataVariantRef {
     ///
     /// # Arguments
     /// * `ok_variant` - The ok variant of the Result.
+    #[must_use]
     pub fn diesel_result(ok_variant: DataVariantRef) -> DataVariantRef {
         let diesel = ExternalCrate::diesel();
         let err_variant = diesel
@@ -407,9 +435,7 @@ impl From<InternalData> for InternalDataRef {
 impl InternalDependencies for InternalDataRef {
     #[inline]
     fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
-        self.data
-            .internal_dependencies()
-            .chain(self.internal_crate.iter().map(|internal_crate| internal_crate.as_ref()))
+        self.data.internal_dependencies().chain(self.internal_crate.iter().map(AsRef::as_ref))
     }
 }
 
@@ -431,42 +457,50 @@ impl InternalDataRef {
     ///
     /// * `internal_crate` - A reference to the internal crate.
     /// * `data` - A reference to the internal data.
+    #[must_use]
     pub fn new(internal_crate: &Arc<InternalCrate>, data: &Arc<InternalData>) -> InternalDataRef {
         InternalDataRef { data: data.clone(), internal_crate: Some(internal_crate.clone()) }
     }
 
     /// Returns the internal data.
+    #[must_use]
     pub fn data(&self) -> &InternalData {
         self.data.as_ref()
     }
 
     /// Returns the internal crate.
+    #[must_use]
     pub fn internal_crate(&self) -> Option<&InternalCrate> {
         self.internal_crate.as_deref()
     }
 
     /// Returns the internal crate Rc reference.
+    #[must_use]
     pub fn crate_ref(&self) -> Option<&Arc<InternalCrate>> {
         self.internal_crate.as_ref()
     }
 
     /// Returns the name of the internal data.
+    #[must_use]
     pub fn name(&self) -> &str {
         self.data.name()
     }
 
     /// Returns the ident of the internal crate.
+    #[must_use]
     pub fn crate_ident(&self) -> Option<Ident> {
         self.internal_crate.as_ref().map(|krate| krate.ident())
     }
 
     /// Returns the markdown formatted documentation path of the internal data
     /// type.
+    #[must_use]
     pub fn documentation_path(&self) -> String {
         format!("[`{}`]({self})", self.name())
     }
 
     /// Formats the variant including the generics, if any, with defaults.
+    #[must_use]
     pub fn format_with_generics(&self) -> TokenStream {
         let generics = self.data.generics_with_defaults();
         quote::quote! { #self #generics }
@@ -516,7 +550,7 @@ impl ToTokens for DataVariantRef {
                 inner.to_tokens(tokens);
             }
             DataVariantRef::Generic(ident) => {
-                ident.to_tokens(tokens);
+                ident.as_ref().to_tokens(tokens);
             }
             DataVariantRef::Result(left, right) => {
                 tokens.extend(quote! {Result<#left, #right>});
@@ -569,6 +603,7 @@ impl InternalModuleRef {
     ///
     /// * `internal_crate` - A reference to the internal crate.
     /// * `module` - A reference to the internal module.
+    #[must_use]
     pub fn new(
         internal_crate: &Arc<InternalCrate>,
         module: &Arc<InternalModule>,
@@ -577,21 +612,25 @@ impl InternalModuleRef {
     }
 
     /// Returns the internal module.
+    #[must_use]
     pub fn module(&self) -> &InternalModule {
         self.module.as_ref()
     }
 
     /// Returns the internal crate.
+    #[must_use]
     pub fn internal_crate(&self) -> &InternalCrate {
         self.internal_crate.as_ref()
     }
 
     /// Returns the name of the internal module.
+    #[must_use]
     pub fn name(&self) -> &str {
         self.module.name()
     }
 
     /// Returns the ident of the internal crate.
+    #[must_use]
     pub fn crate_ident(&self) -> Ident {
         self.internal_crate.ident()
     }
@@ -620,23 +659,30 @@ pub struct InternalData {
     generic_defaults: Vec<Option<DataVariantRef>>,
 }
 
+unsafe impl Send for InternalData {}
+unsafe impl Sync for InternalData {}
+
 impl InternalData {
     /// Initializes a new `InternalDataBuilder`.
+    #[must_use]
     pub fn new() -> InternalDataBuilder {
         InternalDataBuilder::default()
     }
 
     /// Returns a reference to the publicness of the data.
+    #[must_use]
     pub fn publicness(&self) -> &Publicness {
         &self.publicness
     }
 
     /// Returns whether the data is public.
+    #[must_use]
     pub fn is_public(&self) -> bool {
         self.publicness.is_public()
     }
 
     /// Returns the formatted generics of the data.
+    #[must_use]
     pub fn generics(&self) -> Option<TokenStream> {
         if self.generics.is_empty() {
             None
@@ -648,6 +694,7 @@ impl InternalData {
 
     /// Returns the formatted generics, with defaults in place of the generic
     /// where they exist.
+    #[must_use]
     pub fn generics_with_defaults(&self) -> Option<TokenStream> {
         if self.generics.is_empty() {
             None
@@ -673,16 +720,19 @@ impl InternalData {
     }
 
     /// Returns the name of the data.
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns a reference to the name of the data.
+    #[must_use]
     pub fn ident(&self) -> Ident {
         syn::Ident::new(&self.name, proc_macro2::Span::call_site())
     }
 
     /// Returns a reference to the variant of the data.
+    #[must_use]
     pub fn variant(&self) -> &InternalDataVariant {
         &self.variant
     }
@@ -727,8 +777,16 @@ impl ExternalDependencies for InternalData {
         self.traits
             .iter()
             .flat_map(ExternalDependencies::external_dependencies)
-            .chain(self.derives.iter().flat_map(|derive| derive.external_dependencies()))
-            .chain(self.decorators.iter().flat_map(|decorator| decorator.external_dependencies()))
+            .chain(
+                self.derives
+                    .iter()
+                    .flat_map(crate::traits::ExternalDependencies::external_dependencies),
+            )
+            .chain(
+                self.decorators
+                    .iter()
+                    .flat_map(crate::traits::ExternalDependencies::external_dependencies),
+            )
             .chain(self.variant.external_dependencies())
             .chain(self.documentation.external_dependencies())
     }
@@ -740,8 +798,16 @@ impl InternalDependencies for InternalData {
         self.traits
             .iter()
             .flat_map(InternalDependencies::internal_dependencies)
-            .chain(self.derives.iter().flat_map(|derive| derive.internal_dependencies()))
-            .chain(self.decorators.iter().flat_map(|decorator| decorator.internal_dependencies()))
+            .chain(
+                self.derives
+                    .iter()
+                    .flat_map(crate::traits::InternalDependencies::internal_dependencies),
+            )
+            .chain(
+                self.decorators
+                    .iter()
+                    .flat_map(crate::traits::InternalDependencies::internal_dependencies),
+            )
             .chain(self.variant.internal_dependencies())
             .chain(self.documentation.internal_dependencies())
     }

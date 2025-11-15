@@ -38,6 +38,7 @@ impl Hash for InternalCrate {
     }
 }
 
+#[allow(clippy::non_canonical_partial_ord_impl)]
 impl PartialOrd for InternalCrate {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.name.cmp(&other.name))
@@ -74,27 +75,31 @@ impl ToTokens for InternalCrate {
             pub mod prelude {
                 #(pub use crate::#module_exports::*;)*
             }
-        })
+        });
     }
 }
 
 impl InternalCrate {
     /// Initializes a new `InternalCrateBuilder`.
+    #[must_use]
     pub fn new() -> InternalCrateBuilder {
         InternalCrateBuilder::default()
     }
 
     /// Returns a reference to the name of the crate.
+    #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
     /// Returns a reference to the ident of the crate.
+    #[must_use]
     pub fn ident(&self) -> Ident {
         syn::Ident::new(&self.name, proc_macro2::Span::call_site())
     }
 
     /// Returns the path to the provided module within the crate, if it exists.
+    #[must_use]
     pub fn module_path(&self, module: &InternalModule) -> Option<syn::Path> {
         let crate_ident = self.ident();
         for m in &self.modules {
@@ -113,6 +118,7 @@ impl InternalCrate {
 
     /// Returns a reference to the internal data with the given name if it
     /// exists in the crate.
+    #[must_use]
     pub fn internal_data(&self, name: &str) -> Option<&Arc<InternalData>> {
         for module in &self.modules {
             if let Some(data) = module.internal_data(name) {
@@ -124,6 +130,7 @@ impl InternalCrate {
 
     /// Returns a reference to the internal trait with the given name if it
     /// exists in the crate.
+    #[must_use]
     pub fn internal_trait(&self, name: &str) -> Option<&Arc<InternalTrait>> {
         for module in &self.modules {
             if let Some(trait_) = module.internal_trait(name) {
@@ -135,16 +142,16 @@ impl InternalCrate {
 
     /// Returns a reference to the module with the given name if it exists in
     /// the crate.
+    #[must_use]
     pub fn module(&self, name: &str) -> Option<&Arc<InternalModule>> {
-        for module in &self.modules {
-            if module.name() == name {
-                return Some(module);
-            }
-        }
-        None
+        self.modules.iter().find(|module| module.name() == name)
     }
 
     /// Writes out the TOML metadata for the crate at the provided path.
+    ///
+    /// # Errors
+    ///
+    /// Returns an `std::io::Error` if writing to the file fails.
     pub fn write_toml(&self, workspace: &Workspace, path: &std::path::Path) -> std::io::Result<()> {
         use std::io::Write;
 
@@ -156,7 +163,7 @@ impl InternalCrate {
         // Write [package] section
         writeln!(buffer, "[package]")?;
         writeln!(buffer, "name = \"{}\"", self.name)?;
-        writeln!(buffer, "version = \"{}.{}.{}\"", major, minor, edit)?;
+        writeln!(buffer, "version = \"{major}.{minor}.{edit}\"")?;
         writeln!(buffer, "edition = \"{}\"", workspace.edition())?;
         writeln!(buffer)?;
 
@@ -205,6 +212,10 @@ impl InternalCrate {
     }
 
     /// Writes the crate to disk at the provided path.
+    ///
+    /// # Errors
+    ///
+    /// Returns an `std::io::Error` if any file operation fails.
     pub fn write_to_disk(&self, workspace: &Workspace) -> std::io::Result<()> {
         // We create the crate directory.
         let crate_path = workspace.path().join(&self.name);
@@ -220,7 +231,7 @@ impl InternalCrate {
         let syntax_tree = syn::parse_file(&token_stream).map_err(|e| {
             std::io::Error::new(
                 std::io::ErrorKind::InvalidData,
-                format!("Failed to parse generated code: {}", e),
+                format!("Failed to parse generated code: {e}"),
             )
         })?;
         let formatted = prettyplease::unparse(&syntax_tree);

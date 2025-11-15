@@ -37,7 +37,7 @@ impl ExternalCrate {
                                 .unwrap(),
                         ))
                         .unwrap()
-                        .add_traits(Trait::iter().map(|t| t.into()))
+                        .add_traits(Trait::iter().map(std::convert::Into::into))
                         .unwrap()
                         .add_traits([
                             ExternalTrait::new()

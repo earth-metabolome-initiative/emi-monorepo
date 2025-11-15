@@ -46,6 +46,7 @@ impl ExternalCrate {
 
     /// Returns an `Either` `ExternalType` instance parametrized with the
     /// provided left and right types.
+    #[must_use]
     pub fn either_of(
         left: Option<DataVariantRef>,
         right: Option<DataVariantRef>,

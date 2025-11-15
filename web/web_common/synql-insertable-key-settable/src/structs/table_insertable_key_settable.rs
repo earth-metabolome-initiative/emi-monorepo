@@ -141,7 +141,7 @@ impl<'table, T: TableInsertableKeySettableLike + ?Sized> TableInsertableKeySetta
         }
 
         Method::new()
-            .name(host_column.column_snake_name())
+            .name(&host_column.column_snake_name())
             .expect("Failed to set the method name")
             .private()
             .documentation(
@@ -167,7 +167,7 @@ impl<'table, T: TableInsertableKeySettableLike + ?Sized> TableInsertableKeySetta
             .generic(host_column.column_acronym_generic())
             .argument(
                 Argument::new()
-                    .name(host_column.column_snake_name())
+                    .name(&host_column.column_snake_name())
                     .expect("Failed to set the argument name")
                     .arg_type(argument_type.reference(None))
                     .documentation(

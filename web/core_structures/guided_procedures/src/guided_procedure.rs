@@ -19,7 +19,6 @@ pub struct GuidedProcedure<'graph, C> {
 impl<'graph, C> GuidedProcedure<'graph, C> {
     /// Creates a new `GuidedProcedureBuilder` instance.
     #[must_use]
-    #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GuidedProcedureBuilder<'graph, C> {
         GuidedProcedureBuilder::default()
     }

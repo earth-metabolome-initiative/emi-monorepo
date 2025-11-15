@@ -98,7 +98,6 @@ where
 {
     /// Creates a new `GenericDBBuilder` instance.
     #[must_use]
-    #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GenericDBBuilder<T, C, U, F, Func, Ch> {
         GenericDBBuilder::default()
     }

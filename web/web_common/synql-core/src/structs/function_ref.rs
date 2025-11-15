@@ -16,14 +16,15 @@ pub struct ExternalFunctionRef {
     /// The underlying method.
     method: Arc<Method>,
     /// The path to the function in the external crate.
-    path: Arc<syn::Path>,
+    path: syn::Path,
     /// The crate from which the function is referenced.
     crate_ref: Arc<ExternalCrate>,
 }
 
 impl ExternalFunctionRef {
     /// Creates a new `ExternalFunctionRef` instance.
-    pub fn new(method: Arc<Method>, path: Arc<syn::Path>, crate_ref: Arc<ExternalCrate>) -> Self {
+    #[must_use]
+    pub fn new(method: Arc<Method>, path: syn::Path, crate_ref: Arc<ExternalCrate>) -> Self {
         Self { method, path, crate_ref }
     }
 
@@ -40,11 +41,13 @@ impl ExternalFunctionRef {
     }
 
     /// Returns whether the function returns a result type.
+    #[must_use]
     pub fn can_fail(&self) -> bool {
         self.method.can_fail()
     }
 
     /// Returns the return type of the function, if any.
+    #[must_use]
     pub fn return_type(&self) -> Option<&DataVariantRef> {
         self.method.return_type()
     }

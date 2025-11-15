@@ -67,7 +67,7 @@ pub enum ExternalTypeBuilderError {
 impl Display for ExternalTypeBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ExternalTypeBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            ExternalTypeBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             ExternalTypeBuilderError::DuplicatedPostgresType => {
                 write!(f, "Provided a duplicated postgres type")
             }

@@ -67,7 +67,7 @@ pub trait TableBuildableMetadataLike: TableInsertableLike {
                     .unwrap(),
             )
             .ty(DataVariantRef::generic_str(&self.table_singular_camel_name()))
-            .name(self.table_singular_snake_name())
+            .name(&self.table_singular_snake_name())
             .unwrap()
             .build()
             .unwrap()
@@ -90,7 +90,7 @@ pub trait TableBuildableMetadataLike: TableInsertableLike {
                     .unwrap(),
             )
             .ty(insertable_ref)
-            .name(self.table_singular_snake_name())
+            .name(&self.table_singular_snake_name())
             .unwrap()
             .build()
             .unwrap()

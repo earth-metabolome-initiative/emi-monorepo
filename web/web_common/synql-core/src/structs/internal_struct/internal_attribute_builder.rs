@@ -70,7 +70,7 @@ impl From<BuilderError<InternalAttributeAttribute>> for InternalAttributeBuilder
 impl Display for InternalAttributeBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            InternalAttributeBuilderError::Builder(e) => write!(f, "Builder error: {}", e),
+            InternalAttributeBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             InternalAttributeBuilderError::InvalidName => {
                 write!(f, "Invalid attribute name (empty or whitespace only)")
             }
@@ -82,7 +82,7 @@ impl Error for InternalAttributeBuilderError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             InternalAttributeBuilderError::Builder(e) => Some(e),
-            _ => None,
+            InternalAttributeBuilderError::InvalidName => None,
         }
     }
 }
@@ -122,7 +122,7 @@ impl InternalAttributeBuilder {
     ///
     /// # Arguments
     /// * `name` - The name of the attribute.
-    pub fn name<S: ToString>(mut self, name: S) -> Result<Self, InternalAttributeBuilderError> {
+    pub fn name<S: ToString>(mut self, name: &S) -> Result<Self, InternalAttributeBuilderError> {
         let name = name.to_string();
         if name.trim().is_empty() {
             return Err(InternalAttributeBuilderError::InvalidName);

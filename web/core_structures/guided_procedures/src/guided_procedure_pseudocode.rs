@@ -23,7 +23,6 @@ pub struct GuidedProcedurePseudocode<'graph> {
 impl<'graph> GuidedProcedurePseudocode<'graph> {
     /// Creates a new `GuidedProcedurePseudocodeBuilder` instance.
     #[must_use]
-    #[allow(clippy::new_ret_no_self)]
     pub fn new() -> GuidedProcedurePseudocodeBuilder<'graph> {
         GuidedProcedurePseudocodeBuilder::default()
     }
