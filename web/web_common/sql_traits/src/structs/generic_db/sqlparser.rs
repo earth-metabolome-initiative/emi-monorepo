@@ -38,6 +38,214 @@ pub type ParserDB = GenericDB<
 >;
 
 impl ParserDB {
+    /// Helper function to process check constraints.
+    fn process_check_constraint(
+        check_expr: &Expr,
+        _create_table: &Rc<CreateTable>,
+        table_metadata: &TableMetadata<CreateTable>,
+        builder: &GenericDBBuilder<
+            CreateTable,
+            TableAttribute<CreateTable, ColumnDef>,
+            TableAttribute<CreateTable, UniqueConstraint>,
+            TableAttribute<CreateTable, ForeignKeyConstraint>,
+            CreateFunction,
+            TableAttribute<CreateTable, CheckConstraint>,
+        >,
+    ) -> (Vec<Rc<<Self as DatabaseLike>::Column>>, Vec<Rc<<Self as DatabaseLike>::Function>>) {
+        let columns_in_expression = columns_in_expression::columns_in_expression::<Self>(
+            check_expr,
+            table_metadata.column_rc_slice(),
+        );
+        let functions_in_expression = functions_in_expression::functions_in_expression::<Self>(
+            check_expr,
+            builder.function_rc_vec().as_slice(),
+        );
+        (columns_in_expression, functions_in_expression)
+    }
+
+    /// Helper function to create a unique constraint expression from columns.
+    fn create_unique_expression(columns: &[IndexColumn]) -> Expr {
+        let expression_string = format!(
+            "({})",
+            columns.iter().map(|ident| ident.column.to_string()).collect::<Vec<_>>().join(", ")
+        );
+        Parser::new(&sqlparser::dialect::GenericDialect {})
+            .try_with_sql(expression_string.as_str())
+            .expect("Failed to parse unique constraint expression")
+            .parse_expr()
+            .expect("No expression found in parsed unique constraint")
+    }
+
+    /// Helper function to process unique constraints.
+    fn process_unique_constraint(
+        unique_constraint: UniqueConstraint,
+        create_table: &Rc<CreateTable>,
+    ) -> (
+        Rc<TableAttribute<CreateTable, UniqueConstraint>>,
+        UniqueIndexMetadata<TableAttribute<CreateTable, UniqueConstraint>>,
+    ) {
+        let unique_index = Rc::new(TableAttribute::new(create_table.clone(), unique_constraint));
+        let expression = Self::create_unique_expression(&unique_index.attribute().columns);
+        let unique_index_metadata = UniqueIndexMetadata::new(expression, create_table.clone());
+        (unique_index, unique_index_metadata)
+    }
+
+    /// Helper function to process column options.
+    fn process_column_options(
+        column: &Rc<TableAttribute<CreateTable, ColumnDef>>,
+        create_table: &Rc<CreateTable>,
+        table_metadata: &mut TableMetadata<CreateTable>,
+        mut builder: GenericDBBuilder<
+            CreateTable,
+            TableAttribute<CreateTable, ColumnDef>,
+            TableAttribute<CreateTable, UniqueConstraint>,
+            TableAttribute<CreateTable, ForeignKeyConstraint>,
+            CreateFunction,
+            TableAttribute<CreateTable, CheckConstraint>,
+        >,
+    ) -> GenericDBBuilder<
+        CreateTable,
+        TableAttribute<CreateTable, ColumnDef>,
+        TableAttribute<CreateTable, UniqueConstraint>,
+        TableAttribute<CreateTable, ForeignKeyConstraint>,
+        CreateFunction,
+        TableAttribute<CreateTable, CheckConstraint>,
+    > {
+        for option in &column.attribute().options {
+            match option.option.clone() {
+                ColumnOption::Check(check_constraint) => {
+                    let check_rc = Rc::new(TableAttribute::new(
+                        create_table.clone(),
+                        check_constraint.clone(),
+                    ));
+                    table_metadata.add_check_constraint(check_rc.clone());
+                    let (columns_in_expression, functions_in_expression) =
+                        Self::process_check_constraint(
+                            &check_constraint.expr,
+                            create_table,
+                            table_metadata,
+                            &builder,
+                        );
+                    builder = builder.add_check_constraint(
+                        check_rc,
+                        CheckMetadata::new(
+                            *check_constraint.expr.clone(),
+                            create_table.clone(),
+                            columns_in_expression,
+                            functions_in_expression,
+                        ),
+                    );
+                }
+                ColumnOption::ForeignKey(mut foreign_key) => {
+                    foreign_key.columns.push(column.attribute().name.clone());
+                    let fk = Rc::new(TableAttribute::new(create_table.clone(), foreign_key));
+                    table_metadata.add_foreign_key(fk.clone());
+                    builder = builder.add_foreign_key(fk, ());
+                }
+                ColumnOption::Unique(mut unique_constraint) => {
+                    unique_constraint.columns.push(IndexColumn {
+                        column: OrderByExpr {
+                            expr: Expr::Identifier(column.attribute().name.clone()),
+                            options: OrderByOptions::default(),
+                            with_fill: None,
+                        },
+                        operator_class: None,
+                    });
+                    let (unique_index, unique_index_metadata) =
+                        Self::process_unique_constraint(unique_constraint, create_table);
+                    table_metadata.add_unique_index(unique_index.clone());
+                    builder = builder.add_unique_index(unique_index, unique_index_metadata);
+                }
+                ColumnOption::PrimaryKey(_) => {
+                    table_metadata.set_primary_key(vec![column.clone()]);
+                }
+                _ => {}
+            }
+        }
+        builder
+    }
+
+    /// Helper function to process table constraints.
+    fn process_table_constraints(
+        constraints: &[TableConstraint],
+        create_table: &Rc<CreateTable>,
+        table_metadata: &mut TableMetadata<CreateTable>,
+        mut builder: GenericDBBuilder<
+            CreateTable,
+            TableAttribute<CreateTable, ColumnDef>,
+            TableAttribute<CreateTable, UniqueConstraint>,
+            TableAttribute<CreateTable, ForeignKeyConstraint>,
+            CreateFunction,
+            TableAttribute<CreateTable, CheckConstraint>,
+        >,
+    ) -> GenericDBBuilder<
+        CreateTable,
+        TableAttribute<CreateTable, ColumnDef>,
+        TableAttribute<CreateTable, UniqueConstraint>,
+        TableAttribute<CreateTable, ForeignKeyConstraint>,
+        CreateFunction,
+        TableAttribute<CreateTable, CheckConstraint>,
+    > {
+        for constraint in constraints {
+            match constraint {
+                TableConstraint::Unique(uc) => {
+                    let (unique_index, unique_index_metadata) =
+                        Self::process_unique_constraint(uc.clone(), create_table);
+                    table_metadata.add_unique_index(unique_index.clone());
+                    builder = builder.add_unique_index(unique_index, unique_index_metadata);
+                }
+                TableConstraint::ForeignKey(fk) => {
+                    let fk = Rc::new(TableAttribute::new(create_table.clone(), fk.clone()));
+                    table_metadata.add_foreign_key(fk.clone());
+                    builder = builder.add_foreign_key(fk, ());
+                }
+                TableConstraint::Check(check) => {
+                    let check_rc =
+                        Rc::new(TableAttribute::new(create_table.clone(), check.clone()));
+                    table_metadata.add_check_constraint(check_rc.clone());
+                    let (columns_in_expression, functions_in_expression) =
+                        Self::process_check_constraint(
+                            &check.expr,
+                            create_table,
+                            table_metadata,
+                            &builder,
+                        );
+                    builder = builder.add_check_constraint(
+                        check_rc,
+                        CheckMetadata::new(
+                            *check.expr.clone(),
+                            create_table.clone(),
+                            columns_in_expression,
+                            functions_in_expression,
+                        ),
+                    );
+                }
+                TableConstraint::PrimaryKey(pk) => {
+                    let mut primary_key_columns = Vec::new();
+                    for col_name in &pk.columns {
+                        let Expr::Identifier(column_name) = &col_name.column.expr else {
+                            unreachable!(
+                                "Unexpected expression in primary key column: {:?}",
+                                col_name
+                            )
+                        };
+                        primary_key_columns.extend(
+                            table_metadata
+                                .column_rcs()
+                                .filter(|col: &&Rc<TableAttribute<CreateTable, ColumnDef>>| {
+                                    col.column_name() == column_name.value.as_str()
+                                })
+                                .cloned(),
+                        );
+                    }
+                    table_metadata.set_primary_key(primary_key_columns);
+                }
+                _ => {}
+            }
+        }
+        builder
+    }
+
     /// Creates a new `ParserDB` from a vector of SQL statements and a catalog
     /// name.
     ///
@@ -63,182 +271,31 @@ impl ParserDB {
                 Statement::CreateTable(create_table) => {
                     let create_table = Rc::new(create_table);
                     let mut table_metadata: TableMetadata<CreateTable> = TableMetadata::default();
+
+                    // Add all columns to metadata
                     for column in create_table.columns.clone() {
                         let column_rc = Rc::new(TableAttribute::new(create_table.clone(), column));
                         table_metadata.add_column(column_rc.clone());
                     }
+
+                    // Process column options and add columns to builder
                     for column in table_metadata.clone().column_rcs() {
-                        for option in &column.attribute().options {
-                            match option.option.clone() {
-                                ColumnOption::Check(check_constraint) => {
-                                    let check_rc = Rc::new(TableAttribute::new(
-                                        create_table.clone(),
-                                        check_constraint.clone(),
-                                    ));
-                                    table_metadata.add_check_constraint(check_rc.clone());
-                                    let columns_in_expression: Vec<
-                                        Rc<<Self as DatabaseLike>::Column>,
-                                    > = columns_in_expression::columns_in_expression::<Self>(
-                                        &check_constraint.expr,
-                                        table_metadata.column_rc_slice(),
-                                    );
-                                    let functions_in_expression: Vec<
-                                        Rc<<Self as DatabaseLike>::Function>,
-                                    > = functions_in_expression::functions_in_expression::<Self>(
-                                        &check_constraint.expr,
-                                        builder.function_rc_vec().as_slice(),
-                                    );
-                                    builder = builder.add_check_constraint(
-                                        check_rc,
-                                        CheckMetadata::new(
-                                            *check_constraint.expr.clone(),
-                                            create_table.clone(),
-                                            columns_in_expression,
-                                            functions_in_expression,
-                                        ),
-                                    );
-                                }
-                                ColumnOption::ForeignKey(mut foreign_key) => {
-                                    foreign_key.columns.push(column.attribute().name.clone());
-                                    let fk = Rc::new(TableAttribute::new(
-                                        create_table.clone(),
-                                        foreign_key,
-                                    ));
-                                    table_metadata.add_foreign_key(fk.clone());
-                                    builder = builder.add_foreign_key(fk, ());
-                                }
-                                ColumnOption::Unique(mut unique_constraint) => {
-                                    unique_constraint.columns.push(IndexColumn {
-                                        column: OrderByExpr {
-                                            expr: Expr::Identifier(column.attribute().name.clone()),
-                                            options: OrderByOptions::default(),
-                                            with_fill: None,
-                                        },
-                                        operator_class: None,
-                                    });
-                                    let unique_index = Rc::new(TableAttribute::new(
-                                        create_table.clone(),
-                                        unique_constraint,
-                                    ));
-                                    let expression_string = format!(
-                                        "({})",
-                                        unique_index
-                                            .attribute()
-                                            .columns
-                                            .iter()
-                                            .map(|ident| ident.column.to_string())
-                                            .collect::<Vec<_>>()
-                                            .join(", ")
-                                    );
-                                    let expression =
-                                        Parser::new(&sqlparser::dialect::GenericDialect {})
-                                            .try_with_sql(expression_string.as_str())
-                                            .expect("Failed to parse unique constraint expression")
-                                            .parse_expr()
-                                            .unwrap();
-                                    let unique_index_metadata =
-                                        UniqueIndexMetadata::new(expression, create_table.clone());
-                                    table_metadata.add_unique_index(unique_index.clone());
-                                    builder = builder
-                                        .add_unique_index(unique_index, unique_index_metadata);
-                                }
-                                ColumnOption::PrimaryKey(_) => {
-                                    table_metadata.set_primary_key(vec![column.clone()]);
-                                }
-                                _ => {}
-                            }
-                        }
+                        builder = Self::process_column_options(
+                            column,
+                            &create_table,
+                            &mut table_metadata,
+                            builder,
+                        );
                         builder = builder.add_column(column.clone(), ());
                     }
 
-                    for constraint in &create_table.constraints {
-                        match constraint {
-                            TableConstraint::Unique(uc) => {
-                                let unique_index =
-                                    Rc::new(TableAttribute::new(create_table.clone(), uc.clone()));
-                                let expression_string = format!(
-                                    "({})",
-                                    unique_index
-                                        .attribute()
-                                        .columns
-                                        .iter()
-                                        .map(|ident| ident.column.to_string())
-                                        .collect::<Vec<_>>()
-                                        .join(", ")
-                                );
-                                let expression =
-                                    Parser::new(&sqlparser::dialect::GenericDialect {})
-                                        .try_with_sql(expression_string.as_str())
-                                        .expect("Failed to parse unique constraint expression")
-                                        .parse_expr()
-                                        .expect("No expression found in parsed unique constraint");
-                                let unique_index_metadata =
-                                    UniqueIndexMetadata::new(expression, create_table.clone());
-                                table_metadata.add_unique_index(unique_index.clone());
-                                builder =
-                                    builder.add_unique_index(unique_index, unique_index_metadata);
-                            }
-                            TableConstraint::ForeignKey(fk) => {
-                                let fk =
-                                    Rc::new(TableAttribute::new(create_table.clone(), fk.clone()));
-                                table_metadata.add_foreign_key(fk.clone());
-                                builder = builder.add_foreign_key(fk, ());
-                            }
-                            TableConstraint::Check(check) => {
-                                let check_rc = Rc::new(TableAttribute::new(
-                                    create_table.clone(),
-                                    check.clone(),
-                                ));
-                                table_metadata.add_check_constraint(check_rc.clone());
-                                let columns_in_expression: Vec<Rc<<Self as DatabaseLike>::Column>> =
-                                    columns_in_expression::columns_in_expression::<Self>(
-                                        &check.expr,
-                                        table_metadata.column_rc_slice(),
-                                    );
-                                let functions_in_expression: Vec<
-                                    Rc<<Self as DatabaseLike>::Function>,
-                                > = functions_in_expression::functions_in_expression::<Self>(
-                                    &check.expr,
-                                    builder.function_rc_vec().as_slice(),
-                                );
-                                builder = builder.add_check_constraint(
-                                    check_rc,
-                                    CheckMetadata::new(
-                                        *check.expr.clone(),
-                                        create_table.clone(),
-                                        columns_in_expression,
-                                        functions_in_expression,
-                                    ),
-                                );
-                            }
-                            TableConstraint::PrimaryKey(pk) => {
-                                let mut primary_key_columns = Vec::new();
-                                for col_name in &pk.columns {
-                                    let Expr::Identifier(column_name) = &col_name.column.expr
-                                    else {
-                                        unreachable!(
-                                            "Unexpected expression in primary key column: {:?}",
-                                            col_name
-                                        )
-                                    };
-                                    primary_key_columns.extend(
-                                        table_metadata
-                                            .column_rcs()
-                                            .filter(
-                                                |col: &&Rc<
-                                                    TableAttribute<CreateTable, ColumnDef>,
-                                                >| {
-                                                    col.column_name() == column_name.value.as_str()
-                                                },
-                                            )
-                                            .cloned(),
-                                    );
-                                }
-                                table_metadata.set_primary_key(primary_key_columns);
-                            }
-                            _ => {}
-                        }
-                    }
+                    // Process table constraints
+                    builder = Self::process_table_constraints(
+                        &create_table.constraints,
+                        &create_table,
+                        &mut table_metadata,
+                        builder,
+                    );
 
                     builder = builder.add_table(create_table, table_metadata);
                 }

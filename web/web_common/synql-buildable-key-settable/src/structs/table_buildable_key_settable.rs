@@ -282,13 +282,6 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettabl
             .map(|fk| fk.referenced_table(self.database))
             .collect::<Vec<_>>();
 
-        assert!(
-            !referenced_tables.is_empty(),
-            "Expected at least one referenced table for foreign key column {}.{}",
-            host_column.table(self.database).table_name(),
-            host_column.column_name()
-        );
-
         let (referenced_table, other_referenced_tables) = referenced_tables.split_first().unwrap();
 
         let mca_referenced_table = referenced_table

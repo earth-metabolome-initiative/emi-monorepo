@@ -9,4 +9,4 @@ pub use get_column::GetColumn;
 pub mod set_column;
 pub use set_column::SetColumn;
 pub mod same_as;
-pub use same_as::SameAs;
+pub use same_as::{HorizontalSameAs, VerticalSameAs};

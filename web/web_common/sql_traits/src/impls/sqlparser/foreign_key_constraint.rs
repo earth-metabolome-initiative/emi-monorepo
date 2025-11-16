@@ -69,18 +69,21 @@ impl ForeignKeyLike for TableAttribute<CreateTable, ForeignKeyConstraint> {
         Self: 'db,
     {
         let host_table = self.host_table(database);
-        assert_eq!(
-            self.attribute().columns.len(),
-            self.attribute().referred_columns.len(),
-            "Foreign key must have the same number of host and referenced columns: ({:?}) -> ({:?})",
-            self.attribute().columns,
-            self.attribute().referred_columns
-        );
         self.attribute().columns.iter().map(move |col_name| {
             host_table
                 .columns(database)
                 .find(|col: &&<Self::DB as DatabaseLike>::Column| &col.attribute().name == col_name)
-                .unwrap()
+                .unwrap_or_else(|| {
+                    panic!(
+                        "Host column `{}` not found in table `{}` for foreign key, options: {:?}",
+                        col_name,
+                        host_table.table_name(),
+                        host_table
+                            .columns(database)
+                            .map(|c| c.attribute().name.to_string())
+                            .collect::<Vec<_>>()
+                    )
+                })
         })
     }
 

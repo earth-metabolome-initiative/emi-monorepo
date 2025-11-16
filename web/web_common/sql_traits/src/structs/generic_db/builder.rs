@@ -118,13 +118,6 @@ where
     /// Adds a table with its metadata to the builder.
     #[must_use]
     pub fn add_table(mut self, table: Rc<T>, metadata: T::Meta) -> Self {
-        assert!(
-            self.tables.iter().all(|(existing_table, _)| existing_table.as_ref() != table.as_ref()),
-            "Table '{}' already exists in the database '{}'",
-            table.table_name(),
-            self.catalog_name.as_deref().unwrap_or("<unnamed>")
-        );
-
         self.tables.push((table, metadata));
         self
     }

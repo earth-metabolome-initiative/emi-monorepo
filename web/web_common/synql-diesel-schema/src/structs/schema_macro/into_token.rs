@@ -179,11 +179,11 @@ where
             builder = builder.employed_trait(table_is_extension_of_trait.into());
         }
 
-        if schema_macro.table.has_vertically_same_as(schema_macro.database) {
-            let vertically_same_as_trait = schema_macro
+        if schema_macro.table.has_vertical_same_as(schema_macro.database) {
+            let vertical_same_as = schema_macro
                 .workspace
-                .external_trait("IsVerticallySameAs")
-                .expect("Failed to find the VerticallySameAs trait");
+                .external_trait("VerticalSameAs")
+                .expect("Failed to find the VerticalSameAs trait");
 
             for fk in schema_macro.table.vertical_same_as_foreign_keys(schema_macro.database) {
                 let referenced_table = fk.referenced_table(schema_macro.database);
@@ -195,10 +195,11 @@ where
                 let host_column_ident = host_column.column_snake_ident();
                 let referenced_column_ident = referenced_column.column_snake_ident();
                 token_stream.extend(quote! {
-                    impl #vertically_same_as_trait<#referenced_schema_module::#referenced_table_ident::#referenced_column_ident> for #table_name_ident::#host_column_ident {}
+                    impl #vertical_same_as<#referenced_schema_module::#referenced_table_ident::#referenced_column_ident> for #table_name_ident::#host_column_ident {}
                 });
             }
-            builder = builder.employed_trait(vertically_same_as_trait.into());
+
+            builder = builder.employed_trait(vertical_same_as.into());
         }
 
         builder

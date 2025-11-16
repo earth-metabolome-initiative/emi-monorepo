@@ -130,13 +130,6 @@ impl<'table, T: TableRelationsLike + ?Sized> TableRelations<'table, T> {
     }
 
     fn read_based_method(&self, foreign_key: &<T::DB as DatabaseLike>::ForeignKey) -> Method {
-        assert!(foreign_key.is_referenced_primary_key(self.database));
-        assert_eq!(
-            foreign_key.host_columns(self.database).count(),
-            foreign_key.referenced_columns(self.database).count(),
-            "Foreign key must have the same number of host and referenced columns: {}",
-            foreign_key.documentation_schema_repr(self.database)
-        );
         let referenced_table: &T = foreign_key.referenced_table(self.database).borrow();
         let referenced_table_model = referenced_table
             .model_ref(self.workspace)

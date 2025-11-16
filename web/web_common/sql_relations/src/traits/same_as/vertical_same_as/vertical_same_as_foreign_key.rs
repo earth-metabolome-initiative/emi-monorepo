@@ -98,13 +98,13 @@ where
     /// "#,
     /// )?;
     /// let parent_table = db.table(None, "parent").unwrap();
-    /// let parent_name = parent_table.column("name").unwrap();
+    /// let parent_name = parent_table.column("name", &db).unwrap();
     /// let child_table = db.table(None, "child").unwrap();
-    /// let child_name = child_table.column("name").unwrap();
+    /// let child_name = child_table.column("name", &db).unwrap();
     /// let vertical_same_as_fk = child_table.vertical_same_as_foreign_keys(&db).next().unwrap();
     /// let (host, referenced) = vertical_same_as_fk.vertical_same_as_column_pair(&db).unwrap();
-    /// assert_eq!(host, &child_name, "Expected host column to be 'name'");
-    /// assert_eq!(referenced, &parent_name, "Expected referenced column to be 'name'");
+    /// assert_eq!(host, child_name, "Expected host column to be 'name'");
+    /// assert_eq!(referenced, parent_name, "Expected referenced column to be 'name'");
     /// # Ok(())
     /// # }
     /// ```

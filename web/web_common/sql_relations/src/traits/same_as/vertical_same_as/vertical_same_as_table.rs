@@ -75,17 +75,17 @@ where
     /// let child_table = db.table(None, "child").unwrap();
     /// let parent_table = db.table(None, "parent").unwrap();
     /// assert!(
-    ///     child_table.has_vertically_same_as(&db),
+    ///     child_table.has_vertical_same_as(&db),
     ///     "Expected child table to have vertical same-as relationship"
     /// );
     /// assert!(
-    ///     !parent_table.has_vertically_same_as(&db),
+    ///     !parent_table.has_vertical_same_as(&db),
     ///     "Expected parent table to not have vertical same-as relationship"
     /// );
     /// # Ok(())
     /// # }
     /// ```
-    fn has_vertically_same_as(&self, database: &Self::DB) -> bool {
+    fn has_vertical_same_as(&self, database: &Self::DB) -> bool {
         self.vertical_same_as_foreign_keys(database).next().is_some()
     }
 }
