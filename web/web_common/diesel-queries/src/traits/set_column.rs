@@ -1,9 +1,9 @@
 //! Helper method for builders.
 
-use crate::traits::GetColumn;
+use crate::traits::MaybeGetColumn;
 
 /// Trait for setting a column from a Diesel model builder.
-pub trait SetColumn<C: diesel::Column>: GetColumn<C> {
+pub trait SetColumn<C: diesel::Column>: MaybeGetColumn<C> {
     /// The error type returned when setting the column.
     type Error: std::error::Error;
 

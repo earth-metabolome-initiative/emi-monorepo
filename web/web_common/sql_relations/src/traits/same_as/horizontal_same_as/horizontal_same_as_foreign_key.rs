@@ -2,7 +2,7 @@
 //! determining whether a foreign key relationship is a horizontal same-as
 //! relationship.
 
-use sql_traits::traits::{ColumnLike, DatabaseLike};
+use sql_traits::traits::DatabaseLike;
 
 use crate::traits::{SameAsIndexLike, VerticalSameAsForeignKeyLike};
 
@@ -95,6 +95,9 @@ pub trait HorizontalSameAsForeignKeyLike: VerticalSameAsForeignKeyLike {
     /// let child_name = child_table
     ///     .column("child_name", &db)
     ///     .expect("Column 'child_name' should exist in child table");
+    /// let brother_id = child_table
+    ///     .column("brother_id", &db)
+    ///     .expect("Column 'brother_id' should exist in child table");
     /// let foreign_keys = child_table.foreign_keys(&db).collect::<Vec<_>>();
     /// let [pk_fk, vertical_fk, horizontal_fk] = &foreign_keys.as_slice() else {
     ///     panic!("Expected exactly 3 foreign keys in child table");
@@ -107,7 +110,7 @@ pub trait HorizontalSameAsForeignKeyLike: VerticalSameAsForeignKeyLike {
     ///
     /// assert_eq!(
     ///     horizontal_fk.horizontal_same_as_column_pair(&db),
-    ///     Some((child_name, brother_name)),
+    ///     Some((brother_id, child_name, brother_name)),
     ///     "Expected horizontal same-as column pair to be (brother.name, child.name)"
     /// );
     ///
@@ -117,14 +120,24 @@ pub trait HorizontalSameAsForeignKeyLike: VerticalSameAsForeignKeyLike {
     fn horizontal_same_as_column_pair<'db>(
         &'db self,
         database: &'db Self::DB,
-    ) -> Option<(&'db <Self::DB as DatabaseLike>::Column, &'db <Self::DB as DatabaseLike>::Column)>
-    {
+    ) -> Option<(
+        &'db <Self::DB as DatabaseLike>::Column,
+        &'db <Self::DB as DatabaseLike>::Column,
+        &'db <Self::DB as DatabaseLike>::Column,
+    )> {
         if !self.is_horizontal_same_as(database) {
             return None;
         }
-        self.host_columns(database)
-            .zip(self.referenced_columns(database))
-            .find(|(_, referenced_column)| !referenced_column.is_primary_key(database))
+
+        let host_columns = self.host_columns(database).collect::<Vec<_>>();
+        let [host_fk_column, host_column] = host_columns.as_slice() else {
+            return None;
+        };
+        let referenced_columns = self.referenced_columns(database).collect::<Vec<_>>();
+        let [_foreign_pk, referenced_column] = referenced_columns.as_slice() else {
+            return None;
+        };
+        Some((host_fk_column, host_column, referenced_column))
     }
 }
 
