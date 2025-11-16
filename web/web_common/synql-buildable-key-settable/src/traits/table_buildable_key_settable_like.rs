@@ -1,6 +1,7 @@
 //! Submodule providing the `TableBuildableKeySettableLike` trait for SynQL
 //! table models.
 
+use sql_relations::traits::HorizontalSameAsColumnLike;
 use sql_traits::traits::{ColumnLike, DatabaseLike, ForeignKeyLike};
 use syn::Ident;
 use synql_core::structs::{TraitVariantRef, Workspace};
@@ -68,6 +69,7 @@ pub trait TableBuildableKeySettableLike: TableModelLike {
             };
             if covered_columns.contains(&host_column)
                 || host_column.is_generated()
+                || host_column.has_horizontal_same_as_foreign_key(database)
                 || host_column.is_primary_key(database)
             {
                 return false;

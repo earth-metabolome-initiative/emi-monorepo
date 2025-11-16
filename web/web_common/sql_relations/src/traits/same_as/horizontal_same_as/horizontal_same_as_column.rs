@@ -56,6 +56,42 @@ where
             fk.host_columns(database).map(Borrow::borrow).any(|col: &Self| col == self)
         })
     }
+
+    /// Returns whether the column has any horizontal same-as foreign key.
+    ///
+    /// # Arguments
+    /// * `database` - The database containing the tables and foreign keys.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_relations::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE right (id SERIAL PRIMARY KEY, name TEXT, age INT, UNIQUE(id, name), UNIQUE(id, age));
+    /// CREATE TABLE left (
+    ///     id SERIAL PRIMARY KEY,
+    ///     right_id INTEGER REFERENCES right(id),
+    ///     name TEXT,
+    ///     age INT,
+    ///     FOREIGN KEY (right_id, name) REFERENCES right(id, name),
+    ///     FOREIGN KEY (right_id, age) REFERENCES right(id, age)
+    /// );
+    ///   "#,
+    /// )?;
+    /// let left_table = db.table(None, "left").unwrap();
+    /// let name_column = left_table.column("name", &db).expect("Column 'name' should exist");
+    /// let age_column = left_table.column("age", &db).expect("Column 'age' should exist");
+    /// assert!(name_column.has_horizontal_same_as_foreign_key(&db));
+    /// assert!(age_column.has_horizontal_same_as_foreign_key(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_horizontal_same_as_foreign_key(&self, database: &Self::DB) -> bool {
+        self.horizontal_same_as_foreign_keys(database).next().is_some()
+    }
 }
 
 impl<T> HorizontalSameAsColumnLike for T
