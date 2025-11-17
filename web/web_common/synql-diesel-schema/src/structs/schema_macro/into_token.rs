@@ -192,39 +192,13 @@ where
                 let (host_column, referenced_column) =
                     fk.vertical_same_as_column_pair(schema_macro.database).unwrap();
                 let host_column_ident = host_column.column_snake_ident();
-                let referenced_column_path =
-                    referenced_column.column_path(schema_macro.database).unwrap();
+                let referenced_column_path = referenced_column.column_path(schema_macro.database);
                 token_stream.extend(quote! {
                     impl #vertical_same_as<#referenced_column_path> for #table_name_ident::#host_column_ident {}
                 });
             }
 
             builder = builder.employed_trait(vertical_same_as.into());
-        }
-
-        if schema_macro.table.has_horizontal_same_as(schema_macro.database) {
-            let horizontal_same_as = schema_macro
-                .workspace
-                .external_trait("HorizontalSameAs")
-                .expect("Failed to find the HorizontalSameAs trait");
-
-            for fk in schema_macro.table.horizontal_same_as_foreign_keys(schema_macro.database) {
-                let (host_foreign_key_column, host_column, referenced_column) =
-                    fk.horizontal_same_as_column_pair(schema_macro.database).unwrap();
-                let foreign_key_column_ident = host_foreign_key_column.column_snake_ident();
-                let host_column_ident = host_column.column_snake_ident();
-                let referenced_column_path = if fk.is_self_referential(schema_macro.database) {
-                    let referenced_column_ident = referenced_column.column_snake_ident();
-                    syn::parse_quote!(#table_name_ident::#referenced_column_ident)
-                } else {
-                    referenced_column.column_path(schema_macro.database).unwrap()
-                };
-                token_stream.extend(quote! {
-                    impl #horizontal_same_as<#referenced_column_path, #table_name_ident::#foreign_key_column_ident> for #table_name_ident::#host_column_ident {}
-                });
-            }
-
-            builder = builder.employed_trait(horizontal_same_as.into());
         }
 
         builder

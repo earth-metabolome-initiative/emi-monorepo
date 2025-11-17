@@ -16,25 +16,24 @@ static DIESEL_QUERIES_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
 impl ExternalCrate {
     /// Helper function to create a diesel-queries trait without generic
     /// parameters.
-    fn create_diesel_queries_trait(
-        name: &str,
-    ) -> Result<ExternalTrait, Box<dyn std::error::Error>> {
-        let path: syn::Path = syn::parse_str(&format!("diesel_queries::prelude::{}", name))?;
-        Ok(ExternalTrait::new().name(name)?.path(path).build()?)
+    fn create_diesel_queries_trait(name: &str) -> ExternalTrait {
+        let path: syn::Path =
+            syn::parse_str(&format!("diesel_queries::prelude::{}", name)).unwrap();
+        ExternalTrait::new().name(name).unwrap().path(path).build().unwrap()
     }
 
     /// Helper function to create a diesel-queries trait with a single generic
     /// parameter.
-    fn create_diesel_queries_trait_with_generic(
-        name: &str,
-        generic_name: &str,
-    ) -> Result<ExternalTrait, Box<dyn std::error::Error>> {
-        let path: syn::Path = syn::parse_str(&format!("diesel_queries::prelude::{}", name))?;
-        Ok(ExternalTrait::new()
-            .name(name)?
+    fn create_diesel_queries_trait_with_generic(name: &str, generic_name: &str) -> ExternalTrait {
+        let path: syn::Path =
+            syn::parse_str(&format!("diesel_queries::prelude::{}", name)).unwrap();
+        ExternalTrait::new()
+            .name(name)
+            .unwrap()
             .path(path)
             .generic(generic_type(generic_name))
-            .build()?)
+            .build()
+            .unwrap()
     }
 
     /// Helper function to create a diesel-queries trait with multiple generic
@@ -42,10 +41,11 @@ impl ExternalCrate {
     fn create_diesel_queries_trait_with_generics(
         name: &str,
         generic_names: &[&str],
-    ) -> Result<ExternalTrait, Box<dyn std::error::Error>> {
-        let path: syn::Path = syn::parse_str(&format!("diesel_queries::prelude::{}", name))?;
+    ) -> ExternalTrait {
+        let path: syn::Path =
+            syn::parse_str(&format!("diesel_queries::prelude::{}", name)).unwrap();
         let generics: Vec<_> = generic_names.iter().map(|&n| generic_type(n)).collect();
-        Ok(ExternalTrait::new().name(name)?.path(path).generics(generics).build()?)
+        ExternalTrait::new().name(name).unwrap().path(path).generics(generics).build().unwrap()
     }
 
     /// Returns the cached `ExternalCrate` instance describing the
@@ -59,65 +59,56 @@ impl ExternalCrate {
                         .unwrap()
                         .add_traits([
                             // Read trait
-                            Self::create_diesel_queries_trait_with_generic("Read", "C").unwrap(),
+                            Self::create_diesel_queries_trait_with_generic("Read", "C"),
                             // Extension traits
                             Self::create_diesel_queries_trait_with_generic(
                                 "ExtensionOf",
                                 "Extended",
-                            )
-                            .unwrap(),
+                            ),
                             Self::create_diesel_queries_trait_with_generic(
                                 "TableIsExtensionOf",
                                 "Extended",
-                            )
-                            .unwrap(),
+                            ),
                             Self::create_diesel_queries_trait_with_generics(
                                 "Ancestor",
                                 &["Extended", "C"],
-                            )
-                            .unwrap(),
+                            ),
                             // SameAs traits
                             Self::create_diesel_queries_trait_with_generic(
                                 "VerticalSameAs",
                                 "Ancestral",
-                            )
-                            .unwrap(),
+                            ),
                             Self::create_diesel_queries_trait_with_generics(
                                 "HorizontalSameAs",
                                 &["Referenced", "Key"],
-                            )
-                            .unwrap(),
+                            ),
                             // Column accessor traits
-                            Self::create_diesel_queries_trait("TypedColumn").unwrap(),
-                            Self::create_diesel_queries_trait_with_generic("GetColumn", "C")
-                                .unwrap(),
-                            Self::create_diesel_queries_trait_with_generic("MaybeGetColumn", "C")
-                                .unwrap(),
+                            Self::create_diesel_queries_trait("TypedColumn"),
+                            Self::create_diesel_queries_trait_with_generic("GetColumn", "C"),
+                            Self::create_diesel_queries_trait_with_generic("MaybeGetColumn", "C"),
                             // SetColumn traits
-                            Self::create_diesel_queries_trait_with_generic("SetColumn", "C")
-                                .unwrap(),
-                            Self::create_diesel_queries_trait_with_generic("TrySetColumn", "C")
-                                .unwrap(),
+                            Self::create_diesel_queries_trait_with_generic("SetColumn", "C"),
+                            Self::create_diesel_queries_trait_with_generic("TrySetColumn", "C"),
+                            Self::create_diesel_queries_trait_with_generics(
+                                "ForeignKey",
+                                &["Left", "Right"],
+                            ),
                             Self::create_diesel_queries_trait_with_generics(
                                 "SetHorizontalColumn",
                                 &["HostColumn", "Referenced", "Key"],
-                            )
-                            .unwrap(),
+                            ),
                             Self::create_diesel_queries_trait_with_generics(
                                 "TrySetHorizontalColumn",
                                 &["HostColumn", "Referenced", "Key"],
-                            )
-                            .unwrap(),
+                            ),
                             Self::create_diesel_queries_trait_with_generics(
                                 "SetVerticalColumn",
                                 &["HostColumn", "AncestorColumn"],
-                            )
-                            .unwrap(),
+                            ),
                             Self::create_diesel_queries_trait_with_generics(
                                 "TrySetVerticalColumn",
                                 &["HostColumn", "AncestorColumn"],
-                            )
-                            .unwrap(),
+                            ),
                         ])
                         .unwrap()
                         .git(

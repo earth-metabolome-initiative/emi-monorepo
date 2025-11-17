@@ -46,20 +46,18 @@ pub trait ColumnSchema: ColumnSynLike + Sized {
     }
 
     /// Returns the `syn::Path` to the column in the table schema module.
-    fn column_path(&self, database: &Self::DB) -> Option<syn::Path>
+    fn column_path(&self, database: &Self::DB) -> syn::Path
     where
         <Self::DB as DatabaseLike>::Table: TableSchema,
     {
         let table: &<Self::DB as DatabaseLike>::Table = ColumnLike::table(self, database);
-        let crate_name = table.table_schema_crate_name();
-        let table_name = table.table_snake_name();
-        let column_name = self.column_snake_name();
+        let crate_name = table.table_schema_crate_ident();
+        let table_name = table.table_snake_ident();
+        let column_name = self.column_snake_ident();
 
-        let path: syn::Path =
-            syn::parse_str(&format!("{}::schema::{}::{}", crate_name, table_name, column_name))
-                .ok()?;
-
-        Some(path)
+        syn::parse_quote!(
+            #crate_name::schema::#table_name::#column_name
+        )
     }
 }
 

@@ -22,6 +22,13 @@ pub trait TableSchema: TableSynLike + Sized {
         format!("{}_schema", self.table_snake_name())
     }
 
+    /// Returns the identifier of the crate which will contain the diesel
+    /// schema for the table.
+    #[inline]
+    fn table_schema_crate_ident(&self) -> syn::Ident {
+        syn::Ident::new(&self.table_schema_crate_name(), proc_macro2::Span::call_site())
+    }
+
     /// Returns the `SchemaMacro` representing the diesel schema for the table.
     ///
     /// # Arguments

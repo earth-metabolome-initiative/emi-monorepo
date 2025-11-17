@@ -44,6 +44,7 @@ pub trait SetHorizontalColumn<
     Key: TypedColumn<Table = HostColumn::Table>,
 >: SetColumn<HostColumn>
 {
+    #[inline]
     /// Sets the horizontal same-as column.
     fn set_horizontal(self, referred: &dyn MaybeGetColumn<Referenced>) -> Self {
         if let Some(value) = referred.maybe_get_column() { self.set(value.clone()) } else { self }
@@ -102,6 +103,7 @@ where
     HostColumn: ForeignKeyCompatibleColumn<AncestorColumn>,
     HostColumn::Type: ForeignKeyCompatibleType<AncestorColumn::Type>,
 {
+    #[inline]
     /// Sets the vertical same-as column.
     fn set_vertical(self) -> Self {
         if let Some(value) = self.maybe_get_column().cloned().and_then(|v| v.optionify()) {
@@ -130,6 +132,7 @@ pub trait TrySetVerticalColumn<
     HostColumn: ForeignKeyCompatibleColumn<AncestorColumn>,
     HostColumn::Type: ForeignKeyCompatibleType<AncestorColumn::Type>,
 {
+    #[inline]
     /// Sets the vertical same-as column.
     ///
     /// # Errors

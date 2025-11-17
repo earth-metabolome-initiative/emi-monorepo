@@ -27,8 +27,9 @@ where
                     .build()
                     .unwrap(),
             )
-            .internal_tokens(schema_macro.typed_column_impls())
             .internal_token(schema_macro.into())
+            .internal_tokens(schema_macro.typed_column_impls())
+            .internal_tokens(schema_macro.foreign_key_impls())
             .build()
             .unwrap()
     }

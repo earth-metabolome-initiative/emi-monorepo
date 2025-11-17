@@ -153,7 +153,7 @@ impl<'table, T: TableModelLike + ?Sized> TableModel<'table, T> {
             self.workspace.external_trait("GetColumn").expect("Failed to get GetColumn trait");
 
         for column in self.table.columns(self.database) {
-            let column_path = column.column_path(self.database).unwrap();
+            let column_path = column.column_path(self.database);
             let column_type = column.rust_type(self.workspace, self.database).unwrap();
             let column_ident = column.column_snake_ident();
 

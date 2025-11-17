@@ -2,11 +2,14 @@
 //! can be printed out in the context of a `quote` macro.
 
 use quote::ToTokens;
+use sql_traits::traits::ForeignKeyLike;
 use synql_core::{
     prelude::Builder,
     structs::{InternalToken, Workspace},
     traits::{ColumnSynLike, TableSynLike},
 };
+
+use crate::traits::ColumnSchema;
 
 mod into_crate;
 mod into_module;
@@ -66,6 +69,56 @@ impl<'table, T: TableSynLike> SchemaMacro<'table, T> {
         }
 
         typed_column_impls
+    }
+
+    /// Generates implementations of the `ForeignKey` trait for all columns in
+    /// the table.
+    fn foreign_key_impls(&self) -> Vec<InternalToken> {
+        use quote::quote;
+
+        let mut foreign_key_impls = Vec::new();
+
+        let Some(foreign_key_trait) = self.workspace.external_trait("ForeignKey") else {
+            return foreign_key_impls;
+        };
+
+        let table_ident = self.table.table_snake_ident();
+
+        for fk in self.table.foreign_keys(self.database) {
+            let left: Vec<syn::Path> = fk
+                .host_columns(self.database)
+                .map(|column| {
+                    let column_snake_ident = column.column_snake_ident();
+                    syn::parse_quote!(#table_ident::#column_snake_ident)
+                })
+                .collect();
+
+            let right: Vec<syn::Path> = if fk.is_self_referential(self.database) {
+                fk.referenced_columns(self.database)
+                    .map(|column| {
+                        let column_snake_ident = column.column_snake_ident();
+                        syn::parse_quote!(#table_ident::#column_snake_ident)
+                    })
+                    .collect()
+            } else {
+                fk.referenced_columns(self.database)
+                    .map(|column| column.column_path(self.database))
+                    .collect()
+            };
+
+            let foreign_key_impl = InternalToken::new()
+                .private()
+                .stream(quote! {
+                    impl #foreign_key_trait<(#(#left,)*), (#(#right,)*)> for #table_ident::table {}
+                })
+                .implemented_trait(foreign_key_trait.clone().into())
+                .build()
+                .unwrap();
+
+            foreign_key_impls.push(foreign_key_impl);
+        }
+
+        foreign_key_impls
     }
 }
 
