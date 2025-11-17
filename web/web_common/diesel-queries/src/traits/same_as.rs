@@ -5,10 +5,7 @@ use diesel::Table;
 use crate::traits::{ForeignKey, ForeignKeyCompatibleColumn, TableIsExtensionOf, TypedColumn};
 
 /// Trait defining the existance of an horizontal same-as relationship.
-pub trait HorizontalSameAs<Referenced: TypedColumn, Key>:
-    ForeignKeyCompatibleColumn<Referenced>
-{
-}
+pub trait HorizontalSameAs<Referenced, Key>: TypedColumn {}
 
 impl<HostColumn, Referenced, Key> HorizontalSameAs<Referenced, Key> for HostColumn
 where

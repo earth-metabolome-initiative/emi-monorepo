@@ -104,8 +104,8 @@ where
 {
     /// Sets the vertical same-as column.
     fn set_vertical(self) -> Self {
-        if let Some(value) = self.maybe_get_column().cloned() {
-            self.set(value.into())
+        if let Some(value) = self.maybe_get_column().cloned().and_then(|v| v.optionify()) {
+            self.set(value)
         } else {
             self
         }
@@ -136,8 +136,8 @@ pub trait TrySetVerticalColumn<
     ///
     /// Returns an error if the column cannot be set.
     fn try_set_vertical(self) -> Result<Self, Self::Error> {
-        if let Some(value) = self.maybe_get_column().cloned() {
-            self.try_set(value.into())
+        if let Some(value) = self.maybe_get_column().cloned().and_then(|v| v.optionify()) {
+            self.try_set(value)
         } else {
             Ok(self)
         }

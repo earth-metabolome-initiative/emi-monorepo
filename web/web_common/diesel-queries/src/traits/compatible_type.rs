@@ -13,13 +13,29 @@ impl<T> ForeignKeyCompatibleSqlType<T> for diesel::sql_types::Nullable<T> {}
 
 /// Defines a trait for determining whether two types are compatible
 /// for a foreign key relationship in Diesel.
-pub trait ForeignKeyCompatibleType<Other>: Into<Other> {}
+pub trait ForeignKeyCompatibleType<Other> {
+    /// Converts self into an Option of the other type.
+    fn optionify(self) -> Option<Other>;
+}
 
-impl<T> ForeignKeyCompatibleType<T> for T {}
-impl<T> ForeignKeyCompatibleType<Option<T>> for T {}
+impl<T> ForeignKeyCompatibleType<T> for T {
+    fn optionify(self) -> Option<Self> {
+        Some(self)
+    }
+}
+impl<T> ForeignKeyCompatibleType<Option<T>> for T {
+    fn optionify(self) -> Option<Option<T>> {
+        Some(Some(self))
+    }
+}
+impl<T> ForeignKeyCompatibleType<T> for Option<T> {
+    fn optionify(self) -> Option<T> {
+        self
+    }
+}
 
 /// Helper trait for a single compatible type.
-pub trait ForeignKeyCompatibleColumn<Other: TypedColumn>: TypedColumn {}
+pub trait ForeignKeyCompatibleColumn<Other>: TypedColumn {}
 
 impl<C1, C2> ForeignKeyCompatibleColumn<C2> for C1
 where
