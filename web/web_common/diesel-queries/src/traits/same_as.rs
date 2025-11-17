@@ -1,19 +1,20 @@
 //! Handles same-as updates for Diesel model builders.
 
-use crate::traits::TableIsExtensionOf;
+use crate::traits::{TableIsExtensionOf, TypedColumn};
 
 /// Trait defining the existance of an horizontal same-as relationship.
 pub trait HorizontalSameAs<
-    Referenced: diesel::Column,
+    Referenced: TypedColumn<SqlType = Self::SqlType, Type = Self::Type>,
 	// The key in the current table that references the Referenced column
-    Key: diesel::Column<Table = Self::Table>,
->: diesel::Column
+    Key: TypedColumn<Table = Self::Table>,
+>: TypedColumn
 {
 }
 
 /// Trait defining the existance of a vertical same-as relationship.
-pub trait VerticalSameAs<Referenced: diesel::Column>: diesel::Column
+pub trait VerticalSameAs<Ancestral: TypedColumn<SqlType = Self::SqlType, Type = Self::Type>>:
+    TypedColumn
 where
-    Self::Table: TableIsExtensionOf<Referenced::Table>,
+    Self::Table: TableIsExtensionOf<Ancestral::Table>,
 {
 }

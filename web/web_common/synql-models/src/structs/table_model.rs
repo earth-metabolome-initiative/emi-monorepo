@@ -5,7 +5,9 @@ use synql_core::{
     prelude::{Builder, ForeignKeyLike},
     structs::{Decorator, Derive, InternalData, InternalToken},
     traits::ColumnSynLike,
+    utils::generic_type,
 };
+use synql_diesel_schema::traits::ColumnSchema;
 
 mod into_crate;
 mod into_data;
@@ -142,6 +144,39 @@ impl<'table, T: TableModelLike + ?Sized> TableModel<'table, T> {
                 .build()
                 .unwrap(),
         )
+    }
+
+    fn get_column_impls(&self) -> Vec<InternalToken> {
+        let mut get_column_impls = Vec::new();
+        let table_model = self.table.table_singular_camel_ident();
+
+        let get_column =
+            self.workspace.external_trait("GetColumn").expect("Failed to get GetColumn trait");
+
+        for column in self.table.columns(self.database) {
+            let column_path = column.column_path(self.database).unwrap();
+            let column_type = column.rust_type(self.workspace, self.database).unwrap();
+            let column_ident = column.column_snake_ident();
+
+            let get_column = get_column.set_generic_field(&generic_type("C")).unwrap();
+
+            let get_column_impl = InternalToken::new()
+                .private()
+                .stream(quote! {
+                    impl #get_column for #table_model {
+                        fn get_column(&self) -> &Self::ColumnType {
+                            &self.#column_ident
+                        }
+                    }
+                })
+                .implemented_trait(get_column.into())
+                .build()
+                .unwrap();
+
+            get_column_impls.push(get_column_impl);
+        }
+
+        get_column_impls
     }
 
     fn extension_of_impls(&self) -> Vec<InternalToken> {
