@@ -3,8 +3,9 @@
 
 use quote::ToTokens;
 use synql_core::{
+    prelude::Builder,
     structs::{InternalToken, Workspace},
-    traits::TableSynLike,
+    traits::{ColumnSynLike, TableSynLike},
 };
 
 mod into_crate;
@@ -28,6 +29,43 @@ impl<'table, T: TableSynLike> SchemaMacro<'table, T> {
         database: &'table T::DB,
     ) -> Self {
         Self { table, workspace, database }
+    }
+
+    /// Generates implementations of the `TypedColumn` trait for all columns in
+    /// the table.
+    fn typed_column_impls(&self) -> Vec<InternalToken> {
+        use quote::quote;
+
+        let mut typed_column_impls = Vec::new();
+
+        let Some(typed_column_trait) = self.workspace.external_trait("TypedColumn") else {
+            return typed_column_impls;
+        };
+
+        let table_ident = self.table.table_snake_ident();
+
+        for column in self.table.columns(self.database) {
+            let column_snake_ident = column.column_snake_ident();
+            let column_path: syn::Path = syn::parse_quote!(#table_ident::#column_snake_ident);
+            let Some(column_type) = column.rust_type(self.workspace, self.database) else {
+                continue;
+            };
+
+            let typed_column_impl = InternalToken::new()
+                .private()
+                .stream(quote! {
+                    impl #typed_column_trait for #column_path {
+                        type Type = #column_type;
+                    }
+                })
+                .implemented_trait(typed_column_trait.clone().into())
+                .build()
+                .unwrap();
+
+            typed_column_impls.push(typed_column_impl);
+        }
+
+        typed_column_impls
     }
 }
 

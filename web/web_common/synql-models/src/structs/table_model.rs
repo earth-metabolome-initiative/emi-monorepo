@@ -5,7 +5,6 @@ use synql_core::{
     prelude::{Builder, ForeignKeyLike},
     structs::{Decorator, Derive, InternalData, InternalToken},
     traits::ColumnSynLike,
-    utils::generic_type,
 };
 use synql_diesel_schema::traits::ColumnSchema;
 
@@ -158,18 +157,16 @@ impl<'table, T: TableModelLike + ?Sized> TableModel<'table, T> {
             let column_type = column.rust_type(self.workspace, self.database).unwrap();
             let column_ident = column.column_snake_ident();
 
-            let get_column = get_column.set_generic_field(&generic_type("C")).unwrap();
-
             let get_column_impl = InternalToken::new()
                 .private()
                 .stream(quote! {
-                    impl #get_column for #table_model {
-                        fn get_column(&self) -> &Self::ColumnType {
+                    impl #get_column<#column_path> for #table_model {
+                        fn get_column(&self) -> &#column_type {
                             &self.#column_ident
                         }
                     }
                 })
-                .implemented_trait(get_column.into())
+                .implemented_trait(get_column.clone().into())
                 .build()
                 .unwrap();
 

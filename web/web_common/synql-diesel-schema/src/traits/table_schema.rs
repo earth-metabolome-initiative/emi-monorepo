@@ -35,7 +35,7 @@ pub trait TableSchema: TableSynLike + Sized {
     /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// # use synql_diesel_schema::prelude::*;
     /// use quote::{ToTokens, quote};
-    /// let workspace = Workspace::new().name("my_workspace")?.core()?.std()?.build()?;
+    /// let workspace = Workspace::new().name("my_workspace")?.core().std().diesel().build()?;
     ///
     /// let db = ParserDB::try_from(
     ///     "CREATE TABLE my_table (id INT PRIMARY KEY NOT NULL, name TEXT NOT NULL, age INT);",

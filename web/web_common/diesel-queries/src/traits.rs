@@ -13,3 +13,9 @@ pub use set_column::{
 };
 pub mod same_as;
 pub use same_as::{HorizontalSameAs, VerticalSameAs};
+pub mod foreign_key;
+pub use foreign_key::ForeignKey;
+pub mod columns;
+pub use columns::Columns;
+pub mod compatible_type;
+pub use compatible_type::*;

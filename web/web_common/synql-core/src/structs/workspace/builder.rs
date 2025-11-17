@@ -95,7 +95,7 @@ impl WorkspaceBuilder {
     ///
     /// # Arguments
     /// * `name` - The name of the workspace.
-    pub fn name<S: ToString>(mut self, name: &S) -> Result<Self, WorkspaceBuilderError> {
+    pub fn name<S: ToString + ?Sized>(mut self, name: &S) -> Result<Self, WorkspaceBuilderError> {
         let name = name.to_string();
         if name.trim().is_empty() || name.contains(' ') {
             return Err(WorkspaceBuilderError::InvalidName);

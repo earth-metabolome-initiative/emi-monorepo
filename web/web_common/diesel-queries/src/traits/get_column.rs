@@ -1,7 +1,7 @@
 //! Helper method for builders.
 
 /// The rust type for a column.
-pub trait TypedColumn: diesel::Column {
+pub trait TypedColumn: diesel::Column + Sized {
     /// The rust type of the column.
     type Type: Clone;
 }

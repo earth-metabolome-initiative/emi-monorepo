@@ -30,6 +30,7 @@ where
             )
             .public()
             .internal_tokens(table_model.extension_of_impls())
+            .internal_tokens(table_model.get_column_impls())
             .data(table_model.into())
             .expect("Failed to add the internal data to module")
             .build()

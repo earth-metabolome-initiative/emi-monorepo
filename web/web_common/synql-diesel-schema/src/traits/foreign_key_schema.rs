@@ -42,7 +42,7 @@ pub trait ForeignKeySchema: ForeignKeySynLike + Sized {
     /// let doc_repr = foreign_key.documentation_schema_repr(&db);
     /// assert_eq!(
     ///     doc_repr,
-    ///     "[`host_id`](host_table_schema::schema::host_table::host_id) -> [`id`](referenced_table_schema::schema::referenced_table::id), [`host_name`](host_table_schema::schema::host_table::host_name) -> [`name`](referenced_table_schema::schema::referenced_table::name)"
+    ///     "([`host_id`](host_table_schema::schema::host_table::host_id), [`host_name`](host_table_schema::schema::host_table::host_name)) -> ([`id`](referenced_table_schema::schema::referenced_table::id), [`name`](referenced_table_schema::schema::referenced_table::name))"
     /// );
     /// # Ok(())
     /// # }
