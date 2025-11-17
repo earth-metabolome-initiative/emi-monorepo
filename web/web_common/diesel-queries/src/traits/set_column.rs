@@ -1,7 +1,8 @@
 //! Helper method for builders.
 
 use crate::traits::{
-    HorizontalSameAs, MaybeGetColumn, TableIsExtensionOf, VerticalSameAs, get_column::TypedColumn,
+    ForeignKeyCompatibleColumn, ForeignKeyCompatibleType, HorizontalSameAs, MaybeGetColumn,
+    TableIsExtensionOf, VerticalSameAs, get_column::TypedColumn,
 };
 
 /// Trait for setting a column from a Diesel model builder which cannot fail.
@@ -94,15 +95,20 @@ where
 
 /// Trait for setting a vertical same-as column from a Diesel model builder
 /// which cannot fail.
-pub trait SetVerticalColumn<
-    HostColumn: VerticalSameAs<AncestorColumn>,
-    AncestorColumn: TypedColumn<SqlType = HostColumn::SqlType, Type = HostColumn::Type>,
->: SetColumn<AncestorColumn> + MaybeGetColumn<HostColumn> where
+pub trait SetVerticalColumn<HostColumn: VerticalSameAs<AncestorColumn>, AncestorColumn: TypedColumn>:
+    SetColumn<AncestorColumn> + MaybeGetColumn<HostColumn>
+where
     HostColumn::Table: TableIsExtensionOf<AncestorColumn::Table>,
+    HostColumn: ForeignKeyCompatibleColumn<AncestorColumn>,
+    HostColumn::Type: ForeignKeyCompatibleType<AncestorColumn::Type>,
 {
     /// Sets the vertical same-as column.
     fn set_vertical(self) -> Self {
-        if let Some(value) = self.maybe_get_column().cloned() { self.set(value) } else { self }
+        if let Some(value) = self.maybe_get_column().cloned() {
+            self.set(value.into())
+        } else {
+            self
+        }
     }
 }
 
@@ -118,9 +124,11 @@ where
 /// Trait for setting a vertical same-as column from a Diesel model builder.
 pub trait TrySetVerticalColumn<
     HostColumn: VerticalSameAs<AncestorColumn>,
-    AncestorColumn: TypedColumn<SqlType = HostColumn::SqlType, Type = HostColumn::Type>,
+    AncestorColumn: TypedColumn,
 >: TrySetColumn<AncestorColumn> + MaybeGetColumn<HostColumn> where
     HostColumn::Table: TableIsExtensionOf<AncestorColumn::Table>,
+    HostColumn: ForeignKeyCompatibleColumn<AncestorColumn>,
+    HostColumn::Type: ForeignKeyCompatibleType<AncestorColumn::Type>,
 {
     /// Sets the vertical same-as column.
     ///
@@ -129,7 +137,7 @@ pub trait TrySetVerticalColumn<
     /// Returns an error if the column cannot be set.
     fn try_set_vertical(self) -> Result<Self, Self::Error> {
         if let Some(value) = self.maybe_get_column().cloned() {
-            self.try_set(value)
+            self.try_set(value.into())
         } else {
             Ok(self)
         }

@@ -1,36 +1,36 @@
 # Time Report for EMI Workspace Generation Test
 
-The total time spent on all tasks was a minute.
-The slowest task was `Checking Generated Workspace` which took 53 seconds, 415 ms, 561 µs and 906 ns (85.18% of all time).
+The total time spent on all tasks was 29 seconds.
+The slowest task was `Checking Generated Workspace` which took 19 seconds, 307 ms, 101 µs and 840 ns (66.03% of all time).
 
 | name                         | time                                  | percentage | comment |
 |------------------------------|---------------------------------------|------------|---------|
-| Database Parsing             | 3 seconds, 679 ms, 710 µs and 818 ns  | 5.87%      |         |
-| Schema Validation            | 930 ms, 579 µs and 145 ns             | 1.48%      |         |
-| SQL Workspace Generation     | 1 second, 836 ms, 130 µs and 267 ns   | 2.93%      |         |
-| Formatting Workspace         | 2 seconds, 846 ms, 479 µs and 854 ns  | 4.54%      |         |
-| Checking Generated Workspace | 53 seconds, 415 ms, 561 µs and 906 ns | 85.18%     |         |
+| Database Parsing             | 3 seconds, 375 ms, 857 µs and 890 ns  | 11.55%     |         |
+| Schema Validation            | 959 ms, 385 µs and 503 ns             | 3.28%      |         |
+| SQL Workspace Generation     | 2 seconds, 840 ms, 631 µs and 796 ns  | 9.72%      |         |
+| Formatting Workspace         | 2 seconds, 755 ms, 423 µs and 66 ns   | 9.42%      |         |
+| Checking Generated Workspace | 19 seconds, 307 ms, 101 µs and 840 ns | 66.03%     |         |
 
 ## Time Report for SQL Workspace Generation
 
 The total time spent on all tasks was now.
-The slowest task was `workspace_write_to_disk` which took 625 ms, 70 µs and 410 ns (34.04% of all time).
+The slowest task was `workspace_write_to_disk` which took 1 second, 638 ms, 226 µs and 469 ns (57.67% of all time).
 
-| name                          | time                      | percentage | comment |
-|-------------------------------|---------------------------|------------|---------|
-| schema_macro                  | 25 ms, 602 µs and 21 ns   | 1.39%      |         |
-| model                         | 557 ms, 52 µs and 901 ns  | 30.34%     |         |
-| transitive_extension_trait    | 5 ms, 363 µs and 482 ns   | 0.29%      |         |
-| relations_trait               | 14 ms, 334 µs and 732 ns  | 0.78%      |         |
-| attributes                    | 17 ms, 822 µs and 186 ns  | 0.97%      |         |
-| value_settable_trait          | 5 ms, 705 µs and 417 ns   | 0.31%      |         |
-| insertable_key_settable_trait | 8 ms, 703 µs and 408 ns   | 0.47%      |         |
-| buildable_key_settable_trait  | 24 ms, 864 µs and 246 ns  | 1.35%      |         |
-| insertable                    | 30 ms, 988 µs and 821 ns  | 1.69%      |         |
-| buildable                     | 209 ms, 122 µs and 312 ns | 11.39%     |         |
-| extension_attributes          | 11 ms, 933 µs and 800 ns  | 0.65%      |         |
-| workspace_write_to_disk       | 625 ms, 70 µs and 410 ns  | 34.04%     |         |
-| workspace_toml                | 299 ms, 451 µs and 86 ns  | 16.31%     |         |
-| workspace_rustfmt             | 115 µs and 445 ns         | 0.01%      |         |
+| name                          | time                                | percentage | comment |
+|-------------------------------|-------------------------------------|------------|---------|
+| schema_macro                  | 25 ms, 622 µs and 625 ns            | 0.90%      |         |
+| model                         | 560 ms, 94 µs and 836 ns            | 19.72%     |         |
+| transitive_extension_trait    | 5 ms, 29 µs and 611 ns              | 0.18%      |         |
+| relations_trait               | 14 ms, 262 µs and 871 ns            | 0.50%      |         |
+| attributes                    | 17 ms, 859 µs and 41 ns             | 0.63%      |         |
+| value_settable_trait          | 5 ms, 740 µs and 499 ns             | 0.20%      |         |
+| insertable_key_settable_trait | 8 ms, 675 µs and 301 ns             | 0.31%      |         |
+| buildable_key_settable_trait  | 24 ms, 659 µs and 500 ns            | 0.87%      |         |
+| insertable                    | 30 ms, 862 µs and 502 ns            | 1.09%      |         |
+| buildable                     | 207 ms, 786 µs and 939 ns           | 7.31%      |         |
+| extension_attributes          | 11 ms, 928 µs and 641 ns            | 0.42%      |         |
+| workspace_write_to_disk       | 1 second, 638 ms, 226 µs and 469 ns | 57.67%     |         |
+| workspace_toml                | 289 ms, 763 µs and 691 ns           | 10.20%     |         |
+| workspace_rustfmt             | 119 µs and 270 ns                   | 0.00%      |         |
 
 ![Plot](emi_codegen.png)

@@ -5,7 +5,10 @@ use diesel::Table;
 use crate::traits::{ForeignKey, ForeignKeyCompatibleColumn, TableIsExtensionOf, TypedColumn};
 
 /// Trait defining the existance of an horizontal same-as relationship.
-pub trait HorizontalSameAs<Referenced, Key>: TypedColumn {}
+pub trait HorizontalSameAs<Referenced: TypedColumn, Key>:
+    ForeignKeyCompatibleColumn<Referenced>
+{
+}
 
 impl<HostColumn, Referenced, Key> HorizontalSameAs<Referenced, Key> for HostColumn
 where
@@ -20,9 +23,9 @@ where
 }
 
 /// Trait defining the existance of a vertical same-as relationship.
-pub trait VerticalSameAs<Ancestral: TypedColumn>: TypedColumn
+pub trait VerticalSameAs<Ancestral: TypedColumn>:
+    ForeignKeyCompatibleColumn<Ancestral> + Sized
 where
     Self::Table: TableIsExtensionOf<Ancestral::Table>,
-    Ancestral: ForeignKeyCompatibleColumn<Self>,
 {
 }
