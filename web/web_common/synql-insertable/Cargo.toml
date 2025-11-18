@@ -11,6 +11,7 @@ synql-diesel-schema.workspace = true
 synql-value-settable.workspace = true
 synql-insertable-key-settable.workspace = true
 synql-checks.workspace = true
+synql-attributes.workspace = true
 sql_relations.workspace = true
 quote.workspace = true
 proc-macro2.workspace = true

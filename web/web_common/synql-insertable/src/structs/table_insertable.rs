@@ -12,8 +12,7 @@ use crate::traits::TableInsertableLike;
 mod into_crate;
 mod into_data;
 mod into_module;
-mod key_settable;
-mod value_settable;
+mod set_column;
 
 #[derive(Debug)]
 /// Struct representing a SynQL table insertable.

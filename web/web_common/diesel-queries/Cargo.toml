@@ -4,6 +4,8 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
+validation_errors.workspace = true
+common_traits.workspace = true
 diesel.workspace = true
 
 [lints]

@@ -39,8 +39,7 @@ where
             .data(value.into())
             .expect("Failed to add insertable struct to insertable module")
             .internal_tokens(value.maybe_get_column_impls())
-            .internal_token(value.value_settable_impl())
-            .internal_token(value.insertable_key_settable_impl())
+            .internal_tokens(value.set_column_impls())
             .build()
             .expect("Failed to build insertable module")
     }

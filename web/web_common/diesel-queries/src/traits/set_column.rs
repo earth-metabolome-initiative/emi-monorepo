@@ -1,5 +1,8 @@
 //! Helper method for builders.
 
+use common_traits::builder::Attributed;
+use validation_errors::prelude::ValidationError;
+
 use crate::traits::{
     ForeignKeyCompatibleColumn, ForeignKeyCompatibleType, HorizontalSameAs, MaybeGetColumn,
     TableIsExtensionOf, VerticalSameAs, get_column::TypedColumn,
@@ -11,30 +14,25 @@ pub trait SetColumn<C: TypedColumn>: Sized {
     fn set(self, value: C::Type) -> Self;
 }
 
-impl<T, C> TrySetColumn<C> for T
-where
-    T: SetColumn<C>,
-    C: TypedColumn,
-{
-    type Error = std::convert::Infallible;
-
-    #[inline]
-    fn try_set(self, value: C::Type) -> Result<Self, Self::Error> {
-        Ok(self.set(value))
-    }
-}
-
 /// Trait for setting a column from a Diesel model builder.
-pub trait TrySetColumn<C: TypedColumn>: Sized {
-    /// The error type returned when setting the column.
-    type Error: std::error::Error;
-
+pub trait TrySetColumn<C: TypedColumn>: Sized + Attributed {
     /// Sets the column.
     ///
     /// # Errors
     ///
     /// Returns an error if the column cannot be set.
-    fn try_set(self, value: C::Type) -> Result<Self, Self::Error>;
+    fn try_set(self, value: C::Type) -> Result<Self, ValidationError<Self::Attribute>>;
+}
+
+impl<T, C> TrySetColumn<C> for T
+where
+    T: SetColumn<C> + Attributed,
+    C: TypedColumn,
+{
+    #[inline]
+    fn try_set(self, value: C::Type) -> Result<Self, ValidationError<Self::Attribute>> {
+        Ok(self.set(value))
+    }
 }
 
 /// Trait for setting a horizontal same-as column from a Diesel model builder.
@@ -76,7 +74,7 @@ pub trait TrySetHorizontalColumn<
     fn try_set_horizontal(
         self,
         referred: &dyn MaybeGetColumn<Referenced>,
-    ) -> Result<Self, Self::Error> {
+    ) -> Result<Self, ValidationError<Self::Attribute>> {
         if let Some(value) = referred.maybe_get_column() {
             self.try_set(value.clone())
         } else {
@@ -138,7 +136,7 @@ pub trait TrySetVerticalColumn<
     /// # Errors
     ///
     /// Returns an error if the column cannot be set.
-    fn try_set_vertical(self) -> Result<Self, Self::Error> {
+    fn try_set_vertical(self) -> Result<Self, ValidationError<Self::Attribute>> {
         if let Some(value) = self.maybe_get_column().cloned().and_then(|v| v.optionify()) {
             self.try_set(value)
         } else {
