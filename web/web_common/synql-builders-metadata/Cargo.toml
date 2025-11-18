@@ -8,6 +8,8 @@ synql-core.workspace = true
 synql-insertable.workspace = true
 synql-diesel-schema.workspace = true
 synql-models.workspace = true
+syn.workspace = true
+proc-macro2.workspace = true
 
 [lints]
 workspace = true

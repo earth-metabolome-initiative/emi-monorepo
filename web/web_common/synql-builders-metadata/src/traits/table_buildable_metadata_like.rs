@@ -46,6 +46,12 @@ pub trait TableBuildableMetadataLike: TableInsertableLike {
         format!("{}Builder", self.table_singular_camel_name())
     }
 
+    #[inline]
+    /// Returns the identifier of the buildable struct for the table.
+    fn table_buildable_ident(&self) -> syn::Ident {
+        syn::Ident::new(&self.table_buildable_name(), proc_macro2::Span::call_site())
+    }
+
     /// Returns the attribute for an extension field of a builder
     /// when the table is extended by another table.
     fn builder_extension_attribute<'data>(&self, workspace: &Workspace) -> InternalAttribute {

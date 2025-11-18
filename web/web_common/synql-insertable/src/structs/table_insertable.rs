@@ -1,7 +1,7 @@
 //! Submodule defining the `TableInsertable` struct.
 
 use quote::quote;
-use sql_traits::traits::TableLike;
+use sql_traits::traits::{ColumnLike, TableLike};
 use synql_core::{
     prelude::Builder,
     structs::{Decorator, Derive, InternalToken},
@@ -71,5 +71,50 @@ impl<'table, T: TableInsertableLike + ?Sized> TableInsertable<'table, T> {
             .unwrap()
             .build()
             .unwrap()
+    }
+
+    /// Generates implementations of the `MaybeGetColumn` trait for all
+    /// insertable columns in the table.
+    fn maybe_get_column_impls(&self) -> Vec<InternalToken> {
+        use synql_core::traits::ColumnSynLike;
+        use synql_diesel_schema::traits::ColumnSchema;
+
+        let mut maybe_get_column_impls = Vec::new();
+        let table_insertable_name = self.table.table_insertable_name();
+        let table_insertable: syn::Ident = syn::parse_str(&table_insertable_name).unwrap();
+
+        let maybe_get_column = self
+            .workspace
+            .external_trait("MaybeGetColumn")
+            .expect("Failed to get MaybeGetColumn trait");
+
+        for column in self.table.insertable_columns(self.database) {
+            let column_path = column.column_path(self.database);
+            let column_type = column.rust_type(self.workspace, self.database).unwrap();
+            let column_ident = column.column_snake_ident();
+
+            let column_getter = if column.is_nullable(self.database) {
+                quote! { Some(&self.#column_ident) }
+            } else {
+                quote! { self.#column_ident.as_ref() }
+            };
+
+            let maybe_get_column_impl = InternalToken::new()
+                .private()
+                .stream(quote! {
+                    impl #maybe_get_column<#column_path> for #table_insertable {
+                        fn maybe_get_column(&self) -> Option<&#column_type> {
+                            #column_getter
+                        }
+                    }
+                })
+                .implemented_trait(maybe_get_column.clone().into())
+                .build()
+                .unwrap();
+
+            maybe_get_column_impls.push(maybe_get_column_impl);
+        }
+
+        maybe_get_column_impls
     }
 }
