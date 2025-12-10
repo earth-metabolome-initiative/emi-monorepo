@@ -55,7 +55,7 @@ members = [
   "web/web_common/validation_errors",
   "web/web_common/webcodegen",
   "web/web_common/web_common_traits",
-  "web/web_common/ws_messages",
+  "web/web_common/ws_messages", "web/web_common/smiles_parser",
 ]
 
 [workspace.package]
