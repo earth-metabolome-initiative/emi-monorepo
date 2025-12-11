@@ -2,6 +2,8 @@
 A parser that checks the validity of SMILES strings and converts them into molecular graph representations.
 
 ## Definition of SMILES
+Definition from [Wikipedia](https://en.wikipedia.org/wiki/Simplified_Molecular_Input_Line_Entry_System). 
+
 ### Atoms
 Atoms are represented by the standard abbreviation of the chemical elements, in square brackets, such as `[Au]` for gold. Brackets may be omitted in the common case of atoms which:
 1. are in the "organic subset" of B, C, N, O, P, S, F, Cl, Br, or I, and
