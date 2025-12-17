@@ -12,4 +12,12 @@ pub enum Error {
         /// The unexpected character.
         character: char,
     },
+    /// Error indicating a problem in the molecular formula.
+    MolecularFormula(molecular_formulas::errors::Error),
+}
+
+impl From<molecular_formulas::errors::Error> for Error {
+    fn from(err: molecular_formulas::errors::Error) -> Self {
+        Error::MolecularFormula(err)
+    }
 }

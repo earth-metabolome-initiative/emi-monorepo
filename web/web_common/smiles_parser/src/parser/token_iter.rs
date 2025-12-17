@@ -4,6 +4,7 @@
 use std::collections::VecDeque;
 
 use elements_rs::{Element, Isotope};
+use molecular_formulas::MolecularFormula;
 use num_traits::{CheckedAdd, CheckedMul, ConstOne, ConstZero};
 
 use crate::token::Token;
@@ -28,10 +29,22 @@ impl TokenIter<'_> {
             '=' => Token::Equal,
             '#' => Token::Hashtag,
             '$' => Token::Dollar,
+            '.' => Token::Dot,
+            ':' => Token::Colon,
+            '/' => Token::ForwardSlash,
+            '\\' => Token::BackSlash,
+            '@' => {
+                if let Some(&'@') = self.chars.peek() {
+                    self.chars.next();
+                    Token::ClockwiseChirality
+                } else {
+                    Token::CounterClockwiseChirality
+                }
+            }
             '[' => {
                 let molecule_iter = self.chars.by_ref().take_while(|c| *c != ']');
-
-                todo!()
+                let molecule = MolecularFormula::try_from_iter(molecule_iter)?;
+                Token::MolecularFormula(molecule)
             }
             maybe_number @ '0'..='9' => {
                 let label = u8::try_from(maybe_number.to_digit(10).unwrap()).unwrap();

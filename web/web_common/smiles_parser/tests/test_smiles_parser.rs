@@ -6,7 +6,6 @@ const SMILES_STR: &[&str] = &[
     "C1=CC=CC=C1",
     "[OH2]",
     "[Ti+4]",
-    "[Ti++++]",
     "[Co+3]",
     "CCO",
     "C#N",
@@ -29,12 +28,14 @@ const SMILES_STR: &[&str] = &[
     "C[C@H](N)C(=O)O",
     "OC(=O)[C@@H](N)C",
     "[K+].C=C.Cl[Pt-](Cl)Cl.O",
+    "[Ti++++]",
 ];
 
 #[test]
 fn test_tokenizer() {
     for &s in SMILES_STR {
-        let _tokens =
-            TokenIter::from(s).collect::<Result<Vec<_>, _>>().expect("Tokenization failed");
+        let _tokens = TokenIter::from(s)
+            .collect::<Result<Vec<_>, _>>()
+            .expect(&format!("Failed to parse {s}"));
     }
 }
