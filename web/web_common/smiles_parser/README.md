@@ -1,6 +1,9 @@
 # SMILES-parser
 A parser that checks the validity of SMILES strings and converts them into molecular graph representations.
 
+## What is a parser
+
+
 ## Definition of SMILES
 Definition from [Wikipedia](https://en.wikipedia.org/wiki/Simplified_Molecular_Input_Line_Entry_System). 
 

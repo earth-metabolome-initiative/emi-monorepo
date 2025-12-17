@@ -1,18 +1,13 @@
-use elements_rs::{Element, Isotope};
+//! Represents tokens used in parsing SMILES strings.
 
-#[derive(Debug, PartialEq, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
+use elements_rs::{Element, Isotope};
+use molecular_formulas::MolecularFormula;
+
+#[derive(Debug, PartialEq, Clone, Eq, PartialOrd, Ord, Hash)]
 /// Represents a token in a molecular formula.
 pub(crate) enum Token {
-    /// An element
-    Element(Element),
-    /// An isotope
-    Isotope(Isotope),
-    /// A charge
-    Charge(i16),
-    /// A subscript number, which may be a count
-    Count(u16),
-    /// A residual group
-    Residual,
+    /// A molecular formula
+    MolecularFormula(MolecularFormula),
     /// An open round bracket
     OpenRoundBracket,
     /// A close round bracket
@@ -25,10 +20,12 @@ pub(crate) enum Token {
     Dot,
     /// A dash '-' character
     Dash,
-    /// An equal '=' character
+    /// An equal '=' character i.e. a double bond
     Equal,
-    /// A hash '#' character
-    Hash,
+    /// A hash '#' character i.e. a triple bond
+    Hashtag,
+    /// A dollar '$' character i.e. a quadruple bond
+    Dollar,
     /// A colon ':' character
     Colon,
     /// A foward slash '/' character
@@ -39,12 +36,12 @@ pub(crate) enum Token {
 
 impl From<Element> for Token {
     fn from(element: Element) -> Self {
-        Token::Element(element)
+        Token::MolecularFormula(element.into())
     }
 }
 
 impl From<Isotope> for Token {
     fn from(isotope: Isotope) -> Self {
-        Token::Isotope(isotope)
+        Token::MolecularFormula(isotope.into())
     }
 }
