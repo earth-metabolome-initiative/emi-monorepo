@@ -267,6 +267,7 @@ where
         None
     }
 
+    #[allow(clippy::too_many_lines)]
     fn parse_token(&mut self, current_char: char) -> Result<Token, crate::errors::Error> {
         Ok(match current_char {
             '(' => crate::token::Token::OpenRoundBracket,
@@ -304,21 +305,32 @@ where
                 // to fold it into a charge.
                 let mut charge = if is_any_plus(maybe_charge) { 1 } else { -1 };
 
-                if let Some(digit) = self.maybe_consume_digit(
-                    if is_superscript_charge(maybe_charge) {
-                        superscript_to_digit
-                    } else {
-                        ascii_to_digit
-                    },
-                    if is_superscript_charge(maybe_charge) {
-                        is_superscript_digit
-                    } else {
-                        is_ascii_digit
-                    },
-                )? {
-                    charge =
-                        charge.checked_mul(&digit).ok_or(crate::errors::Error::InvalidNumber)?;
+                let mut digit = 1;
+                while let Some(&next_char) = self.chars.peek()
+                    && next_char == maybe_charge
+                {
+                    self.chars.next();
+                    digit += 1;
                 }
+
+                if digit == 1
+                    && let Some(found_digit) = self.maybe_consume_digit(
+                        if is_superscript_charge(maybe_charge) {
+                            superscript_to_digit
+                        } else {
+                            ascii_to_digit
+                        },
+                        if is_superscript_charge(maybe_charge) {
+                            is_superscript_digit
+                        } else {
+                            is_ascii_digit
+                        },
+                    )?
+                {
+                    digit = found_digit;
+                }
+
+                charge = charge.checked_mul(&digit).ok_or(crate::errors::Error::InvalidNumber)?;
 
                 if charge == 0 {
                     return Err(crate::errors::Error::ZeroCharge);
