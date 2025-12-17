@@ -1,9 +1,30 @@
 //! Submodule providing a `Token` enumeration with the entries which may appear
 //! in a molecular formula.
 
+use std::fmt::Display;
+
 use elements_rs::{Element, Isotope};
 use greek_letters::GreekLetter;
 pub mod greek_letters;
+
+#[derive(Debug, PartialEq, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Represents chirality of an atom.
+pub enum Chirality {
+    /// Clockwise chirality
+    Clockwise,
+    /// Counterclockwise chirality
+    Counterclockwise,
+}
+
+impl Display for Chirality {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Clockwise => write!(f, "@"),
+            Self::Counterclockwise => write!(f, "@@"),
+        }
+    }
+}
 
 #[derive(Debug, PartialEq, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -14,6 +35,8 @@ pub struct Atom<E> {
     entity: E,
     /// Whether it is lowercase
     lowercase: bool,
+    /// Chirality
+    chirality: Option<Chirality>,
 }
 
 impl<E> Atom<E> {
@@ -23,13 +46,19 @@ impl<E> Atom<E> {
     ///
     /// * `entity` - The element or isotope.
     /// * `lowercase` - Whether the atom is lowercase.
-    pub fn new(entity: E, lowercase: bool) -> Self {
-        Atom { entity, lowercase }
+    /// * `chirality` - The chirality of the atom.
+    pub fn new(entity: E, lowercase: bool, chirality: Option<Chirality>) -> Self {
+        Atom { entity, lowercase, chirality }
     }
 
     /// Returns whether the atom is lowercase.
     pub fn is_lowercase(&self) -> bool {
         self.lowercase
+    }
+
+    /// Returns the chirality of the atom, if any.
+    pub fn chirality(&self) -> Option<Chirality> {
+        self.chirality
     }
 }
 
@@ -65,13 +94,13 @@ impl From<Atom<Isotope>> for Isotope {
 
 impl From<Element> for Atom<Element> {
     fn from(element: Element) -> Self {
-        Atom::new(element, false)
+        Atom::new(element, false, None)
     }
 }
 
 impl From<Isotope> for Atom<Isotope> {
     fn from(isotope: Isotope) -> Self {
-        Atom::new(isotope, false)
+        Atom::new(isotope, false, None)
     }
 }
 
@@ -137,13 +166,13 @@ impl Token {
 
 impl From<Element> for Token {
     fn from(element: Element) -> Self {
-        Token::Element(Atom::new(element, false))
+        Token::Element(Atom::new(element, false, None))
     }
 }
 
 impl From<Isotope> for Token {
     fn from(isotope: Isotope) -> Self {
-        Token::Isotope(Atom::new(isotope, false))
+        Token::Isotope(Atom::new(isotope, false, None))
     }
 }
 

@@ -12,9 +12,14 @@ impl Display for MolecularFormula {
         match self {
             Self::Element(element) => {
                 if element.is_lowercase() {
-                    write!(f, "{}", element.as_ref().to_string().to_lowercase())
+                    write!(f, "{}", element.as_ref().to_string().to_lowercase())?;
                 } else {
-                    write!(f, "{}", element.as_ref())
+                    write!(f, "{}", element.as_ref())?;
+                }
+                if let Some(chirality) = element.chirality() {
+                    write!(f, "{chirality}")
+                } else {
+                    Ok(())
                 }
             }
             Self::Isotope(isotope) => {
@@ -24,7 +29,11 @@ impl Display for MolecularFormula {
                 } else {
                     isotope.as_ref().element().to_string()
                 };
-                write!(f, "{atomic_mass}{element}")
+                if let Some(chirality) = isotope.chirality() {
+                    write!(f, "{atomic_mass}{element}{chirality}")
+                } else {
+                    write!(f, "{atomic_mass}{element}")
+                }
             }
             Self::Ion(ion) => write!(f, "{ion}"),
             Self::Mixture(mixture) => {

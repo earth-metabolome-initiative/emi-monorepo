@@ -6,7 +6,7 @@ use std::collections::VecDeque;
 use elements_rs::{Element, Isotope};
 use num_traits::{CheckedAdd, CheckedMul, ConstOne, ConstZero};
 
-use crate::token::{Atom, Token, greek_letters::GreekLetter};
+use crate::token::{Atom, Chirality, Token, greek_letters::GreekLetter};
 
 /// Iterator over the `Token`s found in a provided string.
 pub struct TokenIter<I: Iterator<Item = char>> {
@@ -209,6 +209,21 @@ where
         is_charge(*self.chars.peek()?).then(|| self.chars.next()).flatten()
     }
 
+    /// Peaks the next characters and determines whether they form
+    /// a chirality indicator.
+    fn consume_chirality(&mut self) -> Option<Chirality> {
+        if Some('@') == self.chars.peek().copied() {
+            self.chars.next();
+            if Some('@') == self.chars.peek().copied() {
+                self.chars.next();
+                return Some(Chirality::Counterclockwise);
+            } else {
+                return Some(Chirality::Clockwise);
+            }
+        }
+        None
+    }
+
     /// Peaks the next alphabetical character in the iterator and consumes it
     /// if it is a solely alphabetical character.
     fn consume_alphabetic(&mut self, char: char) -> Result<Token, crate::errors::Error> {
@@ -220,17 +235,18 @@ where
         {
             self.chars.next();
             let element = Element::try_from([char, next])?;
-            return Ok(Atom::new(element, char.is_lowercase()).into());
+
+            return Ok(Atom::new(element, char.is_lowercase(), self.consume_chirality()).into());
         }
         // To handle cases like 'P', 'D' and 'T', which respectively
         // represent Protium, Deuterium and Tritium.
         if let Ok(isotope) = Isotope::try_from(char) {
-            Ok(Atom::new(isotope, false).into())
+            Ok(Atom::new(isotope, false, self.consume_chirality()).into())
         } else if char == 'R' {
             Ok(crate::token::Token::Residual)
         } else {
             let element = Element::try_from(char)?;
-            Ok(Atom::new(element, char.is_lowercase()).into())
+            Ok(Atom::new(element, char.is_lowercase(), self.consume_chirality()).into())
         }
     }
 
@@ -392,7 +408,9 @@ where
                 else if let Some(element) = self.consume_element()
                     && let Ok(isotope) = Isotope::try_from((element.into(), digit))
                 {
-                    return Ok(Token::Isotope(Atom::new(isotope, element.is_lowercase())));
+                    return Ok(Token::Isotope(
+                        Atom::new(isotope, element.is_lowercase(), element.chirality()).into(),
+                    ));
                 }
 
                 return Err(crate::errors::Error::InvalidSuperscriptPosition);
