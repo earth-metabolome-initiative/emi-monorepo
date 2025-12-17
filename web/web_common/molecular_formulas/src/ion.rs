@@ -6,7 +6,7 @@ use elements_rs::Element;
 use fmtastic::Superscript;
 use multi_ranged::MultiRanged;
 
-use crate::MolecularFormula;
+use crate::{MolecularFormula, token::Atom};
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -18,7 +18,7 @@ pub struct Ion<E> {
     pub(crate) charge: i16,
 }
 
-impl Ion<Element> {
+impl Ion<Atom<Element>> {
     /// Creates a new `Ion` instance with the given element and charge.
     ///
     /// # Arguments
@@ -32,14 +32,17 @@ impl Ion<Element> {
     ///   error is returned.
     /// * If the charge is not in the oxidation states of the element, an error
     ///   is returned.
-    pub fn from_element(element: Element, charge: i16) -> Result<Self, crate::errors::Error> {
+    pub fn from_element<E: AsRef<Element> + Into<Atom<Element>>>(
+        element: E,
+        charge: i16,
+    ) -> Result<Self, crate::errors::Error> {
         if charge == 0 {
             return Err(crate::errors::Error::ZeroCharge);
         }
-        if !element.oxidation_states().contains(charge) {
+        if !element.as_ref().oxidation_states().contains(charge) {
             return Err(crate::errors::Error::InvalidOxidationState(charge));
         }
-        Ok(Ion { entry: element, charge })
+        Ok(Ion { entry: element.into(), charge })
     }
 }
 
@@ -70,14 +73,14 @@ impl Ion<MolecularFormula> {
     }
 }
 
-impl From<Ion<elements_rs::Element>> for Ion<MolecularFormula> {
-    fn from(ion: Ion<elements_rs::Element>) -> Self {
+impl From<Ion<Atom<Element>>> for Ion<MolecularFormula> {
+    fn from(ion: Ion<Atom<Element>>) -> Self {
         Ion { entry: MolecularFormula::Element(ion.entry), charge: ion.charge }
     }
 }
 
-impl From<Ion<elements_rs::Element>> for Ion<Box<MolecularFormula>> {
-    fn from(ion: Ion<elements_rs::Element>) -> Self {
+impl From<Ion<Atom<Element>>> for Ion<Box<MolecularFormula>> {
+    fn from(ion: Ion<Atom<Element>>) -> Self {
         Ion { entry: Box::new(MolecularFormula::Element(ion.entry)), charge: ion.charge }
     }
 }

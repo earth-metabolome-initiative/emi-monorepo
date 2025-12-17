@@ -7,12 +7,80 @@ pub mod greek_letters;
 
 #[derive(Debug, PartialEq, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Atom<E> {
+    /// Element or isotope
+    entity: E,
+    /// Whether it is lowercase
+    lowercase: bool,
+}
+
+impl<E> Atom<E> {
+    /// Creates a new `Atom` instance with the given entity and lowercase flag.
+    ///
+    /// # Arguments
+    ///
+    /// * `entity` - The element or isotope.
+    /// * `lowercase` - Whether the atom is lowercase.
+    pub fn new(entity: E, lowercase: bool) -> Self {
+        Atom { entity, lowercase }
+    }
+
+    /// Returns whether the atom is lowercase.
+    pub fn is_lowercase(&self) -> bool {
+        self.lowercase
+    }
+}
+
+impl<E> AsRef<E> for Atom<E> {
+    fn as_ref(&self) -> &E {
+        &self.entity
+    }
+}
+
+impl From<Atom<Element>> for Token {
+    fn from(atom: Atom<Element>) -> Self {
+        Token::Element(atom)
+    }
+}
+
+impl From<Atom<Isotope>> for Token {
+    fn from(atom: Atom<Isotope>) -> Self {
+        Token::Isotope(atom)
+    }
+}
+
+impl From<Atom<Element>> for Element {
+    fn from(atom: Atom<Element>) -> Self {
+        atom.entity
+    }
+}
+
+impl From<Atom<Isotope>> for Isotope {
+    fn from(atom: Atom<Isotope>) -> Self {
+        atom.entity
+    }
+}
+
+impl From<Element> for Atom<Element> {
+    fn from(element: Element) -> Self {
+        Atom::new(element, false)
+    }
+}
+
+impl From<Isotope> for Atom<Isotope> {
+    fn from(isotope: Isotope) -> Self {
+        Atom::new(isotope, false)
+    }
+}
+
+#[derive(Debug, PartialEq, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Represents a token in a molecular formula.
 pub enum Token {
     /// An element
-    Element(Element),
+    Element(Atom<Element>),
     /// An isotope
-    Isotope(Isotope),
+    Isotope(Atom<Isotope>),
     /// A charge
     Charge(i16),
     /// A subscript number, which may be a count
@@ -67,18 +135,30 @@ impl Token {
 
 impl From<Element> for Token {
     fn from(element: Element) -> Self {
-        Token::Element(element)
+        Token::Element(Atom::new(element, false))
     }
 }
 
 impl From<Isotope> for Token {
     fn from(isotope: Isotope) -> Self {
-        Token::Isotope(isotope)
+        Token::Isotope(Atom::new(isotope, false))
     }
 }
 
 impl From<GreekLetter> for Token {
     fn from(greek_letter: GreekLetter) -> Self {
         Token::Greek(greek_letter)
+    }
+}
+
+impl From<Atom<Element>> for crate::MolecularFormula {
+    fn from(atom: Atom<Element>) -> Self {
+        crate::MolecularFormula::Element(atom)
+    }
+}
+
+impl From<Atom<Isotope>> for crate::MolecularFormula {
+    fn from(atom: Atom<Isotope>) -> Self {
+        crate::MolecularFormula::Isotope(atom)
     }
 }

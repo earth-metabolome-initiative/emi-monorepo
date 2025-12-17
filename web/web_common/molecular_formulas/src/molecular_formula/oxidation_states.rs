@@ -14,8 +14,8 @@ impl super::MolecularFormula {
     ///   the oxidation states cannot be determined.
     pub fn oxidation_states(&self) -> Result<MultiRange<i16>, crate::errors::Error> {
         Ok(match self {
-            Self::Element(element) => element.oxidation_states(),
-            Self::Isotope(isotope) => isotope.element().oxidation_states(),
+            Self::Element(element) => element.as_ref().oxidation_states(),
+            Self::Isotope(isotope) => isotope.as_ref().element().oxidation_states(),
             Self::Complex(formula) | Self::RepeatingUnit(formula) | Self::Radical(formula, _) => {
                 formula.oxidation_states()?
             }
@@ -74,9 +74,11 @@ impl super::MolecularFormula {
         oxidation_state: i16,
     ) -> Result<bool, crate::errors::Error> {
         match self {
-            Self::Element(element) => Ok(element.oxidation_states().contains(oxidation_state)),
+            Self::Element(element) => {
+                Ok(element.as_ref().oxidation_states().contains(oxidation_state))
+            }
             Self::Isotope(isotope) => {
-                Ok(isotope.element().oxidation_states().contains(oxidation_state))
+                Ok(isotope.as_ref().element().oxidation_states().contains(oxidation_state))
             }
             Self::Complex(formula) | Self::RepeatingUnit(formula) | Self::Radical(formula, _) => {
                 formula.is_valid_oxidation_state(oxidation_state)
