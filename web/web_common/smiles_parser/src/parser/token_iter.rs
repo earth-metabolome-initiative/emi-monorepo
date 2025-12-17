@@ -30,6 +30,7 @@ impl TokenIter<'_> {
             '$' => Token::Dollar,
             '[' => {
                 let molecule_iter = self.chars.by_ref().take_while(|c| *c != ']');
+
                 todo!()
             }
             maybe_number @ '0'..='9' => {
