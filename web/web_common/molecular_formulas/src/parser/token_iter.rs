@@ -273,6 +273,11 @@ where
         self.tokens.push_back(token);
     }
 
+    /// Returns a mutable reference to the internal chars iterator.
+    pub fn chars(&mut self) -> &mut std::iter::Peekable<I> {
+        &mut self.chars
+    }
+
     #[allow(clippy::too_many_lines)]
     fn parse_token(&mut self, current_char: char) -> Result<Token, crate::errors::Error> {
         Ok(match current_char {
