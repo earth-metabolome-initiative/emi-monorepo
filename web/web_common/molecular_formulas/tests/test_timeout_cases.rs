@@ -19,7 +19,11 @@ fn timeout_test(formula: &str) {
     let start_time = std::time::Instant::now();
     let _ = MolecularFormula::from_str(formula);
     let elapsed = start_time.elapsed();
-    assert!(elapsed.as_secs_f64() <= 0.5, "Parsing candidate `{formula}` took too long: {} seconds", elapsed.as_secs_f64());
+    assert!(
+        elapsed.as_secs_f64() <= 0.5,
+        "Parsing candidate `{formula}` took too long: {} seconds",
+        elapsed.as_secs_f64()
+    );
 }
 
 #[test]
