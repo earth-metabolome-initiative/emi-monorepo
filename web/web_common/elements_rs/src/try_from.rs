@@ -4,22 +4,30 @@
 impl TryFrom<char> for crate::Element {
     type Error = crate::errors::Error;
 
+    /// Parses single-character element symbols.
+    /// 
+    /// # Implementation details
+    /// 
+    /// It supports both uppercase and lowercase letters since,
+    /// while in chemical formulas element symbols are capitalized,
+    /// in other contexts such as SMILES strings they may appear in lowercase
+    /// to represent aromatic atoms.
     fn try_from(value: char) -> Result<Self, Self::Error> {
         Ok(match value {
-            'H' => Self::H,
-            'B' => Self::B,
-            'C' => Self::C,
-            'N' => Self::N,
-            'O' => Self::O,
-            'F' => Self::F,
-            'P' => Self::P,
-            'S' => Self::S,
-            'K' => Self::K,
-            'V' => Self::V,
-            'Y' => Self::Y,
-            'I' => Self::I,
-            'W' => Self::W,
-            'U' => Self::U,
+            'H' | 'h' => Self::H,
+            'B' | 'b' => Self::B,
+            'C' | 'c' => Self::C,
+            'N' | 'n' => Self::N,
+            'O' | 'o' => Self::O,
+            'F' | 'f' => Self::F,
+            'P' | 'p' => Self::P,
+            'S' | 's' => Self::S,
+            'K' | 'k' => Self::K,
+            'V' | 'v' => Self::V,
+            'Y' | 'y' => Self::Y,
+            'I' | 'i' => Self::I,
+            'W' | 'w' => Self::W,
+            'U' | 'u' => Self::U,
             _ => {
                 return Err(crate::errors::Error::Element([value, ' ']));
             }
