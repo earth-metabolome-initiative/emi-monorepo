@@ -4,7 +4,10 @@
 use elements_rs::{Element, Isotope};
 
 use super::MolecularFormula;
-use crate::{Ion, token::{Atom, greek_letters::GreekLetter}};
+use crate::{
+    Ion,
+    token::{Atom, greek_letters::GreekLetter},
+};
 
 impl From<Element> for MolecularFormula {
     fn from(element: Element) -> Self {

@@ -2,7 +2,10 @@
 
 use elements_rs::{Element, Isotope};
 
-use crate::{Ion, token::{Atom, greek_letters::GreekLetter}};
+use crate::{
+    Ion,
+    token::{Atom, greek_letters::GreekLetter},
+};
 
 mod charge;
 mod contains_elements;

@@ -74,7 +74,9 @@ impl super::MolecularFormula {
         oxidation_state: i16,
     ) -> Result<bool, crate::errors::Error> {
         match self {
-            Self::Element(element) => Ok(element.as_ref().oxidation_states().contains(oxidation_state)),
+            Self::Element(element) => {
+                Ok(element.as_ref().oxidation_states().contains(oxidation_state))
+            }
             Self::Isotope(isotope) => {
                 Ok(isotope.as_ref().element().oxidation_states().contains(oxidation_state))
             }

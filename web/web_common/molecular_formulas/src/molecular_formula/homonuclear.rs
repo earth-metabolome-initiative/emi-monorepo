@@ -14,7 +14,9 @@ impl crate::MolecularFormula {
                 other.map_or((true, *element.as_ref()), |other| (*element.as_ref() == other, other))
             }
             Self::Isotope(isotope) => {
-                other.map_or((true, isotope.as_ref().element()), |other| (isotope.as_ref().element() == other, other))
+                other.map_or((true, isotope.as_ref().element()), |other| {
+                    (isotope.as_ref().element() == other, other)
+                })
             }
             Self::Residual => {
                 return Err(crate::errors::Error::InvalidOperationForResidual);
