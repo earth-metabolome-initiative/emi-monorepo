@@ -7,6 +7,8 @@ pub mod greek_letters;
 
 #[derive(Debug, PartialEq, Clone, Copy, Eq, PartialOrd, Ord, Hash)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+/// Represents an atom in a molecular formula, which may be an element or an
+/// isotope.
 pub struct Atom<E> {
     /// Element or isotope
     entity: E,
