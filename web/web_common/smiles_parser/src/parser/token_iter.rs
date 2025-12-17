@@ -8,7 +8,8 @@ use num_traits::{CheckedAdd, CheckedMul, ConstOne, ConstZero};
 
 use crate::token::Token;
 
-pub(crate) struct TokenIter<'a> {
+/// An iterator over the tokens found in a SMILES string.
+pub struct TokenIter<'a> {
     /// The peekable chars iterator
     chars: std::iter::Peekable<std::str::Chars<'a>>,
 }
@@ -24,15 +25,34 @@ impl TokenIter<'_> {
         Ok(match current_char {
             '(' => Token::OpenRoundBracket,
             ')' => Token::CloseRoundBracket,
+            '=' => Token::Equal,
+            '#' => Token::Hashtag,
+            '$' => Token::Dollar,
+            '[' => {
+                let molecule_iter = self.chars.by_ref().take_while(|c| *c != ']');
+                todo!()
+            }
+            maybe_number @ '0'..='9' => {
+                let label = u8::try_from(maybe_number.to_digit(10).unwrap()).unwrap();
+                Token::Label(label)
+            }
             maybe_element_char => {
-                if maybe_element_char.is_lowercase() && let Ok(){
-                    
+                if maybe_element_char.is_lowercase()
+                    && let Ok(element) = Element::try_from(maybe_element_char)
+                {
+                    return Ok(Token::AromaticMolecularFormula(element.into()));
                 }
                 if let Some(next_char) = self.chars.peek()
-            }
-            unexpected_char => {
+                    && let Ok(element) = Element::try_from([maybe_element_char, *next_char])
+                {
+                    self.chars.next();
+                    return Ok(Token::MolecularFormula(element.into()));
+                }
+                if let Ok(element) = Element::try_from(maybe_element_char) {
+                    return Ok(Token::MolecularFormula(element.into()));
+                }
                 return Err(crate::errors::Error::UnexpectedCharacter {
-                    character: unexpected_char,
+                    character: maybe_element_char,
                 });
             }
         })

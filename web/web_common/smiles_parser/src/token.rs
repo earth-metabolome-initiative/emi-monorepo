@@ -5,7 +5,7 @@ use molecular_formulas::MolecularFormula;
 
 #[derive(Debug, PartialEq, Clone, Eq, PartialOrd, Ord, Hash)]
 /// Represents a token in a molecular formula.
-pub(crate) enum Token {
+pub enum Token {
     /// A molecular formula
     MolecularFormula(MolecularFormula),
     /// Aromatic molecular formula
@@ -34,16 +34,6 @@ pub(crate) enum Token {
     ForwardSlash,
     /// A back slash '\' character
     BackSlash,
-}
-
-impl From<Element> for Token {
-    fn from(element: Element) -> Self {
-        Token::MolecularFormula(element.into())
-    }
-}
-
-impl From<Isotope> for Token {
-    fn from(isotope: Isotope) -> Self {
-        Token::MolecularFormula(isotope.into())
-    }
+    /// A label that can only go from 0 to 9
+    Label(u8),
 }
