@@ -11,25 +11,25 @@ use crate::{
 
 impl From<Element> for MolecularFormula {
     fn from(element: Element) -> Self {
-        MolecularFormula::Element(Atom::new(element, false))
+        MolecularFormula::Element(Atom::new(element, false, None))
     }
 }
 
 impl From<Element> for Box<MolecularFormula> {
     fn from(element: Element) -> Self {
-        MolecularFormula::Element(Atom::new(element, false)).into()
+        MolecularFormula::Element(Atom::new(element, false, None)).into()
     }
 }
 
 impl From<Isotope> for MolecularFormula {
     fn from(isotope: Isotope) -> Self {
-        MolecularFormula::Isotope(Atom::new(isotope, false))
+        MolecularFormula::Isotope(Atom::new(isotope, false, None))
     }
 }
 
 impl From<Isotope> for Box<MolecularFormula> {
     fn from(isotope: Isotope) -> Self {
-        MolecularFormula::Isotope(Atom::new(isotope, false)).into()
+        MolecularFormula::Isotope(Atom::new(isotope, false, None)).into()
     }
 }
 
