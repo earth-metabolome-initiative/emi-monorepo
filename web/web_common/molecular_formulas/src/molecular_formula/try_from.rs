@@ -1,6 +1,6 @@
 //! Submodule implementing the `TryFrom` trait for the `MolecularFormula` struct
 
-use crate::token::Token;
+use crate::{parser::TokenIter, token::Token};
 
 impl TryFrom<&str> for crate::MolecularFormula {
     type Error = crate::errors::Error;
@@ -42,6 +42,22 @@ impl crate::MolecularFormula {
     #[inline]
     pub fn try_from_iter<I: Iterator<Item = char>>(iter: I) -> Result<Self, crate::errors::Error> {
         crate::parser::Parser::from(iter).parse()
+    }
+
+    /// Tries to parse a `MolecularFormula` from a `TokenIter`.
+    ///
+    /// # Arguments
+    ///
+    /// * `token_iter` - A `TokenIter` representing the molecular formula.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the parsing fails.
+    #[inline]
+    pub fn try_from_token_iter<I: Iterator<Item = char>>(
+        token_iter: TokenIter<I>,
+    ) -> Result<Self, crate::errors::Error> {
+        crate::parser::Parser::from(token_iter).parse()
     }
 }
 
