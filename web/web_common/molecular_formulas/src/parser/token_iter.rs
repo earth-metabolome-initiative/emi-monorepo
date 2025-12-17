@@ -6,7 +6,7 @@ use std::collections::VecDeque;
 use elements_rs::{Element, Isotope};
 use num_traits::{CheckedAdd, CheckedMul, ConstOne, ConstZero};
 
-use crate::token::{Token, greek_letters::GreekLetter};
+use crate::token::{Atom, Token, greek_letters::GreekLetter};
 
 /// Iterator over the `Token`s found in a provided string.
 pub struct TokenIter<I: Iterator<Item = char>> {
@@ -219,16 +219,18 @@ where
             && next.is_ascii_alphabetic()
         {
             self.chars.next();
-            return Element::try_from([char, next]).map(Into::into).map_err(Into::into);
+            let element = Element::try_from([char, next])?;
+            return Ok(Atom::new(element, char.is_lowercase()).into());
         }
         // To handle cases like 'P', 'D' and 'T', which respectively
         // represent Protium, Deuterium and Tritium.
         if let Ok(isotope) = Isotope::try_from(char) {
-            Ok(crate::token::Token::Isotope(isotope))
+            Ok(Atom::new(isotope, false).into())
         } else if char == 'R' {
             Ok(crate::token::Token::Residual)
         } else {
-            Element::try_from(char).map(Into::into).map_err(Into::into)
+            let element = Element::try_from(char)?;
+            Ok(Atom::new(element, char.is_lowercase()).into())
         }
     }
 
@@ -237,7 +239,7 @@ where
     /// check whether the next character is a a lowercase letter, which may
     /// indicate a two-letter element. This operation may fail, and in that case
     /// we may need to push the newly built token back to the `tokens` queue.
-    fn consume_element(&mut self) -> Option<Element> {
+    fn consume_element(&mut self) -> Option<Atom<Element>> {
         if let Some(&next) = self.chars.peek()
             && next.is_ascii_alphabetic()
             && next.is_uppercase()
@@ -388,9 +390,9 @@ where
                 // element, this scalar may be meant as
                 // the mass number of an isotope.
                 else if let Some(element) = self.consume_element()
-                    && let Ok(isotope) = Isotope::try_from((element, digit))
+                    && let Ok(isotope) = Isotope::try_from((element.into(), digit))
                 {
-                    return Ok(Token::Isotope(isotope));
+                    return Ok(Token::Isotope(Atom::new(isotope, element.is_lowercase())));
                 }
 
                 return Err(crate::errors::Error::InvalidSuperscriptPosition);

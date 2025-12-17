@@ -14,8 +14,8 @@ impl MolecularFormula {
     /// * If the `MolecularFormula` contains Residual.
     pub fn isotopologue_mass_with_charge(&self) -> Result<f64, crate::errors::Error> {
         match self {
-            Self::Element(element) => Ok(element.relative_atomic_mass()),
-            Self::Isotope(isotope) => Ok(isotope.relative_atomic_mass()),
+            Self::Element(element) => Ok(element.as_ref().relative_atomic_mass()),
+            Self::Isotope(isotope) => Ok(isotope.as_ref().relative_atomic_mass()),
             Self::Ion(ion) => {
                 ion.entry.isotopologue_mass_with_charge().map(|isotopologue_mass_with_charge| {
                     isotopologue_mass_with_charge
@@ -46,8 +46,8 @@ impl MolecularFormula {
     /// * If the `MolecularFormula` contains Residual.
     pub fn isotopologue_mass_without_charge(&self) -> Result<f64, crate::errors::Error> {
         match self {
-            Self::Element(element) => Ok(element.relative_atomic_mass()),
-            Self::Isotope(isotope) => Ok(isotope.relative_atomic_mass()),
+            Self::Element(element) => Ok(element.as_ref().relative_atomic_mass()),
+            Self::Isotope(isotope) => Ok(isotope.as_ref().relative_atomic_mass()),
             Self::Ion(ion) => ion.entry.isotopologue_mass_without_charge(),
             Self::Count(formula, count) => {
                 formula.isotopologue_mass_without_charge().map(|isotopologue_mass_without_charge| {

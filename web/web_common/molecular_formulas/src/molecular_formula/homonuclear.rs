@@ -11,10 +11,12 @@ impl crate::MolecularFormula {
     ) -> Result<(bool, Element), crate::errors::Error> {
         Ok(match self {
             Self::Element(element) => {
-                other.map_or((true, *element), |other| (*element == other, other))
+                other.map_or((true, *element.as_ref()), |other| (*element.as_ref() == other, other))
             }
             Self::Isotope(isotope) => {
-                other.map_or((true, isotope.element()), |other| (isotope.element() == other, other))
+                other.map_or((true, isotope.as_ref().element()), |other| {
+                    (isotope.as_ref().element() == other, other)
+                })
             }
             Self::Residual => {
                 return Err(crate::errors::Error::InvalidOperationForResidual);

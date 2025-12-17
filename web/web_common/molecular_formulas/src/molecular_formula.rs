@@ -2,7 +2,10 @@
 
 use elements_rs::{Element, Isotope};
 
-use crate::{Ion, token::greek_letters::GreekLetter};
+use crate::{
+    Ion,
+    token::{Atom, greek_letters::GreekLetter},
+};
 
 mod charge;
 mod contains_elements;
@@ -47,9 +50,9 @@ pub enum Side {
 /// or a count of molecules.
 pub enum MolecularFormula {
     /// An atom (element)
-    Element(Element),
+    Element(Atom<Element>),
     /// An isotope (element with mass number)
-    Isotope(Isotope),
+    Isotope(Atom<Isotope>),
     /// A left-hand side radical.
     Radical(Box<MolecularFormula>, Side),
     /// An ion (element or molecule with charge)

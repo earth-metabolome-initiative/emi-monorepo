@@ -3,7 +3,7 @@
 //! elements. This also returns true in case of homonuclear diatomics, such as
 //! `H2`, `O2`, etc.
 
-use elements_rs::{ElementVariant, ValenceElectrons};
+use elements_rs::{Element, ElementVariant, ValenceElectrons};
 mod homodiatomic;
 
 impl crate::MolecularFormula {
@@ -63,26 +63,22 @@ impl crate::MolecularFormula {
         Ok(self.number_of_elements()? == 2)
     }
 
-    fn inner_diatomic(
-        &self,
-        left: &mut Option<elements_rs::Element>,
-        right: &mut Option<elements_rs::Element>,
-    ) {
+    fn inner_diatomic(&self, left: &mut Option<Element>, right: &mut Option<Element>) {
         match self {
             Self::Isotope(isotope) => {
                 if left.is_none() {
-                    *left = Some(isotope.element());
+                    *left = Some(isotope.as_ref().element());
                 } else if right.is_none() {
-                    *right = Some(isotope.element());
+                    *right = Some(isotope.as_ref().element());
                 } else {
                     unreachable!()
                 }
             }
             Self::Element(element) => {
                 if left.is_none() {
-                    *left = Some(*element);
+                    *left = Some(*element.as_ref());
                 } else if right.is_none() {
-                    *right = Some(*element);
+                    *right = Some(*element.as_ref());
                 } else {
                     unreachable!()
                 }
@@ -129,9 +125,7 @@ impl crate::MolecularFormula {
     /// * If the formula contains a non-element, such as a `Residual`.
     /// * If the formula contains a `Mixture`, whether it is diatomic or not, it
     ///   is not well defined and as such an error is returned.
-    pub fn diatomic(
-        &self,
-    ) -> Result<Option<(elements_rs::Element, elements_rs::Element)>, crate::errors::Error> {
+    pub fn diatomic(&self) -> Result<Option<(Element, Element)>, crate::errors::Error> {
         if !self.is_diatomic()? {
             return Ok(None);
         }
@@ -153,18 +147,18 @@ impl crate::MolecularFormula {
         match self {
             Self::Isotope(isotope) => {
                 if left.is_none() {
-                    *left = Some(i16::from(isotope.element().valence_electrons()));
+                    *left = Some(i16::from(isotope.as_ref().element().valence_electrons()));
                 } else if right.is_none() {
-                    *right = Some(i16::from(isotope.element().valence_electrons()));
+                    *right = Some(i16::from(isotope.as_ref().element().valence_electrons()));
                 } else {
                     unreachable!()
                 }
             }
             Self::Element(element) => {
                 if left.is_none() {
-                    *left = Some(i16::from(element.valence_electrons()));
+                    *left = Some(i16::from(element.as_ref().valence_electrons()));
                 } else if right.is_none() {
-                    *right = Some(i16::from(element.valence_electrons()));
+                    *right = Some(i16::from(element.as_ref().valence_electrons()));
                 } else {
                     unreachable!()
                 }
