@@ -4,7 +4,7 @@
 [![Clippy](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-clippy-elements.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-clippy-elements.yml)
 [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-elements.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-elements.yml)
 
-A comprehensive Rust crate providing type-safe enumerations and rich metadata for all [chemical elements](https://en.wikipedia.org/wiki/Chemical_element) of the [periodic table](https://en.wikipedia.org/wiki/Periodic_table) and their [isotopes](https://en.wikipedia.org/wiki/Isotope). The crate includes all 118 elements from Hydrogen to Oganesson with detailed information for each [isotope](https://en.wikipedia.org/wiki/Isotope) including [mass numbers](https://en.wikipedia.org/wiki/Mass_number), [relative atomic masses](https://en.wikipedia.org/wiki/Relative_atomic_mass), [isotopic composition](https://en.wikipedia.org/wiki/Natural_abundance), and identification of the most abundant isotope. Chemical properties are fully supported: [standard atomic weights](https://en.wikipedia.org/wiki/Standard_atomic_weight), [oxidation states](https://en.wikipedia.org/wiki/Oxidation_state) with validation, [valence electrons](https://en.wikipedia.org/wiki/Valence_electron), bond numbers, [electron configurations](https://en.wikipedia.org/wiki/Electron_configuration) with [atomic orbitals](https://en.wikipedia.org/wiki/Atomic_orbital), and [principal quantum numbers](https://en.wikipedia.org/wiki/Principal_quantum_number). Optional features provide database integration through Diesel (PostgreSQL and SQLite), PostgreSQL extension support via PGRX, and serialization through serde.
+A comprehensive Rust crate providing type-safe enumerations and rich metadata for all [chemical elements](https://en.wikipedia.org/wiki/Chemical_element) of the [periodic table](https://en.wikipedia.org/wiki/Periodic_table) and their [isotopes](https://en.wikipedia.org/wiki/Isotope). The crate includes all 118 elements from Hydrogen to Oganesson with detailed information for each [isotope](https://en.wikipedia.org/wiki/Isotope) including [mass numbers](https://en.wikipedia.org/wiki/Mass_number), [relative atomic masses](https://en.wikipedia.org/wiki/Relative_atomic_mass), [isotopic composition](https://en.wikipedia.org/wiki/Natural_abundance), and identification of the most abundant isotope. Chemical properties are fully supported: [standard atomic weights](https://en.wikipedia.org/wiki/Standard_atomic_weight), [oxidation states](https://en.wikipedia.org/wiki/Oxidation_state) with validation, [valence electrons](https://en.wikipedia.org/wiki/Valence_electron), bond numbers, [electron configurations](https://en.wikipedia.org/wiki/Electron_configuration) with [atomic orbitals](https://en.wikipedia.org/wiki/Atomic_orbital), and [principal quantum numbers](https://en.wikipedia.org/wiki/Principal_quantum_number). Optional features provide database integration through Diesel (`PostgreSQL` and `SQLite`), `PostgreSQL` extension support via PGRX, and serialization through serde.
 
 ## Usage
 
@@ -66,11 +66,11 @@ let nitrogen = Element::from_str("N").unwrap();
 
 - `serde` (default): Enables `Serialize` and `Deserialize` implementations for `Element` and `Isotope` types
 - `diesel`: Adds Diesel ORM trait implementations for database queries
-- `sqlite`: Enables SQLite-specific type mappings (requires `diesel`)
-- `postgres`: Enables PostgreSQL-specific type mappings (requires `diesel`)
-- `diesel_pgrx`: Integrates Diesel with PGRX for PostgreSQL extension development (requires `diesel`)
-- `pgrx`: Enables PostgreSQL extension API through PGRX
-- `pg13`, `pg14`, `pg15`, `pg16`, `pg17`: Select specific PostgreSQL version (requires `pgrx`, mutually exclusive)
+- `sqlite`: Enables `SQLite`-specific type mappings (requires `diesel`)
+- `postgres`: Enables `PostgreSQL`-specific type mappings (requires `diesel`)
+- `diesel_pgrx`: Integrates Diesel with PGRX for `PostgreSQL` extension development (requires `diesel`)
+- `pgrx`: Enables `PostgreSQL` extension API through PGRX
+- `pg13`, `pg14`, `pg15`, `pg16`, `pg17`: Select specific `PostgreSQL` version (requires `pgrx`, mutually exclusive)
 
 ## Compiling the PGRX Extension
 
