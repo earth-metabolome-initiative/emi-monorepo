@@ -29,6 +29,22 @@ impl TryFrom<&String> for crate::MolecularFormula {
     }
 }
 
+impl crate::MolecularFormula {
+    /// Tries to parse a `MolecularFormula` from an iterator of characters.
+    ///
+    /// # Arguments
+    ///
+    /// * `iter` - An iterator of characters representing the molecular formula.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the parsing fails.
+    #[inline]
+    pub fn try_from_iter<I: Iterator<Item = char>>(iter: I) -> Result<Self, crate::errors::Error> {
+        crate::parser::Parser::from(iter).parse()
+    }
+}
+
 impl From<Token> for crate::MolecularFormula {
     fn from(token: Token) -> Self {
         match token {
