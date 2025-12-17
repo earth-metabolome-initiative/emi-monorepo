@@ -13,8 +13,8 @@ impl MolecularFormula {
     /// * If the formula is a `Residual`, an error is returned.
     pub fn molar_mass(&self) -> Result<f64, crate::errors::Error> {
         match self {
-            Self::Element(element) => Ok(element.standard_atomic_weight()),
-            Self::Isotope(isotope) => Ok(isotope.element().standard_atomic_weight()),
+            Self::Element(element) => Ok(element.as_ref().standard_atomic_weight()),
+            Self::Isotope(isotope) => Ok(isotope.as_ref().element().standard_atomic_weight()),
             Self::Ion(ion) => {
                 ion.entry.molar_mass().map(|molar_mass| {
                     molar_mass - f64::from(ion.charge) * crate::ion::ELECTRON_MASS

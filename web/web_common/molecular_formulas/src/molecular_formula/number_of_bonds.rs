@@ -17,11 +17,11 @@ impl crate::MolecularFormula {
     pub fn number_of_bonds(&self) -> Result<(i16, i16), Error> {
         Ok(match self {
             Self::Element(element) => {
-                let (min, max) = element.number_of_bonds();
+                let (min, max) = element.as_ref().number_of_bonds();
                 (min.into(), max.into())
             }
             Self::Isotope(isotope) => {
-                let (min, max) = isotope.number_of_bonds();
+                let (min, max) = isotope.as_ref().number_of_bonds();
                 (min.into(), max.into())
             }
             Self::Ion(ion) => {
