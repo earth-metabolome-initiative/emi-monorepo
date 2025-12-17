@@ -5,6 +5,7 @@ use std::iter::Peekable;
 use crate::{Ion, MolecularFormula, molecular_formula::Side, token::Token};
 
 mod token_iter;
+pub use token_iter::TokenIter;
 
 /// Parser for the `MolecularFormula` struct
 pub struct Parser<I: Iterator<Item = char>> {
@@ -22,6 +23,12 @@ impl<I: Iterator<Item = char>> From<I> for Parser<I> {
     fn from(iter: I) -> Self {
         let tokens_iter = token_iter::TokenIter::from(iter).peekable();
         Parser { tokens_iter }
+    }
+}
+
+impl<I: Iterator<Item = char>> From<TokenIter<I>> for Parser<I> {
+    fn from(tokens_iter: TokenIter<I>) -> Self {
+        Parser { tokens_iter: tokens_iter.peekable() }
     }
 }
 

@@ -8,6 +8,7 @@ use num_traits::{CheckedAdd, CheckedMul, ConstOne, ConstZero};
 
 use crate::token::{Token, greek_letters::GreekLetter};
 
+/// Iterator over the `Token`s found in a provided string.
 pub struct TokenIter<I: Iterator<Item = char>> {
     /// The peekable chars iterator
     chars: std::iter::Peekable<I>,
@@ -265,6 +266,11 @@ where
             return Some(Token::Dot);
         }
         None
+    }
+
+    /// Pushes a token back to the tokens queue.
+    pub fn push_back(&mut self, token: Token) {
+        self.tokens.push_back(token);
     }
 
     #[allow(clippy::too_many_lines)]
