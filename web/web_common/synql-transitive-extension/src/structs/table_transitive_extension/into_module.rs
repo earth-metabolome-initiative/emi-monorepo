@@ -3,7 +3,7 @@
 
 use synql_core::{
     prelude::Builder,
-    structs::{Documentation, InternalModule, InternalTrait},
+    structs::{Documentation, InternalModule, TraitDef},
 };
 
 use crate::{
@@ -23,7 +23,7 @@ where
         let trait_name = transitive_ext.table.table_transitive_extension_trait_name();
         let schema_doc_path = transitive_ext.table.table_schema_doc_path();
 
-        let internal_trait: InternalTrait = InternalTrait::from(transitive_ext);
+        let internal_trait: TraitDef = TraitDef::from(transitive_ext);
         let auto_blanket = internal_trait.auto_blanket().expect("Failed to generate auto blanket");
 
         InternalModule::new()

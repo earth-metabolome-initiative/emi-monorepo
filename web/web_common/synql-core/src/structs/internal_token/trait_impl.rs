@@ -1,5 +1,5 @@
 //! Submodule providing a variant of the `InternalToken` builder which
-//! helps to implement completely an `InternalTrait` in meta-programming.
+//! helps to implement completely an `TraitDef` in meta-programming.
 
 use std::{collections::HashSet, fmt::Display};
 

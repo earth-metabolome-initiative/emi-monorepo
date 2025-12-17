@@ -1,4 +1,4 @@
-//! Submodule providing the `TableBuildableKeySettableLike` trait for SynQL
+//! Submodule providing the `TableSettableLike` trait for SynQL
 //! table models.
 
 use sql_relations::traits::HorizontalSameAsColumnLike;
@@ -7,13 +7,13 @@ use syn::Ident;
 use synql_core::structs::{TraitVariantRef, Workspace};
 use synql_models::traits::TableModelLike;
 
-use crate::structs::table_buildable_key_settable::TableBuildableKeySettable;
+use crate::structs::table_buildable_key_settable::TableSettable;
 
 /// Name of the module containing the trait for a table.
 pub(crate) const TRAIT_MODULE_NAME: &str = "buildable_key_settable";
 
 /// Trait representing a SynQL table buildable key settable trait.
-pub trait TableBuildableKeySettableLike: TableModelLike {
+pub trait TableSettableLike: TableModelLike {
     /// Returns the crate name for the table buildable key settable trait.
     ///
     /// # Examples
@@ -41,7 +41,7 @@ pub trait TableBuildableKeySettableLike: TableModelLike {
     /// use synql_settable::prelude::*;
     /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT PRIMARY KEY);")?;
     /// let table = db.table(None, "my_table").unwrap();
-    /// assert_eq!(table.table_buildable_key_settable_trait_name(), "MyTableBuildableKeySettable");
+    /// assert_eq!(table.table_buildable_key_settable_trait_name(), "MyTableSettable");
     /// # Ok(())
     /// # }
     /// ```
@@ -79,7 +79,7 @@ pub trait TableBuildableKeySettableLike: TableModelLike {
         })
     }
 
-    /// Returns the [`TableBuildableKeySettable`]
+    /// Returns the [`TableSettable`]
     /// representing the buildable key settable trait for the table.
     ///
     /// # Arguments
@@ -90,8 +90,8 @@ pub trait TableBuildableKeySettableLike: TableModelLike {
         &'table self,
         workspace: &'table Workspace,
         database: &'table Self::DB,
-    ) -> TableBuildableKeySettable<'table, Self> {
-        TableBuildableKeySettable::new(self, workspace, database)
+    ) -> TableSettable<'table, Self> {
+        TableSettable::new(self, workspace, database)
     }
 
     /// Returns the trait reference for the table buildable key settable trait.
@@ -107,4 +107,4 @@ pub trait TableBuildableKeySettableLike: TableModelLike {
     }
 }
 
-impl<T: TableModelLike + ?Sized> TableBuildableKeySettableLike for T {}
+impl<T: TableModelLike + ?Sized> TableSettableLike for T {}

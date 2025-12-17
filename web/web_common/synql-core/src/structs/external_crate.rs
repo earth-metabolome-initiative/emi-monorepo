@@ -9,7 +9,7 @@ use syn::Type;
 
 use crate::{
     structs::{
-        DataVariantRef, ExternalFunctionRef, ExternalMacro, ExternalTrait, ExternalType, Method,
+        DataVariantRef, ExternalFunctionRef, ExternalMacro, TraitDef, ExternalType, Method,
         Trait, external_crate::builder::ExternalCrateBuilder, external_trait::TraitVariantRef,
     },
     traits::{ExternalDependencies, InternalDependencies},
@@ -41,7 +41,7 @@ pub struct ExternalCrate {
     /// List of the macros defined within the crate.
     macros: Vec<ExternalMacro>,
     /// List of the traits defined within the crate.
-    traits: Vec<ExternalTrait>,
+    traits: Vec<TraitDef>,
     /// Methods defined within the crate.
     functions: Vec<(Arc<Method>, syn::Path)>,
     /// Whether the crate is a dependency.
@@ -155,7 +155,7 @@ impl ExternalCrate {
     /// # Arguments
     /// * `name` - A string slice representing the name of the external trait.
     #[must_use]
-    pub fn external_trait(&self, name: &str) -> Option<&ExternalTrait> {
+    pub fn external_trait(&self, name: &str) -> Option<&TraitDef> {
         self.traits.iter().find(|t| t.name() == name)
     }
 
@@ -385,7 +385,7 @@ impl InternalDependencies for ExternalMacroRef {
 /// Struct representing a reference to an external crate and one of its traits.
 pub struct ExternalTraitRef {
     crate_ref: Arc<ExternalCrate>,
-    trait_ref: Arc<ExternalTrait>,
+    trait_ref: Arc<TraitDef>,
 }
 
 impl From<Trait> for ExternalTraitRef {
@@ -443,7 +443,7 @@ impl ExternalTraitRef {
 
     /// Returns a reference to the external trait.
     #[must_use]
-    pub fn external_trait(&self) -> &ExternalTrait {
+    pub fn external_trait(&self) -> &TraitDef {
         &self.trait_ref
     }
 

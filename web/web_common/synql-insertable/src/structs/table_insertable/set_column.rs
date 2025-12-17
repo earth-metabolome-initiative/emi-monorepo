@@ -38,7 +38,7 @@ where
         let table_attributes =
             self.table.attributes_ref(self.workspace).expect("Failed to retrieve table attributes");
 
-        let validation_error = self
+        let _validation_error = self
             .workspace
             .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
             .expect("Failed to get ValidationError type ref")
@@ -69,9 +69,7 @@ where
                     .private()
                     .stream(quote! {
                         impl #try_set_column_trait<#column_path> for #data {
-                            type Error = #validation_error;
-
-                            fn try_set(mut self, #snake_case_ident: #column_type) -> Result<Self, Self::Error> {
+                            fn try_set(mut self, #snake_case_ident: #column_type) -> Result<Self, > {
                                 #(#check_constraints)*
                                 self.#snake_case_ident = Some(#snake_case_ident);
                                 Ok(self)

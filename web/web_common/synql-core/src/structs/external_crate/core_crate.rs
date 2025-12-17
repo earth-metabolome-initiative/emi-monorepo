@@ -7,7 +7,7 @@ use common_traits::builder::Builder;
 use strum::IntoEnumIterator;
 
 use crate::{
-    structs::{ExternalCrate, ExternalTrait, ExternalType, Trait},
+    structs::{ExternalCrate, TraitDef, ExternalType, Trait},
     utils::generic_type,
 };
 mod numeric;
@@ -40,13 +40,13 @@ impl ExternalCrate {
                         .add_traits(Trait::iter().map(std::convert::Into::into))
                         .unwrap()
                         .add_traits([
-                            ExternalTrait::new()
+                            TraitDef::new()
                                 .name("Display")
                                 .unwrap()
                                 .path(syn::parse_quote!(core::fmt::Display))
                                 .build()
                                 .unwrap(),
-                            ExternalTrait::from_trait(),
+                            TraitDef::from_trait(),
                         ])
                         .unwrap()
                         .build()
@@ -57,9 +57,9 @@ impl ExternalCrate {
     }
 }
 
-impl ExternalTrait {
+impl TraitDef {
     fn from_trait() -> Self {
-        ExternalTrait::new()
+        TraitDef::new()
             .name("From")
             .unwrap()
             .path(syn::parse_quote!(core::convert::From))

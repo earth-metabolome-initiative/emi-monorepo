@@ -1,4 +1,4 @@
-//! Submodule defining a builder for the `InternalTrait` struct.
+//! Submodule defining a builder for the `TraitDef` struct.
 
 use std::{error::Error, fmt::Display};
 
@@ -9,14 +9,16 @@ use common_traits::{
 use quote::ToTokens;
 
 use crate::structs::{
-    Documentation, InternalTrait, Publicness, TraitVariantRef, WhereClause, internal_struct::Method,
+    Documentation, TraitDef, Publicness, TraitVariantRef, WhereClause, internal_struct::Method,
 };
 
 #[derive(Default)]
-/// Builder for the `InternalTrait` struct.
-pub struct InternalTraitBuilder {
+/// Builder for the `TraitDef` struct.
+pub struct TraitDefBuilder {
     /// Name of the trait.
     name: Option<String>,
+    /// Optional path for external traits.
+    path: Option<syn::Path>,
     /// Publicness of the trait.
     publicness: Option<Publicness>,
     /// Internal token streams defined within the trait.
@@ -27,13 +29,15 @@ pub struct InternalTraitBuilder {
     where_clauses: Vec<WhereClause>,
     /// Generics for the trait.
     generics: Vec<syn::GenericParam>,
+    /// Generic default values.
+    generic_defaults: Vec<Option<crate::structs::DataVariantRef>>,
     /// Super traits for the trait.
     super_traits: Vec<TraitVariantRef>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-/// Enumeration of the attributes of the `InternalTrait` struct.
-pub enum InternalTraitAttribute {
+/// Enumeration of the attributes of the `TraitDef` struct.
+pub enum TraitDefAttribute {
     /// Name of the trait.
     Name,
     /// Publicness of the trait.
@@ -50,26 +54,26 @@ pub enum InternalTraitAttribute {
     SuperTraits,
 }
 
-impl Display for InternalTraitAttribute {
+impl Display for TraitDefAttribute {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            InternalTraitAttribute::Name => write!(f, "name"),
-            InternalTraitAttribute::Publicness => write!(f, "publicness"),
-            InternalTraitAttribute::InternalTokens => write!(f, "methods"),
-            InternalTraitAttribute::Documentation => write!(f, "documentation"),
-            InternalTraitAttribute::WhereClauses => write!(f, "where_clauses"),
-            InternalTraitAttribute::Generics => write!(f, "generics"),
-            InternalTraitAttribute::SuperTraits => write!(f, "super_traits"),
+            TraitDefAttribute::Name => write!(f, "name"),
+            TraitDefAttribute::Publicness => write!(f, "publicness"),
+            TraitDefAttribute::InternalTokens => write!(f, "methods"),
+            TraitDefAttribute::Documentation => write!(f, "documentation"),
+            TraitDefAttribute::WhereClauses => write!(f, "where_clauses"),
+            TraitDefAttribute::Generics => write!(f, "generics"),
+            TraitDefAttribute::SuperTraits => write!(f, "super_traits"),
         }
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Enumeration of errors that can occur during the building of an
-/// `InternalTrait`.
-pub enum InternalTraitBuilderError {
+/// `TraitDef`.
+pub enum TraitDefBuilderError {
     /// An error occurred during the building process.
-    Builder(BuilderError<InternalTraitAttribute>),
+    Builder(BuilderError<TraitDefAttribute>),
     /// The name of the trait is invalid.
     InvalidName,
     /// Duplicate method names found.
@@ -80,48 +84,57 @@ pub enum InternalTraitBuilderError {
     DuplicateGeneric(String),
 }
 
-impl Display for InternalTraitBuilderError {
+impl Display for TraitDefBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            InternalTraitBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
-            InternalTraitBuilderError::InvalidName => write!(f, "Invalid trait name"),
-            InternalTraitBuilderError::DuplicateMethodName(name) => {
+            TraitDefBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
+            TraitDefBuilderError::InvalidName => write!(f, "Invalid trait name"),
+            TraitDefBuilderError::DuplicateMethodName(name) => {
                 write!(f, "Duplicate method name found in trait: {name}")
             }
-            InternalTraitBuilderError::DuplicateWhereClause(clause) => {
+            TraitDefBuilderError::DuplicateWhereClause(clause) => {
                 write!(f, "Duplicate where clause found in trait: {clause}")
             }
-            InternalTraitBuilderError::DuplicateGeneric(generic) => {
+            TraitDefBuilderError::DuplicateGeneric(generic) => {
                 write!(f, "Duplicate generic found in trait: {generic}")
             }
         }
     }
 }
 
-impl Error for InternalTraitBuilderError {
+impl Error for TraitDefBuilderError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
-            InternalTraitBuilderError::Builder(e) => Some(e),
+            TraitDefBuilderError::Builder(e) => Some(e),
             _ => None,
         }
     }
 }
 
-impl InternalTraitBuilder {
+impl TraitDefBuilder {
     /// Sets the name of the trait.
     ///
     /// # Arguments
     /// * `name` - The name of the trait.
-    pub fn name<S: ToString>(mut self, name: &S) -> Result<Self, InternalTraitBuilderError> {
+    pub fn name<S: ToString + ?Sized>(mut self, name: &S) -> Result<Self, TraitDefBuilderError> {
         let name = name.to_string();
         if name.trim().is_empty()
             || name.contains(' ')
             || !name.chars().all(|c| c.is_alphanumeric() || c == '_')
         {
-            return Err(InternalTraitBuilderError::InvalidName);
+            return Err(TraitDefBuilderError::InvalidName);
         }
         self.name = Some(name);
         Ok(self)
+    }
+
+    /// Sets the path of the trait (for external traits).
+    ///
+    /// # Arguments
+    /// * `path` - The path to the trait in the external crate.
+    pub fn path(mut self, path: syn::Path) -> Self {
+        self.path = Some(path);
+        self
     }
 
     /// Sets the publicness of the trait.
@@ -158,9 +171,9 @@ impl InternalTraitBuilder {
     ///
     /// # Arguments
     /// * `method` - The method to add.
-    pub fn method(mut self, method: Method) -> Result<Self, InternalTraitBuilderError> {
+    pub fn method(mut self, method: Method) -> Result<Self, TraitDefBuilderError> {
         if self.methods.iter().any(|m| m.name() == method.name()) {
-            return Err(InternalTraitBuilderError::DuplicateMethodName(method.name().to_string()));
+            return Err(TraitDefBuilderError::DuplicateMethodName(method.name().to_string()));
         }
         self.methods.push(method);
         Ok(self)
@@ -170,7 +183,7 @@ impl InternalTraitBuilder {
     ///
     /// # Arguments
     /// * `methods` - The methods to add.
-    pub fn methods<I>(mut self, methods: I) -> Result<Self, InternalTraitBuilderError>
+    pub fn methods<I>(mut self, methods: I) -> Result<Self, TraitDefBuilderError>
     where
         I: IntoIterator<Item = Method>,
     {
@@ -205,6 +218,23 @@ impl InternalTraitBuilder {
         self
     }
 
+    /// Adds a generic with a default value.
+    ///
+    /// # Arguments
+    /// * `generic` - The generic parameter.
+    /// * `default` - The default value for the generic.
+    pub fn generic_with_default(
+        mut self,
+        generic: syn::GenericParam,
+        default: Option<crate::structs::DataVariantRef>,
+    ) -> Self {
+        if !self.generics.contains(&generic) {
+            self.generics.push(generic);
+            self.generic_defaults.push(default);
+        }
+        self
+    }
+
     /// Adds a where clause to the trait.
     ///
     /// # Arguments
@@ -212,9 +242,9 @@ impl InternalTraitBuilder {
     pub fn where_clause(
         mut self,
         where_clause: WhereClause,
-    ) -> Result<Self, InternalTraitBuilderError> {
+    ) -> Result<Self, TraitDefBuilderError> {
         if self.where_clauses.contains(&where_clause) {
-            return Err(InternalTraitBuilderError::DuplicateWhereClause(
+            return Err(TraitDefBuilderError::DuplicateWhereClause(
                 where_clause.to_token_stream().to_string(),
             ));
         }
@@ -226,7 +256,7 @@ impl InternalTraitBuilder {
     ///
     /// # Arguments
     /// * `where_clauses` - The where clauses to add.
-    pub fn where_clauses<I>(mut self, where_clauses: I) -> Result<Self, InternalTraitBuilderError>
+    pub fn where_clauses<I>(mut self, where_clauses: I) -> Result<Self, TraitDefBuilderError>
     where
         I: IntoIterator<Item = WhereClause>,
     {
@@ -267,32 +297,34 @@ impl InternalTraitBuilder {
     }
 }
 
-impl Attributed for InternalTraitBuilder {
-    type Attribute = InternalTraitAttribute;
+impl Attributed for TraitDefBuilder {
+    type Attribute = TraitDefAttribute;
 }
 
-impl IsCompleteBuilder for InternalTraitBuilder {
+impl IsCompleteBuilder for TraitDefBuilder {
     fn is_complete(&self) -> bool {
         self.name.is_some() && self.publicness.is_some() && self.documentation.is_some()
     }
 }
 
-impl Builder for InternalTraitBuilder {
-    type Error = BuilderError<InternalTraitAttribute>;
-    type Object = InternalTrait;
+impl Builder for TraitDefBuilder {
+    type Error = BuilderError<TraitDefAttribute>;
+    type Object = TraitDef;
 
     fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(InternalTrait {
-            name: self.name.ok_or(BuilderError::IncompleteBuild(InternalTraitAttribute::Name))?,
+        Ok(TraitDef {
+            name: self.name.ok_or(BuilderError::IncompleteBuild(TraitDefAttribute::Name))?,
+            path: self.path,
             publicness: self
                 .publicness
-                .ok_or(BuilderError::IncompleteBuild(InternalTraitAttribute::Publicness))?,
+                .ok_or(BuilderError::IncompleteBuild(TraitDefAttribute::Publicness))?,
             methods: self.methods,
             documentation: self
                 .documentation
-                .ok_or(BuilderError::IncompleteBuild(InternalTraitAttribute::Documentation))?,
+                .ok_or(BuilderError::IncompleteBuild(TraitDefAttribute::Documentation))?,
             where_clauses: self.where_clauses,
             generics: self.generics,
+            generic_defaults: self.generic_defaults,
             super_traits: self.super_traits,
         })
     }

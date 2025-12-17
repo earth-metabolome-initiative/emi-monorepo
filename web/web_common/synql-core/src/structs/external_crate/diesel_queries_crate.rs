@@ -7,7 +7,7 @@ use std::sync::{Arc, OnceLock};
 use common_traits::builder::Builder;
 
 use crate::{
-    structs::{ExternalCrate, ExternalTrait},
+    structs::{ExternalCrate, TraitDef},
     utils::generic_type,
 };
 
@@ -16,18 +16,18 @@ static DIESEL_QUERIES_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
 impl ExternalCrate {
     /// Helper function to create a diesel-queries trait without generic
     /// parameters.
-    fn create_diesel_queries_trait(name: &str) -> ExternalTrait {
+    fn create_diesel_queries_trait(name: &str) -> TraitDef {
         let path: syn::Path =
             syn::parse_str(&format!("diesel_queries::prelude::{}", name)).unwrap();
-        ExternalTrait::new().name(name).unwrap().path(path).build().unwrap()
+        TraitDef::new().name(name).unwrap().path(path).build().unwrap()
     }
 
     /// Helper function to create a diesel-queries trait with a single generic
     /// parameter.
-    fn create_diesel_queries_trait_with_generic(name: &str, generic_name: &str) -> ExternalTrait {
+    fn create_diesel_queries_trait_with_generic(name: &str, generic_name: &str) -> TraitDef {
         let path: syn::Path =
             syn::parse_str(&format!("diesel_queries::prelude::{}", name)).unwrap();
-        ExternalTrait::new()
+        TraitDef::new()
             .name(name)
             .unwrap()
             .path(path)
@@ -41,11 +41,11 @@ impl ExternalCrate {
     fn create_diesel_queries_trait_with_generics(
         name: &str,
         generic_names: &[&str],
-    ) -> ExternalTrait {
+    ) -> TraitDef {
         let path: syn::Path =
             syn::parse_str(&format!("diesel_queries::prelude::{}", name)).unwrap();
         let generics: Vec<_> = generic_names.iter().map(|&n| generic_type(n)).collect();
-        ExternalTrait::new().name(name).unwrap().path(path).generics(generics).build().unwrap()
+        TraitDef::new().name(name).unwrap().path(path).generics(generics).build().unwrap()
     }
 
     /// Returns the cached `ExternalCrate` instance describing the

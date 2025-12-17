@@ -1,4 +1,4 @@
-//! Submodule defining the `TableBuildableKeySettable` struct for generating
+//! Submodule defining the `TableSettable` struct for generating
 //! settable traits.
 
 use sql_relations::prelude::TriangularSameAsForeignKeyLike;
@@ -21,7 +21,7 @@ use synql_diesel_schema::traits::{ColumnSchema, TableSchema};
 use synql_models::traits::TableModelLike;
 use synql_transitive_extension::traits::TableTransitiveExtensionLike;
 
-use crate::traits::{ColumnBuildableKeySettableLike, TableBuildableKeySettableLike};
+use crate::traits::{ColumnBuildableKeySettableLike, TableSettableLike};
 
 mod into_crate;
 mod into_module;
@@ -29,14 +29,14 @@ mod into_trait;
 
 #[derive(Debug)]
 /// Struct representing a SynQL table buildable key settable trait.
-pub struct TableBuildableKeySettable<'table, T: TableBuildableKeySettableLike + ?Sized> {
+pub struct TableSettable<'table, T: TableSettableLike + ?Sized> {
     table: &'table T,
     workspace: &'table Workspace,
     database: &'table T::DB,
 }
 
-impl<'table, T: TableBuildableKeySettableLike + ?Sized> Clone
-    for TableBuildableKeySettable<'table, T>
+impl<'table, T: TableSettableLike + ?Sized> Clone
+    for TableSettable<'table, T>
 {
     #[inline]
     fn clone(&self) -> Self {
@@ -44,18 +44,18 @@ impl<'table, T: TableBuildableKeySettableLike + ?Sized> Clone
     }
 }
 
-impl<'table, T: TableBuildableKeySettableLike + ?Sized> Copy
-    for TableBuildableKeySettable<'table, T>
+impl<'table, T: TableSettableLike + ?Sized> Copy
+    for TableSettable<'table, T>
 {
 }
 
-impl<'table, T: TableBuildableKeySettableLike + ?Sized> TableBuildableKeySettable<'table, T> {
-    /// Creates a new `TableBuildableKeySettable` instance.
+impl<'table, T: TableSettableLike + ?Sized> TableSettable<'table, T> {
+    /// Creates a new `TableSettable` instance.
     ///
     /// # Arguments
     ///
     /// * `table` - The table model implementing
-    ///   `TableBuildableKeySettableLike`.
+    ///   `TableSettableLike`.
     /// * `workspace` - The workspace where the table is defined.
     /// * `database` - The database connection to use to query the table model.
     #[inline]

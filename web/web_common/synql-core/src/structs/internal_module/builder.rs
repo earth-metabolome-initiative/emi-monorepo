@@ -8,7 +8,7 @@ use common_traits::{
 };
 
 use crate::structs::{
-    InternalData, InternalModule, InternalToken, InternalTrait, ModuleDocumentation, Publicness,
+    InternalData, InternalModule, InternalToken, TraitDef, ModuleDocumentation, Publicness,
 };
 
 #[derive(Default)]
@@ -23,7 +23,7 @@ pub struct InternalModuleBuilder {
     /// Data structs defined within the module.
     data: Vec<Arc<InternalData>>,
     /// Internal traits defined within the module.
-    internal_traits: Vec<Arc<InternalTrait>>,
+    internal_traits: Vec<Arc<TraitDef>>,
     /// Other token streams defined within the module.
     internal_tokens: Vec<InternalToken>,
     /// Module documentation.
@@ -42,7 +42,7 @@ pub enum InternalModuleAttribute {
     /// Data structs defined within the module.
     Data,
     /// Internal traits defined within the module.
-    InternalTraits,
+    TraitDefs,
     /// Other token streams defined within the module.
     OtherTokens,
     /// Module documentation.
@@ -56,7 +56,7 @@ impl Display for InternalModuleAttribute {
             InternalModuleAttribute::Submodules => write!(f, "submodules"),
             InternalModuleAttribute::Publicness => write!(f, "publicness"),
             InternalModuleAttribute::Data => write!(f, "data"),
-            InternalModuleAttribute::InternalTraits => write!(f, "internal_traits"),
+            InternalModuleAttribute::TraitDefs => write!(f, "internal_traits"),
             InternalModuleAttribute::OtherTokens => write!(f, "other_tokens"),
             InternalModuleAttribute::Documentation => write!(f, "documentation"),
         }
@@ -79,7 +79,7 @@ pub enum InternalModuleBuilderError {
     DuplicatedDataName,
     /// An internal trait with the same name has already been added to the
     /// module.
-    DuplicatedInternalTraitName,
+    DuplicatedTraitDefName,
 }
 
 impl Display for InternalModuleBuilderError {
@@ -93,7 +93,7 @@ impl Display for InternalModuleBuilderError {
             InternalModuleBuilderError::DuplicatedDataName => {
                 write!(f, "A data struct with the same name has already been added to the module")
             }
-            InternalModuleBuilderError::DuplicatedInternalTraitName => {
+            InternalModuleBuilderError::DuplicatedTraitDefName => {
                 write!(
                     f,
                     "An internal trait with the same name has already been added to the module"
@@ -196,10 +196,10 @@ impl InternalModuleBuilder {
     /// * `internal_trait` - The internal trait to add.
     pub fn internal_trait(
         mut self,
-        internal_trait: InternalTrait,
+        internal_trait: TraitDef,
     ) -> Result<Self, InternalModuleBuilderError> {
         if self.internal_traits.iter().any(|t| t.as_ref() == &internal_trait) {
-            return Err(InternalModuleBuilderError::DuplicatedInternalTraitName);
+            return Err(InternalModuleBuilderError::DuplicatedTraitDefName);
         }
         self.internal_traits.push(Arc::new(internal_trait));
         Ok(self)

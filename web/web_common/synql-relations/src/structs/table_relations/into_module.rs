@@ -3,7 +3,7 @@
 
 use synql_core::{
     prelude::Builder,
-    structs::{Documentation, InternalModule, InternalTrait},
+    structs::{Documentation, InternalModule, TraitDef},
 };
 
 use crate::{
@@ -21,7 +21,7 @@ where
             .model_ref(table_relation.workspace)
             .expect("Failed to get the model ref for the table relations");
 
-        let internal_trait: InternalTrait = InternalTrait::from(table_relation);
+        let internal_trait: TraitDef = TraitDef::from(table_relation);
         let auto_blanket = internal_trait.auto_blanket().expect("Failed to generate auto blanket");
         let schema_crate_ref = table_relation
             .table

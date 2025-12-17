@@ -1,209 +1,17 @@
-//! Submodule providing a struct defining a trait available in an external
-//! crate.
+//! Submodule providing enum for trait variant references (internal vs external).
 
-mod builder;
-use std::{fmt::Debug, hash::Hash, sync::Arc};
+use std::sync::Arc;
 
-use builder::ExternalTraitBuilder;
-use common_traits::builder::Builder;
 use proc_macro2::TokenStream;
 use quote::ToTokens;
 
 use crate::{
     structs::{
-        DataVariantRef, InternalCrate, InternalTrait, Method, Trait, TraitImpl,
+        InternalCrate, TraitDef, TraitImpl, Method, Trait, DataVariantRef,
         external_crate::ExternalTraitRef,
     },
     traits::{ExternalDependencies, InternalDependencies},
 };
-
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-/// Struct defining a trait available in an external crate.
-pub struct ExternalTrait {
-    /// The name of the trait.
-    name: String,
-    /// The [`syn::Path`](syn::Path) representing the trait
-    /// within the external crate.
-    path: syn::Path,
-    /// Generics parameters for the trait.
-    generics: Vec<syn::GenericParam>,
-    /// Generic default values for the trait.
-    generic_defaults: Vec<Option<DataVariantRef>>,
-}
-
-impl ToTokens for ExternalTrait {
-    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        let path = &self.path;
-        tokens.extend(quote::quote! {
-            #path
-        });
-    }
-}
-
-impl From<Trait> for ExternalTrait {
-    fn from(value: Trait) -> Self {
-        ExternalTrait {
-            name: value.as_ref().to_owned(),
-            path: value.path(),
-            generics: vec![],
-            generic_defaults: vec![],
-        }
-    }
-}
-
-impl TryFrom<&ExternalTrait> for Trait {
-    type Error = ();
-
-    fn try_from(value: &ExternalTrait) -> Result<Self, Self::Error> {
-        match value.name.as_str() {
-            "Clone" => Ok(Trait::Clone),
-            "Copy" => Ok(Trait::Copy),
-            "Debug" => Ok(Trait::Debug),
-            "Default" => Ok(Trait::Default),
-            "PartialEq" => Ok(Trait::PartialEq),
-            "Eq" => Ok(Trait::Eq),
-            "PartialOrd" => Ok(Trait::PartialOrd),
-            "Ord" => Ok(Trait::Ord),
-            "Hash" => Ok(Trait::Hash),
-            _ => Err(()),
-        }
-    }
-}
-
-unsafe impl Send for ExternalTrait {}
-unsafe impl Sync for ExternalTrait {}
-
-impl ExternalTrait {
-    /// Inizializes a new `ExternalTraitBuilder`.
-    #[must_use]
-    pub fn new() -> ExternalTraitBuilder {
-        ExternalTraitBuilder::default()
-    }
-
-    /// Returns a new `Sized` trait definition.
-    #[must_use]
-    pub fn sized() -> ExternalTrait {
-        ExternalTrait::new()
-            .name("Sized")
-            .unwrap()
-            .path(syn::parse_quote! { std::marker::Sized })
-            .build()
-            .unwrap()
-    }
-
-    /// Returns the name of the trait.
-    #[must_use]
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    /// Returns the [`syn::Path`](syn::Path) representing the trait
-    /// within the external crate.
-    #[must_use]
-    pub fn path(&self) -> &syn::Path {
-        &self.path
-    }
-
-    /// Returns the generics parameters for the trait.
-    #[must_use]
-    pub fn generics(&self) -> &[syn::GenericParam] {
-        &self.generics
-    }
-
-    /// Returns the generic default values for the trait.
-    #[must_use]
-    pub fn generic_defaults(&self) -> &[Option<DataVariantRef>] {
-        &self.generic_defaults
-    }
-
-    /// Returns an iterator over the generic idents without defaults.
-    pub fn generics_without_defaults(&self) -> impl Iterator<Item = &syn::GenericParam> {
-        self.generics.iter().enumerate().filter_map(|(i, generic)| {
-            if self.generic_defaults[i].is_none() { Some(generic) } else { None }
-        })
-    }
-
-    /// Returns the formatted generics, with defaults in place of the generic
-    /// where they exist.
-    #[must_use]
-    pub fn generics_with_defaults(&self) -> Option<TokenStream> {
-        if self.generics.is_empty() {
-            None
-        } else {
-            let generics_with_defaults =
-                self.generics.iter().zip(self.generic_defaults.iter()).map(|(ident, default)| {
-                    if let Some(default) = default {
-                        let default_with_generics = default.format_with_generics();
-                        quote::quote! { #default_with_generics }
-                    } else {
-                        quote::quote! { #ident }
-                    }
-                });
-            Some(quote::quote! { <#(#generics_with_defaults),*> })
-        }
-    }
-
-    /// Sets a generic field to the provided `DataVariantRef`.
-    #[must_use]
-    pub fn set_generic_field(
-        &self,
-        field: &syn::GenericParam,
-        value: DataVariantRef,
-    ) -> Option<Self> {
-        if !self.generics.contains(field) {
-            return None;
-        }
-
-        let mut new = self.clone();
-        for (i, generic) in self.generics.iter().enumerate() {
-            if generic == field {
-                new.generic_defaults[i] = Some(value);
-                return Some(new);
-            }
-        }
-
-        unreachable!()
-    }
-
-    /// Returns whether the trait is implemented for typeless enums.
-    #[must_use]
-    pub fn implemented_for_typeless_enum(&self) -> bool {
-        if self.path.to_token_stream().to_string() == quote::quote! { serde::Serialize }.to_string()
-        {
-            return true;
-        }
-        if self.path.to_token_stream().to_string()
-            == quote::quote! { serde::Deserialize }.to_string()
-        {
-            return true;
-        }
-
-        let Ok(trait_variant) = Trait::try_from(self) else {
-            return false;
-        };
-        matches!(
-            trait_variant,
-            Trait::Clone
-                | Trait::Debug
-                | Trait::Copy
-                | Trait::PartialEq
-                | Trait::Eq
-                | Trait::Hash
-                | Trait::PartialOrd
-                | Trait::Ord
-        )
-    }
-}
-
-impl InternalDependencies for ExternalTrait {
-    #[inline]
-    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
-        self.generic_defaults()
-            .iter()
-            .filter_map(|default| default.as_ref())
-            .flat_map(InternalDependencies::internal_dependencies)
-    }
-}
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 /// Enum representing a trait implemented for some internal data,
@@ -212,7 +20,7 @@ pub enum TraitVariantRef {
     /// Variant representing a trait defined within the workspace.
     /// The crate definition is optional for cases where the crate itself
     /// has not yet been defined (e.g., for the current crate).
-    Internal(Arc<InternalTrait>, Option<Arc<InternalCrate>>),
+    Internal(Arc<TraitDef>, Option<Arc<InternalCrate>>),
     /// Variant representing a trait defined within an external crate.
     External(ExternalTraitRef),
 }
@@ -223,8 +31,8 @@ impl From<ExternalTraitRef> for TraitVariantRef {
     }
 }
 
-impl From<Arc<InternalTrait>> for TraitVariantRef {
-    fn from(trait_def: Arc<InternalTrait>) -> Self {
+impl From<Arc<TraitDef>> for TraitVariantRef {
+    fn from(trait_def: Arc<TraitDef>) -> Self {
         Self::Internal(trait_def, None)
     }
 }

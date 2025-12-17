@@ -1,5 +1,5 @@
 //! Submodule implementing the `From` trait to convert a
-//! `TableBuildableKeySettable` into an `InternalCrate`.
+//! `TableSettable` into an `InternalCrate`.
 
 use synql_core::{
     prelude::Builder,
@@ -7,15 +7,15 @@ use synql_core::{
 };
 
 use crate::{
-    structs::TableBuildableKeySettable,
-    traits::{TRAIT_MODULE_NAME, TableBuildableKeySettableLike},
+    structs::TableSettable,
+    traits::{TRAIT_MODULE_NAME, TableSettableLike},
 };
 
-impl<'table, T> From<TableBuildableKeySettable<'table, T>> for InternalCrate
+impl<'table, T> From<TableSettable<'table, T>> for InternalCrate
 where
-    T: TableBuildableKeySettableLike + ?Sized,
+    T: TableSettableLike + ?Sized,
 {
-    fn from(value: TableBuildableKeySettable<'table, T>) -> Self {
+    fn from(value: TableSettable<'table, T>) -> Self {
         let schema_crate_ref = value
             .table
             .table_schema_ref(value.workspace)

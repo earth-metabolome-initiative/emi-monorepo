@@ -70,12 +70,10 @@ members = [
   "web/web_common/synql-transitive-extension",
   "web/web_common/diesel-queries",
   "web/web_common/synql-attributes",
-  "web/web_common/synql-value-settable",
   "web/web_common/synql-insertable",
   "web/web_common/synql-checks",
-  "web/web_common/synql-insertable-key-settable",
-  "web/web_common/synql-buildable-key-settable",
-  "web/web_common/synql-builders-metadata",
+  "web/web_common/synql-settable",
+  "web/web_common/synql-builders-metadata"
 ]
 
 [workspace.package]
@@ -227,6 +225,7 @@ sql_traits = { path = "web/web_common/sql_traits" }
 sql_relations = { path = "web/web_common/sql_relations" }
 sql_constraints = { path = "web/web_common/sql_constraints" }
 synql = { path = "web/web_common/synql" }
+diesel-builders = {git = "https://github.com/LucaCappelletti94/diesel-builders.git"}
 synql-core = { path = "web/web_common/synql-core" }
 synql-diesel-schema = { path = "web/web_common/synql-diesel-schema" }
 synql-models = { path = "web/web_common/synql-models" }
@@ -235,11 +234,9 @@ synql-builders-metadata = { path = "web/web_common/synql-builders-metadata" }
 synql-relations = { path = "web/web_common/synql-relations" }
 synql-transitive-extension = { path = "web/web_common/synql-transitive-extension" }
 synql-attributes = { path = "web/web_common/synql-attributes" }
-synql-value-settable = { path = "web/web_common/synql-value-settable" }
 synql-insertable = { path = "web/web_common/synql-insertable" }
 synql-checks = { path = "web/web_common/synql-checks" }
-synql-insertable-key-settable = { path = "web/web_common/synql-insertable-key-settable" }
-synql-buildable-key-settable = { path = "web/web_common/synql-buildable-key-settable" }
+synql-settable = { path = "web/web_common/synql-settable" }
 snake_case_sanitizer = { path = "utils/snake_case_sanitizer" }
 rmcp = { version = "0.8.1", features = ["server", "transport-io"] }
 tempfile = "3.6.0"

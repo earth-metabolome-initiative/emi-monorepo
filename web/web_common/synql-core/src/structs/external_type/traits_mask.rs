@@ -59,6 +59,44 @@ impl AsRef<str> for Trait {
     }
 }
 
+impl TryFrom<&str> for Trait {
+    type Error = ();
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
+            "Clone" => Ok(Trait::Clone),
+            "Copy" => Ok(Trait::Copy),
+            "Debug" => Ok(Trait::Debug),
+            "Default" => Ok(Trait::Default),
+            "PartialEq" => Ok(Trait::PartialEq),
+            "Eq" => Ok(Trait::Eq),
+            "PartialOrd" => Ok(Trait::PartialOrd),
+            "Ord" => Ok(Trait::Ord),
+            "Hash" => Ok(Trait::Hash),
+            _ => Err(()),
+        }
+    }
+}
+
+impl TryFrom<&crate::structs::TraitDef> for Trait {
+    type Error = ();
+
+    fn try_from(value: &crate::structs::TraitDef) -> Result<Self, Self::Error> {
+        match value.name() {
+            "Clone" => Ok(Trait::Clone),
+            "Copy" => Ok(Trait::Copy),
+            "Debug" => Ok(Trait::Debug),
+            "Default" => Ok(Trait::Default),
+            "PartialEq" => Ok(Trait::PartialEq),
+            "Eq" => Ok(Trait::Eq),
+            "PartialOrd" => Ok(Trait::PartialOrd),
+            "Ord" => Ok(Trait::Ord),
+            "Hash" => Ok(Trait::Hash),
+            _ => Err(()),
+        }
+    }
+}
+
 impl Trait {
     /// Returns the full path of the trait.
     #[must_use]

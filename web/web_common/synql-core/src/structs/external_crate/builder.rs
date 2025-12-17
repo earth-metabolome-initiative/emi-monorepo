@@ -7,7 +7,7 @@ use common_traits::{
     prelude::{Builder, BuilderError},
 };
 
-use crate::structs::{ExternalCrate, ExternalMacro, ExternalTrait, ExternalType, Method};
+use crate::structs::{ExternalCrate, ExternalMacro, TraitDef, ExternalType, Method};
 
 #[derive(Default)]
 /// Builder for the `ExternalCrate` struct.
@@ -19,7 +19,7 @@ pub struct ExternalCrateBuilder {
     /// List of the macros defined within the crate.
     macros: Vec<ExternalMacro>,
     /// List of the traits defined within the crate.
-    traits: Vec<ExternalTrait>,
+    traits: Vec<TraitDef>,
     /// The version of the crate if it is a dependency.
     version: Option<String>,
     /// Git to the crate, if it is a GitHub dependency.
@@ -217,7 +217,7 @@ impl ExternalCrateBuilder {
     /// Returns an error if a trait with the same name has already been added.
     pub fn add_trait(
         mut self,
-        external_trait: ExternalTrait,
+        external_trait: TraitDef,
     ) -> Result<Self, ExternalCrateBuilderError> {
         if self.traits.iter().any(|t| t.name() == external_trait.name()) {
             return Err(ExternalCrateBuilderError::DuplicatedTrait);
@@ -236,7 +236,7 @@ impl ExternalCrateBuilder {
     /// Returns an error if any trait with the same name has already been added.
     pub fn add_traits<I>(mut self, external_traits: I) -> Result<Self, ExternalCrateBuilderError>
     where
-        I: IntoIterator<Item = ExternalTrait>,
+        I: IntoIterator<Item = TraitDef>,
     {
         for external_trait in external_traits {
             self = self.add_trait(external_trait)?;

@@ -2,8 +2,7 @@
 
 use sql_traits::traits::{ColumnLike, DatabaseLike};
 use synql_core::structs::{InternalDataRef, Workspace};
-use synql_diesel_schema::traits::TableSchema;
-use synql_value_settable::traits::TableValueSettableLike;
+use synql_models::traits::TableModelLike;
 
 use crate::structs::TableInsertable;
 
@@ -11,7 +10,7 @@ use crate::structs::TableInsertable;
 pub const INSERTABLE_MODULE_NAME: &str = "insertable";
 
 /// Trait representing a SynQL table insertable.
-pub trait TableInsertableLike: TableValueSettableLike {
+pub trait TableInsertableLike: TableModelLike {
     /// Returns the name of the crate for the table insertable.
     fn table_insertable_crate_name(&self) -> String {
         format!("{}_insertable", self.table_singular_snake_name())
@@ -66,4 +65,4 @@ pub trait TableInsertableLike: TableValueSettableLike {
     }
 }
 
-impl<T: TableSchema> TableInsertableLike for T {}
+impl<T: TableModelLike> TableInsertableLike for T {}

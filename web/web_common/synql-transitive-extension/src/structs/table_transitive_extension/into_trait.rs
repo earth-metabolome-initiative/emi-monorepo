@@ -1,15 +1,15 @@
 //! Submodule implementing the `From` trait to convert a
-//! `TableTransitiveExtension` into an `InternalTrait`.
+//! `TableTransitiveExtension` into an `TraitDef`.
 
 use synql_core::{
     prelude::Builder,
-    structs::{Documentation, InternalTrait},
+    structs::{Documentation, TraitDef},
     utils::generic_type,
 };
 
 use crate::{structs::TableTransitiveExtension, traits::TableTransitiveExtensionLike};
 
-impl<'table, T> From<TableTransitiveExtension<'table, T>> for InternalTrait
+impl<'table, T> From<TableTransitiveExtension<'table, T>> for TraitDef
 where
     T: TableTransitiveExtensionLike + ?Sized,
 {
@@ -19,7 +19,7 @@ where
             .table_schema_ref(transitive_ext.workspace)
             .expect("Failed to get the table schema ref for the table relations");
         let extensin_of = transitive_ext.workspace.external_trait("ExtensionOf").unwrap();
-        InternalTrait::new()
+        TraitDef::new()
             .public()
             .name(&transitive_ext.table.table_transitive_extension_trait_name())
             .expect("Failed to set the internal trait name")

@@ -10,7 +10,7 @@ use sql_relations::{
 };
 use sql_traits::traits::DatabaseLike;
 use synql_attributes::prelude::*;
-use synql_buildable_key_settable::traits::TableBuildableKeySettableLike;
+use synql_buildable_key_settable::traits::TableSettableLike;
 use synql_core::{
     prelude::Builder,
     structs::{ExternalCrate, InternalData, InternalToken, MethodBuilder, WhereClause},

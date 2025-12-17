@@ -3,7 +3,6 @@
 
 use sql_relations::traits::{VerticalSameAsColumnLike, VerticalSameAsForeignKeyLike};
 use sql_traits::traits::ColumnLike;
-use synql_insertable_key_settable::traits::ColumnInsertableKeySettableLike;
 
 /// Trait representing a SynQL column buildable key settable trait.
 pub trait ColumnBuildableKeySettableLike: ColumnInsertableKeySettableLike {

@@ -5,7 +5,7 @@ use std::sync::{Arc, OnceLock};
 
 use common_traits::builder::Builder;
 
-use crate::structs::{ExternalCrate, ExternalTrait, ExternalType};
+use crate::structs::{ExternalCrate, TraitDef, ExternalType};
 
 static STD_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
 
@@ -34,7 +34,7 @@ impl ExternalCrate {
                             Arc::new(ExternalType::system_time()),
                         ])
                         .unwrap()
-                        .add_trait(ExternalTrait::sized())
+                        .add_trait(TraitDef::sized())
                         .unwrap()
                         .build()
                         .unwrap(),

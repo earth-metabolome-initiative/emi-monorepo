@@ -1,26 +1,24 @@
-//! Submodule implementing the `From` trait to convert a `TableValueSettable`
-//! into an `InternalModule`.
+//! Submodule implementing the `From` trait to convert a
+//! `TableSettable` into an `InternalModule`.
 
-use sql_relations::traits::InheritableDatabaseLike;
 use synql_core::{
     prelude::Builder,
     structs::{Documentation, InternalModule},
 };
 
 use crate::{
-    structs::TableValueSettable,
-    traits::{TRAIT_MODULE_NAME, TableValueSettableLike},
+    structs::TableSettable,
+    traits::{TRAIT_MODULE_NAME, TableSettableLike},
 };
 
-impl<'table, T> From<TableValueSettable<'table, T>> for InternalModule
+impl<'table, T> From<TableSettable<'table, T>> for InternalModule
 where
-    T: TableValueSettableLike + ?Sized,
-    T::DB: InheritableDatabaseLike,
+    T: TableSettableLike + ?Sized,
 {
-    fn from(table_relation: TableValueSettable<'table, T>) -> Self {
-        let schema_crate_ref = table_relation
+    fn from(value: TableSettable<'table, T>) -> Self {
+        let schema_crate_ref = value
             .table
-            .table_schema_ref(table_relation.workspace)
+            .table_schema_ref(value.workspace)
             .expect("Failed to get the table schema ref for the table relations");
 
         InternalModule::new()
@@ -31,8 +29,8 @@ where
                 Documentation::new()
                     .documentation(&format!(
                         "Submodule providing the [`{}`] trait for the {} table.",
-                        table_relation.table.table_value_settable_trait_name(),
-                        table_relation.table.table_schema_doc_path()
+                        value.table.table_buildable_key_settable_trait_name(),
+                        value.table.table_schema_doc_path()
                     ))
                     .unwrap()
                     .internal_dependency(schema_crate_ref)
@@ -40,7 +38,7 @@ where
                     .unwrap(),
             )
             .public()
-            .internal_trait(table_relation.into())
+            .internal_trait(value.into())
             .expect("Failed to add the internal data to module")
             .build()
             .expect("Failed to convert internal data into internal module")

@@ -5,7 +5,7 @@ use std::sync::{Arc, OnceLock};
 
 use common_traits::builder::Builder;
 
-use crate::structs::{ExternalCrate, ExternalMacro, ExternalTrait, ExternalType};
+use crate::structs::{ExternalCrate, ExternalMacro, TraitDef, ExternalType};
 
 static DIESEL_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
 
@@ -55,43 +55,43 @@ impl ExternalCrate {
                         ])
                         .unwrap()
                         .add_traits([
-                            ExternalTrait::new()
+                            TraitDef::new()
                                 .name("Queryable")
                                 .unwrap()
                                 .path(syn::parse_quote!(diesel::Queryable))
                                 .build()
                                 .unwrap(),
-                            ExternalTrait::new()
+                            TraitDef::new()
                                 .name("Selectable")
                                 .unwrap()
                                 .path(syn::parse_quote!(diesel::Selectable))
                                 .build()
                                 .unwrap(),
-                            ExternalTrait::new()
+                            TraitDef::new()
                                 .name("AsChangeset")
                                 .unwrap()
                                 .path(syn::parse_quote!(diesel::AsChangeset))
                                 .build()
                                 .unwrap(),
-                            ExternalTrait::new()
+                            TraitDef::new()
                                 .name("Identifiable")
                                 .unwrap()
                                 .path(syn::parse_quote!(diesel::Identifiable))
                                 .build()
                                 .unwrap(),
-                            ExternalTrait::new()
+                            TraitDef::new()
                                 .name("Insertable")
                                 .unwrap()
                                 .path(syn::parse_quote!(diesel::Insertable))
                                 .build()
                                 .unwrap(),
-                            ExternalTrait::new()
+                            TraitDef::new()
                                 .name("Associations")
                                 .unwrap()
                                 .path(syn::parse_quote!(diesel::Associations))
                                 .build()
                                 .unwrap(),
-                            ExternalTrait::new()
+                            TraitDef::new()
                                 .name("OptionalExtension")
                                 .unwrap()
                                 .path(syn::parse_quote!(diesel::OptionalExtension))

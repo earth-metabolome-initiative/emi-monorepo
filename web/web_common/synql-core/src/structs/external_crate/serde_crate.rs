@@ -5,7 +5,7 @@ use std::sync::{Arc, OnceLock};
 
 use common_traits::builder::Builder;
 
-use crate::structs::{ExternalCrate, ExternalTrait};
+use crate::structs::{ExternalCrate, TraitDef};
 
 static SERDE_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
 
@@ -22,13 +22,13 @@ impl ExternalCrate {
                         .version("1.0")
                         .features(["derive", "rc"])
                         .add_traits([
-                            ExternalTrait::new()
+                            TraitDef::new()
                                 .name("Serialize")
                                 .unwrap()
                                 .path(syn::parse_quote!(serde::Serialize))
                                 .build()
                                 .unwrap(),
-                            ExternalTrait::new()
+                            TraitDef::new()
                                 .name("Deserialize")
                                 .unwrap()
                                 .path(syn::parse_quote!(serde::Deserialize))

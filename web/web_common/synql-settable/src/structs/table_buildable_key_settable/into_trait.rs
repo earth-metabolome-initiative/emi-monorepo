@@ -1,23 +1,23 @@
 //! Submodule implementing the `From` trait to convert a
-//! `TableBuildableKeySettable` into an `InternalTrait`.
+//! `TableSettable` into an `TraitDef`.
 
 use synql_core::{
     prelude::Builder,
-    structs::{Documentation, InternalTrait},
+    structs::{Documentation, TraitDef},
 };
 
-use crate::{structs::TableBuildableKeySettable, traits::TableBuildableKeySettableLike};
+use crate::{structs::TableSettable, traits::TableSettableLike};
 
-impl<'table, T> From<TableBuildableKeySettable<'table, T>> for InternalTrait
+impl<'table, T> From<TableSettable<'table, T>> for TraitDef
 where
-    T: TableBuildableKeySettableLike + ?Sized,
+    T: TableSettableLike + ?Sized,
 {
-    fn from(value: TableBuildableKeySettable<'table, T>) -> Self {
+    fn from(value: TableSettable<'table, T>) -> Self {
         let schema_crate_ref = value
             .table
             .table_schema_ref(value.workspace)
             .expect("Failed to get the table schema ref for the table relations");
-        let mut builder = InternalTrait::new()
+        let mut builder = TraitDef::new()
             .public()
             .name(&value.table.table_buildable_key_settable_trait_name())
             .expect("Failed to set the internal trait name")

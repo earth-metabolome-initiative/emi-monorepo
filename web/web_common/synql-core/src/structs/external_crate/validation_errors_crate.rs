@@ -7,7 +7,7 @@ use std::sync::{Arc, OnceLock};
 use common_traits::builder::Builder;
 
 use crate::{
-    structs::{DataVariantRef, ExternalCrate, ExternalTrait, ExternalType},
+    structs::{DataVariantRef, ExternalCrate, TraitDef, ExternalType},
     utils::generic_type,
 };
 
@@ -48,7 +48,7 @@ impl ExternalCrate {
                         ])
                         .unwrap()
                         .add_trait(
-                            ExternalTrait::new()
+                            TraitDef::new()
                                 .name("ReplaceFieldName")
                                 .unwrap()
                                 .path(syn::parse_quote!(

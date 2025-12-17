@@ -1,8 +1,8 @@
-//! Submodule defining a struct which represents a rust module.
+//! Submodule defining a struct which represents a rust trait.
 
 mod builder;
 
-pub use builder::InternalTraitBuilder;
+pub use builder::TraitDefBuilder;
 use common_traits::prelude::Builder;
 use proc_macro2::TokenStream;
 use quote::ToTokens;
@@ -10,7 +10,8 @@ use syn::Ident;
 
 use crate::{
     structs::{
-        DataVariantRef, Documentation, InternalCrate, InternalToken, Publicness, TraitVariantRef,
+        DataVariantRef, Documentation, InternalCrate, InternalToken, Publicness, Trait,
+        TraitVariantRef,
         internal_struct::{Method, WhereClause},
     },
     traits::{ExternalDependencies, InternalDependencies},
@@ -18,9 +19,11 @@ use crate::{
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 /// Struct representing a rust trait.
-pub struct InternalTrait {
+pub struct TraitDef {
     /// Name of the trait.
     name: String,
+    /// Optional path for external traits (None for internal traits).
+    path: Option<syn::Path>,
     /// Publicness of the trait.
     publicness: Publicness,
     /// Method definitions.
@@ -31,25 +34,34 @@ pub struct InternalTrait {
     where_clauses: Vec<WhereClause>,
     /// Generics for the trait.
     generics: Vec<syn::GenericParam>,
+    /// Generic default values (for external traits).
+    generic_defaults: Vec<Option<DataVariantRef>>,
     /// Super traits for the trait.
     super_traits: Vec<TraitVariantRef>,
 }
 
-impl InternalTrait {
-    /// Initializes a new `InternalTraitBuilder`.
+impl TraitDef {
+    /// Initializes a new `TraitDefBuilder`.
     #[must_use]
-    pub fn new() -> InternalTraitBuilder {
-        InternalTraitBuilder::default()
+    pub fn new() -> TraitDefBuilder {
+        TraitDefBuilder::default()
     }
 
-    /// Returns the name of the module.
+    /// Returns the name of the trait.
     #[inline]
     #[must_use]
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    /// Returns the ident of the module.
+    /// Returns the path of the trait (for external traits).
+    #[inline]
+    #[must_use]
+    pub fn path(&self) -> Option<&syn::Path> {
+        self.path.as_ref()
+    }
+
+    /// Returns the ident of the trait.
     #[inline]
     #[must_use]
     pub fn ident(&self) -> Ident {
@@ -91,6 +103,68 @@ impl InternalTrait {
     #[must_use]
     pub fn methods(&self) -> &Vec<Method> {
         &self.methods
+    }
+
+    /// Returns the generics for the trait.
+    #[inline]
+    #[must_use]
+    pub fn generics(&self) -> &[syn::GenericParam] {
+        &self.generics
+    }
+
+    /// Returns the generic defaults for the trait.
+    #[inline]
+    #[must_use]
+    pub fn generic_defaults(&self) -> &[Option<DataVariantRef>] {
+        &self.generic_defaults
+    }
+
+    /// Returns the formatted generics without defaults.
+    #[must_use]
+    pub fn generics_without_defaults(&self) -> impl Iterator<Item = &syn::GenericParam> {
+        self.generics
+            .iter()
+            .zip(self.generic_defaults.iter())
+            .filter_map(|(generic, default)| if default.is_none() { Some(generic) } else { None })
+    }
+
+    /// Returns the formatted generics with defaults in place.
+    #[must_use]
+    pub fn generics_with_defaults(&self) -> Option<TokenStream> {
+        if self.generics.is_empty() {
+            None
+        } else {
+            let generics_with_defaults =
+                self.generics.iter().zip(self.generic_defaults.iter()).map(|(ident, default)| {
+                    if let Some(default) = default {
+                        let default_with_generics = default.format_with_generics();
+                        quote::quote! { #default_with_generics }
+                    } else {
+                        quote::quote! { #ident }
+                    }
+                });
+            Some(quote::quote! { <#(#generics_with_defaults),*> })
+        }
+    }
+
+    /// Sets a generic field to the provided `DataVariantRef`.
+    #[must_use]
+    pub fn set_generic_field(
+        &self,
+        field: &syn::GenericParam,
+        value: DataVariantRef,
+    ) -> Option<Self> {
+        let mut new_trait = self.clone();
+        for (i, generic) in new_trait.generics.iter().enumerate() {
+            if generic == field {
+                if i >= new_trait.generic_defaults.len() {
+                    new_trait.generic_defaults.resize(i + 1, None);
+                }
+                new_trait.generic_defaults[i] = Some(value);
+                return Some(new_trait);
+            }
+        }
+        None
     }
 
     /// Returns the where clauses, optionally including super-traits.
@@ -142,6 +216,14 @@ impl InternalTrait {
             return false;
         };
         curresponding_method.is_compatible_with(method)
+    }
+
+    /// Returns whether the trait is implemented for a typeless enum.
+    pub fn implemented_for_typeless_enum(&self) -> bool {
+        let Ok(_reference_trait): Result<Trait, ()> = self.try_into() else {
+            return false;
+        };
+        true
     }
 
     /// Returns the auto-blanket for the trait, if it can be generated.
@@ -201,7 +283,7 @@ impl InternalTrait {
     }
 }
 
-impl InternalDependencies for InternalTrait {
+impl InternalDependencies for TraitDef {
     #[inline]
     fn internal_dependencies(&self) -> impl Iterator<Item = &InternalCrate> {
         self.methods
@@ -213,7 +295,7 @@ impl InternalDependencies for InternalTrait {
     }
 }
 
-impl ExternalDependencies for InternalTrait {
+impl ExternalDependencies for TraitDef {
     #[inline]
     fn external_dependencies(&self) -> impl Iterator<Item = &crate::structs::ExternalCrate> {
         self.methods
@@ -225,7 +307,7 @@ impl ExternalDependencies for InternalTrait {
     }
 }
 
-impl ToTokens for InternalTrait {
+impl ToTokens for TraitDef {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let publicness = &self.publicness;
         let name = &self.ident();
@@ -250,5 +332,26 @@ impl ToTokens for InternalTrait {
                 #(#methods)*
             }
         });
+    }
+}
+
+impl From<crate::structs::Trait> for TraitDef {
+    fn from(value: crate::structs::Trait) -> Self {
+        use common_traits::builder::Builder;
+        TraitDef::new().name(value.as_ref()).unwrap().path(value.path()).build().unwrap()
+    }
+}
+
+impl TraitDef {
+    /// Returns a new `Sized` trait definition.
+    #[must_use]
+    pub fn sized() -> TraitDef {
+        use common_traits::builder::Builder;
+        TraitDef::new()
+            .name(&"Sized")
+            .unwrap()
+            .path(syn::parse_quote! { std::marker::Sized })
+            .build()
+            .unwrap()
     }
 }

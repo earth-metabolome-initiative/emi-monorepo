@@ -11,7 +11,7 @@ use syn::Ident;
 
 use crate::{
     structs::{
-        InternalCrate, InternalData, InternalToken, InternalTrait, ModuleDocumentation, Publicness,
+        InternalCrate, InternalData, InternalToken, TraitDef, ModuleDocumentation, Publicness,
     },
     traits::{ExternalDependencies, InternalDependencies},
 };
@@ -28,7 +28,7 @@ pub struct InternalModule {
     /// Data structs defined within the module.
     data: Vec<Arc<InternalData>>,
     /// Internal trait defined within the module.
-    internal_traits: Vec<Arc<InternalTrait>>,
+    internal_traits: Vec<Arc<TraitDef>>,
     /// Internal token streams defined within the module.
     internal_tokens: Vec<InternalToken>,
     /// Module documentation.
@@ -132,7 +132,7 @@ impl InternalModule {
     /// Returns a reference to the internal trait with the given name if it
     /// exists in the module.
     #[must_use]
-    pub fn internal_trait(&self, name: &str) -> Option<&Arc<InternalTrait>> {
+    pub fn internal_trait(&self, name: &str) -> Option<&Arc<TraitDef>> {
         for internal_trait in &self.internal_traits {
             if internal_trait.name() == name {
                 return Some(internal_trait);

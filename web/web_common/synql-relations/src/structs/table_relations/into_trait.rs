@@ -1,16 +1,16 @@
 //! Submodule implementing the `From` trait to convert a `TableRelations`
-//! into an `InternalTrait`.
+//! into an `TraitDef`.
 
 use sql_relations::traits::{HorizontalSameAsForeignKeyLike, VerticalSameAsForeignKeyLike};
 use synql_core::{
     prelude::{Builder, DatabaseLike, ForeignKeyLike},
-    structs::{Documentation, InternalTrait},
+    structs::{Documentation, TraitDef},
     utils::generic_type,
 };
 
 use crate::{structs::TableRelations, traits::TableRelationsLike};
 
-impl<'table, T> From<TableRelations<'table, T>> for InternalTrait
+impl<'table, T> From<TableRelations<'table, T>> for TraitDef
 where
     T: TableRelationsLike + ?Sized,
 {
@@ -26,7 +26,7 @@ where
             .table
             .table_schema_ref(table_relation.workspace)
             .expect("Failed to get the table schema ref for the table relations");
-        InternalTrait::new()
+        TraitDef::new()
             .public()
             .name(&table_relation.table.table_relations_trait_name())
             .expect("Failed to set the internal trait name")

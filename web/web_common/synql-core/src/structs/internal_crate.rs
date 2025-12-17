@@ -9,7 +9,7 @@ use quote::{ToTokens, quote};
 use syn::{Ident, Token};
 
 use crate::{
-    structs::{InternalData, InternalModule, InternalTrait, ModuleDocumentation, Workspace},
+    structs::{InternalData, InternalModule, TraitDef, ModuleDocumentation, Workspace},
     traits::{ExternalDependencies, InternalDependencies},
 };
 
@@ -131,7 +131,7 @@ impl InternalCrate {
     /// Returns a reference to the internal trait with the given name if it
     /// exists in the crate.
     #[must_use]
-    pub fn internal_trait(&self, name: &str) -> Option<&Arc<InternalTrait>> {
+    pub fn internal_trait(&self, name: &str) -> Option<&Arc<TraitDef>> {
         for module in &self.modules {
             if let Some(trait_) = module.internal_trait(name) {
                 return Some(trait_);

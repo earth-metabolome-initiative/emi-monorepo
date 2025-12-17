@@ -3,7 +3,7 @@
 pub mod structs;
 pub mod traits;
 
-/// Prelude for synql-buildable-key-settable
+/// Prelude for synql-settable
 pub mod prelude {
     pub use crate::{structs::*, traits::*};
 }
