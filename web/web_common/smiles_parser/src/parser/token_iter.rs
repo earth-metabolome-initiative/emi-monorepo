@@ -1,11 +1,10 @@
 //! Submodule creating the `TokenIter` struct, which is an iterator over
 //! the `Token`s found in a provided string.
 
-use std::collections::VecDeque;
-
 use elements_rs::{Element, Isotope};
 use molecular_formulas::MolecularFormula;
-use num_traits::{CheckedAdd, CheckedMul, ConstOne, ConstZero};
+use molecular_formulas::Token as MolecularFormulaToken;
+use molecular_formulas::parser::TokenIter as MolecularFormulaTokenIter;
 
 use crate::token::Token;
 
@@ -33,17 +32,20 @@ impl TokenIter<'_> {
             ':' => Token::Colon,
             '/' => Token::ForwardSlash,
             '\\' => Token::BackSlash,
-            '@' => {
-                if let Some(&'@') = self.chars.peek() {
-                    self.chars.next();
-                    Token::ClockwiseChirality
-                } else {
-                    Token::CounterClockwiseChirality
-                }
-            }
             '[' => {
                 let molecule_iter = self.chars.by_ref().take_while(|c| *c != ']');
-                let molecule = MolecularFormula::try_from_iter(molecule_iter)?;
+                let mut molecule_token_iter = MolecularFormulaTokenIter::from(molecule_iter);
+                if let Some(parsed) = molecule_token_iter.next().transpose()? {
+                    if matches!(
+                        parsed,
+                        MolecularFormulaToken::Element(_) | MolecularFormulaToken::Isotope(_)
+                    ) {
+                        // handle chirality tokens
+                        todo!()
+                    }
+                    molecule_token_iter.push_back(parsed)
+                }
+                let molecule = MolecularFormula::try_from_token_iter(molecule_token_iter)?;
                 Token::MolecularFormula(molecule)
             }
             maybe_number @ '0'..='9' => {
