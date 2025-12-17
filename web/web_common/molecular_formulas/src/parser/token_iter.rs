@@ -8,16 +8,25 @@ use num_traits::{CheckedAdd, CheckedMul, ConstOne, ConstZero};
 
 use crate::token::{Token, greek_letters::GreekLetter};
 
-pub struct TokenIter<'a> {
+pub struct TokenIter<I: Iterator<Item = char>> {
     /// The peekable chars iterator
-    chars: std::iter::Peekable<std::str::Chars<'a>>,
+    chars: std::iter::Peekable<I>,
     /// Tokens already built by failed lookahead attempts.
     tokens: VecDeque<Token>,
 }
 
-impl<'a> From<&'a str> for TokenIter<'a> {
+impl<'a> From<&'a str> for TokenIter<std::str::Chars<'a>> {
     fn from(s: &'a str) -> Self {
         TokenIter { chars: s.chars().peekable(), tokens: VecDeque::new() }
+    }
+}
+
+impl<I> From<I> for TokenIter<I>
+where
+    I: Iterator<Item = char>,
+{
+    fn from(iter: I) -> Self {
+        TokenIter { chars: iter.peekable(), tokens: VecDeque::new() }
     }
 }
 
@@ -139,7 +148,10 @@ fn is_dot(c: char) -> bool {
     c == '.' || c == '•' || c == '⋅' || c == '·'
 }
 
-impl TokenIter<'_> {
+impl<I> TokenIter<I>
+where
+    I: Iterator<Item = char>,
+{
     fn consume_digit<T: From<u8> + ConstOne + CheckedMul + CheckedAdd>(
         &mut self,
         starting_digit: char,
@@ -382,7 +394,10 @@ impl TokenIter<'_> {
     }
 }
 
-impl Iterator for TokenIter<'_> {
+impl<I> Iterator for TokenIter<I>
+where
+    I: Iterator<Item = char>,
+{
     type Item = Result<crate::token::Token, crate::errors::Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
