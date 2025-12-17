@@ -14,20 +14,20 @@ impl TryFrom<char> for crate::Element {
     /// to represent aromatic atoms.
     fn try_from(value: char) -> Result<Self, Self::Error> {
         Ok(match value {
-            'H' | 'h' => Self::H,
+            'H' => Self::H,
             'B' | 'b' => Self::B,
             'C' | 'c' => Self::C,
             'N' | 'n' => Self::N,
             'O' | 'o' => Self::O,
-            'F' | 'f' => Self::F,
+            'F' => Self::F,
             'P' | 'p' => Self::P,
             'S' | 's' => Self::S,
-            'K' | 'k' => Self::K,
-            'V' | 'v' => Self::V,
-            'Y' | 'y' => Self::Y,
-            'I' | 'i' => Self::I,
-            'W' | 'w' => Self::W,
-            'U' | 'u' => Self::U,
+            'K' => Self::K,
+            'V' => Self::V,
+            'Y' => Self::Y,
+            'I' => Self::I,
+            'W' => Self::W,
+            'U' => Self::U,
             _ => {
                 return Err(crate::errors::Error::Element([value, ' ']));
             }
