@@ -41,7 +41,19 @@ impl TokenIter<'_> {
                         MolecularFormulaToken::Element(_) | MolecularFormulaToken::Isotope(_)
                     ) {
                         // handle chirality tokens
-                        todo!()
+                        let chars = molecule_token_iter.chars();
+                        if let Some(&'@') = chars.peek() {
+                            chars.next();
+                            if let Some(&'@') = chars.peek() {
+                                chars.next();
+                                let chirality_token = MolecularFormulaToken::ChiralityClockwise;
+                                molecule_token_iter.push_back(chirality_token);
+                            } else {
+                                let chirality_token =
+                                    MolecularFormulaToken::ChiralityCounterClockwise;
+                                molecule_token_iter.push_back(chirality_token);
+                            }
+                        }
                     }
                     molecule_token_iter.push_back(parsed)
                 }
