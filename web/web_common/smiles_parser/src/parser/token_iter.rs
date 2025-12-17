@@ -24,7 +24,12 @@ impl TokenIter<'_> {
         Ok(match current_char {
             '(' => Token::OpenRoundBracket,
             ')' => Token::CloseRoundBracket,
-            maybe_element_char => {}
+            maybe_element_char => {
+                if maybe_element_char.is_lowercase() && let Ok(){
+                    
+                }
+                if let Some(next_char) = self.chars.peek()
+            }
             unexpected_char => {
                 return Err(crate::errors::Error::UnexpectedCharacter {
                     character: unexpected_char,

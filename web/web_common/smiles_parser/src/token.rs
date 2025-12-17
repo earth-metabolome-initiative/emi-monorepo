@@ -8,6 +8,8 @@ use molecular_formulas::MolecularFormula;
 pub(crate) enum Token {
     /// A molecular formula
     MolecularFormula(MolecularFormula),
+    /// Aromatic molecular formula
+    AromaticMolecularFormula(MolecularFormula),
     /// An open round bracket
     OpenRoundBracket,
     /// A close round bracket
