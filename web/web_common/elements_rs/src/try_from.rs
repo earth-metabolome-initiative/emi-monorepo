@@ -5,9 +5,9 @@ impl TryFrom<char> for crate::Element {
     type Error = crate::errors::Error;
 
     /// Parses single-character element symbols.
-    /// 
+    ///
     /// # Implementation details
-    /// 
+    ///
     /// It supports both uppercase and lowercase letters since,
     /// while in chemical formulas element symbols are capitalized,
     /// in other contexts such as SMILES strings they may appear in lowercase
