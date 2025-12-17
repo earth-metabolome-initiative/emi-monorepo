@@ -2,6 +2,7 @@
 //! the `Token`s found in a provided string.
 
 use elements_rs::{Element, Isotope};
+use molecular_formulas::Atom;
 use molecular_formulas::MolecularFormula;
 use molecular_formulas::Token as MolecularFormulaToken;
 use molecular_formulas::parser::TokenIter as MolecularFormulaTokenIter;
@@ -34,30 +35,7 @@ impl TokenIter<'_> {
             '\\' => Token::BackSlash,
             '[' => {
                 let molecule_iter = self.chars.by_ref().take_while(|c| *c != ']');
-                let mut molecule_token_iter = MolecularFormulaTokenIter::from(molecule_iter);
-                if let Some(parsed) = molecule_token_iter.next().transpose()? {
-                    if matches!(
-                        parsed,
-                        MolecularFormulaToken::Element(_) | MolecularFormulaToken::Isotope(_)
-                    ) {
-                        // handle chirality tokens
-                        let chars = molecule_token_iter.chars();
-                        if let Some(&'@') = chars.peek() {
-                            chars.next();
-                            if let Some(&'@') = chars.peek() {
-                                chars.next();
-                                let chirality_token = MolecularFormulaToken::ChiralityClockwise;
-                                molecule_token_iter.push_back(chirality_token);
-                            } else {
-                                let chirality_token =
-                                    MolecularFormulaToken::ChiralityCounterClockwise;
-                                molecule_token_iter.push_back(chirality_token);
-                            }
-                        }
-                    }
-                    molecule_token_iter.push_back(parsed)
-                }
-                let molecule = MolecularFormula::try_from_token_iter(molecule_token_iter)?;
+                let molecule = MolecularFormula::try_from_iter(molecule_iter)?;
                 Token::MolecularFormula(molecule)
             }
             maybe_number @ '0'..='9' => {
@@ -65,19 +43,18 @@ impl TokenIter<'_> {
                 Token::Label(label)
             }
             maybe_element_char => {
-                if maybe_element_char.is_lowercase()
-                    && let Ok(element) = Element::try_from(maybe_element_char)
-                {
-                    return Ok(Token::AromaticMolecularFormula(element.into()));
-                }
                 if let Some(next_char) = self.chars.peek()
                     && let Ok(element) = Element::try_from([maybe_element_char, *next_char])
                 {
                     self.chars.next();
-                    return Ok(Token::MolecularFormula(element.into()));
+                    return Ok(Token::MolecularFormula(
+                        Atom::new(element, maybe_element_char.is_lowercase()).into(),
+                    ));
                 }
                 if let Ok(element) = Element::try_from(maybe_element_char) {
-                    return Ok(Token::MolecularFormula(element.into()));
+                    return Ok(Token::MolecularFormula(
+                        Atom::new(element, maybe_element_char.is_lowercase()).into(),
+                    ));
                 }
                 return Err(crate::errors::Error::UnexpectedCharacter {
                     character: maybe_element_char,

@@ -8,8 +8,6 @@ use molecular_formulas::MolecularFormula;
 pub enum Token {
     /// A molecular formula
     MolecularFormula(MolecularFormula),
-    /// Aromatic molecular formula
-    AromaticMolecularFormula(MolecularFormula),
     /// An open round bracket
     OpenRoundBracket,
     /// A close round bracket
@@ -36,8 +34,4 @@ pub enum Token {
     BackSlash,
     /// A label that can only go from 0 to 9
     Label(u8),
-    /// The at sign '@' character representing the counter-clockwise chirality
-    CounterClockwiseChirality,
-    /// The at sign '@@' characters representing the clockwise chirality
-    ClockwiseChirality,
 }
