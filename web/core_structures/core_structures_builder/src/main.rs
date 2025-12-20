@@ -4,7 +4,6 @@ use std::path::Path;
 use common_traits::builder::Builder;
 use diesel::PgConnection;
 use init_db::init_database;
-use procedure_codegen::ProcedureCodegen;
 use reference_docker::reference_docker_with_connection;
 use time_requirements::prelude::*;
 use webcodegen::{Codegen, PgExtension, Table, errors::WebCodeGenError};

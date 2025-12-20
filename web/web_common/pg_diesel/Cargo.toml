@@ -13,9 +13,6 @@ sqlparser.workspace = true
 [dev-dependencies]
 tokio.workspace = true
 reference_docker.workspace = true
-synql-models.workspace = true
-synql-diesel-schema.workspace = true
-synql-core.workspace = true
 quote.workspace = true
 
 [lints]

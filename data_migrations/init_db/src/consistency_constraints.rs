@@ -1,11 +1,6 @@
 //! Submodule defining rules that all tables in the database must satisfy.
 
 use diesel::PgConnection;
-use procedure_codegen::constraints::{
-    ProcedureAlignmentConstraint, ProcedurePrimaryKeyConstraint,
-    ProcedureTemplatePrimaryKeyConstraint, ProcedureToProcedureTemplateForeignKeyConstraint,
-    UnusedForeignProcedureTemplateConstraint,
-};
 use time_requirements::{prelude::TimeTracker, task::Task};
 use webcodegen::{
     CompatibleForeignTypeConstraint, CustomColumnConstraint, CustomTableConstraint,

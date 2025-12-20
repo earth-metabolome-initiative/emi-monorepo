@@ -5,12 +5,8 @@ use std::path::PathBuf;
 use common_traits::builder::Builder;
 use diesel::PgConnection;
 use pg_diesel::database::PgDatabaseBuilder;
-use quote::ToTokens;
 use reference_docker::reference_docker_with_connection;
 use sql_traits::traits::{ColumnLike, TableLike, database::DatabaseLike};
-use synql_core::{structs::Workspace, traits::ColumnSynLike};
-use synql_diesel_schema::prelude::TableSchema;
-use synql_models::prelude::TableModelLike;
 
 #[tokio::test]
 /// Test retrieval of extensions from a column
@@ -85,16 +81,6 @@ async fn test_schema_completeness() {
         .build()
         .expect("Failed to build database");
 
-    let mut workspace = Workspace::new()
-        .name(&database_name)
-        .unwrap()
-        .core()
-        .std()
-        .diesel()
-        .serde()
-        .build()
-        .expect("Unable to build workspace");
-
     let crate_root_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
 
     for table in db.table_dag() {
@@ -103,9 +89,6 @@ async fn test_schema_completeness() {
             continue;
         }
 
-        workspace.add_internal_crate(table.schema_macro(&workspace, &db).into());
-        workspace.add_internal_crate(table.model(&workspace, &db).into());
-
         let expected_schema_path = crate_root_path
             .join("src")
             .join("schema")
@@ -113,21 +96,7 @@ async fn test_schema_completeness() {
             .join(format!("{}.rs", table.table_name()));
 
         if !expected_schema_path.exists() {
-            let schema = table.schema_macro(&workspace, &db);
-            let model = table.model(&workspace, &db);
-            let schema_tokens = schema.to_token_stream().to_string();
-            let model_tokens = model.to_token_stream().to_string();
-
-            let schema_path = format!("./{}_schema.rs", table.table_name());
-            let model_path = format!("./{}_model.rs", table.table_name());
-            std::fs::write(&schema_path, schema_tokens).expect("Unable to write file");
-            std::fs::write(&model_path, model_tokens).expect("Unable to write file");
-            panic!(
-                "Table `{}` not found in src/schema/, generated schema and models in documents `./{}_schema.rs` and `./{}_model.rs`",
-                expected_schema_path.display(),
-                table.table_name(),
-                table.table_name()
-            );
+            panic!("Table `{}` not found in src/schema/", expected_schema_path.display(),);
         }
 
         // We read the content of the expected schema file
@@ -138,11 +107,9 @@ async fn test_schema_completeness() {
         for column in table.columns(&db) {
             assert!(
                 expected_schema_content.contains(column.column_name()),
-                "Column `{}.{}` with diesel type `{}` and rust type `{}` not found in expected schema file",
+                "Column `{}.{}` not found in expected schema file",
                 table.table_name(),
                 column.column_name(),
-                column.diesel_type(&workspace, &db).unwrap().to_token_stream().to_string(),
-                column.rust_type(&workspace, &db).unwrap().to_token_stream().to_string()
             );
         }
 

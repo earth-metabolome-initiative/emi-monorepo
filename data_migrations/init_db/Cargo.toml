@@ -8,8 +8,6 @@ taxonomy_fetcher.workspace = true
 diesel = { workspace = true, features = ["postgres"] }
 csqlv = { workspace = true, features = ["diesel"] }
 diesel_migrations_utils.workspace = true
-webcodegen.workspace = true
-procedure_codegen.workspace = true
 time_requirements.workspace = true
 
 [dev-dependencies]

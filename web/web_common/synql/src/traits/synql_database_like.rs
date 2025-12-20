@@ -2,8 +2,6 @@
 
 use sql_relations::traits::InheritableDatabaseLike;
 use sql_traits::traits::DatabaseLike;
-use synql_diesel_schema::traits::TableSchema;
-use synql_models::traits::TableModelLike;
 
 /// Trait representing a database that can be used with `SynQL`.
 pub trait SynQLDatabaseLike: InheritableDatabaseLike

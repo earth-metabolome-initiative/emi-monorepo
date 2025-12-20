@@ -4,9 +4,7 @@ use std::fmt::Display;
 
 use csqlv::CSVSchemaError;
 use diesel_migrations_utils::prelude::MigrationError;
-use procedure_codegen::errors::Error as ProcedureCodegenError;
 use taxonomy_fetcher::{TaxonomyBuilderError, TaxonomyError, impls::ncbi::NCBITaxonEntry};
-use webcodegen::errors::WebCodeGenError;
 
 #[derive(Debug)]
 #[allow(dead_code)]

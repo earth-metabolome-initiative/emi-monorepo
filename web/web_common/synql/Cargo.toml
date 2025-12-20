@@ -8,15 +8,6 @@ common_traits.workspace = true
 sql_traits.workspace = true
 sql_relations.workspace = true
 syn.workspace = true
-synql-core.workspace = true
-synql-models.workspace = true
-synql-diesel-schema.workspace = true
-synql-relations.workspace = true
-synql-attributes.workspace = true
-synql-insertable.workspace = true
-synql-builders.workspace = true
-synql-settable.workspace = true
-synql-transitive-extension.workspace = true
 chrono.workspace = true
 time_requirements.workspace = true
 
