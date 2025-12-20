@@ -3,17 +3,15 @@
 //! column representation, building on top of the
 //! [`CheckConstraintLike`](sql_traits::traits::CheckConstraintLike) trait.
 
+use proc_macro2::TokenStream;
 use quote::quote;
 use sql_traits::traits::{CheckConstraintLike, DatabaseLike};
-use synql_core::{
-    prelude::Builder,
-    structs::{InternalToken, Workspace},
-    traits::ColumnSynLike,
-};
 
 mod sub_expressions;
 mod translate_expression;
 use translate_expression::TranslateExpression;
+
+use crate::structs::Workspace;
 
 /// Trait implemented by types that represent SQL check constraints and can be
 /// used to generate Rust code for them.
@@ -32,11 +30,11 @@ pub trait CheckConstraintSynLike: CheckConstraintLike {
         database: &'db Self::DB,
         workspace: &Workspace,
         contextual_columns: &[&'db <Self::DB as DatabaseLike>::Column],
-    ) -> InternalToken {
+    ) -> TokenStream {
         let translator: TranslateExpression<'_, 'db, <Self as CheckConstraintLike>::DB> =
             TranslateExpression::new(self.borrow(), workspace, database, contextual_columns);
 
-        let mut translated_expressions: Vec<InternalToken> = Vec::new();
+        let mut translated_expressions: Vec<TokenStream> = Vec::new();
 
         for sub_expression in sub_expressions::sub_expressions(self.expression(database)) {
             translated_expressions.push(translator.parse(sub_expression));
@@ -64,7 +62,7 @@ pub trait CheckConstraintSynLike: CheckConstraintLike {
                 }
             });
 
-            InternalToken::new()
+            TokenStream::new()
                 .stream(quote! {
                     if let #(Some(#left)),* = #(#right),* {
                         #( #translated_expressions )*

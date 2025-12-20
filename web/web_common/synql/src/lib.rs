@@ -2,6 +2,7 @@
 
 pub mod structs;
 pub mod traits;
+pub mod utils;
 
 /// Prelude module re-exporting commonly used items.
 pub mod prelude {

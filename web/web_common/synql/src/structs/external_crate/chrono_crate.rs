@@ -1,94 +1,63 @@
 //! Submodule implementing the method `chrono` for the [`ExternalCrate`] struct
 //! which initializes a `ExternalCrate` instance describing the `chrono` crate.
 
-use std::sync::{Arc, OnceLock};
-
-use common_traits::builder::Builder;
-
 use crate::structs::{ExternalCrate, ExternalType};
-
-static CHRONO_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
 
 impl ExternalCrate {
     /// Returns the cached `ExternalCrate` instance describing the `chrono`
     /// crate.
-    pub fn chrono() -> Arc<ExternalCrate> {
-        CHRONO_CRATE
-            .get_or_init(|| {
-                Arc::new(
-                    ExternalCrate::new()
-                        .name("chrono")
-                        .unwrap()
-                        .version("0.4.42")
-                        .add_type(Arc::new(
-                            ExternalType::new()
-                                .diesel_type(syn::parse_quote!(diesel::sql_types::Timestamp))
-                                .rust_type(syn::parse_quote!(chrono::NaiveDateTime))
-                                .postgres_type("timestamp")
-                                .unwrap()
-                                .supports_copy()
-                                .supports_eq()
-                                .supports_serde()
-                                .build()
-                                .unwrap(),
-                        ))
-                        .unwrap()
-                        .add_type(Arc::new(
-                            ExternalType::new()
-                                .diesel_type(syn::parse_quote!(diesel::sql_types::Timestamptz))
-                                .rust_type(syn::parse_quote!(chrono::DateTime<chrono::Utc>))
-                                .postgres_type("timestamptz")
-                                .unwrap()
-                                .supports_copy()
-                                .supports_eq()
-                                .supports_serde()
-                                .build()
-                                .unwrap(),
-                        ))
-                        .unwrap()
-                        .add_type(Arc::new(
-                            ExternalType::new()
-                                .diesel_type(syn::parse_quote!(diesel::sql_types::Date))
-                                .rust_type(syn::parse_quote!(chrono::NaiveDate))
-                                .postgres_type("date")
-                                .unwrap()
-                                .supports_copy()
-                                .supports_eq()
-                                .supports_serde()
-                                .build()
-                                .unwrap(),
-                        ))
-                        .unwrap()
-                        .add_type(Arc::new(
-                            ExternalType::new()
-                                .diesel_type(syn::parse_quote!(diesel::sql_types::Time))
-                                .rust_type(syn::parse_quote!(chrono::NaiveTime))
-                                .postgres_type("time")
-                                .unwrap()
-                                .supports_copy()
-                                .supports_eq()
-                                .supports_serde()
-                                .build()
-                                .unwrap(),
-                        ))
-                        .unwrap()
-                        .add_type(Arc::new(
-                            ExternalType::new()
-                                .diesel_type(syn::parse_quote!(diesel::sql_types::Interval))
-                                .rust_type(syn::parse_quote!(chrono::Duration))
-                                .postgres_type("interval")
-                                .unwrap()
-                                .supports_copy()
-                                .supports_eq()
-                                .supports_serde()
-                                .build()
-                                .unwrap(),
-                        ))
-                        .unwrap()
-                        .build()
-                        .unwrap(),
+    pub fn chrono() -> ExternalCrate {
+        ExternalCrate::new("chrono")
+            .unwrap()
+            .version("0.4.42")
+            .types([
+                ExternalType::new(
+                    syn::parse_quote!(diesel::sql_types::Timestamp),
+                    syn::parse_quote!(chrono::NaiveDateTime),
                 )
-            })
-            .clone()
+                .postgres_type("timestamp")
+                .unwrap()
+                .supports_copy()
+                .supports_eq()
+                .into(),
+                ExternalType::new(
+                    syn::parse_quote!(diesel::sql_types::Timestamptz),
+                    syn::parse_quote!(chrono::DateTime<chrono::Utc>),
+                )
+                .postgres_type("timestamptz")
+                .unwrap()
+                .supports_copy()
+                .supports_eq()
+                .into(),
+                ExternalType::new(
+                    syn::parse_quote!(diesel::sql_types::Date),
+                    syn::parse_quote!(chrono::NaiveDate),
+                )
+                .postgres_type("date")
+                .unwrap()
+                .supports_copy()
+                .supports_eq()
+                .into(),
+                ExternalType::new(
+                    syn::parse_quote!(diesel::sql_types::Time),
+                    syn::parse_quote!(chrono::NaiveTime),
+                )
+                .postgres_type("time")
+                .unwrap()
+                .supports_copy()
+                .supports_eq()
+                .into(),
+                ExternalType::new(
+                    syn::parse_quote!(diesel::sql_types::Interval),
+                    syn::parse_quote!(chrono::Duration),
+                )
+                .postgres_type("interval")
+                .unwrap()
+                .supports_copy()
+                .supports_eq()
+                .into(),
+            ])
+            .unwrap()
+            .into()
     }
 }

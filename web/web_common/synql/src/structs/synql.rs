@@ -3,23 +3,12 @@
 
 use std::{path::PathBuf, sync::Arc};
 
-use synql_attributes::traits::{TableAttributesLike, TableExtensionAttributesLike};
-use synql_buildable_key_settable::prelude::*;
-use synql_builders::prelude::*;
-use synql_core::structs::Workspace;
-use synql_diesel_schema::prelude::*;
-use synql_insertable::traits::TableInsertableLike;
-use synql_insertable_key_settable::prelude::*;
-use synql_models::traits::TableModelLike;
-use synql_relations::prelude::*;
-use synql_transitive_extension::prelude::*;
-use synql_value_settable::prelude::*;
 
 mod builder;
 pub use builder::SynQLBuilder;
 use time_requirements::{prelude::TimeTracker, task::Task};
 
-use crate::traits::SynQLDatabaseLike;
+use crate::{structs::ExternalCrate, traits::SynQLDatabaseLike};
 
 /// Struct representing a SQL workspace.
 pub struct SynQL<'a, DB: SynQLDatabaseLike> {
@@ -39,7 +28,7 @@ pub struct SynQL<'a, DB: SynQLDatabaseLike> {
     /// Whether to also generate the rustfmt configuration file.
     generate_rustfmt: bool,
     /// External rust crates to include in the workspace.
-    external_crates: Vec<Arc<ExternalCrate>>,
+    external_crates: Vec<ExternalCrate>,
 }
 
 impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
@@ -72,7 +61,6 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             .external_crates(self.external_crates.iter().cloned())
             .core()
             .std()
-            .diesel_queries()
             .serde()
             .validation_errors()
             .pgrx_validation()
@@ -90,60 +78,7 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
                 continue;
             }
 
-            println!("Generating workspace components for table '{}'", table.table_name());
-
-            let schema_macro_task = Task::new("schema_macro");
-            workspace.add_internal_crate(table.schema_macro(&workspace, self.database).into());
-            time_tracker.add_or_extend_completed_task(schema_macro_task);
-
-            let model_task = Task::new("model");
-            workspace.add_internal_crate(table.model(&workspace, self.database).into());
-            time_tracker.add_or_extend_completed_task(model_task);
-
-            let transitive_extension_task = Task::new("transitive_extension_trait");
-            workspace
-                .add_internal_crate(table.transitive_extension(&workspace, self.database).into());
-            time_tracker.add_or_extend_completed_task(transitive_extension_task);
-
-            let relations_trait_task = Task::new("relations_trait");
-            workspace.add_internal_crate(table.relations_trait(&workspace, self.database).into());
-            time_tracker.add_or_extend_completed_task(relations_trait_task);
-
-            if let Some(extension_attribute) = table.extension_attributes(&workspace, self.database)
-            {
-                let extension_attribute_task = Task::new("extension_attributes");
-                workspace.add_internal_crate(extension_attribute.into());
-                time_tracker.add_or_extend_completed_task(extension_attribute_task);
-            }
-
-            let attributes_task = Task::new("attributes");
-            workspace.add_internal_crate(table.attributes(&workspace, self.database).into());
-            time_tracker.add_or_extend_completed_task(attributes_task);
-
-            let value_settable_trait_task = Task::new("value_settable_trait");
-            workspace
-                .add_internal_crate(table.value_settable_trait(&workspace, self.database).into());
-            time_tracker.add_or_extend_completed_task(value_settable_trait_task);
-
-            let insertable_key_settable_trait_task = Task::new("insertable_key_settable_trait");
-            workspace.add_internal_crate(
-                table.insertable_key_settable_trait(&workspace, self.database).into(),
-            );
-            time_tracker.add_or_extend_completed_task(insertable_key_settable_trait_task);
-
-            let buildable_key_settable_trait_task = Task::new("buildable_key_settable_trait");
-            workspace.add_internal_crate(
-                table.buildable_key_settable_trait(&workspace, self.database).into(),
-            );
-            time_tracker.add_or_extend_completed_task(buildable_key_settable_trait_task);
-
-            let insertable_task = Task::new("insertable");
-            workspace.add_internal_crate(table.insertable(&workspace, self.database).into());
-            time_tracker.add_or_extend_completed_task(insertable_task);
-
-            let buildable_task = Task::new("buildable");
-            workspace.add_internal_crate(table.buildable(&workspace, self.database).into());
-            time_tracker.add_or_extend_completed_task(buildable_task);
+            todo!("Generate table model");
         }
 
         let workspace_write_task = Task::new("workspace_write_to_disk");

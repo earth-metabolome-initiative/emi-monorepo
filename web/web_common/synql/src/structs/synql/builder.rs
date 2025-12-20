@@ -6,10 +6,9 @@ use common_traits::{
     builder::{Attributed, IsCompleteBuilder},
     prelude::{Builder, BuilderError},
 };
-use synql_core::structs::ExternalCrate;
 
 use super::SynQL;
-use crate::traits::SynQLDatabaseLike;
+use crate::{structs::ExternalCrate, traits::SynQLDatabaseLike};
 
 /// Struct to build `SynQL` instances.
 pub struct SynQLBuilder<'a, DB: SynQLDatabaseLike> {
@@ -20,7 +19,7 @@ pub struct SynQLBuilder<'a, DB: SynQLDatabaseLike> {
     edition: u16,
     generate_workspace_toml: bool,
     generate_rustfmt: bool,
-    external_crates: Vec<Arc<ExternalCrate>>,
+    external_crates: Vec<ExternalCrate>
 }
 
 impl<DB: SynQLDatabaseLike> Default for SynQLBuilder<'_, DB> {

@@ -12,7 +12,7 @@ use crate::structs::{ExternalCrate, Workspace};
 /// Builder for the `Workspace` struct.
 pub struct WorkspaceBuilder {
     /// External crates made available within the workspace.
-    external_crates: Vec<Arc<ExternalCrate>>,
+    external_crates: Vec<ExternalCrate>,
     /// Name of the workspace.
     name: Option<String>,
     /// Path where the workspace is being created.
@@ -137,7 +137,7 @@ impl WorkspaceBuilder {
     ///
     /// # Arguments
     /// * `external_crate` - The external crate to add.
-    pub fn external_crate(mut self, external_crate: Arc<ExternalCrate>) -> Self {
+    pub fn external_crate(mut self, external_crate: ExternalCrate) -> Self {
         if !self.external_crates.contains(&external_crate) {
             self.external_crates.push(external_crate);
         }
@@ -159,24 +159,9 @@ impl WorkspaceBuilder {
         self.external_crate(ExternalCrate::diesel())
     }
 
-    /// Adds the `diesel-queries` external crate to the workspace.
-    pub fn diesel_queries(self) -> Self {
-        self.external_crate(ExternalCrate::diesel_queries()).diesel()
-    }
-
     /// Adds the `postgis-diesel` external crate to the workspace.
     pub fn postgis_diesel(self) -> Self {
         self.external_crate(ExternalCrate::postgis_diesel()).diesel()
-    }
-
-    /// Adds the serde external crate to the workspace.
-    pub fn serde(self) -> Self {
-        self.external_crate(ExternalCrate::serde())
-    }
-
-    /// Adds the `validation_errors` external crate to the workspace.
-    pub fn validation_errors(self) -> Self {
-        self.external_crate(ExternalCrate::validation_errors())
     }
 
     /// Adds the `pgrx_validation` external crate to the workspace.
@@ -195,7 +180,7 @@ impl WorkspaceBuilder {
     /// * `external_crates` - The external crates to add.
     pub fn external_crates<I>(mut self, external_crates: I) -> Self
     where
-        I: IntoIterator<Item = Arc<ExternalCrate>>,
+        I: IntoIterator<Item = ExternalCrate>,
     {
         for external_crate in external_crates {
             self = self.external_crate(external_crate);

@@ -6,10 +6,8 @@
 use sql_traits::traits::ColumnLike;
 use syn::{Ident, Type};
 
-use crate::{
-    structs::{ExternalTypeRef, Workspace},
-    utils::{camel_case_name, is_reserved_rust_word, snake_case_name},
-};
+use crate::{structs::Workspace, utils::{camel_case_name, is_reserved_rust_word, snake_case_name}};
+
 
 /// Trait implemented by types that represent SQL columns and can be used to
 /// generate Rust code for them.

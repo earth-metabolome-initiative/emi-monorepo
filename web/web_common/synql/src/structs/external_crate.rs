@@ -3,31 +3,20 @@
 
 use std::{fmt::Debug, hash::Hash, sync::Arc};
 
-use proc_macro2::TokenStream;
+pub use builder::ExternalCrateBuilder;
 use quote::ToTokens;
-use syn::Type;
+use syn::{Path, Type};
 
-use crate::{
-    structs::{
-        DataVariantRef, ExternalFunctionRef, ExternalMacro, TraitDef, ExternalType, Method,
-        Trait, external_crate::builder::ExternalCrateBuilder, external_trait::TraitVariantRef,
-    },
-    traits::{ExternalDependencies, InternalDependencies},
-};
-
+use crate::structs::{ExternalType, external_crate::builder::ExternalCrateBuilderError, external_type::Trait};
 mod builder;
 mod chrono_crate;
 mod core_crate;
 mod diesel_crate;
-mod diesel_queries_crate;
-mod either_crate;
 mod helpers;
 mod pgrx_validation;
 mod postgis_diesel_crate;
 mod rosetta_uuid_crate;
-mod serde_crate;
 mod std_crate;
-mod validation_errors_crate;
 
 #[derive(Clone, Debug)]
 /// Struct defining the crate required by some type found in the postgres
@@ -37,13 +26,9 @@ pub struct ExternalCrate {
     name: String,
     /// List of postgres types and their corresponding diesel and rust types
     /// defined within the crate.
-    types: Vec<Arc<ExternalType>>,
-    /// List of the macros defined within the crate.
-    macros: Vec<ExternalMacro>,
-    /// List of the traits defined within the crate.
-    traits: Vec<TraitDef>,
+    types: Vec<ExternalType>,
     /// Methods defined within the crate.
-    functions: Vec<(Arc<Method>, syn::Path)>,
+    functions: Vec<(String, syn::Path)>,
     /// Whether the crate is a dependency.
     version: Option<String>,
     /// Git to the crate, if it is a local dependency.
@@ -84,8 +69,8 @@ unsafe impl Sync for ExternalCrate {}
 impl ExternalCrate {
     /// Inizializes a new `ExternalCrateBuilder`.
     #[must_use]
-    pub fn new() -> ExternalCrateBuilder {
-        ExternalCrateBuilder::default()
+    pub fn new(name: &str) -> Result<ExternalCrateBuilder, ExternalCrateBuilderError> {
+        ExternalCrateBuilder::new(name)
     }
 
     /// Returns a reference to the name of the crate.
@@ -138,56 +123,14 @@ impl ExternalCrate {
             .map(|t| ExternalTypeRef { crate_ref: self.clone(), type_ref: t.clone() })
     }
 
-    /// Returns the external macro with the provided name, if any.
-    ///
-    /// # Arguments
-    /// * `name` - A string slice representing the name of the external macro.
-    #[must_use]
-    pub fn external_macro(self: &Arc<Self>, name: &str) -> Option<ExternalMacroRef> {
-        self.macros
-            .iter()
-            .find(|m| m.name() == name)
-            .map(|m| ExternalMacroRef { crate_ref: self.clone(), macro_ref: Arc::new(m.clone()) })
-    }
-
-    /// Returns the external trait with the provided name, if any.
-    ///
-    /// # Arguments
-    /// * `name` - A string slice representing the name of the external trait.
-    #[must_use]
-    pub fn external_trait(&self, name: &str) -> Option<&TraitDef> {
-        self.traits.iter().find(|t| t.name() == name)
-    }
-
-    /// Returns an iterator over all external trait refs defined within the
-    /// crate.
-    pub fn external_trait_refs(self: &Arc<Self>) -> impl Iterator<Item = ExternalTraitRef> {
-        let crate_ref = self.clone();
-        self.traits.iter().map(move |t| {
-            ExternalTraitRef { crate_ref: crate_ref.clone(), trait_ref: Arc::new(t.clone()) }
-        })
-    }
-
-    /// Returns the external trait reference with the provided name, if any.
-    ///
-    /// # Arguments
-    /// * `name` - A string slice representing the name of the external trait.
-    #[must_use]
-    pub fn external_trait_ref(self: &Arc<Self>, name: &str) -> Option<ExternalTraitRef> {
-        self.external_trait(name)
-            .map(|t| ExternalTraitRef { crate_ref: self.clone(), trait_ref: Arc::new(t.clone()) })
-    }
-
     /// Returns the external function ref with the provided name, if any.
     ///
     /// # Arguments
     /// * `name` - A string slice representing the name of the external
     ///   function.
     #[must_use]
-    pub fn external_function_ref(&self, name: &str) -> Option<ExternalFunctionRef> {
-        self.functions.iter().find(|(m, _)| m.name() == name).map(|(m, path)| {
-            ExternalFunctionRef::new(m.clone(), path.clone(), Arc::new(self.clone()))
-        })
+    pub fn external_function_ref(&self, name: &str) -> Option<&Path> {
+        self.functions.iter().find(|(m, _)| m.name() == name).map(|(_, path)| path)
     }
 
     /// Returns the external type compatible with the provided postgres name, if
@@ -271,7 +214,7 @@ impl ExternalTypeRef {
     ///
     /// * `trait_ref` - The trait variant to check support for.
     #[must_use]
-    pub fn supports_trait(&self, trait_ref: &TraitVariantRef) -> bool {
+    pub fn supports_trait(&self, trait_ref: &Trait) -> bool {
         self.type_ref.supports(trait_ref)
     }
 
@@ -296,191 +239,10 @@ impl ExternalTypeRef {
     pub fn generics_without_defaults(&self) -> impl Iterator<Item = &syn::GenericParam> + '_ {
         self.type_ref.generics_without_defaults()
     }
-
-    /// Sets a generic field to the provided `DataVariantRef`.
-    #[must_use]
-    pub fn set_generic_field(
-        &self,
-        field: &syn::GenericParam,
-        value: DataVariantRef,
-    ) -> Option<Self> {
-        Some(Self {
-            type_ref: Arc::new(self.type_ref.set_generic_field(field, value)?),
-            crate_ref: self.crate_ref.clone(),
-        })
-    }
-
-    /// Formats the type with its generics.
-    #[must_use]
-    pub fn format_with_generics(&self) -> TokenStream {
-        let generics = self.type_ref.generics_with_defaults();
-        quote::quote! { #self #generics }
-    }
-}
-
-impl ExternalDependencies for ExternalTypeRef {
-    #[inline]
-    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
-        std::iter::once(self.crate_ref.as_ref()).chain(self.type_ref.external_dependencies())
-    }
-}
-
-impl InternalDependencies for ExternalTypeRef {
-    #[inline]
-    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
-        self.type_ref.internal_dependencies()
-    }
 }
 
 impl ToTokens for ExternalTypeRef {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         self.type_ref.rust_type().to_tokens(tokens);
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-/// Struct representing a reference to an external crate and one of its macros.
-pub struct ExternalMacroRef {
-    crate_ref: Arc<ExternalCrate>,
-    macro_ref: Arc<ExternalMacro>,
-}
-
-impl ExternalMacroRef {
-    /// Returns a reference to the name of the crate.
-    pub fn crate_name(&self) -> &str {
-        self.crate_ref.name()
-    }
-
-    /// Returns a reference to the name of the macro.
-    pub fn name(&self) -> &str {
-        self.macro_ref.name()
-    }
-
-    /// Returns a reference to the external crate.
-    pub fn external_crate(&self) -> &ExternalCrate {
-        &self.crate_ref
-    }
-
-    /// Returns a reference to the external macro.
-    pub fn external_macro(&self) -> &ExternalMacro {
-        &self.macro_ref
-    }
-}
-
-impl ExternalDependencies for ExternalMacroRef {
-    #[inline]
-    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
-        std::iter::once(self.crate_ref.as_ref())
-    }
-}
-
-impl InternalDependencies for ExternalMacroRef {
-    #[inline]
-    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
-        std::iter::empty()
-    }
-}
-
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
-/// Struct representing a reference to an external crate and one of its traits.
-pub struct ExternalTraitRef {
-    crate_ref: Arc<ExternalCrate>,
-    trait_ref: Arc<TraitDef>,
-}
-
-impl From<Trait> for ExternalTraitRef {
-    fn from(trait_def: Trait) -> Self {
-        let core = ExternalCrate::core();
-        Self {
-            trait_ref: Arc::new(
-                core.external_trait(trait_def.as_ref())
-                    .unwrap_or_else(|| panic!("Trait `{trait_def}` should exist"))
-                    .clone(),
-            ),
-            crate_ref: core,
-        }
-    }
-}
-
-impl ExternalDependencies for ExternalTraitRef {
-    #[inline]
-    fn external_dependencies(&self) -> impl Iterator<Item = &ExternalCrate> {
-        std::iter::once(self.crate_ref.as_ref())
-    }
-}
-
-impl InternalDependencies for ExternalTraitRef {
-    #[inline]
-    fn internal_dependencies(&self) -> impl Iterator<Item = &crate::structs::InternalCrate> {
-        self.trait_ref.internal_dependencies()
-    }
-}
-
-impl ToTokens for ExternalTraitRef {
-    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
-        tokens.extend(self.trait_ref.path().to_token_stream());
-    }
-}
-
-impl ExternalTraitRef {
-    /// Returns a reference to the name of the crate.
-    #[must_use]
-    pub fn crate_name(&self) -> &str {
-        self.crate_ref.name()
-    }
-
-    /// Returns a reference to the name of the trait.
-    #[must_use]
-    pub fn name(&self) -> &str {
-        self.trait_ref.name()
-    }
-
-    /// Returns a reference to the external crate.
-    #[must_use]
-    pub fn external_crate(&self) -> &ExternalCrate {
-        &self.crate_ref
-    }
-
-    /// Returns a reference to the external trait.
-    #[must_use]
-    pub fn external_trait(&self) -> &TraitDef {
-        &self.trait_ref
-    }
-
-    /// Returns whether the trait is implemented for typeless enums.
-    #[must_use]
-    pub fn implemented_for_typeless_enum(&self) -> bool {
-        self.trait_ref.implemented_for_typeless_enum()
-    }
-
-    /// Returns an iterator over the generic idents without defaults.
-    pub fn generics_without_defaults(&self) -> impl Iterator<Item = &syn::GenericParam> + '_ {
-        self.trait_ref.generics_without_defaults()
-    }
-
-    /// Formats the variant including the generics, if any, with defaults.
-    #[must_use]
-    pub fn generics_with_defaults(&self) -> Option<TokenStream> {
-        self.trait_ref.generics_with_defaults()
-    }
-
-    /// Formats with the generics, if any, with defaults.
-    #[must_use]
-    pub fn format_with_generics(&self) -> TokenStream {
-        let generics = self.trait_ref.generics_with_defaults();
-        quote::quote! { #self #generics }
-    }
-
-    /// Sets a generic field to the provided `DataVariantRef`.
-    #[must_use]
-    pub fn set_generic_field(
-        &self,
-        field: &syn::GenericParam,
-        value: DataVariantRef,
-    ) -> Option<Self> {
-        Some(Self {
-            trait_ref: Arc::new(self.trait_ref.set_generic_field(field, value)?),
-            crate_ref: self.crate_ref.clone(),
-        })
     }
 }

@@ -7,11 +7,8 @@ use sqlparser::ast::{
     BinaryOperator, Expr, FunctionArg, FunctionArgExpr, FunctionArgumentList, FunctionArguments,
     Ident, Value, ValueWithSpan,
 };
-use synql_core::{
-    prelude::Builder,
-    structs::{DataVariantRef, ExternalFunctionRef, InternalToken, Workspace},
-    traits::{ColumnSynLike, FunctionSynLike, TableSynLike},
-};
+
+use crate::structs::Workspace;
 
 pub(super) struct TranslateExpression<'local, 'db, DB: DatabaseLike> {
     check_constraint: &'db DB::CheckConstraint,
@@ -63,7 +60,7 @@ where
     }
 
     /// Maps the provided expression to a validation error, when applicable.
-    fn map_expr_to_validation_error(&self, expr: &Expr) -> Option<InternalToken> {
+    fn map_expr_to_validation_error(&self, expr: &Expr) -> Option<TokenStream> {
         match expr {
             Expr::BinaryOp { left, right, op } => {
                 match (left.as_ref(), right.as_ref()) {
@@ -97,7 +94,7 @@ where
         left: &str,
         right: &str,
         op: &BinaryOperator,
-    ) -> InternalToken {
+    ) -> TokenStream {
         let left_column = self.column(left);
         let right_column = self.column(right);
         let formatted_left = self.formatted_column(left_column, true);
@@ -165,7 +162,7 @@ where
             }
         };
 
-        InternalToken::new().private().stream(stream).build().unwrap()
+        TokenStream::new().private().stream(stream).build().unwrap()
     }
 
     fn map_expr_to_single_field_error(
@@ -173,7 +170,7 @@ where
         ident: &str,
         value: &Value,
         op: &BinaryOperator,
-    ) -> InternalToken {
+    ) -> TokenStream {
         let column = self.column(ident);
         let formatted_column = self.formatted_column(column, false);
         let column_ident = column.column_camel_ident();
@@ -248,7 +245,7 @@ where
                 unimplemented!("Operator {op:?} not supported for single field error mapping");
             }
         };
-        InternalToken::new().private().stream(stream).build().unwrap()
+        TokenStream::new().private().stream(stream).build().unwrap()
     }
 
     /// Returns whether the provided column is contextual.
@@ -321,7 +318,7 @@ where
         &self,
         arg: &FunctionArgExpr,
         arg_type: &DataVariantRef,
-    ) -> (InternalToken, Option<&'_ DB::Column>) {
+    ) -> (TokenStream, Option<&'_ DB::Column>) {
         match arg {
             FunctionArgExpr::Expr(expr) => {
                 let (token_stream, mut scoped_columns, _returning_type) =
@@ -346,7 +343,7 @@ where
         &self,
         arg: &FunctionArg,
         arg_type: &DataVariantRef,
-    ) -> (InternalToken, Option<&'_ DB::Column>) {
+    ) -> (TokenStream, Option<&'_ DB::Column>) {
         match arg {
             FunctionArg::Named { .. } => {
                 unimplemented!("Named arguments not supported");
@@ -364,7 +361,7 @@ where
         &self,
         args: &FunctionArgumentList,
         argument_types: &[DataVariantRef],
-    ) -> (Vec<InternalToken>, Vec<&'_ DB::Column>) {
+    ) -> (Vec<TokenStream>, Vec<&'_ DB::Column>) {
         let mut token_stream = Vec::with_capacity(args.args.len());
         let mut columns = Vec::new();
         assert_eq!(args.args.len(), argument_types.len());
@@ -382,7 +379,7 @@ where
         &self,
         args: &FunctionArguments,
         argument_types: &[DataVariantRef],
-    ) -> (Vec<InternalToken>, Vec<&'_ DB::Column>) {
+    ) -> (Vec<TokenStream>, Vec<&'_ DB::Column>) {
         match args {
             FunctionArguments::None => (Vec::new(), Vec::new()),
             FunctionArguments::Subquery(_) => {
@@ -408,7 +405,7 @@ where
             over,
             within_group,
         }: &sqlparser::ast::Function,
-    ) -> (InternalToken, DataVariantRef) {
+    ) -> (TokenStream, DataVariantRef) {
         if !within_group.is_empty() {
             unimplemented!("WithinGroup not supported");
         }
@@ -488,7 +485,7 @@ where
         let data_variant_ref: DataVariantRef =
             function_ref.return_type().cloned().unwrap_or_else(|| DataVariantRef::unit());
 
-        let internal_token = InternalToken::new()
+        let internal_token = TokenStream::new()
             .stream(quote! {
                 #maybe_rename_field
                 #function_ref(#(#args),*)#map_err
@@ -591,7 +588,7 @@ where
     #[allow(clippy::too_many_lines)]
     /// Translates the provided expression to a
     /// [`TokenStream`](proc_macro2::TokenStream)
-    pub(super) fn parse(&self, expr: &Expr) -> InternalToken {
+    pub(super) fn parse(&self, expr: &Expr) -> TokenStream {
         if let Some(validation_error_token) = self.map_expr_to_validation_error(expr) {
             return validation_error_token;
         }
@@ -608,7 +605,7 @@ where
             returning_type
         );
 
-        InternalToken::new()
+        TokenStream::new()
             .stream(quote! {
                 #internal_token?;
             })
@@ -624,7 +621,7 @@ where
         &self,
         expr: &Expr,
         type_hint: Option<&DataVariantRef>,
-    ) -> (InternalToken, Vec<&'_ DB::Column>, DataVariantRef) {
+    ) -> (TokenStream, Vec<&'_ DB::Column>, DataVariantRef) {
         match expr {
             Expr::Function(function) => {
                 let (token_stream, returning_type) = self.parse_function(function);

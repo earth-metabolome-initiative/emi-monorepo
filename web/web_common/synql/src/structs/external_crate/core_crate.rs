@@ -1,70 +1,12 @@
 //! Submodule implementing the method `core` for the [`ExternalCrate`] struct
 //! which initializes a `ExternalCrate` instance describing the `core` crate.
 
-use std::sync::{Arc, OnceLock};
-
-use common_traits::builder::Builder;
-use strum::IntoEnumIterator;
-
-use crate::{
-    structs::{ExternalCrate, TraitDef, ExternalType, Trait},
-    utils::generic_type,
-};
+use crate::structs::ExternalCrate;
 mod numeric;
-
-static CORE_CRATE: OnceLock<Arc<ExternalCrate>> = OnceLock::new();
 
 impl ExternalCrate {
     /// Returns the cached `ExternalCrate` instance describing the `core` crate.
-    pub fn core() -> Arc<ExternalCrate> {
-        CORE_CRATE
-            .get_or_init(|| {
-                Arc::new(
-                    ExternalCrate::new()
-                        .name("core")
-                        .unwrap()
-                        .add_types(numeric::all_types())
-                        .unwrap()
-                        .add_type(Arc::new(
-                            ExternalType::new()
-                                .rust_type(syn::parse_quote!(()))
-                                .supports_copy()
-                                .supports_default()
-                                .supports_hash()
-                                .supports_ord()
-                                .supports_serde()
-                                .build()
-                                .unwrap(),
-                        ))
-                        .unwrap()
-                        .add_traits(Trait::iter().map(std::convert::Into::into))
-                        .unwrap()
-                        .add_traits([
-                            TraitDef::new()
-                                .name("Display")
-                                .unwrap()
-                                .path(syn::parse_quote!(core::fmt::Display))
-                                .build()
-                                .unwrap(),
-                            TraitDef::from_trait(),
-                        ])
-                        .unwrap()
-                        .build()
-                        .unwrap(),
-                )
-            })
-            .clone()
-    }
-}
-
-impl TraitDef {
-    fn from_trait() -> Self {
-        TraitDef::new()
-            .name("From")
-            .unwrap()
-            .path(syn::parse_quote!(core::convert::From))
-            .generic(generic_type("T"))
-            .build()
-            .unwrap()
+    pub fn core() -> ExternalCrate {
+        ExternalCrate::new("core").unwrap().types(numeric::all_types()).unwrap().into()
     }
 }

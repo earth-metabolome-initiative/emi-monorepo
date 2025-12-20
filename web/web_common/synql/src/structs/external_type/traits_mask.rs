@@ -59,58 +59,20 @@ impl AsRef<str> for Trait {
     }
 }
 
-impl TryFrom<&str> for Trait {
-    type Error = ();
-
-    fn try_from(value: &str) -> Result<Self, Self::Error> {
-        match value {
-            "Clone" => Ok(Trait::Clone),
-            "Copy" => Ok(Trait::Copy),
-            "Debug" => Ok(Trait::Debug),
-            "Default" => Ok(Trait::Default),
-            "PartialEq" => Ok(Trait::PartialEq),
-            "Eq" => Ok(Trait::Eq),
-            "PartialOrd" => Ok(Trait::PartialOrd),
-            "Ord" => Ok(Trait::Ord),
-            "Hash" => Ok(Trait::Hash),
-            _ => Err(()),
-        }
-    }
-}
-
-impl TryFrom<&crate::structs::TraitDef> for Trait {
-    type Error = ();
-
-    fn try_from(value: &crate::structs::TraitDef) -> Result<Self, Self::Error> {
-        match value.name() {
-            "Clone" => Ok(Trait::Clone),
-            "Copy" => Ok(Trait::Copy),
-            "Debug" => Ok(Trait::Debug),
-            "Default" => Ok(Trait::Default),
-            "PartialEq" => Ok(Trait::PartialEq),
-            "Eq" => Ok(Trait::Eq),
-            "PartialOrd" => Ok(Trait::PartialOrd),
-            "Ord" => Ok(Trait::Ord),
-            "Hash" => Ok(Trait::Hash),
-            _ => Err(()),
-        }
-    }
-}
-
 impl Trait {
     /// Returns the full path of the trait.
     #[must_use]
     pub fn path(&self) -> syn::Path {
         match self {
-            Trait::Copy => syn::parse_str("Copy").unwrap(),
-            Trait::Clone => syn::parse_str("Clone").unwrap(),
-            Trait::Default => syn::parse_str("Default").unwrap(),
-            Trait::Debug => syn::parse_str("Debug").unwrap(),
-            Trait::Hash => syn::parse_str("Hash").unwrap(),
-            Trait::Ord => syn::parse_str("Ord").unwrap(),
-            Trait::PartialOrd => syn::parse_str("PartialOrd").unwrap(),
-            Trait::Eq => syn::parse_str("Eq").unwrap(),
-            Trait::PartialEq => syn::parse_str("PartialEq").unwrap(),
+            Trait::Copy => syn::parse_quote!(Copy),
+            Trait::Clone => syn::parse_quote!(Clone),
+            Trait::Default => syn::parse_quote!(Default),
+            Trait::Debug => syn::parse_quote!(Debug),
+            Trait::Hash => syn::parse_quote!(Hash),
+            Trait::Ord => syn::parse_quote!(Ord),
+            Trait::PartialOrd => syn::parse_quote!(PartialOrd),
+            Trait::Eq => syn::parse_quote!(Eq),
+            Trait::PartialEq => syn::parse_quote!(PartialEq),
         }
     }
 }

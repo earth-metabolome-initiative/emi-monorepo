@@ -3,7 +3,7 @@
 use quote::ToTokens;
 
 use crate::structs::{
-    ExternalCrate, ExternalTraitRef, ExternalType, ExternalTypeRef, TraitVariantRef,
+    ExternalCrate, ExternalType, ExternalTypeRef
 };
 
 impl ExternalTypeRef {
@@ -17,24 +17,6 @@ impl ExternalTypeRef {
     #[must_use]
     pub fn is_numeric(&self) -> bool {
         self.type_ref.is_numeric()
-    }
-}
-
-impl ExternalTraitRef {
-    /// Returns the `Sized` trait reference from the `std` crate.
-    #[must_use]
-    pub fn sized() -> Self {
-        ExternalCrate::std()
-            .external_trait_ref("Sized")
-            .expect("Failed to get the `Sized` trait from the `std` crate")
-    }
-}
-
-impl TraitVariantRef {
-    /// Returns the `Sized` trait variant reference.
-    #[must_use]
-    pub fn sized() -> Self {
-        ExternalTraitRef::sized().into()
     }
 }
 

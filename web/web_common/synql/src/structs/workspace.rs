@@ -8,22 +8,15 @@ use std::{
 };
 
 pub use builder::WorkspaceBuilder;
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use syn::Type;
 
-use crate::{
-    structs::{
-        ExternalCrate, ExternalFunctionRef, InternalCrate,
-        external_crate::{ExternalMacroRef, ExternalTraitRef, ExternalTypeRef},
-    },
-    traits::ExternalDependencies,
-};
+use crate::structs::{ExternalCrate, external_crate::ExternalTypeRef};
 
 #[derive(Debug, Clone)]
 /// Struct defining a Cargo workspace.
 pub struct Workspace {
     /// External crates made available within the workspace.
-    external_crates: Vec<Arc<ExternalCrate>>,
+    external_crates: Vec<ExternalCrate>,
     /// Name of the workspace.
     name: String,
     /// Path where the workspace is being created.
@@ -32,8 +25,6 @@ pub struct Workspace {
     version: (u8, u8, u8),
     /// Edition of the workspace.
     edition: u16,
-    /// Internal crates created within the workspace.
-    internal_crates: Vec<Arc<InternalCrate>>,
 }
 
 impl Workspace {
@@ -80,36 +71,6 @@ impl Workspace {
     #[must_use]
     pub fn internal_crate(&self, name: &str) -> Option<&Arc<InternalCrate>> {
         self.internal_crates.iter().find(|internal_crate| internal_crate.name() == name)
-    }
-
-    /// Returns the external macro ref corresponding to the provided name, if
-    /// any.
-    ///
-    /// # Arguments
-    /// * `name` - A string slice representing the name of the external macro.
-    #[must_use]
-    pub fn external_macro(&self, name: &str) -> Option<ExternalMacroRef> {
-        for ext_crate in &self.external_crates {
-            if let Some(ext_macro) = ext_crate.external_macro(name) {
-                return Some(ext_macro);
-            }
-        }
-        None
-    }
-
-    /// Returns the external trait ref corresponding to the provided name, if
-    /// any.
-    ///
-    /// # Arguments
-    /// * `name` - A string slice representing the name of the external trait.
-    #[must_use]
-    pub fn external_trait(&self, name: &str) -> Option<ExternalTraitRef> {
-        for ext_crate in &self.external_crates {
-            if let Some(ext_trait) = ext_crate.external_trait_ref(name) {
-                return Some(ext_trait);
-            }
-        }
-        None
     }
 
     /// Returns the external type ref corresponding to the provided Postgres
