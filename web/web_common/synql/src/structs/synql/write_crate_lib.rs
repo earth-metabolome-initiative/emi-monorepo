@@ -3,11 +3,11 @@
 use std::io::Write;
 
 use quote::quote;
-use sql_relations::prelude::TableLike;
+use sql_relations::prelude::{ColumnLike, TableLike};
 
 use crate::{
     structs::{SynQL, Workspace},
-    traits::{SynQLDatabaseLike, table::TableSynLike},
+    traits::{SynQLDatabaseLike, column::ColumnSynLike, table::TableSynLike},
 };
 
 impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
@@ -83,6 +83,17 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
             });
         }
 
+        // #[diesel(primary_key(user_id, role_id))]
+        let mut primary_key_decorator = None;
+        let primary_key_columns = table.primary_key_columns(self.database).collect::<Vec<_>>();
+        if primary_key_columns.len() > 1 && primary_key_columns[0].column_name() != "id" {
+            let primary_key_idents: Vec<syn::Ident> =
+                primary_key_columns.iter().map(|col| col.column_snake_ident()).collect();
+            primary_key_decorator = Some(quote! {
+                #[diesel(primary_key(#(#primary_key_idents),*))]
+            });
+        }
+
         let fields = table.generate_struct_fields(workspace, self.database)?;
 
         let content = quote! {
@@ -93,6 +104,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
             #[doc=#struct_documentation]
             #ancestor_decorator
             #error_decorator
+            #primary_key_decorator
             #[diesel(table_name = #table_ident)]
             pub struct #camel_case_name {
                 #(#fields),*

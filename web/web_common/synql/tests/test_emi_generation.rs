@@ -60,8 +60,8 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
         .add_type(
             ExternalType::new(
-                syn::parse_quote!(iso_codes::CountryCode),
                 syn::parse_quote!(iso_codes::country_codes::diesel_impls::CountryCode),
+                syn::parse_quote!(iso_codes::CountryCode),
             )
             .postgres_type("countrycode")?
             .into(),
@@ -76,8 +76,8 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
         .add_type(
             ExternalType::new(
-                syn::parse_quote!(media_types::MediaType),
                 syn::parse_quote!(media_types::diesel_impls::MediaType),
+                syn::parse_quote!(media_types::MediaType),
             )
             .postgres_type("mediatype")?
             .into(),
@@ -92,8 +92,8 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
         .add_type(
             ExternalType::new(
-                syn::parse_quote!(cas_codes::CAS),
                 syn::parse_quote!(cas_codes::diesel_impls::CAS),
+                syn::parse_quote!(cas_codes::CAS),
             )
             .postgres_type("cas")?
             .into(),
@@ -108,10 +108,10 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
         .add_type(
             ExternalType::new(
-                syn::parse_quote!(molecular_formulas::MolecularFormula),
                 syn::parse_quote!(
                     molecular_formulas::molecular_formula::diesel_impls::MolecularFormula
                 ),
+                syn::parse_quote!(molecular_formulas::MolecularFormula),
             )
             .postgres_type("molecularformula")?
             .into(),

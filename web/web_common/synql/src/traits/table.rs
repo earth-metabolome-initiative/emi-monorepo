@@ -61,7 +61,8 @@ where
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE _my__table (id INT);")?;
     /// let table = db.table(None, "_my__table").unwrap();
@@ -79,7 +80,8 @@ where
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
     /// let table = db.table(None, "users").unwrap();
@@ -97,7 +99,8 @@ where
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     /// let db = ParserDB::try_from(
     ///     r#"
     ///         CREATE TABLE my_table (id INT);
@@ -121,7 +124,8 @@ where
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE box (id INT);")?;
     /// let table = db.table(None, "box").unwrap();
@@ -144,7 +148,8 @@ where
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
     /// let table = db.table(None, "users").unwrap();
@@ -167,7 +172,8 @@ where
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE my_table (id INT);")?;
     /// let table = db.table(None, "my_table").unwrap();
@@ -185,7 +191,8 @@ where
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
     /// let table = db.table(None, "users").unwrap();
@@ -203,7 +210,8 @@ where
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     /// let db = ParserDB::try_from("CREATE TABLE struct (id INT);")?;
     /// let table = db.table(None, "struct").unwrap();
     /// assert_eq!(table.table_camel_ident().to_string(), "Struct");
@@ -225,7 +233,8 @@ where
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     /// let db = ParserDB::try_from("CREATE TABLE users (id INT);")?;
     /// let table = db.table(None, "users").unwrap();
     /// assert_eq!(table.table_singular_camel_ident().to_string(), "User");

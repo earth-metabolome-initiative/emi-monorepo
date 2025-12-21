@@ -21,7 +21,8 @@ pub trait ColumnSynLike: ColumnLike {
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     /// let db = ParserDB::try_from("CREATE TABLE my_table (my_column INT);")?;
     /// let table = db.table(None, "my_table").unwrap();
     /// let column = table.column("my_column", &db).unwrap();
@@ -52,7 +53,8 @@ pub trait ColumnSynLike: ColumnLike {
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE my_table (_my__column INT);")?;
     /// let table = db.table(None, "my_table").unwrap();
@@ -71,7 +73,8 @@ pub trait ColumnSynLike: ColumnLike {
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     /// let db = ParserDB::try_from("CREATE TABLE my_table (my_column INT, MyColumn INT);")?;
     /// let table = db.table(None, "my_table").unwrap();
     /// let column1 = table.column("my_column", &db).unwrap();
@@ -91,7 +94,8 @@ pub trait ColumnSynLike: ColumnLike {
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE my_table (type INT);")?;
     /// let table = db.table(None, "my_table").unwrap();
@@ -115,7 +119,8 @@ pub trait ColumnSynLike: ColumnLike {
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     ///
     /// let db = ParserDB::try_from("CREATE TABLE my_table (my_column INT);")?;
     /// let table = db.table(None, "my_table").unwrap();
@@ -134,7 +139,8 @@ pub trait ColumnSynLike: ColumnLike {
     ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
-    /// use synql_core::prelude::*;
+    /// use sql_traits::prelude::*;
+    /// use synql::prelude::*;
     /// let db = ParserDB::try_from("CREATE TABLE my_table (struct INT);")?;
     /// let table = db.table(None, "my_table").unwrap();
     /// let column = table.column("struct", &db).unwrap();
