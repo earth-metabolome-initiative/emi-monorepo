@@ -113,6 +113,11 @@ impl WorkspaceBuilder {
         self.external_crate(ExternalCrate::diesel_builders())
     }
 
+    /// Adds the `validation_errors` external crate to the workspace.
+    pub fn validation_errors(self) -> Self {
+        self.external_crate(ExternalCrate::validation_errors())
+    }
+
     /// Adds the core external crate to the workspace.
     pub fn core(self) -> Self {
         self.external_crate(ExternalCrate::core())

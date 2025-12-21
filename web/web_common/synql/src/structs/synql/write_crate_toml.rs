@@ -3,7 +3,7 @@
 use std::io::Write;
 
 use sql_relations::prelude::TableLike;
-
+use std::borrow::Borrow;
 use crate::{
     structs::{SynQL, Workspace},
     traits::{SynQLDatabaseLike, table::TableSynLike},
@@ -57,12 +57,16 @@ edition.workspace = true
 
         // We include the crates associated to tables this table depends on
         for dependency in table.referenced_tables(self.database) {
+            // We skip eventual self-dependencies.
+            if dependency.borrow() == table {
+                continue;
+            }
             let dep_crate_name = dependency.crate_name(workspace);
             writeln!(buffer, "{dep_crate_name}.workspace = true")?;
         }
 
         // Linting
-        writeln!(buffer, "\n[lint]")?;
+        writeln!(buffer, "\n[lints]")?;
         writeln!(buffer, "workspace = true")?;
 
         Ok(())

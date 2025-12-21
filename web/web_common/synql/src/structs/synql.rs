@@ -71,6 +71,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
             .std()
             .pgrx_validation()
             .serde()
+            .validation_errors()
             .postgis_diesel()
             .diesel_builders()
             .rosetta_uuid()

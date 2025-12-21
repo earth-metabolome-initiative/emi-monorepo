@@ -80,7 +80,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         let mut error_decorator = None;
         if table.has_check_constraints(self.database) {
             error_decorator = Some(quote! {
-                #[table_model(error = validation_error::ValidationError)]
+                #[table_model(error = validation_errors::ValidationError)]
             });
         }
 
@@ -93,7 +93,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
             #![doc=#crate_documentation]
 
             #[derive(#(#core_derives),*)]
-            #[derive(diesel::Queryable, diesel::Selectable, diesel::Identifiable, diesel_builders::TableModel)]
+            #[derive(diesel::Queryable, diesel::Selectable, diesel::Identifiable, diesel_builders::prelude::TableModel)]
             #[doc=#struct_documentation]
             #ancestor_decorator
             #error_decorator

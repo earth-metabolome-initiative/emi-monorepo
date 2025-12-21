@@ -9,7 +9,8 @@ impl ExternalCrate {
     pub fn diesel() -> ExternalCrate {
         ExternalCrate::new("diesel")
             .unwrap()
-            .git("https://github.com/diesel-rs/diesel", "main")
+            .features(["extras"])
+            .git("https://github.com/LucaCappelletti94/diesel", "on-conflict-dsl")
             .types([
                 ExternalType::new(
                     syn::parse_quote!(diesel::sql_types::Interval),

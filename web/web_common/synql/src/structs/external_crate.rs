@@ -20,6 +20,7 @@ mod pgrx_validation;
 mod postgis_diesel_crate;
 mod rosetta_uuid_crate;
 mod serde;
+mod validation_errors;
 mod std_crate;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]

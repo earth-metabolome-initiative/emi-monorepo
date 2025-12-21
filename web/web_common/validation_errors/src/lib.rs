@@ -3,6 +3,7 @@
 mod impls;
 mod structs;
 mod traits;
+pub use structs::ValidationError;
 
 /// Prelude module re-exporting commonly used items.
 pub mod prelude {

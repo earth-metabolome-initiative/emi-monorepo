@@ -219,17 +219,29 @@ pub trait ColumnSynLike: ColumnLike {
         database: &Self::DB,
     ) -> Result<proc_macro2::TokenStream, crate::Error> {
         let column_ident = self.column_snake_ident();
-        let rust_type = self
-            .rust_type(workspace, database)
+        let external_postgres_type = self
+            .external_postgres_type(workspace, database)
             .ok_or_else(|| crate::Error::ColumnTypeNotFound {
                 table_name: self.table(database).table_name().to_string(),
                 column_name: self.column_name().to_string(),
                 sql_type: self.data_type(database).to_string(),
             })?;
-        let documentation = format!("Column `{}`.", self.column_name());
+        let documentation = self.column_doc(database).map(|doc| quote! {
+            #[doc = #doc]
+        });
+        let rust_type = external_postgres_type.rust_type();
+        let diesel_type = external_postgres_type.diesel_type();
+        let mut sql_type_decorator = None;
+        if !["std", "core"].contains(&external_postgres_type.crate_name()) {
+            sql_type_decorator = Some(quote! {
+                #[diesel(sql_type = #diesel_type)]
+            });
+        }
+
         let tokens = quote! {
-            #[doc = #documentation]
-            pub #column_ident: #rust_type,
+            #sql_type_decorator
+            #documentation
+            #column_ident: #rust_type
         };
         Ok(tokens)
     }
