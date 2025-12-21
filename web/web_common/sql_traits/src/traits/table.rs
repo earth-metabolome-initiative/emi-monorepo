@@ -548,14 +548,14 @@ pub trait TableLike:
         Self: 'db;
 
     /// Returns whether the table has any check constraints.
-    /// 
+    ///
     /// # Arguments
-    /// 
+    ///
     /// * `database` - A reference to the database instance to which the table
     ///   belongs.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;

@@ -46,7 +46,10 @@ pub trait FunctionSynLike: FunctionLike {
     ///
     /// # Arguments
     /// * `workspace` - The workspace where the column is defined.
-    fn external_function_ref<'workspace>(&self, workspace: &'workspace Workspace) -> Option<ExternalFunctionRef<'workspace>> {
+    fn external_function_ref<'workspace>(
+        &self,
+        workspace: &'workspace Workspace,
+    ) -> Option<ExternalFunctionRef<'workspace>> {
         workspace.external_function(self.name())
     }
 }

@@ -96,11 +96,11 @@ urlencoding = "2.1"
 schemars = "1.0.4"
 bincode = { version = "2", features = ["serde"] }
 # sqlparser = "0.58.0"
-sqlparser = { git = "https://github.com/LucaCappelletti94/sqlparser-rs", branch = "future-main2", features = [
+sqlparser = { version = "0.60.0", features = [
   "serde",
 ] }
 arbitrary = { version = "1", features = ["derive"] }
-diesel = { git = "https://github.com/diesel-rs/diesel", branch = "main", features = [
+diesel = { git = "https://github.com/LucaCappelletti94/diesel", branch = "on-conflict-dsl", features = [
   "extras",
   "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
 ] }

@@ -178,7 +178,7 @@ impl Workspace {
             writeln!(
                 buffer,
                 "{crate_name} = {{ path = \"./{crate_name}\" }}",
-                crate_name=table.crate_name(self),
+                crate_name = table.crate_name(self),
             )?;
         }
 

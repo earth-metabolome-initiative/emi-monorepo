@@ -220,24 +220,32 @@ pub trait ColumnLike:
     fn is_nullable(&self, database: &Self::DB) -> bool;
 
     /// Returns the SQL default value of the column, if any.
-    /// 
+    ///
     /// # Example
-    /// 
+    ///
     /// ```rust
     /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
     /// use sql_traits::prelude::*;
-    /// 
+    ///
     /// let db = ParserDB::try_from(
-    ///    "CREATE TABLE my_table (id INT DEFAULT 0, name TEXT, created_at TIMESTAMP DEFAULT NOW());",
+    ///     "CREATE TABLE my_table (id INT DEFAULT 0, name TEXT, created_at TIMESTAMP DEFAULT NOW());",
     /// )?;
     /// let table = db.table(None, "my_table").unwrap();
     /// let id_column = table.column("id", &db).expect("Column 'id' should exist");
     /// let name_column = table.column("name", &db).expect("Column 'name' should exist");
     /// let created_at_column =
-    ///    table.column("created_at", &db).expect("Column 'created_at' should exist");
-    /// assert_eq!(id_column.default_value(), Some("0".to_string()), "id column should have default value 0");
+    ///     table.column("created_at", &db).expect("Column 'created_at' should exist");
+    /// assert_eq!(
+    ///     id_column.default_value(),
+    ///     Some("0".to_string()),
+    ///     "id column should have default value 0"
+    /// );
     /// assert_eq!(name_column.default_value(), None, "name column should not have a default value");
-    /// assert_eq!(created_at_column.default_value(), Some("NOW()".to_string()), "created_at column should have default value NOW()");
+    /// assert_eq!(
+    ///     created_at_column.default_value(),
+    ///     Some("NOW()".to_string()),
+    ///     "created_at column should have default value NOW()"
+    /// );
     /// # Ok(())
     /// # }
     /// ```

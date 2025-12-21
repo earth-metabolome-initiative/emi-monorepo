@@ -66,7 +66,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
             .name(self.name.as_deref().unwrap_or_else(|| self.database.catalog_name()))
             .expect("Invalid workspace name")
             .external_crates(self.external_crates.iter().cloned())
-            .chrono()
+            .rosetta_timestamp()
             .core()
             .std()
             .pgrx_validation()
@@ -81,7 +81,8 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
 
         // Clear up any directory or file that may already exist at the workspace path
         if workspace.path().exists() {
-            // We remove all contents of the directory, but we do not remove the directory itself
+            // We remove all contents of the directory, but we do not remove the directory
+            // itself
             for entry in std::fs::read_dir(workspace.path())? {
                 let entry = entry?;
                 let path = entry.path();

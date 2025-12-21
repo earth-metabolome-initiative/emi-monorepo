@@ -10,8 +10,8 @@ use sql_traits::traits::{CheckConstraintLike, DatabaseLike};
 mod sub_expressions;
 mod translate_expression;
 use translate_expression::TranslateExpression;
-use crate::traits::column::ColumnSynLike;
-use crate::structs::Workspace;
+
+use crate::{structs::Workspace, traits::column::ColumnSynLike};
 
 /// Trait implemented by types that represent SQL check constraints and can be
 /// used to generate Rust code for them.

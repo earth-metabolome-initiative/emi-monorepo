@@ -1,9 +1,9 @@
 //! Utility functions for code generation and string manipulation.
 mod is_reserved_rust_word;
 use cached::{UnboundCache, proc_macro::cached};
+use inflector::Inflector;
 pub use is_reserved_rust_word::*;
 use snake_case_sanitizer::Sanitizer;
-use inflector::Inflector;
 
 #[cached(
     ty = "UnboundCache<String, String>",

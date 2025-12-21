@@ -18,10 +18,11 @@ mod diesel_builders;
 mod diesel_crate;
 mod pgrx_validation;
 mod postgis_diesel_crate;
+mod rosetta_timestamp;
 mod rosetta_uuid_crate;
 mod serde;
-mod validation_errors;
 mod std_crate;
+mod validation_errors;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 /// Struct defining the crate required by some type found in the postgres

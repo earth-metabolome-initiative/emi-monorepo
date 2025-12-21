@@ -24,7 +24,7 @@ impl ExternalCrate {
                     syn::parse_quote!(diesel::sql_types::Timestamptz),
                     syn::parse_quote!(chrono::DateTime<chrono::Utc>),
                 )
-                .postgres_types(["timestamptz",  "timestamp with time zone"])
+                .postgres_types(["timestamptz", "timestamp with time zone"])
                 .unwrap()
                 .supports_copy()
                 .supports_eq()

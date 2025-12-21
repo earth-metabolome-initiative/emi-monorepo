@@ -1,8 +1,10 @@
 //! Submodule implementing the writing of the crate library files.
 
 use std::io::Write;
+
 use quote::quote;
 use sql_relations::prelude::TableLike;
+
 use crate::{
     structs::{SynQL, Workspace},
     traits::{SynQLDatabaseLike, table::TableSynLike},
@@ -49,10 +51,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         //     another_remote_column: Option<String>,
         // }
 
-        let core_derives = table.supported_core_derives(
-            self.database,
-            workspace,
-        );
+        let core_derives = table.supported_core_derives(self.database, workspace);
         let table_name = table.table_name();
         let camel_case_name = table.table_singular_camel_ident();
         let table_ident = table.table_snake_ident();
@@ -84,10 +83,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
             });
         }
 
-        let fields = table.generate_struct_fields(
-            workspace,
-            self.database,
-        )?;
+        let fields = table.generate_struct_fields(workspace, self.database)?;
 
         let content = quote! {
             #![doc=#crate_documentation]

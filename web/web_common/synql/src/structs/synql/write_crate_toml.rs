@@ -1,9 +1,9 @@
 //! Submodule implementing the writing of the crate toml files.
 
-use std::io::Write;
+use std::{borrow::Borrow, io::Write};
 
 use sql_relations::prelude::TableLike;
-use std::borrow::Borrow;
+
 use crate::{
     structs::{SynQL, Workspace},
     traits::{SynQLDatabaseLike, table::TableSynLike},
@@ -35,7 +35,8 @@ edition.workspace = true
         writeln!(buffer, "diesel-builders.workspace = true")?;
         writeln!(buffer, "diesel.workspace = true")?;
 
-        // If the table has check constraints, it will require the `validation_errors` crate.
+        // If the table has check constraints, it will require the `validation_errors`
+        // crate.
         if table.has_check_constraints(self.database) {
             writeln!(buffer, "validation_errors.workspace = true")?;
         }

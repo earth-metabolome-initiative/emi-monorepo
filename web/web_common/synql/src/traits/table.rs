@@ -251,7 +251,11 @@ where
 
     /// Returns the sorted unique external crates required by this table,
     /// including those required by its columns and its check constraints.
-    fn external_crates<'workspace>(&self, database: &Self::DB, workspace: &'workspace Workspace) -> Vec<&'workspace ExternalCrate> {
+    fn external_crates<'workspace>(
+        &self,
+        database: &Self::DB,
+        workspace: &'workspace Workspace,
+    ) -> Vec<&'workspace ExternalCrate> {
         let mut crates = Vec::new();
         for column in self.columns(database) {
             if let Some(postgres_type) = column.external_postgres_type(workspace, database) {
