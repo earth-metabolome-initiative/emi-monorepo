@@ -29,10 +29,7 @@ pub struct ExternalType {
 impl ExternalType {
     /// Inizializes a new `ExternalTypeBuilder`.
     #[must_use]
-    pub fn new(
-        diesel_type: syn::Type,
-        rust_type: syn::Type,
-    ) -> ExternalTypeBuilder {
+    pub(super) fn new(diesel_type: syn::Type, rust_type: syn::Type) -> ExternalTypeBuilder {
         ExternalTypeBuilder::new(diesel_type, rust_type)
     }
 
@@ -151,5 +148,30 @@ impl ExternalType {
                 return Err(mk_err());
             }
         })
+    }
+
+    /// Returns true if the `ExternalType` is of boolean type.
+    #[must_use]
+    pub fn is_bool(&self) -> bool {
+        self.rust_type().to_token_stream().to_string() == "bool"
+    }
+
+    /// Returns true if the `ExternalType` is of numeric type.
+    #[must_use]
+    pub fn is_numeric(&self) -> bool {
+        matches!(
+            self.rust_type().to_token_stream().to_string().as_str(),
+            "i8" | "i16"
+                | "i32"
+                | "i64"
+                | "i128"
+                | "u8"
+                | "u16"
+                | "u32"
+                | "u64"
+                | "u128"
+                | "f32"
+                | "f64"
+        )
     }
 }

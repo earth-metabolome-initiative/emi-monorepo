@@ -1,24 +1,27 @@
 //! Submodule defining the `SQLWorkspace` trait which allows to generate the
 //! `diesel` workspace from a SQL schema, based on `sql_traits`.
 
-use std::{path::PathBuf, sync::Arc};
-
+use std::path::PathBuf;
 
 mod builder;
 pub use builder::SynQLBuilder;
+use sql_relations::prelude::TableLike;
 use time_requirements::{prelude::TimeTracker, task::Task};
 
-use crate::{structs::ExternalCrate, traits::SynQLDatabaseLike};
+use crate::{
+    structs::{ExternalCrate, Workspace},
+    traits::SynQLDatabaseLike,
+};
 
 /// Struct representing a SQL workspace.
-pub struct SynQL<'a, DB: SynQLDatabaseLike> {
+pub struct SynQL<'db, DB: SynQLDatabaseLike> {
     /// The underlying database which will be used to generate the workspace.
-    database: &'a DB,
+    database: &'db DB,
     /// The path to the workspace.
     path: PathBuf,
     /// List of tables to be excluded from the workspace, which also imply
     /// excluding all of the tables that depend on them via foreign keys.
-    deny_list: Vec<&'a DB::Table>,
+    deny_list: Vec<&'db DB::Table>,
     /// Version of the generated workspace.
     version: (u8, u8, u8),
     /// Edition of the generated workspace.
@@ -31,12 +34,12 @@ pub struct SynQL<'a, DB: SynQLDatabaseLike> {
     external_crates: Vec<ExternalCrate>,
 }
 
-impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
+impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
     /// Create a new `SynQL` instance from a given database.
     #[must_use]
     #[inline]
-    pub fn new() -> SynQLBuilder<'a, DB> {
-        SynQLBuilder::default()
+    pub fn new(database: &'db DB, path: PathBuf) -> SynQLBuilder<'db, DB> {
+        SynQLBuilder::new(database, path)
     }
 
     fn skip_table(&self, table: &DB::Table) -> bool {
@@ -54,22 +57,19 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
     ///
     /// Returns an error if the workspace cannot be written to disk.
     pub fn generate(&self) -> std::io::Result<TimeTracker> {
-        let mut workspace = Workspace::new()
+        let workspace: Workspace = Workspace::new()
             .path(self.path.clone())
             .name(&self.database.catalog_name())
             .expect("Invalid workspace name")
             .external_crates(self.external_crates.iter().cloned())
             .core()
             .std()
-            .serde()
-            .validation_errors()
             .pgrx_validation()
             .postgis_diesel()
             .rosetta_uuid()
             .version(self.version.0, self.version.1, self.version.2)
             .edition(self.edition)
-            .build()
-            .expect("Unable to build workspace");
+            .into();
 
         let mut time_tracker = TimeTracker::new("SQL Workspace Generation");
 
@@ -81,13 +81,9 @@ impl<'a, DB: SynQLDatabaseLike> SynQL<'a, DB> {
             todo!("Generate table model");
         }
 
-        let workspace_write_task = Task::new("workspace_write_to_disk");
-        workspace.write_to_disk()?;
-        time_tracker.add_or_extend_completed_task(workspace_write_task);
-
         if self.generate_workspace_toml {
             let workspace_toml_task = Task::new("workspace_toml");
-            workspace.write_toml()?;
+            workspace.write_toml(self.database)?;
             time_tracker.add_or_extend_completed_task(workspace_toml_task);
         }
 

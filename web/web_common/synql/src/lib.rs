@@ -6,8 +6,5 @@ pub mod utils;
 
 /// Prelude module re-exporting commonly used items.
 pub mod prelude {
-    pub use common_traits::prelude::*;
-    pub use sql_traits::prelude::*;
-
     pub use crate::{structs::*, traits::*};
 }

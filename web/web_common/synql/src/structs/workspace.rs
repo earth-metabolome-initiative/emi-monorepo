@@ -2,15 +2,16 @@
 //! workspace.
 
 mod builder;
-use std::{
-    path::{Path, PathBuf},
-    sync::Arc,
-};
+use std::path::{Path, PathBuf};
+mod core_types;
 
 pub use builder::WorkspaceBuilder;
 use syn::Type;
 
-use crate::structs::{ExternalCrate, external_crate::ExternalTypeRef};
+use crate::{
+    structs::{ExternalCrate, ExternalFunctionRef, ExternalTypeRef},
+    traits::{SynQLDatabaseLike, TableSynLike},
+};
 
 #[derive(Debug, Clone)]
 /// Struct defining a Cargo workspace.
@@ -60,17 +61,6 @@ impl Workspace {
     /// Returns the name of the workspace.
     pub fn name(&self) -> &str {
         &self.name
-    }
-
-    /// Adds a new internal crate to the workspace.
-    pub fn add_internal_crate(&mut self, internal_crate: InternalCrate) {
-        self.internal_crates.push(Arc::new(internal_crate));
-    }
-
-    /// Returns the internal crate with the given name, if any.
-    #[must_use]
-    pub fn internal_crate(&self, name: &str) -> Option<&Arc<InternalCrate>> {
-        self.internal_crates.iter().find(|internal_crate| internal_crate.name() == name)
     }
 
     /// Returns the external type ref corresponding to the provided Postgres
@@ -154,7 +144,7 @@ impl Workspace {
     /// # Errors
     ///
     /// Returns an `std::io::Error` if writing to the file fails.
-    pub fn write_toml(&self) -> std::io::Result<()> {
+    pub fn write_toml<DB: SynQLDatabaseLike>(&self, db: &DB) -> std::io::Result<()> {
         use std::io::Write;
 
         let toml_path = self.path.join("Cargo.toml");
@@ -166,11 +156,11 @@ impl Workspace {
 
         // Write members array
         write!(buffer, "members = [")?;
-        for (i, internal_crate) in self.internal_crates.iter().enumerate() {
+        for (i, table) in db.tables().enumerate() {
             if i > 0 {
                 write!(buffer, ", ")?;
             }
-            write!(buffer, "\"{}\"", internal_crate.name())?;
+            write!(buffer, "\"{}\"", table.crate_name(self))?;
         }
         writeln!(buffer, "]")?;
         writeln!(buffer)?;
@@ -184,27 +174,17 @@ impl Workspace {
         writeln!(buffer, "[workspace.dependencies]")?;
 
         // Write internal crate dependencies
-        for internal_crate in &self.internal_crates {
+        for table in db.tables() {
             writeln!(
                 buffer,
                 "{} = {{ path = \"{}\" }}",
-                internal_crate.name(),
-                internal_crate.name()
+                table.crate_name(self),
+                table.crate_path(self).display()
             )?;
         }
 
-        // Collect and sort external dependencies
-        let mut external_deps: Vec<_> = self
-            .internal_crates
-            .iter()
-            .flat_map(|internal_crate| internal_crate.external_dependencies())
-            .collect();
-
-        external_deps.sort_unstable();
-        external_deps.dedup();
-
         // Write external dependencies
-        for external_crate in external_deps {
+        for external_crate in self.external_crates.iter() {
             if !external_crate.is_dependency() {
                 continue;
             }
@@ -258,35 +238,6 @@ impl Workspace {
         writeln!(buffer, "redundant_explicit_links = \"forbid\"")?;
         writeln!(buffer, "invalid_rust_codeblocks = \"forbid\"")?;
 
-        Ok(())
-    }
-
-    /// Writes the workspace to disk.
-    ///
-    /// # Errors
-    ///
-    /// Returns an `std::io::Error` if any file operation fails.
-    pub fn write_to_disk(&self) -> std::io::Result<()> {
-        // First, we eliminate all existing files in the workspace path.
-        if self.path.exists() {
-            // We remove all contents of the directory.
-            for entry in std::fs::read_dir(self.path())? {
-                let entry = entry?;
-                let path = entry.path();
-                if path.is_dir() {
-                    std::fs::remove_dir_all(path)?;
-                } else {
-                    std::fs::remove_file(path)?;
-                }
-            }
-        }
-        // Then, we create the workspace directory.
-        std::fs::create_dir_all(self.path())?;
-        // And we start writing each internal crate to disk.
-        self.internal_crates
-            .par_iter()
-            .map(|internal_crate: &Arc<InternalCrate>| internal_crate.write_to_disk(self))
-            .collect::<Result<Vec<()>, std::io::Error>>()?;
         Ok(())
     }
 }

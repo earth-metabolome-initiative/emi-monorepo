@@ -1,32 +1,30 @@
 //! Submodule providing a builder for the `SynQL` struct.
 
-use std::{fmt::Display, path::PathBuf, sync::Arc};
-
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::{Builder, BuilderError},
-};
+use std::path::PathBuf;
 
 use super::SynQL;
 use crate::{structs::ExternalCrate, traits::SynQLDatabaseLike};
 
 /// Struct to build `SynQL` instances.
-pub struct SynQLBuilder<'a, DB: SynQLDatabaseLike> {
-    database: Option<&'a DB>,
-    path: Option<PathBuf>,
-    deny_list: Vec<&'a DB::Table>,
+pub struct SynQLBuilder<'db, DB: SynQLDatabaseLike> {
+    database: &'db DB,
+    path: PathBuf,
+    deny_list: Vec<&'db DB::Table>,
     version: (u8, u8, u8),
     edition: u16,
     generate_workspace_toml: bool,
     generate_rustfmt: bool,
-    external_crates: Vec<ExternalCrate>
+    external_crates: Vec<ExternalCrate>,
 }
 
-impl<DB: SynQLDatabaseLike> Default for SynQLBuilder<'_, DB> {
-    fn default() -> Self {
+impl<'db, DB: SynQLDatabaseLike> SynQLBuilder<'db, DB> {
+    #[must_use]
+    #[inline]
+    /// Creates a new `SynQLBuilder` instance.
+    pub fn new(database: &'db DB, path: PathBuf) -> Self {
         SynQLBuilder {
-            database: None,
-            path: None,
+            database,
+            path,
             deny_list: Vec::new(),
             version: (0, 1, 0),
             edition: 2024,
@@ -35,69 +33,11 @@ impl<DB: SynQLDatabaseLike> Default for SynQLBuilder<'_, DB> {
             external_crates: Vec::new(),
         }
     }
-}
-
-/// Attributes that can be set on the `SynQLBuilder`.
-#[derive(Debug)]
-pub enum SynQLAttribute {
-    /// The database instance.
-    Database,
-    /// The path to the workspace.
-    Path,
-    /// The deny list of tables to exclude.
-    DenyList,
-    /// The version of the generated workspace.
-    Version,
-    /// The edition of the generated workspace.
-    Edition,
-    /// Whether to also generate the workspace TOML.
-    GenerateWorkspaceToml,
-    /// Whether to also generate the rustfmt configuration file.
-    GenerateRustfmt,
-}
-
-impl Display for SynQLAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            SynQLAttribute::Database => write!(f, "database"),
-            SynQLAttribute::Path => write!(f, "path"),
-            SynQLAttribute::DenyList => write!(f, "deny_list"),
-            SynQLAttribute::Version => write!(f, "version"),
-            SynQLAttribute::Edition => write!(f, "edition"),
-            SynQLAttribute::GenerateWorkspaceToml => write!(f, "generate_workspace_toml"),
-            SynQLAttribute::GenerateRustfmt => write!(f, "generate_rustfmt"),
-        }
-    }
-}
-
-impl<'a, DB: SynQLDatabaseLike> SynQLBuilder<'a, DB> {
-    /// Creates a new `SynQLBuilder` instance.
-    #[must_use]
-    #[inline]
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    /// Sets the database for the `SynQL` instance.
-    #[must_use]
-    #[inline]
-    pub fn database(mut self, database: &'a DB) -> Self {
-        self.database = Some(database);
-        self
-    }
-
-    /// Sets the path for the `SynQL` instance.
-    #[must_use]
-    #[inline]
-    pub fn path(mut self, path: PathBuf) -> Self {
-        self.path = Some(path);
-        self
-    }
 
     /// Sets the deny list for the `SynQL` instance.
     #[must_use]
     #[inline]
-    pub fn deny_list(mut self, deny_list: Vec<&'a DB::Table>) -> Self {
+    pub fn deny_list(mut self, deny_list: Vec<&'db DB::Table>) -> Self {
         self.deny_list = deny_list;
         self
     }
@@ -105,7 +45,7 @@ impl<'a, DB: SynQLDatabaseLike> SynQLBuilder<'a, DB> {
     /// Adds a table to the deny list.
     #[must_use]
     #[inline]
-    pub fn deny(mut self, table: &'a DB::Table) -> Self {
+    pub fn deny(mut self, table: &'db DB::Table) -> Self {
         self.deny_list.push(table);
         self
     }
@@ -137,7 +77,7 @@ impl<'a, DB: SynQLDatabaseLike> SynQLBuilder<'a, DB> {
     /// Adds an external crate to the workspace.
     #[must_use]
     #[inline]
-    pub fn external_crate(mut self, external_crate: Arc<ExternalCrate>) -> Self {
+    pub fn external_crate(mut self, external_crate: ExternalCrate) -> Self {
         self.external_crates.push(external_crate);
         self
     }
@@ -146,7 +86,7 @@ impl<'a, DB: SynQLDatabaseLike> SynQLBuilder<'a, DB> {
     #[must_use]
     pub fn external_crates<I>(mut self, external_crates: I) -> Self
     where
-        I: IntoIterator<Item = Arc<ExternalCrate>>,
+        I: IntoIterator<Item = ExternalCrate>,
     {
         for external_crate in external_crates {
             self.external_crates.push(external_crate);
@@ -163,34 +103,17 @@ impl<'a, DB: SynQLDatabaseLike> SynQLBuilder<'a, DB> {
     }
 }
 
-impl<DB: SynQLDatabaseLike> Attributed for SynQLBuilder<'_, DB> {
-    type Attribute = SynQLAttribute;
-}
-
-impl<DB: SynQLDatabaseLike> IsCompleteBuilder for SynQLBuilder<'_, DB> {
-    fn is_complete(&self) -> bool {
-        self.database.is_some() && self.path.is_some()
-    }
-}
-
-impl<'a, DB: SynQLDatabaseLike> Builder for SynQLBuilder<'a, DB> {
-    type Error = BuilderError<SynQLAttribute>;
-    type Object = SynQL<'a, DB>;
-
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        let database =
-            self.database.ok_or(BuilderError::IncompleteBuild(SynQLAttribute::Database))?;
-        let path = self.path.ok_or(BuilderError::IncompleteBuild(SynQLAttribute::Path))?;
-
-        Ok(SynQL {
-            database,
-            path,
-            deny_list: self.deny_list,
-            version: self.version,
-            edition: self.edition,
-            generate_workspace_toml: self.generate_workspace_toml,
-            generate_rustfmt: self.generate_rustfmt,
-            external_crates: self.external_crates,
-        })
+impl<'db, DB: SynQLDatabaseLike> From<SynQLBuilder<'db, DB>> for SynQL<'db, DB> {
+    fn from(builder: SynQLBuilder<'db, DB>) -> Self {
+        SynQL {
+            database: builder.database,
+            path: builder.path,
+            deny_list: builder.deny_list,
+            version: builder.version,
+            edition: builder.edition,
+            generate_workspace_toml: builder.generate_workspace_toml,
+            generate_rustfmt: builder.generate_rustfmt,
+            external_crates: builder.external_crates,
+        }
     }
 }

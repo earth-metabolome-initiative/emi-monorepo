@@ -4,7 +4,6 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
-common_traits.workspace = true
 sql_traits.workspace = true
 sql_relations.workspace = true
 syn.workspace = true

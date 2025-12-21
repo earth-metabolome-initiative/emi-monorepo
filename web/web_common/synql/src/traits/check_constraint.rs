@@ -10,7 +10,7 @@ use sql_traits::traits::{CheckConstraintLike, DatabaseLike};
 mod sub_expressions;
 mod translate_expression;
 use translate_expression::TranslateExpression;
-
+use crate::traits::column::ColumnSynLike;
 use crate::structs::Workspace;
 
 /// Trait implemented by types that represent SQL check constraints and can be
@@ -46,7 +46,7 @@ pub trait CheckConstraintSynLike: CheckConstraintLike {
             .collect::<Vec<_>>();
 
         if relevant_optional_columns.is_empty() {
-            translated_expressions.into()
+            translated_expressions.into_iter().collect()
         } else {
             let left = relevant_optional_columns.iter().map(|column| column.column_snake_ident());
             let right = relevant_optional_columns.iter().map(|column| {
@@ -62,15 +62,11 @@ pub trait CheckConstraintSynLike: CheckConstraintLike {
                 }
             });
 
-            TokenStream::new()
-                .stream(quote! {
-                    if let #(Some(#left)),* = #(#right),* {
-                        #( #translated_expressions )*
-                    }
-                })
-                .inherits(translated_expressions)
-                .build()
-                .unwrap()
+            quote! {
+                if let #(Some(#left)),* = #(#right),* {
+                    #( #translated_expressions )*
+                }
+            }
         }
     }
 }

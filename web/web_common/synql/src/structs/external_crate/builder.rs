@@ -2,7 +2,7 @@
 
 use std::fmt::Display;
 
-use crate::structs::{ExternalCrate, ExternalType};
+use crate::structs::{ExternalCrate, ExternalFunction, ExternalType};
 
 /// Builder for the `ExternalCrate` struct.
 pub struct ExternalCrateBuilder {
@@ -17,7 +17,7 @@ pub struct ExternalCrateBuilder {
     /// The feature flags required by the crate.
     features: Vec<String>,
     /// The functions provided by the crate.
-    functions: Vec<(String, syn::Path)>,
+    functions: Vec<ExternalFunction>,
 }
 
 impl ExternalCrateBuilder {
@@ -149,14 +149,8 @@ impl ExternalCrateBuilder {
     ///
     /// * `method` - The method signature of the function.
     /// * `path` - The path to the function.
-    pub fn add_function(mut self, method: String, path: syn::Path) -> Self {
-        for function in &self.functions {
-            if function.0 == method {
-                return self;
-            }
-        }
-
-        self.functions.push((method, path));
+    pub fn function(mut self, function: ExternalFunction) -> Self {
+        self.functions.push(function);
         self
     }
 
@@ -164,12 +158,12 @@ impl ExternalCrateBuilder {
     ///
     /// # Arguments
     /// * `functions` - The functions to add.
-    pub fn add_functions<I>(mut self, functions: I) -> Self
+    pub fn functions<I>(mut self, functions: I) -> Self
     where
-        I: IntoIterator<Item = (String, syn::Path)>,
+        I: IntoIterator<Item = ExternalFunction>,
     {
-        for (method, path) in functions {
-            self = self.add_function(method, path);
+        for function in functions {
+            self = self.function(function);
         }
         self
     }

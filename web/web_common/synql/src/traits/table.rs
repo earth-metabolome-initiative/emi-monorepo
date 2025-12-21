@@ -4,10 +4,19 @@
 //! [`TableLike`](sql_traits::traits::TableLike) trait and the traits from the
 //! [`sql_relations`](sql_relations) crate.
 
+use std::path::PathBuf;
+
 use sql_traits::traits::{DatabaseLike, TableLike};
 use syn::Ident;
 
-use crate::{traits::ColumnSynLike, utils::{camel_case_name, is_reserved_rust_word, singular_camel_case_name, singular_snake_name, snake_case_name}};
+use crate::{
+    structs::Workspace,
+    traits::ColumnSynLike,
+    utils::{
+        camel_case_name, is_reserved_rust_word, singular_camel_case_name, singular_snake_name,
+        snake_case_name,
+    },
+};
 
 /// Trait implemented by types that represent SQL tables and can be used to
 /// generate Rust code for them.
@@ -15,6 +24,26 @@ pub trait TableSynLike: TableLike
 where
     <Self::DB as DatabaseLike>::Column: ColumnSynLike,
 {
+    /// Returns the name of the crate associated with this table.
+    ///
+    /// # Arguments
+    ///
+    /// * `workspace` - The workspace where the crate is defined.
+    #[must_use]
+    fn crate_name(&self, workspace: &Workspace) -> String {
+        format!("{}-{}", workspace.name(), self.table_snake_name())
+    }
+
+    /// Returns the path of the crate associated with this table.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `workspace` - The workspace where the crate is defined.
+    #[must_use]
+    fn crate_path(&self, workspace: &Workspace) -> PathBuf {
+        workspace.path().join(self.crate_name(workspace))
+    }
+
     /// Returns the snake-cased name of this table.
     ///
     /// # Example
@@ -210,8 +239,4 @@ where
     }
 }
 
-impl<T: TableLike> TableSynLike for T
-where
-    <T::DB as DatabaseLike>::Column: ColumnSynLike,
-{
-}
+impl<T: TableLike> TableSynLike for T where <T::DB as DatabaseLike>::Column: ColumnSynLike {}

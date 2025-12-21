@@ -10,7 +10,6 @@ tokio.workspace = true
 chrono.workspace = true
 cas_codes.workspace = true
 anyhow.workspace = true
-web_common_traits = { workspace = true, features = ["backend"] }
 
 [dev-dependencies]
 tokio.workspace = true

@@ -1,11 +1,6 @@
 //! Submodule defining a builder for the `Workspace` struct.
 
-use std::{error::Error, fmt::Display, path::PathBuf, sync::Arc};
-
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::{Builder, BuilderError},
-};
+use std::{fmt::Display, path::PathBuf};
 
 use crate::structs::{ExternalCrate, Workspace};
 
@@ -14,7 +9,7 @@ pub struct WorkspaceBuilder {
     /// External crates made available within the workspace.
     external_crates: Vec<ExternalCrate>,
     /// Name of the workspace.
-    name: Option<String>,
+    name: String,
     /// Path where the workspace is being created.
     path: PathBuf,
     /// Version of the workspace.
@@ -27,7 +22,7 @@ impl Default for WorkspaceBuilder {
     fn default() -> Self {
         Self {
             external_crates: Vec::new(),
-            name: None,
+            name: "synql-workspace".to_string(),
             path: PathBuf::from("synql_workspace"),
             version: (0, 1, 0),
             edition: 2024,
@@ -66,8 +61,6 @@ impl Display for WorkspaceAttribute {
 /// Enumeration of errors that can occur during the building of a
 /// `Workspace`.
 pub enum WorkspaceBuilderError {
-    /// An error occurred during the building process.
-    Builder(BuilderError<WorkspaceAttribute>),
     /// The name of the workspace is invalid.
     InvalidName,
 }
@@ -75,17 +68,7 @@ pub enum WorkspaceBuilderError {
 impl Display for WorkspaceBuilderError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            WorkspaceBuilderError::Builder(e) => write!(f, "Builder error: {e}"),
             WorkspaceBuilderError::InvalidName => write!(f, "Invalid workspace name"),
-        }
-    }
-}
-
-impl Error for WorkspaceBuilderError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            WorkspaceBuilderError::Builder(e) => Some(e),
-            WorkspaceBuilderError::InvalidName => None,
         }
     }
 }
@@ -100,7 +83,7 @@ impl WorkspaceBuilder {
         if name.trim().is_empty() || name.contains(' ') {
             return Err(WorkspaceBuilderError::InvalidName);
         }
-        self.name = Some(name);
+        self.name = name;
         Ok(self)
     }
 
@@ -189,28 +172,14 @@ impl WorkspaceBuilder {
     }
 }
 
-impl Attributed for WorkspaceBuilder {
-    type Attribute = WorkspaceAttribute;
-}
-
-impl IsCompleteBuilder for WorkspaceBuilder {
-    fn is_complete(&self) -> bool {
-        self.name.is_some()
-    }
-}
-
-impl Builder for WorkspaceBuilder {
-    type Error = BuilderError<WorkspaceAttribute>;
-    type Object = Workspace;
-
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(Workspace {
-            external_crates: self.external_crates,
-            name: self.name.ok_or(BuilderError::IncompleteBuild(WorkspaceAttribute::Name))?,
-            path: self.path,
-            version: self.version,
-            edition: self.edition,
-            internal_crates: Vec::new(), // Internal crates are added later in the process.
-        })
+impl From<WorkspaceBuilder> for Workspace {
+    fn from(builder: WorkspaceBuilder) -> Self {
+        Workspace {
+            external_crates: builder.external_crates,
+            name: builder.name,
+            path: builder.path,
+            version: builder.version,
+            edition: builder.edition,
+        }
     }
 }

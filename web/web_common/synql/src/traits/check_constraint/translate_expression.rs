@@ -8,7 +8,10 @@ use sqlparser::ast::{
     Ident, Value, ValueWithSpan,
 };
 
-use crate::structs::Workspace;
+use crate::{
+    structs::{ExternalTypeRef, Workspace},
+    traits::{column::ColumnSynLike, table::TableSynLike},
+};
 
 pub(super) struct TranslateExpression<'local, 'db, DB: DatabaseLike> {
     check_constraint: &'db DB::CheckConstraint,
@@ -106,7 +109,7 @@ where
             .workspace
             .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
             .unwrap();
-        let stream = match op {
+        match op {
             BinaryOperator::NotEq => {
                 quote! {
                     if #formatted_left == #formatted_right {
@@ -160,9 +163,7 @@ where
             _ => {
                 unimplemented!("Operator {op:?} not supported for double field error mapping");
             }
-        };
-
-        TokenStream::new().private().stream(stream).build().unwrap()
+        }
     }
 
     fn map_expr_to_single_field_error(
@@ -175,18 +176,14 @@ where
         let formatted_column = self.formatted_column(column, false);
         let column_ident = column.column_camel_ident();
         let table_ident = self.table().table_snake_ident();
-        let validation_error = self
-            .workspace
-            .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
-            .unwrap();
-        let stream = match op {
+        match op {
             BinaryOperator::NotEq => {
                 if column.is_textual(self.database)
                     && value == &Value::SingleQuotedString("".to_string())
                 {
                     quote! {
                         if #formatted_column.is_empty() {
-                            return Err(#validation_error::empty(crate::#table_ident::#column_ident::NAME));
+                            return Err(validation_errors::prelude::ValidationError::empty(crate::#table_ident::#column_ident::NAME));
                         }
                     }
                 } else {
@@ -195,10 +192,10 @@ where
             }
             BinaryOperator::LtEq => {
                 let column_value = self.parse_column_value(column, value).0;
-                let float_value = self.parse_value(value, Some(&DataVariantRef::f64())).0;
+                let float_value = self.parse_value(value, Some(self.workspace.f64())).0;
                 quote! {
                     if #formatted_column > #column_value {
-                        return Err(#validation_error::smaller_than_value(
+                        return Err(validation_errors::prelude::ValidationError::smaller_than_value(
                             crate::#table_ident::#column_ident::NAME,
                             #float_value
                         ));
@@ -207,10 +204,10 @@ where
             }
             BinaryOperator::Lt => {
                 let column_value = self.parse_column_value(column, value).0;
-                let float_value = self.parse_value(value, Some(&DataVariantRef::f64())).0;
+                let float_value = self.parse_value(value, Some(self.workspace.f64())).0;
                 quote! {
                     if #formatted_column >= #column_value {
-                        return Err(#validation_error::strictly_smaller_than_value(
+                        return Err(validation_errors::prelude::ValidationError::strictly_smaller_than_value(
                             crate::#table_ident::#column_ident::NAME,
                             #float_value
                         ));
@@ -219,10 +216,10 @@ where
             }
             BinaryOperator::Gt => {
                 let column_value = self.parse_column_value(column, value).0;
-                let float_value = self.parse_value(value, Some(&DataVariantRef::f64())).0;
+                let float_value = self.parse_value(value, Some(self.workspace.f64())).0;
                 quote! {
                     if #formatted_column <= #column_value {
-                        return Err(#validation_error::strictly_greater_than_value(
+                        return Err(validation_errors::prelude::ValidationError::strictly_greater_than_value(
                             crate::#table_ident::#column_ident::NAME,
                             #float_value
                         ));
@@ -231,10 +228,10 @@ where
             }
             BinaryOperator::GtEq => {
                 let column_value = self.parse_column_value(column, value).0;
-                let float_value = self.parse_value(value, Some(&DataVariantRef::f64())).0;
+                let float_value = self.parse_value(value, Some(self.workspace.f64())).0;
                 quote! {
                     if #formatted_column < #column_value {
-                        return Err(#validation_error::greater_than_value(
+                        return Err(validation_errors::prelude::ValidationError::greater_than_value(
                             crate::#table_ident::#column_ident::NAME,
                             #float_value
                         ));
@@ -244,8 +241,7 @@ where
             _ => {
                 unimplemented!("Operator {op:?} not supported for single field error mapping");
             }
-        };
-        TokenStream::new().private().stream(stream).build().unwrap()
+        }
     }
 
     /// Returns whether the provided column is contextual.
@@ -317,7 +313,7 @@ where
     fn parse_function_argument_expr(
         &self,
         arg: &FunctionArgExpr,
-        arg_type: &DataVariantRef,
+        arg_type: ExternalTypeRef,
     ) -> (TokenStream, Option<&'_ DB::Column>) {
         match arg {
             FunctionArgExpr::Expr(expr) => {
@@ -342,7 +338,7 @@ where
     fn parse_function_argument(
         &self,
         arg: &FunctionArg,
-        arg_type: &DataVariantRef,
+        arg_type: ExternalTypeRef,
     ) -> (TokenStream, Option<&'_ DB::Column>) {
         match arg {
             FunctionArg::Named { .. } => {
@@ -360,12 +356,12 @@ where
     fn parse_function_argument_list(
         &self,
         args: &FunctionArgumentList,
-        argument_types: &[DataVariantRef],
+        argument_types: &[ExternalTypeRef],
     ) -> (Vec<TokenStream>, Vec<&'_ DB::Column>) {
         let mut token_stream = Vec::with_capacity(args.args.len());
         let mut columns = Vec::new();
         assert_eq!(args.args.len(), argument_types.len());
-        for (arg, arg_type) in args.args.iter().zip(argument_types.iter()) {
+        for (arg, arg_type) in args.args.iter().zip(argument_types.iter().copied()) {
             let (column_token_stream, column) = self.parse_function_argument(arg, arg_type);
             token_stream.push(column_token_stream);
             columns.extend(column);
@@ -378,7 +374,7 @@ where
     fn parse_function_arguments(
         &self,
         args: &FunctionArguments,
-        argument_types: &[DataVariantRef],
+        argument_types: &[ExternalTypeRef],
     ) -> (Vec<TokenStream>, Vec<&'_ DB::Column>) {
         match args {
             FunctionArguments::None => (Vec::new(), Vec::new()),
@@ -405,7 +401,7 @@ where
             over,
             within_group,
         }: &sqlparser::ast::Function,
-    ) -> (TokenStream, DataVariantRef) {
+    ) -> TokenStream {
         if !within_group.is_empty() {
             unimplemented!("WithinGroup not supported");
         }
@@ -436,7 +432,7 @@ where
                     ))
                     .into()
             })
-            .collect::<Vec<DataVariantRef>>();
+            .collect::<Vec<ExternalTypeRef>>();
 
         let (args, scoped_columns) = self.parse_function_arguments(args, &argument_types);
         let function_ref: ExternalFunctionRef =
@@ -453,50 +449,29 @@ where
                 quote! { crate::#table_ident::#column_ident::NAME }
             });
 
-            let rename_field_trait = self
-                .workspace
-                .external_trait("ReplaceFieldName")
-                .expect("Failed to get ReplaceFieldName trait for function error mapping");
-
-            (
-                Some(quote! {
-                    use #rename_field_trait;
-                }),
-                Some(match scoped_columns.len() {
-                    1 => {
-                        quote! {
-                            .map_err(|e| e.replace_field_name(|_|#(#attributes),* ))
-                        }
+            Some(match scoped_columns.len() {
+                1 => {
+                    quote! {
+                        .map_err(|e| e.replace_field_name(|_|#(#attributes),* ))
                     }
-                    2 => {
-                        quote! {
-                            .map_err(|e| e.replace_field_names(|_|#(#attributes),* ))
-                        }
+                }
+                2 => {
+                    quote! {
+                        .map_err(|e| e.replace_field_names(|_|#(#attributes),* ))
                     }
-                    _ => {
-                        unimplemented!("More than two scoped columns not supported");
-                    }
-                }),
-            )
+                }
+                _ => {
+                    unimplemented!("More than two scoped columns not supported");
+                }
+            })
         } else {
-            (None, None)
+            None
         };
 
-        let data_variant_ref: DataVariantRef =
-            function_ref.return_type().cloned().unwrap_or_else(|| DataVariantRef::unit());
-
-        let internal_token = TokenStream::new()
-            .stream(quote! {
-                #maybe_rename_field
-                #function_ref(#(#args),*)#map_err
-            })
-            .data(data_variant_ref.clone())
-            .employed_function(function_ref)
-            .inherits(args)
-            .build()
-            .unwrap();
-
-        (internal_token, data_variant_ref)
+        quote! {
+            #maybe_rename_field
+            #function_ref(#(#args),*)#map_err
+        }
     }
 
     /// Parses the provided [`Value`](sqlparser::ast::Value) for the provided
@@ -515,7 +490,7 @@ where
         &self,
         column: &DB::Column,
         value: &Value,
-    ) -> (proc_macro2::TokenStream, DataVariantRef) {
+    ) -> (proc_macro2::TokenStream, ExternalTypeRef) {
         let column_type =
             column.external_postgres_type(self.workspace, self.database).expect(&format!(
                 "Failed to get type for column `{}.{}` ({})",
@@ -523,7 +498,7 @@ where
                 column.column_name(),
                 column.normalized_data_type(self.database)
             ));
-        self.parse_value(value, Some(&column_type.into()))
+        self.parse_value(value, Some(column_type))
     }
 
     /// Parses the provided [`Value`](sqlparser::ast::Value) to a
@@ -538,16 +513,16 @@ where
     /// # Panics
     ///
     /// * If the provided [`Value`](sqlparser::ast::Value) is not supported
-    fn parse_value(
-        &self,
+    fn parse_value<'workspace>(
+        &'workspace self,
         value: &Value,
-        type_hint: Option<&DataVariantRef>,
-    ) -> (proc_macro2::TokenStream, DataVariantRef) {
+        type_hint: Option<ExternalTypeRef<'workspace>>,
+    ) -> (proc_macro2::TokenStream, ExternalTypeRef<'workspace>) {
         match value {
-            Value::Boolean(value) => (quote! { #value }, DataVariantRef::bool()),
+            Value::Boolean(value) => (quote! { #value }, self.workspace.bool()),
             Value::Number(value, _) => {
                 match type_hint {
-                    Some(type_hint) => (type_hint.cast(value).unwrap(), type_hint.clone()),
+                    Some(type_hint) => (type_hint.cast(value).unwrap(), type_hint),
                     None => {
                         unimplemented!(
                             "Number without type hint not supported: {:?}",
@@ -556,7 +531,7 @@ where
                     }
                 }
             }
-            Value::SingleQuotedString(value) => (quote! { #value }, DataVariantRef::str()),
+            Value::SingleQuotedString(value) => (quote! { #value }, self.workspace.string()),
             other => {
                 unimplemented!("Unsupported value: {:?}", other);
             }
@@ -577,11 +552,11 @@ where
     ///
     /// * If the provided [`ValueWithSpan`](sqlparser::ast::ValueWithSpan) is
     ///   not supported
-    fn parse_value_with_span(
-        &self,
+    fn parse_value_with_span<'workspace>(
+        &'workspace self,
         value: &sqlparser::ast::ValueWithSpan,
-        type_hint: Option<&DataVariantRef>,
-    ) -> (proc_macro2::TokenStream, DataVariantRef) {
+        type_hint: Option<ExternalTypeRef<'workspace>>,
+    ) -> (proc_macro2::TokenStream, ExternalTypeRef<'workspace>) {
         self.parse_value(&value.value, type_hint)
     }
 
@@ -593,25 +568,15 @@ where
             return validation_error_token;
         }
 
-        let (internal_token, scoped_columns, returning_type) = self.inner_parse(expr, None);
+        let (internal_token, scoped_columns, _returning_type) = self.inner_parse(expr, None);
 
         if !scoped_columns.is_empty() {
             unimplemented!("Scoped columns not supported");
         }
 
-        assert!(
-            returning_type.is_unit_result(),
-            "Check constraint expressions must return Unit Result, got {:?}",
-            returning_type
-        );
-
-        TokenStream::new()
-            .stream(quote! {
-                #internal_token?;
-            })
-            .inherit(internal_token)
-            .build()
-            .unwrap()
+        quote! {
+            #internal_token?;
+        }
     }
 
     #[allow(clippy::too_many_lines)]
@@ -620,12 +585,12 @@ where
     fn inner_parse(
         &self,
         expr: &Expr,
-        type_hint: Option<&DataVariantRef>,
-    ) -> (TokenStream, Vec<&'_ DB::Column>, DataVariantRef) {
+        type_hint: Option<ExternalTypeRef>,
+    ) -> (TokenStream, Vec<&'_ DB::Column>, Option<ExternalTypeRef>) {
         match expr {
             Expr::Function(function) => {
-                let (token_stream, returning_type) = self.parse_function(function);
-                (token_stream, Vec::new(), returning_type)
+                let token_stream = self.parse_function(function);
+                (token_stream, Vec::new(), None)
             }
             Expr::Cast { kind, expr, data_type: _, format } => {
                 verify_cast_kind(kind);
@@ -668,19 +633,7 @@ where
                                 }
                                 .into(),
                                 Vec::new(),
-                                DataVariantRef::bool(),
-                            )
-                        } else if left_returning_type.is_unit_result()
-                            && right_returning_type.is_unit_result()
-                            && left_returning_type == right_returning_type
-                        {
-                            (
-                                quote! {
-                                    #left.and_then(|_| #right)
-                                }
-                                .into(),
-                                Vec::new(),
-                                left_returning_type,
+                                self.workspace.bool(),
                             )
                         } else {
                             unimplemented!("Unsupported binary operation");
@@ -701,19 +654,7 @@ where
                                 }
                                 .into(),
                                 Vec::new(),
-                                DataVariantRef::bool(),
-                            )
-                        } else if left_returning_type.is_unit_result()
-                            && right_returning_type.is_unit_result()
-                            && left_returning_type == right_returning_type
-                        {
-                            (
-                                quote! {
-                                    #left.or_else(|_| #right)
-                                }
-                                .into(),
-                                Vec::new(),
-                                left_returning_type,
+                                Some(self.workspace.bool()),
                             )
                         } else {
                             unimplemented!("Unsupported binary operation");
@@ -727,7 +668,7 @@ where
                     | BinaryOperator::LtEq => {
                         let (left, _, left_returning_type) = self.inner_parse(left, None);
                         let (right, _, right_returning_type) =
-                            self.inner_parse(right, Some(&left_returning_type));
+                            self.inner_parse(right, Some(left_returning_type));
                         if left_returning_type != right_returning_type {
                             unimplemented!(
                                 "Equality between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}",
@@ -749,7 +690,7 @@ where
                             }
                             .into(),
                             Vec::new(),
-                            DataVariantRef::bool(),
+                            Some(self.workspace.bool()),
                         )
                     }
                     BinaryOperator::Plus

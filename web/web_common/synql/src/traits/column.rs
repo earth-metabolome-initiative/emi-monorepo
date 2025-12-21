@@ -6,7 +6,7 @@
 use sql_traits::traits::ColumnLike;
 use syn::{Ident, Type};
 
-use crate::{structs::Workspace, utils::{camel_case_name, is_reserved_rust_word, snake_case_name}};
+use crate::{structs::{ExternalTypeRef, Workspace}, utils::{camel_case_name, is_reserved_rust_word, snake_case_name}};
 
 
 /// Trait implemented by types that represent SQL columns and can be used to
@@ -148,18 +148,18 @@ pub trait ColumnSynLike: ColumnLike {
     /// # Arguments
     ///
     /// * `workspace` - The workspace where the column is defined.
-    fn external_postgres_type(
+    fn external_postgres_type<'workspace>(
         &self,
-        workspace: &Workspace,
+        workspace: &'workspace Workspace,
         database: &Self::DB,
-    ) -> Option<ExternalTypeRef> {
+    ) -> Option<ExternalTypeRef<'workspace>> {
         workspace.external_postgres_type(self.normalized_data_type(database))
     }
 
     /// Returns the Diesel type of this column.
     fn diesel_type(&self, workspace: &Workspace, database: &Self::DB) -> Option<Type> {
         let external_type = self.external_postgres_type(workspace, database)?;
-        let diesel_type = external_type.diesel_type()?;
+        let diesel_type = external_type.diesel_type();
         if self.is_nullable(database) {
             Some(syn::parse_quote!(diesel::sql_types::Nullable<#diesel_type>))
         } else {

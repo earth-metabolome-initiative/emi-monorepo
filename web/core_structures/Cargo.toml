@@ -9,7 +9,6 @@ rosetta_uuid = { workspace = true, features = ["diesel"] }
 rosetta_timestamp = { workspace = true, features = ["diesel"] }
 chrono.workspace = true
 diesel.workspace = true
-web_common_traits.workspace = true
 serde = { workspace = true, optional = true }
 common_traits.workspace = true
 generic_backend_request_errors.workspace = true
@@ -36,7 +35,6 @@ serde = [
 ]
 yew = ["dep:yew"]
 postgres = [
-  "web_common_traits/postgres",
   "diesel/postgres",
   "postgis_diesel/postgres",
   "rosetta_uuid/postgres",
@@ -47,7 +45,6 @@ postgres = [
   "media_types/postgres",
 ]
 sqlite = [
-  "web_common_traits/sqlite",
   "diesel/sqlite",
   "postgis_diesel/sqlite",
   "diesel/returning_clauses_for_sqlite_3_35",
@@ -58,5 +55,5 @@ sqlite = [
   "molecular_formulas/sqlite",
   "media_types/sqlite",
 ]
-backend = ["postgres", "web_common_traits/backend"]
-frontend = ["sqlite", "yew", "web_common_traits/frontend"]
+backend = ["postgres"]
+frontend = ["sqlite", "yew"]

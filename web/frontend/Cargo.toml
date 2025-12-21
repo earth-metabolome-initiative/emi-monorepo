@@ -27,7 +27,6 @@ sqlite_migration_generator.workspace = true
 sqlite-wasm-rs = { version = "0.4.3", default-features = false, features = [
   "precompiled",
 ] }
-web_common_traits = { workspace = true, features = ["frontend"] }
 core_structures = { workspace = true, features = ["frontend"] }
 diesel = { workspace = true, features = [
   "sqlite",
