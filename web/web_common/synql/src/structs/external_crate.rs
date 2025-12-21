@@ -8,15 +8,18 @@ use quote::ToTokens;
 use syn::Type;
 
 use crate::structs::{
-    ExternalFunction, ExternalFunctionRef, ExternalType, ExternalTypeRef, external_crate::builder::ExternalCrateBuilderError
+    ExternalFunction, ExternalFunctionRef, ExternalType, ExternalTypeRef,
+    external_crate::builder::ExternalCrateBuilderError,
 };
 mod builder;
 mod chrono_crate;
 mod core_crate;
+mod diesel_builders;
 mod diesel_crate;
 mod pgrx_validation;
 mod postgis_diesel_crate;
 mod rosetta_uuid_crate;
+mod serde;
 mod std_crate;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -36,6 +39,18 @@ pub struct ExternalCrate {
     git: Option<(String, String)>,
     /// Feature flags required by the crate.
     features: Vec<String>,
+}
+
+impl PartialOrd for ExternalCrate {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.name.cmp(&other.name))
+    }
+}
+
+impl Ord for ExternalCrate {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.name.cmp(&other.name)
+    }
 }
 
 impl ExternalCrate {
@@ -86,7 +101,7 @@ impl ExternalCrate {
     /// # Arguments
     /// * `name` - A string slice representing the name of the external type.
     #[must_use]
-    pub fn external_type(&self, ident: &Type) -> Option<ExternalTypeRef> {
+    pub fn external_type(&self, ident: &Type) -> Option<ExternalTypeRef<'_>> {
         self.types
             .iter()
             .find(|t| {
@@ -111,7 +126,7 @@ impl ExternalCrate {
     /// # Arguments
     /// * `postgres_type` - The postgres type to find a compatible type for.
     #[must_use]
-    pub fn external_postgres_type(&self, postgres_type: &str) -> Option<ExternalTypeRef> {
+    pub fn external_postgres_type(&self, postgres_type: &str) -> Option<ExternalTypeRef<'_>> {
         self.types
             .iter()
             .find(|t| t.is_compatible_with(postgres_type))

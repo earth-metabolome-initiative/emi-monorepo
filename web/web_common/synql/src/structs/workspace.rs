@@ -69,7 +69,7 @@ impl Workspace {
     /// # Arguments
     /// * `postgres_type` - A string slice representing the postgres type.
     #[must_use]
-    pub fn external_postgres_type(&self, postgres_type: &str) -> Option<ExternalTypeRef> {
+    pub fn external_postgres_type(&self, postgres_type: &str) -> Option<ExternalTypeRef<'_>> {
         for ext_crate in &self.external_crates {
             if let Some(ext_type) = ext_crate.external_postgres_type(postgres_type) {
                 return Some(ext_type);
@@ -84,7 +84,7 @@ impl Workspace {
     /// # Arguments
     /// * `ident` - A reference to the type.
     #[must_use]
-    pub fn external_type(&self, ident: &Type) -> Option<ExternalTypeRef> {
+    pub fn external_type(&self, ident: &Type) -> Option<ExternalTypeRef<'_>> {
         for ext_crate in &self.external_crates {
             if let Some(ext_type) = ext_crate.external_type(ident) {
                 return Some(ext_type);
@@ -100,7 +100,7 @@ impl Workspace {
     /// * `name` - A string slice representing the name of the external
     ///   function.
     #[must_use]
-    pub fn external_function(&self, name: &str) -> Option<ExternalFunctionRef> {
+    pub fn external_function(&self, name: &str) -> Option<ExternalFunctionRef<'_>> {
         for ext_crate in &self.external_crates {
             if let Some(ext_function) = ext_crate.external_function_ref(name) {
                 return Some(ext_function);
@@ -177,9 +177,8 @@ impl Workspace {
         for table in db.tables() {
             writeln!(
                 buffer,
-                "{} = {{ path = \"{}\" }}",
-                table.crate_name(self),
-                table.crate_path(self).display()
+                "{crate_name} = {{ path = \"./{crate_name}\" }}",
+                crate_name=table.crate_name(self),
             )?;
         }
 

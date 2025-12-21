@@ -547,6 +547,36 @@ pub trait TableLike:
     where
         Self: 'db;
 
+    /// Returns whether the table has any check constraints.
+    /// 
+    /// # Arguments
+    /// 
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    /// 
+    /// # Example
+    /// 
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE my_table_with_cc (id INT CHECK (id > 0), name TEXT);
+    /// CREATE TABLE my_table_without_cc (id INT, name TEXT);
+    /// "#,
+    /// )?;
+    /// let table_with_cc = db.table(None, "my_table_with_cc").unwrap();
+    /// assert!(table_with_cc.has_check_constraints(&db));
+    /// let table_without_cc = db.table(None, "my_table_without_cc").unwrap();
+    /// assert!(!table_without_cc.has_check_constraints(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[inline]
+    fn has_check_constraints(&self, database: &Self::DB) -> bool {
+        self.check_constraints(database).next().is_some()
+    }
+
     /// Iterates over the unique indexes of the table using the provided
     /// schema.
     ///
@@ -1018,6 +1048,65 @@ pub trait TableLike:
         ancestral_tables.dedup();
 
         ancestral_tables
+    }
+
+    /// Returns the unique tables which are extended by either the current
+    /// table or any of the tables it extends via foreign keys, sorted by
+    /// topological order.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE grandparent_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES grandparent_table(id));
+    /// CREATE TABLE child_table (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES parent_table(id));
+    /// "#,
+    /// )?;
+    /// let child_table = db.table(None, "child_table").unwrap();
+    /// let ancestral_tables: Vec<&str> = child_table
+    ///     .ancestral_extended_tables_topological(&db)
+    ///     .iter()
+    ///     .map(|t| t.table_name())
+    ///     .collect();
+    /// assert_eq!(ancestral_tables, vec!["grandparent_table", "parent_table"]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn ancestral_extended_tables_topological<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> Vec<&'db Self>
+    where
+        Self: 'db,
+    {
+        let mut ancestral_extended_tables = self.ancestral_extended_tables(database);
+
+        if ancestral_extended_tables.len() <= 1 {
+            return ancestral_extended_tables;
+        }
+
+        let sorted_dag =
+            database.table_dag().into_iter().map(|table| table.borrow()).collect::<Vec<&Self>>();
+
+        ancestral_extended_tables.sort_by_key(|table| {
+            sorted_dag
+                .iter()
+                .position(|t| t == table)
+                .expect("Table in ancestral extended tables should exist in the DAG")
+        });
+
+        ancestral_extended_tables
     }
 
     /// Returns the tables referenced in foreign keys of the current table via

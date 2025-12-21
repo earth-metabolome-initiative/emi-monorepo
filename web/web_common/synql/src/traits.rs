@@ -8,3 +8,5 @@ pub mod column;
 pub use column::ColumnSynLike;
 pub mod check_constraint;
 pub use check_constraint::CheckConstraintSynLike;
+pub mod function;
+pub use function::FunctionSynLike;

@@ -29,7 +29,7 @@ pub struct ExternalType {
 impl ExternalType {
     /// Inizializes a new `ExternalTypeBuilder`.
     #[must_use]
-    pub(super) fn new(diesel_type: syn::Type, rust_type: syn::Type) -> ExternalTypeBuilder {
+    pub fn new(diesel_type: syn::Type, rust_type: syn::Type) -> ExternalTypeBuilder {
         ExternalTypeBuilder::new(diesel_type, rust_type)
     }
 

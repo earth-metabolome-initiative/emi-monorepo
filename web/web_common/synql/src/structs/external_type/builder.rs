@@ -28,10 +28,12 @@ impl ExternalTypeBuilder {
 }
 
 /// Error enumeration which might occur when building a `ExternalType`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
 pub enum ExternalTypeBuilderError {
+    #[error("The provided postgres type is duplicated")]
     /// Provided a duplicated postgres type.
     DuplicatedPostgresType,
+    #[error("The provided postgres type is not lowercase")]
     /// If the provided postgres type is not lowercase.
     NotLowercasePostgresType,
 }

@@ -9,15 +9,15 @@ use sqlparser::ast::{
 };
 
 use crate::{
-    structs::{ExternalTypeRef, Workspace},
-    traits::{column::ColumnSynLike, table::TableSynLike},
+    structs::{ExternalFunctionRef, ExternalTypeRef, Workspace},
+    traits::{column::ColumnSynLike, function::FunctionSynLike, table::TableSynLike},
 };
 
-pub(super) struct TranslateExpression<'local, 'db, DB: DatabaseLike> {
+pub(super) struct TranslateExpression<'workspace, 'db, DB: DatabaseLike> {
     check_constraint: &'db DB::CheckConstraint,
-    workspace: &'local Workspace,
+    workspace: &'workspace Workspace,
     database: &'db DB,
-    contextual_columns: &'local [&'db DB::Column],
+    contextual_columns: &'workspace [&'db DB::Column],
 }
 
 /// Verifies that the [`CastKind`](sqlparser::ast::CastKind) is supported
@@ -49,15 +49,15 @@ fn invert_operator(op: &BinaryOperator) -> BinaryOperator {
     }
 }
 
-impl<'local, 'db, DB> TranslateExpression<'local, 'db, DB>
+impl<'workspace, 'db, DB> TranslateExpression<'workspace, 'db, DB>
 where
     DB: DatabaseLike,
 {
     pub(super) fn new(
         check_constraint: &'db DB::CheckConstraint,
-        workspace: &'local Workspace,
+        workspace: &'workspace Workspace,
         database: &'db DB,
-        contextual_columns: &'local [&'db DB::Column],
+        contextual_columns: &'workspace [&'db DB::Column],
     ) -> Self {
         Self { check_constraint, workspace, database, contextual_columns }
     }
@@ -313,7 +313,7 @@ where
     fn parse_function_argument_expr(
         &self,
         arg: &FunctionArgExpr,
-        arg_type: ExternalTypeRef,
+        arg_type: ExternalTypeRef<'workspace>,
     ) -> (TokenStream, Option<&'_ DB::Column>) {
         match arg {
             FunctionArgExpr::Expr(expr) => {
@@ -338,7 +338,7 @@ where
     fn parse_function_argument(
         &self,
         arg: &FunctionArg,
-        arg_type: ExternalTypeRef,
+        arg_type: ExternalTypeRef<'workspace>,
     ) -> (TokenStream, Option<&'_ DB::Column>) {
         match arg {
             FunctionArg::Named { .. } => {
@@ -356,7 +356,7 @@ where
     fn parse_function_argument_list(
         &self,
         args: &FunctionArgumentList,
-        argument_types: &[ExternalTypeRef],
+        argument_types: &[ExternalTypeRef<'workspace>],
     ) -> (Vec<TokenStream>, Vec<&'_ DB::Column>) {
         let mut token_stream = Vec::with_capacity(args.args.len());
         let mut columns = Vec::new();
@@ -374,7 +374,7 @@ where
     fn parse_function_arguments(
         &self,
         args: &FunctionArguments,
-        argument_types: &[ExternalTypeRef],
+        argument_types: &[ExternalTypeRef<'workspace>],
     ) -> (Vec<TokenStream>, Vec<&'_ DB::Column>) {
         match args {
             FunctionArguments::None => (Vec::new(), Vec::new()),
@@ -443,33 +443,28 @@ where
 
         let table_ident = self.table().table_snake_ident();
 
-        let (maybe_rename_field, map_err) = if function_ref.can_fail() {
-            let attributes = scoped_columns.iter().map(|scoped_column| {
-                let column_ident = scoped_column.column_camel_ident();
-                quote! { crate::#table_ident::#column_ident::NAME }
-            });
+        let attributes = scoped_columns.iter().map(|scoped_column| {
+            let column_ident = scoped_column.column_camel_ident();
+            quote! { crate::#table_ident::#column_ident::NAME }
+        });
 
-            Some(match scoped_columns.len() {
-                1 => {
-                    quote! {
-                        .map_err(|e| e.replace_field_name(|_|#(#attributes),* ))
-                    }
+        let map_err = match scoped_columns.len() {
+            1 => {
+                quote! {
+                    .map_err(|e| e.replace_field_name(|_|#(#attributes),* ))
                 }
-                2 => {
-                    quote! {
-                        .map_err(|e| e.replace_field_names(|_|#(#attributes),* ))
-                    }
+            }
+            2 => {
+                quote! {
+                    .map_err(|e| e.replace_field_names(|_|#(#attributes),* ))
                 }
-                _ => {
-                    unimplemented!("More than two scoped columns not supported");
-                }
-            })
-        } else {
-            None
+            }
+            _ => {
+                unimplemented!("More than two scoped columns not supported");
+            }
         };
 
         quote! {
-            #maybe_rename_field
             #function_ref(#(#args),*)#map_err
         }
     }
@@ -490,7 +485,7 @@ where
         &self,
         column: &DB::Column,
         value: &Value,
-    ) -> (proc_macro2::TokenStream, ExternalTypeRef) {
+    ) -> (proc_macro2::TokenStream, ExternalTypeRef<'workspace>) {
         let column_type =
             column.external_postgres_type(self.workspace, self.database).expect(&format!(
                 "Failed to get type for column `{}.{}` ({})",
@@ -513,8 +508,8 @@ where
     /// # Panics
     ///
     /// * If the provided [`Value`](sqlparser::ast::Value) is not supported
-    fn parse_value<'workspace>(
-        &'workspace self,
+    fn parse_value(
+        &self,
         value: &Value,
         type_hint: Option<ExternalTypeRef<'workspace>>,
     ) -> (proc_macro2::TokenStream, ExternalTypeRef<'workspace>) {
@@ -552,8 +547,8 @@ where
     ///
     /// * If the provided [`ValueWithSpan`](sqlparser::ast::ValueWithSpan) is
     ///   not supported
-    fn parse_value_with_span<'workspace>(
-        &'workspace self,
+    fn parse_value_with_span(
+        &self,
         value: &sqlparser::ast::ValueWithSpan,
         type_hint: Option<ExternalTypeRef<'workspace>>,
     ) -> (proc_macro2::TokenStream, ExternalTypeRef<'workspace>) {
@@ -585,8 +580,8 @@ where
     fn inner_parse(
         &self,
         expr: &Expr,
-        type_hint: Option<ExternalTypeRef>,
-    ) -> (TokenStream, Vec<&'_ DB::Column>, Option<ExternalTypeRef>) {
+        type_hint: Option<ExternalTypeRef<'workspace>>,
+    ) -> (TokenStream, Vec<&'_ DB::Column>, Option<ExternalTypeRef<'workspace>>) {
         match expr {
             Expr::Function(function) => {
                 let token_stream = self.parse_function(function);
@@ -626,6 +621,10 @@ where
                         if !left_scoped_columns.is_empty() || !right_scoped_columns.is_empty() {
                             unimplemented!("Scoped columns not supported");
                         }
+                        let left_returning_type =
+                            left_returning_type.expect("Left side of AND must have a type");
+                        let right_returning_type =
+                            right_returning_type.expect("Right side of AND must have a type");
                         if left_returning_type.is_bool() && right_returning_type.is_bool() {
                             (
                                 quote! {
@@ -633,7 +632,7 @@ where
                                 }
                                 .into(),
                                 Vec::new(),
-                                self.workspace.bool(),
+                                Some(self.workspace.bool()),
                             )
                         } else {
                             unimplemented!("Unsupported binary operation");
@@ -647,6 +646,10 @@ where
                         if !left_scoped_columns.is_empty() || !right_scoped_columns.is_empty() {
                             unimplemented!("Scoped columns not supported");
                         }
+                        let left_returning_type =
+                            left_returning_type.expect("Left side of AND must have a type");
+                        let right_returning_type =
+                            right_returning_type.expect("Right side of AND must have a type");
                         if left_returning_type.is_bool() && right_returning_type.is_bool() {
                             (
                                 quote! {
@@ -667,8 +670,12 @@ where
                     | BinaryOperator::GtEq
                     | BinaryOperator::LtEq => {
                         let (left, _, left_returning_type) = self.inner_parse(left, None);
+                        let left_returning_type =
+                            left_returning_type.expect("Left side of AND must have a type");
                         let (right, _, right_returning_type) =
                             self.inner_parse(right, Some(left_returning_type));
+                        let right_returning_type =
+                            right_returning_type.expect("Right side of AND must have a type");
                         if left_returning_type != right_returning_type {
                             unimplemented!(
                                 "Equality between different types not supported: {left_returning_type:?} and {right_returning_type:?}. {:?}",
@@ -706,6 +713,10 @@ where
                                 self.check_constraint
                             );
                         }
+                        let left_returning_type =
+                            left_returning_type.expect("Left side of binary op must have a type");
+                        let right_returning_type =
+                            right_returning_type.expect("Right side of binary op must have a type");
                         if left_returning_type.is_numeric() && right_returning_type.is_numeric() {
                             let operator_symbol: syn::BinOp = match op {
                                 BinaryOperator::Plus => {
@@ -731,7 +742,7 @@ where
                                 }
                                 .into(),
                                 Vec::new(),
-                                left_returning_type,
+                                Some(left_returning_type),
                             )
                         } else {
                             unimplemented!(
@@ -749,7 +760,7 @@ where
             }
             Expr::Value(value) => {
                 let (token_stream, returning_type) = self.parse_value_with_span(value, type_hint);
-                (token_stream.into(), Vec::new(), returning_type)
+                (token_stream.into(), Vec::new(), Some(returning_type))
             }
             _ => {
                 unimplemented!(

@@ -1,6 +1,6 @@
 //! Submodule providing a builder for the `SynQL` struct.
 
-use std::path::PathBuf;
+use std::path::Path;
 
 use super::SynQL;
 use crate::{structs::ExternalCrate, traits::SynQLDatabaseLike};
@@ -8,7 +8,8 @@ use crate::{structs::ExternalCrate, traits::SynQLDatabaseLike};
 /// Struct to build `SynQL` instances.
 pub struct SynQLBuilder<'db, DB: SynQLDatabaseLike> {
     database: &'db DB,
-    path: PathBuf,
+    path: &'db Path,
+    name: Option<String>,
     deny_list: Vec<&'db DB::Table>,
     version: (u8, u8, u8),
     edition: u16,
@@ -21,10 +22,11 @@ impl<'db, DB: SynQLDatabaseLike> SynQLBuilder<'db, DB> {
     #[must_use]
     #[inline]
     /// Creates a new `SynQLBuilder` instance.
-    pub fn new(database: &'db DB, path: PathBuf) -> Self {
+    pub fn new(database: &'db DB, path: &'db Path) -> Self {
         SynQLBuilder {
             database,
             path,
+            name: None,
             deny_list: Vec::new(),
             version: (0, 1, 0),
             edition: 2024,
@@ -47,6 +49,14 @@ impl<'db, DB: SynQLDatabaseLike> SynQLBuilder<'db, DB> {
     #[inline]
     pub fn deny(mut self, table: &'db DB::Table) -> Self {
         self.deny_list.push(table);
+        self
+    }
+
+    /// Sets the name of the workspace.
+    #[must_use]
+    #[inline]
+    pub fn name(mut self, name: &str) -> Self {
+        self.name = Some(name.to_string());
         self
     }
 
@@ -108,6 +118,7 @@ impl<'db, DB: SynQLDatabaseLike> From<SynQLBuilder<'db, DB>> for SynQL<'db, DB> 
         SynQL {
             database: builder.database,
             path: builder.path,
+            name: builder.name,
             deny_list: builder.deny_list,
             version: builder.version,
             edition: builder.edition,

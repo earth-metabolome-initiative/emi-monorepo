@@ -60,7 +60,7 @@ impl ColumnLike for crate::models::Column {
         self.__is_nullable == "YES"
     }
 
-    fn has_default(&self) -> bool {
-        self.column_default.is_some()
+    fn default_value(&self) -> Option<String> {
+        self.column_default.clone()
     }
 }

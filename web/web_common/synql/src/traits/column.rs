@@ -3,11 +3,14 @@
 //! representation, building on top of the
 //! [`ColumnLike`](sql_traits::traits::ColumnLike) trait.
 
-use sql_traits::traits::ColumnLike;
+use quote::quote;
+use sql_traits::traits::{ColumnLike, TableLike};
 use syn::{Ident, Type};
 
-use crate::{structs::{ExternalTypeRef, Workspace}, utils::{camel_case_name, is_reserved_rust_word, snake_case_name}};
-
+use crate::{
+    structs::{ExternalTypeRef, Workspace},
+    utils::{camel_case_name, is_reserved_rust_word, snake_case_name},
+};
 
 /// Trait implemented by types that represent SQL columns and can be used to
 /// generate Rust code for them.
@@ -189,6 +192,46 @@ pub trait ColumnSynLike: ColumnLike {
             Some(external_type) => external_type.supports_copy(),
             None => false,
         }
+    }
+
+    /// Returns whether the column type supports the given core trait in Rust.
+    ///
+    /// # Arguments
+    ///
+    /// * `core_trait` - The core trait to check support for.
+    /// * `database` - The database connection to use to query the column type.
+    fn supports(
+        &self,
+        core_trait: crate::structs::Trait,
+        workspace: &Workspace,
+        database: &Self::DB,
+    ) -> bool {
+        match self.external_postgres_type(workspace, database) {
+            Some(external_type) => external_type.supports_trait(core_trait),
+            None => false,
+        }
+    }
+
+    /// Generates the struct field tokens for this column.
+    fn generate_struct_field(
+        &self,
+        workspace: &Workspace,
+        database: &Self::DB,
+    ) -> Result<proc_macro2::TokenStream, crate::Error> {
+        let column_ident = self.column_snake_ident();
+        let rust_type = self
+            .rust_type(workspace, database)
+            .ok_or_else(|| crate::Error::ColumnTypeNotFound {
+                table_name: self.table(database).table_name().to_string(),
+                column_name: self.column_name().to_string(),
+                sql_type: self.data_type(database).to_string(),
+            })?;
+        let documentation = format!("Column `{}`.", self.column_name());
+        let tokens = quote! {
+            #[doc = #documentation]
+            pub #column_ident: #rust_type,
+        };
+        Ok(tokens)
     }
 }
 

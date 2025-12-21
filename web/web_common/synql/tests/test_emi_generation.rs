@@ -7,12 +7,13 @@
 use std::{
     path::{Path, PathBuf},
     process::Command,
-    sync::Arc,
 };
 
 use sql_constraints::prelude::*;
-use synql::prelude::*;
-use synql_core::structs::{ExternalCrate, ExternalType};
+use synql::{
+    prelude::*,
+    structs::{ExternalCrate, ExternalType},
+};
 use time_requirements::{prelude::TimeTracker, report::Report, task::Task};
 
 fn report(time_tracker: &TimeTracker) {
@@ -52,81 +53,78 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
     // directory");
     let workspace_path = std::path::PathBuf::from("../../../../emi_local");
 
-    let iso_codes = ExternalCrate::new()
-        .name("iso_codes")?
-        .features(["diesel", "diesel_pgrx"])
-        .version("0.1.0")
-        .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
-        .add_type(Arc::new(
-            ExternalType::new()
-                .rust_type(syn::parse_quote!(iso_codes::CountryCode))
-                .diesel_type(syn::parse_quote!(iso_codes::country_codes::diesel_impls::CountryCode))
-                .postgres_type("countrycode")?
-                .build()?,
-        ))
+    let iso_codes = ExternalCrate::new("iso_codes")
         .unwrap()
-        .build()?;
-
-    let media_types = ExternalCrate::new()
-        .name("media_types")?
         .features(["diesel", "diesel_pgrx"])
         .version("0.1.0")
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
-        .add_type(Arc::new(
-            ExternalType::new()
-                .rust_type(syn::parse_quote!(media_types::MediaType))
-                .diesel_type(syn::parse_quote!(media_types::diesel_impls::MediaType))
-                .postgres_type("mediatype")?
-                .build()?,
-        ))
+        .add_type(
+            ExternalType::new(
+                syn::parse_quote!(iso_codes::CountryCode),
+                syn::parse_quote!(iso_codes::country_codes::diesel_impls::CountryCode),
+            )
+            .postgres_type("countrycode")?
+            .into(),
+        )
         .unwrap()
-        .build()?;
+        .into();
 
-    let cas_codes = ExternalCrate::new()
-        .name("cas_codes")?
-        .features(["diesel", "diesel_pgrx"])
-        .version("0.1.0")
-        .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
-        .add_type(Arc::new(
-            ExternalType::new()
-                .rust_type(syn::parse_quote!(cas_codes::CAS))
-                .diesel_type(syn::parse_quote!(cas_codes::diesel_impls::CAS))
-                .postgres_type("cas")?
-                .build()?,
-        ))
+    let media_types = ExternalCrate::new("media_types")
         .unwrap()
-        .build()?;
-
-    let molecular_formulas = ExternalCrate::new()
-        .name("molecular_formulas")?
         .features(["diesel", "diesel_pgrx"])
         .version("0.1.0")
         .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
-        .add_type(Arc::new(
-            ExternalType::new()
-                .rust_type(syn::parse_quote!(molecular_formulas::MolecularFormula))
-                .diesel_type(syn::parse_quote!(
+        .add_type(
+            ExternalType::new(
+                syn::parse_quote!(media_types::MediaType),
+                syn::parse_quote!(media_types::diesel_impls::MediaType),
+            )
+            .postgres_type("mediatype")?
+            .into(),
+        )
+        .unwrap()
+        .into();
+
+    let cas_codes = ExternalCrate::new("cas_codes")
+        .unwrap()
+        .features(["diesel", "diesel_pgrx"])
+        .version("0.1.0")
+        .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
+        .add_type(
+            ExternalType::new(
+                syn::parse_quote!(cas_codes::CAS),
+                syn::parse_quote!(cas_codes::diesel_impls::CAS),
+            )
+            .postgres_type("cas")?
+            .into(),
+        )
+        .unwrap()
+        .into();
+
+    let molecular_formulas = ExternalCrate::new("molecular_formulas")
+        .unwrap()
+        .features(["diesel", "diesel_pgrx"])
+        .version("0.1.0")
+        .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
+        .add_type(
+            ExternalType::new(
+                syn::parse_quote!(molecular_formulas::MolecularFormula),
+                syn::parse_quote!(
                     molecular_formulas::molecular_formula::diesel_impls::MolecularFormula
-                ))
-                .postgres_type("molecularformula")?
-                .build()?,
-        ))
+                ),
+            )
+            .postgres_type("molecularformula")?
+            .into(),
+        )
         .unwrap()
-        .build()?;
+        .into();
 
-    let synql = SynQL::new()
-        .database(&db)
-        .external_crates([
-            Arc::new(iso_codes.clone()),
-            Arc::new(media_types.clone()),
-            Arc::new(cas_codes.clone()),
-            Arc::new(molecular_formulas.clone()),
-        ])
-        .path(workspace_path.clone())
+    let synql: SynQL<ParserDB> = SynQL::new(&db, &workspace_path)
+        .name("synql")
+        .external_crates([iso_codes, media_types, cas_codes, molecular_formulas])
         .generate_workspace_toml()
         .generate_rustfmt()
-        .build()
-        .expect("Unable to build SynQL instance");
+        .into();
     tracking_test.extend(synql.generate().expect("Unable to generate workspace"));
 
     // We print the report

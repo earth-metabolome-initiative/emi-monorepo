@@ -1,6 +1,6 @@
 //! Submodule defining a builder for the `Workspace` struct.
 
-use std::{fmt::Display, path::PathBuf};
+use std::path::PathBuf;
 
 use crate::structs::{ExternalCrate, Workspace};
 
@@ -30,47 +30,13 @@ impl Default for WorkspaceBuilder {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-/// Enumeration of the attributes of the `Workspace` struct.
-pub enum WorkspaceAttribute {
-    /// External crates made available within the workspace.
-    ExternalCrates,
-    /// Name of the workspace.
-    Name,
-    /// Path of the workspace.
-    Path,
-    /// Version of the workspace.
-    Version,
-    /// Edition of the workspace.
-    Edition,
-}
-
-impl Display for WorkspaceAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            WorkspaceAttribute::ExternalCrates => write!(f, "external_crates"),
-            WorkspaceAttribute::Name => write!(f, "name"),
-            WorkspaceAttribute::Path => write!(f, "path"),
-            WorkspaceAttribute::Version => write!(f, "version"),
-            WorkspaceAttribute::Edition => write!(f, "edition"),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, thiserror::Error)]
 /// Enumeration of errors that can occur during the building of a
 /// `Workspace`.
 pub enum WorkspaceBuilderError {
+    #[error("The name of the workspace is invalid")]
     /// The name of the workspace is invalid.
     InvalidName,
-}
-
-impl Display for WorkspaceBuilderError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            WorkspaceBuilderError::InvalidName => write!(f, "Invalid workspace name"),
-        }
-    }
 }
 
 impl WorkspaceBuilder {
@@ -130,6 +96,21 @@ impl WorkspaceBuilder {
     /// Adds the `std` external crate to the workspace.
     pub fn std(self) -> Self {
         self.external_crate(ExternalCrate::std())
+    }
+
+    /// Adds the `chrono` external crate to the workspace.
+    pub fn chrono(self) -> Self {
+        self.external_crate(ExternalCrate::chrono())
+    }
+
+    /// Adds the `serde` external crate to the workspace.
+    pub fn serde(self) -> Self {
+        self.external_crate(ExternalCrate::serde())
+    }
+
+    /// Adds the `diesel_builders` external crate to the workspace.
+    pub fn diesel_builders(self) -> Self {
+        self.external_crate(ExternalCrate::diesel_builders())
     }
 
     /// Adds the core external crate to the workspace.

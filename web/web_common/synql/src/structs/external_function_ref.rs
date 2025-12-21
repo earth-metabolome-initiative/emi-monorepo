@@ -2,6 +2,8 @@
 //! contains minimal information about a function and its crate
 //! of provenance.
 
+use quote::ToTokens;
+
 use crate::structs::{ExternalCrate, ExternalFunction};
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -10,19 +12,19 @@ pub struct ExternalFunctionRef<'workspace> {
 	/// Reference to the external function.
 	external_function: &'workspace ExternalFunction,
 	/// Crate where the external function is defined.
-	crate_ref: &'workspace ExternalCrate,
+	external_crate: &'workspace ExternalCrate,
 }
 
 impl<'workspace> ExternalFunctionRef<'workspace> {
 	/// Creates a new `ExternalFunctionRef`.
 	#[must_use]
 	pub fn new(
-		crate_ref: &'workspace ExternalCrate,
+		external_crate: &'workspace ExternalCrate,
 		external_function: &'workspace ExternalFunction,
 	) -> Self {
 		Self {
 			external_function,
-			crate_ref,
+			external_crate,
 		}
 	}
 
@@ -43,7 +45,13 @@ impl<'workspace> ExternalFunctionRef<'workspace> {
 	/// Returns the crate where the external function is defined.
 	#[inline]
 	#[must_use]
-	pub fn crate_ref(&self) -> &ExternalCrate {
-		self.crate_ref
+	pub fn external_crate(&self) -> &'workspace ExternalCrate {
+		self.external_crate
+	}
+}
+
+impl ToTokens for ExternalFunctionRef<'_> {
+	fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+		self.external_function.to_tokens(tokens);
 	}
 }

@@ -6,12 +6,13 @@
 
 use std::path::PathBuf;
 
-use sql_traits::traits::{DatabaseLike, TableLike};
+use sql_traits::traits::{CheckConstraintLike, DatabaseLike, TableLike};
+use strum::IntoEnumIterator;
 use syn::Ident;
 
 use crate::{
-    structs::Workspace,
-    traits::ColumnSynLike,
+    structs::{ExternalCrate, Trait, Workspace},
+    traits::{ColumnSynLike, function::FunctionSynLike},
     utils::{
         camel_case_name, is_reserved_rust_word, singular_camel_case_name, singular_snake_name,
         snake_case_name,
@@ -34,10 +35,20 @@ where
         format!("{}-{}", workspace.name(), self.table_snake_name())
     }
 
-    /// Returns the path of the crate associated with this table.
-    /// 
+    /// Returns the ident of the crate associated with this table.
+    ///
     /// # Arguments
-    /// 
+    ///
+    /// * `workspace` - The workspace where the crate is defined.
+    #[must_use]
+    fn crate_ident(&self, workspace: &Workspace) -> Ident {
+        Ident::new(&self.crate_name(workspace).replace('-', "_"), proc_macro2::Span::call_site())
+    }
+
+    /// Returns the path of the crate associated with this table.
+    ///
+    /// # Arguments
+    ///
     /// * `workspace` - The workspace where the crate is defined.
     #[must_use]
     fn crate_path(&self, workspace: &Workspace) -> PathBuf {
@@ -236,6 +247,65 @@ where
         database: &'db Self::DB,
     ) -> impl Iterator<Item = Ident> + 'db {
         self.primary_key_columns(database).map(ColumnSynLike::column_snake_ident)
+    }
+
+    /// Returns the sorted unique external crates required by this table,
+    /// including those required by its columns and its check constraints.
+    fn external_crates<'workspace>(&self, database: &Self::DB, workspace: &'workspace Workspace) -> Vec<&'workspace ExternalCrate> {
+        let mut crates = Vec::new();
+        for column in self.columns(database) {
+            if let Some(postgres_type) = column.external_postgres_type(workspace, database) {
+                crates.push(postgres_type.external_crate());
+            }
+        }
+        for check_constraint in self.check_constraints(database) {
+            for function in check_constraint.functions(database) {
+                if let Some(external_crate) = function.external_function_ref(workspace) {
+                    crates.push(external_crate.external_crate());
+                }
+            }
+        }
+        crates.sort_unstable();
+        crates.dedup();
+        crates
+    }
+
+    /// Returns the list of core derives that can be derived for this table.
+    ///
+    /// # Arguments
+    /// * `database` - The database where the table is defined.
+    /// * `workspace` - The workspace where the table is defined.
+    fn supported_core_derives(&self, database: &Self::DB, workspace: &Workspace) -> Vec<syn::Path> {
+        let mut derives = Vec::new();
+        for core_trait in Trait::iter() {
+            if self.columns(database).all(|col| col.supports(core_trait, workspace, database)) {
+                derives.push(core_trait.path());
+            }
+        }
+        derives
+    }
+
+    /// Generates the struct field tokens for all columns of this table.
+    ///
+    /// # Arguments
+    /// * `workspace` - The workspace where the table is defined.
+    /// * `database` - The database where the table is defined.
+    ///
+    ///  # Errors
+    ///
+    /// Returns an error if the external type of any column cannot be
+    /// determined.
+    fn generate_struct_fields(
+        &self,
+        workspace: &Workspace,
+        database: &Self::DB,
+    ) -> Result<Vec<proc_macro2::TokenStream>, crate::Error> {
+        let mut attributes = Vec::new();
+        for column in self.columns(database) {
+            let attr_tokens = column.generate_struct_field(workspace, database)?;
+            attributes.push(attr_tokens);
+        }
+        Ok(attributes)
     }
 }
 

@@ -7,24 +7,24 @@ use crate::structs::{ExternalCrate, ExternalType, external_type::Trait};
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 /// Struct representing a reference to an external crate and one of its types.
 pub struct ExternalTypeRef<'a> {
-    crate_ref: &'a ExternalCrate,
+    external_crate: &'a ExternalCrate,
     type_ref: &'a ExternalType,
 }
 
-impl ExternalTypeRef<'_> {
-	/// Creates a new `ExternalTypeRef`.
-	pub(super) fn new<'a>(
-		crate_ref: &'a ExternalCrate,
-		type_ref: &'a ExternalType,
-	) -> ExternalTypeRef<'a> {
-		ExternalTypeRef { crate_ref, type_ref }
-	}
+impl<'workspace> ExternalTypeRef<'workspace> {
+    /// Creates a new `ExternalTypeRef`.
+    pub(super) fn new<'a>(
+        external_crate: &'a ExternalCrate,
+        type_ref: &'a ExternalType,
+    ) -> ExternalTypeRef<'a> {
+        ExternalTypeRef { external_crate, type_ref }
+    }
 
     /// Returns a reference to the name of the crate.
     #[inline]
     #[must_use]
     pub fn crate_name(&self) -> &str {
-        self.crate_ref.name()
+        self.external_crate.name()
     }
 
     /// Returns a reference to the diesel type.
@@ -44,22 +44,22 @@ impl ExternalTypeRef<'_> {
     /// Returns a reference to the external crate.
     #[inline]
     #[must_use]
-    pub fn external_crate(&self) -> &ExternalCrate {
-        &self.crate_ref
+    pub fn external_crate(&self) -> &'workspace ExternalCrate {
+        &self.external_crate
     }
 
     /// Returns true if the crate is a dependency.
     #[inline]
     #[must_use]
     pub fn is_dependency(&self) -> bool {
-        self.crate_ref.is_dependency()
+        self.external_crate.is_dependency()
     }
 
     /// Returns the version of the crate if it is a dependency.
     #[inline]
     #[must_use]
     pub fn version(&self) -> Option<&str> {
-        self.crate_ref.version()
+        self.external_crate.version()
     }
 
     /// Returns the git repository and branch of the crate if it is a
@@ -67,7 +67,7 @@ impl ExternalTypeRef<'_> {
     #[inline]
     #[must_use]
     pub fn git(&self) -> Option<(&str, &str)> {
-        self.crate_ref.git()
+        self.external_crate.git()
     }
 
     /// Returns true if the type supports the provided trait.
@@ -97,7 +97,7 @@ impl ExternalTypeRef<'_> {
         self.type_ref.cast(value)
     }
 
-	/// Returns true if the `ExternalTypeRef` is of boolean type.
+    /// Returns true if the `ExternalTypeRef` is of boolean type.
     #[must_use]
     pub fn is_bool(&self) -> bool {
         self.type_ref.is_bool()

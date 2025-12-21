@@ -8,6 +8,7 @@
 use std::process::Command;
 
 use ::graph::prelude::DirectoryTree;
+use sql_traits::prelude::ParserDB;
 use synql::prelude::*;
 
 #[test]
@@ -39,13 +40,10 @@ fn test_workspace_generation() -> Result<(), Box<dyn std::error::Error>> {
     let workspace_path = temp_dir.path().join("synql_workspace");
     // let workspace_path = std::path::PathBuf::from("../../../../local");
 
-    let synql = SynQL::new()
-        .database(&db)
-        .path(workspace_path.clone())
+    let synql: SynQL<ParserDB> = SynQL::new(&db, &workspace_path)
         .generate_workspace_toml()
         .generate_rustfmt()
-        .build()
-        .expect("Unable to build SynQL instance");
+        .into();
     synql.generate().expect("Unable to generate workspace");
 
     // Load the path tree to see if it matches expectation using `insta`

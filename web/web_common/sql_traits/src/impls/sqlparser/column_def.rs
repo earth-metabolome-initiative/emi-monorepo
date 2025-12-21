@@ -53,11 +53,14 @@ impl ColumnLike for TableAttribute<CreateTable, ColumnDef> {
     }
 
     #[inline]
-    fn has_default(&self) -> bool {
-        self.attribute()
-            .options
-            .iter()
-            .any(|opt| matches!(opt.option, sqlparser::ast::ColumnOption::Default(_)))
+    fn default_value(&self) -> Option<String> {
+        self.attribute().options.iter().find_map(|opt| {
+            if let sqlparser::ast::ColumnOption::Default(expr) = &opt.option {
+                Some(expr.to_string())
+            } else {
+                None
+            }
+        })
     }
 
     #[inline]

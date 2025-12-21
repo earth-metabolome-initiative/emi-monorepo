@@ -1,16 +1,18 @@
 //! Submodule defining the `SQLWorkspace` trait which allows to generate the
 //! `diesel` workspace from a SQL schema, based on `sql_traits`.
 
-use std::path::PathBuf;
+use std::path::Path;
 
 mod builder;
+mod write_crate_lib;
+mod write_crate_toml;
 pub use builder::SynQLBuilder;
 use sql_relations::prelude::TableLike;
 use time_requirements::{prelude::TimeTracker, task::Task};
 
 use crate::{
     structs::{ExternalCrate, Workspace},
-    traits::SynQLDatabaseLike,
+    traits::{SynQLDatabaseLike, table::TableSynLike},
 };
 
 /// Struct representing a SQL workspace.
@@ -18,7 +20,9 @@ pub struct SynQL<'db, DB: SynQLDatabaseLike> {
     /// The underlying database which will be used to generate the workspace.
     database: &'db DB,
     /// The path to the workspace.
-    path: PathBuf,
+    path: &'db Path,
+    /// Optional name of the workspace.
+    name: Option<String>,
     /// List of tables to be excluded from the workspace, which also imply
     /// excluding all of the tables that depend on them via foreign keys.
     deny_list: Vec<&'db DB::Table>,
@@ -38,7 +42,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
     /// Create a new `SynQL` instance from a given database.
     #[must_use]
     #[inline]
-    pub fn new(database: &'db DB, path: PathBuf) -> SynQLBuilder<'db, DB> {
+    pub fn new(database: &'db DB, path: &'db Path) -> SynQLBuilder<'db, DB> {
         SynQLBuilder::new(database, path)
     }
 
@@ -56,20 +60,37 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
     /// # Errors
     ///
     /// Returns an error if the workspace cannot be written to disk.
-    pub fn generate(&self) -> std::io::Result<TimeTracker> {
+    pub fn generate(&self) -> Result<TimeTracker, crate::Error> {
         let workspace: Workspace = Workspace::new()
-            .path(self.path.clone())
-            .name(&self.database.catalog_name())
+            .path(self.path.to_path_buf())
+            .name(self.name.as_deref().unwrap_or_else(|| self.database.catalog_name()))
             .expect("Invalid workspace name")
             .external_crates(self.external_crates.iter().cloned())
+            .chrono()
             .core()
             .std()
             .pgrx_validation()
+            .serde()
             .postgis_diesel()
+            .diesel_builders()
             .rosetta_uuid()
             .version(self.version.0, self.version.1, self.version.2)
             .edition(self.edition)
             .into();
+
+        // Clear up any directory or file that may already exist at the workspace path
+        if workspace.path().exists() {
+            // We remove all contents of the directory, but we do not remove the directory itself
+            for entry in std::fs::read_dir(workspace.path())? {
+                let entry = entry?;
+                let path = entry.path();
+                if path.is_dir() {
+                    std::fs::remove_dir_all(path)?;
+                } else {
+                    std::fs::remove_file(path)?;
+                }
+            }
+        }
 
         let mut time_tracker = TimeTracker::new("SQL Workspace Generation");
 
@@ -78,7 +99,16 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
                 continue;
             }
 
-            todo!("Generate table model");
+            // Create the directory for the crate
+            let crate_path = table.crate_path(&workspace);
+            std::fs::create_dir_all(&crate_path)?;
+
+            let writing_toml = Task::new("writing_crate_toml");
+            self.write_crate_toml(table, &workspace)?;
+            time_tracker.add_or_extend_completed_task(writing_toml);
+            let writing_lib = Task::new("writing_crate_lib");
+            self.write_crate_lib(table, &workspace)?;
+            time_tracker.add_or_extend_completed_task(writing_lib);
         }
 
         if self.generate_workspace_toml {
