@@ -76,9 +76,23 @@ impl<DB: DatabaseLike> TableConstraint for UniqueUniqueIndex<DB> {
         constraints.sort_unstable_by_key(|c| c.expression(database));
         for window in constraints.windows(2) {
             if window[0].expression(database) == window[1].expression(database) {
-                return Err(crate::error::Error::Table(
-                    self.table_error_information(database, table),
-                ));
+                let duplicate_expression = window[0].expression(database);
+                let error_info = ConstraintErrorInfo::new()
+                    .constraint("UniqueUniqueIndex")
+                    .unwrap()
+                    .object(table.table_name().to_owned())
+                    .unwrap()
+                    .message(format!(
+                        "Table '{}' has non-unique unique index on columns: {}",
+                        table.table_name(),
+                        duplicate_expression
+                    ))
+                    .unwrap()
+                    .resolution("Ensure all unique index in the table are unique".to_string())
+                    .unwrap()
+                    .build()
+                    .unwrap();
+                return Err(crate::error::Error::Table(error_info.into()));
             }
         }
         Ok(())

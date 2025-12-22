@@ -157,6 +157,33 @@ impl ParserDB {
                     builder = builder.add_unique_index(unique_index, unique_index_metadata);
                 }
                 ColumnOption::PrimaryKey(_) => {
+                    // From the primary key constraint we also create an associated unique index,
+                    // since primary keys also have an associated unique index.
+                    let primary_key_unique_constraint = UniqueConstraint {
+                        name: None,
+                        index_name: None,
+                        index_type_display: sqlparser::ast::KeyOrIndexDisplay::None,
+                        index_type: None,
+                        columns: vec![IndexColumn {
+                            column: OrderByExpr {
+                                expr: Expr::Identifier(column.attribute().name.clone()),
+                                options: OrderByOptions::default(),
+                                with_fill: None,
+                            },
+                            operator_class: None,
+                        }],
+                        index_options: vec![],
+                        characteristics: None,
+                        nulls_distinct: sqlparser::ast::NullsDistinctOption::None,
+                    };
+
+                    let (unique_index, unique_index_metadata) = Self::process_unique_constraint(
+                        primary_key_unique_constraint,
+                        create_table,
+                    );
+                    table_metadata.add_unique_index(unique_index.clone());
+                    builder = builder.add_unique_index(unique_index, unique_index_metadata);
+
                     table_metadata.set_primary_key(vec![column.clone()]);
                 }
                 _ => {}
@@ -238,6 +265,27 @@ impl ParserDB {
                                 .cloned(),
                         );
                     }
+
+                    // From the primary key constraint we also create an associated unique index,
+                    // since primary keys also have an associated unique index.
+                    let primary_key_unique_constraint = UniqueConstraint {
+                        name: pk.name.clone(),
+                        index_name: None,
+                        index_type_display: sqlparser::ast::KeyOrIndexDisplay::None,
+                        index_type: None,
+                        columns: pk.columns.clone(),
+                        index_options: vec![],
+                        characteristics: pk.characteristics,
+                        nulls_distinct: sqlparser::ast::NullsDistinctOption::None,
+                    };
+
+                    let (unique_index, unique_index_metadata) = Self::process_unique_constraint(
+                        primary_key_unique_constraint,
+                        create_table,
+                    );
+                    table_metadata.add_unique_index(unique_index.clone());
+                    builder = builder.add_unique_index(unique_index, unique_index_metadata);
+
                     table_metadata.set_primary_key(primary_key_columns);
                 }
                 _ => {}

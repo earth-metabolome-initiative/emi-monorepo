@@ -93,7 +93,7 @@ impl CSVTable<'_> {
                     column.data_type().to_sql()
                 },
                 if column.is_primary_key() { " PRIMARY KEY" } else { "" },
-                if column.is_unique() { " UNIQUE" } else { "" },
+                if !column.is_primary_key() && column.is_unique() { " UNIQUE" } else { "" },
                 if column.is_nullable() || column.is_primary_key() { "" } else { " NOT NULL" },
                 if let Some(foreign_table) = &column.foreign_table() {
                     format!(

@@ -778,7 +778,7 @@ pub trait ForeignKeyLike:
     /// assert!(pk_ref_fk.is_referenced_primary_key(&db));
     /// assert!(!non_pk_ref_fk.is_referenced_primary_key(&db));
     /// assert!(non_pk_ref_fk.is_referenced_unique_key(&db).is_some());
-    /// assert!(pk_ref_fk.is_referenced_unique_key(&db).is_none());
+    /// assert!(pk_ref_fk.is_referenced_unique_key(&db).is_some());
     /// assert!(!another_non_pk_ref_fk.is_referenced_primary_key(&db));
     /// assert!(another_non_pk_ref_fk.is_referenced_unique_key(&db).is_some());
     /// # Ok(())
