@@ -6,13 +6,14 @@
 
 use std::path::PathBuf;
 
+use sql_relations::prelude::UniqueIndexLike;
 use sql_traits::traits::{CheckConstraintLike, DatabaseLike, TableLike};
 use strum::IntoEnumIterator;
 use syn::Ident;
 
 use crate::{
     structs::{ExternalCrate, Trait, Workspace},
-    traits::{ColumnSynLike, function::FunctionSynLike},
+    traits::{ColumnSynLike, UniqueIndexSynLike, function::FunctionSynLike},
     utils::{
         camel_case_name, is_reserved_rust_word, singular_camel_case_name, singular_snake_name,
         snake_case_name,
@@ -319,6 +320,30 @@ where
             attributes.push(attr_tokens);
         }
         Ok(attributes)
+    }
+
+    /// Generates the `unique_index!` macro invocations for all unique indexes
+    /// of this table.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - The database where the table is defined.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the external type of any column cannot be
+    /// determined.
+    fn unique_indices_macros(&self, database: &Self::DB) -> Vec<proc_macro2::TokenStream> {
+        let mut indices = Vec::new();
+        for unique_index in self.unique_indices(database) {
+            // Primary keys already automatically have unique constraints macro generated,
+            // so we skip them here.
+            if unique_index.is_primary_key(database) {
+                continue;
+            }
+            indices.push(unique_index.to_syn(database));
+        }
+        indices
     }
 }
 

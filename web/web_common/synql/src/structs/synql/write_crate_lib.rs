@@ -95,6 +95,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         }
 
         let fields = table.generate_struct_fields(workspace, self.database)?;
+        let unique_indices = table.unique_indices_macros(self.database);
 
         let content = quote! {
             #![doc=#crate_documentation]
@@ -109,6 +110,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
             pub struct #camel_case_name {
                 #(#fields),*
             }
+            #(#unique_indices)*
         };
 
         write!(buffer, "{content}")?;

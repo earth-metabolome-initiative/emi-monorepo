@@ -63,6 +63,30 @@ pub trait UniqueIndexLike: Metadata + Ord + Eq + Debug + Clone {
     where
         Self: 'db;
 
+    /// Returns whether this unique index is also the primary key of the table.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"CREATE TABLE my_table (id INT PRIMARY KEY, name TEXT, UNIQUE (name));"#,
+    /// )?;
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let unique_indices: Vec<_> = table.unique_indices(&db).collect();
+    /// let primary_key_flags: Vec<bool> =
+    ///     unique_indices.iter().map(|ui| ui.is_primary_key(&db)).collect();
+    /// assert_eq!(primary_key_flags, vec![true, false]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[inline]
+    fn is_primary_key(&self, database: &Self::DB) -> bool {
+        self.table(database).primary_key_columns(database).eq(self.columns(database))
+    }
+
     /// Returns whether the unique index is defined using simply columns
     /// and no other expressions.
     ///

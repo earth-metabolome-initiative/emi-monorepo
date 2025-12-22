@@ -10,3 +10,5 @@ pub mod check_constraint;
 pub use check_constraint::CheckConstraintSynLike;
 pub mod function;
 pub use function::FunctionSynLike;
+pub mod unique_index;
+pub use unique_index::UniqueIndexSynLike;
