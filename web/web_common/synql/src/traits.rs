@@ -12,3 +12,5 @@ pub mod function;
 pub use function::FunctionSynLike;
 pub mod unique_index;
 pub use unique_index::UniqueIndexSynLike;
+pub mod foreign_key;
+pub use foreign_key::ForeignKeySynLike;

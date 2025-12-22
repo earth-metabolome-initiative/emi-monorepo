@@ -6,14 +6,23 @@
 
 use std::path::PathBuf;
 
-use sql_relations::prelude::UniqueIndexLike;
+use sql_relations::{
+    prelude::UniqueIndexLike,
+    traits::{
+        HorizontalSameAsForeignKeyLike, TriangularSameAsForeignKeyLike,
+        VerticalSameAsForeignKeyLike,
+    },
+};
 use sql_traits::traits::{CheckConstraintLike, DatabaseLike, TableLike};
 use strum::IntoEnumIterator;
 use syn::Ident;
 
 use crate::{
     structs::{ExternalCrate, Trait, Workspace},
-    traits::{ColumnSynLike, UniqueIndexSynLike, function::FunctionSynLike},
+    traits::{
+        ColumnSynLike, UniqueIndexSynLike, foreign_key::ForeignKeySynLike,
+        function::FunctionSynLike,
+    },
     utils::{
         camel_case_name, is_reserved_rust_word, singular_camel_case_name, singular_snake_name,
         snake_case_name,
@@ -344,6 +353,31 @@ where
             indices.push(unique_index.to_syn(database));
         }
         indices
+    }
+
+    /// Generates the `fk!` macro invocations for all foreign keys of this table
+    /// which are not already handled by same-as relations.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - The database where the table is defined.
+    /// * `workspace` - The workspace where the table is defined.
+    fn foreign_keys_macros(
+        &self,
+        database: &Self::DB,
+        workspace: &Workspace,
+    ) -> Vec<proc_macro2::TokenStream> {
+        let mut fks = Vec::new();
+        for foreign_key in self.foreign_keys(database) {
+            if foreign_key.is_vertical_same_as(database)
+                || foreign_key.is_horizontal_same_as(database)
+                || foreign_key.is_triangular_same_as(database)
+            {
+                continue;
+            }
+            fks.push(foreign_key.to_syn(database, workspace));
+        }
+        fks
     }
 }
 

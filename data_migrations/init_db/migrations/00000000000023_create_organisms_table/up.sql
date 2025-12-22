@@ -4,5 +4,5 @@ CREATE TABLE IF NOT EXISTS organism_models (
 CREATE TABLE IF NOT EXISTS organisms (
   id UUID PRIMARY KEY REFERENCES sample_sources(id),
   organism_model INTEGER NOT NULL REFERENCES organism_models(id),
-  FOREIGN KEY (id, organism_model) REFERENCES sample_sources(id, sample_source_model)
+  FOREIGN KEY (id, organism_model) REFERENCES assets(id, model)
 );

@@ -96,6 +96,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
 
         let fields = table.generate_struct_fields(workspace, self.database)?;
         let unique_indices = table.unique_indices_macros(self.database);
+        let foreign_keys = table.foreign_keys_macros(self.database, workspace);
 
         let content = quote! {
             #![doc=#crate_documentation]
@@ -111,6 +112,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
                 #(#fields),*
             }
             #(#unique_indices)*
+            #(#foreign_keys)*
         };
 
         write!(buffer, "{content}")?;
