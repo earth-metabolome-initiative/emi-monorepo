@@ -15,7 +15,10 @@ impl web_common_traits::prelude::ProcedureLike
         ),
     >{
         vec![
-            (self.procedure_template_photographed_asset_model, self.procedure_photographed_asset),
+            (
+                self.procedure_template_photographed_asset_model_id,
+                self.procedure_photographed_asset,
+            ),
             (self.procedure_template_photographed_with_model, self.procedure_photographed_with),
             (self.procedure_template_photograph_model, self.procedure_photograph),
         ]
@@ -41,7 +44,7 @@ impl web_common_traits::prelude::ProcedureBuilderLike
     {
         use crate::codegen::structs_codegen::tables::insertables::PhotographProcedureSettable;
         if let Some(procedure_photographed_asset) = template_graph
-            .procedure_asset(parents, template.procedure_template_photographed_asset_model)
+            .procedure_asset(parents, template.procedure_template_photographed_asset_model_id)
         {
             self = self.procedure_photographed_asset(procedure_photographed_asset)?;
         }

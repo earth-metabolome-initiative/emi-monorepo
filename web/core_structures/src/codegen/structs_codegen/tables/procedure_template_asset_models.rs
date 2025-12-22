@@ -102,7 +102,7 @@ impl ProcedureTemplateAssetModel {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
-            self.asset_model,
+            self.asset_model_id,
             conn,
         )
     }
@@ -129,7 +129,7 @@ impl ProcedureTemplateAssetModel {
                     .eq(based_on)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
-                            .eq(&self.asset_model),
+                            .eq(&self.asset_model_id),
                     ),
             )
             .first::<
@@ -193,7 +193,7 @@ impl ProcedureTemplateAssetModel {
         Self::table()
             .filter(
                 procedure_template_asset_models::name.eq(name).and(
-                    procedure_template_asset_models::procedure_template.eq(procedure_template),
+                    procedure_template_asset_models::procedure_template.eq(procedure_template_id),
                 ),
             )
             .order_by(procedure_template_asset_models::id.asc())
@@ -214,7 +214,7 @@ impl ProcedureTemplateAssetModel {
             .filter(
                 procedure_template_asset_models::based_on
                     .eq(based_on)
-                    .and(procedure_template_asset_models::asset_model.eq(asset_model)),
+                    .and(procedure_template_asset_models::asset_model.eq(asset_model_id)),
             )
             .order_by(procedure_template_asset_models::id.asc())
             .load::<Self>(conn)

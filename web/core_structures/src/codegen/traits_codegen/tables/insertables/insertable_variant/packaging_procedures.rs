@@ -116,7 +116,7 @@ where
         use web_common_traits::database::FromExtension;
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
-        if let Some(procedure_template) = self.procedure_template {
+        if let Some(procedure_template_id) = self.procedure_template {
             let packaging_procedure_templates = crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate::read(
                 procedure_template,
                 conn,
@@ -139,7 +139,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::procedure_template_sample_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
             if let Some(asset) = procedure_assets.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::sample(
@@ -149,7 +149,7 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::sample_model(
                 self,
-                procedure_assets.asset_model,
+                procedure_assets.asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_packaged_with) = self
@@ -161,11 +161,11 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::packaged_with_model(
                 self,
-                procedure_assets.asset_model,
+                procedure_assets.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::PackagingProcedureSettable>::procedure_template_packaged_with_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
         }
         let procedure_template = self

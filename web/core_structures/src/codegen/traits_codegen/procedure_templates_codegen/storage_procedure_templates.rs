@@ -18,7 +18,7 @@ where
                 < Self::ProcedureTemplateAssetModel as web_common_traits::database::Read
                 < C >> ::read(self.procedure_template_stored_into_model, conn) ?, <
                 Self::ProcedureTemplateAssetModel as web_common_traits::database::Read <
-                C >> ::read(self.procedure_template_stored_asset_model, conn) ?
+                C >> ::read(self.procedure_template_stored_asset_model_id, conn) ?
             ],
         )
     }

@@ -95,7 +95,7 @@ impl TaskGraph {
             .graph
             .nodes_vocabulary()
             .binary_search_by(|pt| {
-                pt.procedure_template.cmp(&procedure_template.procedure_template)
+                pt.procedure_template.cmp(&procedure_template.procedure_template_id)
             })
             .expect("Procedure template not part of task graph");
         self.graph.has_successors(procedure_template_id)
@@ -121,7 +121,7 @@ impl TaskGraph {
             .graph
             .nodes_vocabulary()
             .binary_search_by(|pt| {
-                pt.procedure_template.cmp(&procedure_template.procedure_template)
+                pt.procedure_template.cmp(&procedure_template.procedure_template_id)
             })
             .expect("Procedure template not part of task graph");
         self.graph
@@ -146,7 +146,7 @@ impl TaskGraph {
             .graph
             .nodes_vocabulary()
             .binary_search_by(|pt| {
-                pt.procedure_template.cmp(&procedure_template.procedure_template)
+                pt.procedure_template.cmp(&procedure_template.procedure_template_id)
             })
             .expect("Procedure template not part of task graph");
         self.graph.has_predecessors(procedure_template_id)
@@ -172,7 +172,7 @@ impl TaskGraph {
             .graph
             .nodes_vocabulary()
             .binary_search_by(|pt| {
-                pt.procedure_template.cmp(&procedure_template.procedure_template)
+                pt.procedure_template.cmp(&procedure_template.procedure_template_id)
             })
             .expect("Procedure template not part of task graph");
         self.graph

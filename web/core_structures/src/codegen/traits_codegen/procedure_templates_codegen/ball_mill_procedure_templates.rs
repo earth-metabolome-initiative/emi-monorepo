@@ -16,11 +16,11 @@ where
         Ok(
             vec![
                 < Self::ProcedureTemplateAssetModel as web_common_traits::database::Read
-                < C >> ::read(self.procedure_template_bead_model, conn) ?, <
+                < C >> ::read(self.procedure_template_bead_model_id, conn) ?, <
                 Self::ProcedureTemplateAssetModel as web_common_traits::database::Read <
-                C >> ::read(self.procedure_template_milled_with_model, conn) ?, <
+                C >> ::read(self.procedure_template_milled_with_model_id, conn) ?, <
                 Self::ProcedureTemplateAssetModel as web_common_traits::database::Read <
-                C >> ::read(self.procedure_template_milled_container_model, conn) ?
+                C >> ::read(self.procedure_template_milled_container_model_id, conn) ?
             ],
         )
     }

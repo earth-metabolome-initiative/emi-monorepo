@@ -900,9 +900,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_freeze_dried_with_model {
             procedure_template_freeze_dried_with_model = if let (
                 Some(freeze_dried_with_model),
-                Some(asset_model),
-            ) = (self.freeze_dried_with_model, builder.asset_model) {
-                if freeze_dried_with_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.freeze_dried_with_model, builder.asset_model_id) {
+                if freeze_dried_with_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -912,8 +912,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.freeze_dried_with_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.freeze_dried_with_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(freeze_dried_with_model) = self.freeze_dried_with_model {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
@@ -1044,9 +1044,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_freeze_dried_container_model {
             procedure_template_freeze_dried_container_model = if let (
                 Some(freeze_dried_container_model),
-                Some(asset_model),
-            ) = (self.freeze_dried_container_model, builder.asset_model) {
-                if freeze_dried_container_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.freeze_dried_container_model, builder.asset_model_id) {
+                if freeze_dried_container_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -1056,8 +1056,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.freeze_dried_container_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.freeze_dried_container_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(freeze_dried_container_model) = self
                 .freeze_dried_container_model

@@ -879,9 +879,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_weighed_with_model {
             procedure_template_weighed_with_model = if let (
                 Some(weighed_with_model),
-                Some(asset_model),
-            ) = (self.weighed_with_model, builder.asset_model) {
-                if weighed_with_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.weighed_with_model, builder.asset_model_id) {
+                if weighed_with_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -891,8 +891,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.weighed_with_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.weighed_with_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(weighed_with_model) = self.weighed_with_model {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
@@ -1023,9 +1023,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_fragment_container_model {
             procedure_template_fragment_container_model = if let (
                 Some(fragment_container_model),
-                Some(asset_model),
-            ) = (self.fragment_container_model, builder.asset_model) {
-                if fragment_container_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.fragment_container_model, builder.asset_model_id) {
+                if fragment_container_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -1035,8 +1035,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.fragment_container_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.fragment_container_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(fragment_container_model) = self.fragment_container_model
             {
@@ -1168,9 +1168,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_fragment_placed_into_model {
             procedure_template_fragment_placed_into_model = if let (
                 Some(fragment_placed_into_model),
-                Some(asset_model),
-            ) = (self.fragment_placed_into_model, builder.asset_model) {
-                if fragment_placed_into_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.fragment_placed_into_model, builder.asset_model_id) {
+                if fragment_placed_into_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -1180,8 +1180,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.fragment_placed_into_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.fragment_placed_into_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(fragment_placed_into_model) = self
                 .fragment_placed_into_model

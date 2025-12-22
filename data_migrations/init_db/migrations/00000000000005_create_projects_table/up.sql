@@ -10,9 +10,9 @@ CREATE TABLE IF NOT EXISTS projects (
     budget REAL,
     -- Total cost incurred by the project
     cost REAL,
-    created_by INTEGER NOT NULL REFERENCES users(id),
+    created_by_id INTEGER NOT NULL REFERENCES users(id),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_by INTEGER NOT NULL REFERENCES users(id),
+    updated_by_id INTEGER NOT NULL REFERENCES users(id),
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     expected_end_date TIMESTAMP WITH TIME ZONE NOT NULL,
     end_date TIMESTAMP WITH TIME ZONE NOT NULL,

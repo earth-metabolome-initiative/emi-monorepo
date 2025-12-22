@@ -14,7 +14,7 @@ impl web_common_traits::prelude::ProcedureLike
             <Self::ProcedureAsset as web_common_traits::database::PrimaryKeyLike>::PrimaryKey,
         ),
     >{
-        vec![(self.procedure_template_disposed_asset_model, self.procedure_disposed_asset)]
+        vec![(self.procedure_template_disposed_asset_model_id, self.procedure_disposed_asset)]
     }
 }
 impl web_common_traits::prelude::ProcedureBuilderLike
@@ -37,7 +37,7 @@ impl web_common_traits::prelude::ProcedureBuilderLike
     {
         use crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable;
         if let Some(procedure_disposed_asset) = template_graph
-            .procedure_asset(parents, template.procedure_template_disposed_asset_model)
+            .procedure_asset(parents, template.procedure_template_disposed_asset_model_id)
         {
             self = self.procedure_disposed_asset(procedure_disposed_asset)?;
         }

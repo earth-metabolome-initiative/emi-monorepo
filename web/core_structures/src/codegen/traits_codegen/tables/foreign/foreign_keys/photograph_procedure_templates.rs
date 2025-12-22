@@ -35,7 +35,7 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_photographed_asset_model,
+                        self.procedure_template_photographed_asset_model_id,
                     ),
                 ),
             );
@@ -67,7 +67,7 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
-                        self.photographed_asset_model,
+                        self.photographed_asset_model_id,
                     ),
                 ),
             );
@@ -157,8 +157,8 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.photographed_asset_model == physical_asset_models.id {
-                    foreign_keys.photographed_asset_model = Some(physical_asset_models);
+                if self.photographed_asset_model_id == physical_asset_models.id {
+                    foreign_keys.photographed_asset_model_id = Some(physical_asset_models);
                     updated = true;
                 }
             }
@@ -168,8 +168,8 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.photographed_asset_model == physical_asset_models.id {
-                    foreign_keys.photographed_asset_model = None;
+                if self.photographed_asset_model_id == physical_asset_models.id {
+                    foreign_keys.photographed_asset_model_id = None;
                     updated = true;
                 }
             }
@@ -184,7 +184,7 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
                 if self.procedure_template_photographed_asset_model
                     == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_photographed_asset_model = Some(
+                    foreign_keys.procedure_template_photographed_asset_model_id = Some(
                         procedure_template_asset_models.clone(),
                     );
                     updated = true;
@@ -215,7 +215,7 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
                 if self.procedure_template_photographed_asset_model
                     == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_photographed_asset_model = None;
+                    foreign_keys.procedure_template_photographed_asset_model_id = None;
                     updated = true;
                 }
                 if self.procedure_template_photograph_model

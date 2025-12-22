@@ -166,8 +166,8 @@ impl ProcedureTemplateGraph {
         &self,
         procedure_template_asset_model: &ProcedureTemplateAssetModel,
     ) -> bool {
-        self.root_owned_ptam(procedure_template_asset_model)
-            || self.foreign_owned_ptam(procedure_template_asset_model)
+        self.root_owned_ptam(procedure_template_asset_model_id)
+            || self.foreign_owned_ptam(procedure_template_asset_model_id)
     }
 
     /// Returns an iterator over the procedure template asset models which are
@@ -181,7 +181,7 @@ impl ProcedureTemplateGraph {
     /// Returns the task graph of the given procedure template, if it exists.
     #[must_use]
     pub fn task_graph_of(&self, procedure_template: &ProcedureTemplate) -> Option<&TaskGraph> {
-        let procedure_node_id = self.procedure_node_id(procedure_template);
+        let procedure_node_id = self.procedure_node_id(procedure_template_id);
         self.task_graphs[procedure_node_id].as_ref()
     }
 
@@ -312,13 +312,13 @@ impl ProcedureTemplateGraph {
         parents: &[&'graph ProcedureTemplate],
         procedure_template: &'graph ProcedureTemplate,
     ) -> (Vec<&'graph ProcedureTemplate>, &'graph ProcedureTemplate) {
-        if let Some(task_graph) = self.task_graph_of(procedure_template) {
+        if let Some(task_graph) = self.task_graph_of(procedure_template_id) {
             let root_node = task_graph.root_node();
             let mut parents = parents.to_vec();
-            parents.push(procedure_template);
+            parents.push(procedure_template_id);
             self.root_leaf_node_of(&parents, root_node)
         } else {
-            (parents.to_vec(), procedure_template)
+            (parents.to_vec(), procedure_template_id)
         }
     }
 
@@ -336,16 +336,16 @@ impl ProcedureTemplateGraph {
         parents: &[&'graph ProcedureTemplate],
         procedure_template: &'graph ProcedureTemplate,
     ) -> Vec<(Vec<&'graph ProcedureTemplate>, &'graph ProcedureTemplate)> {
-        if let Some(task_graph) = self.task_graph_of(procedure_template) {
+        if let Some(task_graph) = self.task_graph_of(procedure_template_id) {
             let mut result = Vec::new();
             let mut parents = parents.to_vec();
-            parents.push(procedure_template);
+            parents.push(procedure_template_id);
             for sink_node in task_graph.sink_nodes() {
                 result.extend(self.sink_leaf_nodes_of(&parents, sink_node));
             }
             result
         } else {
-            vec![(parents.to_vec(), procedure_template)]
+            vec![(parents.to_vec(), procedure_template_id)]
         }
     }
 }

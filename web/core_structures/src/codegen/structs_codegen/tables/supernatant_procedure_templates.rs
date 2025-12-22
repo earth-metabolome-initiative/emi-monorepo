@@ -21,7 +21,7 @@
         foreign_key = transferred_with_model
     )
 )]
-#[diesel(primary_key(procedure_template))]
+#[diesel(primary_key(procedure_template_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates
 )]
@@ -46,7 +46,7 @@ for web_common_traits::database::IdOrBuilder<
     crate::codegen::structs_codegen::tables::insertables::InsertableSupernatantProcedureTemplateBuilder,
 > {
     fn from(value: &'a SupernatantProcedureTemplate) -> Self {
-        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template_id)
     }
 }
 impl
@@ -715,7 +715,7 @@ impl SupernatantProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(supernatant_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::name.eq(name))
             .order_by(supernatant_procedure_templates::procedure_template.asc())
@@ -739,7 +739,7 @@ impl SupernatantProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(supernatant_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::description.eq(description))
             .order_by(supernatant_procedure_templates::procedure_template.asc())
@@ -763,7 +763,7 @@ impl SupernatantProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(supernatant_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::created_by.eq(created_by))
             .order_by(supernatant_procedure_templates::procedure_template.asc())
@@ -787,7 +787,7 @@ impl SupernatantProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(supernatant_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::updated_by.eq(updated_by))
             .order_by(supernatant_procedure_templates::procedure_template.asc())
@@ -811,7 +811,7 @@ impl SupernatantProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(supernatant_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::deprecated.eq(deprecated))
             .order_by(supernatant_procedure_templates::procedure_template.asc())

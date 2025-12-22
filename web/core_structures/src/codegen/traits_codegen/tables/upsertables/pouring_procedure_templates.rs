@@ -13,7 +13,7 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
         use crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_template)
+            .on_conflict(procedure_template_id)
             .do_update()
             .set(self)
             .filter(
@@ -54,7 +54,7 @@ for crate::codegen::structs_codegen::tables::pouring_procedure_templates::Pourin
         use crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_template)
+            .on_conflict(procedure_template_id)
             .do_update()
             .set(self)
             .filter(

@@ -75,14 +75,14 @@ where
         _user_id: i32,
         _conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
-        let left_asset_model = self
+        let left_asset_model_id = self
             .left_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     crate::codegen::structs_codegen::tables::insertables::AssetCompatibilityRuleAttribute::LeftAssetModel,
                 ),
             )?;
-        let right_asset_model = self
+        let right_asset_model_id = self
             .right_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -104,8 +104,8 @@ where
                 ),
             )?;
         Ok(Self::InsertableVariant {
-            left_asset_model,
-            right_asset_model,
+            left_asset_model_id,
+            right_asset_model_id,
             created_by,
             created_at,
         })

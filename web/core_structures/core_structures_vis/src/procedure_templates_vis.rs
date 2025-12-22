@@ -148,7 +148,7 @@ impl<'graph> PTGListener<'graph> for &mut ProcedureTemplateVisualization<'graph>
         &mut self,
         foreign_procedure_template: &ProcedureTemplate,
     ) -> Result<(), Self::Error> {
-        let procedure_name = procedure_template_icon(foreign_procedure_template).map_or_else(
+        let procedure_name = procedure_template_icon(foreign_procedure_template_id).map_or_else(
             || format!("*{}*", foreign_procedure_template.name),
             |icon| format!("{} *{}*", icon, foreign_procedure_template.name),
         );
@@ -164,11 +164,11 @@ impl<'graph> PTGListener<'graph> for &mut ProcedureTemplateVisualization<'graph>
             .unwrap()
             .style_property(StyleProperty::StrokeDasharray(5, 5))
             .unwrap();
-        for foreign_ptam in self.graph.foreign_ptams_of(foreign_procedure_template) {
+        for foreign_ptam in self.graph.foreign_ptams_of(foreign_procedure_template_id) {
             let foreign_ptam_node = self.builder.node(
                 FlowchartNodeBuilder::default()
                     .id(procedure_template_asset_model_hash(
-                        std::iter::once(foreign_procedure_template),
+                        std::iter::once(foreign_procedure_template_id),
                         foreign_ptam,
                     ))
                     .label(format!("*{}*", foreign_ptam.name))?
@@ -308,8 +308,8 @@ impl<'graph> PTGListener<'graph> for &mut ProcedureTemplateVisualization<'graph>
         leaf: &ProcedureTemplate,
         ptam: &ProcedureTemplateAssetModel,
     ) -> Result<(), Self::Error> {
-        let asset_model = self.graph.asset_model_of(ptam);
-        let label = if let Some(icon) = asset_model_icon(asset_model) {
+        let asset_model_id = self.graph.asset_model_of(ptam);
+        let label = if let Some(icon) = asset_model_icon(asset_model_id) {
             format!("{} {}", icon, ptam.name)
         } else {
             ptam.name.clone()

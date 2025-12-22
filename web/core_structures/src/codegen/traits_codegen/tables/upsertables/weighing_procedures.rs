@@ -19,7 +19,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(weighed_container.ne(excluded(weighed_container)))
                     .or(procedure_template_weighed_container_model
                         .ne(excluded(procedure_template_weighed_container_model)))
@@ -55,7 +55,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(weighed_container.ne(excluded(weighed_container)))
                     .or(procedure_template_weighed_container_model
                         .ne(excluded(procedure_template_weighed_container_model)))

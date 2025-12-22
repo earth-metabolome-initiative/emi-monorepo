@@ -23,7 +23,7 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
-                        self.asset_model,
+                        self.asset_model_id,
                     ),
                 ),
             );
@@ -65,8 +65,8 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.asset_model == asset_models.id {
-                    foreign_keys.asset_model = Some(asset_models);
+                if self.asset_model_id == asset_models.id {
+                    foreign_keys.asset_model_id = Some(asset_models);
                     updated = true;
                 }
             }
@@ -74,8 +74,8 @@ for crate::codegen::structs_codegen::tables::procedure_template_asset_models::Pr
                 crate::codegen::tables::row::Row::AssetModel(asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.asset_model == asset_models.id {
-                    foreign_keys.asset_model = None;
+                if self.asset_model_id == asset_models.id {
+                    foreign_keys.asset_model_id = None;
                     updated = true;
                 }
             }

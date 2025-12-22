@@ -10,10 +10,10 @@ CREATE TABLE IF NOT EXISTS teams (
     state_id SMALLINT NOT NULL DEFAULT 1,
     parent_team_id INTEGER,
     -- The user who created the team
-    created_by INTEGER NOT NULL REFERENCES users(id),
+    created_by_id INTEGER NOT NULL REFERENCES users(id),
     -- The date the team was created
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_by INTEGER NOT NULL REFERENCES users(id),
+    updated_by_id INTEGER NOT NULL REFERENCES users(id),
     -- The date the team was last updated
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (color_id) REFERENCES colors(id),

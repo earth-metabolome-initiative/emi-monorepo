@@ -136,7 +136,7 @@ impl InsertableAssetModel {
 /// use web_common_traits::database::Insertable;
 /// use web_common_traits::database::InsertableVariant;
 ///
-/// let asset_model = AssetModel::new()
+/// let asset_model_id = AssetModel::new()
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
 ///    .description(description)?

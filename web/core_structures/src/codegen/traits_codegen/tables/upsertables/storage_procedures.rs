@@ -19,11 +19,11 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(stored_asset.ne(excluded(stored_asset)))
-                    .or(stored_asset_model.ne(excluded(stored_asset_model)))
+                    .or(stored_asset_model.ne(excluded(stored_asset_model_id)))
                     .or(procedure_template_stored_asset_model
-                        .ne(excluded(procedure_template_stored_asset_model)))
+                        .ne(excluded(procedure_template_stored_asset_model_id)))
                     .or(procedure_stored_asset.ne(excluded(procedure_stored_asset)))
                     .or(stored_into.ne(excluded(stored_into)))
                     .or(stored_into_model.ne(excluded(stored_into_model)))
@@ -56,11 +56,11 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(stored_asset.ne(excluded(stored_asset)))
-                    .or(stored_asset_model.ne(excluded(stored_asset_model)))
+                    .or(stored_asset_model.ne(excluded(stored_asset_model_id)))
                     .or(procedure_template_stored_asset_model
-                        .ne(excluded(procedure_template_stored_asset_model)))
+                        .ne(excluded(procedure_template_stored_asset_model_id)))
                     .or(procedure_stored_asset.ne(excluded(procedure_stored_asset)))
                     .or(stored_into.ne(excluded(stored_into)))
                     .or(stored_into_model.ne(excluded(stored_into_model)))

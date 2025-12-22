@@ -116,22 +116,22 @@ where
         use web_common_traits::database::FromExtension;
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
-        if let Some(procedure_template) = self.procedure_template {
+        if let Some(procedure_template_id) = self.procedure_template {
             let ball_mill_procedure_templates = crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate::read(
                 procedure_template,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_with_model(
                 self,
-                ball_mill_procedure_templates.procedure_template_milled_with_model,
+                ball_mill_procedure_templates.procedure_template_milled_with_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_container_model(
                 self,
-                ball_mill_procedure_templates.procedure_template_milled_container_model,
+                ball_mill_procedure_templates.procedure_template_milled_container_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_bead_model(
                 self,
-                ball_mill_procedure_templates.procedure_template_bead_model,
+                ball_mill_procedure_templates.procedure_template_bead_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_bead) = self
@@ -143,11 +143,11 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::bead_model(
                 self,
-                procedure_assets.asset_model,
+                procedure_assets.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_bead_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_milled_with) = self
@@ -163,11 +163,11 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_with_model(
                 self,
-                procedure_assets.asset_model,
+                procedure_assets.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_with_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
@@ -186,11 +186,11 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_container_model(
                 self,
-                procedure_assets.asset_model,
+                procedure_assets.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_container_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
         }
         let procedure_template = self
@@ -200,28 +200,28 @@ where
                     crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
-        let bead_model = self
+        let bead_model_id = self
             .bead_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::BeadModel,
                 ),
             )?;
-        let procedure_template_bead_model = self
+        let procedure_template_bead_model_id = self
             .procedure_template_bead_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::ProcedureTemplateBeadModel,
                 ),
             )?;
-        let milled_with_model = self
+        let milled_with_model_id = self
             .milled_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::MilledWithModel,
                 ),
             )?;
-        let procedure_template_milled_with_model = self
+        let procedure_template_milled_with_model_id = self
             .procedure_template_milled_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -235,14 +235,14 @@ where
                     crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::MilledContainer,
                 ),
             )?;
-        let milled_container_model = self
+        let milled_container_model_id = self
             .milled_container_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     crate::codegen::structs_codegen::tables::insertables::BallMillProcedureAttribute::MilledContainerModel,
                 ),
             )?;
-        let procedure_template_milled_container_model = self
+        let procedure_template_milled_container_model_id = self
             .procedure_template_milled_container_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -323,16 +323,16 @@ where
         Ok(Self::InsertableVariant {
             procedure,
             procedure_template,
-            bead_model,
-            procedure_template_bead_model,
+            bead_model_id,
+            procedure_template_bead_model_id,
             procedure_bead,
-            milled_with_model,
-            procedure_template_milled_with_model,
+            milled_with_model_id,
+            procedure_template_milled_with_model_id,
             procedure_milled_with,
             milled_with: self.milled_with,
             milled_container,
-            milled_container_model,
-            procedure_template_milled_container_model,
+            milled_container_model_id,
+            procedure_template_milled_container_model_id,
             procedure_milled_container,
         })
     }

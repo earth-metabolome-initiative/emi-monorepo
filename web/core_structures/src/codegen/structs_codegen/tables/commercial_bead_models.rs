@@ -94,7 +94,10 @@ impl CommercialBeadModel {
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::bead_models::BeadModel::read(self.bead_model, conn)
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel::read(
+            self.bead_model_id,
+            conn,
+        )
     }
     pub fn from_bead_model<C>(
         bead_model: i32,
@@ -103,12 +106,12 @@ impl CommercialBeadModel {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::commercial_bead_models::commercial_bead_models::bead_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::commercial_bead_models::commercial_bead_models::bead_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::commercial_bead_models::commercial_bead_models::bead_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::commercial_bead_models::commercial_bead_models::bead_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
@@ -117,7 +120,7 @@ impl CommercialBeadModel {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::commercial_bead_models::commercial_bead_models::bead_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::commercial_bead_models::commercial_bead_models::bead_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
@@ -131,7 +134,7 @@ impl CommercialBeadModel {
 
         use crate::codegen::diesel_codegen::tables::commercial_bead_models::commercial_bead_models;
         Self::table()
-            .filter(commercial_bead_models::bead_model.eq(bead_model))
+            .filter(commercial_bead_models::bead_model.eq(bead_model_id))
             .order_by(commercial_bead_models::id.asc())
             .load::<Self>(conn)
     }

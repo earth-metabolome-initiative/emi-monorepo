@@ -136,7 +136,7 @@ impl InsertablePhysicalAssetModel {
 /// use web_common_traits::database::Insertable;
 /// use web_common_traits::database::InsertableVariant;
 ///
-/// let physical_asset_model = PhysicalAssetModel::new()
+/// let physical_asset_model_id = PhysicalAssetModel::new()
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
 ///    .description(description)?

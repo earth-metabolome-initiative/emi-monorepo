@@ -101,9 +101,9 @@ where
     type Item = Result<L::Output, L::Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if let Some(foreign_procedure_template) = self.foreign_procedures_iter.next() {
+        if let Some(foreign_procedure_template_id) = self.foreign_procedures_iter.next() {
             return Some(
-                self.listener.enter_foreign_procedure_template(foreign_procedure_template),
+                self.listener.enter_foreign_procedure_template(foreign_procedure_template_id),
             );
         }
 

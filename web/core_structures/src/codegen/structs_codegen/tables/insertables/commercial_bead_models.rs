@@ -132,7 +132,10 @@ impl InsertableCommercialBeadModel {
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::bead_models::BeadModel::read(self.bead_model, conn)
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel::read(
+            self.bead_model_id,
+            conn,
+        )
     }
 }
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord, Default)]
@@ -155,7 +158,7 @@ impl InsertableCommercialBeadModel {
 /// use web_common_traits::database::Insertable;
 /// use web_common_traits::database::InsertableVariant;
 ///
-/// let commercial_bead_model = CommercialBeadModel::new()
+/// let commercial_bead_model_id = CommercialBeadModel::new()
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
 ///    .description(description)?
@@ -163,7 +166,7 @@ impl InsertableCommercialBeadModel {
 ///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
 ///    .diameter_millimeters(diameter_millimeters)?
-///    .bead_model(bead_model)?
+///    .bead_model(bead_model_id)?
 ///    .brand(brand_id)?
 ///    // Optionally set fields with default values
 ///    .created_at(created_at)?
@@ -298,19 +301,19 @@ where
     where
         BM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let bead_model = <BM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &bead_model,
+        let bead_model_id = <BM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &bead_model_id,
         );
         self.commercial_bead_models_id_fkey = <BeadModel as crate::codegen::structs_codegen::tables::insertables::PhysicalAssetModelSettable>::parent_model(
                 self.commercial_bead_models_id_fkey,
-                bead_model,
+                bead_model_id,
             )
             .map_err(|err| {
                 err.replace_field_name(|attribute| <Self as common_traits::builder::Attributed>::Attribute::Extension(
                     attribute.into(),
                 ))
             })?;
-        self.bead_model = Some(bead_model);
+        self.bead_model_id = Some(bead_model_id);
         Ok(self)
     }
 }

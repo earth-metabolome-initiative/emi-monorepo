@@ -47,7 +47,7 @@ where
             .created_by(user.id)?
             .insert(user.id, conn)?;
 
-        Ok(parent_procedure_template)
+        Ok(parent_procedure_template_id)
     }
 }
 

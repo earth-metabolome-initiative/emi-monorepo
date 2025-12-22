@@ -419,7 +419,7 @@ impl PouringProcedure {
         crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template_poured_into_model
                             .eq(&self.procedure_template_poured_into_model),
@@ -443,7 +443,7 @@ impl PouringProcedure {
         crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template_measured_with_model
                             .eq(&self.procedure_template_measured_with_model),
@@ -467,7 +467,7 @@ impl PouringProcedure {
         crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template_poured_from_model
                             .eq(&self.procedure_template_poured_from_model),
@@ -830,7 +830,7 @@ impl PouringProcedure {
 
         use crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures;
         Self::table()
-            .filter(pouring_procedures::procedure_template.eq(procedure_template))
+            .filter(pouring_procedures::procedure_template.eq(procedure_template_id))
             .order_by(pouring_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -973,7 +973,7 @@ impl PouringProcedure {
         use crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures;
         Self::table()
             .filter(
-                pouring_procedures::procedure_template.eq(procedure_template).and(
+                pouring_procedures::procedure_template.eq(procedure_template_id).and(
                     pouring_procedures::procedure_template_poured_into_model
                         .eq(procedure_template_poured_into_model),
                 ),
@@ -994,7 +994,7 @@ impl PouringProcedure {
         use crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures;
         Self::table()
             .filter(
-                pouring_procedures::procedure_template.eq(procedure_template).and(
+                pouring_procedures::procedure_template.eq(procedure_template_id).and(
                     pouring_procedures::procedure_template_measured_with_model
                         .eq(procedure_template_measured_with_model),
                 ),
@@ -1015,7 +1015,7 @@ impl PouringProcedure {
         use crate::codegen::diesel_codegen::tables::pouring_procedures::pouring_procedures;
         Self::table()
             .filter(
-                pouring_procedures::procedure_template.eq(procedure_template).and(
+                pouring_procedures::procedure_template.eq(procedure_template_id).and(
                     pouring_procedures::procedure_template_poured_from_model
                         .eq(procedure_template_poured_from_model),
                 ),
@@ -1062,7 +1062,7 @@ impl PouringProcedure {
             .inner_join(
                 procedures::table.on(pouring_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(pouring_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -1106,7 +1106,9 @@ impl PouringProcedure {
             .inner_join(
                 procedures::table.on(pouring_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(pouring_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

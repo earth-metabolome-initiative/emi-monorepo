@@ -116,7 +116,7 @@ where
         use web_common_traits::database::FromExtension;
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
-        if let Some(procedure_template) = self.procedure_template {
+        if let Some(procedure_template_id) = self.procedure_template {
             let freezing_procedure_templates = crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate::read(
                 procedure_template,
                 conn,
@@ -146,11 +146,11 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::frozen_container_model(
                 self,
-                procedure_assets.asset_model,
+                procedure_assets.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::procedure_template_frozen_container_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_frozen_with) = self
@@ -166,11 +166,11 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::frozen_with_model(
                 self,
-                procedure_assets.asset_model,
+                procedure_assets.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::procedure_template_frozen_with_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
         }
         let procedure_template = self

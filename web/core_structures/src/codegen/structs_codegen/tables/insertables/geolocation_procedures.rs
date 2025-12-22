@@ -253,7 +253,7 @@ impl InsertableGeolocationProcedure {
                     .eq(&self.procedure_geolocated_asset)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_geolocated_asset_model),
+                            .eq(&self.procedure_template_geolocated_asset_model_id),
                     ),
             )
             .first::<
@@ -364,7 +364,7 @@ impl InsertableGeolocationProcedure {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_geolocated_asset_model,
+            self.procedure_template_geolocated_asset_model_id,
             conn,
         )
     }
@@ -402,10 +402,10 @@ impl InsertableGeolocationProcedure {
         crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template_geolocated_asset_model
-                            .eq(&self.procedure_template_geolocated_asset_model),
+                            .eq(&self.procedure_template_geolocated_asset_model_id),
                     ),
             )
             .first::<
@@ -426,7 +426,7 @@ impl InsertableGeolocationProcedure {
         crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template_geolocated_with_model
                             .eq(&self.procedure_template_geolocated_with_model),
@@ -460,7 +460,7 @@ impl InsertableGeolocationProcedure {
 ///    .location(location)?
 ///    .procedure_geolocated_asset(procedure_geolocated_asset)?
 ///    .procedure_geolocated_with(procedure_geolocated_with)?
-///    .procedure_template(procedure_template)?
+///    .procedure_template(procedure_template_id)?
 ///    .created_by(created_by)?
 ///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
@@ -820,7 +820,7 @@ where
                     attribute.into(),
                 ))
             })?;
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     ///Sets the value of the `public.geolocation_procedures.geolocated_asset` column.
@@ -923,8 +923,8 @@ where
     where
         PTGAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_geolocated_asset_model = <PTGAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &procedure_template_geolocated_asset_model,
+        let procedure_template_geolocated_asset_model_id = <PTGAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_geolocated_asset_model_id,
         );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_geolocated_asset,
@@ -932,7 +932,7 @@ where
         {
             self.procedure_geolocated_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_geolocated_asset,
-                    procedure_template_geolocated_asset_model,
+                    procedure_template_geolocated_asset_model_id,
                 )
                 .map_err(|e| {
                     e.replace_field_name(|attribute| {
@@ -943,8 +943,8 @@ where
                 })?
                 .into();
         }
-        self.procedure_template_geolocated_asset_model = Some(
-            procedure_template_geolocated_asset_model,
+        self.procedure_template_geolocated_asset_model_id = Some(
+            procedure_template_geolocated_asset_model_id,
         );
         Ok(self)
     }
@@ -1036,11 +1036,11 @@ where
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_geolocated_asset {
             procedure_geolocated_asset = if let (
-                Some(procedure_template_geolocated_asset_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_geolocated_asset_model_id),
+                Some(procedure_template_asset_model_id),
             ) = (
-                self.procedure_template_geolocated_asset_model,
-                builder.procedure_template_asset_model,
+                self.procedure_template_geolocated_asset_model_id,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_geolocated_asset_model
                     != procedure_template_asset_model
@@ -1054,19 +1054,19 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
-                self.procedure_template_geolocated_asset_model = Some(
-                    procedure_template_asset_model,
+                self.procedure_template_geolocated_asset_model_id = Some(
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
-            } else if let Some(procedure_template_geolocated_asset_model) = self
+            } else if let Some(procedure_template_geolocated_asset_model_id) = self
                 .procedure_template_geolocated_asset_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
-                        procedure_template_geolocated_asset_model,
+                        procedure_template_geolocated_asset_model_id,
                     )
                     .map_err(|e| {
                         e.replace_field_name(|attribute| {
@@ -1233,10 +1233,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_geolocated_with {
             procedure_geolocated_with = if let (
                 Some(procedure_template_geolocated_with_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_geolocated_with_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_geolocated_with_model
                     != procedure_template_asset_model
@@ -1250,11 +1250,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_geolocated_with_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_geolocated_with_model) = self

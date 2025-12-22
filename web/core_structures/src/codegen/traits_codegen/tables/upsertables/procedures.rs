@@ -19,11 +19,12 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(parent_procedure.ne(excluded(parent_procedure)))
-                    .or(parent_procedure_template.ne(excluded(parent_procedure_template)))
+                    .or(parent_procedure_template.ne(excluded(parent_procedure_template_id)))
                     .or(predecessor_procedure.ne(excluded(predecessor_procedure)))
-                    .or(predecessor_procedure_template.ne(excluded(predecessor_procedure_template)))
+                    .or(predecessor_procedure_template
+                        .ne(excluded(predecessor_procedure_template_id)))
                     .or(most_concrete_table.ne(excluded(most_concrete_table)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))
@@ -55,11 +56,12 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(parent_procedure.ne(excluded(parent_procedure)))
-                    .or(parent_procedure_template.ne(excluded(parent_procedure_template)))
+                    .or(parent_procedure_template.ne(excluded(parent_procedure_template_id)))
                     .or(predecessor_procedure.ne(excluded(predecessor_procedure)))
-                    .or(predecessor_procedure_template.ne(excluded(predecessor_procedure_template)))
+                    .or(predecessor_procedure_template
+                        .ne(excluded(predecessor_procedure_template_id)))
                     .or(most_concrete_table.ne(excluded(most_concrete_table)))
                     .or(created_by.ne(excluded(created_by)))
                     .or(created_at.ne(excluded(created_at)))

@@ -595,7 +595,7 @@ impl AliquotingProcedure {
         crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates::dsl::procedure_template_pipette_tip_model
                             .eq(&self.procedure_template_pipette_tip_model),
@@ -619,7 +619,7 @@ impl AliquotingProcedure {
         crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates::dsl::procedure_template_aliquoted_from_model
                             .eq(&self.procedure_template_aliquoted_from_model),
@@ -643,7 +643,7 @@ impl AliquotingProcedure {
         crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates::dsl::procedure_template_aliquoted_into_model
                             .eq(&self.procedure_template_aliquoted_into_model),
@@ -667,7 +667,7 @@ impl AliquotingProcedure {
         crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::aliquoting_procedure_templates::aliquoting_procedure_templates::dsl::procedure_template_aliquoted_with_model
                             .eq(&self.procedure_template_aliquoted_with_model),
@@ -1276,7 +1276,7 @@ impl AliquotingProcedure {
 
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
-            .filter(aliquoting_procedures::procedure_template.eq(procedure_template))
+            .filter(aliquoting_procedures::procedure_template.eq(procedure_template_id))
             .order_by(aliquoting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -1335,7 +1335,7 @@ impl AliquotingProcedure {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
             .filter(
-                aliquoting_procedures::procedure_template.eq(procedure_template).and(
+                aliquoting_procedures::procedure_template.eq(procedure_template_id).and(
                     aliquoting_procedures::procedure_template_pipette_tip_model
                         .eq(procedure_template_pipette_tip_model),
                 ),
@@ -1356,7 +1356,7 @@ impl AliquotingProcedure {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
             .filter(
-                aliquoting_procedures::procedure_template.eq(procedure_template).and(
+                aliquoting_procedures::procedure_template.eq(procedure_template_id).and(
                     aliquoting_procedures::procedure_template_aliquoted_from_model
                         .eq(procedure_template_aliquoted_from_model),
                 ),
@@ -1377,7 +1377,7 @@ impl AliquotingProcedure {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
             .filter(
-                aliquoting_procedures::procedure_template.eq(procedure_template).and(
+                aliquoting_procedures::procedure_template.eq(procedure_template_id).and(
                     aliquoting_procedures::procedure_template_aliquoted_into_model
                         .eq(procedure_template_aliquoted_into_model),
                 ),
@@ -1398,7 +1398,7 @@ impl AliquotingProcedure {
         use crate::codegen::diesel_codegen::tables::aliquoting_procedures::aliquoting_procedures;
         Self::table()
             .filter(
-                aliquoting_procedures::procedure_template.eq(procedure_template).and(
+                aliquoting_procedures::procedure_template.eq(procedure_template_id).and(
                     aliquoting_procedures::procedure_template_aliquoted_with_model
                         .eq(procedure_template_aliquoted_with_model),
                 ),
@@ -1445,7 +1445,7 @@ impl AliquotingProcedure {
             .inner_join(
                 procedures::table.on(aliquoting_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(aliquoting_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -1489,7 +1489,9 @@ impl AliquotingProcedure {
             .inner_join(
                 procedures::table.on(aliquoting_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(aliquoting_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

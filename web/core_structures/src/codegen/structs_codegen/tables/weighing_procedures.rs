@@ -110,7 +110,7 @@ impl WeighingProcedure {
         crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates::dsl::procedure_template_weighed_container_model
                             .eq(&self.procedure_template_weighed_container_model),
@@ -134,7 +134,7 @@ impl WeighingProcedure {
         crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates::dsl::procedure_template_weighed_with_model
                             .eq(&self.procedure_template_weighed_with_model),
@@ -391,7 +391,7 @@ impl WeighingProcedure {
 
         use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
         Self::table()
-            .filter(weighing_procedures::procedure_template.eq(procedure_template))
+            .filter(weighing_procedures::procedure_template.eq(procedure_template_id))
             .order_by(weighing_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -408,7 +408,7 @@ impl WeighingProcedure {
         use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
         Self::table()
             .filter(
-                weighing_procedures::procedure_template.eq(procedure_template).and(
+                weighing_procedures::procedure_template.eq(procedure_template_id).and(
                     weighing_procedures::procedure_template_weighed_container_model
                         .eq(procedure_template_weighed_container_model),
                 ),
@@ -429,7 +429,7 @@ impl WeighingProcedure {
         use crate::codegen::diesel_codegen::tables::weighing_procedures::weighing_procedures;
         Self::table()
             .filter(
-                weighing_procedures::procedure_template.eq(procedure_template).and(
+                weighing_procedures::procedure_template.eq(procedure_template_id).and(
                     weighing_procedures::procedure_template_weighed_with_model
                         .eq(procedure_template_weighed_with_model),
                 ),
@@ -724,7 +724,7 @@ impl WeighingProcedure {
             .inner_join(
                 procedures::table.on(weighing_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(weighing_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -768,7 +768,9 @@ impl WeighingProcedure {
             .inner_join(
                 procedures::table.on(weighing_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(weighing_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

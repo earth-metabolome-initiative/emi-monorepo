@@ -15,7 +15,7 @@
         foreign_key = disposed_asset_model
     )
 )]
-#[diesel(primary_key(procedure_template))]
+#[diesel(primary_key(procedure_template_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates
 )]
@@ -33,7 +33,7 @@ for web_common_traits::database::IdOrBuilder<
     crate::codegen::structs_codegen::tables::insertables::InsertableDisposalProcedureTemplateBuilder,
 > {
     fn from(value: &'a DisposalProcedureTemplate) -> Self {
-        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template_id)
     }
 }
 impl
@@ -76,7 +76,7 @@ impl DisposalProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.disposed_asset_model,
+            self.disposed_asset_model_id,
             conn,
         )
     }
@@ -94,10 +94,10 @@ impl DisposalProcedureTemplate {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_disposed_asset_model)
+                    .eq(&self.procedure_template_disposed_asset_model_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
-                            .eq(&self.disposed_asset_model),
+                            .eq(&self.disposed_asset_model_id),
                     ),
             )
             .first::<
@@ -120,7 +120,7 @@ impl DisposalProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_disposed_asset_model,
+            self.procedure_template_disposed_asset_model_id,
             conn,
         )
     }
@@ -138,9 +138,10 @@ impl DisposalProcedureTemplate {
         Self::table()
             .filter(
                 disposal_procedure_templates::procedure_template_disposed_asset_model
-                    .eq(procedure_template_disposed_asset_model)
+                    .eq(procedure_template_disposed_asset_model_id)
                     .and(
-                        disposal_procedure_templates::disposed_asset_model.eq(disposed_asset_model),
+                        disposal_procedure_templates::disposed_asset_model
+                            .eq(disposed_asset_model_id),
                     ),
             )
             .order_by(disposal_procedure_templates::procedure_template.asc())
@@ -153,12 +154,12 @@ impl DisposalProcedureTemplate {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::procedure_template_disposed_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::procedure_template_disposed_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::procedure_template_disposed_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::procedure_template_disposed_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
@@ -167,7 +168,7 @@ impl DisposalProcedureTemplate {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::procedure_template_disposed_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::procedure_template_disposed_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
@@ -183,7 +184,7 @@ impl DisposalProcedureTemplate {
         Self::table()
             .filter(
                 disposal_procedure_templates::procedure_template_disposed_asset_model
-                    .eq(procedure_template_disposed_asset_model),
+                    .eq(procedure_template_disposed_asset_model_id),
             )
             .order_by(disposal_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
@@ -205,7 +206,7 @@ impl DisposalProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(disposal_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::name.eq(name))
             .order_by(disposal_procedure_templates::procedure_template.asc())
@@ -229,7 +230,7 @@ impl DisposalProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(disposal_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::description.eq(description))
             .order_by(disposal_procedure_templates::procedure_template.asc())
@@ -253,7 +254,7 @@ impl DisposalProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(disposal_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::created_by.eq(created_by))
             .order_by(disposal_procedure_templates::procedure_template.asc())
@@ -277,7 +278,7 @@ impl DisposalProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(disposal_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::updated_by.eq(updated_by))
             .order_by(disposal_procedure_templates::procedure_template.asc())
@@ -301,7 +302,7 @@ impl DisposalProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(disposal_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::deprecated.eq(deprecated))
             .order_by(disposal_procedure_templates::procedure_template.asc())

@@ -182,7 +182,7 @@ impl InsertableWeighingProcedure {
         crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates::dsl::procedure_template_weighed_container_model
                             .eq(&self.procedure_template_weighed_container_model),
@@ -206,7 +206,7 @@ impl InsertableWeighingProcedure {
         crate::codegen::structs_codegen::tables::weighing_procedure_templates::WeighingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::weighing_procedure_templates::weighing_procedure_templates::dsl::procedure_template_weighed_with_model
                             .eq(&self.procedure_template_weighed_with_model),
@@ -453,7 +453,7 @@ impl InsertableWeighingProcedure {
 ///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
 ///    .kilograms(kilograms)?
-///    .procedure_template(procedure_template)?
+///    .procedure_template(procedure_template_id)?
 ///    .procedure_weighed_container(procedure_weighed_container)?
 ///    .procedure_weighed_with(procedure_weighed_with)?
 ///    // Optionally set fields with default values
@@ -808,7 +808,7 @@ where
                     attribute.into(),
                 ))
             })?;
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     ///Sets the value of the `public.weighing_procedures.weighed_container` column.
@@ -993,10 +993,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_weighed_container {
             procedure_weighed_container = if let (
                 Some(procedure_template_weighed_container_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_weighed_container_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_weighed_container_model
                     != procedure_template_asset_model
@@ -1010,11 +1010,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_weighed_container_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_weighed_container_model) = self
@@ -1275,10 +1275,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_weighed_with {
             procedure_weighed_with = if let (
                 Some(procedure_template_weighed_with_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_weighed_with_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_weighed_with_model
                     != procedure_template_asset_model
@@ -1292,11 +1292,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_weighed_with_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_weighed_with_model) = self
@@ -1426,7 +1426,7 @@ where
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        <Self as WeighingProcedureSettable>::procedure_template(self, procedure_template)
+        <Self as WeighingProcedureSettable>::procedure_template(self, procedure_template_id)
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.

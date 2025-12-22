@@ -121,7 +121,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::CappingProcedureTemplateSettable>::capped_container_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
@@ -134,7 +134,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::CappingProcedureTemplateSettable>::capped_with_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         let capped_container_model = self

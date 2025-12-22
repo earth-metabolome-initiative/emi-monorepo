@@ -21,7 +21,7 @@
         foreign_key = capped_with_model
     )
 )]
-#[diesel(primary_key(procedure_template))]
+#[diesel(primary_key(procedure_template_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates
 )]
@@ -41,7 +41,7 @@ for web_common_traits::database::IdOrBuilder<
     crate::codegen::structs_codegen::tables::insertables::InsertableCappingProcedureTemplateBuilder,
 > {
     fn from(value: &'a CappingProcedureTemplate) -> Self {
-        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template_id)
     }
 }
 impl
@@ -372,7 +372,7 @@ impl CappingProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(capping_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::name.eq(name))
             .order_by(capping_procedure_templates::procedure_template.asc())
@@ -396,7 +396,7 @@ impl CappingProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(capping_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::description.eq(description))
             .order_by(capping_procedure_templates::procedure_template.asc())
@@ -420,7 +420,7 @@ impl CappingProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(capping_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::created_by.eq(created_by))
             .order_by(capping_procedure_templates::procedure_template.asc())
@@ -444,7 +444,7 @@ impl CappingProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(capping_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::updated_by.eq(updated_by))
             .order_by(capping_procedure_templates::procedure_template.asc())
@@ -468,7 +468,7 @@ impl CappingProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(capping_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::deprecated.eq(deprecated))
             .order_by(capping_procedure_templates::procedure_template.asc())

@@ -101,7 +101,7 @@ impl Procedure {
         let Some(parent_procedure) = self.parent_procedure else {
             return Ok(None);
         };
-        let Some(parent_procedure_template) = self.parent_procedure_template else {
+        let Some(parent_procedure_template_id) = self.parent_procedure_template else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedures::Procedure::table()
@@ -110,7 +110,7 @@ impl Procedure {
                     .eq(parent_procedure)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
-                            .eq(parent_procedure_template),
+                            .eq(parent_procedure_template_id),
                     ),
             )
             .first::<
@@ -131,7 +131,7 @@ impl Procedure {
     {
         use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        let Some(parent_procedure_template) = self.parent_procedure_template else {
+        let Some(parent_procedure_template_id) = self.parent_procedure_template else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
@@ -158,10 +158,10 @@ impl Procedure {
     {
         use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        let Some(parent_procedure_template) = self.parent_procedure_template else {
+        let Some(parent_procedure_template_id) = self.parent_procedure_template else {
             return Ok(None);
         };
-        let Some(predecessor_procedure_template) = self.predecessor_procedure_template else {
+        let Some(predecessor_procedure_template_id) = self.predecessor_procedure_template else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate::read(
@@ -192,11 +192,11 @@ impl Procedure {
     {
         use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        let Some(parent_procedure_template) = self.parent_procedure_template else {
+        let Some(parent_procedure_template_id) = self.parent_procedure_template else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::read(
-                (parent_procedure_template, self.procedure_template),
+                (parent_procedure_template, self.procedure_template_id),
                 conn,
             )
             .optional()
@@ -238,7 +238,7 @@ impl Procedure {
         let Some(predecessor_procedure) = self.predecessor_procedure else {
             return Ok(None);
         };
-        let Some(predecessor_procedure_template) = self.predecessor_procedure_template else {
+        let Some(predecessor_procedure_template_id) = self.predecessor_procedure_template else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedures::Procedure::table()
@@ -247,7 +247,7 @@ impl Procedure {
                     .eq(predecessor_procedure)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
-                            .eq(predecessor_procedure_template),
+                            .eq(predecessor_procedure_template_id),
                     ),
             )
             .first::<
@@ -268,7 +268,7 @@ impl Procedure {
     {
         use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        let Some(predecessor_procedure_template) = self.predecessor_procedure_template else {
+        let Some(predecessor_procedure_template_id) = self.predecessor_procedure_template else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
@@ -371,7 +371,7 @@ impl Procedure {
             .filter(
                 procedures::parent_procedure
                     .eq(parent_procedure)
-                    .and(procedures::parent_procedure_template.eq(parent_procedure_template)),
+                    .and(procedures::parent_procedure_template.eq(parent_procedure_template_id)),
             )
             .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
@@ -385,7 +385,7 @@ impl Procedure {
 
         use crate::codegen::diesel_codegen::tables::procedures::procedures;
         Self::table()
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -404,12 +404,12 @@ impl Procedure {
         Self::table()
             .filter(
                 procedures::parent_procedure_template
-                    .eq(parent_procedure_template)
+                    .eq(parent_procedure_template_id)
                     .and(
                         procedures::predecessor_procedure_template
-                            .eq(predecessor_procedure_template),
+                            .eq(predecessor_procedure_template_id),
                     )
-                    .and(procedures::procedure_template.eq(procedure_template)),
+                    .and(procedures::procedure_template.eq(procedure_template_id)),
             )
             .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
@@ -428,8 +428,8 @@ impl Procedure {
         Self::table()
             .filter(
                 procedures::parent_procedure_template
-                    .eq(parent_procedure_template)
-                    .and(procedures::procedure_template.eq(procedure_template)),
+                    .eq(parent_procedure_template_id)
+                    .and(procedures::procedure_template.eq(procedure_template_id)),
             )
             .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
@@ -459,11 +459,9 @@ impl Procedure {
 
         use crate::codegen::diesel_codegen::tables::procedures::procedures;
         Self::table()
-            .filter(
-                procedures::predecessor_procedure.eq(predecessor_procedure).and(
-                    procedures::predecessor_procedure_template.eq(predecessor_procedure_template),
-                ),
-            )
+            .filter(procedures::predecessor_procedure.eq(predecessor_procedure).and(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            ))
             .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -476,7 +474,9 @@ impl Procedure {
 
         use crate::codegen::diesel_codegen::tables::procedures::procedures;
         Self::table()
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -515,7 +515,7 @@ impl Procedure {
 
         use crate::codegen::diesel_codegen::tables::procedures::procedures;
         Self::table()
-            .filter(procedures::procedure_template.eq(procedure_template))
+            .filter(procedures::procedure_template.eq(procedure_template_id))
             .order_by(procedures::procedure.asc())
             .load::<Self>(conn)
     }

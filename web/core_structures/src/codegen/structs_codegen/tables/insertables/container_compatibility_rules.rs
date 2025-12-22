@@ -78,7 +78,7 @@ impl InsertableContainerCompatibilityRule {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.contained_asset_model,
+            self.contained_asset_model_id,
             conn,
         )
     }
@@ -129,7 +129,7 @@ impl InsertableContainerCompatibilityRule {
 ///
 /// let container_compatibility_rule = ContainerCompatibilityRule::new()
 ///    // Set mandatory fields
-///    .contained_asset_model(contained_asset_model)?
+///    .contained_asset_model(contained_asset_model_id)?
 ///    .container_model(container_model)?
 ///    .created_by(created_by)?
 ///    // Optionally set fields with default values
@@ -307,8 +307,8 @@ where
         let container_model = <CM as web_common_traits::database::PrimaryKeyLike>::primary_key(
             &container_model,
         );
-        if let Some(contained_asset_model) = self.contained_asset_model {
-            pgrx_validation::must_be_distinct_i32(container_model, contained_asset_model)
+        if let Some(contained_asset_model_id) = self.contained_asset_model_id {
+            pgrx_validation::must_be_distinct_i32(container_model, contained_asset_model_id)
                 .map_err(|e| {
                     e
                         .rename_fields(
@@ -328,11 +328,11 @@ where
     where
         CAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let contained_asset_model = <CAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &contained_asset_model,
+        let contained_asset_model_id = <CAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &contained_asset_model_id,
         );
         if let Some(container_model) = self.container_model {
-            pgrx_validation::must_be_distinct_i32(container_model, contained_asset_model)
+            pgrx_validation::must_be_distinct_i32(container_model, contained_asset_model_id)
                 .map_err(|e| {
                     e
                         .rename_fields(
@@ -341,7 +341,7 @@ where
                         )
                 })?;
         }
-        self.contained_asset_model = Some(contained_asset_model);
+        self.contained_asset_model_id = Some(contained_asset_model_id);
         Ok(self)
     }
     ///Sets the value of the `public.container_compatibility_rules.quantity` column.

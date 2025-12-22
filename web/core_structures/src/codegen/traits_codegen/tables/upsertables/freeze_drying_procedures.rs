@@ -19,7 +19,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(freeze_dried_container.ne(excluded(freeze_dried_container)))
                     .or(freeze_dried_container_model.ne(excluded(freeze_dried_container_model)))
                     .or(procedure_template_freeze_dried_container_model
@@ -57,7 +57,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(freeze_dried_container.ne(excluded(freeze_dried_container)))
                     .or(freeze_dried_container_model.ne(excluded(freeze_dried_container_model)))
                     .or(procedure_template_freeze_dried_container_model

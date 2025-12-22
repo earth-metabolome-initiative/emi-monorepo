@@ -19,10 +19,10 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(geolocated_asset.ne(excluded(geolocated_asset)))
                     .or(procedure_template_geolocated_asset_model
-                        .ne(excluded(procedure_template_geolocated_asset_model)))
+                        .ne(excluded(procedure_template_geolocated_asset_model_id)))
                     .or(procedure_geolocated_asset.ne(excluded(procedure_geolocated_asset)))
                     .or(geolocated_with.ne(excluded(geolocated_with)))
                     .or(procedure_geolocated_with.ne(excluded(procedure_geolocated_with)))
@@ -55,10 +55,10 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(geolocated_asset.ne(excluded(geolocated_asset)))
                     .or(procedure_template_geolocated_asset_model
-                        .ne(excluded(procedure_template_geolocated_asset_model)))
+                        .ne(excluded(procedure_template_geolocated_asset_model_id)))
                     .or(procedure_geolocated_asset.ne(excluded(procedure_geolocated_asset)))
                     .or(geolocated_with.ne(excluded(geolocated_with)))
                     .or(procedure_geolocated_with.ne(excluded(procedure_geolocated_with)))

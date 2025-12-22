@@ -175,7 +175,7 @@ impl GeolocationProcedure {
                     .eq(&self.procedure_geolocated_asset)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_geolocated_asset_model),
+                            .eq(&self.procedure_template_geolocated_asset_model_id),
                     ),
             )
             .first::<
@@ -286,7 +286,7 @@ impl GeolocationProcedure {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_geolocated_asset_model,
+            self.procedure_template_geolocated_asset_model_id,
             conn,
         )
     }
@@ -324,10 +324,10 @@ impl GeolocationProcedure {
         crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template_geolocated_asset_model
-                            .eq(&self.procedure_template_geolocated_asset_model),
+                            .eq(&self.procedure_template_geolocated_asset_model_id),
                     ),
             )
             .first::<
@@ -348,7 +348,7 @@ impl GeolocationProcedure {
         crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::dsl::procedure_template_geolocated_with_model
                             .eq(&self.procedure_template_geolocated_with_model),
@@ -436,7 +436,7 @@ impl GeolocationProcedure {
                     .eq(procedure_geolocated_asset)
                     .and(
                         geolocation_procedures::procedure_template_geolocated_asset_model
-                            .eq(procedure_template_geolocated_asset_model),
+                            .eq(procedure_template_geolocated_asset_model_id),
                     ),
             )
             .order_by(geolocation_procedures::procedure.asc())
@@ -559,7 +559,7 @@ impl GeolocationProcedure {
 
         use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
         Self::table()
-            .filter(geolocation_procedures::procedure_template.eq(procedure_template))
+            .filter(geolocation_procedures::procedure_template.eq(procedure_template_id))
             .order_by(geolocation_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -570,12 +570,12 @@ impl GeolocationProcedure {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures::procedure_template_geolocated_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures::procedure_template_geolocated_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures::procedure_template_geolocated_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures::procedure_template_geolocated_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
@@ -584,7 +584,7 @@ impl GeolocationProcedure {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures::procedure_template_geolocated_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures::procedure_template_geolocated_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
@@ -600,7 +600,7 @@ impl GeolocationProcedure {
         Self::table()
             .filter(
                 geolocation_procedures::procedure_template_geolocated_asset_model
-                    .eq(procedure_template_geolocated_asset_model),
+                    .eq(procedure_template_geolocated_asset_model_id),
             )
             .order_by(geolocation_procedures::procedure.asc())
             .load::<Self>(conn)
@@ -660,9 +660,9 @@ impl GeolocationProcedure {
         use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
         Self::table()
             .filter(
-                geolocation_procedures::procedure_template.eq(procedure_template).and(
+                geolocation_procedures::procedure_template.eq(procedure_template_id).and(
                     geolocation_procedures::procedure_template_geolocated_asset_model
-                        .eq(procedure_template_geolocated_asset_model),
+                        .eq(procedure_template_geolocated_asset_model_id),
                 ),
             )
             .order_by(geolocation_procedures::procedure.asc())
@@ -681,7 +681,7 @@ impl GeolocationProcedure {
         use crate::codegen::diesel_codegen::tables::geolocation_procedures::geolocation_procedures;
         Self::table()
             .filter(
-                geolocation_procedures::procedure_template.eq(procedure_template).and(
+                geolocation_procedures::procedure_template.eq(procedure_template_id).and(
                     geolocation_procedures::procedure_template_geolocated_with_model
                         .eq(procedure_template_geolocated_with_model),
                 ),
@@ -728,7 +728,7 @@ impl GeolocationProcedure {
             .inner_join(
                 procedures::table.on(geolocation_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(geolocation_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -772,7 +772,9 @@ impl GeolocationProcedure {
             .inner_join(
                 procedures::table.on(geolocation_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(geolocation_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

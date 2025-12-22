@@ -376,7 +376,7 @@ impl CappingProcedure {
         crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template_capped_with_model
                             .eq(&self.procedure_template_capped_with_model),
@@ -400,7 +400,7 @@ impl CappingProcedure {
         crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::dsl::procedure_template_capped_container_model
                             .eq(&self.procedure_template_capped_container_model),
@@ -729,7 +729,7 @@ impl CappingProcedure {
 
         use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
         Self::table()
-            .filter(capping_procedures::procedure_template.eq(procedure_template))
+            .filter(capping_procedures::procedure_template.eq(procedure_template_id))
             .order_by(capping_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -746,7 +746,7 @@ impl CappingProcedure {
         use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
         Self::table()
             .filter(
-                capping_procedures::procedure_template.eq(procedure_template).and(
+                capping_procedures::procedure_template.eq(procedure_template_id).and(
                     capping_procedures::procedure_template_capped_with_model
                         .eq(procedure_template_capped_with_model),
                 ),
@@ -767,7 +767,7 @@ impl CappingProcedure {
         use crate::codegen::diesel_codegen::tables::capping_procedures::capping_procedures;
         Self::table()
             .filter(
-                capping_procedures::procedure_template.eq(procedure_template).and(
+                capping_procedures::procedure_template.eq(procedure_template_id).and(
                     capping_procedures::procedure_template_capped_container_model
                         .eq(procedure_template_capped_container_model),
                 ),
@@ -814,7 +814,7 @@ impl CappingProcedure {
             .inner_join(
                 procedures::table.on(capping_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(capping_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -858,7 +858,9 @@ impl CappingProcedure {
             .inner_join(
                 procedures::table.on(capping_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(capping_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

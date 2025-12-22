@@ -96,7 +96,7 @@ impl ProcedureAsset {
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(asset).and(
                     crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
-                        .eq(&self.asset_model),
+                        .eq(&self.asset_model_id),
                 ),
             )
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
@@ -130,7 +130,7 @@ impl ProcedureAsset {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor::read(
-            (self.asset_model, self.ancestor_model),
+            (self.asset_model_id, self.ancestor_model),
             conn,
         )
     }
@@ -147,7 +147,7 @@ impl ProcedureAsset {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
-            self.asset_model,
+            self.asset_model_id,
             conn,
         )
     }
@@ -177,7 +177,7 @@ impl ProcedureAsset {
                     .eq(&self.procedure)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
-                            .eq(&self.procedure_template),
+                            .eq(&self.procedure_template_id),
                     ),
             )
             .first::<
@@ -198,7 +198,7 @@ impl ProcedureAsset {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_asset_model)
+                    .eq(&self.procedure_template_asset_model_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
                             .eq(&self.ancestor_model),
@@ -222,7 +222,7 @@ impl ProcedureAsset {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_asset_model,
+            self.procedure_template_asset_model_id,
             conn,
         )
     }
@@ -240,10 +240,10 @@ impl ProcedureAsset {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_asset_model)
+                    .eq(&self.procedure_template_asset_model_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::procedure_template
-                            .eq(&self.procedure_template),
+                            .eq(&self.procedure_template_id),
                     ),
             )
             .first::<
@@ -321,7 +321,7 @@ impl ProcedureAsset {
             .filter(
                 procedure_assets::asset
                     .eq(asset)
-                    .and(procedure_assets::asset_model.eq(asset_model)),
+                    .and(procedure_assets::asset_model.eq(asset_model_id)),
             )
             .order_by(procedure_assets::id.asc())
             .load::<Self>(conn)
@@ -353,7 +353,7 @@ impl ProcedureAsset {
         Self::table()
             .filter(
                 procedure_assets::asset_model
-                    .eq(asset_model)
+                    .eq(asset_model_id)
                     .and(procedure_assets::ancestor_model.eq(ancestor_model)),
             )
             .order_by(procedure_assets::id.asc())
@@ -366,12 +366,12 @@ impl ProcedureAsset {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
@@ -380,7 +380,7 @@ impl ProcedureAsset {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
@@ -394,7 +394,7 @@ impl ProcedureAsset {
 
         use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
         Self::table()
-            .filter(procedure_assets::asset_model.eq(asset_model))
+            .filter(procedure_assets::asset_model.eq(asset_model_id))
             .order_by(procedure_assets::id.asc())
             .load::<Self>(conn)
     }
@@ -452,7 +452,7 @@ impl ProcedureAsset {
             .filter(
                 procedure_assets::procedure
                     .eq(procedure)
-                    .and(procedure_assets::procedure_template.eq(procedure_template)),
+                    .and(procedure_assets::procedure_template.eq(procedure_template_id)),
             )
             .order_by(procedure_assets::id.asc())
             .load::<Self>(conn)
@@ -471,7 +471,7 @@ impl ProcedureAsset {
         Self::table()
             .filter(
                 procedure_assets::procedure_template_asset_model
-                    .eq(procedure_template_asset_model)
+                    .eq(procedure_template_asset_model_id)
                     .and(procedure_assets::ancestor_model.eq(ancestor_model)),
             )
             .order_by(procedure_assets::id.asc())
@@ -484,12 +484,12 @@ impl ProcedureAsset {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::procedure_template_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::procedure_template_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::procedure_template_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::procedure_template_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
@@ -498,7 +498,7 @@ impl ProcedureAsset {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::procedure_template_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::procedure_template_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
@@ -513,7 +513,8 @@ impl ProcedureAsset {
         use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
         Self::table()
             .filter(
-                procedure_assets::procedure_template_asset_model.eq(procedure_template_asset_model),
+                procedure_assets::procedure_template_asset_model
+                    .eq(procedure_template_asset_model_id),
             )
             .order_by(procedure_assets::id.asc())
             .load::<Self>(conn)
@@ -532,8 +533,8 @@ impl ProcedureAsset {
         Self::table()
             .filter(
                 procedure_assets::procedure_template_asset_model
-                    .eq(procedure_template_asset_model)
-                    .and(procedure_assets::procedure_template.eq(procedure_template)),
+                    .eq(procedure_template_asset_model_id)
+                    .and(procedure_assets::procedure_template.eq(procedure_template_id)),
             )
             .order_by(procedure_assets::id.asc())
             .load::<Self>(conn)

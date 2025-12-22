@@ -434,7 +434,7 @@ impl FreezingProcedure {
         crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::dsl::procedure_template_frozen_with_model
                             .eq(&self.procedure_template_frozen_with_model),
@@ -458,7 +458,7 @@ impl FreezingProcedure {
         crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::freezing_procedure_templates::freezing_procedure_templates::dsl::procedure_template_frozen_container_model
                             .eq(&self.procedure_template_frozen_container_model),
@@ -723,7 +723,7 @@ impl FreezingProcedure {
 
         use crate::codegen::diesel_codegen::tables::freezing_procedures::freezing_procedures;
         Self::table()
-            .filter(freezing_procedures::procedure_template.eq(procedure_template))
+            .filter(freezing_procedures::procedure_template.eq(procedure_template_id))
             .order_by(freezing_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -824,7 +824,7 @@ impl FreezingProcedure {
         use crate::codegen::diesel_codegen::tables::freezing_procedures::freezing_procedures;
         Self::table()
             .filter(
-                freezing_procedures::procedure_template.eq(procedure_template).and(
+                freezing_procedures::procedure_template.eq(procedure_template_id).and(
                     freezing_procedures::procedure_template_frozen_with_model
                         .eq(procedure_template_frozen_with_model),
                 ),
@@ -845,7 +845,7 @@ impl FreezingProcedure {
         use crate::codegen::diesel_codegen::tables::freezing_procedures::freezing_procedures;
         Self::table()
             .filter(
-                freezing_procedures::procedure_template.eq(procedure_template).and(
+                freezing_procedures::procedure_template.eq(procedure_template_id).and(
                     freezing_procedures::procedure_template_frozen_container_model
                         .eq(procedure_template_frozen_container_model),
                 ),
@@ -892,7 +892,7 @@ impl FreezingProcedure {
             .inner_join(
                 procedures::table.on(freezing_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(freezing_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -936,7 +936,9 @@ impl FreezingProcedure {
             .inner_join(
                 procedures::table.on(freezing_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(freezing_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

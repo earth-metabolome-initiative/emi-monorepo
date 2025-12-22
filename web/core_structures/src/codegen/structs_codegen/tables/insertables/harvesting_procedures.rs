@@ -305,7 +305,7 @@ impl InsertableHarvestingProcedure {
         crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template_sample_model
                             .eq(&self.procedure_template_sample_model),
@@ -329,7 +329,7 @@ impl InsertableHarvestingProcedure {
         crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template_sample_source_model
                             .eq(&self.procedure_template_sample_source_model),
@@ -426,7 +426,7 @@ impl InsertableHarvestingProcedure {
 ///    // Set mandatory fields
 ///    .procedure_sample(procedure_sample)?
 ///    .procedure_sample_source(procedure_sample_source)?
-///    .procedure_template(procedure_template)?
+///    .procedure_template(procedure_template_id)?
 ///    .created_by(created_by)?
 ///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
@@ -754,7 +754,7 @@ where
                     attribute.into(),
                 ))
             })?;
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     ///Sets the value of the `public.harvesting_procedures.sample_source` column.
@@ -936,10 +936,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_sample_source {
             procedure_sample_source = if let (
                 Some(procedure_template_sample_source_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_sample_source_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_sample_source_model
                     != procedure_template_asset_model
@@ -953,11 +953,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_sample_source_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_sample_source_model) = self
@@ -1189,12 +1189,12 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_sample {
             procedure_sample = if let (
                 Some(procedure_template_sample_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_sample_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
-                if procedure_template_sample_model != procedure_template_asset_model {
+                if procedure_template_sample_model != procedure_template_asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -1204,11 +1204,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_sample_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_sample_model) = self

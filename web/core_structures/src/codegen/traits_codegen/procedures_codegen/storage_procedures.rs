@@ -15,7 +15,7 @@ impl web_common_traits::prelude::ProcedureLike
         ),
     >{
         vec![
-            (self.procedure_template_stored_asset_model, self.procedure_stored_asset),
+            (self.procedure_template_stored_asset_model_id, self.procedure_stored_asset),
             (self.procedure_template_stored_into_model, self.procedure_stored_into),
         ]
     }
@@ -38,8 +38,8 @@ impl web_common_traits::prelude::ProcedureBuilderLike
         >,
     {
         use crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable;
-        if let Some(procedure_stored_asset) =
-            template_graph.procedure_asset(parents, template.procedure_template_stored_asset_model)
+        if let Some(procedure_stored_asset) = template_graph
+            .procedure_asset(parents, template.procedure_template_stored_asset_model_id)
         {
             self = self.procedure_stored_asset(procedure_stored_asset)?;
         }

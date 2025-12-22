@@ -14,7 +14,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict((left_asset_model, right_asset_model))
+            .on_conflict((left_asset_model_id, right_asset_model_id))
             .do_update()
             .set(self)
             .filter(created_by.ne(excluded(created_by)).or(created_at.ne(excluded(created_at))))
@@ -38,7 +38,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict((left_asset_model, right_asset_model))
+            .on_conflict((left_asset_model_id, right_asset_model_id))
             .do_update()
             .set(self)
             .filter(created_by.ne(excluded(created_by)).or(created_at.ne(excluded(created_at))))

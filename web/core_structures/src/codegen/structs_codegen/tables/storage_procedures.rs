@@ -125,7 +125,7 @@ impl StorageProcedure {
                     .eq(&self.procedure_stored_asset)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_stored_asset_model),
+                            .eq(&self.procedure_template_stored_asset_model_id),
                     ),
             )
             .first::<
@@ -173,7 +173,7 @@ impl StorageProcedure {
                     .eq(&self.procedure_stored_asset)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.stored_asset_model),
+                            .eq(&self.stored_asset_model_id),
                     ),
             )
             .first::<
@@ -301,7 +301,7 @@ impl StorageProcedure {
         crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template_stored_into_model
                             .eq(&self.procedure_template_stored_into_model),
@@ -325,10 +325,10 @@ impl StorageProcedure {
         crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template_stored_asset_model
-                            .eq(&self.procedure_template_stored_asset_model),
+                            .eq(&self.procedure_template_stored_asset_model_id),
                     ),
             )
             .first::<
@@ -349,7 +349,7 @@ impl StorageProcedure {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_stored_asset_model,
+            self.procedure_template_stored_asset_model_id,
             conn,
         )
     }
@@ -401,7 +401,7 @@ impl StorageProcedure {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.stored_asset_model,
+            self.stored_asset_model_id,
             conn,
         )
     }
@@ -449,7 +449,7 @@ impl StorageProcedure {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule::read(
-            (self.stored_into_model, self.stored_asset_model),
+            (self.stored_into_model, self.stored_asset_model_id),
             conn,
         )
     }
@@ -507,7 +507,7 @@ impl StorageProcedure {
             .filter(
                 storage_procedures::procedure_stored_asset.eq(procedure_stored_asset).and(
                     storage_procedures::procedure_template_stored_asset_model
-                        .eq(procedure_template_stored_asset_model),
+                        .eq(procedure_template_stored_asset_model_id),
                 ),
             )
             .order_by(storage_procedures::procedure.asc())
@@ -548,7 +548,7 @@ impl StorageProcedure {
             .filter(
                 storage_procedures::procedure_stored_asset
                     .eq(procedure_stored_asset)
-                    .and(storage_procedures::stored_asset_model.eq(stored_asset_model)),
+                    .and(storage_procedures::stored_asset_model.eq(stored_asset_model_id)),
             )
             .order_by(storage_procedures::procedure.asc())
             .load::<Self>(conn)
@@ -688,7 +688,7 @@ impl StorageProcedure {
 
         use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
         Self::table()
-            .filter(storage_procedures::procedure_template.eq(procedure_template))
+            .filter(storage_procedures::procedure_template.eq(procedure_template_id))
             .order_by(storage_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -705,7 +705,7 @@ impl StorageProcedure {
         use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
         Self::table()
             .filter(
-                storage_procedures::procedure_template.eq(procedure_template).and(
+                storage_procedures::procedure_template.eq(procedure_template_id).and(
                     storage_procedures::procedure_template_stored_into_model
                         .eq(procedure_template_stored_into_model),
                 ),
@@ -726,9 +726,9 @@ impl StorageProcedure {
         use crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures;
         Self::table()
             .filter(
-                storage_procedures::procedure_template.eq(procedure_template).and(
+                storage_procedures::procedure_template.eq(procedure_template_id).and(
                     storage_procedures::procedure_template_stored_asset_model
-                        .eq(procedure_template_stored_asset_model),
+                        .eq(procedure_template_stored_asset_model_id),
                 ),
             )
             .order_by(storage_procedures::procedure.asc())
@@ -741,12 +741,12 @@ impl StorageProcedure {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template_stored_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template_stored_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template_stored_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template_stored_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
@@ -755,7 +755,7 @@ impl StorageProcedure {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template_stored_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::storage_procedures::storage_procedures::procedure_template_stored_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
@@ -771,7 +771,7 @@ impl StorageProcedure {
         Self::table()
             .filter(
                 storage_procedures::procedure_template_stored_asset_model
-                    .eq(procedure_template_stored_asset_model),
+                    .eq(procedure_template_stored_asset_model_id),
             )
             .order_by(storage_procedures::procedure.asc())
             .load::<Self>(conn)
@@ -833,7 +833,7 @@ impl StorageProcedure {
             .filter(
                 storage_procedures::stored_into_model
                     .eq(stored_into_model)
-                    .and(storage_procedures::stored_asset_model.eq(stored_asset_model)),
+                    .and(storage_procedures::stored_asset_model.eq(stored_asset_model_id)),
             )
             .order_by(storage_procedures::procedure.asc())
             .load::<Self>(conn)
@@ -877,7 +877,7 @@ impl StorageProcedure {
             .inner_join(
                 procedures::table.on(storage_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(storage_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -921,7 +921,9 @@ impl StorageProcedure {
             .inner_join(
                 procedures::table.on(storage_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(storage_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

@@ -364,7 +364,7 @@ impl InsertablePhotographProcedure {
                     .eq(&self.procedure_photographed_asset)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_photographed_asset_model),
+                            .eq(&self.procedure_template_photographed_asset_model_id),
                     ),
             )
             .first::<
@@ -493,7 +493,7 @@ impl InsertablePhotographProcedure {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_photographed_asset_model,
+            self.procedure_template_photographed_asset_model_id,
             conn,
         )
     }
@@ -531,10 +531,10 @@ impl InsertablePhotographProcedure {
         crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template_photographed_asset_model
-                            .eq(&self.procedure_template_photographed_asset_model),
+                            .eq(&self.procedure_template_photographed_asset_model_id),
                     ),
             )
             .first::<
@@ -555,7 +555,7 @@ impl InsertablePhotographProcedure {
         crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template_photograph_model
                             .eq(&self.procedure_template_photograph_model),
@@ -579,7 +579,7 @@ impl InsertablePhotographProcedure {
         crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template_photographed_with_model
                             .eq(&self.procedure_template_photographed_with_model),
@@ -613,7 +613,7 @@ impl InsertablePhotographProcedure {
 ///    .procedure_photograph(procedure_photograph)?
 ///    .procedure_photographed_asset(procedure_photographed_asset)?
 ///    .procedure_photographed_with(procedure_photographed_with)?
-///    .procedure_template(procedure_template)?
+///    .procedure_template(procedure_template_id)?
 ///    .created_by(created_by)?
 ///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
@@ -1040,7 +1040,7 @@ where
                     attribute.into(),
                 ))
             })?;
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     ///Sets the value of the `public.photograph_procedures.photographed_asset` column.
@@ -1146,8 +1146,8 @@ where
     where
         PTPAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_photographed_asset_model = <PTPAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &procedure_template_photographed_asset_model,
+        let procedure_template_photographed_asset_model_id = <PTPAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_photographed_asset_model_id,
         );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_photographed_asset,
@@ -1155,7 +1155,7 @@ where
         {
             self.procedure_photographed_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_photographed_asset,
-                    procedure_template_photographed_asset_model,
+                    procedure_template_photographed_asset_model_id,
                 )
                 .map_err(|e| {
                     e.replace_field_name(|attribute| {
@@ -1166,8 +1166,8 @@ where
                 })?
                 .into();
         }
-        self.procedure_template_photographed_asset_model = Some(
-            procedure_template_photographed_asset_model,
+        self.procedure_template_photographed_asset_model_id = Some(
+            procedure_template_photographed_asset_model_id,
         );
         Ok(self)
     }
@@ -1259,11 +1259,11 @@ where
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_photographed_asset {
             procedure_photographed_asset = if let (
-                Some(procedure_template_photographed_asset_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_photographed_asset_model_id),
+                Some(procedure_template_asset_model_id),
             ) = (
-                self.procedure_template_photographed_asset_model,
-                builder.procedure_template_asset_model,
+                self.procedure_template_photographed_asset_model_id,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_photographed_asset_model
                     != procedure_template_asset_model
@@ -1277,19 +1277,19 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
-                self.procedure_template_photographed_asset_model = Some(
-                    procedure_template_asset_model,
+                self.procedure_template_photographed_asset_model_id = Some(
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
-            } else if let Some(procedure_template_photographed_asset_model) = self
+            } else if let Some(procedure_template_photographed_asset_model_id) = self
                 .procedure_template_photographed_asset_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
-                        procedure_template_photographed_asset_model,
+                        procedure_template_photographed_asset_model_id,
                     )
                     .map_err(|e| {
                         e.replace_field_name(|attribute| {
@@ -1523,10 +1523,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_photographed_with {
             procedure_photographed_with = if let (
                 Some(procedure_template_photographed_with_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_photographed_with_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_photographed_with_model
                     != procedure_template_asset_model
@@ -1540,11 +1540,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_photographed_with_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_photographed_with_model) = self
@@ -1781,10 +1781,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_photograph {
             procedure_photograph = if let (
                 Some(procedure_template_photograph_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_photograph_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_photograph_model != procedure_template_asset_model
                 {
@@ -1797,11 +1797,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_photograph_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_photograph_model) = self

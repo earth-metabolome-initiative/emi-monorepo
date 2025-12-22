@@ -60,12 +60,14 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadModel(self.bead_model),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadModel(
+                self.bead_model_id,
+            ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
-                self.bead_model,
-                self.milled_container_model,
+                self.bead_model_id,
+                self.milled_container_model_id,
             )),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -75,7 +77,7 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::VolumetricContainerModel(
-                self.milled_container_model,
+                self.milled_container_model_id,
             ),
         ));
         if let Some(milled_with) = self.milled_with {
@@ -87,19 +89,19 @@ impl web_common_traits::prelude::HasForeignKeys
         }
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
-                self.milled_with_model,
-                self.bead_model,
+                self.milled_with_model_id,
+                self.bead_model_id,
             )),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::BallMillMachineModel(
-                self.milled_with_model,
+                self.milled_with_model_id,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetCompatibilityRule((
-                self.milled_with_model,
-                self.milled_container_model,
+                self.milled_with_model_id,
+                self.milled_container_model_id,
             )),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -124,7 +126,7 @@ impl web_common_traits::prelude::HasForeignKeys
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_bead_model,
+                        self.procedure_template_bead_model_id,
                     ),
                 ),
             );
@@ -137,7 +139,7 @@ impl web_common_traits::prelude::HasForeignKeys
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_milled_container_model,
+                        self.procedure_template_milled_container_model_id,
                     ),
                 ),
             );
@@ -145,7 +147,7 @@ impl web_common_traits::prelude::HasForeignKeys
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_milled_with_model,
+                        self.procedure_template_milled_with_model_id,
                     ),
                 ),
             );
@@ -184,22 +186,22 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.bead_model == asset_compatibility_rules.left_asset_model
-                    && self.milled_container_model == asset_compatibility_rules.right_asset_model
+                if self.bead_model_id == asset_compatibility_rules.left_asset_model
+                    && self.milled_container_model_id == asset_compatibility_rules.right_asset_model
                 {
                     foreign_keys.ball_mill_procedures_bead_model_milled_container_model_fkey =
                         Some(asset_compatibility_rules);
                     updated = true;
                 }
-                if self.milled_with_model == asset_compatibility_rules.left_asset_model
-                    && self.bead_model == asset_compatibility_rules.right_asset_model
+                if self.milled_with_model_id == asset_compatibility_rules.left_asset_model
+                    && self.bead_model_id == asset_compatibility_rules.right_asset_model
                 {
                     foreign_keys.ball_mill_procedures_milled_with_model_bead_model_fkey =
                         Some(asset_compatibility_rules);
                     updated = true;
                 }
-                if self.milled_with_model == asset_compatibility_rules.left_asset_model
-                    && self.milled_container_model == asset_compatibility_rules.right_asset_model
+                if self.milled_with_model_id == asset_compatibility_rules.left_asset_model
+                    && self.milled_container_model_id == asset_compatibility_rules.right_asset_model
                 {
                     foreign_keys.ball_mill_procedures_milled_with_model_milled_container_mo_fkey =
                         Some(asset_compatibility_rules);
@@ -210,20 +212,20 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::AssetCompatibilityRule(asset_compatibility_rules),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.bead_model == asset_compatibility_rules.left_asset_model
-                    && self.milled_container_model == asset_compatibility_rules.right_asset_model
+                if self.bead_model_id == asset_compatibility_rules.left_asset_model
+                    && self.milled_container_model_id == asset_compatibility_rules.right_asset_model
                 {
                     foreign_keys.ball_mill_procedures_bead_model_milled_container_model_fkey = None;
                     updated = true;
                 }
-                if self.milled_with_model == asset_compatibility_rules.left_asset_model
-                    && self.bead_model == asset_compatibility_rules.right_asset_model
+                if self.milled_with_model_id == asset_compatibility_rules.left_asset_model
+                    && self.bead_model_id == asset_compatibility_rules.right_asset_model
                 {
                     foreign_keys.ball_mill_procedures_milled_with_model_bead_model_fkey = None;
                     updated = true;
                 }
-                if self.milled_with_model == asset_compatibility_rules.left_asset_model
-                    && self.milled_container_model == asset_compatibility_rules.right_asset_model
+                if self.milled_with_model_id == asset_compatibility_rules.left_asset_model
+                    && self.milled_container_model_id == asset_compatibility_rules.right_asset_model
                 {
                     foreign_keys.ball_mill_procedures_milled_with_model_milled_container_mo_fkey =
                         None;
@@ -236,8 +238,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.milled_with_model == ball_mill_machine_models.id {
-                    foreign_keys.milled_with_model = Some(ball_mill_machine_models);
+                if self.milled_with_model_id == ball_mill_machine_models.id {
+                    foreign_keys.milled_with_model_id = Some(ball_mill_machine_models);
                     updated = true;
                 }
             }
@@ -245,8 +247,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::BallMillMachineModel(ball_mill_machine_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.milled_with_model == ball_mill_machine_models.id {
-                    foreign_keys.milled_with_model = None;
+                if self.milled_with_model_id == ball_mill_machine_models.id {
+                    foreign_keys.milled_with_model_id = None;
                     updated = true;
                 }
             }
@@ -302,8 +304,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.bead_model == bead_models.id {
-                    foreign_keys.bead_model = Some(bead_models);
+                if self.bead_model_id == bead_models.id {
+                    foreign_keys.bead_model_id = Some(bead_models);
                     updated = true;
                 }
             }
@@ -311,8 +313,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::BeadModel(bead_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.bead_model == bead_models.id {
-                    foreign_keys.bead_model = None;
+                if self.bead_model_id == bead_models.id {
+                    foreign_keys.bead_model_id = None;
                     updated = true;
                 }
             }
@@ -360,20 +362,22 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_template_bead_model == procedure_template_asset_models.id {
-                    foreign_keys.procedure_template_bead_model =
+                if self.procedure_template_bead_model_id == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_bead_model_id =
                         Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
                 if self.procedure_template_milled_container_model
                     == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_milled_container_model =
+                    foreign_keys.procedure_template_milled_container_model_id =
                         Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
-                if self.procedure_template_milled_with_model == procedure_template_asset_models.id {
-                    foreign_keys.procedure_template_milled_with_model =
+                if self.procedure_template_milled_with_model_id
+                    == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_milled_with_model_id =
                         Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
@@ -384,18 +388,20 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_template_bead_model == procedure_template_asset_models.id {
-                    foreign_keys.procedure_template_bead_model = None;
+                if self.procedure_template_bead_model_id == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_bead_model_id = None;
                     updated = true;
                 }
                 if self.procedure_template_milled_container_model
                     == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_milled_container_model = None;
+                    foreign_keys.procedure_template_milled_container_model_id = None;
                     updated = true;
                 }
-                if self.procedure_template_milled_with_model == procedure_template_asset_models.id {
-                    foreign_keys.procedure_template_milled_with_model = None;
+                if self.procedure_template_milled_with_model_id
+                    == procedure_template_asset_models.id
+                {
+                    foreign_keys.procedure_template_milled_with_model_id = None;
                     updated = true;
                 }
             }
@@ -427,8 +433,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.milled_container_model == volumetric_container_models.id {
-                    foreign_keys.milled_container_model = Some(volumetric_container_models);
+                if self.milled_container_model_id == volumetric_container_models.id {
+                    foreign_keys.milled_container_model_id = Some(volumetric_container_models);
                     updated = true;
                 }
             }
@@ -438,8 +444,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.milled_container_model == volumetric_container_models.id {
-                    foreign_keys.milled_container_model = None;
+                if self.milled_container_model_id == volumetric_container_models.id {
+                    foreign_keys.milled_container_model_id = None;
                     updated = true;
                 }
             }

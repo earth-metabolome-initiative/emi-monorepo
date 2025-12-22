@@ -502,7 +502,7 @@ impl InsertableSupernatantProcedure {
         crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_supernatant_destination_model
                             .eq(&self.procedure_template_supernatant_destination_model),
@@ -526,7 +526,7 @@ impl InsertableSupernatantProcedure {
         crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_transferred_with_model
                             .eq(&self.procedure_template_transferred_with_model),
@@ -550,7 +550,7 @@ impl InsertableSupernatantProcedure {
         crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_pipette_tip_model
                             .eq(&self.procedure_template_pipette_tip_model),
@@ -574,7 +574,7 @@ impl InsertableSupernatantProcedure {
         crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_stratified_source_model
                             .eq(&self.procedure_template_stratified_source_model),
@@ -844,7 +844,7 @@ impl InsertableSupernatantProcedure {
 ///    .procedure_pipette_tip(procedure_pipette_tip)?
 ///    .procedure_stratified_source(procedure_stratified_source)?
 ///    .procedure_supernatant_destination(procedure_supernatant_destination)?
-///    .procedure_template(procedure_template)?
+///    .procedure_template(procedure_template_id)?
 ///    .procedure_transferred_with(procedure_transferred_with)?
 ///    // Optionally set fields with default values
 ///    .created_at(created_at)?
@@ -1396,7 +1396,7 @@ where
                     attribute.into(),
                 ))
             })?;
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     ///Sets the value of the `public.supernatant_procedures.stratified_source` column.
@@ -1581,10 +1581,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stratified_source {
             procedure_stratified_source = if let (
                 Some(procedure_template_stratified_source_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_stratified_source_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_stratified_source_model
                     != procedure_template_asset_model
@@ -1598,11 +1598,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_stratified_source_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_stratified_source_model) = self
@@ -1845,10 +1845,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_supernatant_destination {
             procedure_supernatant_destination = if let (
                 Some(procedure_template_supernatant_destination_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_supernatant_destination_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_supernatant_destination_model
                     != procedure_template_asset_model
@@ -1862,11 +1862,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_supernatant_destination_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_supernatant_destination_model) = self
@@ -2178,10 +2178,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_transferred_with {
             procedure_transferred_with = if let (
                 Some(procedure_template_transferred_with_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_transferred_with_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_transferred_with_model
                     != procedure_template_asset_model
@@ -2195,11 +2195,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_transferred_with_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_transferred_with_model) = self
@@ -2224,9 +2224,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_transferred_with {
             procedure_transferred_with = if let (
                 Some(transferred_with_model),
-                Some(asset_model),
-            ) = (self.transferred_with_model, builder.asset_model) {
-                if transferred_with_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.transferred_with_model, builder.asset_model_id) {
+                if transferred_with_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -2236,8 +2236,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.transferred_with_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.transferred_with_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(transferred_with_model) = self.transferred_with_model {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
@@ -2498,9 +2498,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_pipette_tip {
             procedure_pipette_tip = if let (
                 Some(pipette_tip_model),
-                Some(asset_model),
-            ) = (self.pipette_tip_model, builder.asset_model) {
-                if pipette_tip_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.pipette_tip_model, builder.asset_model_id) {
+                if pipette_tip_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -2510,8 +2510,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.pipette_tip_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.pipette_tip_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(pipette_tip_model) = self.pipette_tip_model {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
@@ -2533,9 +2533,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_pipette_tip {
             procedure_pipette_tip = if let (
                 Some(pipette_tip_model),
-                Some(asset_model),
-            ) = (self.pipette_tip_model, builder.asset_model) {
-                if pipette_tip_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.pipette_tip_model, builder.asset_model_id) {
+                if pipette_tip_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -2545,8 +2545,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.pipette_tip_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.pipette_tip_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(pipette_tip_model) = self.pipette_tip_model {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
@@ -2568,10 +2568,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_pipette_tip {
             procedure_pipette_tip = if let (
                 Some(procedure_template_pipette_tip_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_pipette_tip_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_pipette_tip_model != procedure_template_asset_model
                 {
@@ -2584,11 +2584,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_pipette_tip_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_pipette_tip_model) = self

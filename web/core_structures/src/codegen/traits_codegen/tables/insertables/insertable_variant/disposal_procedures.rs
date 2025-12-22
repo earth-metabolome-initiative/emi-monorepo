@@ -116,14 +116,14 @@ where
         use web_common_traits::database::FromExtension;
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
-        if let Some(procedure_template) = self.procedure_template {
+        if let Some(procedure_template_id) = self.procedure_template {
             let disposal_procedure_templates = crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate::read(
                 procedure_template,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable>::procedure_template_disposed_asset_model(
                 self,
-                disposal_procedure_templates.procedure_template_disposed_asset_model,
+                disposal_procedure_templates.procedure_template_disposed_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_disposed_asset) = self
@@ -139,7 +139,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::DisposalProcedureSettable>::procedure_template_disposed_asset_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
         }
         let procedure_template = self
@@ -149,7 +149,7 @@ where
                     crate::codegen::structs_codegen::tables::insertables::DisposalProcedureAttribute::ProcedureTemplate,
                 ),
             )?;
-        let procedure_template_disposed_asset_model = self
+        let procedure_template_disposed_asset_model_id = self
             .procedure_template_disposed_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -187,7 +187,7 @@ where
             procedure,
             procedure_template,
             disposed_asset: self.disposed_asset,
-            procedure_template_disposed_asset_model,
+            procedure_template_disposed_asset_model_id,
             procedure_disposed_asset,
         })
     }

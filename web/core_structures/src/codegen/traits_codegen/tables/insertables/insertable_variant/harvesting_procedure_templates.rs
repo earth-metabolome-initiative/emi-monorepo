@@ -124,7 +124,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::HarvestingProcedureTemplateSettable>::sample_source_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         if let Some(sample_model) = self.sample_model {
@@ -147,7 +147,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::HarvestingProcedureTemplateSettable>::sample_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         let sample_source_model = self

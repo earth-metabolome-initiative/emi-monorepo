@@ -112,42 +112,42 @@ where
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
         if let web_common_traits::database::IdOrBuilder::Id(
-            procedure_template_bead_model,
+            procedure_template_bead_model_id,
         ) = self.procedure_template_bead_model
         {
             let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-                procedure_template_bead_model,
+                procedure_template_bead_model_id,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateSettable>::bead_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
-            procedure_template_milled_with_model,
+            procedure_template_milled_with_model_id,
         ) = self.procedure_template_milled_with_model
         {
             let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-                procedure_template_milled_with_model,
+                procedure_template_milled_with_model_id,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateSettable>::milled_with_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
-            procedure_template_milled_container_model,
+            procedure_template_milled_container_model_id,
         ) = self.procedure_template_milled_container_model
         {
             let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-                procedure_template_milled_container_model,
+                procedure_template_milled_container_model_id,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateSettable>::milled_container_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         let kelvin = self
@@ -178,7 +178,7 @@ where
                     crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::Hertz,
                 ),
             )?;
-        let bead_model = self
+        let bead_model_id = self
             .bead_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -192,14 +192,14 @@ where
                     crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::NumberOfBeads,
                 ),
             )?;
-        let milled_with_model = self
+        let milled_with_model_id = self
             .milled_with_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     crate::codegen::structs_codegen::tables::insertables::BallMillProcedureTemplateAttribute::MilledWithModel,
                 ),
             )?;
-        let milled_container_model = self
+        let milled_container_model_id = self
             .milled_container_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -210,13 +210,13 @@ where
             .procedure_template
             .mint_primary_key(user_id, conn)
             .map_err(Self::Error::from_extension)?;
-        let procedure_template_bead_model = match self.procedure_template_bead_model {
+        let procedure_template_bead_model_id = match self.procedure_template_bead_model_id {
             web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
-                mut procedure_template_bead_model,
+                mut procedure_template_bead_model_id,
             ) => {
-                procedure_template_bead_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
-                        procedure_template_bead_model,
+                procedure_template_bead_model_id = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_bead_model_id,
                         procedure_template,
                     )
                     .map_err(|err| {
@@ -233,15 +233,15 @@ where
                     })?
             }
         };
-        let procedure_template_milled_with_model = match self
+        let procedure_template_milled_with_model_id = match self
             .procedure_template_milled_with_model
         {
             web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
-                mut procedure_template_milled_with_model,
+                mut procedure_template_milled_with_model_id,
             ) => {
-                procedure_template_milled_with_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
-                        procedure_template_milled_with_model,
+                procedure_template_milled_with_model_id = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_milled_with_model_id,
                         procedure_template,
                     )
                     .map_err(|err| {
@@ -258,15 +258,15 @@ where
                     })?
             }
         };
-        let procedure_template_milled_container_model = match self
+        let procedure_template_milled_container_model_id = match self
             .procedure_template_milled_container_model
         {
             web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
-                mut procedure_template_milled_container_model,
+                mut procedure_template_milled_container_model_id,
             ) => {
-                procedure_template_milled_container_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
-                        procedure_template_milled_container_model,
+                procedure_template_milled_container_model_id = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_milled_container_model_id,
                         procedure_template,
                     )
                     .map_err(|err| {
@@ -289,13 +289,13 @@ where
             kelvin_tolerance_percentage,
             seconds,
             hertz,
-            bead_model,
-            procedure_template_bead_model,
+            bead_model_id,
+            procedure_template_bead_model_id,
             number_of_beads,
-            milled_with_model,
-            procedure_template_milled_with_model,
-            milled_container_model,
-            procedure_template_milled_container_model,
+            milled_with_model_id,
+            procedure_template_milled_with_model_id,
+            milled_container_model_id,
+            procedure_template_milled_container_model_id,
         })
     }
 }

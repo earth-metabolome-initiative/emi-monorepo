@@ -13,7 +13,7 @@ for crate::codegen::structs_codegen::tables::capping_procedure_templates::Cappin
         use crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_template)
+            .on_conflict(procedure_template_id)
             .do_update()
             .set(self)
             .filter(
@@ -48,7 +48,7 @@ for crate::codegen::structs_codegen::tables::capping_procedure_templates::Cappin
         use crate::codegen::diesel_codegen::tables::capping_procedure_templates::capping_procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_template)
+            .on_conflict(procedure_template_id)
             .do_update()
             .set(self)
             .filter(

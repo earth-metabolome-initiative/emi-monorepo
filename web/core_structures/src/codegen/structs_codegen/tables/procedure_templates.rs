@@ -8,7 +8,7 @@
     diesel::Identifiable,
 )]
 #[cfg_attr(feature = "yew", derive(yew::prelude::Properties))]
-#[diesel(primary_key(procedure_template))]
+#[diesel(primary_key(procedure_template_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates
 )]
@@ -33,7 +33,7 @@ impl<'a> From<&'a ProcedureTemplate>
     >
 {
     fn from(value: &'a ProcedureTemplate) -> Self {
-        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template_id)
     }
 }
 impl

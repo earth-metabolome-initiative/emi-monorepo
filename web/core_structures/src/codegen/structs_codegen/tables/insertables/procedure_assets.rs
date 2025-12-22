@@ -108,7 +108,7 @@ impl InsertableProcedureAsset {
             .filter(
                 crate::codegen::diesel_codegen::tables::assets::assets::dsl::id.eq(asset).and(
                     crate::codegen::diesel_codegen::tables::assets::assets::dsl::model
-                        .eq(&self.asset_model),
+                        .eq(&self.asset_model_id),
                 ),
             )
             .first::<crate::codegen::structs_codegen::tables::assets::Asset>(conn)
@@ -142,7 +142,7 @@ impl InsertableProcedureAsset {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor::read(
-            (self.asset_model, self.ancestor_model),
+            (self.asset_model_id, self.ancestor_model),
             conn,
         )
     }
@@ -159,7 +159,7 @@ impl InsertableProcedureAsset {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
-            self.asset_model,
+            self.asset_model_id,
             conn,
         )
     }
@@ -189,7 +189,7 @@ impl InsertableProcedureAsset {
                     .eq(&self.procedure)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
-                            .eq(&self.procedure_template),
+                            .eq(&self.procedure_template_id),
                     ),
             )
             .first::<
@@ -210,7 +210,7 @@ impl InsertableProcedureAsset {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_asset_model)
+                    .eq(&self.procedure_template_asset_model_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
                             .eq(&self.ancestor_model),
@@ -234,7 +234,7 @@ impl InsertableProcedureAsset {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_asset_model,
+            self.procedure_template_asset_model_id,
             conn,
         )
     }
@@ -252,10 +252,10 @@ impl InsertableProcedureAsset {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_asset_model)
+                    .eq(&self.procedure_template_asset_model_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::procedure_template
-                            .eq(&self.procedure_template),
+                            .eq(&self.procedure_template_id),
                     ),
             )
             .first::<
@@ -300,7 +300,7 @@ impl InsertableProcedureAsset {
 /// let procedure_asset = ProcedureAsset::new()
 ///    // Set mandatory fields
 ///    .procedure(procedure)?
-///    .procedure_template_asset_model(procedure_template_asset_model)?
+///    .procedure_template_asset_model(procedure_template_asset_model_id)?
 ///    // Optionally set fields with default values
 ///    .id(id)?
 ///    // Optionally set optional fields
@@ -581,7 +581,7 @@ where
         let procedure_template = <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(
             &procedure_template,
         );
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     ///Sets the value of the `public.procedure_assets.asset_model` column.
@@ -589,10 +589,10 @@ where
     where
         AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let asset_model = <AM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &asset_model,
+        let asset_model_id = <AM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &asset_model_id,
         );
-        self.asset_model = Some(asset_model);
+        self.asset_model_id = Some(asset_model_id);
         Ok(self)
     }
     ///Sets the value of the `public.procedure_assets.asset` column.
@@ -653,10 +653,10 @@ where
     where
         PTAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_asset_model = <PTAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &procedure_template_asset_model,
+        let procedure_template_asset_model_id = <PTAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_asset_model_id,
         );
-        self.procedure_template_asset_model = Some(procedure_template_asset_model);
+        self.procedure_template_asset_model_id = Some(procedure_template_asset_model_id);
         Ok(self)
     }
     ///Sets the value of the `public.procedure_assets.ancestor_model` column.

@@ -27,7 +27,7 @@
         foreign_key = milled_with_model
     )
 )]
-#[diesel(primary_key(procedure_template))]
+#[diesel(primary_key(procedure_template_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates
 )]
@@ -54,7 +54,7 @@ for web_common_traits::database::IdOrBuilder<
     crate::codegen::structs_codegen::tables::insertables::InsertableBallMillProcedureTemplateBuilder,
 > {
     fn from(value: &'a BallMillProcedureTemplate) -> Self {
-        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template_id)
     }
 }
 impl
@@ -98,10 +98,10 @@ impl BallMillProcedureTemplate {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_bead_model)
+                    .eq(&self.procedure_template_bead_model_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
-                            .eq(&self.bead_model),
+                            .eq(&self.bead_model_id),
                     ),
             )
             .first::<
@@ -122,10 +122,10 @@ impl BallMillProcedureTemplate {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_milled_container_model)
+                    .eq(&self.procedure_template_milled_container_model_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
-                            .eq(&self.milled_container_model),
+                            .eq(&self.milled_container_model_id),
                     ),
             )
             .first::<
@@ -146,10 +146,10 @@ impl BallMillProcedureTemplate {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_milled_with_model)
+                    .eq(&self.procedure_template_milled_with_model_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
-                            .eq(&self.milled_with_model),
+                            .eq(&self.milled_with_model_id),
                     ),
             )
             .first::<
@@ -168,7 +168,10 @@ impl BallMillProcedureTemplate {
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::bead_models::BeadModel::read(self.bead_model, conn)
+        crate::codegen::structs_codegen::tables::bead_models::BeadModel::read(
+            self.bead_model_id,
+            conn,
+        )
     }
     pub fn ball_mill_procedure_templates_bead_model_milled_container_fkey<
         C: diesel::connection::LoadConnection,
@@ -185,7 +188,7 @@ impl BallMillProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
-            (self.bead_model, self.milled_container_model),
+            (self.bead_model_id, self.milled_container_model_id),
             conn,
         )
     }
@@ -203,7 +206,7 @@ impl BallMillProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::volumetric_container_models::VolumetricContainerModel::read(
-            self.milled_container_model,
+            self.milled_container_model_id,
             conn,
         )
     }
@@ -222,7 +225,7 @@ impl BallMillProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
-            (self.milled_with_model, self.bead_model),
+            (self.milled_with_model_id, self.bead_model_id),
             conn,
         )
     }
@@ -239,7 +242,7 @@ impl BallMillProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::ball_mill_machine_models::BallMillMachineModel::read(
-            self.milled_with_model,
+            self.milled_with_model_id,
             conn,
         )
     }
@@ -258,7 +261,7 @@ impl BallMillProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule::read(
-            (self.milled_with_model, self.milled_container_model),
+            (self.milled_with_model_id, self.milled_container_model_id),
             conn,
         )
     }
@@ -276,7 +279,7 @@ impl BallMillProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_bead_model,
+            self.procedure_template_bead_model_id,
             conn,
         )
     }
@@ -296,7 +299,7 @@ impl BallMillProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_milled_container_model,
+            self.procedure_template_milled_container_model_id,
             conn,
         )
     }
@@ -314,7 +317,7 @@ impl BallMillProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_milled_with_model,
+            self.procedure_template_milled_with_model_id,
             conn,
         )
     }
@@ -332,8 +335,8 @@ impl BallMillProcedureTemplate {
         Self::table()
             .filter(
                 ball_mill_procedure_templates::procedure_template_bead_model
-                    .eq(procedure_template_bead_model)
-                    .and(ball_mill_procedure_templates::bead_model.eq(bead_model)),
+                    .eq(procedure_template_bead_model_id)
+                    .and(ball_mill_procedure_templates::bead_model.eq(bead_model_id)),
             )
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
@@ -352,10 +355,10 @@ impl BallMillProcedureTemplate {
         Self::table()
             .filter(
                 ball_mill_procedure_templates::procedure_template_milled_container_model
-                    .eq(procedure_template_milled_container_model)
+                    .eq(procedure_template_milled_container_model_id)
                     .and(
                         ball_mill_procedure_templates::milled_container_model
-                            .eq(milled_container_model),
+                            .eq(milled_container_model_id),
                     ),
             )
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
@@ -375,8 +378,8 @@ impl BallMillProcedureTemplate {
         Self::table()
             .filter(
                 ball_mill_procedure_templates::procedure_template_milled_with_model
-                    .eq(procedure_template_milled_with_model)
-                    .and(ball_mill_procedure_templates::milled_with_model.eq(milled_with_model)),
+                    .eq(procedure_template_milled_with_model_id)
+                    .and(ball_mill_procedure_templates::milled_with_model.eq(milled_with_model_id)),
             )
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
@@ -393,8 +396,8 @@ impl BallMillProcedureTemplate {
 
         use crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates;
         Self::table()
-            .filter(ball_mill_procedure_templates::bead_model.eq(bead_model).and(
-                ball_mill_procedure_templates::milled_container_model.eq(milled_container_model),
+            .filter(ball_mill_procedure_templates::bead_model.eq(bead_model_id).and(
+                ball_mill_procedure_templates::milled_container_model.eq(milled_container_model_id),
             ))
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
@@ -413,8 +416,8 @@ impl BallMillProcedureTemplate {
         Self::table()
             .filter(
                 ball_mill_procedure_templates::milled_with_model
-                    .eq(milled_with_model)
-                    .and(ball_mill_procedure_templates::bead_model.eq(bead_model)),
+                    .eq(milled_with_model_id)
+                    .and(ball_mill_procedure_templates::bead_model.eq(bead_model_id)),
             )
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
@@ -431,8 +434,8 @@ impl BallMillProcedureTemplate {
 
         use crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates;
         Self::table()
-            .filter(ball_mill_procedure_templates::milled_with_model.eq(milled_with_model).and(
-                ball_mill_procedure_templates::milled_container_model.eq(milled_container_model),
+            .filter(ball_mill_procedure_templates::milled_with_model.eq(milled_with_model_id).and(
+                ball_mill_procedure_templates::milled_container_model.eq(milled_container_model_id),
             ))
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
@@ -444,12 +447,12 @@ impl BallMillProcedureTemplate {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_bead_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_bead_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_bead_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_bead_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
@@ -458,7 +461,7 @@ impl BallMillProcedureTemplate {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_bead_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_bead_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
@@ -474,7 +477,7 @@ impl BallMillProcedureTemplate {
         Self::table()
             .filter(
                 ball_mill_procedure_templates::procedure_template_bead_model
-                    .eq(procedure_template_bead_model),
+                    .eq(procedure_template_bead_model_id),
             )
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
@@ -486,12 +489,12 @@ impl BallMillProcedureTemplate {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_milled_container_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_milled_container_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_milled_container_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_milled_container_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
@@ -500,7 +503,7 @@ impl BallMillProcedureTemplate {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_milled_container_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_milled_container_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
@@ -516,7 +519,7 @@ impl BallMillProcedureTemplate {
         Self::table()
             .filter(
                 ball_mill_procedure_templates::procedure_template_milled_container_model
-                    .eq(procedure_template_milled_container_model),
+                    .eq(procedure_template_milled_container_model_id),
             )
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
@@ -528,12 +531,12 @@ impl BallMillProcedureTemplate {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_milled_with_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_milled_with_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_milled_with_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_milled_with_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
@@ -542,7 +545,7 @@ impl BallMillProcedureTemplate {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_milled_with_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::ball_mill_procedure_templates::ball_mill_procedure_templates::procedure_template_milled_with_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
@@ -558,7 +561,7 @@ impl BallMillProcedureTemplate {
         Self::table()
             .filter(
                 ball_mill_procedure_templates::procedure_template_milled_with_model
-                    .eq(procedure_template_milled_with_model),
+                    .eq(procedure_template_milled_with_model_id),
             )
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
@@ -619,7 +622,7 @@ impl BallMillProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(ball_mill_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::name.eq(name))
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
@@ -643,7 +646,7 @@ impl BallMillProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(ball_mill_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::description.eq(description))
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
@@ -667,7 +670,7 @@ impl BallMillProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(ball_mill_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::created_by.eq(created_by))
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
@@ -691,7 +694,7 @@ impl BallMillProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(ball_mill_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::updated_by.eq(updated_by))
             .order_by(ball_mill_procedure_templates::procedure_template.asc())
@@ -715,7 +718,7 @@ impl BallMillProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(ball_mill_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::deprecated.eq(deprecated))
             .order_by(ball_mill_procedure_templates::procedure_template.asc())

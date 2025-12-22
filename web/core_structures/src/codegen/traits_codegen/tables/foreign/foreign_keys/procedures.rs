@@ -44,15 +44,15 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
             ));
         }
-        if let Some(parent_procedure_template) = self.parent_procedure_template {
+        if let Some(parent_procedure_template_id) = self.parent_procedure_template {
             connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
                     parent_procedure_template,
                 ),
             ));
         }
-        if let (Some(parent_procedure_template), Some(predecessor_procedure_template)) =
-            (self.parent_procedure_template, self.predecessor_procedure_template)
+        if let (Some(parent_procedure_template_id), Some(predecessor_procedure_template_id)) =
+            (self.parent_procedure_template, self.predecessor_procedure_template_id)
         {
             connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::NextProcedureTemplate(
@@ -64,7 +64,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
             ));
         }
-        if let Some(parent_procedure_template) = self.parent_procedure_template {
+        if let Some(parent_procedure_template_id) = self.parent_procedure_template {
             connector
                 .send(
                     web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -82,7 +82,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
             ));
         }
-        if let Some(predecessor_procedure_template) = self.predecessor_procedure_template {
+        if let Some(predecessor_procedure_template_id) = self.predecessor_procedure_template {
             connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplate(
                     predecessor_procedure_template,

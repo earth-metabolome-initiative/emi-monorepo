@@ -542,7 +542,7 @@ impl InsertableCentrifugeProcedure {
         crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::centrifuge_procedure_templates::centrifuge_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::centrifuge_procedure_templates::centrifuge_procedure_templates::dsl::procedure_template_centrifuged_with_model
                             .eq(&self.procedure_template_centrifuged_with_model),
@@ -566,7 +566,7 @@ impl InsertableCentrifugeProcedure {
         crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::centrifuge_procedure_templates::centrifuge_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::centrifuge_procedure_templates::centrifuge_procedure_templates::dsl::procedure_template_centrifuged_container_model
                             .eq(&self.procedure_template_centrifuged_container_model),
@@ -599,7 +599,7 @@ impl InsertableCentrifugeProcedure {
 ///    // Set mandatory fields
 ///    .procedure_centrifuged_container(procedure_centrifuged_container)?
 ///    .procedure_centrifuged_with(procedure_centrifuged_with)?
-///    .procedure_template(procedure_template)?
+///    .procedure_template(procedure_template_id)?
 ///    .created_by(created_by)?
 ///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
@@ -987,7 +987,7 @@ where
                     attribute.into(),
                 ))
             })?;
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     ///Sets the value of the `public.centrifuge_procedures.centrifuged_container` column.
@@ -1280,9 +1280,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_centrifuged_container {
             procedure_centrifuged_container = if let (
                 Some(centrifuged_container_model),
-                Some(asset_model),
-            ) = (self.centrifuged_container_model, builder.asset_model) {
-                if centrifuged_container_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.centrifuged_container_model, builder.asset_model_id) {
+                if centrifuged_container_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -1292,8 +1292,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.centrifuged_container_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.centrifuged_container_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(centrifuged_container_model) = self
                 .centrifuged_container_model
@@ -1317,10 +1317,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_centrifuged_container {
             procedure_centrifuged_container = if let (
                 Some(procedure_template_centrifuged_container_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_centrifuged_container_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_centrifuged_container_model
                     != procedure_template_asset_model
@@ -1334,11 +1334,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_centrifuged_container_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_centrifuged_container_model) = self
@@ -1659,9 +1659,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_centrifuged_with {
             procedure_centrifuged_with = if let (
                 Some(centrifuged_with_model),
-                Some(asset_model),
-            ) = (self.centrifuged_with_model, builder.asset_model) {
-                if centrifuged_with_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.centrifuged_with_model, builder.asset_model_id) {
+                if centrifuged_with_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -1671,8 +1671,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.centrifuged_with_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.centrifuged_with_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(centrifuged_with_model) = self.centrifuged_with_model {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
@@ -1694,10 +1694,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_centrifuged_with {
             procedure_centrifuged_with = if let (
                 Some(procedure_template_centrifuged_with_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_centrifuged_with_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_centrifuged_with_model
                     != procedure_template_asset_model
@@ -1711,11 +1711,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_centrifuged_with_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_centrifuged_with_model) = self

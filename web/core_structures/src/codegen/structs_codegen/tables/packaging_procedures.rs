@@ -324,7 +324,7 @@ impl PackagingProcedure {
         crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::dsl::procedure_template_sample_model
                             .eq(&self.procedure_template_sample_model),
@@ -348,7 +348,7 @@ impl PackagingProcedure {
         crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates::dsl::procedure_template_packaged_with_model
                             .eq(&self.procedure_template_packaged_with_model),
@@ -645,7 +645,7 @@ impl PackagingProcedure {
 
         use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
         Self::table()
-            .filter(packaging_procedures::procedure_template.eq(procedure_template))
+            .filter(packaging_procedures::procedure_template.eq(procedure_template_id))
             .order_by(packaging_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -704,7 +704,7 @@ impl PackagingProcedure {
         use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
         Self::table()
             .filter(
-                packaging_procedures::procedure_template.eq(procedure_template).and(
+                packaging_procedures::procedure_template.eq(procedure_template_id).and(
                     packaging_procedures::procedure_template_sample_model
                         .eq(procedure_template_sample_model),
                 ),
@@ -725,7 +725,7 @@ impl PackagingProcedure {
         use crate::codegen::diesel_codegen::tables::packaging_procedures::packaging_procedures;
         Self::table()
             .filter(
-                packaging_procedures::procedure_template.eq(procedure_template).and(
+                packaging_procedures::procedure_template.eq(procedure_template_id).and(
                     packaging_procedures::procedure_template_packaged_with_model
                         .eq(procedure_template_packaged_with_model),
                 ),
@@ -814,7 +814,7 @@ impl PackagingProcedure {
             .inner_join(
                 procedures::table.on(packaging_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(packaging_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -858,7 +858,9 @@ impl PackagingProcedure {
             .inner_join(
                 procedures::table.on(packaging_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(packaging_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

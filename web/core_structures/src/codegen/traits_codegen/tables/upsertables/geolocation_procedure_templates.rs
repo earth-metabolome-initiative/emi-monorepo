@@ -13,7 +13,7 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
         use crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_template)
+            .on_conflict(procedure_template_id)
             .do_update()
             .set(self)
             .filter(
@@ -23,10 +23,10 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                         procedure_template_geolocated_with_model
                             .ne(excluded(procedure_template_geolocated_with_model)),
                     )
-                    .or(geolocated_asset_model.ne(excluded(geolocated_asset_model)))
+                    .or(geolocated_asset_model.ne(excluded(geolocated_asset_model_id)))
                     .or(
                         procedure_template_geolocated_asset_model
-                            .ne(excluded(procedure_template_geolocated_asset_model)),
+                            .ne(excluded(procedure_template_geolocated_asset_model_id)),
                     ),
             )
             .get_results(conn)
@@ -48,7 +48,7 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
         use crate::codegen::diesel_codegen::tables::geolocation_procedure_templates::geolocation_procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_template)
+            .on_conflict(procedure_template_id)
             .do_update()
             .set(self)
             .filter(
@@ -58,10 +58,10 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                         procedure_template_geolocated_with_model
                             .ne(excluded(procedure_template_geolocated_with_model)),
                     )
-                    .or(geolocated_asset_model.ne(excluded(geolocated_asset_model)))
+                    .or(geolocated_asset_model.ne(excluded(geolocated_asset_model_id)))
                     .or(
                         procedure_template_geolocated_asset_model
-                            .ne(excluded(procedure_template_geolocated_asset_model)),
+                            .ne(excluded(procedure_template_geolocated_asset_model_id)),
                     ),
             )
             .get_results(conn)

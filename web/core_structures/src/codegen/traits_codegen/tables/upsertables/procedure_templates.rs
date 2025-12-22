@@ -14,7 +14,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
         use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_template)
+            .on_conflict(procedure_template_id)
             .do_update()
             .set(self)
             .filter(
@@ -48,7 +48,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
         use crate::codegen::diesel_codegen::tables::procedure_templates::procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_template)
+            .on_conflict(procedure_template_id)
             .do_update()
             .set(self)
             .filter(

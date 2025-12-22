@@ -509,7 +509,7 @@ impl InsertablePouringProcedure {
         crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template_poured_into_model
                             .eq(&self.procedure_template_poured_into_model),
@@ -533,7 +533,7 @@ impl InsertablePouringProcedure {
         crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template_measured_with_model
                             .eq(&self.procedure_template_measured_with_model),
@@ -557,7 +557,7 @@ impl InsertablePouringProcedure {
         crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::pouring_procedure_templates::pouring_procedure_templates::dsl::procedure_template_poured_from_model
                             .eq(&self.procedure_template_poured_from_model),
@@ -591,7 +591,7 @@ impl InsertablePouringProcedure {
 ///    .procedure_measured_with(procedure_measured_with)?
 ///    .procedure_poured_from(procedure_poured_from)?
 ///    .procedure_poured_into(procedure_poured_into)?
-///    .procedure_template(procedure_template)?
+///    .procedure_template(procedure_template_id)?
 ///    .created_by(created_by)?
 ///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
@@ -1015,7 +1015,7 @@ where
                     attribute.into(),
                 ))
             })?;
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     ///Sets the value of the `public.pouring_procedures.poured_from` column.
@@ -1232,10 +1232,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_poured_from {
             procedure_poured_from = if let (
                 Some(procedure_template_poured_from_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_poured_from_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_poured_from_model != procedure_template_asset_model
                 {
@@ -1248,11 +1248,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_poured_from_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_poured_from_model) = self
@@ -1491,10 +1491,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_measured_with {
             procedure_measured_with = if let (
                 Some(procedure_template_measured_with_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_measured_with_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_measured_with_model
                     != procedure_template_asset_model
@@ -1508,11 +1508,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_measured_with_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_measured_with_model) = self
@@ -1751,10 +1751,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_poured_into {
             procedure_poured_into = if let (
                 Some(procedure_template_poured_into_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_poured_into_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_poured_into_model != procedure_template_asset_model
                 {
@@ -1767,11 +1767,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_poured_into_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_poured_into_model) = self
@@ -1866,7 +1866,7 @@ where
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        <Self as PouringProcedureSettable>::procedure_template(self, procedure_template)
+        <Self as PouringProcedureSettable>::procedure_template(self, procedure_template_id)
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.

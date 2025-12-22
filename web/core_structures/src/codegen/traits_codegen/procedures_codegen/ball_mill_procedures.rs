@@ -15,9 +15,9 @@ impl web_common_traits::prelude::ProcedureLike
         ),
     >{
         vec![
-            (self.procedure_template_bead_model, self.procedure_bead),
-            (self.procedure_template_milled_with_model, self.procedure_milled_with),
-            (self.procedure_template_milled_container_model, self.procedure_milled_container),
+            (self.procedure_template_bead_model_id, self.procedure_bead),
+            (self.procedure_template_milled_with_model_id, self.procedure_milled_with),
+            (self.procedure_template_milled_container_model_id, self.procedure_milled_container),
         ]
     }
 }
@@ -41,17 +41,17 @@ impl web_common_traits::prelude::ProcedureBuilderLike
     {
         use crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable;
         if let Some(procedure_bead) =
-            template_graph.procedure_asset(parents, template.procedure_template_bead_model)
+            template_graph.procedure_asset(parents, template.procedure_template_bead_model_id)
         {
             self = self.procedure_bead(procedure_bead)?;
         }
-        if let Some(procedure_milled_with) =
-            template_graph.procedure_asset(parents, template.procedure_template_milled_with_model)
+        if let Some(procedure_milled_with) = template_graph
+            .procedure_asset(parents, template.procedure_template_milled_with_model_id)
         {
             self = self.procedure_milled_with(procedure_milled_with)?;
         }
         if let Some(procedure_milled_container) = template_graph
-            .procedure_asset(parents, template.procedure_template_milled_container_model)
+            .procedure_asset(parents, template.procedure_template_milled_container_model_id)
         {
             self = self.procedure_milled_container(procedure_milled_container)?;
         }

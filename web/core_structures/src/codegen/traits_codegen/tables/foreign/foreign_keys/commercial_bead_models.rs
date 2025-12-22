@@ -17,7 +17,9 @@ impl web_common_traits::prelude::HasForeignKeys
         C: web_common_traits::crud::Connector<Row = Self::Row>,
     {
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
-            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadModel(self.bead_model),
+            crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadModel(
+                self.bead_model_id,
+            ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::BeadModel(self.id),
@@ -45,8 +47,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.bead_model == bead_models.id {
-                    foreign_keys.bead_model = Some(bead_models);
+                if self.bead_model_id == bead_models.id {
+                    foreign_keys.bead_model_id = Some(bead_models);
                     updated = true;
                 }
                 if self.id == bead_models.id {
@@ -58,8 +60,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::BeadModel(bead_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.bead_model == bead_models.id {
-                    foreign_keys.bead_model = None;
+                if self.bead_model_id == bead_models.id {
+                    foreign_keys.bead_model_id = None;
                     updated = true;
                 }
                 if self.id == bead_models.id {

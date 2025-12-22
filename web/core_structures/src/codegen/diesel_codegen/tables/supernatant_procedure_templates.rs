@@ -1,5 +1,5 @@
 diesel::table! {
-    supernatant_procedure_templates(procedure_template) { procedure_template ->
+    supernatant_procedure_templates(procedure_template_id) { procedure_template ->
     diesel::sql_types::Integer, liters -> diesel::sql_types::Float,
     stratified_source_model -> diesel::sql_types::Integer,
     procedure_template_stratified_source_model -> diesel::sql_types::Integer,

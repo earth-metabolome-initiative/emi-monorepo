@@ -73,7 +73,7 @@ impl InsertableProcedureTemplateAssetModel {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
-            self.asset_model,
+            self.asset_model_id,
             conn,
         )
     }
@@ -100,7 +100,7 @@ impl InsertableProcedureTemplateAssetModel {
                     .eq(based_on)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
-                            .eq(&self.asset_model),
+                            .eq(&self.asset_model_id),
                     ),
             )
             .first::<
@@ -168,10 +168,10 @@ impl InsertableProcedureTemplateAssetModel {
 /// use web_common_traits::database::Insertable;
 /// use web_common_traits::database::InsertableVariant;
 ///
-/// let procedure_template_asset_model = ProcedureTemplateAssetModel::new()
+/// let procedure_template_asset_model_id = ProcedureTemplateAssetModel::new()
 ///    // Set mandatory fields
 ///    .name(name)?
-///    .procedure_template(procedure_template)?
+///    .procedure_template(procedure_template_id)?
 ///    // Optionally set optional fields
 ///    .based_on(based_on)?
 ///    // Finally, insert the new record in the database
@@ -341,7 +341,7 @@ where
         let procedure_template = <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(
             &procedure_template,
         );
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     ///Sets the value of the `public.procedure_template_asset_models.based_on` column.
@@ -377,10 +377,10 @@ where
     where
         AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let asset_model = <AM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &asset_model,
+        let asset_model_id = <AM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &asset_model_id,
         );
-        self.asset_model = Some(asset_model);
+        self.asset_model_id = Some(asset_model_id);
         Ok(self)
     }
 }

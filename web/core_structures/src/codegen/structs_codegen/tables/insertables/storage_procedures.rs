@@ -183,7 +183,7 @@ impl InsertableStorageProcedure {
                     .eq(&self.procedure_stored_asset)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_stored_asset_model),
+                            .eq(&self.procedure_template_stored_asset_model_id),
                     ),
             )
             .first::<
@@ -231,7 +231,7 @@ impl InsertableStorageProcedure {
                     .eq(&self.procedure_stored_asset)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
-                            .eq(&self.stored_asset_model),
+                            .eq(&self.stored_asset_model_id),
                     ),
             )
             .first::<
@@ -359,7 +359,7 @@ impl InsertableStorageProcedure {
         crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template_stored_into_model
                             .eq(&self.procedure_template_stored_into_model),
@@ -383,10 +383,10 @@ impl InsertableStorageProcedure {
         crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::dsl::procedure_template_stored_asset_model
-                            .eq(&self.procedure_template_stored_asset_model),
+                            .eq(&self.procedure_template_stored_asset_model_id),
                     ),
             )
             .first::<
@@ -407,7 +407,7 @@ impl InsertableStorageProcedure {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_stored_asset_model,
+            self.procedure_template_stored_asset_model_id,
             conn,
         )
     }
@@ -459,7 +459,7 @@ impl InsertableStorageProcedure {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.stored_asset_model,
+            self.stored_asset_model_id,
             conn,
         )
     }
@@ -507,7 +507,7 @@ impl InsertableStorageProcedure {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::container_compatibility_rules::ContainerCompatibilityRule::read(
-            (self.stored_into_model, self.stored_asset_model),
+            (self.stored_into_model, self.stored_asset_model_id),
             conn,
         )
     }
@@ -537,7 +537,7 @@ impl InsertableStorageProcedure {
 ///    .updated_by(updated_by)?
 ///    .procedure_stored_asset(procedure_stored_asset)?
 ///    .procedure_stored_into(procedure_stored_into)?
-///    .procedure_template(procedure_template)?
+///    .procedure_template(procedure_template_id)?
 ///    // Optionally set fields with default values
 ///    .created_at(created_at)?
 ///    .procedure(procedure)?
@@ -913,7 +913,7 @@ where
                     attribute.into(),
                 ))
             })?;
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     ///Sets the value of the `public.storage_procedures.stored_asset` column.
@@ -1018,8 +1018,8 @@ where
     where
         SAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let stored_asset_model = <SAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &stored_asset_model,
+        let stored_asset_model_id = <SAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &stored_asset_model_id,
         );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_stored_asset,
@@ -1027,7 +1027,7 @@ where
         {
             self.procedure_stored_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                     procedure_stored_asset,
-                    stored_asset_model,
+                    stored_asset_model_id,
                 )
                 .map_err(|e| {
                     e.replace_field_name(|attribute| {
@@ -1038,7 +1038,7 @@ where
                 })?
                 .into();
         }
-        self.stored_asset_model = Some(stored_asset_model);
+        self.stored_asset_model_id = Some(stored_asset_model_id);
         Ok(self)
     }
     ///Sets the value of the `public.storage_procedures.procedure_template_stored_asset_model` column.
@@ -1081,8 +1081,8 @@ where
     where
         PTSAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_stored_asset_model = <PTSAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &procedure_template_stored_asset_model,
+        let procedure_template_stored_asset_model_id = <PTSAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_stored_asset_model_id,
         );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_stored_asset,
@@ -1090,7 +1090,7 @@ where
         {
             self.procedure_stored_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_stored_asset,
-                    procedure_template_stored_asset_model,
+                    procedure_template_stored_asset_model_id,
                 )
                 .map_err(|e| {
                     e.replace_field_name(|attribute| {
@@ -1101,8 +1101,8 @@ where
                 })?
                 .into();
         }
-        self.procedure_template_stored_asset_model = Some(
-            procedure_template_stored_asset_model,
+        self.procedure_template_stored_asset_model_id = Some(
+            procedure_template_stored_asset_model_id,
         );
         Ok(self)
     }
@@ -1167,11 +1167,11 @@ where
         let mut procedure_stored_asset = procedure_stored_asset.into();
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_asset {
             procedure_stored_asset = if let (
-                Some(procedure_template_stored_asset_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_stored_asset_model_id),
+                Some(procedure_template_asset_model_id),
             ) = (
-                self.procedure_template_stored_asset_model,
-                builder.procedure_template_asset_model,
+                self.procedure_template_stored_asset_model_id,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_stored_asset_model
                     != procedure_template_asset_model
@@ -1185,19 +1185,19 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
-                self.procedure_template_stored_asset_model = Some(
-                    procedure_template_asset_model,
+                self.procedure_template_stored_asset_model_id = Some(
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
-            } else if let Some(procedure_template_stored_asset_model) = self
+            } else if let Some(procedure_template_stored_asset_model_id) = self
                 .procedure_template_stored_asset_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
-                        procedure_template_stored_asset_model,
+                        procedure_template_stored_asset_model_id,
                     )
                     .map_err(|e| {
                         e.replace_field_name(|attribute| {
@@ -1248,10 +1248,10 @@ where
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_asset {
             procedure_stored_asset = if let (
-                Some(stored_asset_model),
-                Some(asset_model),
-            ) = (self.stored_asset_model, builder.asset_model) {
-                if stored_asset_model != asset_model {
+                Some(stored_asset_model_id),
+                Some(asset_model_id),
+            ) = (self.stored_asset_model_id, builder.asset_model_id) {
+                if stored_asset_model_id != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -1261,13 +1261,13 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.stored_asset_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.stored_asset_model_id = Some(asset_model_id);
                 builder.into()
-            } else if let Some(stored_asset_model) = self.stored_asset_model {
+            } else if let Some(stored_asset_model_id) = self.stored_asset_model_id {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
                         builder,
-                        stored_asset_model,
+                        stored_asset_model_id,
                     )
                     .map_err(|e| {
                         e.replace_field_name(|attribute| {
@@ -1536,10 +1536,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_into {
             procedure_stored_into = if let (
                 Some(procedure_template_stored_into_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_stored_into_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_stored_into_model != procedure_template_asset_model
                 {
@@ -1552,11 +1552,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_stored_into_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_stored_into_model) = self
@@ -1616,9 +1616,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_stored_into {
             procedure_stored_into = if let (
                 Some(stored_into_model),
-                Some(asset_model),
-            ) = (self.stored_into_model, builder.asset_model) {
-                if stored_into_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.stored_into_model, builder.asset_model_id) {
+                if stored_into_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -1628,8 +1628,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.stored_into_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.stored_into_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(stored_into_model) = self.stored_into_model {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::asset_model(
@@ -1721,7 +1721,7 @@ where
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        <Self as StorageProcedureSettable>::procedure_template(self, procedure_template)
+        <Self as StorageProcedureSettable>::procedure_template(self, procedure_template_id)
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.

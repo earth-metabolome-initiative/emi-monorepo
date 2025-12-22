@@ -239,7 +239,7 @@ impl HarvestingProcedure {
         crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template_sample_model
                             .eq(&self.procedure_template_sample_model),
@@ -263,7 +263,7 @@ impl HarvestingProcedure {
         crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::harvesting_procedure_templates::harvesting_procedure_templates::dsl::procedure_template_sample_source_model
                             .eq(&self.procedure_template_sample_source_model),
@@ -532,7 +532,7 @@ impl HarvestingProcedure {
 
         use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
         Self::table()
-            .filter(harvesting_procedures::procedure_template.eq(procedure_template))
+            .filter(harvesting_procedures::procedure_template.eq(procedure_template_id))
             .order_by(harvesting_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -549,7 +549,7 @@ impl HarvestingProcedure {
         use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
         Self::table()
             .filter(
-                harvesting_procedures::procedure_template.eq(procedure_template).and(
+                harvesting_procedures::procedure_template.eq(procedure_template_id).and(
                     harvesting_procedures::procedure_template_sample_model
                         .eq(procedure_template_sample_model),
                 ),
@@ -570,7 +570,7 @@ impl HarvestingProcedure {
         use crate::codegen::diesel_codegen::tables::harvesting_procedures::harvesting_procedures;
         Self::table()
             .filter(
-                harvesting_procedures::procedure_template.eq(procedure_template).and(
+                harvesting_procedures::procedure_template.eq(procedure_template_id).and(
                     harvesting_procedures::procedure_template_sample_source_model
                         .eq(procedure_template_sample_source_model),
                 ),
@@ -701,7 +701,7 @@ impl HarvestingProcedure {
             .inner_join(
                 procedures::table.on(harvesting_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(harvesting_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -745,7 +745,9 @@ impl HarvestingProcedure {
             .inner_join(
                 procedures::table.on(harvesting_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(harvesting_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

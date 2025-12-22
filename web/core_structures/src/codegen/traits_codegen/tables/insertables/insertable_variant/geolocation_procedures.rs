@@ -117,14 +117,14 @@ where
         use web_common_traits::database::FromExtension;
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
-        if let Some(procedure_template) = self.procedure_template {
+        if let Some(procedure_template_id) = self.procedure_template {
             let geolocation_procedure_templates = crate::codegen::structs_codegen::tables::geolocation_procedure_templates::GeolocationProcedureTemplate::read(
                 procedure_template,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureSettable>::procedure_template_geolocated_asset_model(
                 self,
-                geolocation_procedure_templates.procedure_template_geolocated_asset_model,
+                geolocation_procedure_templates.procedure_template_geolocated_asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureSettable>::procedure_template_geolocated_with_model(
                 self,
@@ -147,7 +147,7 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureSettable>::procedure_template_geolocated_asset_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_geolocated_with) = self
@@ -163,7 +163,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureSettable>::procedure_template_geolocated_with_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
         }
         let procedure_template = self
@@ -180,7 +180,7 @@ where
                     crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureAttribute::GeolocatedAsset,
                 ),
             )?;
-        let procedure_template_geolocated_asset_model = self
+        let procedure_template_geolocated_asset_model_id = self
             .procedure_template_geolocated_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -255,7 +255,7 @@ where
             procedure,
             procedure_template,
             geolocated_asset,
-            procedure_template_geolocated_asset_model,
+            procedure_template_geolocated_asset_model_id,
             procedure_geolocated_asset,
             geolocated_with: self.geolocated_with,
             procedure_geolocated_with,

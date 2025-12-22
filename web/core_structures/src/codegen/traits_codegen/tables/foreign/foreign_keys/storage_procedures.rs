@@ -66,7 +66,7 @@ impl web_common_traits::prelude::HasForeignKeys
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_stored_asset_model,
+                        self.procedure_template_stored_asset_model_id,
                     ),
                 ),
             );
@@ -85,7 +85,7 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
-                self.stored_asset_model,
+                self.stored_asset_model_id,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -100,7 +100,7 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::ContainerCompatibilityRule(
-                (self.stored_into_model, self.stored_asset_model),
+                (self.stored_into_model, self.stored_asset_model_id),
             ),
         ));
     }
@@ -203,8 +203,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.stored_asset_model == physical_asset_models.id {
-                    foreign_keys.stored_asset_model = Some(physical_asset_models);
+                if self.stored_asset_model_id == physical_asset_models.id {
+                    foreign_keys.stored_asset_model_id = Some(physical_asset_models);
                     updated = true;
                 }
             }
@@ -212,8 +212,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::PhysicalAssetModel(physical_asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.stored_asset_model == physical_asset_models.id {
-                    foreign_keys.stored_asset_model = None;
+                if self.stored_asset_model_id == physical_asset_models.id {
+                    foreign_keys.stored_asset_model_id = None;
                     updated = true;
                 }
             }
@@ -273,9 +273,10 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_template_stored_asset_model == procedure_template_asset_models.id
+                if self.procedure_template_stored_asset_model_id
+                    == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_stored_asset_model =
+                    foreign_keys.procedure_template_stored_asset_model_id =
                         Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
@@ -291,9 +292,10 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_template_stored_asset_model == procedure_template_asset_models.id
+                if self.procedure_template_stored_asset_model_id
+                    == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_stored_asset_model = None;
+                    foreign_keys.procedure_template_stored_asset_model_id = None;
                     updated = true;
                 }
                 if self.procedure_template_stored_into_model == procedure_template_asset_models.id {

@@ -113,7 +113,7 @@ where
         conn: &mut C,
     ) -> Result<Self::InsertableVariant, Self::Error> {
         use web_common_traits::database::FromExtension;
-        let bead_model = self
+        let bead_model_id = self
             .bead_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -145,7 +145,7 @@ where
         };
         Ok(Self::InsertableVariant {
             id,
-            bead_model,
+            bead_model_id,
         })
     }
 }

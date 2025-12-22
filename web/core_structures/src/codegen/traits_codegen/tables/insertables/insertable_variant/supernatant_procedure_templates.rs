@@ -121,7 +121,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateSettable>::stratified_source_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
@@ -134,7 +134,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateSettable>::supernatant_destination_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
@@ -147,7 +147,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateSettable>::transferred_with_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
@@ -160,7 +160,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureTemplateSettable>::pipette_tip_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         let liters = self

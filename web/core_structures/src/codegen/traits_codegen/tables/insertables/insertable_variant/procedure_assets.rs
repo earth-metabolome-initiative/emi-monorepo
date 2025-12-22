@@ -154,15 +154,15 @@ where
                 assets.model,
             )?;
         }
-        if let Some(procedure_template_asset_model) = self.procedure_template_asset_model
+        if let Some(procedure_template_asset_model_id) = self.procedure_template_asset_model
         {
             let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-                procedure_template_asset_model,
+                procedure_template_asset_model_id,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::ancestor_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template(
                 self,
@@ -190,14 +190,14 @@ where
                     crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::ProcedureTemplate,
                 ),
             )?;
-        let asset_model = self
+        let asset_model_id = self
             .asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute::AssetModel,
                 ),
             )?;
-        let procedure_template_asset_model = self
+        let procedure_template_asset_model_id = self
             .procedure_template_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -215,9 +215,9 @@ where
             id,
             procedure,
             procedure_template,
-            asset_model,
+            asset_model_id,
             asset: self.asset,
-            procedure_template_asset_model,
+            procedure_template_asset_model_id,
             ancestor_model,
         })
     }

@@ -121,7 +121,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateSettable>::weighed_with_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
@@ -134,7 +134,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateSettable>::fragment_container_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
@@ -147,7 +147,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureTemplateSettable>::fragment_placed_into_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         let kilograms = self

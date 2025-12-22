@@ -91,7 +91,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         let name = self
@@ -108,7 +108,7 @@ where
                     crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelAttribute::ProcedureTemplate,
                 ),
             )?;
-        let asset_model = self
+        let asset_model_id = self
             .asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -119,7 +119,7 @@ where
             name,
             procedure_template,
             based_on: self.based_on,
-            asset_model,
+            asset_model_id,
         })
     }
 }

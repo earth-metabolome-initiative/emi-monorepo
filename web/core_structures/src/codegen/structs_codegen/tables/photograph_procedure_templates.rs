@@ -27,7 +27,7 @@
         foreign_key = photographed_with_model
     )
 )]
-#[diesel(primary_key(procedure_template))]
+#[diesel(primary_key(procedure_template_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates
 )]
@@ -49,7 +49,7 @@ for web_common_traits::database::IdOrBuilder<
     crate::codegen::structs_codegen::tables::insertables::InsertablePhotographProcedureTemplateBuilder,
 > {
     fn from(value: &'a PhotographProcedureTemplate) -> Self {
-        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template_id)
     }
 }
 impl
@@ -95,7 +95,7 @@ impl PhotographProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_photographed_asset_model,
+            self.procedure_template_photographed_asset_model_id,
             conn,
         )
     }
@@ -155,10 +155,10 @@ impl PhotographProcedureTemplate {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_photographed_asset_model)
+                    .eq(&self.procedure_template_photographed_asset_model_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
-                            .eq(&self.photographed_asset_model),
+                            .eq(&self.photographed_asset_model_id),
                     ),
             )
             .first::<
@@ -239,7 +239,7 @@ impl PhotographProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.photographed_asset_model,
+            self.photographed_asset_model_id,
             conn,
         )
     }
@@ -267,12 +267,12 @@ impl PhotographProcedureTemplate {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::procedure_template_photographed_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::procedure_template_photographed_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::procedure_template_photographed_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::procedure_template_photographed_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
@@ -281,7 +281,7 @@ impl PhotographProcedureTemplate {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::procedure_template_photographed_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::procedure_template_photographed_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
@@ -297,7 +297,7 @@ impl PhotographProcedureTemplate {
         Self::table()
             .filter(
                 photograph_procedure_templates::procedure_template_photographed_asset_model
-                    .eq(procedure_template_photographed_asset_model),
+                    .eq(procedure_template_photographed_asset_model_id),
             )
             .order_by(photograph_procedure_templates::procedure_template.asc())
             .load::<Self>(conn)
@@ -381,10 +381,10 @@ impl PhotographProcedureTemplate {
         Self::table()
             .filter(
                 photograph_procedure_templates::procedure_template_photographed_asset_model
-                    .eq(procedure_template_photographed_asset_model)
+                    .eq(procedure_template_photographed_asset_model_id)
                     .and(
                         photograph_procedure_templates::photographed_asset_model
-                            .eq(photographed_asset_model),
+                            .eq(photographed_asset_model_id),
                     ),
             )
             .order_by(photograph_procedure_templates::procedure_template.asc())
@@ -469,7 +469,7 @@ impl PhotographProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(photograph_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::name.eq(name))
             .order_by(photograph_procedure_templates::procedure_template.asc())
@@ -493,7 +493,7 @@ impl PhotographProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(photograph_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::description.eq(description))
             .order_by(photograph_procedure_templates::procedure_template.asc())
@@ -517,7 +517,7 @@ impl PhotographProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(photograph_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::created_by.eq(created_by))
             .order_by(photograph_procedure_templates::procedure_template.asc())
@@ -541,7 +541,7 @@ impl PhotographProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(photograph_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::updated_by.eq(updated_by))
             .order_by(photograph_procedure_templates::procedure_template.asc())
@@ -565,7 +565,7 @@ impl PhotographProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(photograph_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::deprecated.eq(deprecated))
             .order_by(photograph_procedure_templates::procedure_template.asc())

@@ -16,7 +16,7 @@ where
         Ok(
             vec![
                 < Self::ProcedureTemplateAssetModel as web_common_traits::database::Read
-                < C >> ::read(self.procedure_template_disposed_asset_model, conn) ?
+                < C >> ::read(self.procedure_template_disposed_asset_model_id, conn) ?
             ],
         )
     }

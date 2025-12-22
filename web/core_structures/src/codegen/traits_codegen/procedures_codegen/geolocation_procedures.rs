@@ -15,7 +15,7 @@ impl web_common_traits::prelude::ProcedureLike
         ),
     >{
         vec![
-            (self.procedure_template_geolocated_asset_model, self.procedure_geolocated_asset),
+            (self.procedure_template_geolocated_asset_model_id, self.procedure_geolocated_asset),
             (self.procedure_template_geolocated_with_model, self.procedure_geolocated_with),
         ]
     }
@@ -40,7 +40,7 @@ impl web_common_traits::prelude::ProcedureBuilderLike
     {
         use crate::codegen::structs_codegen::tables::insertables::GeolocationProcedureSettable;
         if let Some(procedure_geolocated_asset) = template_graph
-            .procedure_asset(parents, template.procedure_template_geolocated_asset_model)
+            .procedure_asset(parents, template.procedure_template_geolocated_asset_model_id)
         {
             self = self.procedure_geolocated_asset(procedure_geolocated_asset)?;
         }

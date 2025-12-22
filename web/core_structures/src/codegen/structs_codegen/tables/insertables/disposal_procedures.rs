@@ -205,7 +205,7 @@ impl InsertableDisposalProcedure {
                     .eq(&self.procedure_disposed_asset)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_disposed_asset_model),
+                            .eq(&self.procedure_template_disposed_asset_model_id),
                     ),
             )
             .first::<
@@ -228,7 +228,7 @@ impl InsertableDisposalProcedure {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_disposed_asset_model,
+            self.procedure_template_disposed_asset_model_id,
             conn,
         )
     }
@@ -264,10 +264,10 @@ impl InsertableDisposalProcedure {
         crate::codegen::structs_codegen::tables::disposal_procedure_templates::DisposalProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::disposal_procedure_templates::disposal_procedure_templates::dsl::procedure_template_disposed_asset_model
-                            .eq(&self.procedure_template_disposed_asset_model),
+                            .eq(&self.procedure_template_disposed_asset_model_id),
                     ),
             )
             .first::<
@@ -296,7 +296,7 @@ impl InsertableDisposalProcedure {
 /// let disposal_procedure = DisposalProcedure::new()
 ///    // Set mandatory fields
 ///    .procedure_disposed_asset(procedure_disposed_asset)?
-///    .procedure_template(procedure_template)?
+///    .procedure_template(procedure_template_id)?
 ///    .created_by(created_by)?
 ///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
@@ -533,7 +533,7 @@ where
                     attribute.into(),
                 ))
             })?;
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     ///Sets the value of the `public.disposal_procedures.disposed_asset` column.
@@ -636,8 +636,8 @@ where
     where
         PTDAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template_disposed_asset_model = <PTDAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &procedure_template_disposed_asset_model,
+        let procedure_template_disposed_asset_model_id = <PTDAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_disposed_asset_model_id,
         );
         if let web_common_traits::database::IdOrBuilder::Builder(
             procedure_disposed_asset,
@@ -645,7 +645,7 @@ where
         {
             self.procedure_disposed_asset = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                     procedure_disposed_asset,
-                    procedure_template_disposed_asset_model,
+                    procedure_template_disposed_asset_model_id,
                 )
                 .map_err(|e| {
                     e.replace_field_name(|attribute| {
@@ -656,8 +656,8 @@ where
                 })?
                 .into();
         }
-        self.procedure_template_disposed_asset_model = Some(
-            procedure_template_disposed_asset_model,
+        self.procedure_template_disposed_asset_model_id = Some(
+            procedure_template_disposed_asset_model_id,
         );
         Ok(self)
     }
@@ -749,11 +749,11 @@ where
         }
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_disposed_asset {
             procedure_disposed_asset = if let (
-                Some(procedure_template_disposed_asset_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_disposed_asset_model_id),
+                Some(procedure_template_asset_model_id),
             ) = (
-                self.procedure_template_disposed_asset_model,
-                builder.procedure_template_asset_model,
+                self.procedure_template_disposed_asset_model_id,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_disposed_asset_model
                     != procedure_template_asset_model
@@ -767,19 +767,19 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
-                self.procedure_template_disposed_asset_model = Some(
-                    procedure_template_asset_model,
+                self.procedure_template_disposed_asset_model_id = Some(
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
-            } else if let Some(procedure_template_disposed_asset_model) = self
+            } else if let Some(procedure_template_disposed_asset_model_id) = self
                 .procedure_template_disposed_asset_model
             {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable>::procedure_template_asset_model(
                         builder,
-                        procedure_template_disposed_asset_model,
+                        procedure_template_disposed_asset_model_id,
                     )
                     .map_err(|e| {
                         e.replace_field_name(|attribute| {
@@ -866,7 +866,7 @@ where
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        <Self as DisposalProcedureSettable>::procedure_template(self, procedure_template)
+        <Self as DisposalProcedureSettable>::procedure_template(self, procedure_template_id)
     }
     #[inline]
     ///Sets the value of the `public.procedures.parent_procedure` column.

@@ -173,7 +173,7 @@ impl InsertableGeolocationProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_geolocated_asset_model,
+            self.procedure_template_geolocated_asset_model_id,
             conn,
         )
     }
@@ -215,10 +215,10 @@ impl InsertableGeolocationProcedureTemplate {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::id
-                    .eq(&self.procedure_template_geolocated_asset_model)
+                    .eq(&self.procedure_template_geolocated_asset_model_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models::dsl::asset_model
-                            .eq(&self.geolocated_asset_model),
+                            .eq(&self.geolocated_asset_model_id),
                     ),
             )
             .first::<
@@ -258,7 +258,7 @@ impl InsertableGeolocationProcedureTemplate {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.geolocated_asset_model,
+            self.geolocated_asset_model_id,
             conn,
         )
     }
@@ -300,7 +300,7 @@ impl InsertableGeolocationProcedureTemplate {
 ///
 /// let geolocation_procedure_template = GeolocationProcedureTemplate::new()
 ///    // Set mandatory fields
-///    .procedure_template_geolocated_asset_model(procedure_template_geolocated_asset_model)?
+///    .procedure_template_geolocated_asset_model(procedure_template_geolocated_asset_model_id)?
 ///    .procedure_template_geolocated_with_model(procedure_template_geolocated_with_model)?
 ///    .created_by(created_by)?
 ///    .description(description)?
@@ -597,9 +597,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_geolocated_with_model {
             procedure_template_geolocated_with_model = if let (
                 Some(geolocated_with_model),
-                Some(asset_model),
-            ) = (self.geolocated_with_model, builder.asset_model) {
-                if geolocated_with_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.geolocated_with_model, builder.asset_model_id) {
+                if geolocated_with_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -609,8 +609,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.geolocated_with_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.geolocated_with_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(geolocated_with_model) = self.geolocated_with_model {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
@@ -670,16 +670,16 @@ where
     where
         GAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let geolocated_asset_model = <GAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &geolocated_asset_model,
+        let geolocated_asset_model_id = <GAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &geolocated_asset_model_id,
         );
         if let web_common_traits::database::IdOrBuilder::Builder(
-            procedure_template_geolocated_asset_model,
+            procedure_template_geolocated_asset_model_id,
         ) = self.procedure_template_geolocated_asset_model
         {
-            self.procedure_template_geolocated_asset_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
-                    procedure_template_geolocated_asset_model,
-                    geolocated_asset_model,
+            self.procedure_template_geolocated_asset_model_id = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
+                    procedure_template_geolocated_asset_model_id,
+                    geolocated_asset_model_id,
                 )
                 .map_err(|e| {
                     e.replace_field_name(|attribute| {
@@ -690,7 +690,7 @@ where
                 })?
                 .into();
         }
-        self.geolocated_asset_model = Some(geolocated_asset_model);
+        self.geolocated_asset_model_id = Some(geolocated_asset_model_id);
         Ok(self)
     }
     ///Sets the value of the `public.geolocation_procedure_templates.procedure_template_geolocated_asset_model` column.
@@ -736,14 +736,14 @@ where
             >,
         >,
     {
-        let mut procedure_template_geolocated_asset_model = procedure_template_geolocated_asset_model
+        let mut procedure_template_geolocated_asset_model_id = procedure_template_geolocated_asset_model
             .into();
-        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_geolocated_asset_model {
-            procedure_template_geolocated_asset_model = if let (
-                Some(geolocated_asset_model),
-                Some(asset_model),
-            ) = (self.geolocated_asset_model, builder.asset_model) {
-                if geolocated_asset_model != asset_model {
+        if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_geolocated_asset_model_id {
+            procedure_template_geolocated_asset_model_id = if let (
+                Some(geolocated_asset_model_id),
+                Some(asset_model_id),
+            ) = (self.geolocated_asset_model_id, builder.asset_model_id) {
+                if geolocated_asset_model_id != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -753,13 +753,13 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.geolocated_asset_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.geolocated_asset_model_id = Some(asset_model_id);
                 builder.into()
-            } else if let Some(geolocated_asset_model) = self.geolocated_asset_model {
+            } else if let Some(geolocated_asset_model_id) = self.geolocated_asset_model_id {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
                         builder,
-                        geolocated_asset_model,
+                        geolocated_asset_model_id,
                     )
                     .map_err(|e| {
                         e.replace_field_name(|attribute| {
@@ -773,7 +773,7 @@ where
                 builder.into()
             };
         }
-        self.procedure_template_geolocated_asset_model = procedure_template_geolocated_asset_model;
+        self.procedure_template_geolocated_asset_model_id = procedure_template_geolocated_asset_model;
         Ok(self)
     }
 }

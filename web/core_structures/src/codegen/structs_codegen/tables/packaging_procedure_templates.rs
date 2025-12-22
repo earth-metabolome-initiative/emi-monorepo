@@ -21,7 +21,7 @@
         foreign_key = sample_model
     )
 )]
-#[diesel(primary_key(procedure_template))]
+#[diesel(primary_key(procedure_template_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::packaging_procedure_templates::packaging_procedure_templates
 )]
@@ -41,7 +41,7 @@ for web_common_traits::database::IdOrBuilder<
     crate::codegen::structs_codegen::tables::insertables::InsertablePackagingProcedureTemplateBuilder,
 > {
     fn from(value: &'a PackagingProcedureTemplate) -> Self {
-        web_common_traits::database::IdOrBuilder::Id(value.procedure_template)
+        web_common_traits::database::IdOrBuilder::Id(value.procedure_template_id)
     }
 }
 impl
@@ -371,7 +371,7 @@ impl PackagingProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(packaging_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::name.eq(name))
             .order_by(packaging_procedure_templates::procedure_template.asc())
@@ -395,7 +395,7 @@ impl PackagingProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(packaging_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::description.eq(description))
             .order_by(packaging_procedure_templates::procedure_template.asc())
@@ -419,7 +419,7 @@ impl PackagingProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(packaging_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::created_by.eq(created_by))
             .order_by(packaging_procedure_templates::procedure_template.asc())
@@ -443,7 +443,7 @@ impl PackagingProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(packaging_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::updated_by.eq(updated_by))
             .order_by(packaging_procedure_templates::procedure_template.asc())
@@ -467,7 +467,7 @@ impl PackagingProcedureTemplate {
         Self::table()
             .inner_join(
                 procedure_templates::table.on(packaging_procedure_templates::procedure_template
-                    .eq(procedure_templates::procedure_template)),
+                    .eq(procedure_templates::procedure_template_id)),
             )
             .filter(procedure_templates::deprecated.eq(deprecated))
             .order_by(packaging_procedure_templates::procedure_template.asc())

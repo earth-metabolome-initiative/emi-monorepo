@@ -311,7 +311,7 @@ impl FractioningProcedure {
         crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template_fragment_container_model
                             .eq(&self.procedure_template_fragment_container_model),
@@ -335,7 +335,7 @@ impl FractioningProcedure {
         crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template_fragment_placed_into_model
                             .eq(&self.procedure_template_fragment_placed_into_model),
@@ -359,7 +359,7 @@ impl FractioningProcedure {
         crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template_weighed_with_model
                             .eq(&self.procedure_template_weighed_with_model),
@@ -762,7 +762,7 @@ impl FractioningProcedure {
 
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
         Self::table()
-            .filter(fractioning_procedures::procedure_template.eq(procedure_template))
+            .filter(fractioning_procedures::procedure_template.eq(procedure_template_id))
             .order_by(fractioning_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -863,7 +863,7 @@ impl FractioningProcedure {
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
         Self::table()
             .filter(
-                fractioning_procedures::procedure_template.eq(procedure_template).and(
+                fractioning_procedures::procedure_template.eq(procedure_template_id).and(
                     fractioning_procedures::procedure_template_fragment_container_model
                         .eq(procedure_template_fragment_container_model),
                 ),
@@ -884,7 +884,7 @@ impl FractioningProcedure {
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
         Self::table()
             .filter(
-                fractioning_procedures::procedure_template.eq(procedure_template).and(
+                fractioning_procedures::procedure_template.eq(procedure_template_id).and(
                     fractioning_procedures::procedure_template_fragment_placed_into_model
                         .eq(procedure_template_fragment_placed_into_model),
                 ),
@@ -905,7 +905,7 @@ impl FractioningProcedure {
         use crate::codegen::diesel_codegen::tables::fractioning_procedures::fractioning_procedures;
         Self::table()
             .filter(
-                fractioning_procedures::procedure_template.eq(procedure_template).and(
+                fractioning_procedures::procedure_template.eq(procedure_template_id).and(
                     fractioning_procedures::procedure_template_weighed_with_model
                         .eq(procedure_template_weighed_with_model),
                 ),
@@ -1074,7 +1074,7 @@ impl FractioningProcedure {
             .inner_join(
                 procedures::table.on(fractioning_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(fractioning_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -1118,7 +1118,9 @@ impl FractioningProcedure {
             .inner_join(
                 procedures::table.on(fractioning_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(fractioning_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

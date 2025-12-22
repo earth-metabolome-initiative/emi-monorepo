@@ -121,20 +121,20 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateSettable>::stored_into_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
-            procedure_template_stored_asset_model,
+            procedure_template_stored_asset_model_id,
         ) = self.procedure_template_stored_asset_model
         {
             let procedure_template_asset_models = crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-                procedure_template_stored_asset_model,
+                procedure_template_stored_asset_model_id,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateSettable>::stored_asset_model(
                 self,
-                procedure_template_asset_models.asset_model,
+                procedure_template_asset_models.asset_model_id,
             )?;
         }
         let kelvin = self
@@ -158,7 +158,7 @@ where
                     crate::codegen::structs_codegen::tables::insertables::StorageProcedureTemplateAttribute::StoredIntoModel,
                 ),
             )?;
-        let stored_asset_model = self
+        let stored_asset_model_id = self
             .stored_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -194,15 +194,15 @@ where
                     })?
             }
         };
-        let procedure_template_stored_asset_model = match self
+        let procedure_template_stored_asset_model_id = match self
             .procedure_template_stored_asset_model
         {
             web_common_traits::database::IdOrBuilder::Id(id) => id,
             web_common_traits::database::IdOrBuilder::Builder(
-                mut procedure_template_stored_asset_model,
+                mut procedure_template_stored_asset_model_id,
             ) => {
-                procedure_template_stored_asset_model = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
-                        procedure_template_stored_asset_model,
+                procedure_template_stored_asset_model_id = <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::procedure_template(
+                        procedure_template_stored_asset_model_id,
                         procedure_template,
                     )
                     .map_err(|err| {
@@ -225,8 +225,8 @@ where
             kelvin_tolerance_percentage,
             stored_into_model,
             procedure_template_stored_into_model,
-            stored_asset_model,
-            procedure_template_stored_asset_model,
+            stored_asset_model_id,
+            procedure_template_stored_asset_model_id,
         })
     }
 }

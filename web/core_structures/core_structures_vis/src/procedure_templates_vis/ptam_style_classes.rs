@@ -25,16 +25,16 @@ where
     I: Iterator<Item = &'graph ProcedureTemplateAssetModel>,
 {
     let mut ptam_builders = Vec::new();
-    for procedure_template_asset_model in ptams {
+    for procedure_template_asset_model_id in ptams {
         let mut node = StyleClassBuilder::default()
-            .name(ptam_node_class_name(procedure_template_asset_model))
+            .name(ptam_node_class_name(procedure_template_asset_model_id))
             .unwrap()
             .property(StyleProperty::BorderRadius(Unit::Pixel(2)))
             .unwrap();
         let mut edge = StyleClassBuilder::default()
-            .name(ptam_edge_class_name(procedure_template_asset_model))
+            .name(ptam_edge_class_name(procedure_template_asset_model_id))
             .unwrap();
-        if graph.foreign_owned_ptam(procedure_template_asset_model) {
+        if graph.foreign_owned_ptam(procedure_template_asset_model_id) {
             node = node.property(StyleProperty::StrokeDasharray(5, 5)).unwrap();
             edge = edge.property(StyleProperty::StrokeDasharray(5, 5)).unwrap();
         }

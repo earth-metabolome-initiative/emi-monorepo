@@ -42,13 +42,13 @@ impl web_common_traits::prelude::HasForeignKeys
         }
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModelAncestor((
-                self.asset_model,
+                self.asset_model_id,
                 self.ancestor_model,
             )),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
-                self.asset_model,
+                self.asset_model_id,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
@@ -58,7 +58,7 @@ impl web_common_traits::prelude::HasForeignKeys
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_asset_model,
+                        self.procedure_template_asset_model_id,
                     ),
                 ),
             );
@@ -91,7 +91,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.asset_model == asset_model_ancestors.descendant_model
+                if self.asset_model_id == asset_model_ancestors.descendant_model
                     && self.ancestor_model == asset_model_ancestors.ancestor_model
                 {
                     foreign_keys.procedure_assets_asset_model_ancestor_model_fkey =
@@ -103,7 +103,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::AssetModelAncestor(asset_model_ancestors),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.asset_model == asset_model_ancestors.descendant_model
+                if self.asset_model_id == asset_model_ancestors.descendant_model
                     && self.ancestor_model == asset_model_ancestors.ancestor_model
                 {
                     foreign_keys.procedure_assets_asset_model_ancestor_model_fkey = None;
@@ -120,8 +120,8 @@ impl web_common_traits::prelude::HasForeignKeys
                     foreign_keys.ancestor_model = Some(asset_models.clone());
                     updated = true;
                 }
-                if self.asset_model == asset_models.id {
-                    foreign_keys.asset_model = Some(asset_models.clone());
+                if self.asset_model_id == asset_models.id {
+                    foreign_keys.asset_model_id = Some(asset_models.clone());
                     updated = true;
                 }
             }
@@ -133,8 +133,8 @@ impl web_common_traits::prelude::HasForeignKeys
                     foreign_keys.ancestor_model = None;
                     updated = true;
                 }
-                if self.asset_model == asset_models.id {
-                    foreign_keys.asset_model = None;
+                if self.asset_model_id == asset_models.id {
+                    foreign_keys.asset_model_id = None;
                     updated = true;
                 }
             }
@@ -166,8 +166,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_template_asset_model == procedure_template_asset_models.id {
-                    foreign_keys.procedure_template_asset_model =
+                if self.procedure_template_asset_model_id == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_asset_model_id =
                         Some(procedure_template_asset_models);
                     updated = true;
                 }
@@ -178,8 +178,8 @@ impl web_common_traits::prelude::HasForeignKeys
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_template_asset_model == procedure_template_asset_models.id {
-                    foreign_keys.procedure_template_asset_model = None;
+                if self.procedure_template_asset_model_id == procedure_template_asset_models.id {
+                    foreign_keys.procedure_template_asset_model_id = None;
                     updated = true;
                 }
             }

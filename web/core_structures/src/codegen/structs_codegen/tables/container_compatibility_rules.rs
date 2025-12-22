@@ -27,7 +27,7 @@
         foreign_key = created_by
     )
 )]
-#[diesel(primary_key(container_model, contained_asset_model))]
+#[diesel(primary_key(container_model, contained_asset_model_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::container_compatibility_rules::container_compatibility_rules
 )]
@@ -49,7 +49,7 @@ for web_common_traits::database::IdOrBuilder<
     fn from(value: &'a ContainerCompatibilityRule) -> Self {
         web_common_traits::database::IdOrBuilder::Id((
             value.container_model,
-            value.contained_asset_model,
+            value.contained_asset_model_id,
         ))
     }
 }
@@ -62,13 +62,13 @@ where
 impl diesel::Identifiable for ContainerCompatibilityRule {
     type Id = (i32, i32);
     fn id(self) -> Self::Id {
-        (self.container_model, self.contained_asset_model)
+        (self.container_model, self.contained_asset_model_id)
     }
 }
 impl web_common_traits::database::PrimaryKeyLike for ContainerCompatibilityRule {
     type PrimaryKey = (i32, i32);
     fn primary_key(&self) -> Self::PrimaryKey {
-        (self.container_model, self.contained_asset_model)
+        (self.container_model, self.contained_asset_model_id)
     }
 }
 impl ContainerCompatibilityRule {
@@ -85,7 +85,7 @@ impl ContainerCompatibilityRule {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::physical_asset_models::PhysicalAssetModel::read(
-            self.contained_asset_model,
+            self.contained_asset_model_id,
             conn,
         )
     }

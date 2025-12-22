@@ -40,7 +40,7 @@ pub(crate) fn sample_extraction_solvent_procedure(
         .insert(user.id, conn)?;
 
     let ptam = ProcedureTemplateAssetModel::new()
-        .procedure_template(&procedure_template)?
+        .procedure_template(&procedure_template_id)?
         .asset_model(bottle_1l(user, conn)?)?
         .name(SAMPLE_EXTRACTION_SOLVENT)?
         .insert(user.id, conn)?;

@@ -13,7 +13,7 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
         use crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_template)
+            .on_conflict(procedure_template_id)
             .do_update()
             .set(self)
             .filter(
@@ -23,10 +23,10 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
                         procedure_template_photographed_with_model
                             .ne(excluded(procedure_template_photographed_with_model)),
                     )
-                    .or(photographed_asset_model.ne(excluded(photographed_asset_model)))
+                    .or(photographed_asset_model.ne(excluded(photographed_asset_model_id)))
                     .or(
                         procedure_template_photographed_asset_model
-                            .ne(excluded(procedure_template_photographed_asset_model)),
+                            .ne(excluded(procedure_template_photographed_asset_model_id)),
                     )
                     .or(photograph_model.ne(excluded(photograph_model)))
                     .or(
@@ -53,7 +53,7 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
         use crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_template)
+            .on_conflict(procedure_template_id)
             .do_update()
             .set(self)
             .filter(
@@ -63,10 +63,10 @@ for crate::codegen::structs_codegen::tables::photograph_procedure_templates::Pho
                         procedure_template_photographed_with_model
                             .ne(excluded(procedure_template_photographed_with_model)),
                     )
-                    .or(photographed_asset_model.ne(excluded(photographed_asset_model)))
+                    .or(photographed_asset_model.ne(excluded(photographed_asset_model_id)))
                     .or(
                         procedure_template_photographed_asset_model
-                            .ne(excluded(procedure_template_photographed_asset_model)),
+                            .ne(excluded(procedure_template_photographed_asset_model_id)),
                     )
                     .or(photograph_model.ne(excluded(photograph_model)))
                     .or(

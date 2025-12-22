@@ -13,7 +13,7 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
         use crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_template)
+            .on_conflict(procedure_template_id)
             .do_update()
             .set(self)
             .filter(
@@ -28,10 +28,10 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                         procedure_template_stored_into_model
                             .ne(excluded(procedure_template_stored_into_model)),
                     )
-                    .or(stored_asset_model.ne(excluded(stored_asset_model)))
+                    .or(stored_asset_model.ne(excluded(stored_asset_model_id)))
                     .or(
                         procedure_template_stored_asset_model
-                            .ne(excluded(procedure_template_stored_asset_model)),
+                            .ne(excluded(procedure_template_stored_asset_model_id)),
                     ),
             )
             .get_results(conn)
@@ -53,7 +53,7 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
         use crate::codegen::diesel_codegen::tables::storage_procedure_templates::storage_procedure_templates::*;
         diesel::insert_into(table)
             .values(self)
-            .on_conflict(procedure_template)
+            .on_conflict(procedure_template_id)
             .do_update()
             .set(self)
             .filter(
@@ -68,10 +68,10 @@ for crate::codegen::structs_codegen::tables::storage_procedure_templates::Storag
                         procedure_template_stored_into_model
                             .ne(excluded(procedure_template_stored_into_model)),
                     )
-                    .or(stored_asset_model.ne(excluded(stored_asset_model)))
+                    .or(stored_asset_model.ne(excluded(stored_asset_model_id)))
                     .or(
                         procedure_template_stored_asset_model
-                            .ne(excluded(procedure_template_stored_asset_model)),
+                            .ne(excluded(procedure_template_stored_asset_model_id)),
                     ),
             )
             .get_results(conn)

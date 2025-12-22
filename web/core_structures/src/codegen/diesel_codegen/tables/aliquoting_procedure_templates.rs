@@ -1,5 +1,5 @@
 diesel::table! {
-    aliquoting_procedure_templates(procedure_template) { procedure_template ->
+    aliquoting_procedure_templates(procedure_template_id) { procedure_template ->
     diesel::sql_types::Integer, liters -> diesel::sql_types::Float, aliquoted_from_model
     -> diesel::sql_types::Integer, procedure_template_aliquoted_from_model ->
     diesel::sql_types::Integer, aliquoted_into_model -> diesel::sql_types::Integer,

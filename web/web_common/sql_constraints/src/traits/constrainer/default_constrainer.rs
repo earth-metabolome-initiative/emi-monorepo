@@ -10,7 +10,7 @@ use crate::{
         SnakeCaseTableName, UniqueCheckConstraint, UniqueColumnNamesInExtensionGraph,
         UniqueForeignKey, UniqueUniqueIndex,
     },
-    prelude::ReferencesUniqueIndex,
+    prelude::{PrimaryKeyReferenceEndsWithId, ReferencesUniqueIndex},
     traits::Constrainer,
 };
 
@@ -94,6 +94,8 @@ where
         constrainer.register_foreign_key_constraint(Box::new(CompatibleForeignKey::default()));
         constrainer.register_foreign_key_constraint(Box::new(LowercaseForeignKeyName::default()));
         constrainer.register_foreign_key_constraint(Box::new(ReferencesUniqueIndex::default()));
+        constrainer
+            .register_foreign_key_constraint(Box::new(PrimaryKeyReferenceEndsWithId::default()));
 
         Self { constrainer }
     }

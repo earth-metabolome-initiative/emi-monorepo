@@ -82,7 +82,7 @@ where
                     crate::codegen::structs_codegen::tables::insertables::ContainerCompatibilityRuleAttribute::ContainerModel,
                 ),
             )?;
-        let contained_asset_model = self
+        let contained_asset_model_id = self
             .contained_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -105,7 +105,7 @@ where
             )?;
         Ok(Self::InsertableVariant {
             container_model,
-            contained_asset_model,
+            contained_asset_model_id,
             quantity: self.quantity,
             created_by,
             created_at,

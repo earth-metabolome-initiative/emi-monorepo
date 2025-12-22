@@ -139,7 +139,7 @@ impl InsertableDigitalAssetModel {
 /// use web_common_traits::database::Insertable;
 /// use web_common_traits::database::InsertableVariant;
 ///
-/// let digital_asset_model = DigitalAssetModel::new()
+/// let digital_asset_model_id = DigitalAssetModel::new()
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
 ///    .description(description)?

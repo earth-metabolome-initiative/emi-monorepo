@@ -464,7 +464,7 @@ impl CentrifugeProcedure {
         crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::centrifuge_procedure_templates::centrifuge_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::centrifuge_procedure_templates::centrifuge_procedure_templates::dsl::procedure_template_centrifuged_with_model
                             .eq(&self.procedure_template_centrifuged_with_model),
@@ -488,7 +488,7 @@ impl CentrifugeProcedure {
         crate::codegen::structs_codegen::tables::centrifuge_procedure_templates::CentrifugeProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::centrifuge_procedure_templates::centrifuge_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::centrifuge_procedure_templates::centrifuge_procedure_templates::dsl::procedure_template_centrifuged_container_model
                             .eq(&self.procedure_template_centrifuged_container_model),
@@ -867,7 +867,7 @@ impl CentrifugeProcedure {
 
         use crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures;
         Self::table()
-            .filter(centrifuge_procedures::procedure_template.eq(procedure_template))
+            .filter(centrifuge_procedures::procedure_template.eq(procedure_template_id))
             .order_by(centrifuge_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -884,7 +884,7 @@ impl CentrifugeProcedure {
         use crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures;
         Self::table()
             .filter(
-                centrifuge_procedures::procedure_template.eq(procedure_template).and(
+                centrifuge_procedures::procedure_template.eq(procedure_template_id).and(
                     centrifuge_procedures::procedure_template_centrifuged_with_model
                         .eq(procedure_template_centrifuged_with_model),
                 ),
@@ -905,7 +905,7 @@ impl CentrifugeProcedure {
         use crate::codegen::diesel_codegen::tables::centrifuge_procedures::centrifuge_procedures;
         Self::table()
             .filter(
-                centrifuge_procedures::procedure_template.eq(procedure_template).and(
+                centrifuge_procedures::procedure_template.eq(procedure_template_id).and(
                     centrifuge_procedures::procedure_template_centrifuged_container_model
                         .eq(procedure_template_centrifuged_container_model),
                 ),
@@ -952,7 +952,7 @@ impl CentrifugeProcedure {
             .inner_join(
                 procedures::table.on(centrifuge_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(centrifuge_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -996,7 +996,9 @@ impl CentrifugeProcedure {
             .inner_join(
                 procedures::table.on(centrifuge_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(centrifuge_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

@@ -979,9 +979,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_stratified_source_model {
             procedure_template_stratified_source_model = if let (
                 Some(stratified_source_model),
-                Some(asset_model),
-            ) = (self.stratified_source_model, builder.asset_model) {
-                if stratified_source_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.stratified_source_model, builder.asset_model_id) {
+                if stratified_source_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -991,8 +991,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.stratified_source_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.stratified_source_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(stratified_source_model) = self.stratified_source_model {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
@@ -1123,9 +1123,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_supernatant_destination_model {
             procedure_template_supernatant_destination_model = if let (
                 Some(supernatant_destination_model),
-                Some(asset_model),
-            ) = (self.supernatant_destination_model, builder.asset_model) {
-                if supernatant_destination_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.supernatant_destination_model, builder.asset_model_id) {
+                if supernatant_destination_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -1135,8 +1135,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.supernatant_destination_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.supernatant_destination_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(supernatant_destination_model) = self
                 .supernatant_destination_model
@@ -1269,9 +1269,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_transferred_with_model {
             procedure_template_transferred_with_model = if let (
                 Some(transferred_with_model),
-                Some(asset_model),
-            ) = (self.transferred_with_model, builder.asset_model) {
-                if transferred_with_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.transferred_with_model, builder.asset_model_id) {
+                if transferred_with_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -1281,8 +1281,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.transferred_with_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.transferred_with_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(transferred_with_model) = self.transferred_with_model {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(
@@ -1413,9 +1413,9 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_template_pipette_tip_model {
             procedure_template_pipette_tip_model = if let (
                 Some(pipette_tip_model),
-                Some(asset_model),
-            ) = (self.pipette_tip_model, builder.asset_model) {
-                if pipette_tip_model != asset_model {
+                Some(asset_model_id),
+            ) = (self.pipette_tip_model, builder.asset_model_id) {
+                if pipette_tip_model != asset_model_id {
                     return Err(
                         web_common_traits::database::InsertError::BuilderError(
                             web_common_traits::prelude::BuilderError::UnexpectedAttribute(
@@ -1425,8 +1425,8 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(asset_model) = builder.asset_model {
-                self.pipette_tip_model = Some(asset_model);
+            } else if let Some(asset_model_id) = builder.asset_model_id {
+                self.pipette_tip_model = Some(asset_model_id);
                 builder.into()
             } else if let Some(pipette_tip_model) = self.pipette_tip_model {
                 <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureTemplateAssetModelBuilder as crate::codegen::structs_codegen::tables::insertables::ProcedureTemplateAssetModelSettable>::asset_model(

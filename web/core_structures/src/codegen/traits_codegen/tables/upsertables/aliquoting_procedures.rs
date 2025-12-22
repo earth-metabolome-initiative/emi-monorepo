@@ -19,7 +19,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(aliquoted_with.ne(excluded(aliquoted_with)))
                     .or(aliquoted_with_model.ne(excluded(aliquoted_with_model)))
                     .or(procedure_template_aliquoted_with_model
@@ -63,7 +63,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(aliquoted_with.ne(excluded(aliquoted_with)))
                     .or(aliquoted_with_model.ne(excluded(aliquoted_with_model)))
                     .or(procedure_template_aliquoted_with_model

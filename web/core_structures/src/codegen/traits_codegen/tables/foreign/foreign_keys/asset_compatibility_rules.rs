@@ -20,12 +20,12 @@ impl web_common_traits::prelude::HasForeignKeys
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
-                self.left_asset_model,
+                self.left_asset_model_id,
             ),
         ));
         connector.send(web_common_traits::crud::CrudPrimaryKeyOperation::Read(
             crate::codegen::tables::table_primary_keys::TablePrimaryKey::AssetModel(
-                self.right_asset_model,
+                self.right_asset_model_id,
             ),
         ));
     }
@@ -48,12 +48,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.left_asset_model == asset_models.id {
-                    foreign_keys.left_asset_model = Some(asset_models.clone());
+                if self.left_asset_model_id == asset_models.id {
+                    foreign_keys.left_asset_model_id = Some(asset_models.clone());
                     updated = true;
                 }
-                if self.right_asset_model == asset_models.id {
-                    foreign_keys.right_asset_model = Some(asset_models.clone());
+                if self.right_asset_model_id == asset_models.id {
+                    foreign_keys.right_asset_model_id = Some(asset_models.clone());
                     updated = true;
                 }
             }
@@ -61,12 +61,12 @@ impl web_common_traits::prelude::HasForeignKeys
                 crate::codegen::tables::row::Row::AssetModel(asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.left_asset_model == asset_models.id {
-                    foreign_keys.left_asset_model = None;
+                if self.left_asset_model_id == asset_models.id {
+                    foreign_keys.left_asset_model_id = None;
                     updated = true;
                 }
-                if self.right_asset_model == asset_models.id {
-                    foreign_keys.right_asset_model = None;
+                if self.right_asset_model_id == asset_models.id {
+                    foreign_keys.right_asset_model_id = None;
                     updated = true;
                 }
             }

@@ -116,7 +116,7 @@ where
         use web_common_traits::database::FromExtension;
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
-        if let Some(procedure_template) = self.procedure_template {
+        if let Some(procedure_template_id) = self.procedure_template {
             let storage_procedure_templates = crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate::read(
                 procedure_template,
                 conn,
@@ -127,7 +127,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::procedure_template_stored_asset_model(
                 self,
-                storage_procedure_templates.procedure_template_stored_asset_model,
+                storage_procedure_templates.procedure_template_stored_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_stored_asset) = self
@@ -139,7 +139,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::procedure_template_stored_asset_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
             if let Some(asset) = procedure_assets.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::stored_asset(
@@ -149,7 +149,7 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::stored_asset_model(
                 self,
-                procedure_assets.asset_model,
+                procedure_assets.asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_stored_into) = self
@@ -161,7 +161,7 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::procedure_template_stored_into_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
             if let Some(asset) = procedure_assets.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::stored_into(
@@ -171,7 +171,7 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::stored_into_model(
                 self,
-                procedure_assets.asset_model,
+                procedure_assets.asset_model_id,
             )?;
         }
         let procedure_template = self
@@ -188,14 +188,14 @@ where
                     crate::codegen::structs_codegen::tables::insertables::StorageProcedureAttribute::StoredAsset,
                 ),
             )?;
-        let stored_asset_model = self
+        let stored_asset_model_id = self
             .stored_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
                     crate::codegen::structs_codegen::tables::insertables::StorageProcedureAttribute::StoredAssetModel,
                 ),
             )?;
-        let procedure_template_stored_asset_model = self
+        let procedure_template_stored_asset_model_id = self
             .procedure_template_stored_asset_model
             .ok_or(
                 common_traits::prelude::BuilderError::IncompleteBuild(
@@ -277,8 +277,8 @@ where
             procedure,
             procedure_template,
             stored_asset,
-            stored_asset_model,
-            procedure_template_stored_asset_model,
+            stored_asset_model_id,
+            procedure_template_stored_asset_model_id,
             procedure_stored_asset,
             stored_into,
             stored_into_model,

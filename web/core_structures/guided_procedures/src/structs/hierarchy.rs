@@ -74,8 +74,8 @@ impl Hierarchy {
     {
         let procedure_template = Rc::new(procedure_template.clone());
         let (mut procedure_nodes, edges) = load_subprocedure_templates(&procedure_template, conn)?;
-        procedure_nodes.push(procedure_template);
-        procedure_nodes.sort_unstable_by(|a, b| a.procedure_template.cmp(&b.procedure_template));
+        procedure_nodes.push(procedure_template_id);
+        procedure_nodes.sort_unstable_by(|a, b| a.procedure_template.cmp(&b.procedure_template_id));
         procedure_nodes.dedup();
         let procedure_nodes = SortedVec::try_from(procedure_nodes).unwrap();
         let mut numerical_edges = edges
@@ -142,7 +142,7 @@ pub trait HierarchyLike: AsRef<Hierarchy> {
             .hierarchy
             .nodes_vocabulary()
             .binary_search_by(|pt| {
-                pt.procedure_template.cmp(&procedure_template.procedure_template)
+                pt.procedure_template.cmp(&procedure_template.procedure_template_id)
             })
             .expect("Procedure template not part of hierarchy graph");
 
@@ -165,7 +165,7 @@ pub trait HierarchyLike: AsRef<Hierarchy> {
             .hierarchy
             .nodes_vocabulary()
             .binary_search_by(|pt| {
-                pt.procedure_template.cmp(&procedure_template.procedure_template)
+                pt.procedure_template.cmp(&procedure_template.procedure_template_id)
             })
             .expect("Procedure template not part of hierarchy graph")
     }

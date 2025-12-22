@@ -272,7 +272,7 @@ impl PhotographProcedure {
                     .eq(&self.procedure_photographed_asset)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
-                            .eq(&self.procedure_template_photographed_asset_model),
+                            .eq(&self.procedure_template_photographed_asset_model_id),
                     ),
             )
             .first::<
@@ -401,7 +401,7 @@ impl PhotographProcedure {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel::read(
-            self.procedure_template_photographed_asset_model,
+            self.procedure_template_photographed_asset_model_id,
             conn,
         )
     }
@@ -439,10 +439,10 @@ impl PhotographProcedure {
         crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template_photographed_asset_model
-                            .eq(&self.procedure_template_photographed_asset_model),
+                            .eq(&self.procedure_template_photographed_asset_model_id),
                     ),
             )
             .first::<
@@ -463,7 +463,7 @@ impl PhotographProcedure {
         crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template_photograph_model
                             .eq(&self.procedure_template_photograph_model),
@@ -487,7 +487,7 @@ impl PhotographProcedure {
         crate::codegen::structs_codegen::tables::photograph_procedure_templates::PhotographProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::photograph_procedure_templates::photograph_procedure_templates::dsl::procedure_template_photographed_with_model
                             .eq(&self.procedure_template_photographed_with_model),
@@ -656,7 +656,7 @@ impl PhotographProcedure {
                     .eq(procedure_photographed_asset)
                     .and(
                         photograph_procedures::procedure_template_photographed_asset_model
-                            .eq(procedure_template_photographed_asset_model),
+                            .eq(procedure_template_photographed_asset_model_id),
                     ),
             )
             .order_by(photograph_procedures::procedure.asc())
@@ -781,7 +781,7 @@ impl PhotographProcedure {
 
         use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
         Self::table()
-            .filter(photograph_procedures::procedure_template.eq(procedure_template))
+            .filter(photograph_procedures::procedure_template.eq(procedure_template_id))
             .order_by(photograph_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -834,12 +834,12 @@ impl PhotographProcedure {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures::procedure_template_photographed_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures::procedure_template_photographed_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures::procedure_template_photographed_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures::procedure_template_photographed_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
@@ -848,7 +848,7 @@ impl PhotographProcedure {
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures::procedure_template_photographed_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures::procedure_template_photographed_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
@@ -864,7 +864,7 @@ impl PhotographProcedure {
         Self::table()
             .filter(
                 photograph_procedures::procedure_template_photographed_asset_model
-                    .eq(procedure_template_photographed_asset_model),
+                    .eq(procedure_template_photographed_asset_model_id),
             )
             .order_by(photograph_procedures::procedure.asc())
             .load::<Self>(conn)
@@ -924,9 +924,9 @@ impl PhotographProcedure {
         use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
         Self::table()
             .filter(
-                photograph_procedures::procedure_template.eq(procedure_template).and(
+                photograph_procedures::procedure_template.eq(procedure_template_id).and(
                     photograph_procedures::procedure_template_photographed_asset_model
-                        .eq(procedure_template_photographed_asset_model),
+                        .eq(procedure_template_photographed_asset_model_id),
                 ),
             )
             .order_by(photograph_procedures::procedure.asc())
@@ -945,7 +945,7 @@ impl PhotographProcedure {
         use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
         Self::table()
             .filter(
-                photograph_procedures::procedure_template.eq(procedure_template).and(
+                photograph_procedures::procedure_template.eq(procedure_template_id).and(
                     photograph_procedures::procedure_template_photograph_model
                         .eq(procedure_template_photograph_model),
                 ),
@@ -966,7 +966,7 @@ impl PhotographProcedure {
         use crate::codegen::diesel_codegen::tables::photograph_procedures::photograph_procedures;
         Self::table()
             .filter(
-                photograph_procedures::procedure_template.eq(procedure_template).and(
+                photograph_procedures::procedure_template.eq(procedure_template_id).and(
                     photograph_procedures::procedure_template_photographed_with_model
                         .eq(procedure_template_photographed_with_model),
                 ),
@@ -1013,7 +1013,7 @@ impl PhotographProcedure {
             .inner_join(
                 procedures::table.on(photograph_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(photograph_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -1057,7 +1057,9 @@ impl PhotographProcedure {
             .inner_join(
                 procedures::table.on(photograph_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(photograph_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

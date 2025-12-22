@@ -15,7 +15,7 @@
         foreign_key = created_by
     )
 )]
-#[diesel(primary_key(left_asset_model, right_asset_model))]
+#[diesel(primary_key(left_asset_model_id, right_asset_model_id))]
 #[diesel(
     table_name = crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules
 )]
@@ -35,8 +35,8 @@ for web_common_traits::database::IdOrBuilder<
 > {
     fn from(value: &'a AssetCompatibilityRule) -> Self {
         web_common_traits::database::IdOrBuilder::Id((
-            value.left_asset_model,
-            value.right_asset_model,
+            value.left_asset_model_id,
+            value.right_asset_model_id,
         ))
     }
 }
@@ -51,13 +51,13 @@ where
 impl diesel::Identifiable for AssetCompatibilityRule {
     type Id = (i32, i32);
     fn id(self) -> Self::Id {
-        (self.left_asset_model, self.right_asset_model)
+        (self.left_asset_model_id, self.right_asset_model_id)
     }
 }
 impl web_common_traits::database::PrimaryKeyLike for AssetCompatibilityRule {
     type PrimaryKey = (i32, i32);
     fn primary_key(&self) -> Self::PrimaryKey {
-        (self.left_asset_model, self.right_asset_model)
+        (self.left_asset_model_id, self.right_asset_model_id)
     }
 }
 impl AssetCompatibilityRule {
@@ -84,7 +84,7 @@ impl AssetCompatibilityRule {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
-            self.left_asset_model,
+            self.left_asset_model_id,
             conn,
         )
     }
@@ -101,7 +101,7 @@ impl AssetCompatibilityRule {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
-            self.right_asset_model,
+            self.right_asset_model_id,
             conn,
         )
     }
@@ -112,35 +112,35 @@ impl AssetCompatibilityRule {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
             (
                 diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model,
+                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model_id,
                 >,
                 diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model,
+                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model_id,
                 >,
             ),
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
             (
                 diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model,
+                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model_id,
                 >,
                 diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model,
+                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model_id,
                 >,
             ),
         >>::Output: diesel::RunQueryDsl<C>
@@ -150,7 +150,7 @@ impl AssetCompatibilityRule {
 
         use crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules;
         Self::table()
-            .filter(asset_compatibility_rules::left_asset_model.eq(left_asset_model))
+            .filter(asset_compatibility_rules::left_asset_model.eq(left_asset_model_id))
             .order_by((
                 asset_compatibility_rules::left_asset_model.asc(),
                 asset_compatibility_rules::right_asset_model.asc(),
@@ -164,35 +164,35 @@ impl AssetCompatibilityRule {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
             (
                 diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model,
+                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model_id,
                 >,
                 diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model,
+                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model_id,
                 >,
             ),
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
             (
                 diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model,
+                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::left_asset_model_id,
                 >,
                 diesel::helper_types::Asc<
-                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model,
+                    crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules::right_asset_model_id,
                 >,
             ),
         >>::Output: diesel::RunQueryDsl<C>
@@ -202,7 +202,7 @@ impl AssetCompatibilityRule {
 
         use crate::codegen::diesel_codegen::tables::asset_compatibility_rules::asset_compatibility_rules;
         Self::table()
-            .filter(asset_compatibility_rules::right_asset_model.eq(right_asset_model))
+            .filter(asset_compatibility_rules::right_asset_model.eq(right_asset_model_id))
             .order_by((
                 asset_compatibility_rules::left_asset_model.asc(),
                 asset_compatibility_rules::right_asset_model.asc(),

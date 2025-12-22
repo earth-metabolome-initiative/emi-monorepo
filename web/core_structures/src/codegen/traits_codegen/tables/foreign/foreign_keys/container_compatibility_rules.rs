@@ -19,7 +19,7 @@ for crate::codegen::structs_codegen::tables::container_compatibility_rules::Cont
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
-                        self.contained_asset_model,
+                        self.contained_asset_model_id,
                     ),
                 ),
             );
@@ -81,8 +81,8 @@ for crate::codegen::structs_codegen::tables::container_compatibility_rules::Cont
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.contained_asset_model == physical_asset_models.id {
-                    foreign_keys.contained_asset_model = Some(physical_asset_models);
+                if self.contained_asset_model_id == physical_asset_models.id {
+                    foreign_keys.contained_asset_model_id = Some(physical_asset_models);
                     updated = true;
                 }
             }
@@ -92,8 +92,8 @@ for crate::codegen::structs_codegen::tables::container_compatibility_rules::Cont
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.contained_asset_model == physical_asset_models.id {
-                    foreign_keys.contained_asset_model = None;
+                if self.contained_asset_model_id == physical_asset_models.id {
+                    foreign_keys.contained_asset_model_id = None;
                     updated = true;
                 }
             }

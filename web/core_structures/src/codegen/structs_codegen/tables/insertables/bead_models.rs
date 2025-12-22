@@ -112,7 +112,7 @@ impl InsertableBeadModel {}
 /// use web_common_traits::database::Insertable;
 /// use web_common_traits::database::InsertableVariant;
 ///
-/// let bead_model = BeadModel::new()
+/// let bead_model_id = BeadModel::new()
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
 ///    .description(description)?

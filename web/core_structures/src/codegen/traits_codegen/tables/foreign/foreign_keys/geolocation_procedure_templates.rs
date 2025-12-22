@@ -29,7 +29,7 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_geolocated_asset_model,
+                        self.procedure_template_geolocated_asset_model_id,
                     ),
                 ),
             );
@@ -45,7 +45,7 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::PhysicalAssetModel(
-                        self.geolocated_asset_model,
+                        self.geolocated_asset_model_id,
                     ),
                 ),
             );
@@ -89,8 +89,8 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.geolocated_asset_model == physical_asset_models.id {
-                    foreign_keys.geolocated_asset_model = Some(physical_asset_models);
+                if self.geolocated_asset_model_id == physical_asset_models.id {
+                    foreign_keys.geolocated_asset_model_id = Some(physical_asset_models);
                     updated = true;
                 }
             }
@@ -100,8 +100,8 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                 ),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.geolocated_asset_model == physical_asset_models.id {
-                    foreign_keys.geolocated_asset_model = None;
+                if self.geolocated_asset_model_id == physical_asset_models.id {
+                    foreign_keys.geolocated_asset_model_id = None;
                     updated = true;
                 }
             }
@@ -140,7 +140,7 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                 if self.procedure_template_geolocated_asset_model
                     == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_geolocated_asset_model = Some(
+                    foreign_keys.procedure_template_geolocated_asset_model_id = Some(
                         procedure_template_asset_models.clone(),
                     );
                     updated = true;
@@ -163,7 +163,7 @@ for crate::codegen::structs_codegen::tables::geolocation_procedure_templates::Ge
                 if self.procedure_template_geolocated_asset_model
                     == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_geolocated_asset_model = None;
+                    foreign_keys.procedure_template_geolocated_asset_model_id = None;
                     updated = true;
                 }
                 if self.procedure_template_geolocated_with_model

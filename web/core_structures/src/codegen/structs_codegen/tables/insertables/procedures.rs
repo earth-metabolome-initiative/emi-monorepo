@@ -138,7 +138,7 @@ impl InsertableProcedure {
         let Some(parent_procedure) = self.parent_procedure else {
             return Ok(None);
         };
-        let Some(parent_procedure_template) = self.parent_procedure_template else {
+        let Some(parent_procedure_template_id) = self.parent_procedure_template else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedures::Procedure::table()
@@ -147,7 +147,7 @@ impl InsertableProcedure {
                     .eq(parent_procedure)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
-                            .eq(parent_procedure_template),
+                            .eq(parent_procedure_template_id),
                     ),
             )
             .first::<
@@ -168,7 +168,7 @@ impl InsertableProcedure {
     {
         use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        let Some(parent_procedure_template) = self.parent_procedure_template else {
+        let Some(parent_procedure_template_id) = self.parent_procedure_template else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
@@ -195,10 +195,10 @@ impl InsertableProcedure {
     {
         use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        let Some(parent_procedure_template) = self.parent_procedure_template else {
+        let Some(parent_procedure_template_id) = self.parent_procedure_template else {
             return Ok(None);
         };
-        let Some(predecessor_procedure_template) = self.predecessor_procedure_template else {
+        let Some(predecessor_procedure_template_id) = self.predecessor_procedure_template else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::next_procedure_templates::NextProcedureTemplate::read(
@@ -229,11 +229,11 @@ impl InsertableProcedure {
     {
         use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        let Some(parent_procedure_template) = self.parent_procedure_template else {
+        let Some(parent_procedure_template_id) = self.parent_procedure_template else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::parent_procedure_templates::ParentProcedureTemplate::read(
-                (parent_procedure_template, self.procedure_template),
+                (parent_procedure_template, self.procedure_template_id),
                 conn,
             )
             .optional()
@@ -275,7 +275,7 @@ impl InsertableProcedure {
         let Some(predecessor_procedure) = self.predecessor_procedure else {
             return Ok(None);
         };
-        let Some(predecessor_procedure_template) = self.predecessor_procedure_template else {
+        let Some(predecessor_procedure_template_id) = self.predecessor_procedure_template else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedures::Procedure::table()
@@ -284,7 +284,7 @@ impl InsertableProcedure {
                     .eq(predecessor_procedure)
                     .and(
                         crate::codegen::diesel_codegen::tables::procedures::procedures::dsl::procedure_template
-                            .eq(predecessor_procedure_template),
+                            .eq(predecessor_procedure_template_id),
                     ),
             )
             .first::<
@@ -305,7 +305,7 @@ impl InsertableProcedure {
     {
         use diesel::OptionalExtension;
         use web_common_traits::database::Read;
-        let Some(predecessor_procedure_template) = self.predecessor_procedure_template else {
+        let Some(predecessor_procedure_template_id) = self.predecessor_procedure_template else {
             return Ok(None);
         };
         crate::codegen::structs_codegen::tables::procedure_templates::ProcedureTemplate::read(
@@ -362,7 +362,7 @@ impl InsertableProcedure {
 /// let procedure = Procedure::new()
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
-///    .procedure_template(procedure_template)?
+///    .procedure_template(procedure_template_id)?
 ///    // Note: `updated_by` is automatically set by the `created by` column.
 ///    .updated_by(updated_by)?
 ///    // Optionally set fields with default values
@@ -706,9 +706,10 @@ where
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let procedure_template =
-            <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(&procedure_template);
-        if let Some(parent_procedure_template) = self.parent_procedure_template {
+        let procedure_template = <PT as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &procedure_template_id,
+        );
+        if let Some(parent_procedure_template_id) = self.parent_procedure_template {
             pgrx_validation::must_be_distinct_i32(
                     procedure_template,
                     parent_procedure_template,
@@ -721,7 +722,7 @@ where
                         )
                 })?;
         }
-        if let Some(predecessor_procedure_template) = self.predecessor_procedure_template {
+        if let Some(predecessor_procedure_template_id) = self.predecessor_procedure_template {
             pgrx_validation::must_be_distinct_i32(
                     procedure_template,
                     predecessor_procedure_template,
@@ -734,7 +735,7 @@ where
                         )
                 })?;
         }
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     /// Sets the value of the `public.procedures.parent_procedure` column.
@@ -789,8 +790,8 @@ where
             <PPT as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
                 &parent_procedure_template,
             );
-        if let (Some(procedure_template), Some(parent_procedure_template)) =
-            (self.procedure_template, parent_procedure_template)
+        if let (Some(procedure_template_id), Some(parent_procedure_template_id)) =
+            (self.procedure_template, parent_procedure_template_id)
         {
             pgrx_validation::must_be_distinct_i32(
                     procedure_template,
@@ -861,8 +862,8 @@ where
             <PPT as web_common_traits::database::MaybePrimaryKeyLike>::maybe_primary_key(
                 &predecessor_procedure_template,
             );
-        if let (Some(procedure_template), Some(predecessor_procedure_template)) =
-            (self.procedure_template, predecessor_procedure_template)
+        if let (Some(procedure_template_id), Some(predecessor_procedure_template_id)) =
+            (self.procedure_template, predecessor_procedure_template_id)
         {
             pgrx_validation::must_be_distinct_i32(
                     procedure_template,

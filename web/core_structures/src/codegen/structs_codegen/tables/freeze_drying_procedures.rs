@@ -463,7 +463,7 @@ impl FreezeDryingProcedure {
         crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::freeze_drying_procedure_templates::freeze_drying_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::freeze_drying_procedure_templates::freeze_drying_procedure_templates::dsl::procedure_template_freeze_dried_container_model
                             .eq(&self.procedure_template_freeze_dried_container_model),
@@ -487,7 +487,7 @@ impl FreezeDryingProcedure {
         crate::codegen::structs_codegen::tables::freeze_drying_procedure_templates::FreezeDryingProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::freeze_drying_procedure_templates::freeze_drying_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::freeze_drying_procedure_templates::freeze_drying_procedure_templates::dsl::procedure_template_freeze_dried_with_model
                             .eq(&self.procedure_template_freeze_dried_with_model),
@@ -791,7 +791,7 @@ impl FreezeDryingProcedure {
 
         use crate::codegen::diesel_codegen::tables::freeze_drying_procedures::freeze_drying_procedures;
         Self::table()
-            .filter(freeze_drying_procedures::procedure_template.eq(procedure_template))
+            .filter(freeze_drying_procedures::procedure_template.eq(procedure_template_id))
             .order_by(freeze_drying_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -892,7 +892,7 @@ impl FreezeDryingProcedure {
         use crate::codegen::diesel_codegen::tables::freeze_drying_procedures::freeze_drying_procedures;
         Self::table()
             .filter(
-                freeze_drying_procedures::procedure_template.eq(procedure_template).and(
+                freeze_drying_procedures::procedure_template.eq(procedure_template_id).and(
                     freeze_drying_procedures::procedure_template_freeze_dried_container_model
                         .eq(procedure_template_freeze_dried_container_model),
                 ),
@@ -913,7 +913,7 @@ impl FreezeDryingProcedure {
         use crate::codegen::diesel_codegen::tables::freeze_drying_procedures::freeze_drying_procedures;
         Self::table()
             .filter(
-                freeze_drying_procedures::procedure_template.eq(procedure_template).and(
+                freeze_drying_procedures::procedure_template.eq(procedure_template_id).and(
                     freeze_drying_procedures::procedure_template_freeze_dried_with_model
                         .eq(procedure_template_freeze_dried_with_model),
                 ),
@@ -960,7 +960,7 @@ impl FreezeDryingProcedure {
             .inner_join(
                 procedures::table.on(freeze_drying_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(freeze_drying_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -1004,7 +1004,9 @@ impl FreezeDryingProcedure {
             .inner_join(
                 procedures::table.on(freeze_drying_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(freeze_drying_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

@@ -423,7 +423,7 @@ impl InsertableFractioningProcedure {
         crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template_fragment_container_model
                             .eq(&self.procedure_template_fragment_container_model),
@@ -447,7 +447,7 @@ impl InsertableFractioningProcedure {
         crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template_fragment_placed_into_model
                             .eq(&self.procedure_template_fragment_placed_into_model),
@@ -471,7 +471,7 @@ impl InsertableFractioningProcedure {
         crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::fractioning_procedure_templates::fractioning_procedure_templates::dsl::procedure_template_weighed_with_model
                             .eq(&self.procedure_template_weighed_with_model),
@@ -615,7 +615,7 @@ impl InsertableFractioningProcedure {
 ///    .kilograms(kilograms)?
 ///    .procedure_fragment_container(procedure_fragment_container)?
 ///    .procedure_fragment_placed_into(procedure_fragment_placed_into)?
-///    .procedure_template(procedure_template)?
+///    .procedure_template(procedure_template_id)?
 ///    .procedure_weighed_with(procedure_weighed_with)?
 ///    .created_by(created_by)?
 ///    // Note: `updated_by` is automatically set by the `created by` column.
@@ -1072,7 +1072,7 @@ where
                     attribute.into(),
                 ))
             })?;
-        self.procedure_template = Some(procedure_template);
+        self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
     ///Sets the value of the `public.fractioning_procedures.fragment_container` column.
@@ -1292,10 +1292,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_fragment_container {
             procedure_fragment_container = if let (
                 Some(procedure_template_fragment_container_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_fragment_container_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_fragment_container_model
                     != procedure_template_asset_model
@@ -1309,11 +1309,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_fragment_container_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_fragment_container_model) = self
@@ -1555,10 +1555,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_fragment_placed_into {
             procedure_fragment_placed_into = if let (
                 Some(procedure_template_fragment_placed_into_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_fragment_placed_into_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_fragment_placed_into_model
                     != procedure_template_asset_model
@@ -1572,11 +1572,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_fragment_placed_into_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_fragment_placed_into_model) = self
@@ -1802,10 +1802,10 @@ where
         if let web_common_traits::database::IdOrBuilder::Builder(builder) = procedure_weighed_with {
             procedure_weighed_with = if let (
                 Some(procedure_template_weighed_with_model),
-                Some(procedure_template_asset_model),
+                Some(procedure_template_asset_model_id),
             ) = (
                 self.procedure_template_weighed_with_model,
-                builder.procedure_template_asset_model,
+                builder.procedure_template_asset_model_id,
             ) {
                 if procedure_template_weighed_with_model
                     != procedure_template_asset_model
@@ -1819,11 +1819,11 @@ where
                     );
                 }
                 builder.into()
-            } else if let Some(procedure_template_asset_model) = builder
+            } else if let Some(procedure_template_asset_model_id) = builder
                 .procedure_template_asset_model
             {
                 self.procedure_template_weighed_with_model = Some(
-                    procedure_template_asset_model,
+                    procedure_template_asset_model_id,
                 );
                 builder.into()
             } else if let Some(procedure_template_weighed_with_model) = self

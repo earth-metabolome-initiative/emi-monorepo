@@ -94,6 +94,7 @@ impl ForeignKeyLike for TableAttribute<CreateTable, ForeignKeyConstraint> {
     where
         Self: 'db,
     {
+        let host_table = self.host_table(database);
         let referenced_table = self.referenced_table(database);
         self.attribute().referred_columns.iter().map(move |col_name| {
             referenced_table
@@ -101,8 +102,9 @@ impl ForeignKeyLike for TableAttribute<CreateTable, ForeignKeyConstraint> {
                 .find(|col: &&<Self::DB as DatabaseLike>::Column| &col.attribute().name == col_name)
                 .unwrap_or_else(|| {
                     panic!(
-                        "Referenced column `{}` not found in table `{}` for foreign key",
+                        "Referenced column `{}` in table `{}` not found in table `{}` for foreign key",
                         col_name,
+                        host_table.table_name(),
                         referenced_table.table_name()
                     )
                 })

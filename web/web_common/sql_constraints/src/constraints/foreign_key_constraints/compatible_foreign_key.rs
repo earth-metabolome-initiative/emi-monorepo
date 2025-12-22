@@ -3,6 +3,8 @@
 //! with the referenced columns, i.e. have the same data type and they are from
 //! which are part the same extension hierarchy.
 
+use std::borrow::Borrow;
+
 use common_traits::builder::Builder;
 use sql_traits::traits::{ColumnLike, DatabaseLike, ForeignKeyLike, TableLike};
 
@@ -94,21 +96,113 @@ impl<DB: DatabaseLike> ForeignKeyConstraint for CompatibleForeignKey<DB> {
             foreign_key.host_columns(database).zip(foreign_key.referenced_columns(database))
         {
             if !host_column.is_compatible_with(database, referenced_column) {
-                return Err(crate::error::Error::ForeignKey(
-                    ConstraintErrorInfo::new()
-                        .constraint("CompatibleForeignKey")
-                        .unwrap()
-                        .object(foreign_key.foreign_key_name().unwrap_or("Unnamed foreign key").to_owned())
-                        .unwrap()
-                        .message(format!(
-                            "Foreign key column `{}.{}` is not compatible with referenced column `{}.{}`",
+                // Determine the specific reason for incompatibility
+                let (message, resolution) = if host_column.is_generated()
+                    && referenced_column.is_generated()
+                {
+                    (
+                        format!(
+                            "Foreign key column `{}.{}` and referenced column `{}.{}` are both generative (auto-increment/serial), which means they should never have the same value",
                             host_table.table_name(),
                             host_column.column_name(),
                             referenced_table.table_name(),
                             referenced_column.column_name(),
-                        ))
+                        ),
+                        format!(
+                            "Remove the generative property from `{}.{}` (change from SERIAL/AUTO_INCREMENT to INT/BIGINT) or redesign the foreign key relationship",
+                            host_table.table_name(),
+                            host_column.column_name(),
+                        ),
+                    )
+                } else if host_column.normalized_data_type(database)
+                    != referenced_column.normalized_data_type(database)
+                {
+                    (
+                        format!(
+                            "Foreign key column `{}.{}` has data type '{}' which is incompatible with referenced column `{}.{}` data type '{}'",
+                            host_table.table_name(),
+                            host_column.column_name(),
+                            host_column.normalized_data_type(database),
+                            referenced_table.table_name(),
+                            referenced_column.column_name(),
+                            referenced_column.normalized_data_type(database),
+                        ),
+                        format!(
+                            "Change the data type of `{}.{}` to '{}' to match the referenced column",
+                            host_table.table_name(),
+                            host_column.column_name(),
+                            referenced_column.normalized_data_type(database),
+                        ),
+                    )
+                } else {
+                    // The columns reference incompatible table hierarchies
+                    let host_referenced_tables =
+                        host_table.referenced_tables_via_column(database, host_column.borrow());
+                    let other_referenced_tables = referenced_table
+                        .referenced_tables_via_column(database, referenced_column.borrow());
+
+                    let host_refs = if !host_referenced_tables.is_empty() {
+                        host_referenced_tables
+                            .iter()
+                            .map(|t| t.table_name())
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    } else if host_column.is_primary_key(database) {
+                        format!("{} (primary key)", host_table.table_name())
+                    } else {
+                        "none".to_string()
+                    };
+
+                    let other_refs = if !other_referenced_tables.is_empty() {
+                        other_referenced_tables
+                            .iter()
+                            .map(|t| t.table_name())
+                            .collect::<Vec<_>>()
+                            .join(", ")
+                    } else if referenced_column.is_primary_key(database) {
+                        format!("{} (primary key)", referenced_table.table_name())
+                    } else {
+                        "none".to_string()
+                    };
+
+                    (
+                        format!(
+                            "Foreign key column `{}.{}` is not compatible with referenced column `{}.{}`: they reference incompatible table hierarchies. `{}.{}` references [{}], while `{}.{}` references [{}]",
+                            host_table.table_name(),
+                            host_column.column_name(),
+                            referenced_table.table_name(),
+                            referenced_column.column_name(),
+                            host_table.table_name(),
+                            host_column.column_name(),
+                            host_refs,
+                            referenced_table.table_name(),
+                            referenced_column.column_name(),
+                            other_refs,
+                        ),
+                        format!(
+                            "Ensure that `{}.{}` and `{}.{}` are part of the same table extension hierarchy, or reconsider the foreign key relationship",
+                            host_table.table_name(),
+                            host_column.column_name(),
+                            referenced_table.table_name(),
+                            referenced_column.column_name(),
+                        ),
+                    )
+                };
+
+                return Err(crate::error::Error::ForeignKey(
+                    ConstraintErrorInfo::new()
+                        .constraint("CompatibleForeignKey")
                         .unwrap()
-                        .resolution("Ensure that the foreign key column is compatible with the referenced column".to_string())
+                        .object(
+                            foreign_key
+                                .foreign_key_name()
+                                .unwrap_or("Unnamed foreign key")
+                                .to_owned(),
+                        )
+                        .unwrap()
+                        .message(message)
+                        .unwrap()
+                        .resolution(resolution)
                         .unwrap()
                         .build()
                         .unwrap()

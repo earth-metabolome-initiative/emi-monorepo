@@ -83,7 +83,7 @@ impl InsertableAssetCompatibilityRule {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
-            self.left_asset_model,
+            self.left_asset_model_id,
             conn,
         )
     }
@@ -100,7 +100,7 @@ impl InsertableAssetCompatibilityRule {
     {
         use web_common_traits::database::Read;
         crate::codegen::structs_codegen::tables::asset_models::AssetModel::read(
-            self.right_asset_model,
+            self.right_asset_model_id,
             conn,
         )
     }
@@ -125,8 +125,8 @@ impl InsertableAssetCompatibilityRule {
 /// let asset_compatibility_rule = AssetCompatibilityRule::new()
 ///    // Set mandatory fields
 ///    .created_by(created_by)?
-///    .left_asset_model(left_asset_model)?
-///    .right_asset_model(right_asset_model)?
+///    .left_asset_model(left_asset_model_id)?
+///    .right_asset_model(right_asset_model_id)?
 ///    // Optionally set fields with default values
 ///    .created_at(created_at)?
 ///    // Finally, insert the new record in the database
@@ -275,11 +275,11 @@ where
     where
         LAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let left_asset_model = <LAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &left_asset_model,
+        let left_asset_model_id = <LAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &left_asset_model_id,
         );
-        if let Some(right_asset_model) = self.right_asset_model {
-            pgrx_validation::must_be_distinct_i32(left_asset_model, right_asset_model)
+        if let Some(right_asset_model_id) = self.right_asset_model_id {
+            pgrx_validation::must_be_distinct_i32(left_asset_model_id, right_asset_model_id)
                 .map_err(|e| {
                     e
                         .rename_fields(
@@ -288,7 +288,7 @@ where
                         )
                 })?;
         }
-        self.left_asset_model = Some(left_asset_model);
+        self.left_asset_model_id = Some(left_asset_model_id);
         Ok(self)
     }
     ///Sets the value of the `public.asset_compatibility_rules.right_asset_model` column.
@@ -299,11 +299,11 @@ where
     where
         RAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
     {
-        let right_asset_model = <RAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
-            &right_asset_model,
+        let right_asset_model_id = <RAM as web_common_traits::database::PrimaryKeyLike>::primary_key(
+            &right_asset_model_id,
         );
-        if let Some(left_asset_model) = self.left_asset_model {
-            pgrx_validation::must_be_distinct_i32(left_asset_model, right_asset_model)
+        if let Some(left_asset_model_id) = self.left_asset_model_id {
+            pgrx_validation::must_be_distinct_i32(left_asset_model_id, right_asset_model_id)
                 .map_err(|e| {
                     e
                         .rename_fields(
@@ -312,7 +312,7 @@ where
                         )
                 })?;
         }
-        self.right_asset_model = Some(right_asset_model);
+        self.right_asset_model_id = Some(right_asset_model_id);
         Ok(self)
     }
     ///Sets the value of the `public.asset_compatibility_rules.created_by` column.

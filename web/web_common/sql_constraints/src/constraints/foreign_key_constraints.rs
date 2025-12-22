@@ -6,3 +6,5 @@ mod lowercase_foreign_key_name;
 pub use lowercase_foreign_key_name::LowercaseForeignKeyName;
 mod references_unique_index;
 pub use references_unique_index::ReferencesUniqueIndex;
+mod primary_key_reference_ends_with_id;
+pub use primary_key_reference_ends_with_id::PrimaryKeyReferenceEndsWithId;

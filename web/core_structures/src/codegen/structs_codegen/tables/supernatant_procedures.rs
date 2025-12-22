@@ -376,7 +376,7 @@ impl SupernatantProcedure {
         crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_supernatant_destination_model
                             .eq(&self.procedure_template_supernatant_destination_model),
@@ -400,7 +400,7 @@ impl SupernatantProcedure {
         crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_transferred_with_model
                             .eq(&self.procedure_template_transferred_with_model),
@@ -424,7 +424,7 @@ impl SupernatantProcedure {
         crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_pipette_tip_model
                             .eq(&self.procedure_template_pipette_tip_model),
@@ -448,7 +448,7 @@ impl SupernatantProcedure {
         crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate::table()
             .filter(
                 crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template
-                    .eq(&self.procedure_template)
+                    .eq(&self.procedure_template_id)
                     .and(
                         crate::codegen::diesel_codegen::tables::supernatant_procedure_templates::supernatant_procedure_templates::dsl::procedure_template_stratified_source_model
                             .eq(&self.procedure_template_stratified_source_model),
@@ -977,7 +977,7 @@ impl SupernatantProcedure {
 
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
         Self::table()
-            .filter(supernatant_procedures::procedure_template.eq(procedure_template))
+            .filter(supernatant_procedures::procedure_template.eq(procedure_template_id))
             .order_by(supernatant_procedures::procedure.asc())
             .load::<Self>(conn)
     }
@@ -1036,7 +1036,7 @@ impl SupernatantProcedure {
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
         Self::table()
             .filter(
-                supernatant_procedures::procedure_template.eq(procedure_template).and(
+                supernatant_procedures::procedure_template.eq(procedure_template_id).and(
                     supernatant_procedures::procedure_template_supernatant_destination_model
                         .eq(procedure_template_supernatant_destination_model),
                 ),
@@ -1057,7 +1057,7 @@ impl SupernatantProcedure {
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
         Self::table()
             .filter(
-                supernatant_procedures::procedure_template.eq(procedure_template).and(
+                supernatant_procedures::procedure_template.eq(procedure_template_id).and(
                     supernatant_procedures::procedure_template_transferred_with_model
                         .eq(procedure_template_transferred_with_model),
                 ),
@@ -1078,7 +1078,7 @@ impl SupernatantProcedure {
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
         Self::table()
             .filter(
-                supernatant_procedures::procedure_template.eq(procedure_template).and(
+                supernatant_procedures::procedure_template.eq(procedure_template_id).and(
                     supernatant_procedures::procedure_template_pipette_tip_model
                         .eq(procedure_template_pipette_tip_model),
                 ),
@@ -1099,7 +1099,7 @@ impl SupernatantProcedure {
         use crate::codegen::diesel_codegen::tables::supernatant_procedures::supernatant_procedures;
         Self::table()
             .filter(
-                supernatant_procedures::procedure_template.eq(procedure_template).and(
+                supernatant_procedures::procedure_template.eq(procedure_template_id).and(
                     supernatant_procedures::procedure_template_stratified_source_model
                         .eq(procedure_template_stratified_source_model),
                 ),
@@ -1474,7 +1474,7 @@ impl SupernatantProcedure {
             .inner_join(
                 procedures::table.on(supernatant_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::parent_procedure_template.eq(parent_procedure_template))
+            .filter(procedures::parent_procedure_template.eq(parent_procedure_template_id))
             .order_by(supernatant_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)
@@ -1518,7 +1518,9 @@ impl SupernatantProcedure {
             .inner_join(
                 procedures::table.on(supernatant_procedures::procedure.eq(procedures::procedure)),
             )
-            .filter(procedures::predecessor_procedure_template.eq(predecessor_procedure_template))
+            .filter(
+                procedures::predecessor_procedure_template.eq(predecessor_procedure_template_id),
+            )
             .order_by(supernatant_procedures::procedure.asc())
             .select(Self::as_select())
             .load::<Self>(conn)

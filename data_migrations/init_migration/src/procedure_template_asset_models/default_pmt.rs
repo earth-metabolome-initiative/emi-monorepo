@@ -34,6 +34,6 @@ where
         diesel::Identifiable<Id = <&'a AssetModel as diesel::Identifiable>::Id>,
 {
     use diesel::Identifiable;
-    let asset_model = AssetModel::read(*asset_model_like.id(), conn)?;
-    Ok(ProcedureTemplateAssetModel::new().name(&asset_model.name)?.asset_model(asset_model)?)
+    let asset_model_id = AssetModel::read(*asset_model_like.id(), conn)?;
+    Ok(ProcedureTemplateAssetModel::new().name(&asset_model.name)?.asset_model(asset_model_id)?)
 }

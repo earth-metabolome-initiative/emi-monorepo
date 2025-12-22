@@ -116,7 +116,7 @@ where
         use web_common_traits::database::FromExtension;
         use web_common_traits::database::TryInsertGeneric;
         use web_common_traits::database::Read;
-        if let Some(procedure_template) = self.procedure_template {
+        if let Some(procedure_template_id) = self.procedure_template {
             let capping_procedure_templates = crate::codegen::structs_codegen::tables::capping_procedure_templates::CappingProcedureTemplate::read(
                 procedure_template,
                 conn,
@@ -146,11 +146,11 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::CappingProcedureSettable>::capped_container_model(
                 self,
-                procedure_assets.asset_model,
+                procedure_assets.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::CappingProcedureSettable>::procedure_template_capped_container_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_capped_with) = self
@@ -162,11 +162,11 @@ where
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::CappingProcedureSettable>::capped_with_model(
                 self,
-                procedure_assets.asset_model,
+                procedure_assets.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::CappingProcedureSettable>::procedure_template_capped_with_model(
                 self,
-                procedure_assets.procedure_template_asset_model,
+                procedure_assets.procedure_template_asset_model_id,
             )?;
         }
         let procedure_template = self

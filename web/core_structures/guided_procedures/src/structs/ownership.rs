@@ -115,7 +115,7 @@ pub trait OwnershipLike: AsRef<Ownership> {
     ///
     /// * `procedure_template` - The procedure template to check.
     fn is_foreign_procedure_template(&self, procedure_template: &ProcedureTemplate) -> bool {
-        self.as_ref().foreign_procedure_templates.binary_search(procedure_template).is_ok()
+        self.as_ref().foreign_procedure_templates.binary_search(procedure_template_id).is_ok()
     }
 
     /// Returns an iterator over all procedure template asset models in the
@@ -146,7 +146,7 @@ pub trait OwnershipLike: AsRef<Ownership> {
         self.as_ref()
             .foreign_procedure_templates
             .binary_search_by(|pt| {
-                pt.procedure_template.cmp(&procedure_template_asset_model.procedure_template)
+                pt.procedure_template.cmp(&procedure_template_asset_model.procedure_template_id)
             })
             .ok()
             .and_then(|index| self.as_ref().foreign_procedure_templates.get(index))
@@ -163,7 +163,7 @@ pub trait OwnershipLike: AsRef<Ownership> {
         &self,
         procedure_template_asset_model: &ProcedureTemplateAssetModel,
     ) -> bool {
-        self.foreign_procedure_template_of(procedure_template_asset_model).is_some()
+        self.foreign_procedure_template_of(procedure_template_asset_model_id).is_some()
     }
 
     /// Returns the procedure template asset models which are owned by the
@@ -177,9 +177,9 @@ pub trait OwnershipLike: AsRef<Ownership> {
         &self,
         procedure_template: &ProcedureTemplate,
     ) -> impl Iterator<Item = &ProcedureTemplateAssetModel> {
-        assert!(self.is_foreign_procedure_template(procedure_template));
+        assert!(self.is_foreign_procedure_template(procedure_template_id));
         self.procedure_template_asset_models()
-            .filter(move |ptam| ptam.procedure_template == procedure_template.procedure_template)
+            .filter(move |ptam| ptam.procedure_template == procedure_template.procedure_template_id)
     }
 
     /// Returns the procedure template asset models which are employed by
@@ -202,7 +202,7 @@ pub trait OwnershipLike: AsRef<Ownership> {
             .graph
             .left_nodes_vocabulary()
             .binary_search_by(|pt| {
-                pt.procedure_template.cmp(&procedure_template.procedure_template)
+                pt.procedure_template.cmp(&procedure_template.procedure_template_id)
             })
             .expect("Procedure template not part of ownership graph");
 
@@ -235,7 +235,7 @@ pub trait OwnershipLike: AsRef<Ownership> {
             .as_ref()
             .graph
             .right_nodes_vocabulary()
-            .binary_search(procedure_template_asset_model)
+            .binary_search(procedure_template_asset_model_id)
             .expect("Procedure template asset model not part of ownership graph");
 
         self.as_ref().asset_models.get(ptam_id).expect("Asset model id out of bounds")
@@ -283,13 +283,13 @@ pub trait OwnershipLike: AsRef<Ownership> {
         if procedure_template_asset_model.procedure_template == parents[0].procedure_template {
             // If the PTAM is owned by the root procedure template, it is its own
             // certain based on alias.
-            return Some(procedure_template_asset_model);
+            return Some(procedure_template_asset_model_id);
         }
 
         let nv = self.as_ref().derivatives.nodes_vocabulary();
 
         let ptam_id = nv
-            .binary_search(procedure_template_asset_model)
+            .binary_search(procedure_template_asset_model_id)
             .expect("Procedure template asset model not part of ownership graph");
 
         // Either the current PTAM has a single predecessor, or if they are

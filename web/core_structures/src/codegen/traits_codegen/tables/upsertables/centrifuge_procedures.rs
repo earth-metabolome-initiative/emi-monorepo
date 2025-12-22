@@ -19,7 +19,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(centrifuged_container.ne(excluded(centrifuged_container)))
                     .or(centrifuged_container_model.ne(excluded(centrifuged_container_model)))
                     .or(procedure_template_centrifuged_container_model
@@ -57,7 +57,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(centrifuged_container.ne(excluded(centrifuged_container)))
                     .or(centrifuged_container_model.ne(excluded(centrifuged_container_model)))
                     .or(procedure_template_centrifuged_container_model

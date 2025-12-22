@@ -101,7 +101,7 @@ impl web_common_traits::prelude::HasForeignKeys
             .send(
                 web_common_traits::crud::CrudPrimaryKeyOperation::Read(
                     crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureTemplateAssetModel(
-                        self.procedure_template_photographed_asset_model,
+                        self.procedure_template_photographed_asset_model_id,
                     ),
                 ),
             );
@@ -283,7 +283,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 if self.procedure_template_photographed_asset_model
                     == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_photographed_asset_model =
+                    foreign_keys.procedure_template_photographed_asset_model_id =
                         Some(procedure_template_asset_models.clone());
                     updated = true;
                 }
@@ -308,7 +308,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 if self.procedure_template_photographed_asset_model
                     == procedure_template_asset_models.id
                 {
-                    foreign_keys.procedure_template_photographed_asset_model = None;
+                    foreign_keys.procedure_template_photographed_asset_model_id = None;
                     updated = true;
                 }
                 if self.procedure_template_photographed_with_model

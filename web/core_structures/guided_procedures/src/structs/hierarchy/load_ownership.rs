@@ -49,7 +49,7 @@ impl Hierarchy {
         let mut procedure_template_asset_models = Vec::new();
         let mut edges = Vec::new();
 
-        for (i, procedure_template) in self.hierarchy.nodes_vocabulary().iter().enumerate() {
+        for (i, procedure_template_id) in self.hierarchy.nodes_vocabulary().iter().enumerate() {
             for ptam in procedure_template.procedure_template_asset_models(conn)? {
                 // If the owner of the procedure template asset model is not in
                 // the hierarchy, add it to the foreign procedure templates.
@@ -57,7 +57,7 @@ impl Hierarchy {
                     .hierarchy
                     .nodes_vocabulary()
                     .binary_search_by(|pt| {
-                        pt.as_ref().procedure_template.cmp(&ptam.procedure_template)
+                        pt.as_ref().procedure_template.cmp(&ptam.procedure_template_id)
                     })
                     .is_err()
                 {

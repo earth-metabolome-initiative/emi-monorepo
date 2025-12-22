@@ -19,10 +19,10 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(photographed_asset.ne(excluded(photographed_asset)))
                     .or(procedure_template_photographed_asset_model
-                        .ne(excluded(procedure_template_photographed_asset_model)))
+                        .ne(excluded(procedure_template_photographed_asset_model_id)))
                     .or(procedure_photographed_asset.ne(excluded(procedure_photographed_asset)))
                     .or(photographed_with.ne(excluded(photographed_with)))
                     .or(procedure_template_photographed_with_model
@@ -58,10 +58,10 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             .set(self)
             .filter(
                 procedure_template
-                    .ne(excluded(procedure_template))
+                    .ne(excluded(procedure_template_id))
                     .or(photographed_asset.ne(excluded(photographed_asset)))
                     .or(procedure_template_photographed_asset_model
-                        .ne(excluded(procedure_template_photographed_asset_model)))
+                        .ne(excluded(procedure_template_photographed_asset_model_id)))
                     .or(procedure_photographed_asset.ne(excluded(procedure_photographed_asset)))
                     .or(photographed_with.ne(excluded(photographed_with)))
                     .or(procedure_template_photographed_with_model
