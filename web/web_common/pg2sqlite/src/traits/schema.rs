@@ -26,10 +26,15 @@ pub trait Schema: DatabaseLike<Table = CreateTable, Function = CreateFunction> {
         let function_body = function.function_body.as_ref()?;
         match function_body {
             CreateFunctionBody::AsBeginEnd(body) => Some(body.clone()),
-            CreateFunctionBody::AsBeforeOptions(Expr::Value(ValueWithSpan {
-                value: Value::DollarQuotedString(DollarQuotedString { value: maybe_body, tag: _ }),
-                span: _,
-            })) => {
+            CreateFunctionBody::AsBeforeOptions {
+                body:
+                    Expr::Value(ValueWithSpan {
+                        value:
+                            Value::DollarQuotedString(DollarQuotedString { value: maybe_body, tag: _ }),
+                        span: _,
+                    }),
+                ..
+            } => {
                 // We strip spaces and semicolons from the body.
                 let maybe_body = maybe_body.trim().trim_end_matches(';').trim();
 

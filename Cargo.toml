@@ -95,7 +95,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 urlencoding = "2.1"
 schemars = "1.0.4"
 bincode = { version = "2", features = ["serde"] }
-sqlparser = { version = "0.60.0", git = "https://github.com/LucaCappelletti94/sqlparser-rs", branch = "main", features = [
+sqlparser = { version = "0.60.0", features = [
   "serde",
 ] }
 arbitrary = { version = "1", features = ["derive"] }

@@ -8,3 +8,5 @@ mod references_unique_index;
 pub use references_unique_index::ReferencesUniqueIndex;
 mod primary_key_reference_ends_with_id;
 pub use primary_key_reference_ends_with_id::PrimaryKeyReferenceEndsWithId;
+mod extension_foreign_key_on_delete_cascade;
+pub use extension_foreign_key_on_delete_cascade::ExtensionForeignKeyOnDeleteCascade;

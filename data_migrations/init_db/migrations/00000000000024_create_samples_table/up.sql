@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS sample_models (
-  id INTEGER PRIMARY KEY REFERENCES physical_asset_models(id),
+  id INTEGER PRIMARY KEY REFERENCES physical_asset_models(id) ON DELETE CASCADE,
   sample_source_model_id INTEGER NOT NULL REFERENCES sample_source_models(id),
 	-- We create a unique index to allow for foreign keys checking that there exist a `sample_source_model`
 	-- for the current `sample_model`.
@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS sample_models (
 );
 
 CREATE TABLE IF NOT EXISTS samples (
-  id UUID PRIMARY KEY REFERENCES physical_assets(id),
+  id UUID PRIMARY KEY REFERENCES physical_assets(id) ON DELETE CASCADE,
   sample_model_id INTEGER NOT NULL REFERENCES sample_models(id),
   sample_source_id UUID REFERENCES sample_sources(id),
   sample_source_model_id INTEGER NOT NULL REFERENCES sample_source_models(id),

@@ -1,14 +1,14 @@
 CREATE TABLE IF NOT EXISTS container_models (
-    id INTEGER PRIMARY KEY REFERENCES physical_asset_models(id)
+    id INTEGER PRIMARY KEY REFERENCES physical_asset_models(id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS volumetric_container_models (
-    id INTEGER PRIMARY KEY REFERENCES container_models(id),
+    id INTEGER PRIMARY KEY REFERENCES container_models(id) ON DELETE CASCADE,
     -- Volume in liters. The maximum volume of the container.
     volume REAL NOT NULL CHECK (volume > 0.0)
 );
 CREATE TABLE IF NOT EXISTS container_compatibility_rules (
-    container_model_id INTEGER NOT NULL REFERENCES container_models(id),
-    contained_asset_model_id INTEGER NOT NULL REFERENCES physical_asset_models(id),
+    container_model_id INTEGER NOT NULL REFERENCES container_models(id) ON DELETE CASCADE,
+    contained_asset_model_id INTEGER NOT NULL REFERENCES physical_asset_models(id) ON DELETE CASCADE,
     -- The maximal quantity of the right trackable that can be associated with the left trackable.
     quantity SMALLINT CHECK (quantity > 0),
     created_by_id INTEGER NOT NULL REFERENCES users(id),
