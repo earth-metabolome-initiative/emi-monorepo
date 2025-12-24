@@ -57,7 +57,15 @@ edition.workspace = true
         }
 
         // We include the crates associated to tables this table depends on
-        for dependency in table.referenced_tables(self.database) {
+        let mut dependencies = table
+            .referenced_tables(self.database)
+            .into_iter()
+            .chain(table.ancestral_extended_tables(self.database))
+            .collect::<Vec<_>>();
+        dependencies.sort_unstable();
+        dependencies.dedup();
+
+        for dependency in dependencies {
             // We skip eventual self-dependencies.
             if dependency.borrow() == table {
                 continue;

@@ -4,11 +4,13 @@
 //! [`ColumnLike`](sql_traits::traits::ColumnLike) trait.
 
 use quote::quote;
+use sql_relations::traits::VerticalSameAsColumnLike;
 use sql_traits::traits::{ColumnLike, TableLike};
 use syn::{Ident, Type};
 
 use crate::{
     structs::{ExternalTypeRef, Workspace},
+    traits::TableSynLike,
     utils::{camel_case_name, is_reserved_rust_word, snake_case_name},
 };
 
@@ -247,8 +249,22 @@ pub trait ColumnSynLike: ColumnLike {
             });
         }
 
+        // If the column has vertical same-as constraint, we add the
+        // ` #[same_as(parent::parent_column)]` decorators
+        let mut vertical_same_as_decorators = vec![];
+        for same_as in self.dominant_vertical_same_as_columns(database) {
+            let parent_table = same_as.table(database);
+            let parent_table_ident = parent_table.table_snake_ident();
+            let parent_column_ident = same_as.column_snake_ident();
+            let parent_table_crate = parent_table.crate_ident(workspace);
+            vertical_same_as_decorators.push(quote! {
+                #[same_as(#parent_table_crate::#parent_table_ident::#parent_column_ident)]
+            });
+        }
+
         let tokens = quote! {
             #documentation
+            #(#vertical_same_as_decorators)*
             #sql_type_decorator
             #column_ident: #rust_type
         };

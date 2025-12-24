@@ -64,13 +64,13 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
             let ancestor_table_paths: Vec<syn::Path> = ancestors
                 .iter()
                 .map(|ancestor_table| {
-                    let ancestor_crate = ancestor_table.crate_ident(workspace);
                     let ancestor_table_ident = ancestor_table.table_snake_ident();
-                    syn::parse_quote! { #ancestor_crate::#ancestor_table_ident }
+                    let ancestor_table_crate_ident = ancestor_table.crate_ident(workspace);
+                    syn::parse_quote! { #ancestor_table_crate_ident::#ancestor_table_ident }
                 })
                 .collect();
             ancestor_decorator = Some(quote! {
-                #[table_model(ancestors = (#(#ancestor_table_paths),*))]
+                #[table_model(ancestors(#(#ancestor_table_paths),*))]
             });
         }
 

@@ -99,9 +99,8 @@ sqlparser = { version = "0.60.0", features = [
   "serde",
 ] }
 arbitrary = { version = "1", features = ["derive"] }
-diesel = { git = "https://github.com/LucaCappelletti94/diesel", branch = "on-conflict-dsl", features = [
+diesel = { git = "https://github.com/LucaCappelletti94/diesel", branch = "future3", features = [
   "extras",
-  "i-implement-a-third-party-backend-and-opt-into-breaking-changes",
 ] }
 # diesel_full_text_search = "2.2"
 diesel_pgrx = { path = "utils/diesel_pgrx" }
