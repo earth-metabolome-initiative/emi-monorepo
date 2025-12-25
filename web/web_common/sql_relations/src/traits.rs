@@ -8,6 +8,7 @@ pub use most_concrete::{InheritableDatabaseLike, MostConcreteColumnLike, MostCon
 mod same_as;
 pub use same_as::{
     HorizontalSameAsColumnLike, HorizontalSameAsForeignKeyLike, HorizontalSameAsTableLike,
-    SameAsIndexLike, SameAsTableLike, TriangularSameAsForeignKeyLike, TriangularSameAsTableLike,
-    VerticalSameAsColumnLike, VerticalSameAsForeignKeyLike, VerticalSameAsTableLike,
+    SameAsIndexLike, SameAsTableLike, TriangularSameAsColumnLike, TriangularSameAsForeignKeyLike,
+    TriangularSameAsTableLike, VerticalSameAsColumnLike, VerticalSameAsForeignKeyLike,
+    VerticalSameAsTableLike,
 };

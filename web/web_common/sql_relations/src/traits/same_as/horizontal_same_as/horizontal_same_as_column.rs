@@ -40,6 +40,9 @@ where
     ///   "#,
     /// )?;
     /// let left_table = db.table(None, "left").unwrap();
+    /// let right_id_column =
+    ///     left_table.column("right_id", &db).expect("Column 'right_id' should exist");
+    /// assert_eq!(right_id_column.horizontal_same_as_foreign_keys(&db).count(), 2);
     /// let name_column = left_table.column("name", &db).expect("Column 'name' should exist");
     /// let age_column = left_table.column("age", &db).expect("Column 'age' should exist");
     /// assert_eq!(name_column.horizontal_same_as_foreign_keys(&db).count(), 1);

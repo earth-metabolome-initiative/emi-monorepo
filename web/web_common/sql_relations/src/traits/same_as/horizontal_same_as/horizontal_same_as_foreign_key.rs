@@ -58,7 +58,10 @@ pub trait HorizontalSameAsForeignKeyLike: VerticalSameAsForeignKeyLike {
             return false;
         };
 
-        unique_index.is_same_as(database) && !self.is_vertical_same_as(database)
+        unique_index.is_same_as(database)
+            && !self.is_vertical_same_as(database)
+            && !self.is_self_referential(database)
+            && !self.references_ancestor_table(database)
     }
 
     /// Returns the tuple of host-referenced column pairs for this horizontal
@@ -99,10 +102,12 @@ pub trait HorizontalSameAsForeignKeyLike: VerticalSameAsForeignKeyLike {
     ///     .column("brother_id", &db)
     ///     .expect("Column 'brother_id' should exist in child table");
     /// let foreign_keys = child_table.foreign_keys(&db).collect::<Vec<_>>();
-    /// let [pk_fk, vertical_fk, horizontal_fk] = &foreign_keys.as_slice() else {
-    ///     panic!("Expected exactly 3 foreign keys in child table");
+    /// let [pk_fk, brother_fk, vertical_fk, horizontal_fk] = &foreign_keys.as_slice() else {
+    ///     panic!("Expected exactly 4 foreign keys in child table, got {}", foreign_keys.len());
     /// };
     /// assert!(pk_fk.is_extension_foreign_key(&db), "Expected extension primary key");
+    /// assert!(!brother_fk.is_extension_foreign_key(&db), "Expected non-extension foreign key");
+    /// assert!(!brother_fk.is_vertical_same_as(&db), "Expected non-vertical same-as foreign key");
     /// assert!(vertical_fk.is_vertical_same_as(&db), "Expected vertical same-as foreign key");
     /// assert!(!vertical_fk.is_horizontal_same_as(&db), "Expected non-horizontal same-as foreign key");
     /// assert!(horizontal_fk.is_horizontal_same_as(&db), "Expected horizontal same-as foreign key");

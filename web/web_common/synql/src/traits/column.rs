@@ -3,9 +3,14 @@
 //! representation, building on top of the
 //! [`ColumnLike`](sql_traits::traits::ColumnLike) trait.
 
+use std::borrow::Borrow;
+
 use quote::quote;
-use sql_relations::traits::VerticalSameAsColumnLike;
-use sql_traits::traits::{ColumnLike, TableLike};
+use sql_relations::traits::{
+    HorizontalSameAsColumnLike, TriangularSameAsColumnLike, TriangularSameAsForeignKeyLike,
+    VerticalSameAsColumnLike,
+};
+use sql_traits::traits::{ColumnLike, ForeignKeyLike, TableLike};
 use syn::{Ident, Type};
 
 use crate::{
@@ -262,13 +267,85 @@ pub trait ColumnSynLike: ColumnLike {
             });
         }
 
-        let tokens = quote! {
+        // If the column has horizontal same-as constraint, we add the
+        // ` #[same_as(satellite::table::column, key)]` decorators
+        let mut horizontal_same_as_decorators = vec![];
+        for same_as in self.horizontal_same_as_foreign_keys(database) {
+            let host_columns =
+                same_as.host_columns(database).map(Borrow::borrow).collect::<Vec<&Self>>();
+            let referenced_columns =
+                same_as.referenced_columns(database).map(Borrow::borrow).collect::<Vec<&Self>>();
+
+            let [key, other] = host_columns.as_slice() else {
+                unimplemented!(
+                    "Only binary foreign keys are supported for horizontal same-as constraints, found a foreign key in table `{}` to table `{}` with `{}` columns: {}",
+                    same_as.host_table(database).table_name(),
+                    same_as.referenced_table(database).table_name(),
+                    host_columns.len(),
+                    host_columns.iter().map(|col| col.column_name()).collect::<Vec<_>>().join(", ")
+                );
+            };
+            let [_foreign_pk, referenced_column] = referenced_columns.as_slice() else {
+                unreachable!();
+            };
+
+            if !same_as.is_horizontal_same_as_of_triangular(database) {
+                continue;
+            }
+
+            if key == &self {
+                // The key is handled separately in the discretionary/mandatory
+                // decorators
+                continue;
+            }
+            if other != &self {
+                unreachable!(
+                    "The column must be either the key or the other column in the foreign key"
+                );
+            }
+            let key_ident = key.column_snake_ident();
+            let satellite_table = same_as.referenced_table(database);
+            let satellite_table_ident = satellite_table.table_snake_ident();
+            let satellite_table_crate = satellite_table.crate_ident(workspace);
+            let referenced_column_ident = referenced_column.column_snake_ident();
+
+            horizontal_same_as_decorators.push(quote! {
+                #[same_as(#satellite_table_crate::#satellite_table_ident::#referenced_column_ident, #key_ident)]
+            });
+        }
+
+        // If the handle has foreign keys which define discretionary/mandatory
+        // same-as constraints, we add the corresponding decorators
+        let mut triangular_same_as_decorators = vec![];
+        for foreign_key in self.triangular_same_as_foreign_keys(database) {
+            let Some(triangular) = foreign_key.triangular_same_as(database) else {
+                continue;
+            };
+
+            let referenced_table = foreign_key.referenced_table(database);
+            let referenced_table_ident = referenced_table.table_snake_ident();
+            let referenced_table_crate = referenced_table.crate_ident(workspace);
+            let referenced_table_path = quote! { #referenced_table_crate::#referenced_table_ident };
+
+            triangular_same_as_decorators.push(if triangular.is_mandatory() {
+                quote! {
+                    #[mandatory(#referenced_table_path)]
+                }
+            } else {
+                quote! {
+                    #[discretionary(#referenced_table_path)]
+                }
+            });
+        }
+
+        Ok(quote! {
             #documentation
             #(#vertical_same_as_decorators)*
+            #(#horizontal_same_as_decorators)*
+            #(#triangular_same_as_decorators)*
             #sql_type_decorator
             #column_ident: #rust_type
-        };
-        Ok(tokens)
+        })
     }
 }
 

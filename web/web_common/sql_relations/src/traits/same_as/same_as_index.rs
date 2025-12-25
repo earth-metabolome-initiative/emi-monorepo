@@ -43,14 +43,14 @@ pub trait SameAsIndexLike: UniqueIndexLike {
         // Next, we retrieve the columns associated with the index.
         let columns = self.columns(database).collect::<Vec<_>>();
 
-        if columns.len() == 1 {
-            return false;
-        }
-
         // We expect that all of the columns in the primary key of the table are also in
         // the index.
         let primary_key_columns =
             self.table(database).primary_key_columns(database).collect::<Vec<_>>();
+
+        if columns.len() <= primary_key_columns.len() {
+            return false;
+        }
 
         // If any of the primary key columns are not in the index, it cannot be a
         // same-as index

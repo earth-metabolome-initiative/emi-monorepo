@@ -13,4 +13,6 @@ pub use horizontal_same_as::{
     HorizontalSameAsColumnLike, HorizontalSameAsForeignKeyLike, HorizontalSameAsTableLike,
 };
 mod triangular_same_as;
-pub use triangular_same_as::{TriangularSameAsForeignKeyLike, TriangularSameAsTableLike};
+pub use triangular_same_as::{
+    TriangularSameAsColumnLike, TriangularSameAsForeignKeyLike, TriangularSameAsTableLike,
+};

@@ -682,6 +682,66 @@ pub trait ForeignKeyLike:
         self.host_table(database) == self.referenced_table(database)
     }
 
+    /// Returns whether the foreign key references any of the ancestor tables
+    /// of the host table in the given database schema.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the foreign
+    ///   key belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE grandparent (id INT PRIMARY KEY);
+    /// CREATE TABLE parent (id INT PRIMARY KEY, FOREIGN KEY (id) REFERENCES grandparent(id));
+    /// CREATE TABLE child (
+    ///     id INT PRIMARY KEY,
+    ///     other_id INT,
+    ///     FOREIGN KEY (id) REFERENCES parent(id),
+    ///     FOREIGN KEY (other_id) REFERENCES grandparent(id)
+    /// );
+    /// CREATE TABLE other (id INT PRIMARY KEY);
+    /// CREATE TABLE child_other (
+    ///     id INT PRIMARY KEY,
+    ///     other_id INT,
+    ///     FOREIGN KEY (id) REFERENCES parent(id),
+    ///     FOREIGN KEY (other_id) REFERENCES other(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let child_table = db.table(None, "child").unwrap();
+    /// let foreign_keys: Vec<_> = child_table.foreign_keys(&db).collect();
+    /// let parent_fk =
+    ///     foreign_keys.iter().find(|fk| fk.referenced_table(&db).table_name() == "parent").unwrap();
+    /// let grandparent_fk = foreign_keys
+    ///     .iter()
+    ///     .find(|fk| fk.referenced_table(&db).table_name() == "grandparent")
+    ///     .unwrap();
+    ///
+    /// assert!(parent_fk.references_ancestor_table(&db));
+    /// assert!(grandparent_fk.references_ancestor_table(&db));
+    ///
+    /// let child_other_table = db.table(None, "child_other").unwrap();
+    /// let other_fk = child_other_table
+    ///     .foreign_keys(&db)
+    ///     .find(|fk| fk.referenced_table(&db).table_name() == "other")
+    ///     .unwrap();
+    /// assert!(!other_fk.references_ancestor_table(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn references_ancestor_table(&self, database: &Self::DB) -> bool {
+        let host_table = self.host_table(database);
+        let referenced_table = self.referenced_table(database);
+        host_table.ancestral_extended_tables(database).contains(&referenced_table)
+    }
+
     /// Returns whether the foreign key references the primary key of the
     /// referenced table.
     ///

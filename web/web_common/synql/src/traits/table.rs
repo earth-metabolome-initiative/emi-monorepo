@@ -13,7 +13,7 @@ use sql_relations::{
         VerticalSameAsForeignKeyLike,
     },
 };
-use sql_traits::traits::{CheckConstraintLike, DatabaseLike, ForeignKeyLike, TableLike};
+use sql_traits::traits::{CheckConstraintLike, DatabaseLike, TableLike};
 use strum::IntoEnumIterator;
 use syn::Ident;
 

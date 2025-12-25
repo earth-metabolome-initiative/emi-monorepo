@@ -11,3 +11,5 @@ mod triangular_same_as_foreign_key;
 pub use triangular_same_as_foreign_key::TriangularSameAsForeignKeyLike;
 mod triangular_same_as_table;
 pub use triangular_same_as_table::TriangularSameAsTableLike;
+mod triangular_same_as_columns;
+pub use triangular_same_as_columns::TriangularSameAsColumnLike;

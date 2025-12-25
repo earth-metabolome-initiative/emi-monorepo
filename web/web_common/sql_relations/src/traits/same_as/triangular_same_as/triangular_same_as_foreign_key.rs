@@ -7,7 +7,8 @@ use std::borrow::Borrow;
 use sql_traits::traits::{DatabaseLike, TableLike};
 
 use crate::traits::{
-    HorizontalSameAsForeignKeyLike, same_as::horizontal_same_as::HorizontalSameAsTableLike,
+    HorizontalSameAsForeignKeyLike, TriangularSameAsColumnLike,
+    same_as::horizontal_same_as::HorizontalSameAsTableLike,
 };
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -141,6 +142,40 @@ pub trait TriangularSameAsForeignKeyLike: HorizontalSameAsForeignKeyLike {
     /// ```
     fn is_triangular_same_as<'db>(&self, database: &'db Self::DB) -> bool {
         self.triangular_same_as(database).is_some()
+    }
+
+    /// Returns whether this foreign key is an horizontal same-as foreign key
+    /// of a mandatory triangular same-as relationship.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - The database containing the tables.
+    fn is_horizontal_same_as_of_mandatory_triangular<'db>(&self, database: &'db Self::DB) -> bool {
+        self.is_horizontal_same_as(database)
+            && self.host_table(database).foreign_keys(database).any(|fk| {
+                let Some(triangle) = fk.triangular_same_as(database) else {
+                    return false;
+                };
+                triangle.horizontal_same_as().map(Borrow::borrow) == Some(self)
+            })
+    }
+
+    /// Returns whether this foreign key is an horizontal same-as foreign key
+    /// of a triangular same-as relationship.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - The database containing the tables.
+    fn is_horizontal_same_as_of_triangular<'db>(&self, database: &'db Self::DB) -> bool {
+        if !self.is_horizontal_same_as(database) {
+            return false;
+        }
+
+        let Some(first_host_column) = self.host_columns(database).next() else {
+            return false;
+        };
+
+        first_host_column.has_triangular_same_as_foreign_key(database)
     }
 
     /// Returns the kind of triangular same-as relationship this foreign key
