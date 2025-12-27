@@ -5,7 +5,7 @@ pub struct ProcedureAssetForeignKeys {
         crate::codegen::structs_codegen::tables::asset_models::AssetModel,
     >,
     pub asset: Option<crate::codegen::structs_codegen::tables::assets::Asset>,
-    pub procedure_assets_asset_model_ancestor_model_fkey: Option<
+    pub procedure_asset_models_asset_model_ancestor_model_fkey: Option<
         crate::codegen::structs_codegen::tables::asset_model_ancestors::AssetModelAncestor,
     >,
     pub asset_model: Option<
@@ -22,7 +22,7 @@ pub struct ProcedureAssetForeignKeys {
     >,
 }
 impl web_common_traits::prelude::HasForeignKeys
-    for crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset
+    for crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset
 {
     type ForeignKeys = ProcedureAssetForeignKeys;
     type Row = crate::codegen::tables::row::Row;
@@ -71,7 +71,7 @@ impl web_common_traits::prelude::HasForeignKeys
     fn foreign_keys_loaded(&self, foreign_keys: &Self::ForeignKeys) -> bool {
         foreign_keys.ancestor_model.is_some()
             && (foreign_keys.asset.is_some() || self.asset.is_some())
-            && foreign_keys.procedure_assets_asset_model_ancestor_model_fkey.is_some()
+            && foreign_keys.procedure_asset_models_asset_model_ancestor_model_fkey.is_some()
             && foreign_keys.asset_model.is_some()
             && foreign_keys.procedure.is_some()
             && foreign_keys.procedure_template_asset_model.is_some()
@@ -94,7 +94,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 if self.asset_model_id == asset_model_ancestors.descendant_model
                     && self.ancestor_model == asset_model_ancestors.ancestor_model
                 {
-                    foreign_keys.procedure_assets_asset_model_ancestor_model_fkey =
+                    foreign_keys.procedure_asset_models_asset_model_ancestor_model_fkey =
                         Some(asset_model_ancestors);
                     updated = true;
                 }
@@ -106,7 +106,7 @@ impl web_common_traits::prelude::HasForeignKeys
                 if self.asset_model_id == asset_model_ancestors.descendant_model
                     && self.ancestor_model == asset_model_ancestors.ancestor_model
                 {
-                    foreign_keys.procedure_assets_asset_model_ancestor_model_fkey = None;
+                    foreign_keys.procedure_asset_models_asset_model_ancestor_model_fkey = None;
                     updated = true;
                 }
             }

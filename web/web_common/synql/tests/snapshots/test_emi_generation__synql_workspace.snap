@@ -4014,7 +4014,7 @@ expression: normalized_output
         /src
             /lib.rs
             /value_settable.rs
-    /procedure_assets_schema
+    /procedure_asset_models_schema
         /Cargo.toml
         /src
             /lib.rs

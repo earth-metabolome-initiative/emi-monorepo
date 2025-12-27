@@ -101,7 +101,7 @@ where
             crate::codegen::structs_codegen::tables::insertables::StorageProcedureAttribute,
         >,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate: web_common_traits::database::Read<
@@ -133,15 +133,15 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_stored_asset) = self
             .procedure_stored_asset
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_stored_asset,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::procedure_template_stored_asset_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::stored_asset(
                     self,
                     asset,
@@ -149,21 +149,21 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::stored_asset_model(
                 self,
-                procedure_assets.asset_model_id,
+                procedure_asset_models.asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_stored_into) = self
             .procedure_stored_into
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_stored_into,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::procedure_template_stored_into_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::stored_into(
                     self,
                     asset,
@@ -171,7 +171,7 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::StorageProcedureSettable>::stored_into_model(
                 self,
-                procedure_assets.asset_model_id,
+                procedure_asset_models.asset_model_id,
             )?;
         }
         let procedure_template = self

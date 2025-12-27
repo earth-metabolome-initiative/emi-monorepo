@@ -10,6 +10,7 @@ graph.workspace = true
 algebra.workspace = true
 csqlv.workspace = true
 rayon.workspace = true
+thiserror.workspace = true
 
 [lints]
 workspace = true

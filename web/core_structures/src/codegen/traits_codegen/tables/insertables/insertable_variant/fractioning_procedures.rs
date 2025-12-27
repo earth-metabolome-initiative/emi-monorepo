@@ -105,7 +105,7 @@ where
     crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
 {
@@ -141,11 +141,11 @@ where
             procedure_fragment_container,
         ) = self.procedure_fragment_container
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_fragment_container,
                 conn,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureSettable>::fragment_container(
                     self,
                     asset,
@@ -153,18 +153,18 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureSettable>::procedure_template_fragment_container_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
             procedure_fragment_placed_into,
         ) = self.procedure_fragment_placed_into
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_fragment_placed_into,
                 conn,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureSettable>::fragment_placed_into(
                     self,
                     asset,
@@ -172,23 +172,23 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureSettable>::procedure_template_fragment_placed_into_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_weighed_with) = self
             .procedure_weighed_with
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_weighed_with,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureSettable>::procedure_template_weighed_with_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FractioningProcedureSettable>::weighed_with(
                 self,
-                procedure_assets.asset,
+                procedure_asset_models.asset,
             )?;
         }
         let procedure_template = self

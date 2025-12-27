@@ -111,15 +111,15 @@ impl SupernatantProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
             self.procedure_pipette_tip,
             conn,
         )
@@ -129,23 +129,23 @@ impl SupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_pipette_tip)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::asset_model
                             .eq(&self.pipette_tip_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -153,23 +153,23 @@ impl SupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_pipette_tip)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::asset_model
                             .eq(&self.pipette_tip_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -177,38 +177,38 @@ impl SupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_pipette_tip)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::procedure_template_asset_model
                             .eq(&self.procedure_template_pipette_tip_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     pub fn procedure_stratified_source<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
             self.procedure_stratified_source,
             conn,
         )
@@ -218,23 +218,23 @@ impl SupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_stratified_source)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::procedure_template_asset_model
                             .eq(&self.procedure_template_stratified_source_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -242,38 +242,38 @@ impl SupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_stratified_source)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::asset
                             .eq(&self.stratified_source),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     pub fn procedure_supernatant_destination<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
             self.procedure_supernatant_destination,
             conn,
         )
@@ -283,23 +283,23 @@ impl SupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_supernatant_destination)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::procedure_template_asset_model
                             .eq(&self.procedure_template_supernatant_destination_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -307,23 +307,23 @@ impl SupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_supernatant_destination)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::asset
                             .eq(&self.supernatant_destination),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
@@ -522,15 +522,15 @@ impl SupernatantProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
             self.procedure_transferred_with,
             conn,
         )
@@ -540,23 +540,23 @@ impl SupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_transferred_with)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::procedure_template_asset_model
                             .eq(&self.procedure_template_transferred_with_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -564,23 +564,23 @@ impl SupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_transferred_with)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::asset_model
                             .eq(&self.transferred_with_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -588,23 +588,23 @@ impl SupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_transferred_with)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::asset
                             .eq(&self.transferred_with),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     pub fn stratified_source<C: diesel::connection::LoadConnection>(

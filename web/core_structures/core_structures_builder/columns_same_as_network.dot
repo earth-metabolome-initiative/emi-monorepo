@@ -127,12 +127,12 @@ subgraph cluster_commercial_packaging_models {
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }
-subgraph cluster_procedure_assets {
-  C381 [color="blue", fillcolor="#ffffff", label="procedure_assets\nancestor_model"];
-  C382 [color="blue", fillcolor="#ffffff", label="procedure_assets\nasset"];
-  C387 [color="blue", fillcolor="#ffffff", label="procedure_assets\nprocedure_template"];
-  C388 [color="blue", fillcolor="#ffffff", label="procedure_assets\nprocedure_template_asset_model"];
-  label="procedure_assets";
+subgraph cluster_procedure_asset_models {
+  C381 [color="blue", fillcolor="#ffffff", label="procedure_asset_models\nancestor_model"];
+  C382 [color="blue", fillcolor="#ffffff", label="procedure_asset_models\nasset"];
+  C387 [color="blue", fillcolor="#ffffff", label="procedure_asset_models\nprocedure_template"];
+  C388 [color="blue", fillcolor="#ffffff", label="procedure_asset_models\nprocedure_template_asset_model"];
+  label="procedure_asset_models";
   style="filled, rounded";
   fillcolor="#f0f0f0";
 }

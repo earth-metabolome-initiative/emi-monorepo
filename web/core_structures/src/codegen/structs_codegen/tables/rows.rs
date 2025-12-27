@@ -103,7 +103,7 @@ mod positioning_device_models;
 mod positioning_devices;
 mod pouring_procedure_templates;
 mod pouring_procedures;
-mod procedure_assets;
+mod procedure_asset_models;
 mod procedure_template_asset_models;
 mod procedure_templates;
 mod procedures;
@@ -554,7 +554,7 @@ pub enum Rows {
         >,
     ),
     ProcedureAsset(
-        Vec<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+        Vec<crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset>,
     ),
     ProcedureTemplateAssetModel(
         Vec<
@@ -1405,8 +1405,8 @@ impl Rows {
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
                     .into()
             }
-            Rows::ProcedureAsset(procedure_assets) => {
-                procedure_assets
+            Rows::ProcedureAsset(procedure_asset_models) => {
+                procedure_asset_models
                     .iter()
                     .filter_map(|entry| entry.upsert(conn).transpose())
                     .collect::<Result<Vec<_>, diesel::result::Error>>()?
@@ -1907,7 +1907,7 @@ impl web_common_traits::prelude::Rows for Rows {
                 pouring_procedure_templates.primary_keys()
             }
             Rows::PouringProcedure(pouring_procedures) => pouring_procedures.primary_keys(),
-            Rows::ProcedureAsset(procedure_assets) => procedure_assets.primary_keys(),
+            Rows::ProcedureAsset(procedure_asset_models) => procedure_asset_models.primary_keys(),
             Rows::ProcedureTemplateAssetModel(procedure_template_asset_models) => {
                 procedure_template_asset_models.primary_keys()
             }

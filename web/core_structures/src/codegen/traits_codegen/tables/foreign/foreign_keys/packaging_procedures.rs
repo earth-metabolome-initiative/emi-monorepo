@@ -11,10 +11,10 @@ pub struct PackagingProcedureForeignKeys {
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
     pub procedure_packaged_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub procedure_sample: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub procedure_template: Option<
         crate::codegen::structs_codegen::tables::packaging_procedure_templates::PackagingProcedureTemplate,
@@ -225,29 +225,29 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_asset_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_packaged_with == procedure_assets.id {
-                    foreign_keys.procedure_packaged_with = Some(procedure_assets);
+                if self.procedure_packaged_with == procedure_asset_models.id {
+                    foreign_keys.procedure_packaged_with = Some(procedure_asset_models);
                     updated = true;
                 }
-                if self.procedure_sample == procedure_assets.id {
-                    foreign_keys.procedure_sample = Some(procedure_assets);
+                if self.procedure_sample == procedure_asset_models.id {
+                    foreign_keys.procedure_sample = Some(procedure_asset_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_packaged_with == procedure_assets.id {
+                if self.procedure_packaged_with == procedure_asset_models.id {
                     foreign_keys.procedure_packaged_with = None;
                     updated = true;
                 }
-                if self.procedure_sample == procedure_assets.id {
+                if self.procedure_sample == procedure_asset_models.id {
                     foreign_keys.procedure_sample = None;
                     updated = true;
                 }

@@ -205,6 +205,12 @@ where
         self.functions.iter().map(|(func_rc, _)| func_rc.clone()).collect()
     }
 
+    /// Returns a slice of table Rc references with their metadata.
+    #[must_use]
+    pub fn tables(&self) -> &[(Rc<T>, T::Meta)] {
+        &self.tables
+    }
+
     /// Adds a check constraint with its metadata to the builder.
     #[must_use]
     pub fn add_check_constraint(mut self, constraint: Rc<Ch>, metadata: Ch::Meta) -> Self {

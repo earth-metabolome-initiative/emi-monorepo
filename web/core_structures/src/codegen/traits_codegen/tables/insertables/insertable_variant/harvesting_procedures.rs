@@ -104,7 +104,7 @@ where
     crate::codegen::structs_codegen::tables::harvesting_procedure_templates::HarvestingProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
 {
@@ -133,15 +133,15 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_sample_source) = self
             .procedure_sample_source
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_sample_source,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::HarvestingProcedureSettable>::procedure_template_sample_source_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::HarvestingProcedureSettable>::sample_source(
                     self,
                     asset,
@@ -151,15 +151,15 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_sample) = self
             .procedure_sample
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_sample,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::HarvestingProcedureSettable>::procedure_template_sample_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::HarvestingProcedureSettable>::sample(
                     self,
                     asset,

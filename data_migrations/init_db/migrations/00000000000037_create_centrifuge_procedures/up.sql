@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS centrifuge_procedures (
 	-- The procedure_id template asset model associated to the `centrifuged_container`.
 	procedure_template_centrifuged_container_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `centrifuged_container`.
-	procedure_centrifuged_container_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_centrifuged_container_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- The centrifuge model used for the centrifuge procedure.
 	centrifuged_with_model_id INTEGER NOT NULL REFERENCES centrifuge_models(id),
 	-- The centrifuge used for the procedure. This field is optional because the centrifuge
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS centrifuge_procedures (
 	-- The procedure_id template asset model associated to the `centrifuged_with_model`.
 	procedure_template_centrifuged_with_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `centrifuged_with`.
-	procedure_centrifuged_with_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_centrifuged_with_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure_id is a centrifugating procedure.
 	FOREIGN KEY (id, centrifuge_procedure_template_id) REFERENCES procedures(id, procedure_template_id),
@@ -101,12 +101,12 @@ CREATE TABLE IF NOT EXISTS centrifuge_procedures (
 	FOREIGN KEY (
 		procedure_centrifuged_container_id,
 		procedure_template_centrifuged_container_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We enforce that the specified `procedure_centrifuged_with` is of the specified `procedure_template_centrifuged_with_model`.
 	FOREIGN KEY (
 		procedure_centrifuged_with_id,
 		procedure_template_centrifuged_with_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We check that the `centrifuged_with_model` is indeed a instrument that is compatible with the `centrifuged_container_model`.
 	FOREIGN KEY (
 		centrifuged_with_model_id,
@@ -116,17 +116,11 @@ CREATE TABLE IF NOT EXISTS centrifuge_procedures (
 	FOREIGN KEY (
 		procedure_centrifuged_container_id,
 		centrifuged_container_model_id
-	) REFERENCES procedure_assets(id, asset_model_id),
-	-- We ensure that the `procedure_centrifuged_container` is associated with the `centrifuged_container`.
-	FOREIGN KEY (
-		procedure_centrifuged_container_id,
-		centrifuged_container_id
-	) REFERENCES procedure_assets(id, asset_id),
+	) REFERENCES procedure_asset_models(id, asset_model_id),
+	FOREIGN KEY (centrifuged_container_id, centrifuged_container_model_id) REFERENCES assets(id, model_id),
 	-- We ensure that the `procedure_centrifuged_with` is associated with the `centrifuged_container`.
 	FOREIGN KEY (
 		procedure_centrifuged_with_id,
 		centrifuged_with_model_id
-	) REFERENCES procedure_assets(id, asset_model_id),
-	-- We ensure that the `procedure_centrifuged_with` is associated with the `centrifuged_with`.
-	FOREIGN KEY (procedure_centrifuged_with_id, centrifuged_with_id) REFERENCES procedure_assets(id, asset_id)
+	) REFERENCES procedure_asset_models(id, asset_model_id)
 );

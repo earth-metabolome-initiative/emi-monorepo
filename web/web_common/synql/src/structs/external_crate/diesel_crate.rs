@@ -13,8 +13,8 @@ impl ExternalCrate {
             .git("https://github.com/LucaCappelletti94/diesel", "future3")
             .types([
                 ExternalType::new(
-                    syn::parse_quote!(diesel::sql_types::Interval),
-                    syn::parse_quote!(diesel::pg::data_types::PgInterval),
+                    syn::parse_quote!(::diesel::sql_types::Interval),
+                    syn::parse_quote!(::diesel::pg::data_types::PgInterval),
                 )
                 .postgres_type("interval")
                 .unwrap()
@@ -22,8 +22,8 @@ impl ExternalCrate {
                 .supports_eq()
                 .into(),
                 ExternalType::new(
-                    syn::parse_quote!(diesel::result::Error),
-                    syn::parse_quote!(diesel::result::Error),
+                    syn::parse_quote!(::diesel::result::Error),
+                    syn::parse_quote!(::diesel::result::Error),
                 )
                 .into(),
             ])

@@ -1,23 +1,23 @@
-impl From<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>
+impl From<crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset>
     for super::Rows
 {
     fn from(
-        value: crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        value: crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     ) -> Self {
         Self::from(vec![value])
     }
 }
-impl From<Vec<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>>
+impl From<Vec<crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset>>
     for super::Rows
 {
     fn from(
-        value: Vec<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>,
+        value: Vec<crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset>,
     ) -> Self {
         super::Rows::ProcedureAsset(value)
     }
 }
 impl From<super::Rows>
-    for Option<Vec<crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset>>
+    for Option<Vec<crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset>>
 {
     fn from(value: super::Rows) -> Self {
         match value {

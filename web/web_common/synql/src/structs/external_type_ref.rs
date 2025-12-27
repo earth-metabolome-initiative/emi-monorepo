@@ -92,6 +92,18 @@ impl<'workspace> ExternalTypeRef<'workspace> {
         self.type_ref.is_unit()
     }
 
+    /// Returns whether the type is a `uuid::Uuid`.
+    #[must_use]
+    pub fn is_uuid(&self) -> bool {
+        self.crate_name() == "uuid"
+    }
+
+    /// Returns whether the type is a `rosetta_uuid::Uuid`.
+    #[must_use]
+    pub fn is_rosetta_uuid(&self) -> bool {
+        self.crate_name() == "rosetta_uuid"
+    }
+
     /// Casts a value to the external type.
     pub(crate) fn cast(&self, value: &str) -> Result<proc_macro2::TokenStream, syn::Error> {
         self.type_ref.cast(value)

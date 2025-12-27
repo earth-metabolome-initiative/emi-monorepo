@@ -13,8 +13,8 @@ impl ExternalCrate {
             .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
             .features(["diesel", "serde"])
             .types([ExternalType::new(
-                syn::parse_quote!(rosetta_uuid::diesel_impls::Uuid),
-                syn::parse_quote!(rosetta_uuid::Uuid),
+                syn::parse_quote!(::rosetta_uuid::diesel_impls::Uuid),
+                syn::parse_quote!(::rosetta_uuid::Uuid),
             )
             .postgres_type("uuid")
             .unwrap()

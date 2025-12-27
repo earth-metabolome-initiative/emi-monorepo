@@ -259,7 +259,7 @@ impl core::str::FromStr for TableName {
             "positioning_devices" => Ok(TableName::PositioningDevice),
             "pouring_procedure_templates" => Ok(TableName::PouringProcedureTemplate),
             "pouring_procedures" => Ok(TableName::PouringProcedure),
-            "procedure_assets" => Ok(TableName::ProcedureAsset),
+            "procedure_asset_models" => Ok(TableName::ProcedureAsset),
             "procedure_template_asset_models" => Ok(TableName::ProcedureTemplateAssetModel),
             "procedure_templates" => Ok(TableName::ProcedureTemplate),
             "procedures" => Ok(TableName::Procedure),
@@ -466,7 +466,7 @@ impl core::fmt::Display for TableName {
                 write!(f, "pouring_procedure_templates")
             }
             TableName::PouringProcedure => write!(f, "pouring_procedures"),
-            TableName::ProcedureAsset => write!(f, "procedure_assets"),
+            TableName::ProcedureAsset => write!(f, "procedure_asset_models"),
             TableName::ProcedureTemplateAssetModel => {
                 write!(f, "procedure_template_asset_models")
             }

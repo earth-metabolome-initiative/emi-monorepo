@@ -22,10 +22,12 @@ CREATE TABLE IF NOT EXISTS disposal_procedures (
 	disposal_procedure_template_id INTEGER NOT NULL REFERENCES disposal_procedure_templates(id) ON DELETE CASCADE,
 	-- The disposed asset is the one that is being disposed_asset_id of.
 	disposed_asset_id UUID REFERENCES physical_assets(id),
+	-- The model of the disposed asset.
+	disposed_asset_model_id INTEGER NOT NULL REFERENCES physical_asset_models(id),
 	-- The procedure_id template asset model associated to the `disposed_asset`.
 	procedure_template_disposed_asset_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `disposed_asset`.
-	procedure_disposed_asset_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_disposed_asset_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- We ensure that the parent_id table's procedure_template_id is indeed a disposal_procedure_template.
 	FOREIGN KEY (id, disposal_procedure_template_id) REFERENCES procedures(id, procedure_template_id),
 	-- The procedure_id template asset model describing the `disposed_asset` must be the same one
@@ -41,7 +43,9 @@ CREATE TABLE IF NOT EXISTS disposal_procedures (
 	FOREIGN KEY (
 		procedure_disposed_asset_id,
 		procedure_template_disposed_asset_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
+	-- We enforce that the `procedure_disposed_asset` is associated with the `disposed_asset_model`.
+	FOREIGN KEY (procedure_disposed_asset_id, disposed_asset_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
 	-- We enforce that the `procedure_disposed_asset` is associated with the `disposed_asset`.
-	FOREIGN KEY (procedure_disposed_asset_id, disposed_asset_id) REFERENCES procedure_assets(id, asset_id)
+	FOREIGN KEY (disposed_asset_id, disposed_asset_model_id) REFERENCES assets(id, model_id)
 );

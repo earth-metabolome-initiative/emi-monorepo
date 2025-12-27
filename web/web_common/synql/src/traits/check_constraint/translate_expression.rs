@@ -16,8 +16,8 @@ use crate::{
 pub(super) struct TranslateExpression<'workspace, 'db, DB: DatabaseLike> {
     check_constraint: &'db DB::CheckConstraint,
     workspace: &'workspace Workspace,
-    database: &'db DB,
     contextual_columns: &'workspace [&'db DB::Column],
+    database: &'db DB,
 }
 
 /// Verifies that the [`CastKind`](sqlparser::ast::CastKind) is supported
@@ -56,10 +56,10 @@ where
     pub(super) fn new(
         check_constraint: &'db DB::CheckConstraint,
         workspace: &'workspace Workspace,
-        database: &'db DB,
         contextual_columns: &'workspace [&'db DB::Column],
+        database: &'db DB,
     ) -> Self {
-        Self { check_constraint, workspace, database, contextual_columns }
+        Self { check_constraint, workspace, contextual_columns, database }
     }
 
     /// Maps the provided expression to a validation error, when applicable.
@@ -92,6 +92,10 @@ where
         }
     }
 
+    fn is_contextual_column(&self, column: &DB::Column) -> bool {
+        self.contextual_columns.contains(&column)
+    }
+
     fn map_expr_to_double_field_error(
         &self,
         left: &str,
@@ -100,19 +104,50 @@ where
     ) -> TokenStream {
         let left_column = self.column(left);
         let right_column = self.column(right);
-        let formatted_left = self.formatted_column(left_column, true);
-        let formatted_right = self.formatted_column(right_column, true);
         let table_ident = self.table().table_snake_ident();
         let left_column_ident = left_column.column_snake_ident();
         let right_column_ident = right_column.column_snake_ident();
-        let validation_error = self
-            .workspace
-            .external_type(&syn::parse_quote!(validation_errors::prelude::ValidationError))
-            .unwrap();
+        let validation_error = quote! { validation_errors::prelude::ValidationError };
+        let compare_op = |op: TokenStream| {
+            match (
+                left_column.is_nullable(self.database) && !self.is_contextual_column(left_column),
+                right_column.is_nullable(self.database) && !self.is_contextual_column(right_column),
+            ) {
+                (true, true) => {
+                    quote! {
+                        #left_column_ident.as_ref().is_some_and(|#left_column_ident|
+                            #right_column_ident.as_ref().is_some_and(|#right_column_ident|
+                                #left_column_ident #op #right_column_ident
+                            )
+                        )
+                    }
+                }
+                (true, false) => {
+                    quote! {
+                        #left_column_ident.as_ref().is_some_and(|#left_column_ident|
+                            #left_column_ident #op #right_column_ident
+                        )
+                    }
+                }
+                (false, true) => {
+                    quote! {
+                        #right_column_ident.as_ref().is_some_and(|#right_column_ident|
+                            #left_column_ident #op #right_column_ident
+                        )
+                    }
+                }
+                (false, false) => {
+                    quote! {
+                        #left_column_ident #op #right_column_ident
+                    }
+                }
+            }
+        };
         match op {
             BinaryOperator::NotEq => {
+                let compare_op = compare_op(quote! {==});
                 quote! {
-                    if #formatted_left == #formatted_right {
+                    if #compare_op {
                         return Err(#validation_error::equal(
                             crate::#table_ident::#left_column_ident::NAME,
                             crate::#table_ident::#right_column_ident::NAME
@@ -121,8 +156,9 @@ where
                 }
             }
             BinaryOperator::LtEq => {
+                let compare_op = compare_op(quote! {>});
                 quote! {
-                    if #formatted_left > #formatted_right {
+                    if #compare_op {
                         return Err(#validation_error::smaller_than(
                             crate::#table_ident::#left_column_ident::NAME,
                             crate::#table_ident::#right_column_ident::NAME
@@ -131,8 +167,9 @@ where
                 }
             }
             BinaryOperator::Lt => {
+                let compare_op = compare_op(quote! {>=});
                 quote! {
-                    if #formatted_left >= #formatted_right {
+                    if #compare_op {
                         return Err(#validation_error::strictly_smaller_than(
                             crate::#table_ident::#left_column_ident::NAME,
                             crate::#table_ident::#right_column_ident::NAME
@@ -141,8 +178,9 @@ where
                 }
             }
             BinaryOperator::Gt => {
+                let compare_op = compare_op(quote! {<=});
                 quote! {
-                    if #formatted_left <= #formatted_right {
+                    if #compare_op {
                         return Err(#validation_error::strictly_greater_than(
                             crate::#table_ident::#left_column_ident::NAME,
                             crate::#table_ident::#right_column_ident::NAME
@@ -151,8 +189,9 @@ where
                 }
             }
             BinaryOperator::GtEq => {
+                let compare_op = compare_op(quote! {<});
                 quote! {
-                    if #formatted_left < #formatted_right {
+                    if #compare_op {
                         return Err(#validation_error::greater_than(
                             crate::#table_ident::#left_column_ident::NAME,
                             crate::#table_ident::#right_column_ident::NAME
@@ -173,8 +212,7 @@ where
         op: &BinaryOperator,
     ) -> TokenStream {
         let column = self.column(ident);
-        let formatted_column = self.formatted_column(column, false);
-        let column_ident = column.column_camel_ident();
+        let column_ident = column.column_snake_ident();
         let table_ident = self.table().table_snake_ident();
         match op {
             BinaryOperator::NotEq => {
@@ -182,7 +220,7 @@ where
                     && value == &Value::SingleQuotedString("".to_string())
                 {
                     quote! {
-                        if #formatted_column.is_empty() {
+                        if #column_ident.is_empty() {
                             return Err(validation_errors::prelude::ValidationError::empty(crate::#table_ident::#column_ident::NAME));
                         }
                     }
@@ -194,7 +232,7 @@ where
                 let column_value = self.parse_column_value(column, value).0;
                 let float_value = self.parse_value(value, Some(self.workspace.f64())).0;
                 quote! {
-                    if #formatted_column > #column_value {
+                    if #column_ident > &#column_value {
                         return Err(validation_errors::prelude::ValidationError::smaller_than_value(
                             crate::#table_ident::#column_ident::NAME,
                             #float_value
@@ -206,7 +244,7 @@ where
                 let column_value = self.parse_column_value(column, value).0;
                 let float_value = self.parse_value(value, Some(self.workspace.f64())).0;
                 quote! {
-                    if #formatted_column >= #column_value {
+                    if #column_ident >= &#column_value {
                         return Err(validation_errors::prelude::ValidationError::strictly_smaller_than_value(
                             crate::#table_ident::#column_ident::NAME,
                             #float_value
@@ -218,7 +256,7 @@ where
                 let column_value = self.parse_column_value(column, value).0;
                 let float_value = self.parse_value(value, Some(self.workspace.f64())).0;
                 quote! {
-                    if #formatted_column <= #column_value {
+                    if #column_ident <= &#column_value {
                         return Err(validation_errors::prelude::ValidationError::strictly_greater_than_value(
                             crate::#table_ident::#column_ident::NAME,
                             #float_value
@@ -230,7 +268,7 @@ where
                 let column_value = self.parse_column_value(column, value).0;
                 let float_value = self.parse_value(value, Some(self.workspace.f64())).0;
                 quote! {
-                    if #formatted_column < #column_value {
+                    if #column_ident < &#column_value {
                         return Err(validation_errors::prelude::ValidationError::greater_than_value(
                             crate::#table_ident::#column_ident::NAME,
                             #float_value
@@ -241,35 +279,6 @@ where
             _ => {
                 unimplemented!("Operator {op:?} not supported for single field error mapping");
             }
-        }
-    }
-
-    /// Returns whether the provided column is contextual.
-    ///
-    /// # Arguments
-    ///
-    /// * `column` - The column to check
-    fn is_contextual(&self, column: &DB::Column) -> bool {
-        self.contextual_columns.contains(&column)
-    }
-
-    /// Returns the formatted column for use as an argument.
-    ///
-    /// # Arguments
-    ///
-    /// * `column` - The column to format
-    fn formatted_column(&self, column: &DB::Column, reference: bool) -> TokenStream {
-        let column_ident = column.column_snake_ident();
-        // When a column is either contextual or nullable, it can be accessed directly
-        // because we expect it to be accessible in the current scope.
-        if self.is_contextual(column) {
-            if column.supports_copy(self.database, self.workspace) || !reference {
-                quote! { #column_ident }
-            } else {
-                quote! { &#column_ident }
-            }
-        } else {
-            quote! { #column_ident }
         }
     }
 
@@ -305,7 +314,11 @@ where
     /// * If the column does not exist, which should not happen as
     /// it would mean that the provided SQL defining the database is invalid.
     fn column(&self, name: &str) -> &DB::Column {
-        self.check_constraint.column(self.database, name).unwrap()
+        self.check_constraint.column(self.database, name).expect(&format!(
+            "Column `{}` not found for check constraint from table `{}`.",
+            name,
+            self.table().table_name()
+        ))
     }
 
     /// Translates the provided function argument to a
@@ -444,19 +457,25 @@ where
         let table_ident = self.table().table_snake_ident();
 
         let attributes = scoped_columns.iter().map(|scoped_column| {
-            let column_ident = scoped_column.column_camel_ident();
+            let column_ident = scoped_column.column_snake_ident();
             quote! { crate::#table_ident::#column_ident::NAME }
         });
 
         let map_err = match scoped_columns.len() {
             1 => {
                 quote! {
-                    .map_err(|e| e.replace_field_name(|_|#(#attributes),* ))
+                    .map_err(|e| {
+                        use validation_errors::prelude::ReplaceFieldName;
+                        e.replace_field_name(|_|#(#attributes),* )
+                    })
                 }
             }
             2 => {
                 quote! {
-                    .map_err(|e| e.replace_field_names(|_|#(#attributes),* ))
+                    .map_err(|e| {
+                        use validation_errors::prelude::ReplaceFieldName;
+                        e.replace_field_names(|_|#(#attributes),* )
+                    })
                 }
             }
             _ => {
@@ -597,8 +616,12 @@ where
             Expr::Nested(expr) => self.inner_parse(expr, type_hint),
             Expr::Identifier(ident) => {
                 let column = self.column(&ident.value);
+                let column_ident = column.column_snake_ident();
                 (
-                    self.formatted_column(column, true).into(),
+                    quote! {
+                        #column_ident
+                    }
+                    .into(),
                     vec![column],
                     column
                         .external_postgres_type(self.workspace, self.database)
@@ -627,10 +650,14 @@ where
                             right_returning_type.expect("Right side of AND must have a type");
                         if left_returning_type.is_bool() && right_returning_type.is_bool() {
                             (
-                                quote! {
-                                    #left && #right
-                                }
-                                .into(),
+                                match (left.to_string().as_str(), right.to_string().as_str()) {
+                                    ("true", "true") => quote! { true },
+                                    ("false", _) => quote! { false },
+                                    (_, "false") => quote! { false },
+                                    ("true", _) => quote! { #right },
+                                    (_, "true") => quote! { #left },
+                                    (_, _) => quote! { #left && #right },
+                                },
                                 Vec::new(),
                                 Some(self.workspace.bool()),
                             )
@@ -652,10 +679,14 @@ where
                             right_returning_type.expect("Right side of AND must have a type");
                         if left_returning_type.is_bool() && right_returning_type.is_bool() {
                             (
-                                quote! {
-                                    #left || #right
-                                }
-                                .into(),
+                                match (left.to_string().as_str(), right.to_string().as_str()) {
+                                    ("false", "false") => quote! { false },
+                                    ("true", _) => quote! { true },
+                                    (_, "true") => quote! { true },
+                                    ("false", _) => quote! { #right },
+                                    (_, "false") => quote! { #left },
+                                    (_, _) => quote! { #left || #right },
+                                },
                                 Vec::new(),
                                 Some(self.workspace.bool()),
                             )
@@ -761,6 +792,92 @@ where
             Expr::Value(value) => {
                 let (token_stream, returning_type) = self.parse_value_with_span(value, type_hint);
                 (token_stream.into(), Vec::new(), Some(returning_type))
+            }
+            Expr::IsNull(expr) => {
+                if let Expr::Identifier(Ident { value: ident, .. }) = expr.as_ref() {
+                    let column = self.column(ident);
+                    if !column.is_nullable(self.database) {
+                        unimplemented!(
+                            "IS NULL on non-nullable column `{}` not supported. {:?}",
+                            ident,
+                            self.check_constraint
+                        );
+                    }
+                    if self.is_contextual_column(column) {
+                        (
+                            quote! {
+                                false
+                            }
+                            .into(),
+                            Vec::new(),
+                            Some(self.workspace.bool()),
+                        )
+                    } else {
+                        let column_ident = column.column_snake_ident();
+                        (
+                            quote! {
+                                #column_ident.is_none()
+                            }
+                            .into(),
+                            Vec::new(),
+                            Some(self.workspace.bool()),
+                        )
+                    }
+                } else {
+                    let (inner_token, _scoped_columns, _returning_type) =
+                        self.inner_parse(expr, None);
+                    (
+                        quote! {
+                            #inner_token.is_none()
+                        }
+                        .into(),
+                        Vec::new(),
+                        Some(self.workspace.bool()),
+                    )
+                }
+            }
+            Expr::IsNotNull(expr) => {
+                if let Expr::Identifier(Ident { value: ident, .. }) = expr.as_ref() {
+                    let column = self.column(ident);
+                    if !column.is_nullable(self.database) {
+                        unimplemented!(
+                            "IS NOT NULL on non-nullable column `{}` not supported. {:?}",
+                            ident,
+                            self.check_constraint
+                        );
+                    }
+                    if self.is_contextual_column(column) {
+                        (
+                            quote! {
+                                true
+                            }
+                            .into(),
+                            Vec::new(),
+                            Some(self.workspace.bool()),
+                        )
+                    } else {
+                        let column_ident = column.column_snake_ident();
+                        (
+                            quote! {
+                                #column_ident.is_some()
+                            }
+                            .into(),
+                            Vec::new(),
+                            Some(self.workspace.bool()),
+                        )
+                    }
+                } else {
+                    let (inner_token, _scoped_columns, _returning_type) =
+                        self.inner_parse(expr, None);
+                    (
+                        quote! {
+                            #inner_token.is_some()
+                        }
+                        .into(),
+                        Vec::new(),
+                        Some(self.workspace.bool()),
+                    )
+                }
             }
             _ => {
                 unimplemented!(

@@ -13,7 +13,7 @@ use sql_relations::{
         VerticalSameAsForeignKeyLike,
     },
 };
-use sql_traits::traits::{CheckConstraintLike, DatabaseLike, TableLike};
+use sql_traits::traits::{CheckConstraintLike, ColumnLike, DatabaseLike, TableLike};
 use strum::IntoEnumIterator;
 use syn::Ident;
 
@@ -378,6 +378,28 @@ where
             fks.push(foreign_key.to_syn(database, workspace));
         }
         fks
+    }
+
+    /// Generates the validation impls for all check constraints of this table.
+    ///
+    /// # Arguments
+    ///
+    /// * `workspace` - The workspace where the table is defined.
+    /// * `database` - The database where the table is defined.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the external type of any column cannot be
+    /// determined.
+    fn generate_validation_impls(
+        &self,
+        workspace: &Workspace,
+        database: &Self::DB,
+    ) -> Result<Vec<proc_macro2::TokenStream>, crate::Error> {
+        self.columns(database)
+            .filter(|c| c.has_check_constraints(database))
+            .map(|c| c.generate_validation_impl(workspace, database))
+            .collect()
     }
 }
 

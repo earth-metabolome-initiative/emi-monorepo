@@ -104,7 +104,7 @@ where
     crate::codegen::structs_codegen::tables::pouring_procedure_templates::PouringProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
 {
@@ -137,11 +137,11 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_poured_from) = self
             .procedure_poured_from
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_poured_from,
                 conn,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable>::poured_from(
                     self,
                     asset,
@@ -149,33 +149,33 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable>::procedure_template_poured_from_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_measured_with) = self
             .procedure_measured_with
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_measured_with,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable>::measured_with(
                 self,
-                procedure_assets.asset,
+                procedure_asset_models.asset,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable>::procedure_template_measured_with_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_poured_into) = self
             .procedure_poured_into
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_poured_into,
                 conn,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable>::poured_into(
                     self,
                     asset,
@@ -183,7 +183,7 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::PouringProcedureSettable>::procedure_template_poured_into_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         let procedure_template = self

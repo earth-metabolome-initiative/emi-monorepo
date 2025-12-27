@@ -11,8 +11,8 @@ use crate::codegen::diesel_codegen::tables::photographs::photographs;
 diesel::allow_tables_to_appear_in_same_query!(photograph_procedures, photographs);
 use crate::codegen::diesel_codegen::tables::physical_assets::physical_assets;
 diesel::allow_tables_to_appear_in_same_query!(photograph_procedures, physical_assets);
-use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
-diesel::allow_tables_to_appear_in_same_query!(photograph_procedures, procedure_assets);
+use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
+diesel::allow_tables_to_appear_in_same_query!(photograph_procedures, procedure_asset_models);
 use crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models;
 diesel::allow_tables_to_appear_in_same_query!(
     photograph_procedures,

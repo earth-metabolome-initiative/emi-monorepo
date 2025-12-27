@@ -26,7 +26,7 @@ pub(super) struct GPBListener<'listener, C> {
     designated_successor: Option<&'listener ProcedureTemplate>,
     parent_procedures: Vec<<Procedure as PrimaryKeyLike>::PrimaryKey>,
     predecessor_procedure: Option<<Procedure as PrimaryKeyLike>::PrimaryKey>,
-    procedure_assets: HashMap<
+    procedure_asset_models: HashMap<
         <ProcedureTemplateAssetModel as PrimaryKeyLike>::PrimaryKey,
         <ProcedureAsset as PrimaryKeyLike>::PrimaryKey,
     >,
@@ -46,7 +46,7 @@ impl<C> ProcedureTemplateAssetGraph for GPBListener<'_, C> {
             self.graph.ptam_by_primary_key(ptam_id).expect("PTAM not found in graph");
         let reference_ptam: &ProcedureTemplateAssetModel =
             self.graph.reference_based_on_alias(parents, ptam).expect("Alias not found in graph");
-        self.procedure_assets.get(&reference_ptam.id).copied()
+        self.procedure_asset_models.get(&reference_ptam.id).copied()
     }
 }
 
@@ -63,7 +63,7 @@ impl<'listener, C> GPBListener<'listener, C> {
             designated_successor: None,
             parent_procedures: Vec::new(),
             predecessor_procedure: None,
-            procedure_assets: HashMap::new(),
+            procedure_asset_models: HashMap::new(),
         }
     }
 
@@ -85,14 +85,16 @@ impl<'listener, C> GPBListener<'listener, C> {
     {
         let procedure = builder.insert(self.author.id, self.connection)?;
         self.parent_procedures.push(procedure.primary_key());
-        for (ptam_id, pa_id) in procedure.procedure_template_asset_models_and_procedure_assets() {
+        for (ptam_id, pa_id) in
+            procedure.procedure_template_asset_models_and_procedure_asset_models()
+        {
             let ptam: &ProcedureTemplateAssetModel =
                 self.graph.ptam_by_primary_key(ptam_id).expect("PTAM not found in graph");
             let reference_ptam: &ProcedureTemplateAssetModel = self
                 .graph
                 .reference_based_on_alias(parents, ptam)
                 .expect("Alias not found in graph");
-            self.procedure_assets.insert(reference_ptam.id, pa_id);
+            self.procedure_asset_models.insert(reference_ptam.id, pa_id);
         }
         Ok(())
     }

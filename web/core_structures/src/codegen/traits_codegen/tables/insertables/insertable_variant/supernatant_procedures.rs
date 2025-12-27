@@ -102,7 +102,7 @@ where
             crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureAttribute,
         >,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate: web_common_traits::database::Read<
@@ -145,15 +145,15 @@ where
             procedure_stratified_source,
         ) = self.procedure_stratified_source
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_stratified_source,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_stratified_source_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::stratified_source(
                     self,
                     asset,
@@ -164,15 +164,15 @@ where
             procedure_supernatant_destination,
         ) = self.procedure_supernatant_destination
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_supernatant_destination,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_supernatant_destination_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::supernatant_destination(
                     self,
                     asset,
@@ -183,19 +183,19 @@ where
             procedure_transferred_with,
         ) = self.procedure_transferred_with
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_transferred_with,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_transferred_with_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::transferred_with_model(
                 self,
-                procedure_assets.asset_model_id,
+                procedure_asset_models.asset_model_id,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::transferred_with(
                     self,
                     asset,
@@ -205,21 +205,21 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_pipette_tip) = self
             .procedure_pipette_tip
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_pipette_tip,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::pipette_tip_model(
                 self,
-                procedure_assets.asset_model_id,
+                procedure_asset_models.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::pipette_tip_model(
                 self,
-                procedure_assets.asset_model_id,
+                procedure_asset_models.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::SupernatantProcedureSettable>::procedure_template_pipette_tip_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         let procedure_template = self

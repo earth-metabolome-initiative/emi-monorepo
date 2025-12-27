@@ -6,7 +6,7 @@ impl web_common_traits::prelude::ProcedureLike
     type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
     type Builder =
         crate::codegen::structs_codegen::tables::insertables::InsertableGeolocationProcedureBuilder;
-    fn procedure_template_asset_models_and_procedure_assets(
+    fn procedure_template_asset_models_and_procedure_asset_models(
         &self,
     ) -> Vec<
         (

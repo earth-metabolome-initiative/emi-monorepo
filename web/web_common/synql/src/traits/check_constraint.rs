@@ -11,7 +11,10 @@ mod sub_expressions;
 mod translate_expression;
 use translate_expression::TranslateExpression;
 
-use crate::{structs::Workspace, traits::column::ColumnSynLike};
+use crate::{
+    structs::Workspace,
+    traits::{TableSynLike, column::ColumnSynLike},
+};
 
 /// Trait implemented by types that represent SQL check constraints and can be
 /// used to generate Rust code for them.
@@ -32,7 +35,7 @@ pub trait CheckConstraintSynLike: CheckConstraintLike {
         contextual_columns: &[&'db <Self::DB as DatabaseLike>::Column],
     ) -> TokenStream {
         let translator: TranslateExpression<'_, 'db, <Self as CheckConstraintLike>::DB> =
-            TranslateExpression::new(self.borrow(), workspace, database, contextual_columns);
+            TranslateExpression::new(self.borrow(), workspace, contextual_columns, database);
 
         let mut translated_expressions: Vec<TokenStream> = Vec::new();
 
@@ -48,22 +51,13 @@ pub trait CheckConstraintSynLike: CheckConstraintLike {
         if relevant_optional_columns.is_empty() {
             translated_expressions.into_iter().collect()
         } else {
-            let left = relevant_optional_columns.iter().map(|column| column.column_snake_ident());
-            let right = relevant_optional_columns.iter().map(|column| {
-                let ident = column.column_snake_ident();
-                if column.supports_copy(database, workspace) {
-                    quote! {
-                        self.#ident
-                    }
-                } else {
-                    quote! {
-                        self.#ident.as_ref()
-                    }
-                }
-            });
-
+            let column_idents = relevant_optional_columns
+                .iter()
+                .map(|column| column.column_snake_ident())
+                .collect::<Vec<_>>();
+            let table_ident = self.table(database).table_snake_ident();
             quote! {
-                if let #(Some(#left)),* = #(#right),* {
+                if let #(Some(#column_idents)),* = #(<Self as diesel_builders::MayGetColumn<#table_ident::#column_idents>>::may_get_column_ref(self)),* {
                     #( #translated_expressions )*
                 }
             }

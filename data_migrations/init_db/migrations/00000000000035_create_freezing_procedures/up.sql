@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS freezing_procedures (
 	-- The procedure_id template asset model associated to the `frozen_container`.
 	procedure_template_frozen_container_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `frozen_container`.
-	procedure_frozen_container_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_frozen_container_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- The freezer used for the freezing procedure. This field is optional, as the freezer might not necessarily be tracked.
 	frozen_with_id UUID REFERENCES freezers(id),
 	-- The model of the freezer used, which must be a freezer model.
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS freezing_procedures (
 	-- The procedure_id template asset model associated to the `frozen_with_model`.
 	procedure_template_frozen_with_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `frozen_with`.
-	procedure_frozen_with_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_frozen_with_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- We enforce that the current `freezing_procedure_templates` has indeed the same `freezing_procedure_templates_template`.
 	FOREIGN KEY (id, freezing_procedure_template_id) REFERENCES procedures(id, procedure_template_id),
 	-- The `procedure_template_frozen_with_model` must be the same as in the `freezing_procedure_templates`.
@@ -85,21 +85,19 @@ CREATE TABLE IF NOT EXISTS freezing_procedures (
 	FOREIGN KEY (
 		procedure_frozen_container_id,
 		procedure_template_frozen_container_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We ensure that the `procedure_frozen_with` is associated with the `procedure_template_frozen_with_model`.
 	FOREIGN KEY (
 		procedure_frozen_with_id,
 		procedure_template_frozen_with_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We ensure that the `procedure_frozen_container` is associated to the `frozen_container_model`.
 	FOREIGN KEY (
 		procedure_frozen_container_id,
 		frozen_container_model_id
-	) REFERENCES procedure_assets(id, asset_model_id),
-	-- We ensure that the `procedure_frozen_with` is associated to the `frozen_with_model`.
-	FOREIGN KEY (procedure_frozen_with_id, frozen_with_model_id) REFERENCES procedure_assets(id, asset_model_id),
-	-- We ensure that the `procedure_frozen_container` is associated to the `frozen_container`.
-	FOREIGN KEY (procedure_frozen_container_id, frozen_container_id) REFERENCES procedure_assets(id, asset_id),
+	) REFERENCES procedure_asset_models(id, asset_model_id),
+	FOREIGN KEY (frozen_container_id, frozen_container_model_id) REFERENCES assets(id, model_id),
 	-- We ensure that the `procedure_frozen_with` is associated to the `frozen_with`.
-	FOREIGN KEY (procedure_frozen_with_id, frozen_with_id) REFERENCES procedure_assets(id, asset_id)
+	FOREIGN KEY (procedure_frozen_with_id, frozen_with_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
+	FOREIGN KEY (frozen_with_id, frozen_with_model_id) REFERENCES assets(id, model_id)
 );

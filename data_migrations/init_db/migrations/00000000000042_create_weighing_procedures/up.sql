@@ -38,19 +38,23 @@ CREATE TABLE IF NOT EXISTS weighing_procedures(
 	weighing_procedure_template_id INTEGER NOT NULL REFERENCES weighing_procedure_templates(id),
 	-- The container being weighed, which must be a volumetric container model.
 	weighed_container_id UUID NOT NULL REFERENCES volumetric_containers(id),
+	-- The model of the container being weighed.
+	weighed_container_model_id INTEGER NOT NULL REFERENCES volumetric_container_models(id),
 	-- The procedure_id template asset model associated to the `weighed_container`.
 	procedure_template_weighed_container_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `weighed_container`.
-	procedure_weighed_container_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_weighed_container_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- Mass in kilograms. The measured weight, which must be strictly positive.
 	mass REAL NOT NULL CHECK (mass > 0.0),
 	-- The weighing device used for weighing. This field is optional as there
 	-- are several situations where the weighing device is not tracked.
 	weighed_with_id UUID REFERENCES weighing_devices(id),
+	-- The model of the weighing device used for weighing.
+	weighed_with_model_id INTEGER NOT NULL REFERENCES weighing_device_models(id),
 	-- The procedure_id template asset model associated to the `weighed_with_model`.
 	procedure_template_weighed_with_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id) ON DELETE CASCADE,
 	-- The procedure_id asset associated to the `weighed_with_model`.
-	procedure_weighed_with_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_weighed_with_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure_id is a weighing procedure_id without the possibility of a mistake.
 	FOREIGN KEY (id, weighing_procedure_template_id) REFERENCES procedures(id, procedure_template_id),
@@ -71,17 +75,19 @@ CREATE TABLE IF NOT EXISTS weighing_procedures(
 		procedure_template_weighed_with_model_id
 	),
 	-- We check that the `procedure_weighed_container` is associated to the `weighed_container`.
-	FOREIGN KEY (procedure_weighed_container_id, weighed_container_id) REFERENCES procedure_assets(id, asset_id),
+	FOREIGN KEY (procedure_weighed_container_id, weighed_container_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
+	FOREIGN KEY (weighed_container_id, weighed_container_model_id) REFERENCES assets(id, model_id),
 	-- We check that the `procedure_weighed_with` is associated to the `procedure_template_weighed_container_model`.
 	FOREIGN KEY (
 		procedure_weighed_container_id,
 		procedure_template_weighed_container_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We check that the `procedure_weighed_with` is associated to the `procedure_template_weighed_with_model`.
 	FOREIGN KEY (
 		procedure_weighed_with_id,
 		procedure_template_weighed_with_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We check that the `procedure_weighed_with` is associated to the `weighed_with` asset (if any).
-	FOREIGN KEY (procedure_weighed_with_id, weighed_with_id) REFERENCES procedure_assets(id, asset_id)
+	FOREIGN KEY (procedure_weighed_with_id, weighed_with_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
+	FOREIGN KEY (weighed_with_id, weighed_with_model_id) REFERENCES assets(id, model_id)
 );

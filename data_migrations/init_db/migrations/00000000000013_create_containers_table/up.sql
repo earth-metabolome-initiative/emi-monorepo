@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS container_compatibility_rules (
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (container_model_id, contained_asset_model_id),
     CHECK (
-        container_model_id <> contained_asset_model
+        container_model_id <> contained_asset_model_id
     )
 );
 CREATE TABLE IF NOT EXISTS containers (

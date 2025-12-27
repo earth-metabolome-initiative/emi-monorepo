@@ -100,7 +100,7 @@ pub mod positioning_device_models;
 pub mod positioning_devices;
 pub mod pouring_procedure_templates;
 pub mod pouring_procedures;
-pub mod procedure_assets;
+pub mod procedure_asset_models;
 pub mod procedure_template_asset_models;
 pub mod procedure_templates;
 pub mod procedures;

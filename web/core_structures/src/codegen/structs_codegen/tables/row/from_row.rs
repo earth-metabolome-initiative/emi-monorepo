@@ -287,8 +287,8 @@ impl From<super::Row> for crate::codegen::tables::rows::Rows {
             super::Row::PouringProcedure(pouring_procedures) => {
                 crate::codegen::tables::rows::Rows::from(pouring_procedures)
             }
-            super::Row::ProcedureAsset(procedure_assets) => {
-                crate::codegen::tables::rows::Rows::from(procedure_assets)
+            super::Row::ProcedureAsset(procedure_asset_models) => {
+                crate::codegen::tables::rows::Rows::from(procedure_asset_models)
             }
             super::Row::ProcedureTemplateAssetModel(procedure_template_asset_models) => {
                 crate::codegen::tables::rows::Rows::from(procedure_template_asset_models)

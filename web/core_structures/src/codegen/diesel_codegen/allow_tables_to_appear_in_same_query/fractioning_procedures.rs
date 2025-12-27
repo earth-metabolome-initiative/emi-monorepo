@@ -6,8 +6,8 @@ diesel::allow_tables_to_appear_in_same_query!(
     fractioning_procedures,
     fractioning_procedure_templates
 );
-use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
-diesel::allow_tables_to_appear_in_same_query!(fractioning_procedures, procedure_assets);
+use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
+diesel::allow_tables_to_appear_in_same_query!(fractioning_procedures, procedure_asset_models);
 use crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models;
 diesel::allow_tables_to_appear_in_same_query!(
     fractioning_procedures,

@@ -1,5 +1,5 @@
 impl web_common_traits::prelude::Tabular
-    for crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset
+    for crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset
 {
     type TableName = crate::codegen::tables::table_names::TableName;
     fn table_name(&self) -> Self::TableName {
@@ -7,14 +7,14 @@ impl web_common_traits::prelude::Tabular
     }
 }
 impl web_common_traits::prelude::StaticTabular
-    for crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset
+    for crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset
 {
     fn static_table_name() -> Self::TableName {
         crate::codegen::tables::table_names::TableName::ProcedureAsset
     }
 }
 impl web_common_traits::prelude::Row
-    for crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset
+    for crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset
 {
     type PrimaryKey = crate::codegen::tables::table_primary_keys::TablePrimaryKey;
     fn primary_key(&self) -> Self::PrimaryKey {

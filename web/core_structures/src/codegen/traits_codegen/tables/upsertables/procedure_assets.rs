@@ -1,6 +1,6 @@
 #[cfg(feature = "postgres")]
 impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
-    for crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset
+    for crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset
 {
     fn upsert(
         &self,
@@ -11,7 +11,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
             upsert::excluded,
         };
 
-        use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::*;
+        use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::*;
         diesel::insert_into(table)
             .values(self)
             .on_conflict(id)
@@ -33,7 +33,7 @@ impl web_common_traits::prelude::Upsertable<diesel::PgConnection>
 }
 #[cfg(feature = "sqlite")]
 impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
-    for crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset
+    for crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset
 {
     fn upsert(
         &self,
@@ -44,7 +44,7 @@ impl web_common_traits::prelude::Upsertable<diesel::SqliteConnection>
             upsert::excluded,
         };
 
-        use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::*;
+        use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::*;
         diesel::insert_into(table)
             .values(self)
             .on_conflict(id)

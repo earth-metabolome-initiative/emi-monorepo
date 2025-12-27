@@ -46,13 +46,13 @@ CREATE TABLE IF NOT EXISTS capping_procedures (
 	-- The procedure_id template asset model describing the `capped_container`.
 	procedure_template_capped_container_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset describing the `capped_container`.
-	procedure_capped_container_id UUID NOT NULL REFERENCES procedure_assets(id),
+	procedure_capped_container_id UUID NOT NULL REFERENCES procedure_asset_models(id),
 	-- The cap being used, which must be a cap model.
 	capped_with_model_id INTEGER NOT NULL REFERENCES cap_models(id),
 	-- The procedure_id template asset model describing the `capped_with_model`.
 	procedure_template_capped_with_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset describing the `capped_with_model`.
-	procedure_capped_with_id UUID NOT NULL REFERENCES procedure_assets(id),
+	procedure_capped_with_id UUID NOT NULL REFERENCES procedure_asset_models(id),
 	-- The current procedure_id must be a capping procedure.
 	FOREIGN KEY (id, capping_procedure_template_id) REFERENCES procedures(id, procedure_template_id),
 	-- The procedure_id template asset model describing the `capped_container` must be the same one
@@ -78,22 +78,22 @@ CREATE TABLE IF NOT EXISTS capping_procedures (
 	FOREIGN KEY (
 		procedure_capped_container_id,
 		procedure_template_capped_container_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- The procedure_id template asset model and the procedure_id asset describing the `capped_with_model`
 	-- must be compatible.
 	FOREIGN KEY (
 		procedure_capped_with_id,
 		procedure_template_capped_with_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We ensure that the `procedure_capped_container` is associated with the `capped_container_model`.
 	FOREIGN KEY (
 		procedure_capped_container_id,
 		capped_container_model_id
-	) REFERENCES procedure_assets(id, asset_model_id),
+	) REFERENCES procedure_asset_models(id, asset_model_id),
 	-- We ensure that the `procedure_capped_with` is associated with the `capped_with_model`.
-	FOREIGN KEY (procedure_capped_with_id, capped_with_model_id) REFERENCES procedure_assets(id, asset_model_id),
+	FOREIGN KEY (procedure_capped_with_id, capped_with_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
 	-- We ensure that the `procedure_capped_container` is associated with the `capped_container`.
-	FOREIGN KEY (procedure_capped_container_id, capped_container_id) REFERENCES procedure_assets(id, asset_id),
+	FOREIGN KEY (capped_container_id, capped_container_model_id) REFERENCES assets(id, model_id),
 	-- We check that the `capped_container_model` is compatible with the `capped_with_model`.
 	FOREIGN KEY (capped_container_model_id, capped_with_model_id) REFERENCES asset_compatibility_rules(left_asset_model_id, right_asset_model_id)
 );

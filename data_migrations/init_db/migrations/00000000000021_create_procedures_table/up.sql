@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS procedures (
 		)
 	)
 );
-CREATE TABLE IF NOT EXISTS procedure_assets (
+CREATE TABLE IF NOT EXISTS procedure_asset_models (
 	-- The ID of this procedure_id asset.
 	id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	-- The ID of the procedure_id this asset is used in.
@@ -94,8 +94,6 @@ CREATE TABLE IF NOT EXISTS procedure_assets (
 	procedure_template_id INTEGER NOT NULL REFERENCES procedure_templates(id),
 	-- The asset model of the asset used in this procedure.
 	asset_model_id INTEGER NOT NULL REFERENCES asset_models(id),
-	-- The specific asset used in this procedure_id (if any).
-	asset_id UUID REFERENCES assets(id),
 	-- We enforce that there must be a procedure_id template asset for this asset.
 	procedure_template_asset_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The ancestor asset model defined in the procedure_id template asset.
@@ -114,26 +112,22 @@ CREATE TABLE IF NOT EXISTS procedure_assets (
 	) REFERENCES procedure_template_asset_models(id, asset_model_id),
 	-- We check that the asset is indeed a descendant of the ancestor asset defined in the procedure_id template asset.
 	FOREIGN KEY (asset_model_id, ancestor_model_id) REFERENCES asset_model_ancestors(descendant_model_id, ancestor_model_id),
-	-- We check that the specified asset (if any) is indeed of the specified asset model.
-	FOREIGN KEY (asset_id, asset_model_id) REFERENCES assets(id, model_id),
 	-- We create a unique index to allow for foreign keys checking that the current procedure_id asset
 	-- corresponds to a specific procedure_id template asset model in the procedure_id template.
 	UNIQUE (id, procedure_template_asset_model_id),
 	-- We create a unique index to allow for foreign keys checking that the current procedure_id asset
 	-- corresponds to a specific asset model.
-	UNIQUE (id, asset_model_id),
-	-- We create a unique index to allow for foreign keys checking that the current procedure_id asset
-	-- corresponds to a specific asset (if any).
-	UNIQUE (id, asset_id)
+	UNIQUE (id, asset_model_id)
 );
+
 -- When we insert a procedure_id assets, the parent_id procedure_id if any
 -- must also receive its own version of the procedure_id asset. The
 -- parent_id procedure's procedure_id asset will reference many of the
 -- same fields, but the `procedure_template_asset_model` will be
 -- the one defined in the parent_id procedure_id template which is characterized
 -- by being `based_on` the current procedure_id template asset model.
-CREATE OR REPLACE FUNCTION inherit_procedure_assets() RETURNS TRIGGER AS $$ BEGIN
-INSERT INTO procedure_assets (
+CREATE OR REPLACE FUNCTION inherit_procedure_asset_models() RETURNS TRIGGER AS $$ BEGIN
+INSERT INTO procedure_asset_models (
 		id,
 		procedure_template_id,
 		asset_model_id,
@@ -155,6 +149,6 @@ WHERE p.procedure_id = NEW.procedure
 RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-CREATE OR REPLACE TRIGGER trg_inherit_procedure_assets
+CREATE OR REPLACE TRIGGER trg_inherit_procedure_asset_models
 AFTER
-INSERT ON procedure_assets FOR EACH ROW EXECUTE FUNCTION inherit_procedure_assets();
+INSERT ON procedure_asset_models FOR EACH ROW EXECUTE FUNCTION inherit_procedure_asset_models();

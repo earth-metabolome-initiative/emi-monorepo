@@ -12,8 +12,8 @@ impl ExternalCrate {
             .version("0.4.42")
             .types([
                 ExternalType::new(
-                    syn::parse_quote!(diesel::sql_types::Timestamp),
-                    syn::parse_quote!(chrono::NaiveDateTime),
+                    syn::parse_quote!(::diesel::sql_types::Timestamp),
+                    syn::parse_quote!(::chrono::NaiveDateTime),
                 )
                 .postgres_types(["timestamp", "timestamp without time zone"])
                 .unwrap()
@@ -21,8 +21,8 @@ impl ExternalCrate {
                 .supports_eq()
                 .into(),
                 ExternalType::new(
-                    syn::parse_quote!(diesel::sql_types::Timestamptz),
-                    syn::parse_quote!(chrono::DateTime<chrono::Utc>),
+                    syn::parse_quote!(::diesel::sql_types::Timestamptz),
+                    syn::parse_quote!(::chrono::DateTime<chrono::Utc>),
                 )
                 .postgres_types(["timestamptz", "timestamp with time zone"])
                 .unwrap()
@@ -30,8 +30,8 @@ impl ExternalCrate {
                 .supports_eq()
                 .into(),
                 ExternalType::new(
-                    syn::parse_quote!(diesel::sql_types::Date),
-                    syn::parse_quote!(chrono::NaiveDate),
+                    syn::parse_quote!(::diesel::sql_types::Date),
+                    syn::parse_quote!(::chrono::NaiveDate),
                 )
                 .postgres_type("date")
                 .unwrap()
@@ -39,8 +39,8 @@ impl ExternalCrate {
                 .supports_eq()
                 .into(),
                 ExternalType::new(
-                    syn::parse_quote!(diesel::sql_types::Time),
-                    syn::parse_quote!(chrono::NaiveTime),
+                    syn::parse_quote!(::diesel::sql_types::Time),
+                    syn::parse_quote!(::chrono::NaiveTime),
                 )
                 .postgres_type("time")
                 .unwrap()
@@ -48,8 +48,8 @@ impl ExternalCrate {
                 .supports_eq()
                 .into(),
                 ExternalType::new(
-                    syn::parse_quote!(diesel::sql_types::Interval),
-                    syn::parse_quote!(chrono::Duration),
+                    syn::parse_quote!(::diesel::sql_types::Interval),
+                    syn::parse_quote!(::chrono::Duration),
                 )
                 .postgres_type("interval")
                 .unwrap()

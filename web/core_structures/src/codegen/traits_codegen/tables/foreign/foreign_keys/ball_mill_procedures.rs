@@ -26,16 +26,16 @@ pub struct BallMillProcedureForeignKeys {
         crate::codegen::structs_codegen::tables::asset_compatibility_rules::AssetCompatibilityRule,
     >,
     pub procedure_bead: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub procedure: Option<
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
     pub procedure_milled_container: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub procedure_milled_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub procedure_template_bead_model: Option<
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
@@ -319,37 +319,37 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_asset_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_bead == procedure_assets.id {
-                    foreign_keys.procedure_bead = Some(procedure_assets);
+                if self.procedure_bead == procedure_asset_models.id {
+                    foreign_keys.procedure_bead = Some(procedure_asset_models);
                     updated = true;
                 }
-                if self.procedure_milled_container == procedure_assets.id {
-                    foreign_keys.procedure_milled_container = Some(procedure_assets);
+                if self.procedure_milled_container == procedure_asset_models.id {
+                    foreign_keys.procedure_milled_container = Some(procedure_asset_models);
                     updated = true;
                 }
-                if self.procedure_milled_with == procedure_assets.id {
-                    foreign_keys.procedure_milled_with = Some(procedure_assets);
+                if self.procedure_milled_with == procedure_asset_models.id {
+                    foreign_keys.procedure_milled_with = Some(procedure_asset_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_bead == procedure_assets.id {
+                if self.procedure_bead == procedure_asset_models.id {
                     foreign_keys.procedure_bead = None;
                     updated = true;
                 }
-                if self.procedure_milled_container == procedure_assets.id {
+                if self.procedure_milled_container == procedure_asset_models.id {
                     foreign_keys.procedure_milled_container = None;
                     updated = true;
                 }
-                if self.procedure_milled_with == procedure_assets.id {
+                if self.procedure_milled_with == procedure_asset_models.id {
                     foreign_keys.procedure_milled_with = None;
                     updated = true;
                 }

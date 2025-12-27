@@ -5,10 +5,10 @@ pub struct StorageProcedureForeignKeys {
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
     pub procedure_stored_asset: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub procedure_stored_into: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub procedure_template: Option<
         crate::codegen::structs_codegen::tables::storage_procedure_templates::StorageProcedureTemplate,
@@ -238,29 +238,29 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_asset_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_stored_asset == procedure_assets.id {
-                    foreign_keys.procedure_stored_asset = Some(procedure_assets);
+                if self.procedure_stored_asset == procedure_asset_models.id {
+                    foreign_keys.procedure_stored_asset = Some(procedure_asset_models);
                     updated = true;
                 }
-                if self.procedure_stored_into == procedure_assets.id {
-                    foreign_keys.procedure_stored_into = Some(procedure_assets);
+                if self.procedure_stored_into == procedure_asset_models.id {
+                    foreign_keys.procedure_stored_into = Some(procedure_asset_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_stored_asset == procedure_assets.id {
+                if self.procedure_stored_asset == procedure_asset_models.id {
                     foreign_keys.procedure_stored_asset = None;
                     updated = true;
                 }
-                if self.procedure_stored_into == procedure_assets.id {
+                if self.procedure_stored_into == procedure_asset_models.id {
                     foreign_keys.procedure_stored_into = None;
                     updated = true;
                 }

@@ -31,8 +31,8 @@ impl ExternalCrate {
 impl ExternalType {
     fn point() -> Self {
         ExternalType::new(
-            syn::parse_quote!(postgis_diesel::sql_types::Geometry),
-            syn::parse_quote!(postgis_diesel::types::Point),
+            syn::parse_quote!(::postgis_diesel::sql_types::Geometry),
+            syn::parse_quote!(::postgis_diesel::types::Point),
         )
         .postgres_types(["point", "geography(point, 4326)", "geometry(point, 4326)"])
         .unwrap()
@@ -45,8 +45,8 @@ impl ExternalType {
 
     fn linestring() -> Self {
         ExternalType::new(
-            syn::parse_quote!(postgis_diesel::sql_types::Geometry),
-            syn::parse_quote!(postgis_diesel::types::LineString),
+            syn::parse_quote!(::postgis_diesel::sql_types::Geometry),
+            syn::parse_quote!(::postgis_diesel::types::LineString),
         )
         .postgres_type("linestring")
         .unwrap()
@@ -58,8 +58,8 @@ impl ExternalType {
 
     fn polygon() -> Self {
         ExternalType::new(
-            syn::parse_quote!(postgis_diesel::sql_types::Geometry),
-            syn::parse_quote!(postgis_diesel::types::Polygon),
+            syn::parse_quote!(::postgis_diesel::sql_types::Geometry),
+            syn::parse_quote!(::postgis_diesel::types::Polygon),
         )
         .postgres_type("polygon")
         .unwrap()
@@ -71,8 +71,8 @@ impl ExternalType {
 
     fn multipoint() -> Self {
         ExternalType::new(
-            syn::parse_quote!(postgis_diesel::sql_types::Geometry),
-            syn::parse_quote!(postgis_diesel::types::MultiPoint),
+            syn::parse_quote!(::postgis_diesel::sql_types::Geometry),
+            syn::parse_quote!(::postgis_diesel::types::MultiPoint),
         )
         .postgres_type("multipoint")
         .unwrap()
@@ -84,8 +84,8 @@ impl ExternalType {
 
     fn multilinestring() -> Self {
         ExternalType::new(
-            syn::parse_quote!(postgis_diesel::sql_types::Geometry),
-            syn::parse_quote!(postgis_diesel::types::MultiLineString),
+            syn::parse_quote!(::postgis_diesel::sql_types::Geometry),
+            syn::parse_quote!(::postgis_diesel::types::MultiLineString),
         )
         .postgres_type("multilinestring")
         .unwrap()
@@ -97,8 +97,8 @@ impl ExternalType {
 
     fn multipolygon() -> Self {
         ExternalType::new(
-            syn::parse_quote!(postgis_diesel::sql_types::Geometry),
-            syn::parse_quote!(postgis_diesel::types::MultiPolygon),
+            syn::parse_quote!(::postgis_diesel::sql_types::Geometry),
+            syn::parse_quote!(::postgis_diesel::types::MultiPolygon),
         )
         .postgres_type("multipolygon")
         .unwrap()
@@ -110,8 +110,8 @@ impl ExternalType {
 
     fn geometrycollection() -> Self {
         ExternalType::new(
-            syn::parse_quote!(postgis_diesel::sql_types::Geometry),
-            syn::parse_quote!(postgis_diesel::types::GeometryCollection),
+            syn::parse_quote!(::postgis_diesel::sql_types::Geometry),
+            syn::parse_quote!(::postgis_diesel::types::GeometryCollection),
         )
         .postgres_type("geometrycollection")
         .unwrap()
@@ -123,7 +123,7 @@ impl ExternalType {
 
     fn geometry() -> Self {
         ExternalType::new(
-            syn::parse_quote!(postgis_diesel::sql_types::Geometry),
+            syn::parse_quote!(::postgis_diesel::sql_types::Geometry),
             syn::parse_quote!(
                 postgis_diesel::types::GeometryContainer<postgis_diesel::types::Point>
             ),
@@ -138,7 +138,7 @@ impl ExternalType {
 
     fn geography() -> Self {
         ExternalType::new(
-            syn::parse_quote!(postgis_diesel::sql_types::Geography),
+            syn::parse_quote!(::postgis_diesel::sql_types::Geography),
             syn::parse_quote!(
                 postgis_diesel::types::GeometryContainer<postgis_diesel::types::Point>
             ),

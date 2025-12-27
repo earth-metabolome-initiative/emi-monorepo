@@ -104,7 +104,7 @@ where
     crate::codegen::structs_codegen::tables::freezing_procedure_templates::FreezingProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
 {
@@ -134,11 +134,11 @@ where
             procedure_frozen_container,
         ) = self.procedure_frozen_container
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_frozen_container,
                 conn,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::frozen_container(
                     self,
                     asset,
@@ -146,31 +146,31 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::frozen_container_model(
                 self,
-                procedure_assets.asset_model_id,
+                procedure_asset_models.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::procedure_template_frozen_container_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_frozen_with) = self
             .procedure_frozen_with
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_frozen_with,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::frozen_with(
                 self,
-                procedure_assets.asset,
+                procedure_asset_models.asset,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::frozen_with_model(
                 self,
-                procedure_assets.asset_model_id,
+                procedure_asset_models.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::FreezingProcedureSettable>::procedure_template_frozen_with_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         let procedure_template = self

@@ -17,7 +17,7 @@
 )]
 #[diesel(primary_key(id))]
 #[diesel(
-    table_name = crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets
+    table_name = crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models
 )]
 pub struct ProcedureAsset {
     pub id: ::rosetta_uuid::Uuid,
@@ -29,7 +29,7 @@ pub struct ProcedureAsset {
     pub ancestor_model: i32,
 }
 impl web_common_traits::prelude::TableName for ProcedureAsset {
-    const TABLE_NAME: &'static str = "procedure_assets";
+    const TABLE_NAME: &'static str = "procedure_asset_models";
 }
 impl<'a> From<&'a ProcedureAsset>
     for web_common_traits::database::IdOrBuilder<
@@ -43,7 +43,7 @@ impl<'a> From<&'a ProcedureAsset>
 }
 impl
     web_common_traits::prelude::ExtensionTable<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     > for ProcedureAsset
 where
     for<'a> &'a Self: diesel::Identifiable<Id = &'a ::rosetta_uuid::Uuid>,
@@ -80,7 +80,7 @@ impl ProcedureAsset {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn procedure_assets_asset_asset_model_fkey(
+    pub fn procedure_asset_models_asset_asset_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
@@ -117,7 +117,7 @@ impl ProcedureAsset {
         };
         crate::codegen::structs_codegen::tables::assets::Asset::read(asset, conn).optional()
     }
-    pub fn procedure_assets_asset_model_ancestor_model_fkey<C: diesel::connection::LoadConnection>(
+    pub fn procedure_asset_models_asset_model_ancestor_model_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -163,7 +163,7 @@ impl ProcedureAsset {
         crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn procedure_assets_procedure_procedure_template_fkey(
+    pub fn procedure_asset_models_procedure_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
@@ -185,7 +185,7 @@ impl ProcedureAsset {
             >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn procedure_assets_procedure_template_asset_model_ancestor_m_fkey(
+    pub fn procedure_asset_models_procedure_template_asset_model_ancestor_m_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -227,7 +227,7 @@ impl ProcedureAsset {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn procedure_assets_procedure_template_asset_model_procedure_fkey(
+    pub fn procedure_asset_models_procedure_template_asset_model_procedure_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -274,36 +274,36 @@ impl ProcedureAsset {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::ancestor_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::ancestor_model as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::ancestor_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::ancestor_model as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::id,
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::id,
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::ancestor_model as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::ancestor_model as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::id,
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::id,
             >,
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
-        use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
+        use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
         Self::table()
-            .filter(procedure_assets::ancestor_model.eq(ancestor_model))
-            .order_by(procedure_assets::id.asc())
+            .filter(procedure_asset_models::ancestor_model.eq(ancestor_model))
+            .order_by(procedure_asset_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -316,14 +316,14 @@ impl ProcedureAsset {
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
 
-        use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
+        use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
         Self::table()
             .filter(
-                procedure_assets::asset
+                procedure_asset_models::asset
                     .eq(asset)
-                    .and(procedure_assets::asset_model.eq(asset_model_id)),
+                    .and(procedure_asset_models::asset_model.eq(asset_model_id)),
             )
-            .order_by(procedure_assets::id.asc())
+            .order_by(procedure_asset_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -333,10 +333,10 @@ impl ProcedureAsset {
     ) -> Result<Vec<Self>, diesel::result::Error> {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
-        use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
+        use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
         Self::table()
-            .filter(procedure_assets::asset.eq(asset))
-            .order_by(procedure_assets::id.asc())
+            .filter(procedure_asset_models::asset.eq(asset))
+            .order_by(procedure_asset_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -349,14 +349,14 @@ impl ProcedureAsset {
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
 
-        use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
+        use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
         Self::table()
             .filter(
-                procedure_assets::asset_model
+                procedure_asset_models::asset_model
                     .eq(asset_model_id)
-                    .and(procedure_assets::ancestor_model.eq(ancestor_model)),
+                    .and(procedure_asset_models::ancestor_model.eq(ancestor_model)),
             )
-            .order_by(procedure_assets::id.asc())
+            .order_by(procedure_asset_models::id.asc())
             .load::<Self>(conn)
     }
     pub fn from_asset_model<C>(
@@ -366,36 +366,36 @@ impl ProcedureAsset {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::asset_model_id as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::asset_model_id as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::id,
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::id,
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::asset_model_id as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::id,
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::id,
             >,
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
-        use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
+        use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
         Self::table()
-            .filter(procedure_assets::asset_model.eq(asset_model_id))
-            .order_by(procedure_assets::id.asc())
+            .filter(procedure_asset_models::asset_model.eq(asset_model_id))
+            .order_by(procedure_asset_models::id.asc())
             .load::<Self>(conn)
     }
     pub fn from_procedure<C>(
@@ -405,36 +405,36 @@ impl ProcedureAsset {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::procedure as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::procedure as diesel::expression_methods::EqAll<
                 ::rosetta_uuid::Uuid,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::procedure as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::procedure as diesel::expression_methods::EqAll<
                 ::rosetta_uuid::Uuid,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::id,
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::id,
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::procedure as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::procedure as diesel::expression_methods::EqAll<
                 ::rosetta_uuid::Uuid,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::id,
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::id,
             >,
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
-        use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
+        use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
         Self::table()
-            .filter(procedure_assets::procedure.eq(procedure))
-            .order_by(procedure_assets::id.asc())
+            .filter(procedure_asset_models::procedure.eq(procedure))
+            .order_by(procedure_asset_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -447,14 +447,14 @@ impl ProcedureAsset {
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
 
-        use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
+        use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
         Self::table()
             .filter(
-                procedure_assets::procedure
+                procedure_asset_models::procedure
                     .eq(procedure)
-                    .and(procedure_assets::procedure_template.eq(procedure_template_id)),
+                    .and(procedure_asset_models::procedure_template.eq(procedure_template_id)),
             )
-            .order_by(procedure_assets::id.asc())
+            .order_by(procedure_asset_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -467,14 +467,14 @@ impl ProcedureAsset {
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
 
-        use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
+        use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
         Self::table()
             .filter(
-                procedure_assets::procedure_template_asset_model
+                procedure_asset_models::procedure_template_asset_model
                     .eq(procedure_template_asset_model_id)
-                    .and(procedure_assets::ancestor_model.eq(ancestor_model)),
+                    .and(procedure_asset_models::ancestor_model.eq(ancestor_model)),
             )
-            .order_by(procedure_assets::id.asc())
+            .order_by(procedure_asset_models::id.asc())
             .load::<Self>(conn)
     }
     pub fn from_procedure_template_asset_model<C>(
@@ -484,39 +484,39 @@ impl ProcedureAsset {
     where
         C: diesel::connection::LoadConnection,
         <Self as diesel::associations::HasTable>::Table: diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::procedure_template_asset_model_id as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::procedure_template_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >,
         <<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::procedure_template_asset_model_id as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::procedure_template_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output: diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::id,
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::id,
             >,
         >,
         <<<Self as diesel::associations::HasTable>::Table as diesel::query_dsl::methods::FilterDsl<
-            <crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::procedure_template_asset_model_id as diesel::expression_methods::EqAll<
+            <crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::procedure_template_asset_model_id as diesel::expression_methods::EqAll<
                 i32,
             >>::Output,
         >>::Output as diesel::query_dsl::methods::OrderDsl<
             diesel::helper_types::Asc<
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::id,
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::id,
             >,
         >>::Output: diesel::RunQueryDsl<C>
             + for<'a> diesel::query_dsl::LoadQuery<'a, C, Self>,
     {
         use diesel::{ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable};
 
-        use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
+        use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
         Self::table()
             .filter(
-                procedure_assets::procedure_template_asset_model
+                procedure_asset_models::procedure_template_asset_model
                     .eq(procedure_template_asset_model_id),
             )
-            .order_by(procedure_assets::id.asc())
+            .order_by(procedure_asset_models::id.asc())
             .load::<Self>(conn)
     }
     #[cfg(feature = "postgres")]
@@ -529,14 +529,14 @@ impl ProcedureAsset {
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
 
-        use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
+        use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
         Self::table()
             .filter(
-                procedure_assets::procedure_template_asset_model
+                procedure_asset_models::procedure_template_asset_model
                     .eq(procedure_template_asset_model_id)
-                    .and(procedure_assets::procedure_template.eq(procedure_template_id)),
+                    .and(procedure_asset_models::procedure_template.eq(procedure_template_id)),
             )
-            .order_by(procedure_assets::id.asc())
+            .order_by(procedure_asset_models::id.asc())
             .load::<Self>(conn)
     }
 }

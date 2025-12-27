@@ -8,13 +8,13 @@ pub struct SupernatantProcedureForeignKeys {
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
     pub procedure_pipette_tip: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub procedure_stratified_source: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub procedure_supernatant_destination: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub procedure_template: Option<
         crate::codegen::structs_codegen::tables::supernatant_procedure_templates::SupernatantProcedureTemplate,
@@ -32,7 +32,7 @@ pub struct SupernatantProcedureForeignKeys {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
     pub procedure_transferred_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub stratified_source: Option<
         crate::codegen::structs_codegen::tables::volumetric_containers::VolumetricContainer,
@@ -267,45 +267,45 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_asset_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_pipette_tip == procedure_assets.id {
-                    foreign_keys.procedure_pipette_tip = Some(procedure_assets);
+                if self.procedure_pipette_tip == procedure_asset_models.id {
+                    foreign_keys.procedure_pipette_tip = Some(procedure_asset_models);
                     updated = true;
                 }
-                if self.procedure_stratified_source == procedure_assets.id {
-                    foreign_keys.procedure_stratified_source = Some(procedure_assets);
+                if self.procedure_stratified_source == procedure_asset_models.id {
+                    foreign_keys.procedure_stratified_source = Some(procedure_asset_models);
                     updated = true;
                 }
-                if self.procedure_supernatant_destination == procedure_assets.id {
-                    foreign_keys.procedure_supernatant_destination = Some(procedure_assets);
+                if self.procedure_supernatant_destination == procedure_asset_models.id {
+                    foreign_keys.procedure_supernatant_destination = Some(procedure_asset_models);
                     updated = true;
                 }
-                if self.procedure_transferred_with == procedure_assets.id {
-                    foreign_keys.procedure_transferred_with = Some(procedure_assets);
+                if self.procedure_transferred_with == procedure_asset_models.id {
+                    foreign_keys.procedure_transferred_with = Some(procedure_asset_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_pipette_tip == procedure_assets.id {
+                if self.procedure_pipette_tip == procedure_asset_models.id {
                     foreign_keys.procedure_pipette_tip = None;
                     updated = true;
                 }
-                if self.procedure_stratified_source == procedure_assets.id {
+                if self.procedure_stratified_source == procedure_asset_models.id {
                     foreign_keys.procedure_stratified_source = None;
                     updated = true;
                 }
-                if self.procedure_supernatant_destination == procedure_assets.id {
+                if self.procedure_supernatant_destination == procedure_asset_models.id {
                     foreign_keys.procedure_supernatant_destination = None;
                     updated = true;
                 }
-                if self.procedure_transferred_with == procedure_assets.id {
+                if self.procedure_transferred_with == procedure_asset_models.id {
                     foreign_keys.procedure_transferred_with = None;
                     updated = true;
                 }

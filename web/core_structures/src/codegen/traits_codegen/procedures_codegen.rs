@@ -24,7 +24,7 @@ impl web_common_traits::prelude::ProcedureLike
     type ProcedureTemplateAssetModel = crate::ProcedureTemplateAssetModel;
     type Builder =
         crate::codegen::structs_codegen::tables::most_concrete_variants::ProcedureBuilderDAG;
-    fn procedure_template_asset_models_and_procedure_assets(
+    fn procedure_template_asset_models_and_procedure_asset_models(
         &self,
     ) -> Vec<
         (
@@ -34,55 +34,55 @@ impl web_common_traits::prelude::ProcedureLike
     >{
         match self {
             Self::AliquotingProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::BallMillProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::CappingProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::CentrifugeProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::DisposalProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::FractioningProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::FreezeDryingProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::FreezingProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::GeolocationProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::HarvestingProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::PackagingProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::PhotographProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::PouringProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::Procedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::StorageProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::SupernatantProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
             Self::WeighingProcedure(procedure) => {
-                procedure.procedure_template_asset_models_and_procedure_assets()
+                procedure.procedure_template_asset_models_and_procedure_asset_models()
             }
         }
     }

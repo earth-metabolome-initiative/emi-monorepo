@@ -237,15 +237,15 @@ impl InsertableSupernatantProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
             self.procedure_pipette_tip,
             conn,
         )
@@ -255,23 +255,23 @@ impl InsertableSupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_pipette_tip)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::asset_model
                             .eq(&self.pipette_tip_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -279,23 +279,23 @@ impl InsertableSupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_pipette_tip)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::asset_model
                             .eq(&self.pipette_tip_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -303,38 +303,38 @@ impl InsertableSupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_pipette_tip)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::procedure_template_asset_model
                             .eq(&self.procedure_template_pipette_tip_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     pub fn procedure_stratified_source<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
             self.procedure_stratified_source,
             conn,
         )
@@ -344,23 +344,23 @@ impl InsertableSupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_stratified_source)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::procedure_template_asset_model
                             .eq(&self.procedure_template_stratified_source_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -368,38 +368,38 @@ impl InsertableSupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_stratified_source)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::asset
                             .eq(&self.stratified_source),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     pub fn procedure_supernatant_destination<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
             self.procedure_supernatant_destination,
             conn,
         )
@@ -409,23 +409,23 @@ impl InsertableSupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_supernatant_destination)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::procedure_template_asset_model
                             .eq(&self.procedure_template_supernatant_destination_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -433,23 +433,23 @@ impl InsertableSupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_supernatant_destination)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::asset
                             .eq(&self.supernatant_destination),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     pub fn procedure_template<C: diesel::connection::LoadConnection>(
@@ -648,15 +648,15 @@ impl InsertableSupernatantProcedure {
         &self,
         conn: &mut C,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     >
     where
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset:
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset:
             web_common_traits::database::Read<C>,
     {
         use web_common_traits::database::Read;
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
             self.procedure_transferred_with,
             conn,
         )
@@ -666,23 +666,23 @@ impl InsertableSupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_transferred_with)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::procedure_template_asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::procedure_template_asset_model
                             .eq(&self.procedure_template_transferred_with_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -690,23 +690,23 @@ impl InsertableSupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_transferred_with)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset_model
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::asset_model
                             .eq(&self.transferred_with_model),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     #[cfg(feature = "postgres")]
@@ -714,23 +714,23 @@ impl InsertableSupernatantProcedure {
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         diesel::result::Error,
     > {
         use diesel::{
             BoolExpressionMethods, ExpressionMethods, QueryDsl, RunQueryDsl, associations::HasTable,
         };
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::table()
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::table()
             .filter(
-                crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::id
+                crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::id
                     .eq(&self.procedure_transferred_with)
                     .and(
-                        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::dsl::asset
+                        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::dsl::asset
                             .eq(&self.transferred_with),
                     ),
             )
             .first::<
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             >(conn)
     }
     pub fn stratified_source<C: diesel::connection::LoadConnection>(
@@ -1345,7 +1345,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v7 ["`procedure_assets`"]
+    ///subgraph v7 ["`procedure_asset_models`"]
     ///    v6@{shape: rounded, label: "procedure_template_asset_model"}
     ///class v6 undirectly-involved-column
     ///end
@@ -1412,7 +1412,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v4 ["`procedure_assets`"]
+    ///subgraph v4 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "asset"}
     ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
@@ -1476,7 +1476,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v4 ["`procedure_assets`"]
+    ///subgraph v4 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
     ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
@@ -1540,7 +1540,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v6 ["`procedure_assets`"]
+    ///subgraph v6 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "asset"}
     ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
@@ -1675,7 +1675,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v4 ["`procedure_assets`"]
+    ///subgraph v4 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "asset"}
     ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
@@ -1739,7 +1739,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v4 ["`procedure_assets`"]
+    ///subgraph v4 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
     ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
@@ -1803,7 +1803,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v6 ["`procedure_assets`"]
+    ///subgraph v6 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "asset"}
     ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_asset_model"}
@@ -1939,7 +1939,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v4 ["`procedure_assets`"]
+    ///subgraph v4 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "asset"}
     ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
@@ -2001,7 +2001,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v4 ["`procedure_assets`"]
+    ///subgraph v4 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
     ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
@@ -2064,7 +2064,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v4 ["`procedure_assets`"]
+    ///subgraph v4 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
     ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
@@ -2129,7 +2129,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v8 ["`procedure_assets`"]
+    ///subgraph v8 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "asset"}
     ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "asset_model"}
@@ -2307,7 +2307,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v4 ["`procedure_assets`"]
+    ///subgraph v4 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
     ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
@@ -2389,7 +2389,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v4 ["`procedure_assets`"]
+    ///subgraph v4 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "procedure_template_asset_model"}
     ///class v0 directly-involved-column
     ///    v3@{shape: rounded, label: "id"}
@@ -2454,7 +2454,7 @@ where
     ///classDef column-of-interest stroke: #f0746c,fill: #f49f9a
     ///classDef directly-involved-column stroke: #6c74f0,fill: #9a9ff4
     ///classDef undirectly-involved-column stroke: #a7eff0,stroke-dasharray: 5, 5,fill: #d2f6f7
-    ///subgraph v6 ["`procedure_assets`"]
+    ///subgraph v6 ["`procedure_asset_models`"]
     ///    v0@{shape: rounded, label: "asset_model"}
     ///class v0 directly-involved-column
     ///    v1@{shape: rounded, label: "procedure_template_asset_model"}

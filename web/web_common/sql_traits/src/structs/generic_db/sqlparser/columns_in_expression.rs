@@ -8,43 +8,54 @@ use crate::traits::{DatabaseLike, column::ColumnLike};
 
 pub(super) fn columns_in_expression<DB: DatabaseLike>(
     expr: &Expr,
+    table_name: &str,
     columns: &[Rc<DB::Column>],
-) -> Vec<Rc<DB::Column>> {
+) -> Result<Vec<Rc<DB::Column>>, crate::errors::Error> {
     let mut result = Vec::new();
 
     match expr {
         Expr::Identifier(ident) => {
-            result.extend(
-                columns.iter().filter(|col| col.column_name() == ident.value.as_str()).cloned(),
-            );
+            if let Some(col) = columns.iter().find(|col| col.column_name() == ident.value.as_str())
+            {
+                result.push(col.clone());
+            } else {
+                return Err(crate::errors::Error::UnknownColumnInCheckConstraint {
+                    column_name: ident.value.clone(),
+                    table_name: table_name.to_string(),
+                });
+            }
         }
         Expr::CompoundIdentifier(idents) => {
             if let Some(last_ident) = idents.last() {
-                result.extend(
-                    columns
-                        .iter()
-                        .filter(|col| col.column_name() == last_ident.value.as_str())
-                        .cloned(),
-                );
+                if let Some(col) =
+                    columns.iter().find(|col| col.column_name() == last_ident.value.as_str())
+                {
+                    result.push(col.clone());
+                } else {
+                    return Err(crate::errors::Error::UnknownColumnInCheckConstraint {
+                        column_name: last_ident.value.clone(),
+                        table_name: table_name.to_string(),
+                    });
+                }
             }
         }
         Expr::BinaryOp { left, right, .. } => {
-            result.extend(columns_in_expression::<DB>(left, columns));
-            result.extend(columns_in_expression::<DB>(right, columns));
+            result.extend(columns_in_expression::<DB>(left, table_name, columns)?);
+            result.extend(columns_in_expression::<DB>(right, table_name, columns)?);
         }
         Expr::Nested(nested_expr) => {
-            result.extend(columns_in_expression::<DB>(nested_expr, columns));
+            result.extend(columns_in_expression::<DB>(nested_expr, table_name, columns)?);
         }
         Expr::Between { expr, negated: _, low, high } => {
-            result.extend(columns_in_expression::<DB>(expr, columns));
-            result.extend(columns_in_expression::<DB>(low, columns));
-            result.extend(columns_in_expression::<DB>(high, columns));
+            result.extend(columns_in_expression::<DB>(expr, table_name, columns)?);
+            result.extend(columns_in_expression::<DB>(low, table_name, columns)?);
+            result.extend(columns_in_expression::<DB>(high, table_name, columns)?);
         }
         Expr::UnaryOp { expr, .. }
         | Expr::Cast { expr, .. }
         | Expr::IsNull(expr)
         | Expr::IsNotNull(expr) => {
-            result.extend(columns_in_expression::<DB>(expr, columns));
+            result.extend(columns_in_expression::<DB>(expr, table_name, columns)?);
         }
         Expr::Function(func) => {
             if let sqlparser::ast::FunctionArguments::List(args) = &func.args {
@@ -57,7 +68,7 @@ pub(super) fn columns_in_expression<DB: DatabaseLike>(
                         | sqlparser::ast::FunctionArg::Unnamed(
                             sqlparser::ast::FunctionArgExpr::Expr(expr),
                         ) => {
-                            result.extend(columns_in_expression::<DB>(expr, columns));
+                            result.extend(columns_in_expression::<DB>(expr, table_name, columns)?);
                         }
                         sqlparser::ast::FunctionArg::ExprNamed { .. }
                         | sqlparser::ast::FunctionArg::Named { .. }
@@ -67,13 +78,13 @@ pub(super) fn columns_in_expression<DB: DatabaseLike>(
             }
         }
         Expr::InList { expr, list, .. } => {
-            result.extend(columns_in_expression::<DB>(expr, columns));
+            result.extend(columns_in_expression::<DB>(expr, table_name, columns)?);
             for list_expr in list {
-                result.extend(columns_in_expression::<DB>(list_expr, columns));
+                result.extend(columns_in_expression::<DB>(list_expr, table_name, columns)?);
             }
         }
         Expr::InSubquery { expr, .. } => {
-            result.extend(columns_in_expression::<DB>(expr, columns));
+            result.extend(columns_in_expression::<DB>(expr, table_name, columns)?);
             // Note: We don't traverse into subqueries as they have their own
             // column scope
         }
@@ -82,11 +93,11 @@ pub(super) fn columns_in_expression<DB: DatabaseLike>(
 
     // Remove duplicates while preserving order
     let mut seen = std::collections::HashSet::new();
-    result
+    Ok(result
         .into_iter()
         .filter(|col| {
             let ptr = Rc::as_ptr(col).cast::<()>();
             seen.insert(ptr)
         })
-        .collect()
+        .collect())
 }

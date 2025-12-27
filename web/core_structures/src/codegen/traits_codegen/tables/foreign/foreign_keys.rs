@@ -96,7 +96,7 @@ mod positioning_device_models;
 mod positioning_devices;
 mod pouring_procedure_templates;
 mod pouring_procedures;
-mod procedure_assets;
+mod procedure_asset_models;
 mod procedure_template_asset_models;
 mod procedure_templates;
 mod procedures;

@@ -13,8 +13,8 @@ impl ExternalCrate {
             .git("https://github.com/earth-metabolome-initiative/emi-monorepo", "postgres-crate")
             .features(["diesel", "serde"])
             .types([ExternalType::new(
-                syn::parse_quote!(rosetta_timestamp::diesel_impls::TimestampUTC),
-                syn::parse_quote!(rosetta_timestamp::TimestampUTC),
+                syn::parse_quote!(::rosetta_timestamp::diesel_impls::TimestampUTC),
+                syn::parse_quote!(::rosetta_timestamp::TimestampUTC),
             )
             .postgres_types(["timestamp with time zone", "timestamptz"])
             .unwrap()

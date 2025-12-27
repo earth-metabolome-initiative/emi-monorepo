@@ -72,13 +72,13 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedures (
 	-- The procedure_id template asset model associated to the `bead_model`.
 	procedure_template_bead_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `bead_model`.
-	procedure_bead_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_bead_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- The device used for the ball mill procedure.
 	milled_with_model_id INTEGER NOT NULL REFERENCES ball_mill_machine_models(id),
 	-- The procedure_id template asset model associated to the `milled_with_model`.
 	procedure_template_milled_with_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `milled_with_model`.
-	procedure_milled_with_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_milled_with_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- The ball mill machine used for the procedure. This field is optional because the ball mill
 	-- machine might not have been recorded at the time of performing the procedure.
 	milled_with_id UUID REFERENCES ball_mill_machines(id),
@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedures (
 	-- The procedure_id template asset model associated to the `milled_container`.
 	procedure_template_milled_container_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `milled_container`.
-	procedure_milled_container_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_milled_container_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure_id is a ball mill procedure_id without the possibility of a mistake.
 	FOREIGN KEY (id, ball_mill_procedure_template_id) REFERENCES procedures(id, procedure_template_id),
@@ -122,32 +122,32 @@ CREATE TABLE IF NOT EXISTS ball_mill_procedures (
 	),
 	-- We enforce that the procedure_id template asset model reported in the procedure_id is indeed
 	-- the same one associated to the procedure_id asset for the asset model `bead_model`.
-	FOREIGN KEY (procedure_bead_id, procedure_template_bead_model_id) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	FOREIGN KEY (procedure_bead_id, procedure_template_bead_model_id) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We enforce that the procedure_id template asset model reported in the procedure_id is indeed
 	-- the same one associated to the procedure_id asset for the asset model `milled_with_model`.
 	FOREIGN KEY (
 		procedure_milled_with_id,
 		procedure_template_milled_with_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We enforce that the procedure_id template asset model reported in the procedure_id is indeed
 	-- the same one associated to the procedure_id asset for the asset model `milled_container_model`.
 	FOREIGN KEY (
 		procedure_milled_container_id,
 		procedure_template_milled_container_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We enforce that the `procedure_milled_container` procedure_id asset is indeed associated to the `milled_container_model`.
 	FOREIGN KEY (
 		procedure_milled_container_id,
 		milled_container_model_id
-	) REFERENCES procedure_assets(id, asset_model_id),
+	) REFERENCES procedure_asset_models(id, asset_model_id),
 	-- We enforce that the `procedure_milled_with` procedure_id asset is indeed associated to the `milled_with_model`.
-	FOREIGN KEY (procedure_milled_with_id, milled_with_model_id) REFERENCES procedure_assets(id, asset_model_id),
+	FOREIGN KEY (procedure_milled_with_id, milled_with_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
 	-- We enforce that the `procedure_milled_with` procedure_id asset is indeed associated to the `milled_with`.
-	FOREIGN KEY (procedure_milled_with_id, milled_with_id) REFERENCES procedure_assets(id, asset_id),
+	FOREIGN KEY (milled_with_id, milled_with_model_id) REFERENCES assets(id, model_id),
 	-- We enforce that the `procedure_bead_id` procedure_id asset is indeed associated to the `bead_model`.
-	FOREIGN KEY (procedure_bead_id, bead_model_id) REFERENCES procedure_assets(id, asset_model_id),
+	FOREIGN KEY (procedure_bead_id, bead_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
 	-- We enforce that the `procedure_milled_container` procedure_id asset is indeed associated to the `milled_container`.
-	FOREIGN KEY (procedure_milled_container_id, milled_container_id) REFERENCES procedure_assets(id, asset_id),
+	FOREIGN KEY (milled_container_id, milled_container_model_id) REFERENCES assets(id, model_id),
 	-- We check that the `milled_with` is indeed a ball mill machine that can hold the `milled_container_model`.
 	FOREIGN KEY (milled_with_model_id, milled_container_model_id) REFERENCES asset_compatibility_rules(left_asset_model_id, right_asset_model_id),
 	-- We check that the `milled_with` is indeed a ball mill machine that can use the `bead_model`.

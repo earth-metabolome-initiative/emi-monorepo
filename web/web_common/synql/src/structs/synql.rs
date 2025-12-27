@@ -67,6 +67,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
             .expect("Invalid workspace name")
             .external_crates(self.external_crates.iter().cloned())
             .rosetta_timestamp()
+            .chrono()
             .core()
             .std()
             .pgrx_validation()

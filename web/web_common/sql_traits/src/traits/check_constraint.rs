@@ -116,6 +116,37 @@ pub trait CheckConstraintLike:
         database: &'db Self::DB,
     ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::Column>;
 
+    /// Returns the number of columns involved in the check constraint.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query the columns
+    ///   from.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"CREATE TABLE my_table (id INT CHECK (id > 0), name TEXT CHECK (length(name) > 0));"#,
+    /// )?;
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let check_constraints: Vec<_> = table.check_constraints(&db).collect();
+    /// let [cc1, cc2] = &check_constraints.as_slice() else {
+    ///     panic!("Expected two check constraints");
+    /// };
+    /// assert_eq!(cc1.number_of_columns(&db), 1);
+    /// assert_eq!(cc2.number_of_columns(&db), 1);
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[inline]
+    fn number_of_columns(&self, database: &Self::DB) -> usize {
+        self.columns(database).count()
+    }
+
     /// Returns a reference to the requested column by name, if any.
     ///
     /// # Arguments

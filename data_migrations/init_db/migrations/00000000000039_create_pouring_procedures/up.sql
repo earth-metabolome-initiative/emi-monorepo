@@ -56,22 +56,28 @@ CREATE TABLE IF NOT EXISTS pouring_procedures (
 	pouring_procedure_template_id INTEGER NOT NULL REFERENCES pouring_procedure_templates(id),
 	-- The container from which the liquid is poured.
 	poured_from_id UUID NOT NULL REFERENCES volumetric_containers(id),
+	-- The model of the container from which the liquid is poured.
+	poured_from_model_id INTEGER NOT NULL REFERENCES volumetric_container_models(id),
 	-- The procedure_id template asset model associated to the `poured_from`.
 	procedure_template_poured_from_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `poured_from`.
-	procedure_poured_from_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_poured_from_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- The actual measuring device (if known) used to measure the liquid volume.
 	measured_with_id UUID REFERENCES volume_measuring_devices(id),
+	-- The model of the measuring device.
+	measured_with_model_id INTEGER REFERENCES volume_measuring_device_models(id),
 	-- The procedure_id template asset model associated to the `measured_with_model`.
 	procedure_template_measured_with_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `measured_with`.
-	procedure_measured_with_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_measured_with_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- The container into which the liquid is poured.
 	poured_into_id UUID NOT NULL REFERENCES volumetric_containers(id),
+	-- The model of the container into which the liquid is poured.
+	poured_into_model_id INTEGER NOT NULL REFERENCES volumetric_container_models(id),
 	-- The procedure_id template asset model associated to the `poured_into`.
 	procedure_template_poured_into_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `poured_into`.
-	procedure_poured_into_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_poured_into_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure_id is a packaging procedure.
 	FOREIGN KEY (id, pouring_procedure_template_id) REFERENCES procedures(id, procedure_template_id),
@@ -100,24 +106,27 @@ CREATE TABLE IF NOT EXISTS pouring_procedures (
 		procedure_template_poured_into_model_id
 	),
 	-- We check that the `procedure_poured_from` is associated to the `poured_from`.
-	FOREIGN KEY (procedure_poured_from_id, poured_from_id) REFERENCES procedure_assets(id, asset_id),
+	FOREIGN KEY (procedure_poured_from_id, poured_from_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
+	FOREIGN KEY (poured_from_id, poured_from_model_id) REFERENCES assets(id, model_id),
 	-- We check that the `procedure_poured_into` is associated to the `poured_into`.
-	FOREIGN KEY (procedure_poured_into_id, poured_into_id) REFERENCES procedure_assets(id, asset_id),
+	FOREIGN KEY (procedure_poured_into_id, poured_into_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
+	FOREIGN KEY (poured_into_id, poured_into_model_id) REFERENCES assets(id, model_id),
 	-- We check that the `procedure_poured_from` is indeed associated to the `procedure_template_poured_from_model`.
 	FOREIGN KEY (
 		procedure_poured_from_id,
 		procedure_template_poured_from_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We check that the `procedure_measured_with` is indeed associated to the `procedure_template_measured_with_model`.
 	FOREIGN KEY (
 		procedure_measured_with_id,
 		procedure_template_measured_with_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We check that the `procedure_poured_into` is indeed associated to the `procedure_template_poured_into_model`.
 	FOREIGN KEY (
 		procedure_poured_into_id,
 		procedure_template_poured_into_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We check that the `procedure_measured_with` is associated to the `measured_with` asset (if any).
-	FOREIGN KEY (procedure_measured_with_id, measured_with_id) REFERENCES procedure_assets(id, asset_id)
+	FOREIGN KEY (procedure_measured_with_id, measured_with_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
+	FOREIGN KEY (measured_with_id, measured_with_model_id) REFERENCES assets(id, model_id)
 );

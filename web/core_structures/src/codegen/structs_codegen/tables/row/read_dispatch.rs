@@ -306,7 +306,7 @@ where
     crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::database::Read<
@@ -1362,7 +1362,7 @@ where
                 crate::codegen::tables::table_primary_keys::TablePrimaryKey::ProcedureAsset(
                     primary_key,
                 ) => {
-                    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+                    crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                             primary_key,
                             conn,
                         )?

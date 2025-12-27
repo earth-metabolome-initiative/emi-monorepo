@@ -19,7 +19,7 @@ pub trait UniqueIndexSynLike: UniqueIndexLike {
                 quote! {#table_ident::#ident}
             });
         quote! {
-            diesel_builders::prelude::unique_index!(#(#column_idents),*);
+            ::diesel_builders::prelude::unique_index!(#(#column_idents),*);
         }
     }
 }

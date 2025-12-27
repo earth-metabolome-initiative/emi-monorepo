@@ -35,14 +35,18 @@ CREATE TABLE IF NOT EXISTS geolocation_procedures (
 	geolocation_procedure_template_id INTEGER NOT NULL REFERENCES geolocation_procedure_templates(id),
 	-- The asset being geolocated, which must be a physical asset.
 	geolocated_asset_id UUID NOT NULL REFERENCES physical_assets(id),
+	-- The model of the asset being geolocated.
+	geolocated_asset_model_id INTEGER NOT NULL REFERENCES physical_asset_models(id),
 	-- The procedure_id template asset model associated to the `geolocated_asset`.
 	procedure_template_geolocated_asset_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure_id asset associated to the `geolocated_asset`.
-	procedure_geolocated_asset_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_geolocated_asset_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- The positioning device used for geolocation. This field is optional, as the positioning device might not necessarily be tracked.
 	geolocated_with_id UUID REFERENCES positioning_devices(id),
+	-- The model of the positioning device used for geolocation.
+	geolocated_with_model_id INTEGER NOT NULL REFERENCES positioning_device_models(id),
 	-- The procedure_id asset associated to the `geolocated_with`.
-	procedure_geolocated_with_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_geolocated_with_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- The procedure_id template asset model associated to the `geolocated_with_model`.
 	procedure_template_geolocated_with_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The latitude and longitude of the geolocation.
@@ -69,14 +73,18 @@ CREATE TABLE IF NOT EXISTS geolocation_procedures (
 	FOREIGN KEY (
 		procedure_geolocated_asset_id,
 		procedure_template_geolocated_asset_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We check that the `procedure_geolocated_with` has the same `procedure_template_geolocated_with_model`.
 	FOREIGN KEY (
 		procedure_geolocated_with_id,
 		procedure_template_geolocated_with_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
+	-- We check that the `procedure_geolocated_asset` is associated to the `geolocated_asset_model`.
+	FOREIGN KEY (procedure_geolocated_asset_id, geolocated_asset_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
+	-- We check that the `procedure_geolocated_with` is associated to the `geolocated_with_model`.
+	FOREIGN KEY (procedure_geolocated_with_id, geolocated_with_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
 	-- We check that the `procedure_geolocated_asset` is associated to the `geolocated_asset`.
-	FOREIGN KEY (procedure_geolocated_asset_id, geolocated_asset_id) REFERENCES procedure_assets(id, asset_id),
+	FOREIGN KEY (geolocated_asset_id, geolocated_asset_model_id) REFERENCES assets(id, model_id),
 	-- We check that the `procedure_geolocated_with` is associated to the `geolocated_with`.
-	FOREIGN KEY (procedure_geolocated_with_id, geolocated_with_id) REFERENCES procedure_assets(id, asset_id)
+	FOREIGN KEY (geolocated_with_id, geolocated_with_model_id) REFERENCES assets(id, model_id)
 );

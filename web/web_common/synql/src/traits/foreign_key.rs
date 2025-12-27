@@ -32,12 +32,12 @@ pub trait ForeignKeySynLike: ForeignKeyLike {
                 if self.is_self_referential(database) {
                     syn::parse_quote!(#foreign_table_ident::#col_ident)
                 } else {
-                    syn::parse_quote!(#foreign_table_crate_ident::#foreign_table_ident::#col_ident)
+                    syn::parse_quote!(::#foreign_table_crate_ident::#foreign_table_ident::#col_ident)
                 }
             })
             .collect::<Vec<syn::Path>>();
         quote! {
-            diesel_builders::prelude::fk!((#(#host_column_paths),*) -> (#(#foreign_column_paths),*));
+            ::diesel_builders::prelude::fk!((#(#host_column_paths),*) -> (#(#foreign_column_paths),*));
         }
     }
 }

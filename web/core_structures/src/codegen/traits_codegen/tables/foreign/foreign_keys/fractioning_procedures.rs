@@ -11,10 +11,10 @@ pub struct FractioningProcedureForeignKeys {
         crate::codegen::structs_codegen::tables::procedures::Procedure,
     >,
     pub procedure_fragment_container: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub procedure_fragment_placed_into: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub procedure_template: Option<
         crate::codegen::structs_codegen::tables::fractioning_procedure_templates::FractioningProcedureTemplate,
@@ -29,7 +29,7 @@ pub struct FractioningProcedureForeignKeys {
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
     >,
     pub procedure_weighed_with: Option<
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     pub weighed_with: Option<
         crate::codegen::structs_codegen::tables::weighing_devices::WeighingDevice,
@@ -158,37 +158,37 @@ impl web_common_traits::prelude::HasForeignKeys
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_asset_models),
                 web_common_traits::crud::CRUD::Read
                 | web_common_traits::crud::CRUD::Create
                 | web_common_traits::crud::CRUD::Update,
             ) => {
-                if self.procedure_fragment_container == procedure_assets.id {
-                    foreign_keys.procedure_fragment_container = Some(procedure_assets);
+                if self.procedure_fragment_container == procedure_asset_models.id {
+                    foreign_keys.procedure_fragment_container = Some(procedure_asset_models);
                     updated = true;
                 }
-                if self.procedure_fragment_placed_into == procedure_assets.id {
-                    foreign_keys.procedure_fragment_placed_into = Some(procedure_assets);
+                if self.procedure_fragment_placed_into == procedure_asset_models.id {
+                    foreign_keys.procedure_fragment_placed_into = Some(procedure_asset_models);
                     updated = true;
                 }
-                if self.procedure_weighed_with == procedure_assets.id {
-                    foreign_keys.procedure_weighed_with = Some(procedure_assets);
+                if self.procedure_weighed_with == procedure_asset_models.id {
+                    foreign_keys.procedure_weighed_with = Some(procedure_asset_models);
                     updated = true;
                 }
             }
             (
-                crate::codegen::tables::row::Row::ProcedureAsset(procedure_assets),
+                crate::codegen::tables::row::Row::ProcedureAsset(procedure_asset_models),
                 web_common_traits::crud::CRUD::Delete,
             ) => {
-                if self.procedure_fragment_container == procedure_assets.id {
+                if self.procedure_fragment_container == procedure_asset_models.id {
                     foreign_keys.procedure_fragment_container = None;
                     updated = true;
                 }
-                if self.procedure_fragment_placed_into == procedure_assets.id {
+                if self.procedure_fragment_placed_into == procedure_asset_models.id {
                     foreign_keys.procedure_fragment_placed_into = None;
                     updated = true;
                 }
-                if self.procedure_weighed_with == procedure_assets.id {
+                if self.procedure_weighed_with == procedure_asset_models.id {
                     foreign_keys.procedure_weighed_with = None;
                     updated = true;
                 }

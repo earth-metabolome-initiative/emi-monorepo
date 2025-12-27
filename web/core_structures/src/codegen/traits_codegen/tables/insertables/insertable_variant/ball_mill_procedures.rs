@@ -104,7 +104,7 @@ where
     crate::codegen::structs_codegen::tables::ball_mill_procedure_templates::BallMillProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
 {
@@ -137,48 +137,48 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_bead) = self
             .procedure_bead
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_bead,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::bead_model(
                 self,
-                procedure_assets.asset_model_id,
+                procedure_asset_models.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_bead_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_milled_with) = self
             .procedure_milled_with
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_milled_with,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_with(
                 self,
-                procedure_assets.asset,
+                procedure_asset_models.asset,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_with_model(
                 self,
-                procedure_assets.asset_model_id,
+                procedure_asset_models.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_with_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(
             procedure_milled_container,
         ) = self.procedure_milled_container
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_milled_container,
                 conn,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_container(
                     self,
                     asset,
@@ -186,11 +186,11 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::milled_container_model(
                 self,
-                procedure_assets.asset_model_id,
+                procedure_asset_models.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::BallMillProcedureSettable>::procedure_template_milled_container_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         let procedure_template = self

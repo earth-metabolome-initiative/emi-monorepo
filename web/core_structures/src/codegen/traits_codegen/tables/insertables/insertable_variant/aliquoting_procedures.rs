@@ -104,7 +104,7 @@ where
     crate::codegen::structs_codegen::tables::aliquoting_procedure_templates::AliquotingProcedureTemplate: web_common_traits::database::Read<
         C,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::database::Read<
+    crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset: web_common_traits::database::Read<
         C,
     >,
 {
@@ -141,47 +141,47 @@ where
         if let web_common_traits::database::IdOrBuilder::Id(procedure_aliquoted_with) = self
             .procedure_aliquoted_with
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_aliquoted_with,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable>::aliquoted_with(
                 self,
-                procedure_assets.asset,
+                procedure_asset_models.asset,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable>::aliquoted_with_model(
                 self,
-                procedure_assets.asset_model_id,
+                procedure_asset_models.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable>::procedure_template_aliquoted_with_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_pipette_tip) = self
             .procedure_pipette_tip
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_pipette_tip,
                 conn,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable>::pipette_tip_model(
                 self,
-                procedure_assets.asset_model_id,
+                procedure_asset_models.asset_model_id,
             )?;
             self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable>::procedure_template_pipette_tip_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_aliquoted_from) = self
             .procedure_aliquoted_from
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_aliquoted_from,
                 conn,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable>::aliquoted_from(
                     self,
                     asset,
@@ -189,17 +189,17 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable>::procedure_template_aliquoted_from_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         if let web_common_traits::database::IdOrBuilder::Id(procedure_aliquoted_into) = self
             .procedure_aliquoted_into
         {
-            let procedure_assets = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::read(
+            let procedure_asset_models = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::read(
                 procedure_aliquoted_into,
                 conn,
             )?;
-            if let Some(asset) = procedure_assets.asset {
+            if let Some(asset) = procedure_asset_models.asset {
                 self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable>::aliquoted_into(
                     self,
                     asset,
@@ -207,7 +207,7 @@ where
             }
             self = <Self as crate::codegen::structs_codegen::tables::insertables::AliquotingProcedureSettable>::procedure_template_aliquoted_into_model(
                 self,
-                procedure_assets.procedure_template_asset_model_id,
+                procedure_asset_models.procedure_template_asset_model_id,
             )?;
         }
         let procedure_template = self

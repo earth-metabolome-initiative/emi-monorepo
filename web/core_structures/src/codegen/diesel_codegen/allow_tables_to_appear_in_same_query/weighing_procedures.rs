@@ -1,7 +1,7 @@
 use crate::codegen::diesel_codegen::tables::{
-    procedure_assets::procedure_assets, weighing_procedures::weighing_procedures,
+    procedure_asset_models::procedure_asset_models, weighing_procedures::weighing_procedures,
 };
-diesel::allow_tables_to_appear_in_same_query!(weighing_procedures, procedure_assets);
+diesel::allow_tables_to_appear_in_same_query!(weighing_procedures, procedure_asset_models);
 use crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models;
 diesel::allow_tables_to_appear_in_same_query!(weighing_procedures, procedure_template_asset_models);
 use crate::codegen::diesel_codegen::tables::procedures::procedures;

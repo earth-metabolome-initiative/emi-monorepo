@@ -41,7 +41,7 @@ impl ParserDB {
     /// Helper function to process check constraints.
     fn process_check_constraint(
         check_expr: &Expr,
-        _create_table: &Rc<CreateTable>,
+        create_table: &Rc<CreateTable>,
         table_metadata: &TableMetadata<CreateTable>,
         builder: &GenericDBBuilder<
             CreateTable,
@@ -51,16 +51,20 @@ impl ParserDB {
             CreateFunction,
             TableAttribute<CreateTable, CheckConstraint>,
         >,
-    ) -> (Vec<Rc<<Self as DatabaseLike>::Column>>, Vec<Rc<<Self as DatabaseLike>::Function>>) {
+    ) -> Result<
+        (Vec<Rc<<Self as DatabaseLike>::Column>>, Vec<Rc<<Self as DatabaseLike>::Function>>),
+        crate::errors::Error,
+    > {
         let columns_in_expression = columns_in_expression::columns_in_expression::<Self>(
             check_expr,
+            &create_table.name.to_string(),
             table_metadata.column_rc_slice(),
-        );
+        )?;
         let functions_in_expression = functions_in_expression::functions_in_expression::<Self>(
             check_expr,
             builder.function_rc_vec().as_slice(),
         );
-        (columns_in_expression, functions_in_expression)
+        Ok((columns_in_expression, functions_in_expression))
     }
 
     /// Helper function to create a unique constraint expression from columns.
@@ -103,13 +107,16 @@ impl ParserDB {
             CreateFunction,
             TableAttribute<CreateTable, CheckConstraint>,
         >,
-    ) -> GenericDBBuilder<
-        CreateTable,
-        TableAttribute<CreateTable, ColumnDef>,
-        TableAttribute<CreateTable, UniqueConstraint>,
-        TableAttribute<CreateTable, ForeignKeyConstraint>,
-        CreateFunction,
-        TableAttribute<CreateTable, CheckConstraint>,
+    ) -> Result<
+        GenericDBBuilder<
+            CreateTable,
+            TableAttribute<CreateTable, ColumnDef>,
+            TableAttribute<CreateTable, UniqueConstraint>,
+            TableAttribute<CreateTable, ForeignKeyConstraint>,
+            CreateFunction,
+            TableAttribute<CreateTable, CheckConstraint>,
+        >,
+        crate::errors::Error,
     > {
         for option in &column.attribute().options {
             match option.option.clone() {
@@ -125,7 +132,7 @@ impl ParserDB {
                             create_table,
                             table_metadata,
                             &builder,
-                        );
+                        )?;
                     builder = builder.add_check_constraint(
                         check_rc,
                         CheckMetadata::new(
@@ -189,7 +196,7 @@ impl ParserDB {
                 _ => {}
             }
         }
-        builder
+        Ok(builder)
     }
 
     /// Helper function to process table constraints.
@@ -205,13 +212,16 @@ impl ParserDB {
             CreateFunction,
             TableAttribute<CreateTable, CheckConstraint>,
         >,
-    ) -> GenericDBBuilder<
-        CreateTable,
-        TableAttribute<CreateTable, ColumnDef>,
-        TableAttribute<CreateTable, UniqueConstraint>,
-        TableAttribute<CreateTable, ForeignKeyConstraint>,
-        CreateFunction,
-        TableAttribute<CreateTable, CheckConstraint>,
+    ) -> Result<
+        GenericDBBuilder<
+            CreateTable,
+            TableAttribute<CreateTable, ColumnDef>,
+            TableAttribute<CreateTable, UniqueConstraint>,
+            TableAttribute<CreateTable, ForeignKeyConstraint>,
+            CreateFunction,
+            TableAttribute<CreateTable, CheckConstraint>,
+        >,
+        crate::errors::Error,
     > {
         for constraint in constraints {
             match constraint {
@@ -222,6 +232,57 @@ impl ParserDB {
                     builder = builder.add_unique_index(unique_index, unique_index_metadata);
                 }
                 TableConstraint::ForeignKey(fk) => {
+                    // Validate host columns exist
+                    for col_ident in &fk.columns {
+                        let column_exists = table_metadata
+                            .column_rcs()
+                            .any(|col| col.column_name() == col_ident.value.as_str());
+
+                        if !column_exists {
+                            return Err(crate::errors::Error::HostColumnNotFoundForForeignKey {
+                                host_column: col_ident.value.clone(),
+                                host_table: create_table.name.to_string(),
+                            });
+                        }
+                    }
+
+                    // Validate referenced table exists or is current table (self-referential)
+                    let referenced_table_name = fk.foreign_table.to_string();
+
+                    let referenced_table = builder
+                        .tables()
+                        .iter()
+                        .map(|(t, _)| t.as_ref())
+                        .chain(std::iter::once(create_table.as_ref()))
+                        .find(|t| t.name.to_string() == referenced_table_name);
+
+                    let referenced_table = if let Some(table) = referenced_table {
+                        table
+                    } else {
+                        return Err(crate::errors::Error::ReferencedTableNotFoundForForeignKey {
+                            referenced_table: referenced_table_name.clone(),
+                            host_table: create_table.name.to_string(),
+                        });
+                    };
+
+                    // Validate referenced columns exist
+                    for ref_col_ident in &fk.referred_columns {
+                        let column_exists = referenced_table
+                            .columns
+                            .iter()
+                            .any(|col| col.name.value.as_str() == ref_col_ident.value.as_str());
+
+                        if !column_exists {
+                            return Err(
+                                crate::errors::Error::ReferencedColumnNotFoundForForeignKey {
+                                    referenced_column: ref_col_ident.value.clone(),
+                                    referenced_table: referenced_table_name.clone(),
+                                    host_table: create_table.name.to_string(),
+                                },
+                            );
+                        }
+                    }
+
                     let fk = Rc::new(TableAttribute::new(create_table.clone(), fk.clone()));
                     table_metadata.add_foreign_key(fk.clone());
                     builder = builder.add_foreign_key(fk, ());
@@ -236,7 +297,7 @@ impl ParserDB {
                             create_table,
                             table_metadata,
                             &builder,
-                        );
+                        )?;
                     builder = builder.add_check_constraint(
                         check_rc,
                         CheckMetadata::new(
@@ -291,7 +352,7 @@ impl ParserDB {
                 _ => {}
             }
         }
-        builder
+        Ok(builder)
     }
 
     /// Creates a new `ParserDB` from a vector of SQL statements and a catalog
@@ -306,9 +367,16 @@ impl ParserDB {
     ///
     /// Panics if a statement other than `CREATE TABLE` or `CREATE FUNCTION` is
     /// encountered, or if the builder fails to build the database.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if a check constraint references an unknown column.
     #[must_use]
     #[allow(clippy::too_many_lines)]
-    pub fn from_statements(statements: Vec<Statement>, catalog_name: String) -> Self {
+    pub fn from_statements(
+        statements: Vec<Statement>,
+        catalog_name: String,
+    ) -> Result<Self, crate::errors::Error> {
         let mut builder = GenericDBBuilder::new().catalog_name(catalog_name);
 
         for statement in statements {
@@ -333,7 +401,7 @@ impl ParserDB {
                             &create_table,
                             &mut table_metadata,
                             builder,
-                        );
+                        )?;
                         builder = builder.add_column(column.clone(), ());
                     }
 
@@ -343,7 +411,7 @@ impl ParserDB {
                         &create_table,
                         &mut table_metadata,
                         builder,
-                    );
+                    )?;
 
                     builder = builder.add_table(create_table, table_metadata);
                 }
@@ -378,18 +446,18 @@ impl ParserDB {
             }
         }
 
-        builder.build().expect("Failed to build ParserDB")
+        Ok(builder.build().expect("Failed to build ParserDB"))
     }
 }
 
 impl TryFrom<&str> for ParserDB {
-    type Error = sqlparser::parser::ParserError;
+    type Error = crate::errors::Error;
 
     fn try_from(sql: &str) -> Result<Self, Self::Error> {
         let dialect = sqlparser::dialect::GenericDialect {};
         let mut parser = sqlparser::parser::Parser::new(&dialect).try_with_sql(sql)?;
         let statements = parser.parse_statements()?;
-        Ok(Self::from_statements(statements, "unknown_catalog".to_string()))
+        Self::from_statements(statements, "unknown_catalog".to_string())
     }
 }
 
@@ -417,7 +485,7 @@ fn search_sql_documents(path: &Path) -> Vec<std::path::PathBuf> {
 }
 
 impl TryFrom<&Path> for ParserDB {
-    type Error = sqlparser::parser::ParserError;
+    type Error = crate::errors::Error;
 
     fn try_from(path: &Path) -> Result<Self, Self::Error> {
         let mut comulative_sql = String::new();
@@ -433,7 +501,7 @@ impl TryFrom<&Path> for ParserDB {
 }
 
 impl TryFrom<&[&Path]> for ParserDB {
-    type Error = sqlparser::parser::ParserError;
+    type Error = crate::errors::Error;
 
     fn try_from(paths: &[&Path]) -> Result<Self, Self::Error> {
         let mut sql_documents = Vec::new();
@@ -444,7 +512,8 @@ impl TryFrom<&[&Path]> for ParserDB {
                 return Err(ParserError::TokenizerError(format!(
                     "Path does not exist: {}",
                     path.display()
-                )));
+                ))
+                .into());
             }
 
             let mut sql_paths = search_sql_documents(path);
@@ -488,6 +557,6 @@ impl TryFrom<&[&Path]> for ParserDB {
             .flatten()
             .collect::<Vec<Statement>>();
 
-        Ok(Self::from_statements(statements, "unknown_catalog".to_string()))
+        Self::from_statements(statements, "unknown_catalog".to_string())
     }
 }

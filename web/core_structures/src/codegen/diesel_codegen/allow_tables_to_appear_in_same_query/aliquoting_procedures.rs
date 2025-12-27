@@ -14,8 +14,8 @@ use crate::codegen::diesel_codegen::tables::pipette_tip_models::pipette_tip_mode
 diesel::allow_tables_to_appear_in_same_query!(aliquoting_procedures, pipette_tip_models);
 use crate::codegen::diesel_codegen::tables::pipettes::pipettes;
 diesel::allow_tables_to_appear_in_same_query!(aliquoting_procedures, pipettes);
-use crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets;
-diesel::allow_tables_to_appear_in_same_query!(aliquoting_procedures, procedure_assets);
+use crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models;
+diesel::allow_tables_to_appear_in_same_query!(aliquoting_procedures, procedure_asset_models);
 use crate::codegen::diesel_codegen::tables::procedure_template_asset_models::procedure_template_asset_models;
 diesel::allow_tables_to_appear_in_same_query!(
     aliquoting_procedures,

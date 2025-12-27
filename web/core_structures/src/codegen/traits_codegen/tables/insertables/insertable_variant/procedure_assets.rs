@@ -1,7 +1,7 @@
 impl web_common_traits::database::DispatchableInsertVariantMetadata
     for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder
 {
-    type Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset;
+    type Row = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset;
     type Error = web_common_traits::database::InsertError<
         crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
     >;
@@ -19,19 +19,19 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAsset as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     Self: web_common_traits::database::InsertableVariant<
         C,
         InsertableVariant = crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAsset,
-        Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        Row = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
         Error = web_common_traits::database::InsertError<
             crate::codegen::structs_codegen::tables::insertables::ProcedureAssetAttribute,
         >,
@@ -104,14 +104,14 @@ impl<
 for crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAssetBuilder
 where
     diesel::query_builder::InsertStatement<
-        <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table,
+        <crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset as diesel::associations::HasTable>::Table,
         <crate::codegen::structs_codegen::tables::insertables::InsertableProcedureAsset as diesel::Insertable<
-            <crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset as diesel::associations::HasTable>::Table,
+            <crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset as diesel::associations::HasTable>::Table,
         >>::Values,
     >: for<'query> diesel::query_dsl::LoadQuery<
         'query,
         C,
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     >,
     Self: crate::codegen::structs_codegen::tables::insertables::ProcedureAssetSettable<
         Error = web_common_traits::database::InsertError<

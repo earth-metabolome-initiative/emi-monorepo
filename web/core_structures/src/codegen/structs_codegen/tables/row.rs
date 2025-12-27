@@ -101,7 +101,7 @@ mod positioning_device_models;
 mod positioning_devices;
 mod pouring_procedure_templates;
 mod pouring_procedures;
-mod procedure_assets;
+mod procedure_asset_models;
 mod procedure_template_asset_models;
 mod procedure_templates;
 mod procedures;
@@ -405,7 +405,7 @@ pub enum Row {
         crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure,
     ),
     ProcedureAsset(
-        crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+        crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
     ),
     ProcedureTemplateAssetModel(
         crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel,
@@ -738,7 +738,7 @@ impl Row {
             Row::PouringProcedure(pouring_procedures) => {
                 pouring_procedures.upsert(conn)?.map(Row::from)
             }
-            Row::ProcedureAsset(procedure_assets) => procedure_assets.upsert(conn)?.map(Row::from),
+            Row::ProcedureAsset(procedure_asset_models) => procedure_asset_models.upsert(conn)?.map(Row::from),
             Row::ProcedureTemplateAssetModel(procedure_template_asset_models) => {
                 procedure_template_asset_models.upsert(conn)?.map(Row::from)
             }
@@ -1013,7 +1013,7 @@ impl web_common_traits::prelude::Row for Row {
                 pouring_procedure_templates.primary_key()
             }
             Row::PouringProcedure(pouring_procedures) => pouring_procedures.primary_key(),
-            Row::ProcedureAsset(procedure_assets) => procedure_assets.primary_key(),
+            Row::ProcedureAsset(procedure_asset_models) => procedure_asset_models.primary_key(),
             Row::ProcedureTemplateAssetModel(procedure_template_asset_models) => {
                 procedure_template_asset_models.primary_key()
             }

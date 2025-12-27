@@ -68,25 +68,25 @@ CREATE TABLE IF NOT EXISTS aliquoting_procedures (
 	-- The procedure template asset model associated to the `aliquoted_with`.
 	procedure_template_aliquoted_with_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure asset associated to the `aliquoted_with`.
-	procedure_aliquoted_with_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_aliquoted_with_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- The pipette tip model mounted on the pipette.
 	pipette_tip_model_id INTEGER NOT NULL REFERENCES pipette_tip_models(id),
 	-- The procedure template asset model associated to the `pipette_tip_model`.
 	procedure_template_pipette_tip_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure asset associated to the `pipette_tip_model`.
-	procedure_pipette_tip_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_pipette_tip_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- The container being aliquoted, which must be a volumetric container model.
 	aliquoted_from_id UUID NOT NULL REFERENCES volumetric_containers(id),
 	-- The procedure template asset model associated to the `aliquoted_from`.
 	procedure_template_aliquoted_from_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure asset associated to the `aliquoted_from`.
-	procedure_aliquoted_from_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_aliquoted_from_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- The container receiving the aliquot, which must be a volumetric container model.
 	aliquoted_into_id UUID NOT NULL REFERENCES volumetric_containers(id),
 	-- The procedure template asset model associated to the `aliquoted_into`.
 	procedure_template_aliquoted_into_model_id INTEGER NOT NULL REFERENCES procedure_template_asset_models(id),
 	-- The procedure asset associated to the `aliquoted_into`.
-	procedure_aliquoted_into_id UUID NOT NULL REFERENCES procedure_assets(id) ON DELETE CASCADE,
+	procedure_aliquoted_into_id UUID NOT NULL REFERENCES procedure_asset_models(id) ON DELETE CASCADE,
 	-- We enforce that the extended `procedure` has indeed the same `procedure_template`, making
 	-- sure that the procedure is an aliquoting procedure without the possibility of a mistake.
 	FOREIGN KEY (id, aliquoting_procedure_template_id) REFERENCES procedures(id, procedure_template_id),
@@ -131,35 +131,29 @@ CREATE TABLE IF NOT EXISTS aliquoting_procedures (
 	FOREIGN KEY (
 		procedure_aliquoted_with_id,
 		procedure_template_aliquoted_with_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We enforce that the procedure template asset model reported in the procedure is indeed
 	-- the same one associated to the procedure asset for the asset model `pipette_tip_model`.
 	FOREIGN KEY (
 		procedure_pipette_tip_id,
 		procedure_template_pipette_tip_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We enforce that the procedure template asset model reported in the procedure is indeed
 	-- the same one associated to the procedure asset for the asset `aliquoted_from`.
 	FOREIGN KEY (
 		procedure_aliquoted_from_id,
 		procedure_template_aliquoted_from_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We enforce that the procedure template asset model reported in the procedure is indeed
 	-- the same one associated to the procedure asset for the asset `aliquoted_into`.
 	FOREIGN KEY (
 		procedure_aliquoted_into_id,
 		procedure_template_aliquoted_into_model_id
-	) REFERENCES procedure_assets(id, procedure_template_asset_model_id),
+	) REFERENCES procedure_asset_models(id, procedure_template_asset_model_id),
 	-- We enfore that the `aliquoted_with_model` asset model is correctly associated to the `aliquoted_with` procedure asset.
-	FOREIGN KEY (procedure_aliquoted_with_id, aliquoted_with_model_id) REFERENCES procedure_assets(id, asset_model_id),
-	-- We enfore that the `aliquoted_with` asset is correctly associated to the `aliquoted_with` procedure asset.
-	FOREIGN KEY (procedure_aliquoted_with_id, aliquoted_with_id) REFERENCES procedure_assets(id, asset_id),
-	-- We enfore that the `aliquoted_from` asset is correctly associated to the `aliquoted_from` procedure asset.
-	FOREIGN KEY (procedure_aliquoted_from_id, aliquoted_from_id) REFERENCES procedure_assets(id, asset_id),
-	-- We enfore that the `aliquoted_into` asset is correctly associated to the `aliquoted_into` procedure asset.
-	FOREIGN KEY (procedure_aliquoted_into_id, aliquoted_into_id) REFERENCES procedure_assets(id, asset_id),
+	FOREIGN KEY (procedure_aliquoted_with_id, aliquoted_with_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
 	-- We enfore that the `pipette_tip_model` asset model is correctly associated to the `pipette_tip` procedure asset.
-	FOREIGN KEY (procedure_pipette_tip_id, pipette_tip_model_id) REFERENCES procedure_assets(id, asset_model_id),
+	FOREIGN KEY (procedure_pipette_tip_id, pipette_tip_model_id) REFERENCES procedure_asset_models(id, asset_model_id),
 	-- We enfore that the `pipette_tip_model` is compatible with the `aliquoted_with_model`.
 	FOREIGN KEY (aliquoted_with_model_id, pipette_tip_model_id) REFERENCES asset_compatibility_rules(left_asset_model_id, right_asset_model_id)
 );

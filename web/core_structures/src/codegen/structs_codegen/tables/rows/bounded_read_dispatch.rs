@@ -306,7 +306,7 @@ where
     crate::codegen::structs_codegen::tables::pouring_procedures::PouringProcedure: web_common_traits::prelude::BoundedRead<
         C,
     >,
-    crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset: web_common_traits::prelude::BoundedRead<
+    crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset: web_common_traits::prelude::BoundedRead<
         C,
     >,
     crate::codegen::structs_codegen::tables::procedure_template_asset_models::ProcedureTemplateAssetModel: web_common_traits::prelude::BoundedRead<
@@ -1259,7 +1259,7 @@ where
                     .map(super::Rows::from)
             }
             crate::codegen::tables::table_names::TableName::ProcedureAsset => {
-                crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset::bounded_read(
+                crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset::bounded_read(
                         offset,
                         limit,
                         conn,

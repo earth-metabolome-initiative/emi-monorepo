@@ -79,7 +79,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         let mut error_decorator = None;
         if table.has_check_constraints(self.database) {
             error_decorator = Some(quote! {
-                #[table_model(error = validation_errors::ValidationError)]
+                #[table_model(error = ::validation_errors::ValidationError)]
             });
         }
 
@@ -97,6 +97,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         let fields = table.generate_struct_fields(workspace, self.database)?;
         let unique_indices = table.unique_indices_macros(self.database);
         let foreign_keys = table.foreign_keys_macros(self.database, workspace);
+        let check_constraint_impls = table.generate_validation_impls(workspace, self.database)?;
 
         let content = quote! {
             #![doc=#crate_documentation]
@@ -113,6 +114,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
             }
             #(#unique_indices)*
             #(#foreign_keys)*
+            #(#check_constraint_impls)*
         };
 
         write!(buffer, "{content}")?;

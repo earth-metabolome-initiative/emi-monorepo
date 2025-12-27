@@ -540,8 +540,8 @@ pub use pouring_procedures::{
     InsertablePouringProcedure, InsertablePouringProcedureBuilder, PouringProcedureAttribute,
     PouringProcedureExtensionAttribute, PouringProcedureSettable,
 };
-mod procedure_assets;
-pub use procedure_assets::{
+mod procedure_asset_models;
+pub use procedure_asset_models::{
     InsertableProcedureAsset, InsertableProcedureAssetBuilder, ProcedureAssetAttribute,
     ProcedureAssetSettable,
 };

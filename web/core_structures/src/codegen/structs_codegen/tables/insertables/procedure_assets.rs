@@ -43,15 +43,15 @@ impl web_common_traits::database::HasTableType for ProcedureAssetAttribute {
 impl core::fmt::Display for ProcedureAssetAttribute {
     fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
         match self {
-            Self::Id => write!(f, "procedure_assets.id"),
-            Self::Procedure => write!(f, "procedure_assets.procedure"),
-            Self::ProcedureTemplate => write!(f, "procedure_assets.procedure_template"),
-            Self::AssetModel => write!(f, "procedure_assets.asset_model"),
-            Self::Asset => write!(f, "procedure_assets.asset"),
+            Self::Id => write!(f, "procedure_asset_models.id"),
+            Self::Procedure => write!(f, "procedure_asset_models.procedure"),
+            Self::ProcedureTemplate => write!(f, "procedure_asset_models.procedure_template"),
+            Self::AssetModel => write!(f, "procedure_asset_models.asset_model"),
+            Self::Asset => write!(f, "procedure_asset_models.asset"),
             Self::ProcedureTemplateAssetModel => {
-                write!(f, "procedure_assets.procedure_template_asset_model")
+                write!(f, "procedure_asset_models.procedure_template_asset_model")
             }
-            Self::AncestorModel => write!(f, "procedure_assets.ancestor_model"),
+            Self::AncestorModel => write!(f, "procedure_asset_models.ancestor_model"),
         }
     }
 }
@@ -60,7 +60,7 @@ impl core::fmt::Display for ProcedureAssetAttribute {
 #[cfg_attr(
     any(feature = "postgres", feature = "sqlite"),
     diesel(
-        table_name = crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets
+        table_name = crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models
     )
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -92,7 +92,7 @@ impl InsertableProcedureAsset {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn procedure_assets_asset_asset_model_fkey(
+    pub fn procedure_asset_models_asset_asset_model_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<Option<crate::codegen::structs_codegen::tables::assets::Asset>, diesel::result::Error>
@@ -129,7 +129,7 @@ impl InsertableProcedureAsset {
         };
         crate::codegen::structs_codegen::tables::assets::Asset::read(asset, conn).optional()
     }
-    pub fn procedure_assets_asset_model_ancestor_model_fkey<C: diesel::connection::LoadConnection>(
+    pub fn procedure_asset_models_asset_model_ancestor_model_fkey<C: diesel::connection::LoadConnection>(
         &self,
         conn: &mut C,
     ) -> Result<
@@ -175,7 +175,7 @@ impl InsertableProcedureAsset {
         crate::codegen::structs_codegen::tables::procedures::Procedure::read(self.procedure, conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn procedure_assets_procedure_procedure_template_fkey(
+    pub fn procedure_asset_models_procedure_procedure_template_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<crate::codegen::structs_codegen::tables::procedures::Procedure, diesel::result::Error>
@@ -197,7 +197,7 @@ impl InsertableProcedureAsset {
             >(conn)
     }
     #[cfg(feature = "postgres")]
-    pub fn procedure_assets_procedure_template_asset_model_ancestor_m_fkey(
+    pub fn procedure_asset_models_procedure_template_asset_model_ancestor_m_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -239,7 +239,7 @@ impl InsertableProcedureAsset {
         )
     }
     #[cfg(feature = "postgres")]
-    pub fn procedure_assets_procedure_template_asset_model_procedure_fkey(
+    pub fn procedure_asset_models_procedure_template_asset_model_procedure_fkey(
         &self,
         conn: &mut diesel::PgConnection,
     ) -> Result<
@@ -283,7 +283,7 @@ impl InsertableProcedureAsset {
 #[derive(Clone, Debug, PartialEq, PartialOrd, Eq, Hash, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 /// Builder for creating and inserting a new
-/// [`ProcedureAsset`](crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset).
+/// [`ProcedureAsset`](crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset).
 ///
 ///
 /// # Implementation details
@@ -318,9 +318,9 @@ pub struct InsertableProcedureAssetBuilder {
     pub(crate) ancestor_model: Option<i32>,
 }
 impl diesel::associations::HasTable for InsertableProcedureAssetBuilder {
-    type Table = crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::table;
+    type Table = crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::table;
     fn table() -> Self::Table {
-        crate::codegen::diesel_codegen::tables::procedure_assets::procedure_assets::table
+        crate::codegen::diesel_codegen::tables::procedure_asset_models::procedure_asset_models::table
     }
 }
 impl From<InsertableProcedureAssetBuilder>
@@ -365,10 +365,10 @@ impl common_traits::builder::IsCompleteBuilder
 pub trait ProcedureAssetSettable: Sized {
     /// Error type returned when setting attributes.
     type Error;
-    /// Sets the value of the `public.procedure_assets.id` column.
+    /// Sets the value of the `public.procedure_asset_models.id` column.
     ///
     /// # Arguments
-    /// * `id`: The value to set for the `public.procedure_assets.id` column.
+    /// * `id`: The value to set for the `public.procedure_asset_models.id` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -386,11 +386,11 @@ pub trait ProcedureAssetSettable: Sized {
     fn id<I>(self, id: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
-    /// Sets the value of the `public.procedure_assets.procedure` column.
+    /// Sets the value of the `public.procedure_asset_models.procedure` column.
     ///
     /// # Arguments
     /// * `procedure`: The value to set for the
-    ///   `public.procedure_assets.procedure` column.
+    ///   `public.procedure_asset_models.procedure` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -408,12 +408,12 @@ pub trait ProcedureAssetSettable: Sized {
     fn procedure<P>(self, procedure: P) -> Result<Self, Self::Error>
     where
         P: web_common_traits::database::PrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
-    /// Sets the value of the `public.procedure_assets.procedure_template`
+    /// Sets the value of the `public.procedure_asset_models.procedure_template`
     /// column.
     ///
     /// # Arguments
     /// * `procedure_template`: The value to set for the
-    ///   `public.procedure_assets.procedure_template` column.
+    ///   `public.procedure_asset_models.procedure_template` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -430,11 +430,11 @@ pub trait ProcedureAssetSettable: Sized {
     fn procedure_template<PT>(self, procedure_template: PT) -> Result<Self, Self::Error>
     where
         PT: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
-    /// Sets the value of the `public.procedure_assets.asset_model` column.
+    /// Sets the value of the `public.procedure_asset_models.asset_model` column.
     ///
     /// # Arguments
     /// * `asset_model`: The value to set for the
-    ///   `public.procedure_assets.asset_model` column.
+    ///   `public.procedure_asset_models.asset_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -451,10 +451,10 @@ pub trait ProcedureAssetSettable: Sized {
     fn asset_model<AM>(self, asset_model: AM) -> Result<Self, Self::Error>
     where
         AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
-    /// Sets the value of the `public.procedure_assets.asset` column.
+    /// Sets the value of the `public.procedure_asset_models.asset` column.
     ///
     /// # Arguments
-    /// * `asset`: The value to set for the `public.procedure_assets.asset`
+    /// * `asset`: The value to set for the `public.procedure_asset_models.asset`
     ///   column.
     ///
     /// # Implementation details
@@ -474,11 +474,11 @@ pub trait ProcedureAssetSettable: Sized {
     where
         A: web_common_traits::database::MaybePrimaryKeyLike<PrimaryKey = ::rosetta_uuid::Uuid>;
     /// Sets the value of the
-    /// `public.procedure_assets.procedure_template_asset_model` column.
+    /// `public.procedure_asset_models.procedure_template_asset_model` column.
     ///
     /// # Arguments
     /// * `procedure_template_asset_model`: The value to set for the
-    ///   `public.procedure_assets.procedure_template_asset_model` column.
+    ///   `public.procedure_asset_models.procedure_template_asset_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -498,11 +498,11 @@ pub trait ProcedureAssetSettable: Sized {
     ) -> Result<Self, Self::Error>
     where
         PTAM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>;
-    /// Sets the value of the `public.procedure_assets.ancestor_model` column.
+    /// Sets the value of the `public.procedure_asset_models.ancestor_model` column.
     ///
     /// # Arguments
     /// * `ancestor_model`: The value to set for the
-    ///   `public.procedure_assets.ancestor_model` column.
+    ///   `public.procedure_asset_models.ancestor_model` column.
     ///
     /// # Implementation details
     /// This method accepts a reference to a generic value which can be
@@ -529,7 +529,7 @@ where
     type Error = web_common_traits::database::InsertError<
         <Self as common_traits::builder::Attributed>::Attribute,
     >;
-    ///Sets the value of the `public.procedure_assets.id` column.
+    ///Sets the value of the `public.procedure_asset_models.id` column.
     fn id<I>(mut self, id: I) -> Result<Self, Self::Error>
     where
         I: web_common_traits::database::PrimaryKeyLike<
@@ -540,7 +540,7 @@ where
         self.id = Some(id);
         Ok(self)
     }
-    ///Sets the value of the `public.procedure_assets.procedure` column.
+    ///Sets the value of the `public.procedure_asset_models.procedure` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -570,7 +570,7 @@ where
         self.procedure = Some(procedure);
         Ok(self)
     }
-    ///Sets the value of the `public.procedure_assets.procedure_template` column.
+    ///Sets the value of the `public.procedure_asset_models.procedure_template` column.
     fn procedure_template<PT>(
         mut self,
         procedure_template: PT,
@@ -584,7 +584,7 @@ where
         self.procedure_template = Some(procedure_template_id);
         Ok(self)
     }
-    ///Sets the value of the `public.procedure_assets.asset_model` column.
+    ///Sets the value of the `public.procedure_asset_models.asset_model` column.
     fn asset_model<AM>(mut self, asset_model: AM) -> Result<Self, Self::Error>
     where
         AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
@@ -595,7 +595,7 @@ where
         self.asset_model_id = Some(asset_model_id);
         Ok(self)
     }
-    ///Sets the value of the `public.procedure_assets.asset` column.
+    ///Sets the value of the `public.procedure_asset_models.asset` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -625,7 +625,7 @@ where
         self.asset = asset;
         Ok(self)
     }
-    ///Sets the value of the `public.procedure_assets.procedure_template_asset_model` column.
+    ///Sets the value of the `public.procedure_asset_models.procedure_template_asset_model` column.
     ///
     ///# Implementation notes
     ///This method also set the values of other columns, due to
@@ -659,7 +659,7 @@ where
         self.procedure_template_asset_model_id = Some(procedure_template_asset_model_id);
         Ok(self)
     }
-    ///Sets the value of the `public.procedure_assets.ancestor_model` column.
+    ///Sets the value of the `public.procedure_asset_models.ancestor_model` column.
     fn ancestor_model<AM>(mut self, ancestor_model: AM) -> Result<Self, Self::Error>
     where
         AM: web_common_traits::database::PrimaryKeyLike<PrimaryKey = i32>,
@@ -682,7 +682,7 @@ impl<C> web_common_traits::database::TryInsertGeneric<C> for InsertableProcedure
 where
     Self: web_common_traits::database::DispatchableInsertableVariant<
             C,
-            Row = crate::codegen::structs_codegen::tables::procedure_assets::ProcedureAsset,
+            Row = crate::codegen::structs_codegen::tables::procedure_asset_models::ProcedureAsset,
             Error = web_common_traits::database::InsertError<ProcedureAssetAttribute>,
         > + web_common_traits::database::SetPrimaryKey<PrimaryKey = ::rosetta_uuid::Uuid>
         + common_traits::builder::IsCompleteBuilder,
