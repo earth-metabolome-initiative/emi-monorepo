@@ -7,11 +7,15 @@ use diesel::{
     BoolExpressionMethods, ExpressionMethods, JoinOnDsl, OptionalExtension, PgConnection, QueryDsl,
     Queryable, QueryableByName, Selectable, SelectableHelper,
 };
-use sql_traits::{structs::metadata::CheckMetadata, traits::FunctionLike};
+use sql_traits::{
+    structs::metadata::CheckMetadata,
+    traits::{CheckConstraintLike, FunctionLike},
+    utils::columns_in_expression,
+};
 
 use crate::{
     model_metadata::TableMetadata,
-    models::{Column, PgConstraint, PgOperator, PgProc, Table, TableConstraint},
+    models::{PgConstraint, PgOperator, PgProc, Table, TableConstraint},
 };
 
 mod cached_queries;
@@ -140,19 +144,6 @@ impl CheckConstraint {
         self.table_constraint(conn)?.table(conn)
     }
 
-    /// Returns all the columns associated to this check constraint
-    ///
-    /// # Arguments
-    ///
-    /// * `conn` - A mutable reference to a `PgConnection`
-    ///
-    /// # Errors
-    ///
-    /// * If their is an error while querying the database.
-    pub fn columns(&self, conn: &mut PgConnection) -> Result<Vec<Column>, diesel::result::Error> {
-        cached_queries::columns(self, conn)
-    }
-
     /// Returns the metadata for this check constraint
     ///
     /// # Arguments
@@ -183,18 +174,17 @@ impl CheckConstraint {
             .parse_expr()
             .expect("No expression found in parsed unique constraint");
 
+        let columns = columns_in_expression::<<Self as CheckConstraintLike>::DB>(
+            &expression,
+            &table.table_name,
+            table_metadata.column_rc_slice(),
+        )
+        .unwrap();
+
         Ok(CheckMetadata::new(
             expression,
             table,
-            self.columns(conn)?
-                .into_iter()
-                .filter_map(|col| {
-                    table_metadata
-                        .column_rcs()
-                        .find(|table_col| table_col.column_name == col.column_name)
-                        .cloned()
-                })
-                .collect(),
+            columns,
             self.functions(conn)?
                 .into_iter()
                 .filter_map(|func| {

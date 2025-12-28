@@ -6,7 +6,23 @@ use sqlparser::ast::Expr;
 
 use crate::traits::{DatabaseLike, column::ColumnLike};
 
-pub(super) fn columns_in_expression<DB: DatabaseLike>(
+/// Extracts columns from a SQL expression.
+///
+/// # Arguments
+///
+/// * `expr` - The SQL expression to extract columns from.
+/// * `table_name` - The name of the table the expression belongs to.
+/// * `columns` - The list of columns available in the table.
+///
+/// # Returns
+///
+/// * A vector of columns found in the expression.
+///
+/// # Errors
+///
+/// * If a column in the expression is not found in the provided list of
+///   columns.
+pub fn columns_in_expression<DB: DatabaseLike>(
     expr: &Expr,
     table_name: &str,
     columns: &[Rc<DB::Column>],

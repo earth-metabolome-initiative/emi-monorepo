@@ -44,6 +44,11 @@ impl TableMetadata {
         self.metadata.column_rcs()
     }
 
+    /// Returns a slice of Rc of columns of the table.
+    pub fn column_rc_slice(&self) -> &[Rc<Column>] {
+        self.metadata.column_rc_slice()
+    }
+
     /// Returns an iterator over the check constraints of the table.
     pub fn check_constraints(&self) -> impl Iterator<Item = &CheckConstraint> {
         self.metadata.check_constraints()

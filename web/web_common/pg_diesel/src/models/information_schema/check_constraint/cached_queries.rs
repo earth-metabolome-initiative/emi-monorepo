@@ -2,43 +2,10 @@
 //! [`CheckConstraint`] struct.
 
 use diesel::{
-    BoolExpressionMethods, ExpressionMethods, JoinOnDsl, PgConnection, QueryDsl, RunQueryDsl,
-    SelectableHelper,
+    BoolExpressionMethods, ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl, SelectableHelper,
 };
 
-use crate::models::{CheckConstraint, Column, TableConstraint};
-
-pub(super) fn columns(
-    check_constraint: &CheckConstraint,
-    conn: &mut PgConnection,
-) -> Result<Vec<Column>, diesel::result::Error> {
-    use diesel::RunQueryDsl;
-
-    use crate::schema::information_schema::{
-        columns::columns, constraint_column_usage::constraint_column_usage,
-    };
-    Ok(columns::table
-        .inner_join(
-            constraint_column_usage::table.on(columns::table_schema
-                .eq(constraint_column_usage::table_schema)
-                .and(columns::table_name.eq(constraint_column_usage::table_name))
-                .and(columns::column_name.eq(constraint_column_usage::column_name))),
-        )
-        .filter(
-            constraint_column_usage::constraint_name
-                .eq(&check_constraint.constraint_name)
-                .and(
-                    constraint_column_usage::constraint_schema
-                        .eq(&check_constraint.constraint_schema),
-                )
-                .and(
-                    constraint_column_usage::constraint_catalog
-                        .eq(&check_constraint.constraint_catalog),
-                ),
-        )
-        .select(Column::as_select())
-        .load(conn)?)
-}
+use crate::models::{CheckConstraint, TableConstraint};
 
 pub fn table_constraint(
     check_constraint: &CheckConstraint,

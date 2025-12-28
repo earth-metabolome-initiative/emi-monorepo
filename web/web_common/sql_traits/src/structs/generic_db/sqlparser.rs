@@ -21,9 +21,9 @@ use crate::{
         metadata::{CheckMetadata, UniqueIndexMetadata},
     },
     traits::{DatabaseLike, column::ColumnLike},
+    utils::columns_in_expression,
 };
 
-mod columns_in_expression;
 mod functions_in_expression;
 
 /// A type alias for a `GenericDB` specialized for `sqlparser`'s `CreateTable`.
@@ -54,7 +54,7 @@ impl ParserDB {
         (Vec<Rc<<Self as DatabaseLike>::Column>>, Vec<Rc<<Self as DatabaseLike>::Function>>),
         crate::errors::Error,
     > {
-        let columns_in_expression = columns_in_expression::columns_in_expression::<Self>(
+        let columns_in_expression = columns_in_expression::<Self>(
             check_expr,
             &create_table.name.to_string(),
             table_metadata.column_rc_slice(),
