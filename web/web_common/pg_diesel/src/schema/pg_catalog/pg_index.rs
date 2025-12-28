@@ -102,6 +102,3 @@ diesel::table! {
 
 use super::pg_attribute::pg_attribute;
 diesel::allow_tables_to_appear_in_same_query!(pg_index, pg_attribute);
-
-use super::pg_attribute::pg_attribute;
-diesel::allow_tables_to_appear_in_same_query!(pg_index, pg_attribute);
