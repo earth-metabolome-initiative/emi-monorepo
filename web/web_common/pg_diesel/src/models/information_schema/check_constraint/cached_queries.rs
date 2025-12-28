@@ -28,16 +28,11 @@ pub(super) fn columns(
                             constraint_column_usage::constraint_schema
                                 .eq(&check_constraint.constraint_schema),
                         ),
-                )),
-        )
-        .filter(
-            constraint_column_usage::column_name.eq(&columns::column_name).and(
-                constraint_column_usage::table_catalog.eq(&columns::table_catalog).and(
-                    constraint_column_usage::table_schema
-                        .eq(&columns::table_schema)
-                        .and(constraint_column_usage::table_name.eq(&columns::table_name)),
-                ),
-            ),
+                )
+                .and(constraint_column_usage::column_name.eq(columns::column_name))
+                .and(constraint_column_usage::table_catalog.eq(columns::table_catalog))
+                .and(constraint_column_usage::table_schema.eq(columns::table_schema))
+                .and(constraint_column_usage::table_name.eq(columns::table_name))),
         )
         .select(Column::as_select())
         .load(conn)?)
