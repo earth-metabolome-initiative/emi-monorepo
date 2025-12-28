@@ -70,6 +70,9 @@ edition.workspace = true
             if dependency.borrow() == table {
                 continue;
             }
+            if self.skip_table(dependency) {
+                continue;
+            }
             let dep_crate_name = dependency.crate_name(workspace);
             writeln!(buffer, "{dep_crate_name}.workspace = true")?;
         }

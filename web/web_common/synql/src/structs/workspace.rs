@@ -8,10 +8,7 @@ mod core_types;
 pub use builder::WorkspaceBuilder;
 use syn::Type;
 
-use crate::{
-    structs::{ExternalCrate, ExternalFunctionRef, ExternalTypeRef},
-    traits::{SynQLDatabaseLike, TableSynLike},
-};
+use crate::structs::{ExternalCrate, ExternalFunctionRef, ExternalTypeRef};
 
 #[derive(Debug, Clone)]
 /// Struct defining a Cargo workspace.
@@ -135,107 +132,6 @@ impl Workspace {
         writeln!(buffer, "force_multiline_blocks = true")?;
         writeln!(buffer, "fn_single_line = false")?;
         writeln!(buffer, "where_single_line = false")?;
-
-        Ok(())
-    }
-
-    /// Writes the workspace TOML.
-    ///
-    /// # Errors
-    ///
-    /// Returns an `std::io::Error` if writing to the file fails.
-    pub fn write_toml<DB: SynQLDatabaseLike>(&self, db: &DB) -> std::io::Result<()> {
-        use std::io::Write;
-
-        let toml_path = self.path.join("Cargo.toml");
-        let mut buffer = std::fs::File::create(toml_path)?;
-
-        // Write [workspace] section
-        writeln!(buffer, "[workspace]")?;
-        writeln!(buffer, "resolver = \"2\"")?;
-
-        // Write members array
-        write!(buffer, "members = [")?;
-        for (i, table) in db.tables().enumerate() {
-            if i > 0 {
-                write!(buffer, ", ")?;
-            }
-            write!(buffer, "\"{}\"", table.crate_name(self))?;
-        }
-        writeln!(buffer, "]")?;
-        writeln!(buffer)?;
-
-        // Write [workspace.package] section
-        writeln!(buffer, "[workspace.package]")?;
-        writeln!(buffer, "edition = \"{}\"", self.edition)?;
-        writeln!(buffer)?;
-
-        // Write [workspace.dependencies] section
-        writeln!(buffer, "[workspace.dependencies]")?;
-
-        // Write internal crate dependencies
-        for table in db.tables() {
-            writeln!(
-                buffer,
-                "{crate_name} = {{ path = \"./{crate_name}\" }}",
-                crate_name = table.crate_name(self),
-            )?;
-        }
-
-        // Write external dependencies
-        for external_crate in self.external_crates.iter() {
-            if !external_crate.is_dependency() {
-                continue;
-            }
-
-            let dep_name = external_crate.name();
-            write!(buffer, "{dep_name} = {{ ")?;
-
-            let mut parts = Vec::new();
-
-            if let Some(version) = external_crate.version() {
-                parts.push(format!("version = \"{version}\""));
-            }
-
-            if let Some((repository, branch)) = external_crate.git() {
-                parts.push(format!("git = \"{repository}\""));
-                parts.push(format!("branch = \"{branch}\""));
-            }
-
-            let features = external_crate.features();
-            if !features.is_empty() {
-                let features_str =
-                    features.iter().map(|f| format!("\"{f}\"")).collect::<Vec<_>>().join(", ");
-                parts.push(format!("features = [{features_str}]"));
-            }
-
-            write!(buffer, "{}", parts.join(", "))?;
-            writeln!(buffer, " }}")?;
-        }
-        writeln!(buffer)?;
-
-        // Write [workspace.lints.rust] section
-        writeln!(buffer, "[workspace.lints.rust]")?;
-        writeln!(buffer, "missing_docs = \"forbid\"")?;
-        writeln!(buffer, "unused_macro_rules = \"forbid\"")?;
-        writeln!(buffer, "unused_doc_comments = \"forbid\"")?;
-        writeln!(buffer, "unconditional_recursion = \"forbid\"")?;
-        writeln!(buffer, "unreachable_patterns = \"forbid\"")?;
-        writeln!(buffer, "unused_import_braces = \"forbid\"")?;
-        writeln!(buffer, "unused_must_use = \"forbid\"")?;
-        writeln!(buffer, "deprecated = \"deny\"")?;
-        writeln!(buffer)?;
-
-        // Write [workspace.lints.rustdoc] section
-        writeln!(buffer, "[workspace.lints.rustdoc]")?;
-        writeln!(buffer, "broken_intra_doc_links = \"forbid\"")?;
-        writeln!(buffer, "bare_urls = \"forbid\"")?;
-        writeln!(buffer, "invalid_codeblock_attributes = \"forbid\"")?;
-        writeln!(buffer, "invalid_html_tags = \"forbid\"")?;
-        writeln!(buffer, "missing_crate_level_docs = \"forbid\"")?;
-        writeln!(buffer, "unescaped_backticks = \"forbid\"")?;
-        writeln!(buffer, "redundant_explicit_links = \"forbid\"")?;
-        writeln!(buffer, "invalid_rust_codeblocks = \"forbid\"")?;
 
         Ok(())
     }
