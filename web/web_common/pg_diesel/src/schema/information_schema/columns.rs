@@ -123,3 +123,6 @@ diesel::allow_tables_to_appear_in_same_query!(columns, pg_namespace);
 
 use crate::schema::pg_catalog::pg_index::pg_index;
 diesel::allow_tables_to_appear_in_same_query!(columns, pg_index);
+
+use crate::schema::pg_catalog::pg_constraint::pg_constraint;
+diesel::allow_tables_to_appear_in_same_query!(columns, pg_constraint);
