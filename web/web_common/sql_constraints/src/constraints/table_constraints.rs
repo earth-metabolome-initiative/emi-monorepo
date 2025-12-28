@@ -20,3 +20,5 @@ mod non_redundant_extension_dag;
 pub use non_redundant_extension_dag::NonRedundantExtensionDag;
 mod unique_column_names_in_extension_graph;
 pub use unique_column_names_in_extension_graph::UniqueColumnNamesInExtensionGraph;
+mod no_tautological_check_constraint;
+pub use no_tautological_check_constraint::NoTautologicalCheckConstraint;

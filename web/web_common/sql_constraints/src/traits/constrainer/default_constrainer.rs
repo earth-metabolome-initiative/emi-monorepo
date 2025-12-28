@@ -11,7 +11,8 @@ use crate::{
         UniqueForeignKey, UniqueUniqueIndex,
     },
     prelude::{
-        ExtensionForeignKeyOnDeleteCascade, PrimaryKeyReferenceEndsWithId, ReferencesUniqueIndex,
+        ExtensionForeignKeyOnDeleteCascade, NoTautologicalCheckConstraint,
+        PrimaryKeyReferenceEndsWithId, ReferencesUniqueIndex,
     },
     traits::Constrainer,
 };
@@ -76,6 +77,7 @@ where
         constrainer.register_table_constraint(Box::new(LowercaseTableName::default()));
         constrainer.register_table_constraint(Box::new(SnakeCaseTableName::default()));
         constrainer.register_table_constraint(Box::new(PluralTableName::default()));
+        constrainer.register_table_constraint(Box::new(NoTautologicalCheckConstraint::default()));
         constrainer.register_table_constraint(Box::new(NoForbiddenColumnInExtension::new(
             "most_concrete_table",
         )));

@@ -3,9 +3,112 @@
 
 use std::{borrow::Borrow, fmt::Debug};
 
-use sqlparser::ast::{Expr, Ident};
+use sqlparser::ast::{BinaryOperator, Expr, Ident, Value};
 
 use crate::traits::{DatabaseLike, Metadata, column::ColumnLike, function_like::FunctionLike};
+
+/// Helper function to determine if an expression is tautological (always true).
+fn is_tautological_expr<DB: DatabaseLike>(
+    database: &DB,
+    columns: &[&<DB as DatabaseLike>::Column],
+    expr: &Expr,
+) -> Option<bool> {
+    match expr {
+        // Literal true
+        Expr::Value(value_with_span) => {
+            match value_with_span.value {
+                Value::Boolean(true) => Some(true),
+                Value::Boolean(false) => Some(false),
+                _ => None,
+            }
+        }
+
+        Expr::IsNotNull(col_expr) => {
+            // Check if the column is declared NOT NULL in the table schema
+            if let Expr::Identifier(ident) = col_expr.as_ref() {
+                for column in columns.iter() {
+                    if column.column_name() == ident.value {
+                        return Some(if column.is_nullable(database) { false } else { true });
+                    }
+                }
+                None
+            } else {
+                None
+            }
+        }
+
+        // Nested expressions
+        Expr::Nested(inner) => is_tautological_expr(database, columns, inner),
+
+        // Binary operations
+        Expr::BinaryOp { left, op, right } => {
+            // Check for patterns like 1 = 1, 0 = 0, etc.
+            if matches!(op, BinaryOperator::Eq) {
+                if let (Expr::Value(left_val), Expr::Value(right_val)) =
+                    (left.as_ref(), right.as_ref())
+                {
+                    return Some(left_val.value == right_val.value);
+                }
+            }
+
+            // Check for IS NULL OR IS NOT NULL pattern (always true)
+            if matches!(op, BinaryOperator::Or) {
+                if let (Expr::IsNull(null_col), Expr::IsNotNull(not_null_col)) =
+                    (left.as_ref(), right.as_ref())
+                {
+                    if null_col == not_null_col {
+                        return Some(true);
+                    }
+                }
+                if let (Expr::IsNotNull(not_null_col), Expr::IsNull(null_col)) =
+                    (left.as_ref(), right.as_ref())
+                {
+                    if null_col == not_null_col {
+                        return Some(true);
+                    }
+                }
+            }
+
+            // Recursively check if both sides are tautological for AND
+            if matches!(op, BinaryOperator::And) {
+                return match (
+                    is_tautological_expr(database, columns, left),
+                    is_tautological_expr(database, columns, right),
+                ) {
+                    (Some(true), Some(true)) => Some(true),
+                    (Some(false), _) | (_, Some(false)) => Some(false),
+                    _ => None,
+                };
+            }
+
+            // Recursively check if either side is tautological for OR
+            if matches!(op, BinaryOperator::Or) {
+                return match (
+                    is_tautological_expr(database, columns, left),
+                    is_tautological_expr(database, columns, right),
+                ) {
+                    (Some(true), _) | (_, Some(true)) => Some(true),
+                    (Some(false), Some(false)) => Some(false),
+                    _ => None,
+                };
+            }
+
+            None
+        }
+
+        // NOT false is true, NOT true is false
+        Expr::UnaryOp { op: sqlparser::ast::UnaryOperator::Not, expr } => {
+            match is_tautological_expr(database, columns, expr) {
+                Some(true) => Some(false),
+                Some(false) => Some(true),
+                None => None,
+            }
+        }
+
+        // Everything else is not obviously tautological
+        _ => None,
+    }
+}
 
 /// Helper to extract column names from nullability checks in an AND chain
 fn extract_null_columns(expr: &Expr, is_null: bool) -> Option<Vec<&Ident>> {
@@ -341,10 +444,13 @@ pub trait CheckConstraintLike:
     ///
     /// # Implementation Note
     ///
-    /// At this time, this method only recognizes tautological statements such
-    /// as `column IS NOT NULL` for columns that are defined as `NOT NULL`, and
-    /// the case `CHECK (TRUE)`.
-    /// More complex tautologies may be added in the future.
+    /// This method recognizes several tautological patterns:
+    /// - `CHECK (TRUE)` - literal true
+    /// - `CHECK (1 = 1)`, `CHECK (0 = 0)` - equal constant comparisons
+    /// - `CHECK (NOT FALSE)` - negated false
+    /// - `CHECK (column IS NOT NULL)` for `NOT NULL` columns
+    /// - `CHECK (column IS NULL OR column IS NOT NULL)` - always true for any
+    ///   column
     ///
     /// # Example
     ///
@@ -358,44 +464,37 @@ pub trait CheckConstraintLike:
     ///         col2 INT,
     ///         CHECK (col1 IS NOT NULL),
     ///         CHECK (TRUE),
-    ///         CHECK (col2 IS NOT NULL)
+    ///         CHECK (1 = 1),
+    ///         CHECK (NOT FALSE),
+    ///         CHECK (col2 IS NOT NULL),
+    ///         CHECK (col2 IS NULL OR col2 IS NOT NULL),
+    ///         CHECK (col1 IS NULL OR col2 IS NOT NULL)
     ///     );"#,
     /// )?;
     /// let table = db.table(None, "my_table").unwrap();
     /// let check_constraints: Vec<_> = table.check_constraints(&db).collect();
-    /// let [cc1, cc2, cc3] = &check_constraints.as_slice() else {
-    ///     panic!("Expected three check constraints");
+    /// let [cc1, cc2, cc3, cc4, cc5, cc6, cc7] = &check_constraints.as_slice() else {
+    ///     panic!("Expected seven check constraints");
     /// };
-    /// assert!(cc1.is_tautology(&db));
-    /// assert!(cc2.is_tautology(&db));
-    /// assert!(!cc3.is_tautology(&db));
+    /// assert!(cc1.is_tautology(&db)); // col1 IS NOT NULL on NOT NULL column
+    /// assert!(cc2.is_tautology(&db)); // TRUE
+    /// assert!(cc3.is_tautology(&db)); // 1 = 1
+    /// assert!(cc4.is_tautology(&db)); // NOT FALSE
+    /// assert!(!cc5.is_tautology(&db)); // col2 IS NOT NULL on nullable column
+    /// assert!(cc6.is_tautology(&db)); // IS NULL OR IS NOT NULL is always true
+    /// assert!(!cc7.is_tautology(&db)); // mixed columns
+    /// //
     /// # Ok(())
     /// # }
     /// ```
     fn is_tautology(&self, database: &Self::DB) -> bool {
-        use sqlparser::ast::Expr;
-
+        let columns = self.columns(database).collect::<Vec<_>>();
         let expr = self.expression(database);
 
-        // Check for simple "column IS NOT NULL" expressions
-        if let Expr::IsNotNull(col_expr) = expr {
-            if let Expr::Identifier(ident) = col_expr.as_ref() {
-                if let Some(column) = self.column(database, &ident.value) {
-                    return !column.is_nullable(database);
-                }
-            }
-        }
-
-        // Check for "TRUE" expression
-        if let Expr::Value(sqlparser::ast::ValueWithSpan {
-            value: sqlparser::ast::Value::Boolean(true),
-            ..
-        }) = expr
-        {
+        // First check using expression analysis
+        if let Some(true) = is_tautological_expr(database, &columns, expr) {
             return true;
         }
-
-        // Additional tautology checks can be added here
 
         false
     }

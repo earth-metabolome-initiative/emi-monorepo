@@ -142,6 +142,11 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
         for table in tables {
             let table_metadata = table.metadata(connection, &value.denylist_types)?;
 
+            for column in table_metadata.column_rcs() {
+                generic_builder = generic_builder
+                    .add_column(column.clone(), column.metadata(table.clone(), connection)?);
+            }
+
             for check_constraint in table_metadata.check_constraint_rcs() {
                 let metadata = check_constraint.metadata(
                     table.clone(),
@@ -151,11 +156,6 @@ impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
                 )?;
                 generic_builder =
                     generic_builder.add_check_constraint(check_constraint.clone(), metadata);
-            }
-
-            for column in table_metadata.column_rcs() {
-                generic_builder = generic_builder
-                    .add_column(column.clone(), column.metadata(table.clone(), connection)?);
             }
 
             for fk in table_metadata.foreign_key_rcs() {
