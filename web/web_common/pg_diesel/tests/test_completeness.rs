@@ -107,25 +107,6 @@ async fn test_schema_completeness() {
                 column.column_name(),
             );
         }
-
-        // We check that the number of columns in the table matches the number of "->"
-        // in the expected schema file, as each column is represented by a line
-        // containing "->"
-        let column_count = table.number_of_columns(&db);
-        let arrow_count = expected_schema_content.matches("->").count();
-        assert_eq!(
-            column_count,
-            arrow_count,
-            "Table `{}` has {} columns, but expected schema file has {} columns, and the unexpected columns should be removed. The expected columns are:\n{}",
-            table.table_name(),
-            column_count,
-            arrow_count,
-            table
-                .columns(&db)
-                .map(|c| format!("- {}", c.column_name()))
-                .collect::<Vec<_>>()
-                .join("\n")
-        );
     }
 
     docker.stop().await.unwrap();

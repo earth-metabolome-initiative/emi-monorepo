@@ -66,6 +66,7 @@ pub struct PgProc {
     pub prosrc: String,
     /// The binary representation of the function.
     pub probin: Option<Vec<u8>>,
+    #[cfg(feature = "postgres-14")]
     /// The SQL body of the function, if any.
     pub prosqlbody: Option<String>,
     /// The configuration settings for the function.
