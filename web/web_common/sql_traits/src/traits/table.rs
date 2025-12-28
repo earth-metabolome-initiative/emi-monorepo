@@ -1463,7 +1463,8 @@ pub trait TableLike:
         }
         self.foreign_keys(database).any(|fk| {
             let referenced_table: &Self = fk.referenced_table(database).borrow();
-            referenced_table == other || referenced_table.depends_on(database, other)
+            referenced_table == other
+                || referenced_table != self && referenced_table.depends_on(database, other)
         })
     }
 
