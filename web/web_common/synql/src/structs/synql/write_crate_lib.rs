@@ -77,6 +77,14 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
             None
         };
 
+        let allow_non_snake_case = if !table.has_snake_case_table_name() {
+            Some(quote! {
+                #![allow(non_snake_case)]
+            })
+        } else {
+            None
+        };
+
         let fields = table.generate_struct_fields(workspace, self.database)?;
         let unique_indices = table.unique_indices_macros(self.database);
         let foreign_keys = table.foreign_keys_macros(self.database, workspace);
@@ -92,6 +100,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
             #error_decorator
             #primary_key_decorator
             #surrogate_key_decorator
+            #allow_non_snake_case
             #[diesel(table_name = #table_ident)]
             pub struct #camel_case_name {
                 #(#fields),*

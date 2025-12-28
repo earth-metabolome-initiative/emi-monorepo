@@ -35,6 +35,32 @@ pub trait TableLike:
     /// ```
     fn table_name(&self) -> &str;
 
+    /// Returns whether the table has a snake_case name.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE my_table (id INT);
+    /// CREATE TABLE MyTable (id INT);
+    /// "#,
+    /// )?;
+    /// let snake_case_table = db.table(None, "my_table").unwrap();
+    /// assert!(snake_case_table.is_snake_case());
+    /// let non_snake_case_table = db.table(None, "MyTable").unwrap();
+    /// assert!(!non_snake_case_table.is_snake_case());
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn is_snake_case(&self) -> bool {
+        let name = self.table_name();
+        name.chars().all(|c| c.is_lowercase() || c == '_')
+    }
+
     /// Returns the documentation of the table, if any.
     fn table_doc<'db>(&'db self, database: &'db Self::DB) -> Option<&'db str>
     where
