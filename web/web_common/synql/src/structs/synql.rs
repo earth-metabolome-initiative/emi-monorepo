@@ -110,7 +110,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
         }
 
         // Write external dependencies
-        for external_crate in self.external_crates.iter() {
+        for external_crate in workspace.external_crates() {
             if !external_crate.is_dependency() {
                 continue;
             }

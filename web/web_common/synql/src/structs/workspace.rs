@@ -106,6 +106,12 @@ impl Workspace {
         None
     }
 
+    /// Iterates over the external crates in the workspace.
+    #[must_use]
+    pub fn external_crates(&self) -> impl Iterator<Item = &ExternalCrate> {
+        self.external_crates.iter()
+    }
+
     /// Writes the formatting rules for the workspace.
     ///
     /// # Errors
