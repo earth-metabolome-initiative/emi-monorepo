@@ -28,6 +28,7 @@ pub struct PgIndex {
     pub indnkeyatts: i16,
     /// `true` if the index enforces uniqueness.
     pub indisunique: bool,
+    #[cfg(feature = "postgres-15")]
     /// `true` if nulls are considered distinct in a unique index.
     pub indnullsnotdistinct: bool,
     /// `true` if this is the primary key index for the table.

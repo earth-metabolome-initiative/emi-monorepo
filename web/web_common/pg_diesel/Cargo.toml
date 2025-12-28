@@ -22,3 +22,4 @@ workspace = true
 default = []
 serde = ["dep:serde"]
 postgres-14 = []
+postgres-15 = []
