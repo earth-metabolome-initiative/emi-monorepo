@@ -108,6 +108,11 @@ impl WorkspaceBuilder {
         self.external_crate(ExternalCrate::serde())
     }
 
+    /// Adds the `serde_json` external crate to the workspace.
+    pub fn serde_json(self) -> Self {
+        self.external_crate(ExternalCrate::serde_json())
+    }
+
     /// Adds the `diesel_builders` external crate to the workspace.
     pub fn diesel_builders(self) -> Self {
         self.external_crate(ExternalCrate::diesel_builders())

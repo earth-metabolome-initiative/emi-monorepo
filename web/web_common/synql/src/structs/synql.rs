@@ -74,6 +74,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
             .std()
             .pgrx_validation()
             .serde()
+            .serde_json()
             .validation_errors()
             .postgis_diesel()
             .diesel_builders()

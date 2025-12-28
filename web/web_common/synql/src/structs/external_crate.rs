@@ -21,6 +21,7 @@ mod postgis_diesel_crate;
 mod rosetta_timestamp;
 mod rosetta_uuid_crate;
 mod serde;
+mod serde_json;
 mod std_crate;
 mod validation_errors;
 
