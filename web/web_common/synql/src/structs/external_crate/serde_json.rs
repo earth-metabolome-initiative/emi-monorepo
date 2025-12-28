@@ -13,7 +13,7 @@ impl ExternalCrate {
             .version("1.0")
             .types([
                 ExternalType::new(
-                    syn::parse_quote!(::diesel::pg::types::sql_types::Json),
+                    syn::parse_quote!(::diesel::sql_types::Json),
                     syn::parse_quote!(::serde_json::Value),
                 )
                 .postgres_types(["json"])
@@ -22,7 +22,7 @@ impl ExternalCrate {
                 .supports_eq()
                 .into(),
                 ExternalType::new(
-                    syn::parse_quote!(::diesel::pg::types::sql_types::Jsonb),
+                    syn::parse_quote!(::diesel::sql_types::Jsonb),
                     syn::parse_quote!(::serde_json::Value),
                 )
                 .postgres_types(["jsonb"])
