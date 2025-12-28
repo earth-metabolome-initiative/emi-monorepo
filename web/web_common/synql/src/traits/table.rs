@@ -407,7 +407,7 @@ where
         database: &Self::DB,
     ) -> Result<Vec<proc_macro2::TokenStream>, crate::Error> {
         self.columns(database)
-            .filter(|c| c.has_check_constraints(database))
+            .filter(|c| c.has_non_tautological_check_constraints(database))
             .map(|c| c.generate_validation_impl(workspace, database))
             .collect()
     }

@@ -332,6 +332,74 @@ pub trait CheckConstraintLike:
         self.columns(database).any(|col| col == column)
     }
 
+    /// Returns whether the check constraint is a tautology (always true).
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query the table
+    ///   from.
+    ///
+    /// # Implementation Note
+    ///
+    /// At this time, this method only recognizes tautological statements such
+    /// as `column IS NOT NULL` for columns that are defined as `NOT NULL`, and
+    /// the case `CHECK (TRUE)`.
+    /// More complex tautologies may be added in the future.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"CREATE TABLE my_table (
+    ///         col1 INT NOT NULL,
+    ///         col2 INT,
+    ///         CHECK (col1 IS NOT NULL),
+    ///         CHECK (TRUE),
+    ///         CHECK (col2 IS NOT NULL)
+    ///     );"#,
+    /// )?;
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let check_constraints: Vec<_> = table.check_constraints(&db).collect();
+    /// let [cc1, cc2, cc3] = &check_constraints.as_slice() else {
+    ///     panic!("Expected three check constraints");
+    /// };
+    /// assert!(cc1.is_tautology(&db));
+    /// assert!(cc2.is_tautology(&db));
+    /// assert!(!cc3.is_tautology(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn is_tautology(&self, database: &Self::DB) -> bool {
+        use sqlparser::ast::Expr;
+
+        let expr = self.expression(database);
+
+        // Check for simple "column IS NOT NULL" expressions
+        if let Expr::IsNotNull(col_expr) = expr {
+            if let Expr::Identifier(ident) = col_expr.as_ref() {
+                if let Some(column) = self.column(database, &ident.value) {
+                    return !column.is_nullable(database);
+                }
+            }
+        }
+
+        // Check for "TRUE" expression
+        if let Expr::Value(sqlparser::ast::ValueWithSpan {
+            value: sqlparser::ast::Value::Boolean(true),
+            ..
+        }) = expr
+        {
+            return true;
+        }
+
+        // Additional tautology checks can be added here
+
+        false
+    }
+
     /// Returns whether the check constraint is a mutual nullability constraint.
     ///
     /// # Arguments

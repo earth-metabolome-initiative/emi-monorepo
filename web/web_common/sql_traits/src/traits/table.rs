@@ -2,7 +2,9 @@
 
 use std::{borrow::Borrow, fmt::Debug, hash::Hash};
 
-use crate::traits::{ColumnLike, DatabaseLike, ForeignKeyLike, Metadata};
+use crate::traits::{
+    ColumnLike, DatabaseLike, ForeignKeyLike, Metadata, check_constraint::CheckConstraintLike,
+};
 
 /// A trait for types that can be treated as SQL tables.
 pub trait TableLike:
@@ -547,6 +549,43 @@ pub trait TableLike:
     where
         Self: 'db;
 
+    /// Iterates over the non-tautological check constraints of the table using
+    /// the provided schema.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE my_table (id INT CHECK (TRUE), name TEXT, CHECK (length(name) > 0));
+    /// "#,
+    /// )?;
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let non_tautological_ccs: Vec<_> = table
+    ///     .non_tautological_check_constraints(&db)
+    ///     .map(|cc| cc.expression(&db).to_string())
+    ///     .collect();
+    /// assert_eq!(non_tautological_ccs, vec!["length(name) > 0"]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn non_tautological_check_constraints<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::CheckConstraint>
+    where
+        Self: 'db,
+    {
+        self.check_constraints(database).filter(|cc| !cc.is_tautology(database))
+    }
+
     /// Returns whether the table has any check constraints.
     ///
     /// # Arguments
@@ -575,6 +614,39 @@ pub trait TableLike:
     #[inline]
     fn has_check_constraints(&self, database: &Self::DB) -> bool {
         self.check_constraints(database).next().is_some()
+    }
+
+    /// Returns whether the table has any non-tautological check constraints.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE my_table_with_non_tautological_cc (id INT CHECK (id > 0), name TEXT);
+    /// CREATE TABLE my_table_with_only_tautological_cc (id INT CHECK (TRUE), name TEXT);
+    /// "#,
+    /// )?;
+    /// let table_with_non_tautological_cc =
+    ///     db.table(None, "my_table_with_non_tautological_cc").unwrap();
+    /// assert!(table_with_non_tautological_cc.has_non_tautological_check_constraints(&db));
+    /// let table_with_only_tautological_cc =
+    ///     db.table(None, "my_table_with_only_tautological_cc").unwrap();
+    /// assert!(!table_with_only_tautological_cc.has_non_tautological_check_constraints(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[inline]
+    fn has_non_tautological_check_constraints(&self, database: &Self::DB) -> bool {
+        self.non_tautological_check_constraints(database).next().is_some()
     }
 
     /// Iterates over the unique indexes of the table using the provided

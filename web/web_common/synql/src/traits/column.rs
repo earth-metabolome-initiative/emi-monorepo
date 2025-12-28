@@ -416,7 +416,7 @@ pub trait ColumnSynLike: ColumnLike {
     ) -> Result<Vec<proc_macro2::TokenStream>, crate::Error> {
         let mut validations = vec![];
         let table_has_surrogate_pk = self.table(database).has_surrogate_primary_key(database);
-        for check_constraint in self.check_constraints(database) {
+        for check_constraint in self.non_tautological_check_constraints(database) {
             if check_constraint.number_of_columns(database) <= 1 {
                 continue;
             }
@@ -447,7 +447,7 @@ pub trait ColumnSynLike: ColumnLike {
         database: &Self::DB,
     ) -> Result<Vec<proc_macro2::TokenStream>, crate::Error> {
         let mut validations = vec![];
-        for check_constraint in self.check_constraints(database) {
+        for check_constraint in self.non_tautological_check_constraints(database) {
             if check_constraint.number_of_columns(database) > 1 {
                 continue;
             }
@@ -582,8 +582,8 @@ pub trait ColumnSynLike: ColumnLike {
         let default_decorator = self.generate_default_decorator(workspace, database)?;
 
         // If the column has no check constraints, we can mark it as infallible
-        let infallible_decorator = if !self.has_check_constraints(database)
-            && self.table(database).has_check_constraints(database)
+        let infallible_decorator = if !self.has_non_tautological_check_constraints(database)
+            && self.table(database).has_non_tautological_check_constraints(database)
             && !(self.is_primary_key(database)
                 && self.table(database).has_surrogate_primary_key(database))
         {

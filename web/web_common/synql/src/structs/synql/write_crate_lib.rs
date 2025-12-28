@@ -50,7 +50,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         // If the crate has check constraints, it means we need to specify
         // the error type in the derive macro.
         let mut error_decorator = None;
-        if table.has_check_constraints(self.database) {
+        if table.has_non_tautological_check_constraints(self.database) {
             error_decorator = Some(quote! {
                 #[table_model(error = ::validation_errors::ValidationError)]
             });

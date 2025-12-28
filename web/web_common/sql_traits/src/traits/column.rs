@@ -737,4 +737,31 @@ pub trait ColumnLike:
     fn has_check_constraints(&self, database: &Self::DB) -> bool {
         self.check_constraints(database).next().is_some()
     }
+
+    #[inline]
+    /// Returns an iterator over the non-tautological
+    /// [`CheckConstraintLike`](crate::traits::CheckConstraintLike)s
+    /// that involve this column within the table.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query check
+    ///   constraints from.
+    fn non_tautological_check_constraints<'db>(
+        &'db self,
+        database: &'db Self::DB,
+    ) -> impl Iterator<Item = &'db <Self::DB as DatabaseLike>::CheckConstraint> + 'db {
+        self.check_constraints(database).filter(move |check| !check.is_tautology(database))
+    }
+
+    #[inline]
+    /// Returns whether the column has non-tautological check constraints.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query check
+    ///   constraints from.
+    fn has_non_tautological_check_constraints(&self, database: &Self::DB) -> bool {
+        self.non_tautological_check_constraints(database).next().is_some()
+    }
 }
