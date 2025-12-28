@@ -5,5 +5,5 @@ pub mod impls;
 pub mod models;
 pub mod schema;
 pub mod traits;
-pub use database::PgDatabase;
+pub use database::PgDieselDatabase;
 pub mod model_metadata;

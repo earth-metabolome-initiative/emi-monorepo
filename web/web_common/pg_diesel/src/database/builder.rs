@@ -6,13 +6,13 @@ use diesel::PgConnection;
 use sql_traits::{structs::generic_db::GenericDBBuilder, traits::TableLike};
 
 use crate::{
-    PgDatabase,
+    PgDieselDatabase,
     models::{PgProc, Table},
 };
 
 #[derive(Default)]
 /// Builder for constructing a [`PgDatabase`] instance from PostgreSQL metadata.
-pub struct PgDatabaseBuilder<'conn> {
+pub struct PgDieselDatabaseBuilder<'conn> {
     /// Connection to the PostgreSQL database.
     connection: Option<&'conn mut PgConnection>,
     /// The catalog (database) name to filter by.
@@ -43,7 +43,7 @@ pub enum PgDatabaseBuildError {
     DuplicateDenylistedType(String),
 }
 
-impl<'conn> PgDatabaseBuilder<'conn> {
+impl<'conn> PgDieselDatabaseBuilder<'conn> {
     /// Sets the PostgreSQL connection to use for building the `PgDatabase`.
     pub fn connection(mut self, connection: &'conn mut PgConnection) -> Self {
         self.connection = Some(connection);
@@ -91,10 +91,10 @@ impl<'conn> PgDatabaseBuilder<'conn> {
     }
 }
 
-impl TryFrom<PgDatabaseBuilder<'_>> for PgDatabase {
+impl<'a> TryFrom<PgDieselDatabaseBuilder<'a>> for PgDieselDatabase {
     type Error = PgDatabaseBuildError;
 
-    fn try_from(value: PgDatabaseBuilder<'_>) -> Result<Self, Self::Error> {
+    fn try_from(value: PgDieselDatabaseBuilder<'a>) -> Result<Self, Self::Error> {
         let connection =
             value.connection.ok_or(PgDatabaseBuildError::MissingAttribute("connection"))?;
 

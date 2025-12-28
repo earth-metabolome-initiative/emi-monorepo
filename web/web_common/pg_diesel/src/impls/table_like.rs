@@ -15,14 +15,14 @@
 
 use sql_traits::traits::{Metadata, TableLike};
 
-use crate::{PgDatabase, model_metadata::TableMetadata};
+use crate::{PgDieselDatabase, model_metadata::TableMetadata};
 
 impl Metadata for crate::models::Table {
     type Meta = TableMetadata;
 }
 
 impl TableLike for crate::models::Table {
-    type DB = PgDatabase;
+    type DB = PgDieselDatabase;
 
     fn table_name(&self) -> &str {
         &self.table_name

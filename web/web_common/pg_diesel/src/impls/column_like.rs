@@ -12,14 +12,14 @@
 
 use sql_traits::traits::{ColumnLike, Metadata};
 
-use crate::{PgDatabase, model_metadata::ColumnMetadata};
+use crate::{PgDieselDatabase, model_metadata::ColumnMetadata};
 
 impl Metadata for crate::models::Column {
     type Meta = ColumnMetadata;
 }
 
 impl ColumnLike for crate::models::Column {
-    type DB = PgDatabase;
+    type DB = PgDieselDatabase;
 
     fn column_name(&self) -> &str {
         &self.column_name

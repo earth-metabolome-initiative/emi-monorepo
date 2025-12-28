@@ -15,14 +15,14 @@
 
 use sql_traits::traits::{FunctionLike, Metadata};
 
-use crate::{PgDatabase, database::PgProcMetadata, models::PgProc};
+use crate::{PgDieselDatabase, database::PgProcMetadata, models::PgProc};
 
 impl Metadata for PgProc {
     type Meta = PgProcMetadata;
 }
 
 impl FunctionLike for PgProc {
-    type DB = PgDatabase;
+    type DB = PgDieselDatabase;
 
     fn name(&self) -> &str {
         &self.proname

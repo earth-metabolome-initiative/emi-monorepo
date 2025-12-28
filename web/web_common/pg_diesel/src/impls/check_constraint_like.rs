@@ -13,14 +13,14 @@ use sql_traits::{
     traits::{CheckConstraintLike, Metadata},
 };
 
-use crate::{PgDatabase, models::CheckConstraint};
+use crate::{PgDieselDatabase, models::CheckConstraint};
 
 impl Metadata for CheckConstraint {
     type Meta = CheckMetadata<Self>;
 }
 
 impl CheckConstraintLike for CheckConstraint {
-    type DB = PgDatabase;
+    type DB = PgDieselDatabase;
 
     fn expression<'db>(&'db self, database: &'db Self::DB) -> &'db sqlparser::ast::Expr {
         database

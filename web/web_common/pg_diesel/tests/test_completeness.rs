@@ -2,9 +2,8 @@
 
 use std::path::PathBuf;
 
-use common_traits::builder::Builder;
 use diesel::PgConnection;
-use pg_diesel::database::PgDatabaseBuilder;
+use pg_diesel::database::{PgDieselDatabase, PgDieselDatabaseBuilder};
 use reference_docker::reference_docker_with_connection;
 use sql_traits::traits::{ColumnLike, TableLike, database::DatabaseLike};
 
@@ -62,7 +61,7 @@ async fn test_schema_completeness() {
     // consider adding an explicit custom type, a textual/JSON representation at
     // the SQL level, or a targeted parser to convert the internal format into a
     // stable Rust struct.
-    let db = PgDatabaseBuilder::default()
+    let db: PgDieselDatabase = PgDieselDatabaseBuilder::default()
         .connection(&mut conn)
         .catalog(database_name)
         .denylist_types([
@@ -78,7 +77,7 @@ async fn test_schema_completeness() {
             "pg_catalog".to_owned(),
             "information_schema".to_owned(),
         ])
-        .build()
+        .try_into()
         .expect("Failed to build database");
 
     let crate_root_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));

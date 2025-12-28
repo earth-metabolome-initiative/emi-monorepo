@@ -11,7 +11,7 @@ mod pg_proc_metadata;
 pub use pg_proc_metadata::PgProcMetadata;
 
 mod builder;
-pub use builder::PgDatabaseBuilder;
+pub use builder::PgDieselDatabaseBuilder;
 
 /// Type alias representing a PostgreSQL database with loaded metadata.
 ///
@@ -32,4 +32,5 @@ pub use builder::PgDatabaseBuilder;
 /// The `PgDatabase` implements
 /// [`DatabaseLike`](sql_traits::prelude::DatabaseLike), providing methods to
 /// iterate over tables, columns, foreign keys, and other database objects.
-pub type PgDatabase = GenericDB<Table, Column, PgIndex, KeyColumnUsage, PgProc, CheckConstraint>;
+pub type PgDieselDatabase =
+    GenericDB<Table, Column, PgIndex, KeyColumnUsage, PgProc, CheckConstraint>;

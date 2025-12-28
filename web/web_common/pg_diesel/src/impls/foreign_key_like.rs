@@ -16,14 +16,14 @@
 
 use sql_traits::traits::{ForeignKeyLike, Metadata};
 
-use crate::{PgDatabase, database::KeyColumnUsageMetadata, models::KeyColumnUsage};
+use crate::{PgDieselDatabase, database::KeyColumnUsageMetadata, models::KeyColumnUsage};
 
 impl Metadata for KeyColumnUsage {
     type Meta = KeyColumnUsageMetadata;
 }
 
 impl ForeignKeyLike for KeyColumnUsage {
-    type DB = PgDatabase;
+    type DB = PgDieselDatabase;
 
     fn foreign_key_name(&self) -> Option<&str> {
         Some(&self.constraint_name)

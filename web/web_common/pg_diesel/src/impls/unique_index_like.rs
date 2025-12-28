@@ -17,14 +17,14 @@ use sql_traits::{
 };
 use sqlparser::ast::Expr;
 
-use crate::{PgDatabase, models::PgIndex};
+use crate::{PgDieselDatabase, models::PgIndex};
 
 impl Metadata for PgIndex {
     type Meta = UniqueIndexMetadata<Self>;
 }
 
 impl UniqueIndexLike for PgIndex {
-    type DB = PgDatabase;
+    type DB = PgDieselDatabase;
 
     fn table<'db>(
         &'db self,

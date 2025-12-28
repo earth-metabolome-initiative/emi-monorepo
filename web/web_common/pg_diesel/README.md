@@ -6,7 +6,7 @@ Diesel models and schemas for PostgreSQL system catalogs (`pg_catalog`, `informa
 
 - Provides Diesel schemas for all PostgreSQL metadata tables
 - Includes models for querying system catalogs type-safely
-- Offers `PgDatabaseBuilder` for runtime database introspection
+- Offers `PgDieselDatabaseBuilder` for runtime database introspection
 - Implements `sql_traits` for generic metadata access
 
 ## Known limitations

@@ -1,6 +1,6 @@
 //! Builder for constructing a `GenericDB` instance.
 
-use std::{fmt::Display, rc::Rc};
+use std::rc::Rc;
 
 use crate::{
     structs::GenericDB,
@@ -58,24 +58,6 @@ where
             foreign_keys: Vec::new(),
             functions: Vec::new(),
             check_constraints: Vec::new(),
-        }
-    }
-}
-
-/// Attributes that can be set on the `GenericDBBuilder`.
-#[derive(Debug)]
-pub enum GenericDBAttribute {
-    /// The catalog (database) name.
-    CatalogName,
-    /// The timezone of the database.
-    Timezone,
-}
-
-impl Display for GenericDBAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            GenericDBAttribute::CatalogName => write!(f, "catalog_name"),
-            GenericDBAttribute::Timezone => write!(f, "timezone"),
         }
     }
 }
