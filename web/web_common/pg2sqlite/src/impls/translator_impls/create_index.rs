@@ -42,7 +42,7 @@ impl Translator for CreateIndex {
                 }
             };
             let table = schema.table(None, table_name).unwrap();
-            if !table.has_generated_primary_key(schema)
+            if !table.has_surrogate_primary_key(schema)
                 && table.primary_key_type(schema).as_slice() == ["uuid"]
             {
                 // Drop the index by returning None.

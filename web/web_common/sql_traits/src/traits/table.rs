@@ -314,13 +314,13 @@ pub trait TableLike:
     /// "#,
     /// )?;
     /// let table = db.table(None, "my_table").unwrap();
-    /// assert!(table.has_generated_primary_key(&db));
+    /// assert!(table.has_surrogate_primary_key(&db));
     /// let no_gen_pk_table = db.table(None, "my_no_gen_pk_table").unwrap();
-    /// assert!(!no_gen_pk_table.has_generated_primary_key(&db));
+    /// assert!(!no_gen_pk_table.has_surrogate_primary_key(&db));
     /// # Ok(())
     /// # }
     /// ```
-    fn has_generated_primary_key(&self, database: &Self::DB) -> bool {
+    fn has_surrogate_primary_key(&self, database: &Self::DB) -> bool {
         self.primary_key_columns(database).all(ColumnLike::is_generated)
             && self.has_primary_key(database)
     }

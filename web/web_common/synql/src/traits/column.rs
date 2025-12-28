@@ -348,6 +348,10 @@ pub trait ColumnSynLike: ColumnLike {
         workspace: &Workspace,
         database: &Self::DB,
     ) -> Result<proc_macro2::TokenStream, crate::Error> {
+        if self.is_primary_key(database) && self.table(database).has_surrogate_primary_key(database)
+        {
+            return Ok(quote! {});
+        }
         let Some(default_value) = self.default_value() else {
             return Ok(quote! {});
         };
@@ -400,6 +404,7 @@ pub trait ColumnSynLike: ColumnLike {
         database: &Self::DB,
     ) -> Result<Vec<proc_macro2::TokenStream>, crate::Error> {
         let mut validations = vec![];
+        let table_has_surrogate_pk = self.table(database).has_surrogate_primary_key(database);
         for check_constraint in self.check_constraints(database) {
             if check_constraint.number_of_columns(database) <= 1 {
                 continue;
@@ -407,6 +412,18 @@ pub trait ColumnSynLike: ColumnLike {
             if check_constraint.is_mutual_nullability_constraint(database) {
                 continue;
             }
+
+            let mut skip_constraint = false;
+            for column in check_constraint.columns(database) {
+                if column.is_primary_key(database) && table_has_surrogate_pk {
+                    skip_constraint = true;
+                    break;
+                }
+            }
+            if skip_constraint {
+                continue;
+            }
+
             validations.push(check_constraint.to_syn(database, workspace, &[self.borrow()]));
         }
         Ok(validations)
@@ -556,6 +573,8 @@ pub trait ColumnSynLike: ColumnLike {
         // If the column has no check constraints, we can mark it as infallible
         let infallible_decorator = if !self.has_check_constraints(database)
             && self.table(database).has_check_constraints(database)
+            && !(self.is_primary_key(database)
+                && self.table(database).has_surrogate_primary_key(database))
         {
             Some(quote! {
                 #[infallible]
