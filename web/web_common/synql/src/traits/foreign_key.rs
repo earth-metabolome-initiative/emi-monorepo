@@ -15,8 +15,8 @@ pub trait ForeignKeySynLike: ForeignKeyLike {
     /// the `fk` or the `fpk` macro, depending on whether the foreign key
     /// is a foreign primary key or not.
     fn to_syn(&self, database: &Self::DB, workspace: &Workspace) -> TokenStream {
-        let host_table_ident = self.host_table(database).table_snake_ident();
-        let foreign_table_ident = self.referenced_table(database).table_snake_ident();
+        let host_table_ident = self.host_table(database).table_ident();
+        let foreign_table_ident = self.referenced_table(database).table_ident();
         let foreign_table_crate_ident = self.referenced_table(database).crate_ident(workspace);
         let host_column_paths = self
             .host_columns(database)

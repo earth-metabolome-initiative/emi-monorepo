@@ -82,7 +82,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
 
         let allow_non_snake_case = if !table.has_snake_case_table_name() {
             Some(quote! {
-                #[allow(non_snake_case)]
+                #![allow(non_snake_case)]
             })
         } else {
             None
@@ -94,6 +94,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         let check_constraint_impls = table.generate_validation_impls(workspace, self.database)?;
 
         let content = quote! {
+            #allow_non_snake_case
             #![doc=#crate_documentation]
 
             #[derive(#(#core_derives),*)]
@@ -103,7 +104,6 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
             #error_decorator
             #primary_key_decorator
             #surrogate_key_decorator
-            #allow_non_snake_case
             #[diesel(table_name = #table_ident)]
             pub struct #camel_case_name {
                 #(#fields),*
