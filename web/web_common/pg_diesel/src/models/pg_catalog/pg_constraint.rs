@@ -71,6 +71,7 @@ pub struct PgConstraint {
     pub conppeqop: Option<Vec<u32>>,
     /// If a foreign key, list of the equality operators for FK = FK comparisons
     pub conffeqop: Option<Vec<u32>>,
+    #[cfg(feature = "postgres-15")]
     /// If a foreign key with a SET NULL or SET DEFAULT delete action, the
     /// columns that will be updated. If null, all of the referencing columns
     /// will be updated.
