@@ -76,11 +76,11 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
         let mut wrote = false;
         write!(buffer, "members = [")?;
         for table in self.database.tables() {
-            if wrote {
-                write!(buffer, ", ")?;
-            }
             if self.skip_table(table) {
                 continue;
+            }
+            if wrote {
+                write!(buffer, ", ")?;
             }
 
             write!(buffer, "\"{}\"", table.crate_name(workspace))?;
