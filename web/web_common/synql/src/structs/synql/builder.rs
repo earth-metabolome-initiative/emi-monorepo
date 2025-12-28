@@ -9,6 +9,7 @@ use crate::{structs::ExternalCrate, traits::SynQLDatabaseLike};
 pub struct SynQLBuilder<'db, DB: SynQLDatabaseLike> {
     database: &'db DB,
     path: &'db Path,
+    clear_existing: bool,
     name: Option<String>,
     deny_list: Vec<&'db DB::Table>,
     version: (u8, u8, u8),
@@ -26,6 +27,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQLBuilder<'db, DB> {
         SynQLBuilder {
             database,
             path,
+            clear_existing: false,
             name: None,
             deny_list: Vec::new(),
             version: (0, 1, 0),
@@ -92,6 +94,14 @@ impl<'db, DB: SynQLDatabaseLike> SynQLBuilder<'db, DB> {
         self
     }
 
+    #[must_use]
+    #[inline]
+    /// Sets to clear existing workspace directory if it already exists.
+    pub fn clear_existing(mut self) -> Self {
+        self.clear_existing = true;
+        self
+    }
+
     /// Adds several external crates to the workspace.
     #[must_use]
     pub fn external_crates<I>(mut self, external_crates: I) -> Self
@@ -117,6 +127,7 @@ impl<'db, DB: SynQLDatabaseLike> From<SynQLBuilder<'db, DB>> for SynQL<'db, DB> 
     fn from(builder: SynQLBuilder<'db, DB>) -> Self {
         SynQL {
             database: builder.database,
+            clear_existing: builder.clear_existing,
             path: builder.path,
             name: builder.name,
             deny_list: builder.deny_list,

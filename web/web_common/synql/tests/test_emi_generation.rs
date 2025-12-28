@@ -122,6 +122,7 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
 
     let synql: SynQL<ParserDB> = SynQL::new(&db, &workspace_path)
         .name("synql")
+        .clear_existing()
         .external_crates([iso_codes, media_types, cas_codes, molecular_formulas])
         .generate_workspace_toml()
         .generate_rustfmt()

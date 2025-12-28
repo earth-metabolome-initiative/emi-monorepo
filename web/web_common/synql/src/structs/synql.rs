@@ -36,6 +36,8 @@ pub struct SynQL<'db, DB: SynQLDatabaseLike> {
     generate_rustfmt: bool,
     /// External rust crates to include in the workspace.
     external_crates: Vec<ExternalCrate>,
+    /// Whether to clear workspace directory if it already exists.
+    clear_existing: bool,
 }
 
 impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
@@ -80,17 +82,19 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
             .edition(self.edition)
             .into();
 
-        // Clear up any directory or file that may already exist at the workspace path
-        if workspace.path().exists() {
-            // We remove all contents of the directory, but we do not remove the directory
-            // itself
-            for entry in std::fs::read_dir(workspace.path())? {
-                let entry = entry?;
-                let path = entry.path();
-                if path.is_dir() {
-                    std::fs::remove_dir_all(path)?;
-                } else {
-                    std::fs::remove_file(path)?;
+        if self.clear_existing {
+            // Clear up any directory or file that may already exist at the workspace path
+            if workspace.path().exists() {
+                // We remove all contents of the directory, but we do not remove the directory
+                // itself
+                for entry in std::fs::read_dir(workspace.path())? {
+                    let entry = entry?;
+                    let path = entry.path();
+                    if path.is_dir() {
+                        std::fs::remove_dir_all(path)?;
+                    } else {
+                        std::fs::remove_file(path)?;
+                    }
                 }
             }
         }
