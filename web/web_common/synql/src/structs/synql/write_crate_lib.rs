@@ -27,7 +27,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         let core_derives = table.supported_core_derives(self.database, workspace);
         let table_name = table.table_name();
         let camel_case_name = table.table_singular_camel_ident();
-        let table_ident = table.table_snake_ident();
+        let table_ident = table.table_ident();
         let crate_documentation = format!("Auto-generated crate for the `{table_name}` table.");
         let struct_documentation = format!("Model for table `{table_name}`.");
 

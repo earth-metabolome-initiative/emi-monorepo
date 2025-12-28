@@ -65,6 +65,16 @@ where
         workspace.path().join(self.crate_name(workspace))
     }
 
+    /// Returns the ident of this table, with no normalization applied.
+    fn table_ident(&self) -> Ident {
+        let table_name = self.table_name();
+        if is_reserved_rust_word(&table_name) {
+            Ident::new_raw(&table_name, proc_macro2::Span::call_site())
+        } else {
+            Ident::new(&table_name, proc_macro2::Span::call_site())
+        }
+    }
+
     /// Returns the snake-cased name of this table.
     ///
     /// # Example
