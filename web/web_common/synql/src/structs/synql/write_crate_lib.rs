@@ -79,7 +79,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
 
         let allow_non_snake_case = if !table.has_snake_case_table_name() {
             Some(quote! {
-                #![allow(non_snake_case)]
+                #[allow(non_snake_case)]
             })
         } else {
             None
