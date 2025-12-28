@@ -103,3 +103,6 @@ diesel::allow_tables_to_appear_in_same_query!(pg_class, pg_trigger);
 
 use crate::schema::pg_catalog::pg_description::pg_description;
 diesel::allow_tables_to_appear_in_same_query!(pg_class, pg_description);
+
+use crate::schema::pg_catalog::pg_depend::pg_depend;
+diesel::allow_tables_to_appear_in_same_query!(pg_class, pg_depend);
