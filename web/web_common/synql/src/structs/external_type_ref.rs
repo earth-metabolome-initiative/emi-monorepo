@@ -92,6 +92,12 @@ impl<'workspace> ExternalTypeRef<'workspace> {
         self.type_ref.is_unit()
     }
 
+    /// Returns whether the underlyng crate is postgis-diesel.
+    #[must_use]
+    pub fn is_postgis_diesel(&self) -> bool {
+        self.crate_name() == "postgis_diesel"
+    }
+
     /// Returns whether the type is a `uuid::Uuid`.
     #[must_use]
     pub fn is_uuid(&self) -> bool {

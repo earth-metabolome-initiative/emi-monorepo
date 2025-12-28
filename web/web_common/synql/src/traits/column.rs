@@ -364,6 +364,9 @@ pub trait ColumnSynLike: ColumnLike {
         };
 
         let casted_default_value = match default_value.as_str() {
+            "NULL::geometry" if external_postgres_type.is_postgis_diesel() => {
+                return Ok(quote! {});
+            }
             "gen_random_uuid()" if external_postgres_type.is_uuid() => {
                 quote! { ::uuid::Uuid::new_v4() }
             }
