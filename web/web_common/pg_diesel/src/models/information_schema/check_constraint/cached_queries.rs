@@ -19,17 +19,22 @@ pub(super) fn columns(
     };
     Ok(columns::table
         .inner_join(
-            constraint_column_usage::table.on(
-                columns::table_schema
-                    .eq(constraint_column_usage::table_schema)
-                    .and(columns::table_name.eq(constraint_column_usage::table_name))
-                    .and(columns::column_name.eq(constraint_column_usage::column_name)),
-            ),
+            constraint_column_usage::table.on(columns::table_schema
+                .eq(constraint_column_usage::table_schema)
+                .and(columns::table_name.eq(constraint_column_usage::table_name))
+                .and(columns::column_name.eq(constraint_column_usage::column_name))),
         )
         .filter(
-            constraint_column_usage::constraint_name.eq(&check_constraint.constraint_name)
-                .and(constraint_column_usage::constraint_schema.eq(&check_constraint.constraint_schema))
-                .and(constraint_column_usage::constraint_catalog.eq(&check_constraint.constraint_catalog)),
+            constraint_column_usage::constraint_name
+                .eq(&check_constraint.constraint_name)
+                .and(
+                    constraint_column_usage::constraint_schema
+                        .eq(&check_constraint.constraint_schema),
+                )
+                .and(
+                    constraint_column_usage::constraint_catalog
+                        .eq(&check_constraint.constraint_catalog),
+                ),
         )
         .select(Column::as_select())
         .load(conn)?)
