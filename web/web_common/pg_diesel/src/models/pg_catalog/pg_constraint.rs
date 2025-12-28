@@ -53,6 +53,12 @@ pub struct PgConstraint {
     /// This constraint is defined locally for the relation. Note that a
     /// constraint can be locally defined and inherited simultaneously.
     pub conislocal: bool,
+    #[cfg(not(any(feature = "postgres-14", feature = "postgres-15")))]
+    /// The number of direct inheritance ancestors this constraint has. A
+    /// constraint with a nonzero number of ancestors cannot be dropped nor
+    /// renamed.
+    pub coninhcount: i32,
+    #[cfg(any(feature = "postgres-14", feature = "postgres-15"))]
     /// The number of direct inheritance ancestors this constraint has. A
     /// constraint with a nonzero number of ancestors cannot be dropped nor
     /// renamed.
