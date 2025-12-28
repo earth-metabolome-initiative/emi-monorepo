@@ -12,5 +12,6 @@ pub mod model_metadata;
 pub mod prelude {
 	pub use crate::database::PgDatabase;
 	pub use crate::traits::*;
+	pub use crate::models::*;
 	pub use sql_traits::prelude::*;
 }
