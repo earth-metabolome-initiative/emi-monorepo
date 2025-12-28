@@ -57,14 +57,22 @@ impl<'conn> PgDieselDatabaseBuilder<'conn> {
     }
 
     /// Adds a schema name to include.
-    pub fn add_schema<S: ToString>(mut self, schema: S) -> Self {
+    pub fn schema<S: ToString>(mut self, schema: S) -> Self {
         self.schemas.push(schema.to_string());
         self
     }
 
     /// Sets the schema names to include.
-    pub fn schemas(mut self, schemas: Vec<String>) -> Self {
-        self.schemas = schemas;
+    pub fn schemas<I, S>(mut self, schemas: I) -> Self
+    where
+        I: IntoIterator<Item = S>,
+        S: ToString,
+    {
+        for schema in schemas {
+            if !self.schemas.contains(&schema.to_string()) {
+                self = self.schema(schema);
+            }
+        }
         self
     }
 

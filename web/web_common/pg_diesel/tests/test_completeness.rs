@@ -72,11 +72,7 @@ async fn test_schema_completeness() {
             "_pg_statistic",
         ])
         .unwrap()
-        .schemas(vec![
-            "pg_toast".to_owned(),
-            "pg_catalog".to_owned(),
-            "information_schema".to_owned(),
-        ])
+        .schemas(["pg_toast", "pg_catalog", "information_schema"])
         .try_into()
         .expect("Failed to build database");
 
