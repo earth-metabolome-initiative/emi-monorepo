@@ -59,6 +59,7 @@ pub struct PgType {
     pub typmodout: u32,
     /// The analyze function for the type.
     pub typanalyze: u32,
+    #[cfg(feature = "postgres-14")]
     /// The subscripting function for the type.
     pub typsubscript: u32,
     /// The alignment requirement of the type.
