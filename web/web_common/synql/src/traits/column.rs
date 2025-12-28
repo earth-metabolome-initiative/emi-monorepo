@@ -364,8 +364,16 @@ pub trait ColumnSynLike: ColumnLike {
         };
 
         let casted_default_value = match default_value.as_str() {
-            "NULL::geometry" if external_postgres_type.is_postgis_diesel() => {
+            candidate if candidate.starts_with("NULL::") => {
                 return Ok(quote! {});
+            }
+            candidate
+                if external_postgres_type.is_string()
+                    && candidate.ends_with("::character varying") =>
+            {
+                let stripped_value =
+                    candidate.trim_end_matches("::character varying").trim_matches('\'');
+                quote! { #stripped_value }
             }
             "gen_random_uuid()" if external_postgres_type.is_uuid() => {
                 quote! { ::uuid::Uuid::new_v4() }

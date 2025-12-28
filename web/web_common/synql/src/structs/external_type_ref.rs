@@ -92,6 +92,12 @@ impl<'workspace> ExternalTypeRef<'workspace> {
         self.type_ref.is_unit()
     }
 
+    #[must_use]
+    /// Returns whether the type is a `String`.
+    pub fn is_string(&self) -> bool {
+        self.crate_name() == "std" && self.rust_type().to_token_stream().to_string() == "String"
+    }
+
     /// Returns whether the underlyng crate is postgis-diesel.
     #[must_use]
     pub fn is_postgis_diesel(&self) -> bool {
