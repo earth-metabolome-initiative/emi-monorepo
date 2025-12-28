@@ -13,7 +13,7 @@ pub trait UniqueIndexSynLike: UniqueIndexLike {
     /// Converts the unique index to its Syn representation,
     /// using the `diesel-builders` crate.
     fn to_syn(&self, database: &Self::DB) -> TokenStream {
-        let table_ident = self.table(database).table_snake_ident();
+        let table_ident = self.table(database).table_ident();
         let column_idents =
             self.columns(database).map(|col| col.column_snake_ident()).map(|ident| {
                 quote! {#table_ident::#ident}
