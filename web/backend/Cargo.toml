@@ -26,7 +26,6 @@ rand.workspace = true
 init_db.workspace = true
 init_migration.workspace = true
 tokio.workspace = true
-core_structures = { workspace = true, features = ["backend"] }
 openssl = { version = "0.10" }
 actix-cors.workspace = true
 actix-web.workspace = true

@@ -6,7 +6,6 @@ edition.workspace = true
 [dependencies]
 serde.workspace = true
 generic_backend_request_errors.workspace = true
-core_structures = { workspace = true, features = ["serde"] }
 
 [lints]
 workspace = true

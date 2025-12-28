@@ -1,6 +1,0 @@
-use crate::codegen::diesel_codegen::tables::{
-    asset_models::asset_models, commercial_products::commercial_products,
-};
-diesel::allow_tables_to_appear_in_same_query!(commercial_products, asset_models);
-use crate::codegen::diesel_codegen::tables::brands::brands;
-diesel::allow_tables_to_appear_in_same_query!(commercial_products, brands);

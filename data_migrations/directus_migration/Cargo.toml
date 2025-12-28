@@ -13,7 +13,6 @@ postgis_diesel.workspace = true
 tokio.workspace = true
 const_format.workspace = true
 rosetta_timestamp = { workspace = true, features = ["serde", "postgres"] }
-core_structures = { workspace = true, features = ["backend"] }
 anyhow.workspace = true
 init_migration.workspace = true
 directus_codegen.workspace = true
@@ -33,7 +32,6 @@ serde = []
 postgres = [
   "diesel/extras",
   "postgis_diesel/postgres",
-  "core_structures/postgres",
 ]
 32-column-tables = ["postgres"]
 64-column-tables = ["32-column-tables", "diesel/64-column-tables"]

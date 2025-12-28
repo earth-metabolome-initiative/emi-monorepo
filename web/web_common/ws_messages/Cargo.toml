@@ -4,7 +4,6 @@ version = "0.1.0"
 edition.workspace = true
 
 [dependencies]
-core_structures = { workspace = true, features = ["serde"] }
 gloo.workspace = true
 bincode.workspace = true
 serde.workspace = true
