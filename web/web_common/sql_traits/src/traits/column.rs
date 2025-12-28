@@ -347,6 +347,66 @@ pub trait ColumnLike:
         })
     }
 
+    /// Returns whether the column references the given table or any of its
+    /// descendants.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query foreign
+    ///   keys from.
+    /// * `table` - A reference to the table to check references against.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE parent (id INT PRIMARY KEY);
+    /// CREATE TABLE child (
+    ///     id INT PRIMARY KEY REFERENCES parent(id)
+    /// );
+    /// CREATE TABLE other (
+    ///     id INT PRIMARY KEY,
+    ///     child_id INT REFERENCES child(id)
+    /// );
+    /// "#,
+    /// )?;
+    /// let parent_table = db.table(None, "parent").unwrap();
+    /// let child_table = db.table(None, "child").unwrap();
+    /// let other_table = db.table(None, "other").unwrap();
+    /// let child_id_column = other_table.column("child_id", &db).unwrap();
+    /// assert!(
+    ///     child_id_column.references_table_pk_or_descendant(&db, parent_table),
+    ///     "child_id should reference parent or its descendant"
+    /// );
+    /// assert!(
+    ///     child_id_column.references_table_pk_or_descendant(&db, child_table),
+    ///     "child_id should reference child or its descendant"
+    /// );
+    /// assert!(
+    ///     !child_id_column.references_table_pk_or_descendant(&db, other_table),
+    ///     "child_id should not reference other or its descendant"
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn references_table_pk_or_descendant(
+        &self,
+        database: &Self::DB,
+        table: &<Self::DB as DatabaseLike>::Table,
+    ) -> bool {
+        self.foreign_keys(database).any(|fk| {
+            if !fk.is_referenced_primary_key(database) || fk.is_composite(database) {
+                return false;
+            }
+            let referenced_table = fk.referenced_table(database);
+            referenced_table == table || referenced_table.is_descendant_of(database, table)
+        })
+    }
+
     /// Returns the extension foreign keys associated with this column.
     ///
     /// # Arguments

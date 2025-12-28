@@ -6,25 +6,19 @@ pub use constraint_error_info::ConstraintErrorInfo;
 
 use crate::traits::ConstraintFailureInformation;
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 /// Enumeration of possible errors that may occur when applying constraints.
 pub enum Error {
+    #[error("Table constraint violated: {0}")]
     /// Error indicating that a table constraint was violated.
     Table(Box<dyn ConstraintFailureInformation>),
+    /// Unapplicable constraint error.
+    #[error("Unapplicable constraint: {0}")]
+    Unapplicable(String),
+    #[error("Column constraint violated: {0}")]
     /// Error indicating that a column constraint was violated.
     Column(Box<dyn ConstraintFailureInformation>),
+    #[error("Foreign key constraint violated: {0}")]
     /// Error indicating that a foreign key constraint was violated.
     ForeignKey(Box<dyn ConstraintFailureInformation>),
 }
-
-impl std::fmt::Display for Error {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Error::Table(info) => write!(f, "Table constraint violation: {info}"),
-            Error::Column(info) => write!(f, "Column constraint violation: {info}"),
-            Error::ForeignKey(info) => write!(f, "Foreign key constraint violation: {info}"),
-        }
-    }
-}
-
-impl std::error::Error for Error {}

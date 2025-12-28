@@ -45,7 +45,8 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
 
     // Validate the database schema with all available constraints
     let validation_task = Task::new("Schema Validation");
-    let constrainer = DefaultConstrainer::<ParserDB>::default();
+    let mut constrainer = DefaultConstrainer::<ParserDB>::default();
+    sql_procedure_constraints::register_procedure_constraints(&mut constrainer);
     constrainer.validate_schema(&db).expect("Database schema should pass all constraints");
     tracking_test.add_completed_task(validation_task);
 
