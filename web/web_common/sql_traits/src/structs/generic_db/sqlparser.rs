@@ -2,7 +2,6 @@
 
 use std::{path::Path, rc::Rc};
 
-use common_traits::prelude::Builder;
 use csqlv::{CSVSchema, CSVSchemaBuilder, SQLGenerationOptions};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use sqlparser::{
@@ -377,7 +376,7 @@ impl ParserDB {
         statements: Vec<Statement>,
         catalog_name: String,
     ) -> Result<Self, crate::errors::Error> {
-        let mut builder = GenericDBBuilder::new().catalog_name(catalog_name);
+        let mut builder = GenericDBBuilder::new(catalog_name);
 
         for statement in statements {
             match statement {
@@ -446,7 +445,7 @@ impl ParserDB {
             }
         }
 
-        Ok(builder.build().expect("Failed to build ParserDB"))
+        Ok(builder.into())
     }
 }
 

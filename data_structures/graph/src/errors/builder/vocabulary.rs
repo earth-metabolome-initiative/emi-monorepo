@@ -1,12 +1,14 @@
 //! Error enumeration for the vocabulary builder.
 
-use crate::traits::{Vocabulary, VocabularyBuilderOptions};
+use crate::traits::Vocabulary;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, thiserror::Error)]
 /// Enum representing the possible errors that can occur when building a graph.
 pub enum VocabularyBuilderError<V: Vocabulary> {
     /// Error that occurs when building a vocabulary.
-    BuilderError(common_traits::builder::BuilderError<VocabularyBuilderOptions>),
+    #[error("Missing builder attribute: {0}")]
+    MissingAttribute(&'static str),
+    #[error("Unexpected number of symbols: expected {expected}, got {actual}")]
     /// Whether the expected number of symbols was not reached or it was
     /// overreached.
     NumberOfSymbols {
@@ -15,52 +17,20 @@ pub enum VocabularyBuilderError<V: Vocabulary> {
         /// The actual number of symbols.
         actual: usize,
     },
+    #[error("Repeated source symbol: {0:?}")]
     /// A source symbol appeared more than once in the vocabulary and it is not
     /// allowed.
     RepeatedSourceSymbol(V::SourceSymbol),
+    #[error("Repeated destination symbol: {0:?}")]
     /// A destination symbol appeared more than once in the vocabulary and it is
     /// not allowed.
     RepeatedDestinationSymbol(V::DestinationSymbol),
+    #[error("Sparse source node: {0:?}")]
     /// A source node did not respect the density requirements of the
     /// vocabulary.
     SparseSourceNode(V::SourceSymbol),
+    #[error("Unordered destination node: {0:?}")]
     /// A destination node did not respect the sorting requirements of the
     /// vocabulary.
     UnorderedDestinationNode(V::DestinationSymbol),
-}
-
-impl<V: Vocabulary> From<common_traits::builder::BuilderError<VocabularyBuilderOptions>>
-    for VocabularyBuilderError<V>
-{
-    fn from(e: common_traits::builder::BuilderError<VocabularyBuilderOptions>) -> Self {
-        VocabularyBuilderError::BuilderError(e)
-    }
-}
-
-impl<V: Vocabulary> core::error::Error for VocabularyBuilderError<V> {}
-
-impl<V: Vocabulary> core::fmt::Display for VocabularyBuilderError<V> {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-        match self {
-            VocabularyBuilderError::BuilderError(e) => write!(f, "{e}"),
-            VocabularyBuilderError::RepeatedSourceSymbol(e) => {
-                write!(f, "Repeated source symbol: {e:?}")
-            }
-            VocabularyBuilderError::RepeatedDestinationSymbol(e) => {
-                write!(f, "Repeated destination symbol: {e:?}")
-            }
-            VocabularyBuilderError::NumberOfSymbols { expected, actual } => {
-                write!(
-                    f,
-                    "Expected number of symbols: {expected}, actual number of symbols: {actual}"
-                )
-            }
-            VocabularyBuilderError::SparseSourceNode(e) => {
-                write!(f, "Sparse source node: {e:?}")
-            }
-            VocabularyBuilderError::UnorderedDestinationNode(e) => {
-                write!(f, "Unordered destination node: {e:?}")
-            }
-        }
-    }
 }

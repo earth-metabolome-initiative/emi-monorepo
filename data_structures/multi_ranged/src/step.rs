@@ -18,6 +18,7 @@ pub trait Step:
     + ToPrimitive
     + SaturatingAdd
     + SaturatingSub
+    + 'static
 {
     #[inline]
     #[must_use]
@@ -47,5 +48,6 @@ impl<T> Step for T where
         + ToPrimitive
         + SaturatingAdd
         + SaturatingSub
+        + 'static
 {
 }

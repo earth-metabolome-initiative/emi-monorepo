@@ -32,6 +32,7 @@ pub trait Number:
     + core::ops::MulAssign
     + core::ops::DivAssign
     + core::ops::RemAssign
+    + 'static
 {
 }
 
@@ -64,5 +65,6 @@ impl<T> Number for T where
         + core::ops::MulAssign
         + core::ops::DivAssign
         + core::ops::RemAssign
+        + 'static
 {
 }

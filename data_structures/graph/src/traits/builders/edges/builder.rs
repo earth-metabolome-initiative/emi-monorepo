@@ -1,34 +1,11 @@
 //! Submodule defining the trait for Options for building a edges.
 
 use algebra::prelude::SparseMatrixMut;
-use common_traits::prelude::Builder;
 
 use crate::traits::{Edges, GrowableEdges};
 
-#[derive(Clone, core::fmt::Debug)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Options for building a edges.
-pub enum EdgesBuilderOptions {
-    /// The source of the edges.
-    Edges,
-}
-
-impl core::fmt::Display for EdgesBuilderOptions {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-        match self {
-            EdgesBuilderOptions::Edges => write!(f, "edges"),
-        }
-    }
-}
-
 /// Trait for Options for building edges.
-pub trait EdgesBuilder:
-    Builder<
-        Object = <Self as EdgesBuilder>::Edges,
-        Error = crate::errors::builder::edges::EdgesBuilderError<<Self as EdgesBuilder>::Edges>,
-        Attribute = EdgesBuilderOptions,
-    >
-{
+pub trait EdgesBuilder {
     /// The type of the edges being built.
     type Edges: Edges;
     /// The intermediate type of the edges, if any.

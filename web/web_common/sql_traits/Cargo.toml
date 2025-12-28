@@ -5,7 +5,6 @@ edition.workspace = true
 
 [dependencies]
 sqlparser.workspace = true
-common_traits.workspace = true
 graph.workspace = true
 algebra.workspace = true
 csqlv.workspace = true

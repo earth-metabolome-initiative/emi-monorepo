@@ -7,13 +7,7 @@ use algebra::{
     prelude::{Johnson, Kahn, MatrixMut, RaggedVector},
 };
 use diesel::Connection;
-use graph::{
-    prelude::{
-        Builder, GenericGraph, GenericMonoplexMonopartiteGraphBuilder, MonoplexGraph,
-        MonoplexMonopartiteGraph,
-    },
-    traits::{MonopartiteGraphBuilder, MonoplexGraphBuilder},
-};
+use graph::prelude::{GenericGraph, MonoplexGraph, MonoplexMonopartiteGraph};
 
 use crate::{errors::Error, migration::Migration, prelude::MigrationKind};
 
@@ -132,11 +126,7 @@ impl MigrationDirectory {
             ))
             .expect("Failed to create the dependency graph");
 
-        Ok(GenericMonoplexMonopartiteGraphBuilder::default()
-            .nodes(self.migrations.as_slice())
-            .edges(dependency_edges)
-            .build()
-            .unwrap())
+        Ok(MigrationGraph::try_from((self.migrations.as_slice(), dependency_edges)).unwrap())
     }
 
     /// Iterates over the migrations in the directory in topological order.

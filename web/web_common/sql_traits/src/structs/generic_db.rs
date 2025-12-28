@@ -98,8 +98,8 @@ where
 {
     /// Creates a new `GenericDBBuilder` instance.
     #[must_use]
-    pub fn new() -> GenericDBBuilder<T, C, U, F, Func, Ch> {
-        GenericDBBuilder::default()
+    pub fn new(catalog_name: String) -> GenericDBBuilder<T, C, U, F, Func, Ch> {
+        GenericDBBuilder::new(catalog_name)
     }
 
     /// Returns a reference to the metadata of the specified table, if it exists

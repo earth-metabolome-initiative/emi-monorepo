@@ -6,7 +6,6 @@ use algebra::{
     impls::CSR2D,
     prelude::{Kahn, SquareCSR2D},
 };
-use common_traits::builder::Builder;
 use graph::{prelude::GenericEdgesBuilder, traits::EdgesBuilder};
 
 use crate::traits::{

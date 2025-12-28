@@ -2,7 +2,6 @@
 
 use ::graph::prelude::*;
 use algebra::impls::{CSR2D, SymmetricCSR2D};
-use common_traits::builder::Builder;
 use sorted_vec::prelude::SortedVec;
 
 #[test]
@@ -21,12 +20,7 @@ pub fn test_undirected_graph() {
         .edges(edges.into_iter())
         .build()
         .unwrap();
-    let graph: UndiGraph<usize> = GenericMonoplexMonopartiteGraphBuilder::default()
-        .nodes(nodes)
-        .edges(edges)
-        .build()
-        .unwrap();
-
+    let graph: UndiGraph<usize> = UndiGraph::try_from((nodes, edges)).unwrap();
     assert_eq!(graph.number_of_nodes(), 6);
     assert_eq!(graph.number_of_edges(), 10);
 }

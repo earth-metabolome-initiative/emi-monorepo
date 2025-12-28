@@ -5,15 +5,11 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use common_traits::prelude::Builder;
 use sorted_vec::prelude::SortedVec;
 
 use crate::{
-    prelude::{DiGraph, GenericEdgesBuilder, GenericMonoplexMonopartiteGraphBuilder},
-    traits::{
-        EdgesBuilder, MonopartiteGraph, MonopartiteGraphBuilder, MonoplexGraph,
-        MonoplexGraphBuilder,
-    },
+    prelude::{DiGraph, GenericEdgesBuilder},
+    traits::{EdgesBuilder, MonopartiteGraph, MonoplexGraph},
 };
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -58,11 +54,11 @@ impl From<PathBuf> for DirectoryTree {
             .build()
             .expect("Failed to build directory tree edges");
 
-        let graph = GenericMonoplexMonopartiteGraphBuilder::default()
-            .nodes(SortedVec::try_from(nodes).expect("Failed to build directory tree nodes"))
-            .edges(edges)
-            .build()
-            .expect("Failed to build directory tree graph");
+        let graph = DiGraph::try_from((
+            SortedVec::try_from(nodes).expect("Failed to build directory tree nodes"),
+            edges,
+        ))
+        .expect("Failed to build graph");
 
         DirectoryTree { graph }
     }

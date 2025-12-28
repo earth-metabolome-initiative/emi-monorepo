@@ -3,10 +3,10 @@
 use algebra::impls::{CSR2D, SquareCSR2D};
 use graph::{
     prelude::{
-        Builder, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder,
-        GenericVocabularyBuilder, MonopartiteGraph, MonoplexGraph, SinkNodes,
+        DiEdgesBuilder, DiGraph, GenericVocabularyBuilder, MonopartiteGraph, MonoplexGraph,
+        SinkNodes,
     },
-    traits::{EdgesBuilder, MonopartiteGraphBuilder, MonoplexGraphBuilder, VocabularyBuilder},
+    traits::{EdgesBuilder, VocabularyBuilder},
 };
 use sorted_vec::prelude::SortedVec;
 
@@ -26,11 +26,7 @@ fn test_no_sink_nodes() {
         .edges(edges.into_iter())
         .build()
         .unwrap();
-    let graph: DiGraph<usize> = GenericMonoplexMonopartiteGraphBuilder::default()
-        .nodes(nodes)
-        .edges(edges)
-        .build()
-        .unwrap();
+    let graph: DiGraph<usize> = DiGraph::try_from((nodes, edges)).unwrap();
 
     assert_eq!(graph.number_of_nodes(), 6);
     assert_eq!(graph.number_of_edges(), 10);
@@ -53,11 +49,7 @@ fn test_sink_nodes() {
         .edges(edges.into_iter())
         .build()
         .unwrap();
-    let graph: DiGraph<usize> = GenericMonoplexMonopartiteGraphBuilder::default()
-        .nodes(nodes)
-        .edges(edges)
-        .build()
-        .unwrap();
+    let graph: DiGraph<usize> = DiGraph::try_from((nodes, edges)).unwrap();
 
     assert_eq!(graph.number_of_nodes(), 6);
     assert_eq!(graph.number_of_edges(), 5);

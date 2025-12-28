@@ -3,10 +3,10 @@
 use algebra::impls::{CSR2D, SquareCSR2D};
 use graph::{
     prelude::{
-        Builder, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder,
-        GenericVocabularyBuilder, MonopartiteGraph, MonoplexGraph, RootNodes,
+        DiEdgesBuilder, DiGraph, GenericVocabularyBuilder, MonopartiteGraph, MonoplexGraph,
+        RootNodes,
     },
-    traits::{EdgesBuilder, MonopartiteGraphBuilder, MonoplexGraphBuilder, VocabularyBuilder},
+    traits::{EdgesBuilder, VocabularyBuilder},
 };
 use sorted_vec::prelude::SortedVec;
 
@@ -24,8 +24,7 @@ fn test_no_root_nodes() -> Result<(), Box<dyn std::error::Error>> {
         .expected_shape(nodes.len())
         .edges(edges.into_iter())
         .build()?;
-    let graph: DiGraph<usize> =
-        GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
+    let graph: DiGraph<usize> = DiGraph::try_from((nodes, edges))?;
 
     assert_eq!(graph.number_of_nodes(), 6);
     assert_eq!(graph.number_of_edges(), 9);
@@ -48,8 +47,7 @@ fn test_root_nodes() -> Result<(), Box<dyn std::error::Error>> {
         .expected_shape(nodes.len())
         .edges(edges.into_iter())
         .build()?;
-    let graph: DiGraph<usize> =
-        GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
+    let graph: DiGraph<usize> = DiGraph::try_from((nodes, edges))?;
 
     assert_eq!(graph.number_of_nodes(), 6);
     assert_eq!(graph.number_of_edges(), 5);

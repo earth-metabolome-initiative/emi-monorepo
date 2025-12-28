@@ -7,8 +7,8 @@ edition.workspace = true
 diesel = { workspace = true, features = ["postgres", "128-column-tables"] }
 serde = { workspace = true, optional = true }
 sql_traits.workspace = true
-common_traits.workspace = true
 sqlparser.workspace = true
+thiserror.workspace = true
 
 [dev-dependencies]
 tokio.workspace = true

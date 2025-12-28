@@ -2,11 +2,8 @@
 
 use algebra::impls::{CSR2D, SquareCSR2D};
 use graph::{
-    prelude::{
-        Builder, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder,
-        GenericVocabularyBuilder, SimplePath,
-    },
-    traits::{EdgesBuilder, MonopartiteGraphBuilder, MonoplexGraphBuilder, VocabularyBuilder},
+    prelude::{DiEdgesBuilder, DiGraph, GenericVocabularyBuilder, SimplePath},
+    traits::{EdgesBuilder, VocabularyBuilder},
 };
 use sorted_vec::prelude::SortedVec;
 
@@ -23,8 +20,7 @@ fn test_simple_path_on_empty_graph() -> Result<(), Box<dyn std::error::Error>> {
         .expected_shape(nodes.len())
         .edges(edges.into_iter())
         .build()?;
-    let graph: DiGraph<usize> =
-        GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
+    let graph: DiGraph<usize> = DiGraph::try_from((nodes, edges))?;
 
     assert!(!graph.is_simple_path(), "An empty graph is not a simple path");
 
@@ -44,8 +40,7 @@ fn test_simple_path_on_singleton_node() -> Result<(), Box<dyn std::error::Error>
         .expected_shape(nodes.len())
         .edges(edges.into_iter())
         .build()?;
-    let graph: DiGraph<usize> =
-        GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
+    let graph: DiGraph<usize> = DiGraph::try_from((nodes, edges))?;
 
     assert!(graph.is_simple_path(), "A singleton node is a simple path");
 
@@ -65,8 +60,7 @@ fn test_simple_path_on_selflooping_singleton_node() -> Result<(), Box<dyn std::e
         .expected_shape(nodes.len())
         .edges(edges.into_iter())
         .build()?;
-    let graph: DiGraph<usize> =
-        GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
+    let graph: DiGraph<usize> = DiGraph::try_from((nodes, edges))?;
 
     assert!(!graph.is_simple_path(), "A self-looping singleton node is not a simple path");
 
@@ -86,8 +80,7 @@ fn test_simple_path_on_edge() -> Result<(), Box<dyn std::error::Error>> {
         .expected_shape(nodes.len())
         .edges(edges.into_iter())
         .build()?;
-    let graph: DiGraph<usize> =
-        GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
+    let graph: DiGraph<usize> = DiGraph::try_from((nodes, edges))?;
 
     assert!(graph.is_simple_path(), "A simple path with an edge is a simple path");
 
@@ -107,8 +100,7 @@ fn test_simple_path_on_circle() -> Result<(), Box<dyn std::error::Error>> {
         .expected_shape(nodes.len())
         .edges(edges.into_iter())
         .build()?;
-    let graph: DiGraph<usize> =
-        GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
+    let graph: DiGraph<usize> = DiGraph::try_from((nodes, edges))?;
 
     assert!(!graph.is_simple_path(), "A simple path with a cycle is not a simple path");
 
@@ -128,8 +120,7 @@ fn test_simple_path_on_tree() -> Result<(), Box<dyn std::error::Error>> {
         .expected_shape(nodes.len())
         .edges(edges.into_iter())
         .build()?;
-    let graph: DiGraph<usize> =
-        GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
+    let graph: DiGraph<usize> = DiGraph::try_from((nodes, edges))?;
 
     assert!(!graph.is_simple_path(), "A simple path with a tree is not a simple path");
 

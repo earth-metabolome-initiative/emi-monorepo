@@ -1,35 +1,9 @@
 //! Submodule defining the trait for Options for building a vocabulary.
 
-use common_traits::prelude::Builder;
-
 use crate::traits::{GrowableVocabulary, Vocabulary};
 
-#[derive(Debug, Clone)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Options for building a vocabulary.
-pub enum VocabularyBuilderOptions {
-    /// The symbol from which to load the vocabulary.
-    Symbols,
-}
-
-impl core::fmt::Display for VocabularyBuilderOptions {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
-        match self {
-            VocabularyBuilderOptions::Symbols => write!(f, "symbols"),
-        }
-    }
-}
-
 /// Trait for Options for building a vocabulary.
-pub trait VocabularyBuilder:
-    Builder<
-        Object = <Self as VocabularyBuilder>::Vocabulary,
-        Error = crate::errors::builder::vocabulary::VocabularyBuilderError<
-            <Self as VocabularyBuilder>::Vocabulary,
-        >,
-        Attribute = VocabularyBuilderOptions,
-    >
-{
+pub trait VocabularyBuilder {
     /// The type of the vocabulary being built.
     type Vocabulary: GrowableVocabulary;
     /// The iterator of symbols.

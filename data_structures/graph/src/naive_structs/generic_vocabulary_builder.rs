@@ -1,12 +1,10 @@
 //! A generic vocabulary builder that can be used to build a vocabulary for any
 //! type of graph.
 
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::Builder,
+use crate::{
+    errors::builder::vocabulary::VocabularyBuilderError,
+    traits::{GrowableVocabulary, Vocabulary, VocabularyBuilder},
 };
-
-use crate::traits::{GrowableVocabulary, Vocabulary, VocabularyBuilder, VocabularyBuilderOptions};
 
 #[derive(Clone)]
 /// A generic vocabulary builder that can be used to build a vocabulary for any
@@ -66,7 +64,7 @@ where
     }
 }
 
-impl<Symbols, V> IsCompleteBuilder for GenericVocabularyBuilder<Symbols, V>
+impl<Symbols, V> GenericVocabularyBuilder<Symbols, V>
 where
     Self: VocabularyBuilder<Symbols = Symbols>,
     Symbols: IntoIterator<
@@ -76,40 +74,13 @@ where
         ),
     >,
 {
-    fn is_complete(&self) -> bool {
-        self.symbols.is_some()
-    }
-}
-
-impl<Symbols, V> Attributed for GenericVocabularyBuilder<Symbols, V>
-where
-    Self: VocabularyBuilder<Symbols = Symbols>,
-    Symbols: IntoIterator<
-        Item = (
-            <<Self as VocabularyBuilder>::Vocabulary as Vocabulary>::SourceSymbol,
-            <<Self as VocabularyBuilder>::Vocabulary as Vocabulary>::DestinationSymbol,
-        ),
-    >,
-{
-    type Attribute = VocabularyBuilderOptions;
-}
-
-impl<Symbols, V> Builder for GenericVocabularyBuilder<Symbols, V>
-where
-    Self: VocabularyBuilder<Symbols = Symbols>,
-    Symbols: IntoIterator<
-        Item = (
-            <<Self as VocabularyBuilder>::Vocabulary as Vocabulary>::SourceSymbol,
-            <<Self as VocabularyBuilder>::Vocabulary as Vocabulary>::DestinationSymbol,
-        ),
-    >,
-{
-    type Object = <Self as VocabularyBuilder>::Vocabulary;
-    type Error = crate::errors::builder::vocabulary::VocabularyBuilderError<
+    /// Builds the vocabulary.
+    pub fn build(
+        self,
+    ) -> Result<
         <Self as VocabularyBuilder>::Vocabulary,
-    >;
-
-    fn build(self) -> Result<Self::Object, Self::Error> {
+        VocabularyBuilderError<<Self as VocabularyBuilder>::Vocabulary>,
+    > {
         let expected_number_of_symbols = self.get_expected_number_of_symbols();
         let mut vocabulary = if let Some(number_of_symbols) = expected_number_of_symbols {
             <Self as VocabularyBuilder>::Vocabulary::with_capacity(number_of_symbols)
@@ -118,11 +89,7 @@ where
         };
         let should_ignore_duplicates = self.should_ignore_duplicates();
         self.symbols
-            .ok_or({
-                common_traits::prelude::BuilderError::IncompleteBuild(
-                    VocabularyBuilderOptions::Symbols,
-                )
-            })?
+            .ok_or(VocabularyBuilderError::MissingAttribute("symbols"))?
             .into_iter()
             .try_for_each(|(source, destination)| {
                 if let Err(err) = vocabulary.add(source, destination) {

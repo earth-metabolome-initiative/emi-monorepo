@@ -1,7 +1,6 @@
 //! Simple test for vocabulary.
 
 use ::graph::prelude::*;
-use common_traits::builder::Builder;
 use sorted_vec::prelude::SortedVec;
 
 #[test]

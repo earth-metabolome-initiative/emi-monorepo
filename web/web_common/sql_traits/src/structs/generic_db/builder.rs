@@ -2,11 +2,6 @@
 
 use std::{fmt::Display, rc::Rc};
 
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::{Builder, BuilderError},
-};
-
 use crate::{
     structs::GenericDB,
     traits::{
@@ -25,7 +20,7 @@ where
     Ch: CheckConstraintLike,
 {
     /// Catalog name of the database.
-    catalog_name: Option<String>,
+    catalog_name: String,
     /// Timezone of the database.
     timezone: Option<String>,
     /// List of tables in the database.
@@ -42,7 +37,7 @@ where
     check_constraints: Vec<(Rc<Ch>, Ch::Meta)>,
 }
 
-impl<T, C, U, F, Func, Ch> Default for GenericDBBuilder<T, C, U, F, Func, Ch>
+impl<T, C, U, F, Func, Ch> GenericDBBuilder<T, C, U, F, Func, Ch>
 where
     T: TableLike,
     C: ColumnLike,
@@ -51,9 +46,11 @@ where
     Func: FunctionLike,
     Ch: CheckConstraintLike,
 {
-    fn default() -> Self {
+    #[must_use]
+    /// Creates a new `GenericDBBuilder` instance.
+    pub fn new(catalog_name: String) -> Self {
         Self {
-            catalog_name: None,
+            catalog_name,
             timezone: None,
             tables: Vec::new(),
             columns: Vec::new(),
@@ -92,26 +89,11 @@ where
     Func: FunctionLike,
     Ch: CheckConstraintLike,
 {
-    /// Creates a new `GenericDBBuilder` instance.
-    #[must_use]
-    #[inline]
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     /// Sets the timezone for the database.
     #[must_use]
     #[inline]
     pub fn timezone(mut self, timezone: String) -> Self {
         self.timezone = Some(timezone);
-        self
-    }
-
-    /// Sets the catalog name for the database.
-    #[must_use]
-    #[inline]
-    pub fn catalog_name(mut self, catalog_name: String) -> Self {
-        self.catalog_name = Some(catalog_name);
         self
     }
 
@@ -219,7 +201,8 @@ where
     }
 }
 
-impl<T, C, U, F, Func, Ch> Attributed for GenericDBBuilder<T, C, U, F, Func, Ch>
+impl<T, C, U, F, Func, Ch> From<GenericDBBuilder<T, C, U, F, Func, Ch>>
+    for GenericDB<T, C, U, F, Func, Ch>
 where
     T: TableLike,
     C: ColumnLike,
@@ -228,63 +211,31 @@ where
     Func: FunctionLike,
     Ch: CheckConstraintLike,
 {
-    type Attribute = GenericDBAttribute;
-}
+    fn from(mut builder: GenericDBBuilder<T, C, U, F, Func, Ch>) -> Self {
+        let catalog_name = builder.catalog_name;
 
-impl<T, C, U, F, Func, Ch> IsCompleteBuilder for GenericDBBuilder<T, C, U, F, Func, Ch>
-where
-    T: TableLike,
-    C: ColumnLike,
-    U: UniqueIndexLike,
-    F: ForeignKeyLike,
-    Func: FunctionLike,
-    Ch: CheckConstraintLike,
-{
-    #[inline]
-    fn is_complete(&self) -> bool {
-        self.catalog_name.is_some()
-    }
-}
-
-impl<T, C, U, F, Func, Ch> Builder for GenericDBBuilder<T, C, U, F, Func, Ch>
-where
-    T: TableLike,
-    C: ColumnLike,
-    U: UniqueIndexLike,
-    F: ForeignKeyLike,
-    Func: FunctionLike,
-    Ch: CheckConstraintLike,
-{
-    type Error = BuilderError<GenericDBAttribute>;
-    type Object = GenericDB<T, C, U, F, Func, Ch>;
-
-    fn build(mut self) -> Result<Self::Object, Self::Error> {
-        let catalog_name = self
-            .catalog_name
-            .ok_or(BuilderError::IncompleteBuild(GenericDBAttribute::CatalogName))?;
-
-        self.tables.sort_unstable_by_key(|(table, _)| {
+        builder.tables.sort_unstable_by_key(|(table, _)| {
             (
                 table.table_schema().map(std::string::ToString::to_string),
                 table.table_name().to_string(),
             )
         });
 
-        self.columns.sort_unstable_by(|(a, _), (b, _)| a.as_ref().cmp(b.as_ref()));
-        self.unique_indices.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
-        self.foreign_keys.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
-        self.functions.sort_unstable_by(|(a, _), (b, _)| a.name().cmp(b.name()));
-        self.check_constraints.sort_unstable_by(|(a, _), (b, _)| a.as_ref().cmp(b.as_ref()));
+        builder.columns.sort_unstable_by(|(a, _), (b, _)| a.as_ref().cmp(b.as_ref()));
+        builder.unique_indices.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
+        builder.foreign_keys.sort_unstable_by(|(a, _), (b, _)| a.cmp(b));
+        builder.functions.sort_unstable_by(|(a, _), (b, _)| a.name().cmp(b.name()));
+        builder.check_constraints.sort_unstable_by(|(a, _), (b, _)| a.as_ref().cmp(b.as_ref()));
 
-        Ok(GenericDB {
+        GenericDB {
             catalog_name,
-            timezone: self.timezone,
-            tables: self.tables,
-            columns: self.columns,
-            unique_indices: self.unique_indices,
-            foreign_keys: self.foreign_keys,
-            functions: self.functions,
-            check_constraints: self.check_constraints,
-        })
+            timezone: builder.timezone,
+            tables: builder.tables,
+            columns: builder.columns,
+            unique_indices: builder.unique_indices,
+            foreign_keys: builder.foreign_keys,
+            functions: builder.functions,
+            check_constraints: builder.check_constraints,
+        }
     }
 }

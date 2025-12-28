@@ -2,7 +2,6 @@
 
 use numeric_common_traits::prelude::{IntoUsize, PositiveInteger, TryFromUsize};
 
-use super::generic_monoplex_monopartite_graph_builder::MonoplexMonopartiteGraphBuilderError;
 use crate::traits::{BidirectionalVocabulary, Edges, Graph, MonopartiteGraph, MonoplexGraph};
 
 #[cfg(feature = "arbitrary")]
@@ -40,11 +39,9 @@ where
     }
 }
 
-impl<Nodes, Edges> TryFrom<(Nodes, Edges)> for GenericGraph<Nodes, Edges> {
-    type Error = MonoplexMonopartiteGraphBuilderError;
-
-    fn try_from((nodes, edges): (Nodes, Edges)) -> Result<Self, Self::Error> {
-        Ok(Self { nodes, edges })
+impl<Nodes, Edges> From<(Nodes, Edges)> for GenericGraph<Nodes, Edges> {
+    fn from((nodes, edges): (Nodes, Edges)) -> Self {
+        Self { nodes, edges }
     }
 }
 

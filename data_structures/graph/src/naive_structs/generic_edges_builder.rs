@@ -2,14 +2,10 @@
 //! graph.
 
 use algebra::{impls::MutabilityError, prelude::SparseMatrixMut};
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::Builder,
-};
 
 use crate::{
     errors::builder::edges::EdgesBuilderError,
-    traits::{Edges, EdgesBuilder, EdgesBuilderOptions, GrowableEdges},
+    traits::{Edges, EdgesBuilder, GrowableEdges},
 };
 
 /// A generic edges builder that can be used to build a edges for any type of
@@ -86,38 +82,21 @@ where
     }
 }
 
-impl<EdgeIterator, GE> IsCompleteBuilder for GenericEdgesBuilder<EdgeIterator, GE>
+impl<EdgeIterator, GE> GenericEdgesBuilder<EdgeIterator, GE>
 where
     GE: GrowableEdges<Error = EdgesBuilderError<GE>>,
-    Self: EdgesBuilder<EdgeIterator = EdgeIterator, Edges = GE, IntermediateEdges = GE>,
-    EdgeIterator: IntoIterator<Item = <<Self as EdgesBuilder>::Edges as Edges>::Edge>,
+    GenericEdgesBuilder<EdgeIterator, GE>:
+        EdgesBuilder<EdgeIterator = EdgeIterator, Edges = GE, IntermediateEdges = GE>,
+    EdgeIterator: IntoIterator<
+        Item = <<GenericEdgesBuilder<EdgeIterator, GE> as EdgesBuilder>::Edges as Edges>::Edge,
+    >,
 {
-    fn is_complete(&self) -> bool {
-        self.edges.is_some()
-            && self.expected_number_of_edges.is_some()
-            && self.expected_shape.is_some()
-    }
-}
-
-impl<EdgeIterator, GE> Attributed for GenericEdgesBuilder<EdgeIterator, GE>
-where
-    GE: GrowableEdges<Error = EdgesBuilderError<GE>>,
-    Self: EdgesBuilder<EdgeIterator = EdgeIterator, Edges = GE, IntermediateEdges = GE>,
-    EdgeIterator: IntoIterator<Item = <<Self as EdgesBuilder>::Edges as Edges>::Edge>,
-{
-    type Attribute = EdgesBuilderOptions;
-}
-
-impl<EdgeIterator, GE> Builder for GenericEdgesBuilder<EdgeIterator, GE>
-where
-    GE: GrowableEdges<Error = EdgesBuilderError<GE>>,
-    Self: EdgesBuilder<EdgeIterator = EdgeIterator, Edges = GE, IntermediateEdges = GE>,
-    EdgeIterator: IntoIterator<Item = <<Self as EdgesBuilder>::Edges as Edges>::Edge>,
-{
-    type Object = GE;
-    type Error = EdgesBuilderError<GE>;
-
-    fn build(self) -> Result<Self::Object, Self::Error> {
+    /// Builds the edges.
+    ///
+    /// # Errors
+    ///
+    /// * If any edge is invalid.
+    pub fn build(self: GenericEdgesBuilder<EdgeIterator, GE>) -> Result<GE, EdgesBuilderError<GE>> {
         let expected_number_of_edges = self.get_expected_number_of_edges();
         let mut edges = match (expected_number_of_edges, self.get_expected_shape()) {
             (Some(number_of_edges), Some(shape)) => {
@@ -128,12 +107,8 @@ where
             (None, None) => Default::default(),
         };
         let should_ignore_duplicates = self.should_ignore_duplicates();
-        self.edges
-            .ok_or({
-                common_traits::prelude::BuilderError::IncompleteBuild(EdgesBuilderOptions::Edges)
-            })?
-            .into_iter()
-            .try_for_each(|edge| {
+        self.edges.ok_or(EdgesBuilderError::MissingAttribute("edges"))?.into_iter().try_for_each(
+            |edge| {
                 if let Err(err) = edges.add(edge) {
                     match err {
                         crate::errors::builder::edges::EdgesBuilderError::MatrixError(
@@ -150,7 +125,8 @@ where
                 } else {
                     Ok(())
                 }
-            })?;
+            },
+        )?;
 
         if let Some(expected_number_of_edges) = expected_number_of_edges
             && edges.number_of_edges() != expected_number_of_edges

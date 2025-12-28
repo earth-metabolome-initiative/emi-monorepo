@@ -1,6 +1,8 @@
 //! Submodule implementing Edges-related traits for
 //! [`SquaredUpperTriangularCSR2D`].
 
+use std::fmt::Debug;
+
 use algebra::prelude::*;
 use numeric_common_traits::prelude::TryFromUsize;
 
@@ -25,12 +27,14 @@ where
 
 impl<M> GrowableEdges for UpperTriangularCSR2D<M>
 where
-    M: SparseMatrixMut<
+    M: Debug
+        + SparseMatrixMut<
             MinimalShape = <Self as Matrix>::Coordinates,
             Entry = <Self as Matrix>::Coordinates,
             Error = MutabilityError<M>,
         > + Default
-        + SizedSparseMatrix2D<ColumnIndex = <Self as Matrix2D>::RowIndex>,
+        + SizedSparseMatrix2D<ColumnIndex = <Self as Matrix2D>::RowIndex>
+        + 'static,
     M::RowIndex: TryFromUsize,
     M::SparseIndex: TryFromUsize,
 {

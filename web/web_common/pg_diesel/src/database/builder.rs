@@ -1,11 +1,7 @@
 //! Builder pattern for constructing a [`PgDatabase`] instance.
 
-use std::{fmt::Display, rc::Rc};
+use std::rc::Rc;
 
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::{Builder, BuilderError},
-};
 use diesel::PgConnection;
 use sql_traits::{structs::generic_db::GenericDBBuilder, traits::TableLike};
 
@@ -27,31 +23,7 @@ pub struct PgDatabaseBuilder<'conn> {
     denylist_types: Vec<String>,
 }
 
-#[derive(Debug)]
-/// Attributes that can be set on the `PgDatabaseBuilder`.
-pub enum PgDatabaseAttribute {
-    /// A PostgreSQL database connection.
-    Connection,
-    /// The catalog (database) name to filter by.
-    Catalog,
-    /// The schema names to include.
-    Schemas,
-    /// Types denylist.
-    DenylistTypes,
-}
-
-impl Display for PgDatabaseAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            PgDatabaseAttribute::Connection => write!(f, "connection"),
-            PgDatabaseAttribute::Catalog => write!(f, "catalog"),
-            PgDatabaseAttribute::Schemas => write!(f, "schemas"),
-            PgDatabaseAttribute::DenylistTypes => write!(f, "denylist_types"),
-        }
-    }
-}
-
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 /// Errors that can occur when building a [`PgDatabase`] instance.
 ///
 /// This error type encompasses all failure modes during database metadata
@@ -60,46 +32,15 @@ impl Display for PgDatabaseAttribute {
 /// - Database query failures
 /// - Invalid denylist configurations
 pub enum PgDatabaseBuildError {
-    /// An error occurred while building the `PgDatabase`.
-    Builder(BuilderError<PgDatabaseAttribute>),
+    #[error("Missing required builder attribute: {0}")]
+    /// An attribute was missing.
+    MissingAttribute(&'static str),
+    #[error("Diesel error: {0}")]
     /// An error occurred while querying the database schema.
-    Diesel(diesel::result::Error),
+    Diesel(#[from] diesel::result::Error),
+    #[error("Duplicate denylisted type: {0}")]
     /// A deny-listed type was inserted multiple times.
     DuplicateDenylistedType(String),
-}
-
-impl Display for PgDatabaseBuildError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            PgDatabaseBuildError::Builder(err) => write!(f, "Builder error: {}", err),
-            PgDatabaseBuildError::Diesel(err) => write!(f, "Diesel error: {}", err),
-            PgDatabaseBuildError::DuplicateDenylistedType(ty) => {
-                write!(f, "Duplicate deny-listed type: {}", ty)
-            }
-        }
-    }
-}
-
-impl From<BuilderError<PgDatabaseAttribute>> for PgDatabaseBuildError {
-    fn from(err: BuilderError<PgDatabaseAttribute>) -> Self {
-        PgDatabaseBuildError::Builder(err)
-    }
-}
-
-impl From<diesel::result::Error> for PgDatabaseBuildError {
-    fn from(err: diesel::result::Error) -> Self {
-        PgDatabaseBuildError::Diesel(err)
-    }
-}
-
-impl std::error::Error for PgDatabaseBuildError {
-    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
-        match self {
-            PgDatabaseBuildError::Builder(err) => Some(err),
-            PgDatabaseBuildError::Diesel(err) => Some(err),
-            PgDatabaseBuildError::DuplicateDenylistedType(_) => None,
-        }
-    }
 }
 
 impl<'conn> PgDatabaseBuilder<'conn> {
@@ -150,41 +91,29 @@ impl<'conn> PgDatabaseBuilder<'conn> {
     }
 }
 
-impl Attributed for PgDatabaseBuilder<'_> {
-    type Attribute = PgDatabaseAttribute;
-}
-
-impl IsCompleteBuilder for PgDatabaseBuilder<'_> {
-    fn is_complete(&self) -> bool {
-        self.connection.is_some() && self.catalog.is_some() && !self.schemas.is_empty()
-    }
-}
-
-impl Builder for PgDatabaseBuilder<'_> {
+impl TryFrom<PgDatabaseBuilder<'_>> for PgDatabase {
     type Error = PgDatabaseBuildError;
-    type Object = PgDatabase;
 
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        let connection = self
-            .connection
-            .ok_or(BuilderError::IncompleteBuild(PgDatabaseAttribute::Connection))?;
+    fn try_from(value: PgDatabaseBuilder<'_>) -> Result<Self, Self::Error> {
+        let connection =
+            value.connection.ok_or(PgDatabaseBuildError::MissingAttribute("connection"))?;
 
         let table_catalog =
-            self.catalog.ok_or(BuilderError::IncompleteBuild(PgDatabaseAttribute::Catalog))?;
+            value.catalog.ok_or(PgDatabaseBuildError::MissingAttribute("catalog"))?;
 
         let table_schemas = {
-            if self.schemas.is_empty() {
-                return Err(BuilderError::IncompleteBuild(PgDatabaseAttribute::Schemas).into());
+            if value.schemas.is_empty() {
+                return Err(PgDatabaseBuildError::MissingAttribute("schemas"));
             } else {
-                self.schemas
+                value.schemas
             }
         };
 
-        let mut builder = GenericDBBuilder::new().catalog_name(table_catalog.clone());
+        let mut generic_builder = GenericDBBuilder::new(table_catalog.clone());
 
         for function in PgProc::load_all(connection)? {
             let metadata = crate::database::PgProcMetadata::new(&function, connection)?;
-            builder = builder.add_function(std::rc::Rc::new(function), metadata);
+            generic_builder = generic_builder.add_function(std::rc::Rc::new(function), metadata);
         }
 
         let mut tables = Vec::new();
@@ -203,36 +132,37 @@ impl Builder for PgDatabaseBuilder<'_> {
         // For each table, we determine all of the foreign keys and for each foreign key
         // we determine which table it references.
         for table in tables {
-            let table_metadata = table.metadata(connection, &self.denylist_types)?;
+            let table_metadata = table.metadata(connection, &value.denylist_types)?;
 
             for check_constraint in table_metadata.check_constraint_rcs() {
                 let metadata = check_constraint.metadata(
                     table.clone(),
                     &table_metadata,
-                    builder.function_rc_vec().as_slice(),
+                    generic_builder.function_rc_vec().as_slice(),
                     connection,
                 )?;
-                builder = builder.add_check_constraint(check_constraint.clone(), metadata);
+                generic_builder =
+                    generic_builder.add_check_constraint(check_constraint.clone(), metadata);
             }
 
             for column in table_metadata.column_rcs() {
-                builder =
-                    builder.add_column(column.clone(), column.metadata(table.clone(), connection)?);
+                generic_builder = generic_builder
+                    .add_column(column.clone(), column.metadata(table.clone(), connection)?);
             }
 
             for fk in table_metadata.foreign_key_rcs() {
-                builder =
-                    builder.add_foreign_key(fk.clone(), fk.metadata(table.clone(), connection)?);
+                generic_builder = generic_builder
+                    .add_foreign_key(fk.clone(), fk.metadata(table.clone(), connection)?);
             }
 
             for index in table_metadata.unique_index_rcs() {
-                builder = builder
+                generic_builder = generic_builder
                     .add_unique_index(index.clone(), index.metadata(table.clone(), connection)?);
             }
 
-            builder = builder.add_table(table, table_metadata);
+            generic_builder = generic_builder.add_table(table, table_metadata);
         }
 
-        Ok(builder.build().expect("Failed to build PgDatabase: catalog_name should be set"))
+        Ok(generic_builder.into())
     }
 }

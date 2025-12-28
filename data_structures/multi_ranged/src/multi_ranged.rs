@@ -16,6 +16,7 @@ pub trait MultiRanged:
     + MulAssign<Self::Step>
     + TryFrom<(Self::Step, Self::Step), Error = Error<Self::Step>>
     + From<Self::Step>
+    + 'static
 {
     /// The type of the elements in the range.
     type Step: Step;
