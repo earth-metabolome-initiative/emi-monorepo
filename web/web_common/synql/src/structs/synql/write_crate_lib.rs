@@ -29,7 +29,10 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         let camel_case_name = table.table_singular_camel_ident();
         let table_ident = table.table_ident();
         let crate_documentation = format!("Auto-generated crate for the `{table_name}` table.");
-        let struct_documentation = format!("Model for table `{table_name}`.");
+        let struct_documentation = table
+            .table_doc(self.database)
+            .map(|doc| doc.to_string())
+            .unwrap_or_else(|| format!("Struct representing a row in the `{table_name}` table."));
 
         let mut ancestor_decorator = None;
         let ancestors = table.ancestral_extended_tables_topological(self.database);
