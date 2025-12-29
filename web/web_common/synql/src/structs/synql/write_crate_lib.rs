@@ -100,6 +100,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
             #![doc=#crate_documentation]
 
             #[derive(#(#core_derives),*)]
+            #[derive(serde::Serialize, serde::Deserialize)]
             #[derive(diesel::Queryable, diesel::Selectable, diesel::Identifiable, diesel_builders::prelude::TableModel)]
             #[doc=#struct_documentation]
             #ancestor_decorator
