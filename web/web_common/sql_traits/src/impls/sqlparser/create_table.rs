@@ -6,6 +6,7 @@ use ::sqlparser::ast::{CreateTable, Ident};
 use crate::{
     structs::{TableMetadata, generic_db::ParserDB},
     traits::{DatabaseLike, Metadata, TableLike},
+    utils::last_str,
 };
 
 impl Metadata for CreateTable {
@@ -17,14 +18,7 @@ impl TableLike for CreateTable {
 
     #[inline]
     fn table_name(&self) -> &str {
-        let object_name_parts = &self.name.0;
-        let last_object_name_parts = &object_name_parts[object_name_parts.len() - 1];
-        match last_object_name_parts {
-            sqlparser::ast::ObjectNamePart::Identifier(Ident { value, .. }) => value.as_str(),
-            sqlparser::ast::ObjectNamePart::Function(_) => {
-                panic!("Unexpected object name part in CreateTable: {last_object_name_parts:?}")
-            }
-        }
+        last_str(&self.name)
     }
 
     #[inline]

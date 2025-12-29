@@ -5,6 +5,7 @@ use sqlparser::ast::{ConstraintReferenceMatchKind, CreateTable, ForeignKeyConstr
 use crate::{
     structs::{TableAttribute, generic_db::ParserDB},
     traits::{ForeignKeyLike, Metadata, database::DatabaseLike, table::TableLike},
+    utils::last_str,
 };
 
 impl Metadata for TableAttribute<CreateTable, ForeignKeyConstraint> {
@@ -34,20 +35,15 @@ impl ForeignKeyLike for TableAttribute<CreateTable, ForeignKeyConstraint> {
         &self,
         database: &'db Self::DB,
     ) -> &'db <Self::DB as DatabaseLike>::Table {
-        let referenced_table_name = &self
-            .attribute()
-            .foreign_table
-            .0
-            .last()
-            .expect("Foreign table name is empty")
-            .to_string();
+        let referenced_table_name = last_str(&self.attribute().foreign_table);
         database
             .tables()
             .find(|table: &&<Self::DB as DatabaseLike>::Table| {
                 table.table_name() == referenced_table_name
             })
             .unwrap_or_else(|| {
-                panic!("Referenced table `{referenced_table_name}` not found for foreign key")
+                let host_table = self.host_table(database);
+                panic!("Referenced table `{referenced_table_name}` not found for foreign key in table `{}`", host_table.table_name())
             })
     }
 

@@ -1,12 +1,12 @@
 //! Implementation of the `FunctionLike` trait for sqlparser's `CreateFunction`
 //! type.
 
-use sqlparser::ast::{CreateFunction, ObjectNamePart};
+use sqlparser::ast::CreateFunction;
 
 use crate::{
     structs::ParserDB,
     traits::{FunctionLike, Metadata},
-    utils::normalize_sqlparser_type,
+    utils::{last_str, normalize_sqlparser_type},
 };
 
 impl Metadata for CreateFunction {
@@ -18,11 +18,7 @@ impl FunctionLike for CreateFunction {
 
     #[inline]
     fn name(&self) -> &str {
-        match self.name.0.last() {
-            Some(ObjectNamePart::Identifier(ident)) => &ident.value,
-            Some(ObjectNamePart::Function(ident)) => &ident.name.value,
-            None => unreachable!("Function name should not be empty"),
-        }
+        last_str(&self.name)
     }
 
     #[inline]
