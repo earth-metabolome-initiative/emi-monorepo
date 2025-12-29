@@ -62,7 +62,9 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         // #[diesel(primary_key(user_id, role_id))]
         let mut primary_key_decorator = None;
         let primary_key_columns = table.primary_key_columns(self.database).collect::<Vec<_>>();
-        if primary_key_columns.len() > 1 || primary_key_columns[0].column_name() != "id" {
+        if !primary_key_columns.is_empty()
+            && (primary_key_columns.len() > 1 || primary_key_columns[0].column_name() != "id")
+        {
             let primary_key_idents: Vec<syn::Ident> =
                 primary_key_columns.iter().map(|col| col.column_snake_ident()).collect();
             primary_key_decorator = Some(quote! {
