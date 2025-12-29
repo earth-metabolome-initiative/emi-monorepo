@@ -108,11 +108,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
             if wrote {
                 write!(buffer, ", ")?;
             }
-            write!(
-                buffer,
-                "\"{}\"",
-                workspace.crate_base_path().join(sink_crate_name).display()
-            )?;
+            write!(buffer, "\"{}\"", workspace.crate_base_path().join(sink_crate_name).display())?;
         }
 
         writeln!(buffer, "]")?;
@@ -275,7 +271,8 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
         }
 
         if let Some(sink_crate_name) = &self.sink_crate_name {
-            let sink_crate_path = workspace.crate_base_path().join(sink_crate_name);
+            let sink_crate_path =
+                workspace.path().join(workspace.crate_base_path()).join(sink_crate_name);
             std::fs::create_dir_all(&sink_crate_path)?;
 
             let writing_sink_toml = Task::new("writing_sink_crate_toml");
