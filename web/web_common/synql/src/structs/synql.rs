@@ -173,8 +173,19 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
     ///
     /// Returns an error if the workspace cannot be written to disk.
     pub fn generate(&self) -> Result<TimeTracker, crate::Error> {
-        let maximum_number_of_columns: MaximalNumberOfColumns =
-            self.database.maximum_number_of_columns().try_into()?;
+        let maximum_number_of_columns: MaximalNumberOfColumns = self
+            .database
+            .tables()
+            .filter_map(|table| {
+                if self.skip_table(table) {
+                    None
+                } else {
+                    Some(table.number_of_columns(self.database))
+                }
+            })
+            .max()
+            .unwrap_or(0)
+            .try_into()?;
 
         let workspace: Workspace = Workspace::new()
             .path(self.path.to_path_buf())
