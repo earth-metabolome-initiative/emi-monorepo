@@ -124,6 +124,22 @@ impl Table {
         indices(self, conn)
     }
 
+    /// Returns the primary key columns for the table.
+    ///
+    /// # Arguments
+    /// 
+    /// * `conn` - The database connection.
+    /// 
+    /// # Errors
+    /// 
+    /// * If the primary key columns cannot be loaded from the database.
+    pub fn primary_key_columns(
+        &self,
+        conn: &mut PgConnection,
+    ) -> Result<Vec<Column>, diesel::result::Error> {
+        primary_key_columns(self, conn)
+    }
+
     /// Returns the UNIQUE constraint indices for the table.
     ///
     /// # Arguments
