@@ -3,6 +3,7 @@
 
 use crate::structs::{ExternalCrate, ExternalType};
 
+#[derive(Debug, Clone, Copy)]
 /// Enum to specify the maximal number of columns flags to
 /// be enabled in the `diesel` crate. Since the compile times
 /// increase precipitously with the number of columns, it is
@@ -35,7 +36,7 @@ impl TryFrom<usize> for MaximalNumberOfColumns {
 impl MaximalNumberOfColumns {
     /// Returns the feature string corresponding to the maximal number of
     /// columns.
-    fn as_feature_str(&self) -> Option<&str> {
+    fn as_diesel_feature_str(&self) -> Option<&str> {
         match self {
             MaximalNumberOfColumns::Columns16 => None,
             MaximalNumberOfColumns::Columns32 => Some("32-column-tables"),
@@ -52,7 +53,7 @@ impl ExternalCrate {
         ExternalCrate::new("diesel")
             .unwrap()
             .feature("extras")
-            .features(number_of_columns.as_feature_str())
+            .features(number_of_columns.as_diesel_feature_str())
             .git("https://github.com/LucaCappelletti94/diesel", "future3")
             .types([
                 ExternalType::new(

@@ -201,7 +201,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
             .serde_json()
             .validation_errors()
             .postgis_diesel(maximum_number_of_columns)
-            .diesel_builders()
+            .diesel_builders(maximum_number_of_columns)
             .rosetta_uuid()
             .version(self.version.0, self.version.1, self.version.2)
             .edition(self.edition)

@@ -114,8 +114,8 @@ impl WorkspaceBuilder {
     }
 
     /// Adds the `diesel_builders` external crate to the workspace.
-    pub fn diesel_builders(self) -> Self {
-        self.external_crate(ExternalCrate::diesel_builders())
+    pub fn diesel_builders(self, number_of_columns: MaximalNumberOfColumns) -> Self {
+        self.external_crate(ExternalCrate::diesel_builders(number_of_columns))
     }
 
     /// Adds the `rosetta_timestamp` external crate to the workspace.
