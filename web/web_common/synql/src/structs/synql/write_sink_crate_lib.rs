@@ -23,7 +23,9 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         let lib_rs_path = src_path.join("lib.rs");
         let mut buffer = std::fs::File::create(lib_rs_path)?;
 
-        let crate_documentation = format!("Auto-generated sink crate `{sink_crate_name}` which re-exports all table crates.");
+        let crate_documentation = format!(
+            "Auto-generated sink crate `{sink_crate_name}` which re-exports all table crates."
+        );
 
         let mut re_exports = Vec::new();
         for table in self.database.tables() {

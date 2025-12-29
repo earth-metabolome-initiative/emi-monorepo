@@ -11,9 +11,9 @@ use crate::{
         UniqueForeignKey, UniqueUniqueIndex,
     },
     prelude::{
-        ExtensionForeignKeyOnDeleteCascade, NoRustKeywordColumnName, NoRustKeywordForeignKeyName,
-        NoRustKeywordTableName, NoTautologicalCheckConstraint, PrimaryKeyReferenceEndsWithId,
-        ReferencesUniqueIndex,
+        ExtensionForeignKeyOnDeleteCascade, NoNegationCheckConstraint, NoRustKeywordColumnName,
+        NoRustKeywordForeignKeyName, NoRustKeywordTableName, NoTautologicalCheckConstraint,
+        PrimaryKeyReferenceEndsWithId, ReferencesUniqueIndex,
     },
     traits::Constrainer,
 };
@@ -80,6 +80,7 @@ where
         constrainer.register_table_constraint(Box::new(PluralTableName::default()));
         constrainer.register_table_constraint(Box::new(NoRustKeywordTableName::default()));
         constrainer.register_table_constraint(Box::new(NoTautologicalCheckConstraint::default()));
+        constrainer.register_table_constraint(Box::new(NoNegationCheckConstraint::default()));
         constrainer.register_table_constraint(Box::new(NoForbiddenColumnInExtension::new(
             "most_concrete_table",
         )));

@@ -7,14 +7,16 @@ use sqlparser::ast::{BinaryOperator, Expr, Ident, Value};
 
 use crate::traits::{DatabaseLike, Metadata, column::ColumnLike, function_like::FunctionLike};
 
-/// Helper function to determine if an expression is tautological (always true).
-fn is_tautological_expr<DB: DatabaseLike>(
+/// Helper function to determine if an expression evaluates to a constant
+/// boolean value. Returns `Some(true)` if always true, `Some(false)` if always
+/// false, and `None` otherwise.
+fn evaluate_constant_expr<DB: DatabaseLike>(
     database: &DB,
     columns: &[&<DB as DatabaseLike>::Column],
     expr: &Expr,
 ) -> Option<bool> {
     match expr {
-        // Literal true
+        // Literal true/false
         Expr::Value(value_with_span) => {
             match value_with_span.value {
                 Value::Boolean(true) => Some(true),
@@ -28,7 +30,25 @@ fn is_tautological_expr<DB: DatabaseLike>(
             if let Expr::Identifier(ident) = col_expr.as_ref() {
                 for column in columns.iter() {
                     if column.column_name() == ident.value {
-                        return Some(if column.is_nullable(database) { false } else { true });
+                        // If column is NOT NULL, IS NOT NULL is TRUE.
+                        // If column is NULLABLE, IS NOT NULL is variable (None).
+                        return if !column.is_nullable(database) { Some(true) } else { None };
+                    }
+                }
+                None
+            } else {
+                None
+            }
+        }
+
+        Expr::IsNull(col_expr) => {
+            // Check if the column is declared NOT NULL in the table schema
+            if let Expr::Identifier(ident) = col_expr.as_ref() {
+                for column in columns.iter() {
+                    if column.column_name() == ident.value {
+                        // If column is NOT NULL, IS NULL is FALSE.
+                        // If column is NULLABLE, IS NULL is variable (None).
+                        return if !column.is_nullable(database) { Some(false) } else { None };
                     }
                 }
                 None
@@ -38,7 +58,7 @@ fn is_tautological_expr<DB: DatabaseLike>(
         }
 
         // Nested expressions
-        Expr::Nested(inner) => is_tautological_expr(database, columns, inner),
+        Expr::Nested(inner) => evaluate_constant_expr(database, columns, inner),
 
         // Binary operations
         Expr::BinaryOp { left, op, right } => {
@@ -72,8 +92,8 @@ fn is_tautological_expr<DB: DatabaseLike>(
             // Recursively check if both sides are tautological for AND
             if matches!(op, BinaryOperator::And) {
                 return match (
-                    is_tautological_expr(database, columns, left),
-                    is_tautological_expr(database, columns, right),
+                    evaluate_constant_expr(database, columns, left),
+                    evaluate_constant_expr(database, columns, right),
                 ) {
                     (Some(true), Some(true)) => Some(true),
                     (Some(false), _) | (_, Some(false)) => Some(false),
@@ -84,8 +104,8 @@ fn is_tautological_expr<DB: DatabaseLike>(
             // Recursively check if either side is tautological for OR
             if matches!(op, BinaryOperator::Or) {
                 return match (
-                    is_tautological_expr(database, columns, left),
-                    is_tautological_expr(database, columns, right),
+                    evaluate_constant_expr(database, columns, left),
+                    evaluate_constant_expr(database, columns, right),
                 ) {
                     (Some(true), _) | (_, Some(true)) => Some(true),
                     (Some(false), Some(false)) => Some(false),
@@ -98,7 +118,7 @@ fn is_tautological_expr<DB: DatabaseLike>(
 
         // NOT false is true, NOT true is false
         Expr::UnaryOp { op: sqlparser::ast::UnaryOperator::Not, expr } => {
-            match is_tautological_expr(database, columns, expr) {
+            match evaluate_constant_expr(database, columns, expr) {
                 Some(true) => Some(false),
                 Some(false) => Some(true),
                 None => None,
@@ -492,7 +512,65 @@ pub trait CheckConstraintLike:
         let expr = self.expression(database);
 
         // First check using expression analysis
-        if let Some(true) = is_tautological_expr(database, &columns, expr) {
+        if let Some(true) = evaluate_constant_expr(database, &columns, expr) {
+            return true;
+        }
+
+        false
+    }
+
+    /// Returns whether the check constraint is a negation (always false).
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to query the table
+    ///   from.
+    ///
+    /// # Implementation Note
+    ///
+    /// This method recognizes several negation patterns:
+    /// - `CHECK (FALSE)` - literal false
+    /// - `CHECK (1 = 0)` - unequal constant comparisons
+    /// - `CHECK (NOT TRUE)` - negated true
+    /// - `CHECK (column IS NULL)` for `NOT NULL` columns
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"CREATE TABLE my_table (
+    ///         col1 INT NOT NULL,
+    ///         col2 INT,
+    ///         CHECK (col1 IS NULL),
+    ///         CHECK (FALSE),
+    ///         CHECK (1 = 0),
+    ///         CHECK (NOT TRUE),
+    ///         CHECK (col2 IS NULL)
+    ///     );"#,
+    /// )?;
+    /// let table = db.table(None, "my_table").unwrap();
+    /// let check_constraints: Vec<_> = table.check_constraints(&db).collect();
+    /// let [cc1, cc2, cc3, cc4, cc5] = &check_constraints.as_slice() else {
+    ///     panic!("Expected five check constraints");
+    /// };
+    /// assert!(cc1.is_negation(&db)); // col1 IS NULL on NOT NULL column
+    /// assert!(cc2.is_negation(&db)); // FALSE
+    /// assert!(cc3.is_negation(&db)); // 1 = 0
+    /// assert!(cc4.is_negation(&db)); // NOT TRUE
+    /// assert!(!cc5.is_negation(&db)); // col2 IS NULL on nullable column
+    /// //
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn is_negation(&self, database: &Self::DB) -> bool {
+        let columns = self.columns(database).collect::<Vec<_>>();
+        let expr = self.expression(database);
+
+        // First check using expression analysis
+        if let Some(false) = evaluate_constant_expr(database, &columns, expr) {
             return true;
         }
 

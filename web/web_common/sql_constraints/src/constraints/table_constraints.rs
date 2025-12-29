@@ -18,6 +18,8 @@ mod no_forbidden_column_in_extension;
 pub use no_forbidden_column_in_extension::NoForbiddenColumnInExtension;
 mod no_rust_keyword_table_name;
 pub use no_rust_keyword_table_name::NoRustKeywordTableName;
+mod no_negation_check_constraint;
+pub use no_negation_check_constraint::NoNegationCheckConstraint;
 mod non_redundant_extension_dag;
 pub use non_redundant_extension_dag::NonRedundantExtensionDag;
 mod unique_column_names_in_extension_graph;
