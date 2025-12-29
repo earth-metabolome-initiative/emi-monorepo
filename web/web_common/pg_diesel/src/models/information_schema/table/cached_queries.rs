@@ -52,14 +52,14 @@ pub(crate) fn columns(
 }
 
 /// Returns the columns that are part of the primary key for the given table.
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `table` - The table for which to retrieve the primary key columns.
 /// * `conn` - The database connection.
-/// 
+///
 /// # Errors
-/// 
+///
 /// * If the columns cannot be loaded from the database.
 pub fn primary_key_columns(
     table: &Table,

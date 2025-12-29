@@ -127,11 +127,11 @@ impl Table {
     /// Returns the primary key columns for the table.
     ///
     /// # Arguments
-    /// 
+    ///
     /// * `conn` - The database connection.
-    /// 
+    ///
     /// # Errors
-    /// 
+    ///
     /// * If the primary key columns cannot be loaded from the database.
     pub fn primary_key_columns(
         &self,
