@@ -21,6 +21,9 @@ pub enum Error {
         /// Name of the function whose definition was not found.
         function_name: String,
     },
+    #[error("Database contains more than {0} columns, which is unsupported")]
+    /// Error indicating the database has more columns than supported.
+    TooManyColumns(usize),
     #[error("I/O error: {0}")]
     /// I/O error.
     IO(#[from] std::io::Error),

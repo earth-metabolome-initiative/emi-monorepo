@@ -24,6 +24,7 @@ mod serde;
 mod serde_json;
 mod std_crate;
 mod validation_errors;
+pub use diesel_crate::MaximalNumberOfColumns;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 /// Struct defining the crate required by some type found in the postgres

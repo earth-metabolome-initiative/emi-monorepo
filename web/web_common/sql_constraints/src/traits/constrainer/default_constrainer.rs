@@ -11,8 +11,9 @@ use crate::{
         UniqueForeignKey, UniqueUniqueIndex,
     },
     prelude::{
-        ExtensionForeignKeyOnDeleteCascade, NoTautologicalCheckConstraint,
-        PrimaryKeyReferenceEndsWithId, ReferencesUniqueIndex,
+        ExtensionForeignKeyOnDeleteCascade, NoRustKeywordColumnName, NoRustKeywordForeignKeyName,
+        NoRustKeywordTableName, NoTautologicalCheckConstraint, PrimaryKeyReferenceEndsWithId,
+        ReferencesUniqueIndex,
     },
     traits::Constrainer,
 };
@@ -77,6 +78,7 @@ where
         constrainer.register_table_constraint(Box::new(LowercaseTableName::default()));
         constrainer.register_table_constraint(Box::new(SnakeCaseTableName::default()));
         constrainer.register_table_constraint(Box::new(PluralTableName::default()));
+        constrainer.register_table_constraint(Box::new(NoRustKeywordTableName::default()));
         constrainer.register_table_constraint(Box::new(NoTautologicalCheckConstraint::default()));
         constrainer.register_table_constraint(Box::new(NoForbiddenColumnInExtension::new(
             "most_concrete_table",
@@ -93,6 +95,7 @@ where
         constrainer.register_column_constraint(Box::new(NonCompositePrimaryKeyNamedId::default()));
         constrainer.register_column_constraint(Box::new(SnakeCaseColumnName::default()));
         constrainer.register_column_constraint(Box::new(SingularColumnName::default()));
+        constrainer.register_column_constraint(Box::new(NoRustKeywordColumnName::default()));
 
         // Register all foreign key constraints
         constrainer.register_foreign_key_constraint(Box::new(CompatibleForeignKey::default()));
@@ -103,6 +106,8 @@ where
         constrainer.register_foreign_key_constraint(Box::new(
             ExtensionForeignKeyOnDeleteCascade::default(),
         ));
+        constrainer
+            .register_foreign_key_constraint(Box::new(NoRustKeywordForeignKeyName::default()));
 
         Self { constrainer }
     }

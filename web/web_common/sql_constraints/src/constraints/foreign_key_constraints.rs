@@ -4,6 +4,8 @@ mod compatible_foreign_key;
 pub use compatible_foreign_key::CompatibleForeignKey;
 mod lowercase_foreign_key_name;
 pub use lowercase_foreign_key_name::LowercaseForeignKeyName;
+mod no_rust_keyword_foreign_key_name;
+pub use no_rust_keyword_foreign_key_name::NoRustKeywordForeignKeyName;
 mod references_unique_index;
 pub use references_unique_index::ReferencesUniqueIndex;
 mod primary_key_reference_ends_with_id;

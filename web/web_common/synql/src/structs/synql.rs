@@ -11,7 +11,7 @@ use sql_relations::prelude::TableLike;
 use time_requirements::{prelude::TimeTracker, task::Task};
 
 use crate::{
-    structs::{ExternalCrate, Workspace},
+    structs::{ExternalCrate, Workspace, external_crate::MaximalNumberOfColumns},
     traits::{SynQLDatabaseLike, table::TableSynLike},
 };
 
@@ -173,6 +173,9 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
     ///
     /// Returns an error if the workspace cannot be written to disk.
     pub fn generate(&self) -> Result<TimeTracker, crate::Error> {
+        let maximum_number_of_columns: MaximalNumberOfColumns =
+            self.database.maximum_number_of_columns().try_into()?;
+
         let workspace: Workspace = Workspace::new()
             .path(self.path.to_path_buf())
             .name(self.name.as_deref().unwrap_or_else(|| self.database.catalog_name()))
@@ -186,7 +189,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
             .serde()
             .serde_json()
             .validation_errors()
-            .postgis_diesel()
+            .postgis_diesel(maximum_number_of_columns)
             .diesel_builders()
             .rosetta_uuid()
             .version(self.version.0, self.version.1, self.version.2)

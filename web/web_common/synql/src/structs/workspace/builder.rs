@@ -2,7 +2,7 @@
 
 use std::path::PathBuf;
 
-use crate::structs::{ExternalCrate, Workspace};
+use crate::structs::{ExternalCrate, Workspace, external_crate::MaximalNumberOfColumns};
 
 /// Builder for the `Workspace` struct.
 pub struct WorkspaceBuilder {
@@ -134,13 +134,13 @@ impl WorkspaceBuilder {
     }
 
     /// Adds the diesel external crate to the workspace.
-    pub fn diesel(self) -> Self {
-        self.external_crate(ExternalCrate::diesel())
+    pub fn diesel(self, number_of_columns: MaximalNumberOfColumns) -> Self {
+        self.external_crate(ExternalCrate::diesel(number_of_columns))
     }
 
     /// Adds the `postgis-diesel` external crate to the workspace.
-    pub fn postgis_diesel(self) -> Self {
-        self.external_crate(ExternalCrate::postgis_diesel()).diesel()
+    pub fn postgis_diesel(self, number_of_columns: MaximalNumberOfColumns) -> Self {
+        self.external_crate(ExternalCrate::postgis_diesel()).diesel(number_of_columns)
     }
 
     /// Adds the `pgrx_validation` external crate to the workspace.

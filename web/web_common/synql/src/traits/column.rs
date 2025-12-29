@@ -16,7 +16,7 @@ use syn::{Ident, Type};
 use crate::{
     structs::{ExternalTypeRef, Workspace},
     traits::{CheckConstraintSynLike, TableSynLike},
-    utils::{camel_case_name, is_reserved_rust_word, snake_case_name},
+    utils::{camel_case_name, is_reserved_diesel_keyword, is_reserved_rust_word, snake_case_name},
 };
 
 /// Trait implemented by types that represent SQL columns and can be used to
@@ -540,7 +540,17 @@ pub trait ColumnSynLike: ColumnLike {
         workspace: &Workspace,
         database: &Self::DB,
     ) -> Result<proc_macro2::TokenStream, crate::Error> {
-        let column_ident = self.column_snake_ident();
+        let column_name = self.column_name();
+        let (sql_name_decorator, column_ident) = if is_reserved_diesel_keyword(column_name) {
+            let ident_str = format!("__{}", self.column_snake_name());
+            (
+                Some(quote! {#[table_model(sql_name = #column_name)]}),
+                Ident::new(&ident_str, proc_macro2::Span::call_site()),
+            )
+        } else {
+            (None, self.column_snake_ident())
+        };
+
         let external_postgres_type =
             self.external_postgres_type(workspace, database).ok_or_else(|| {
                 crate::Error::ColumnTypeNotFound {
@@ -611,6 +621,7 @@ pub trait ColumnSynLike: ColumnLike {
             #default_decorator
             #infallible_decorator
             #sql_type_decorator
+            #sql_name_decorator
             #column_ident: #rust_type
         })
     }

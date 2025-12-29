@@ -19,3 +19,17 @@ pub fn is_reserved_rust_word(name: &str) -> bool {
     );
     RESERVED_RUST_WORDS.binary_search(&name).is_ok()
 }
+
+/// Reserved Diesel keywords that cannot be used as identifiers.
+pub const RESERVED_DIESEL_KEYWORDS: [&str; 1] = ["columns"];
+
+#[inline]
+#[must_use]
+/// Returns whether the provided name is a reserved Diesel keyword.
+pub fn is_reserved_diesel_keyword(name: &str) -> bool {
+    debug_assert!(
+        RESERVED_DIESEL_KEYWORDS.windows(2).all(|w| w[0] < w[1]),
+        "RESERVED_DIESEL_KEYWORDS must be sorted"
+    );
+    RESERVED_DIESEL_KEYWORDS.binary_search(&name).is_ok()
+}

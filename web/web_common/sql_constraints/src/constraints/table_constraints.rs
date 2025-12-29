@@ -16,6 +16,8 @@ mod has_primary_key;
 pub use has_primary_key::HasPrimaryKey;
 mod no_forbidden_column_in_extension;
 pub use no_forbidden_column_in_extension::NoForbiddenColumnInExtension;
+mod no_rust_keyword_table_name;
+pub use no_rust_keyword_table_name::NoRustKeywordTableName;
 mod non_redundant_extension_dag;
 pub use non_redundant_extension_dag::NonRedundantExtensionDag;
 mod unique_column_names_in_extension_graph;

@@ -87,6 +87,29 @@ pub trait DatabaseLike: Clone + Debug {
         self.tables().next().is_some()
     }
 
+    /// Returns the maximum number of columns found in any table in the
+    /// database.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE table1 (id INT, name TEXT);
+    /// CREATE TABLE table2 (score DECIMAL, level INT, active BOOLEAN);
+    /// "#,
+    /// )?;
+    /// assert_eq!(db.maximum_number_of_columns(), 3);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn maximum_number_of_columns(&self) -> usize {
+        self.tables().map(|table| table.columns(self).count()).max().unwrap_or(0)
+    }
+
     /// Returns tables as a Kahn's ordering based on foreign key dependencies,
     /// ignoring potential self-references which would create cycles.
     ///
