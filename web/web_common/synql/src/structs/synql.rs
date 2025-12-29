@@ -6,6 +6,8 @@ use std::path::Path;
 mod builder;
 mod write_crate_lib;
 mod write_crate_toml;
+mod write_sink_crate_lib;
+mod write_sink_crate_toml;
 pub use builder::SynQLBuilder;
 use sql_relations::prelude::TableLike;
 use time_requirements::{prelude::TimeTracker, task::Task};
@@ -36,6 +38,8 @@ pub struct SynQL<'db, DB: SynQLDatabaseLike> {
     generate_workspace_toml: bool,
     /// Whether to also generate the rustfmt configuration file.
     generate_rustfmt: bool,
+    /// Whether to also generate a crate which imports all the table crates.
+    sink_crate_name: Option<String>,
     /// External rust crates to include in the workspace.
     external_crates: Vec<ExternalCrate>,
     /// Whether to clear workspace directory if it already exists.
@@ -99,6 +103,18 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
             write!(buffer, "\"{}\"", table.crate_relative_path(workspace).display())?;
             wrote = true;
         }
+
+        if let Some(sink_crate_name) = &self.sink_crate_name {
+            if wrote {
+                write!(buffer, ", ")?;
+            }
+            write!(
+                buffer,
+                "\"{}\"",
+                workspace.crate_base_path().join(sink_crate_name).display()
+            )?;
+        }
+
         writeln!(buffer, "]")?;
         writeln!(buffer)?;
 
@@ -256,6 +272,19 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
             let writing_lib = Task::new("writing_crate_lib");
             self.write_crate_lib(table, &workspace)?;
             time_tracker.add_or_extend_completed_task(writing_lib);
+        }
+
+        if let Some(sink_crate_name) = &self.sink_crate_name {
+            let sink_crate_path = workspace.crate_base_path().join(sink_crate_name);
+            std::fs::create_dir_all(&sink_crate_path)?;
+
+            let writing_sink_toml = Task::new("writing_sink_crate_toml");
+            self.write_sink_crate_toml(&workspace, sink_crate_name, &sink_crate_path)?;
+            time_tracker.add_or_extend_completed_task(writing_sink_toml);
+
+            let writing_sink_lib = Task::new("writing_sink_crate_lib");
+            self.write_sink_crate_lib(&workspace, sink_crate_name, &sink_crate_path)?;
+            time_tracker.add_or_extend_completed_task(writing_sink_lib);
         }
 
         if self.generate_workspace_toml {

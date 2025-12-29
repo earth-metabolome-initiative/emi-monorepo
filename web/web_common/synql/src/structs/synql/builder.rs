@@ -17,6 +17,7 @@ pub struct SynQLBuilder<'db, DB: SynQLDatabaseLike> {
     edition: u16,
     generate_workspace_toml: bool,
     generate_rustfmt: bool,
+    sink_crate_name: Option<String>,
     external_crates: Vec<ExternalCrate>,
 }
 
@@ -36,6 +37,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQLBuilder<'db, DB> {
             edition: 2024,
             generate_workspace_toml: false,
             generate_rustfmt: false,
+            sink_crate_name: None,
             external_crates: Vec::new(),
         }
     }
@@ -123,6 +125,14 @@ impl<'db, DB: SynQLDatabaseLike> SynQLBuilder<'db, DB> {
         self.generate_rustfmt = true;
         self
     }
+
+    /// Sets to generate a sink crate which imports all the table crates.
+    #[must_use]
+    #[inline]
+    pub fn sink_crate(mut self, sink_crate_name: &str) -> Self {
+        self.sink_crate_name = Some(sink_crate_name.to_string());
+        self
+    }
 }
 
 impl<'db, DB: SynQLDatabaseLike> From<SynQLBuilder<'db, DB>> for SynQL<'db, DB> {
@@ -138,6 +148,7 @@ impl<'db, DB: SynQLDatabaseLike> From<SynQLBuilder<'db, DB>> for SynQL<'db, DB> 
             edition: builder.edition,
             generate_workspace_toml: builder.generate_workspace_toml,
             generate_rustfmt: builder.generate_rustfmt,
+            sink_crate_name: builder.sink_crate_name,
             external_crates: builder.external_crates,
         }
     }
