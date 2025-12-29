@@ -12,6 +12,8 @@ pub struct WorkspaceBuilder {
     name: String,
     /// Path where the workspace is being created.
     path: PathBuf,
+    /// Path inside the workspace where the crates will be created.
+    crate_base_path: PathBuf,
     /// Version of the workspace.
     version: (u8, u8, u8),
     /// Edition of the workspace.
@@ -24,6 +26,7 @@ impl Default for WorkspaceBuilder {
             external_crates: Vec::new(),
             name: "synql-workspace".to_string(),
             path: PathBuf::from("synql_workspace"),
+            crate_base_path: PathBuf::from("."),
             version: (0, 1, 0),
             edition: 2024,
         }
@@ -59,6 +62,17 @@ impl WorkspaceBuilder {
     /// * `path` - The path where the workspace is being created.
     pub fn path(mut self, path: std::path::PathBuf) -> Self {
         self.path = path;
+        self
+    }
+
+    /// Sets the crate base path inside the workspace where the crates will be
+    /// created.
+    ///
+    /// # Arguments
+    ///
+    /// * `crate_base_path` - The crate base path inside the workspace.
+    pub fn crate_base_path(mut self, crate_base_path: std::path::PathBuf) -> Self {
+        self.crate_base_path = crate_base_path;
         self
     }
 
@@ -174,6 +188,7 @@ impl From<WorkspaceBuilder> for Workspace {
             external_crates: builder.external_crates,
             name: builder.name,
             path: builder.path,
+            crate_base_path: builder.crate_base_path,
             version: builder.version,
             edition: builder.edition,
         }

@@ -19,6 +19,8 @@ pub struct Workspace {
     name: String,
     /// Path where the workspace is being created.
     path: PathBuf,
+    /// Path inside the workspace where the crates will be created.
+    crate_base_path: PathBuf,
     /// Version of the workspace.
     version: (u8, u8, u8),
     /// Edition of the workspace.
@@ -51,6 +53,13 @@ impl Workspace {
     #[must_use]
     pub fn path(&self) -> &Path {
         self.path.as_path()
+    }
+
+    #[inline]
+    #[must_use]
+    /// Returns the path inside the workspace where the crates will be created.
+    pub fn crate_base_path(&self) -> &Path {
+        self.crate_base_path.as_path()
     }
 
     #[inline]

@@ -17,7 +17,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         workspace: &Workspace,
     ) -> Result<(), crate::Error> {
         // We create the `src` directory if it does not exist
-        let crate_path = table.crate_path(workspace);
+        let crate_path = table.crate_absolute_path(workspace);
         let src_path = crate_path.join("src");
         std::fs::create_dir_all(&src_path)?;
         // We create the `lib.rs` file

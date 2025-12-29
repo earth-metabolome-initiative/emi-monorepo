@@ -9,6 +9,7 @@ use crate::{structs::ExternalCrate, traits::SynQLDatabaseLike};
 pub struct SynQLBuilder<'db, DB: SynQLDatabaseLike> {
     database: &'db DB,
     path: &'db Path,
+    crate_base_path: &'db Path,
     clear_existing: bool,
     name: Option<String>,
     deny_list: Vec<&'db DB::Table>,
@@ -23,10 +24,11 @@ impl<'db, DB: SynQLDatabaseLike> SynQLBuilder<'db, DB> {
     #[must_use]
     #[inline]
     /// Creates a new `SynQLBuilder` instance.
-    pub fn new(database: &'db DB, path: &'db Path) -> Self {
+    pub fn new(database: &'db DB, path: &'db Path, crate_base_path: &'db Path) -> Self {
         SynQLBuilder {
             database,
             path,
+            crate_base_path,
             clear_existing: false,
             name: None,
             deny_list: Vec::new(),
@@ -129,6 +131,7 @@ impl<'db, DB: SynQLDatabaseLike> From<SynQLBuilder<'db, DB>> for SynQL<'db, DB> 
             database: builder.database,
             clear_existing: builder.clear_existing,
             path: builder.path,
+            crate_base_path: builder.crate_base_path,
             name: builder.name,
             deny_list: builder.deny_list,
             version: builder.version,

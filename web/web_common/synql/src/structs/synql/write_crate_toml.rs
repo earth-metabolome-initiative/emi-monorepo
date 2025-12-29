@@ -15,7 +15,7 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
         table: &DB::Table,
         workspace: &Workspace,
     ) -> Result<(), crate::Error> {
-        let cargo_toml_path = table.crate_path(workspace).join("Cargo.toml");
+        let cargo_toml_path = table.crate_absolute_path(workspace).join("Cargo.toml");
         let mut buffer = std::fs::File::create(cargo_toml_path)?;
         let name = table.crate_name(workspace);
         let (major, minor, patch) = workspace.version();

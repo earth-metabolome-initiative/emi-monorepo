@@ -55,14 +55,24 @@ where
         Ident::new(&self.crate_name(workspace).replace('-', "_"), proc_macro2::Span::call_site())
     }
 
-    /// Returns the path of the crate associated with this table.
+    /// Returns the absolute path of the crate associated with this table.
     ///
     /// # Arguments
     ///
     /// * `workspace` - The workspace where the crate is defined.
     #[must_use]
-    fn crate_path(&self, workspace: &Workspace) -> PathBuf {
-        workspace.path().join(self.crate_name(workspace))
+    fn crate_absolute_path(&self, workspace: &Workspace) -> PathBuf {
+        workspace.path().join(workspace.crate_base_path()).join(self.crate_name(workspace))
+    }
+
+    /// Returns the relative path of the crate associated with this table.
+    ///
+    /// # Arguments
+    ///
+    /// * `workspace` - The workspace where the crate is defined.
+    #[must_use]
+    fn crate_relative_path(&self, workspace: &Workspace) -> PathBuf {
+        workspace.crate_base_path().join(self.crate_name(workspace))
     }
 
     /// Returns the ident of this table, with no normalization applied.

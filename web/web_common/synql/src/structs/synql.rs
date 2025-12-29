@@ -21,6 +21,8 @@ pub struct SynQL<'db, DB: SynQLDatabaseLike> {
     database: &'db DB,
     /// The path to the workspace.
     path: &'db Path,
+    /// The path inside the workspace where the crates will be created.
+    crate_base_path: &'db Path,
     /// Optional name of the workspace.
     name: Option<String>,
     /// List of tables to be excluded from the workspace, which also imply
@@ -45,7 +47,18 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
     #[must_use]
     #[inline]
     pub fn new(database: &'db DB, path: &'db Path) -> SynQLBuilder<'db, DB> {
-        SynQLBuilder::new(database, path)
+        Self::new_with_crate_base_path(database, path, Path::new("."))
+    }
+
+    /// Create a new `SynQL` instance from a given database and crate base path.
+    #[must_use]
+    #[inline]
+    pub fn new_with_crate_base_path(
+        database: &'db DB,
+        path: &'db Path,
+        crate_base_path: &'db Path,
+    ) -> SynQLBuilder<'db, DB> {
+        SynQLBuilder::new(database, path, crate_base_path)
     }
 
     fn skip_table(&self, table: &DB::Table) -> bool {
@@ -83,7 +96,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
                 write!(buffer, ", ")?;
             }
 
-            write!(buffer, "\"{}\"", table.crate_name(workspace))?;
+            write!(buffer, "\"{}\"", table.crate_relative_path(workspace).display())?;
             wrote = true;
         }
         writeln!(buffer, "]")?;
@@ -104,8 +117,9 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
             }
             writeln!(
                 buffer,
-                "{crate_name} = {{ path = \"./{crate_name}\" }}",
+                "{crate_name} = {{ path = \"{crate_path}\" }}",
                 crate_name = table.crate_name(workspace),
+                crate_path = table.crate_relative_path(workspace).display(),
             )?;
         }
 
@@ -189,6 +203,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
 
         let workspace: Workspace = Workspace::new()
             .path(self.path.to_path_buf())
+            .crate_base_path(self.crate_base_path.to_path_buf())
             .name(self.name.as_deref().unwrap_or_else(|| self.database.catalog_name()))
             .expect("Invalid workspace name")
             .external_crates(self.external_crates.iter().cloned())
@@ -232,7 +247,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
             }
 
             // Create the directory for the crate
-            let crate_path = table.crate_path(&workspace);
+            let crate_path = table.crate_absolute_path(&workspace);
             std::fs::create_dir_all(&crate_path)?;
 
             let writing_toml = Task::new("writing_crate_toml");
