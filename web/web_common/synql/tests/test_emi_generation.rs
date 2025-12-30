@@ -126,6 +126,7 @@ fn test_emi_generation() -> Result<(), Box<dyn std::error::Error>> {
         .external_crates([iso_codes, media_types, cas_codes, molecular_formulas])
         .generate_workspace_toml()
         .generate_rustfmt()
+        .sink_crate("sink")
         .into();
     tracking_test.extend(synql.generate().expect("Unable to generate workspace"));
 

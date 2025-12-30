@@ -33,8 +33,12 @@ impl<DB: SynQLDatabaseLike> SynQL<'_, DB> {
                 continue;
             }
             let crate_ident = table.crate_ident(workspace);
+            let table_struct_ident = table.table_singular_camel_ident();
+            let table_ident = table.table_ident();
             re_exports.push(quote! {
-                pub use #crate_ident::*;
+                pub use #crate_ident;
+                pub use #crate_ident::#table_ident;
+                pub use #crate_ident::#table_struct_ident;
             });
         }
 

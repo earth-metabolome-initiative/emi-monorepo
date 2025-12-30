@@ -1,26 +1,28 @@
 # Time Report for EMI Workspace Generation Test
 
-The total time spent on all tasks was 24 seconds.
-The slowest task was `Checking Generated Workspace` which took 18 seconds, 647 ms, 861 µs and 863 ns (77.46% of all time).
+The total time spent on all tasks was 22 seconds.
+The slowest task was `Checking Generated Workspace` which took 17 seconds, 255 ms, 955 µs and 106 ns (75.57% of all time).
 
 | name                         | time                                  | percentage | comment |
 |------------------------------|---------------------------------------|------------|---------|
-| Database Parsing             | 3 seconds, 331 ms, 622 µs and 829 ns  | 13.84%     |         |
-| Schema Validation            | 682 ms, 413 µs and 557 ns             | 2.83%      |         |
-| SQL Workspace Generation     | 1 second, 210 ms, 611 µs and 493 ns   | 5.03%      |         |
-| Formatting Workspace         | 200 ms, 620 µs and 78 ns              | 0.83%      |         |
-| Checking Generated Workspace | 18 seconds, 647 ms, 861 µs and 863 ns | 77.46%     |         |
+| Database Parsing             | 3 seconds, 405 ms, 501 µs and 838 ns  | 14.91%     |         |
+| Schema Validation            | 702 ms, 872 µs and 464 ns             | 3.08%      |         |
+| SQL Workspace Generation     | 1 second, 260 ms, 930 µs and 389 ns   | 5.52%      |         |
+| Formatting Workspace         | 208 ms, 185 µs and 407 ns             | 0.91%      |         |
+| Checking Generated Workspace | 17 seconds, 255 ms, 955 µs and 106 ns | 75.57%     |         |
 
 ## Time Report for SQL Workspace Generation
 
 The total time spent on all tasks was now.
-The slowest task was `writing_crate_lib` which took 1 second, 191 ms, 165 µs and 201 ns (98.39% of all time).
+The slowest task was `writing_crate_lib` which took 1 second, 231 ms, 6 µs and 46 ns (97.63% of all time).
 
-| name               | time                                | percentage | comment |
-|--------------------|-------------------------------------|------------|---------|
-| writing_crate_toml | 15 ms, 791 µs and 17 ns             | 1.30%      |         |
-| writing_crate_lib  | 1 second, 191 ms, 165 µs and 201 ns | 98.39%     |         |
-| workspace_toml     | 3 ms, 589 µs and 95 ns              | 0.30%      |         |
-| workspace_rustfmt  | 66 µs and 180 ns                    | 0.01%      |         |
+| name                    | time                             | percentage | comment |
+|-------------------------|----------------------------------|------------|---------|
+| writing_crate_toml      | 15 ms, 98 µs and 630 ns          | 1.20%      |         |
+| writing_crate_lib       | 1 second, 231 ms, 6 µs and 46 ns | 97.63%     |         |
+| writing_sink_crate_toml | 728 µs and 483 ns                | 0.06%      |         |
+| writing_sink_crate_lib  | 11 ms, 150 µs and 249 ns         | 0.88%      |         |
+| workspace_toml          | 2 ms, 893 µs and 761 ns          | 0.23%      |         |
+| workspace_rustfmt       | 53 µs and 220 ns                 | 0.00%      |         |
 
 ![Plot](emi_codegen.png)
