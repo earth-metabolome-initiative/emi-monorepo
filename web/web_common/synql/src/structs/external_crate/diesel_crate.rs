@@ -62,6 +62,7 @@ impl ExternalCrate {
                 )
                 .postgres_type("interval")
                 .unwrap()
+                .supports_debug()
                 .supports_copy()
                 .supports_eq()
                 .into(),

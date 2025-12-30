@@ -83,6 +83,7 @@ impl ExternalTypeBuilder {
 
     /// Sets that the current type supports hash.
     pub fn supports_hash(mut self) -> Self {
+        self = self.supports_eq();
         self.traits.set_supports(Trait::Hash);
         self
     }

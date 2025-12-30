@@ -10,6 +10,7 @@ impl ExternalCrate {
         ExternalCrate::new("chrono")
             .unwrap()
             .version("0.4.42")
+            .feature("serde")
             .types([
                 ExternalType::new(
                     syn::parse_quote!(::diesel::sql_types::Timestamp),
@@ -17,8 +18,10 @@ impl ExternalCrate {
                 )
                 .postgres_types(["timestamp", "timestamp without time zone"])
                 .unwrap()
+                .supports_debug()
                 .supports_copy()
-                .supports_eq()
+                .supports_ord()
+                .supports_hash()
                 .into(),
                 ExternalType::new(
                     syn::parse_quote!(::diesel::sql_types::Timestamptz),
@@ -26,8 +29,10 @@ impl ExternalCrate {
                 )
                 .postgres_types(["timestamptz", "timestamp with time zone"])
                 .unwrap()
+                .supports_debug()
                 .supports_copy()
-                .supports_eq()
+                .supports_ord()
+                .supports_hash()
                 .into(),
                 ExternalType::new(
                     syn::parse_quote!(::diesel::sql_types::Date),
@@ -35,8 +40,10 @@ impl ExternalCrate {
                 )
                 .postgres_type("date")
                 .unwrap()
+                .supports_debug()
                 .supports_copy()
-                .supports_eq()
+                .supports_ord()
+                .supports_hash()
                 .into(),
                 ExternalType::new(
                     syn::parse_quote!(::diesel::sql_types::Time),
@@ -44,8 +51,10 @@ impl ExternalCrate {
                 )
                 .postgres_type("time")
                 .unwrap()
+                .supports_debug()
                 .supports_copy()
-                .supports_eq()
+                .supports_ord()
+                .supports_hash()
                 .into(),
                 ExternalType::new(
                     syn::parse_quote!(::diesel::sql_types::Interval),
@@ -53,8 +62,10 @@ impl ExternalCrate {
                 )
                 .postgres_type("interval")
                 .unwrap()
+                .supports_debug()
                 .supports_copy()
-                .supports_eq()
+                .supports_ord()
+                .supports_hash()
                 .into(),
             ])
             .unwrap()

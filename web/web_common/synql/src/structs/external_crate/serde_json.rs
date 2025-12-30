@@ -19,7 +19,9 @@ impl ExternalCrate {
                 .postgres_types(["json"])
                 .unwrap()
                 .supports_clone()
+                .supports_debug()
                 .supports_eq()
+                .supports_hash()
                 .into(),
                 ExternalType::new(
                     syn::parse_quote!(::diesel::sql_types::Jsonb),
@@ -28,7 +30,9 @@ impl ExternalCrate {
                 .postgres_types(["jsonb"])
                 .unwrap()
                 .supports_clone()
+                .supports_debug()
                 .supports_eq()
+                .supports_hash()
                 .into(),
             ])
             .unwrap()
