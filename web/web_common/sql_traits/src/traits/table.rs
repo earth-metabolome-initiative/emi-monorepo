@@ -1566,6 +1566,80 @@ pub trait TableLike:
         })
     }
 
+    /// Returns an iterator over all tables that depend directly or indirectly
+    /// via foreign keys (including extensions) on the current table, excluding
+    /// itself.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE grandparent_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES grandparent_table(id));
+    /// CREATE TABLE child_table (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES parent_table(id));
+    /// "#,
+    /// )?;
+    /// let grandparent_table = db.table(None, "grandparent_table").unwrap();
+    /// let dependent_tables: Vec<&str> =
+    ///     grandparent_table.dependent_tables(&db).map(|t| t.table_name()).collect();
+    /// assert_eq!(dependent_tables, vec!["child_table", "parent_table"]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn dependent_tables<'db>(&'db self, database: &'db Self::DB) -> impl Iterator<Item = &'db Self>
+    where
+        Self: 'db,
+    {
+        database.tables().filter_map(move |table| {
+            let table_ref: &Self = table.borrow();
+            if table_ref != self && table_ref.depends_on(database, self) {
+                Some(table_ref)
+            } else {
+                None
+            }
+        })
+    }
+
+    /// Returns whether the table has any dependent tables.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// # fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY, name TEXT);
+    /// CREATE TABLE child_table (id INT PRIMARY KEY, name TEXT,
+    ///     FOREIGN KEY (id) REFERENCES parent_table(id));
+    /// "#,
+    /// )?;
+    /// let parent_table = db.table(None, "parent_table").unwrap();
+    /// let child_table = db.table(None, "child_table").unwrap();
+    /// assert!(parent_table.has_dependent_tables(&db));
+    /// assert!(!child_table.has_dependent_tables(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn has_dependent_tables(&self, database: &Self::DB) -> bool {
+        self.dependent_tables(database).next().is_some()
+    }
+
     /// Returns the most recent common ancestor table between the current table
     /// and all of the provided tables, if any.
     ///
