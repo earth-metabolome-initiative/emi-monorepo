@@ -304,6 +304,11 @@ pub trait TriangularSameAsForeignKeyLike: HorizontalSameAsForeignKeyLike {
 
         let host_table = self.host_table(database);
         let foreign_table = self.referenced_table(database);
+
+        if foreign_table.has_composite_primary_key(database) {
+            return None;
+        }
+
         // If the source table is a descendant of the foreign table,
         // we do not consider it a triangular constraint.
         if host_table.shares_ancestors_with(database, &foreign_table) {

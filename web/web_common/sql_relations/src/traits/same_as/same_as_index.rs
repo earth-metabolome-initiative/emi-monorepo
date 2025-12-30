@@ -24,6 +24,8 @@ pub trait SameAsIndexLike: UniqueIndexLike {
     /// CREATE TABLE with_same_as (id INT PRIMARY KEY, name TEXT, UNIQUE(id, name));
     /// CREATE TABLE no_same_as_one (id INT PRIMARY KEY, name TEXT, UNIQUE(name));
     /// CREATE TABLE no_same_as_two (id INT PRIMARY KEY);
+    /// CREATE TABLE no_same_as_three (id INT, name TEXT, PRIMARY KEY(id, name));
+    /// CREATE TABLE no_same_as_four (id INT, name TEXT, PRIMARY KEY(id, name), UNIQUE(id), UNIQUE(name), UNIQUE(id, name));
     /// "#,
     /// )?;
     ///
@@ -35,6 +37,18 @@ pub trait SameAsIndexLike: UniqueIndexLike {
     /// assert_eq!(table_no_same_as_one.same_as_indices(&db).count(), 0, "Expected no same-as indices");
     /// let table_no_same_as_two = db.table(None, "no_same_as_two").unwrap();
     /// assert_eq!(table_no_same_as_two.same_as_indices(&db).count(), 0, "Expected no same-as indices");
+    /// let table_no_same_as_three = db.table(None, "no_same_as_three").unwrap();
+    /// assert_eq!(
+    ///     table_no_same_as_three.same_as_indices(&db).count(),
+    ///     0,
+    ///     "Expected no same-as indices"
+    /// );
+    /// let table_no_same_as_four = db.table(None, "no_same_as_four").unwrap();
+    /// assert_eq!(
+    ///     table_no_same_as_four.same_as_indices(&db).count(),
+    ///     0,
+    ///     "Expected no same-as indices"
+    /// );
     ///
     /// # Ok(())
     /// # }
