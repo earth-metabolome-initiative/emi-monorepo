@@ -44,6 +44,8 @@ pub struct SynQL<'db, DB: SynQLDatabaseLike> {
     external_crates: Vec<ExternalCrate>,
     /// Whether to clear workspace directory if it already exists.
     clear_existing: bool,
+    /// Additional workspace members.
+    members: Vec<&'db Path>,
 }
 
 impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
@@ -92,6 +94,15 @@ impl<'db, DB: SynQLDatabaseLike> SynQL<'db, DB> {
         // Write members array
         let mut wrote = false;
         write!(buffer, "members = [")?;
+
+        for member in &self.members {
+            if wrote {
+                write!(buffer, ", ")?;
+            }
+            write!(buffer, "\"{}\"", member.display())?;
+            wrote = true;
+        }
+
         for table in self.database.tables() {
             if self.skip_table(table) {
                 continue;

@@ -1,6 +1,6 @@
 //! Submodule providing a builder for the `SynQL` struct.
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use super::SynQL;
 use crate::{structs::ExternalCrate, traits::SynQLDatabaseLike};
@@ -19,6 +19,8 @@ pub struct SynQLBuilder<'db, DB: SynQLDatabaseLike> {
     generate_rustfmt: bool,
     sink_crate_name: Option<String>,
     external_crates: Vec<ExternalCrate>,
+    /// Additional workspace members.
+    members: Vec<&'db Path>,
 }
 
 impl<'db, DB: SynQLDatabaseLike> SynQLBuilder<'db, DB> {
@@ -39,6 +41,7 @@ impl<'db, DB: SynQLDatabaseLike> SynQLBuilder<'db, DB> {
             generate_rustfmt: false,
             sink_crate_name: None,
             external_crates: Vec::new(),
+            members: Vec::new(),
         }
     }
 
@@ -133,6 +136,36 @@ impl<'db, DB: SynQLDatabaseLike> SynQLBuilder<'db, DB> {
         self.sink_crate_name = Some(sink_crate_name.to_string());
         self
     }
+
+    /// Adds a member path to the workspace.
+    ///
+    /// # Arguments
+    /// * `member` - The member path to add.
+    #[must_use]
+    pub fn member<S: AsRef<Path> + ?Sized>(mut self, member: &'db S) -> Self {
+        if !self.members.contains(&member.as_ref()) {
+            self.members.push(member.as_ref());
+        }
+        self
+    }
+
+    /// Adds several member paths to the workspace.
+    ///
+    /// # Arguments
+    /// * `members` - The member paths to add.
+    #[must_use]
+    pub fn members<I, S>(mut self, members: I) -> Self
+    where
+        I: IntoIterator<Item = &'db S> + 'db,
+        S: AsRef<Path> + ?Sized + 'db,
+    {
+        for member in members {
+            if !self.members.contains(&member.as_ref()) {
+                self.members.push(member.as_ref());
+            }
+        }
+        self
+    }
 }
 
 impl<'db, DB: SynQLDatabaseLike> From<SynQLBuilder<'db, DB>> for SynQL<'db, DB> {
@@ -150,6 +183,7 @@ impl<'db, DB: SynQLDatabaseLike> From<SynQLBuilder<'db, DB>> for SynQL<'db, DB> 
             generate_rustfmt: builder.generate_rustfmt,
             sink_crate_name: builder.sink_crate_name,
             external_crates: builder.external_crates,
+            members: builder.members,
         }
     }
 }
