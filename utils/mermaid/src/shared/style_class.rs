@@ -12,6 +12,7 @@ use std::fmt::Display;
 pub use builder::StyleClassBuilder;
 pub use color::Color;
 pub use error::StyleClassError;
+pub use font_weight::FontWeight;
 pub use style_properties::StyleProperty;
 pub use units::Unit;
 

@@ -14,8 +14,8 @@ pub mod prelude {
     pub use crate::{
         diagrams::{class_diagram::*, entity_relationship::*, flowchart::*},
         shared::{
-            ArrowShape, Color, Direction, LineStyle, Renderer, StyleClass, StyleClassBuilder,
-            StyleProperty, Unit,
+            ArrowShape, Color, Direction, FontWeight, LineStyle, Renderer, StyleClass,
+            StyleClassBuilder, StyleProperty, Unit,
         },
         traits::*,
     };
