@@ -127,7 +127,8 @@ impl<DB: DatabaseLike> TableConstraint for NonRedundantExtensionDag<DB> {
         table: &<Self::Database as DatabaseLike>::Table,
     ) -> Result<(), crate::error::Error> {
         // Collect all directly extended tables
-        let extended_tables = table.extended_tables(database);
+        let extended_tables =
+            table.extended_tables(database).collect::<Vec<&<DB as DatabaseLike>::Table>>();
 
         for (i, extended_table) in extended_tables.iter().enumerate() {
             for (j, other_extended_table) in extended_tables.iter().enumerate() {

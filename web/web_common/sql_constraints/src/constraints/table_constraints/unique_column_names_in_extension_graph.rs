@@ -119,7 +119,8 @@ impl<DB: DatabaseLike> UniqueColumnNamesInExtensionGraph<DB> {
     /// Helper method to find duplicate column names in the extension graph
     fn find_duplicate_columns(database: &DB, table: &<DB as DatabaseLike>::Table) -> Vec<String> {
         let mut duplicates = Vec::new();
-        let extended_tables = table.extended_tables(database);
+        let extended_tables =
+            table.extended_tables(database).collect::<Vec<&<DB as DatabaseLike>::Table>>();
 
         if extended_tables.is_empty() {
             return duplicates;
@@ -220,7 +221,8 @@ impl<DB: DatabaseLike> TableConstraint for UniqueColumnNamesInExtensionGraph<DB>
         table: &<Self::Database as DatabaseLike>::Table,
     ) -> Result<(), crate::error::Error> {
         // Check if the table extends other tables
-        let extended_tables = table.extended_tables(database);
+        let extended_tables =
+            table.extended_tables(database).collect::<Vec<&<DB as DatabaseLike>::Table>>();
 
         // If there are no extended tables, no constraint applies
         if extended_tables.is_empty() {

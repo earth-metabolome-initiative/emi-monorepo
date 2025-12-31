@@ -122,8 +122,8 @@ impl<DB: DatabaseLike> TableConstraint for NoForbiddenColumnInExtension<DB> {
         context: &<Self::Database as DatabaseLike>::Table,
     ) -> Box<dyn crate::prelude::ConstraintFailureInformation> {
         let table_name = context.table_name();
-        let extended_tables = context.extended_tables(database);
-        let extended_table_names: Vec<_> = extended_tables.iter().map(|t| t.table_name()).collect();
+        let extended_table_names =
+            context.extended_tables(database).map(|t| t.table_name()).collect::<Vec<_>>();
 
         ConstraintErrorInfo::new()
             .constraint("NoForbiddenColumnInExtension")
@@ -154,8 +154,7 @@ impl<DB: DatabaseLike> TableConstraint for NoForbiddenColumnInExtension<DB> {
         table: &<Self::Database as DatabaseLike>::Table,
     ) -> Result<(), crate::error::Error> {
         // Check if the table extends other tables
-        let extended_tables = table.extended_tables(database);
-        if extended_tables.is_empty() {
+        if !table.is_extension(database) {
             // If the table doesn't extend any other table, the constraint doesn't apply
             return Ok(());
         }
