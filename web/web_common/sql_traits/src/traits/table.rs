@@ -978,17 +978,15 @@ pub trait TableLike:
     /// )?;
     /// let host_table = db.table(None, "host_table").unwrap();
     /// let extended_tables = host_table.extended_tables(&db);
-    /// assert_eq!(extended_tables.len(), 1);
+    /// assert_eq!(extended_tables.count(), 1);
     /// # Ok(())
     /// # }
     /// ```
-    fn extended_tables<'db>(&'db self, database: &'db Self::DB) -> Vec<&'db Self>
+    fn extended_tables<'db>(&'db self, database: &'db Self::DB) -> impl Iterator<Item = &'db Self>
     where
         Self: 'db,
     {
-        self.extension_foreign_keys(database)
-            .map(|fk| fk.referenced_table(database).borrow())
-            .collect()
+        self.extension_foreign_keys(database).map(|fk| fk.referenced_table(database).borrow())
     }
 
     /// Returns the root table of the extension hierarchy for the current
@@ -1028,11 +1026,75 @@ pub trait TableLike:
     where
         Self: 'db,
     {
-        if let Some(extension) = self.extended_tables(database).first() {
-            extension.extension_root_table(database).or(Some(*extension))
+        if let Some(extension) = self.extended_tables(database).next() {
+            extension.extension_root_table(database).or(Some(extension))
         } else {
             None
         }
+    }
+
+    /// Returns the tables which extend the current table.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY);
+    /// CREATE TABLE child_table (id INT PRIMARY KEY REFERENCES parent_table(id));
+    /// "#,
+    /// )?;
+    /// let parent_table = db.table(None, "parent_table").unwrap();
+    /// let extending_tables = parent_table.extending_tables(&db);
+    /// assert_eq!(extending_tables.count(), 1);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn extending_tables<'db>(&'db self, database: &'db Self::DB) -> impl Iterator<Item = &'db Self>
+    where
+        Self: 'db,
+    {
+        database
+            .tables()
+            .map(Borrow::borrow)
+            .filter(move |table: &&Self| table.is_descendant_of(database, self))
+    }
+
+    /// Returns whether the current table is extended by any other table.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY);
+    /// CREATE TABLE child_table (id INT PRIMARY KEY REFERENCES parent_table(id));
+    /// "#,
+    /// )?;
+    /// let parent_table = db.table(None, "parent_table").unwrap();
+    /// assert!(parent_table.is_extended(&db));
+    /// let child_table = db.table(None, "child_table").unwrap();
+    /// assert!(!child_table.is_extended(&db));
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[inline]
+    fn is_extended(&self, database: &Self::DB) -> bool {
+        self.extending_tables(database).next().is_some()
     }
 
     /// Returns the first extension foreign key found in the current table which
@@ -1178,7 +1240,7 @@ pub trait TableLike:
     where
         Self: 'db,
     {
-        let extension_tables = self.extended_tables(database);
+        let extension_tables = self.extended_tables(database).collect::<Vec<&Self>>();
         let mut ancestral_tables = extension_tables.clone();
 
         for table in &extension_tables {
