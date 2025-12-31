@@ -991,6 +991,50 @@ pub trait TableLike:
             .collect()
     }
 
+    /// Returns the root table of the extension hierarchy for the current
+    /// table, if any. If the table is not extending any other table, returns
+    /// `None`.
+    ///
+    /// # Arguments
+    ///
+    /// * `database` - A reference to the database instance to which the table
+    ///   belongs.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE grandparent_table (id INT PRIMARY KEY);
+    /// CREATE TABLE parent_table (id INT PRIMARY KEY REFERENCES grandparent_table(id));
+    /// CREATE TABLE child_table (id INT PRIMARY KEY REFERENCES parent_table(id));
+    /// "#,
+    /// )?;
+    /// let child_table = db.table(None, "child_table").unwrap();
+    /// let root_table = child_table.extension_root_table(&db).unwrap();
+    /// let grandparent_table = db.table(None, "grandparent_table").unwrap();
+    /// assert_eq!(root_table, grandparent_table);
+    /// let parent_table = db.table(None, "parent_table").unwrap();
+    /// let parent_root_table = parent_table.extension_root_table(&db).unwrap();
+    /// assert_eq!(parent_root_table, grandparent_table);
+    /// let grandparent_root_table = grandparent_table.extension_root_table(&db);
+    /// assert!(grandparent_root_table.is_none());
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn extension_root_table<'db>(&'db self, database: &'db Self::DB) -> Option<&'db Self>
+    where
+        Self: 'db,
+    {
+        if let Some(extension) = self.extended_tables(database).first() {
+            extension.extension_root_table(database).or(Some(*extension))
+        } else {
+            None
+        }
+    }
+
     /// Returns the first extension foreign key found in the current table which
     /// references to the provided table or any of its descendants.
     ///
