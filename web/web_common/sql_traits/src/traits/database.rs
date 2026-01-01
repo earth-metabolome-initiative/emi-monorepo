@@ -113,7 +113,7 @@ pub trait DatabaseLike: Clone + Debug {
     /// # }
     /// ```
     fn root_tables(&self) -> impl Iterator<Item = &Self::Table> {
-        self.tables().filter(|table| table.is_extended(self))
+        self.tables().filter(|table| !table.is_extension(self) && table.is_extended(self))
     }
 
     /// Returns the maximum number of columns found in any table in the
