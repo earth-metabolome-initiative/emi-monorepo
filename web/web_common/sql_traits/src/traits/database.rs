@@ -87,6 +87,35 @@ pub trait DatabaseLike: Clone + Debug {
         self.tables().next().is_some()
     }
 
+    /// Returns an iterator over the root tables in the database,
+    /// i.e., tables which are extended by some other table and
+    /// do not extend any other table. Tables which are not involved
+    /// in any extension relationship are not considered root tables.
+    ///
+    /// # Example
+    ///
+    /// ```rust
+    /// #  fn main() -> Result<(), Box<dyn std::error::Error>> {
+    /// use sql_traits::prelude::*;
+    ///
+    /// let db = ParserDB::try_from(
+    ///     r#"
+    /// CREATE TABLE base_table (id INT PRIMARY KEY);
+    /// CREATE TABLE extended_table1 (id INT PRIMARY KEY REFERENCES base_table(id));
+    /// CREATE TABLE extended_table2 (id INT PRIMARY KEY REFERENCES base_table(id));
+    /// CREATE TABLE independent_table (id INT PRIMARY KEY);
+    /// "#,
+    /// )?;
+    ///
+    /// let root_table_names: Vec<&str> = db.root_tables().map(|t| t.table_name()).collect();
+    /// assert_eq!(root_table_names, vec!["base_table"]);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn root_tables(&self) -> impl Iterator<Item = &Self::Table> {
+        self.tables().filter(|table| table.is_extended(self))
+    }
+
     /// Returns the maximum number of columns found in any table in the
     /// database.
     ///

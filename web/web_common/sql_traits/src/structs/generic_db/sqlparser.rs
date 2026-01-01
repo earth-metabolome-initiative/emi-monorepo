@@ -2,8 +2,6 @@
 
 use std::{path::Path, rc::Rc};
 
-use csqlv::{CSVSchema, CSVSchemaBuilder, SQLGenerationOptions};
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use sqlparser::{
     ast::{
         CheckConstraint, ColumnDef, ColumnOption, CreateFunction, CreateTable, Expr,
@@ -503,9 +501,7 @@ impl TryFrom<&[&Path]> for ParserDB {
     type Error = crate::errors::Error;
 
     fn try_from(paths: &[&Path]) -> Result<Self, Self::Error> {
-        let mut sql_documents = Vec::new();
-
-        let mut sql_files = Vec::new();
+        let mut statements = Vec::new();
         for path in paths {
             if !path.exists() {
                 return Err(ParserError::TokenizerError(format!(
@@ -517,44 +513,15 @@ impl TryFrom<&[&Path]> for ParserDB {
 
             let mut sql_paths = search_sql_documents(path);
             sql_paths.sort_unstable();
-            sql_files.extend(sql_paths);
 
-            let schema: CSVSchema =
-                CSVSchemaBuilder::default().include_gz().from_dir(path).map_err(|e| {
-                    ParserError::TokenizerError(format!(
-                        "Failed to build CSV schema from path {}: {}",
-                        path.display(),
-                        e
-                    ))
-                })?;
-
-            sql_documents.push(schema.to_sql(&SQLGenerationOptions::default()).map_err(|e| {
-                ParserError::TokenizerError(format!(
-                    "Failed to convert CSV schema to SQL from path {}: {}",
-                    path.display(),
-                    e
-                ))
-            })?);
-        }
-
-        // First, we handle the IO part sequentially, as it is a I/O-bound task.
-        for sql_document in sql_files {
-            let sql_content = std::fs::read_to_string(&sql_document)
-                .map_err(|e| ParserError::TokenizerError(e.to_string()))?;
-            sql_documents.push(sql_content);
-        }
-
-        let statements = sql_documents
-            .into_par_iter()
-            .map(|sql_file: String| {
+            for sql_path in sql_paths {
+                let sql_content = std::fs::read_to_string(&sql_path)
+                    .map_err(|e| ParserError::TokenizerError(e.to_string()))?;
                 let mut parser = sqlparser::parser::Parser::new(&PostgreSqlDialect {})
-                    .try_with_sql(&sql_file)?;
-                parser.parse_statements()
-            })
-            .collect::<Result<Vec<Vec<Statement>>, ParserError>>()?
-            .into_iter()
-            .flatten()
-            .collect::<Vec<Statement>>();
+                    .try_with_sql(&sql_content)?;
+                statements.extend(parser.parse_statements()?);
+            }
+        }
 
         Self::from_statements(statements, "unknown_catalog".to_string())
     }
