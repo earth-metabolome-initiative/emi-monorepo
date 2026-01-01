@@ -8,7 +8,7 @@ use std::fmt::Display;
 use entity_relationship_edge::EREdge;
 pub use entity_relationship_edge::EREdgeBuilder;
 use entity_relationship_node::ERNode;
-pub use entity_relationship_node::{ERNodeAttribute, ERNodeBuilder};
+pub use entity_relationship_node::ERNodeBuilder;
 
 use crate::{
     shared::{

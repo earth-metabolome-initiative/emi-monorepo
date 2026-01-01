@@ -3,19 +3,20 @@
 
 use std::rc::Rc;
 
-use common_traits::prelude::Builder;
-
-use crate::{
-    shared::{ArrowShape, LineStyle},
-    traits::{Edge, Node},
-};
+use crate::shared::{ArrowShape, LineStyle};
 
 /// Trait representing an edge builder in a Mermaid diagram.
-pub trait EdgeBuilder: Builder<Object = <Self as EdgeBuilder>::Edge> {
+pub trait EdgeBuilder: Sized {
     /// The type of edge this builder constructs.
-    type Edge: Edge<Builder = Self, Node = Self::Node>;
+    type Edge;
     /// Type of the node this edge connects to.
-    type Node: Node;
+    type Node;
+
+    /// The error type returned when building the edge fails.
+    type Error;
+
+    /// Builds the edge.
+    fn build(self) -> Result<Self::Edge, Self::Error>;
 
     /// Set the label for this edge.
     ///

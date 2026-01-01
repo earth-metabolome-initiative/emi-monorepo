@@ -2,11 +2,9 @@
 
 use std::{fmt::Display, rc::Rc};
 
-use common_traits::prelude::Builder;
-
 use crate::{
     shared::{StyleClass, StyleClassBuilder},
-    traits::{Configuration, ConfigurationBuilder, Diagram, Edge, Node, NodeBuilder},
+    traits::{Configuration, ConfigurationBuilder, Diagram, Edge, EdgeBuilder, Node, NodeBuilder},
 };
 
 /// Trait defining the builder for Mermaid diagrams.
@@ -28,7 +26,7 @@ where
     /// Type of edge used in the diagram.
     type Edge: Edge<Node = Self::Node> + Display;
     /// The type of edge builder used to create edges in the diagram.
-    type EdgeBuilder: Builder<Object = Self::Edge>;
+    type EdgeBuilder: EdgeBuilder<Edge = Self::Edge>;
     /// The configuration type for the diagram.
     type Configuration: Configuration + Display;
     /// The configuration builder type for the diagram.

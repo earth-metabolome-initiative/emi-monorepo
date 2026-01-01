@@ -1,57 +1,31 @@
 //! Submodule defining the error enumeration which describes errors
 //! which may happen while creating style classes in Mermaid diagrams.
 
-use common_traits::prelude::BuilderError;
+use thiserror::Error;
 
-use crate::shared::{
-    StyleClass,
-    style_class::{StyleProperty, builder::StyleClassAttribute},
-};
+use crate::shared::{StyleClass, style_class::StyleProperty};
 
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Error)]
 /// Enum representing the different types of errors that can occur when
 /// creating or using style classes in Mermaid diagrams.
 pub enum StyleClassError {
     /// The name of the style class is empty.
+    #[error("Style class name cannot be empty.")]
     EmptyName,
     /// The style class was duplicated.
+    #[error("Duplicate style class: `{0}`")]
     DuplicateClass(String),
     /// The property was duplicated.
+    #[error("Duplicate property found: `{0}`")]
     DuplicateProperty(StyleProperty),
     /// The style class is unknown in the context of the diagram.
+    #[error("Unknown style class: `{}`", .0.name())]
     UnknownClass(StyleClass),
-    /// Builder errors.
-    Builder(BuilderError<StyleClassAttribute>),
-}
-
-impl From<BuilderError<StyleClassAttribute>> for StyleClassError {
-    fn from(error: BuilderError<StyleClassAttribute>) -> Self {
-        StyleClassError::Builder(error)
-    }
-}
-
-impl std::fmt::Display for StyleClassError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            StyleClassError::EmptyName => write!(f, "Style class name cannot be empty."),
-            StyleClassError::DuplicateProperty(property) => {
-                write!(f, "Duplicate property found: `{property}`")
-            }
-            StyleClassError::UnknownClass(class) => {
-                write!(f, "Unknown style class: `{}`", class.name())
-            }
-            StyleClassError::DuplicateClass(name) => write!(f, "Duplicate style class: `{name}`"),
-            StyleClassError::Builder(error) => write!(f, "Builder error: {error}"),
-        }
-    }
-}
-
-impl core::error::Error for StyleClassError {
-    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
-        match self {
-            StyleClassError::Builder(error) => Some(error),
-            _ => None,
-        }
-    }
+    /// The name of the style class is missing.
+    #[error("Style class name is missing.")]
+    MissingName,
+    /// The properties of the style class are missing.
+    #[error("Style class properties are missing.")]
+    MissingProperties,
 }

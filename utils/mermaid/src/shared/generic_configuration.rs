@@ -4,10 +4,6 @@
 mod renderers;
 use std::fmt::Display;
 
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::Builder,
-};
 pub use renderers::Renderer;
 mod direction;
 pub use direction::Direction;
@@ -93,60 +89,27 @@ pub struct GenericConfigurationBuilder {
     look: Look,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum GenericConfigurationAttribute {
-    /// Title of the diagram.
-    Title,
-    /// Renderer used for the diagram.
-    Renderer,
-    /// Direction of the flowchart.
-    Direction,
-    /// Theme of the diagram.
-    Theme,
-    /// Look of the diagram.
-    Look,
-}
+impl TryFrom<GenericConfigurationBuilder> for GenericConfiguration {
+    type Error = ConfigError;
 
-impl Display for GenericConfigurationAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Title => write!(f, "title"),
-            Self::Renderer => write!(f, "renderer"),
-            Self::Direction => write!(f, "direction"),
-            Self::Theme => write!(f, "theme"),
-            Self::Look => write!(f, "look"),
-        }
-    }
-}
-
-impl IsCompleteBuilder for GenericConfigurationBuilder {
-    fn is_complete(&self) -> bool {
-        true
-    }
-}
-
-impl Attributed for GenericConfigurationBuilder {
-    type Attribute = GenericConfigurationAttribute;
-}
-
-impl Builder for GenericConfigurationBuilder {
-    type Error = ConfigError<GenericConfigurationAttribute>;
-    type Object = GenericConfiguration;
-
-    fn build(self) -> Result<Self::Object, Self::Error> {
+    fn try_from(builder: GenericConfigurationBuilder) -> Result<Self, Self::Error> {
         Ok(GenericConfiguration {
-            title: self.title,
-            renderer: self.renderer,
-            direction: self.direction,
-            theme: self.theme,
-            look: self.look,
+            title: builder.title,
+            renderer: builder.renderer,
+            direction: builder.direction,
+            theme: builder.theme,
+            look: builder.look,
         })
     }
 }
 
 impl ConfigurationBuilder for GenericConfigurationBuilder {
     type Configuration = GenericConfiguration;
+    type Error = ConfigError;
+
+    fn build(self) -> Result<Self::Configuration, Self::Error> {
+        self.try_into()
+    }
 
     fn title<S: ToString>(mut self, title: S) -> Result<Self, Self::Error> {
         let title = title.to_string();

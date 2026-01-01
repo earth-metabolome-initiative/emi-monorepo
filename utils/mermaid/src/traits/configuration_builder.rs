@@ -1,18 +1,17 @@
 //! Submodule defining the `ConfigurationBuilder` trait for Mermaid diagrams.
 
-use common_traits::prelude::Builder;
-
-use crate::{
-    shared::generic_configuration::{Direction, Renderer},
-    traits::Configuration,
-};
+use crate::shared::generic_configuration::{Direction, Renderer};
 
 /// Trait defining a configuration builder for Mermaid diagrams.
-pub trait ConfigurationBuilder:
-    Builder<Object = <Self as ConfigurationBuilder>::Configuration>
-{
+pub trait ConfigurationBuilder: Sized {
     /// Type of the configuration that this builder constructs.
-    type Configuration: Configuration;
+    type Configuration;
+
+    /// The error type returned when building the configuration fails.
+    type Error;
+
+    /// Builds the configuration.
+    fn build(self) -> Result<Self::Configuration, Self::Error>;
 
     /// Returns the current title of the configuration, if any.
     ///

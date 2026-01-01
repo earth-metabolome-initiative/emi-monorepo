@@ -1,21 +1,13 @@
 //! Submodule defining the struct for building a flowchart edge.
 
-use std::{fmt::Display, rc::Rc};
-
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::{Builder, BuilderError},
-};
+use std::rc::Rc;
 
 use crate::{
     diagrams::flowchart::{
         curve_styles::CurveStyle, flowchart_edge::FlowchartEdge, flowchart_node::FlowchartNode,
     },
     errors::EdgeError,
-    shared::{
-        StyleClass, StyleClassError, StyleProperty,
-        generic_edge::{GenericEdgeAttribute, GenericEdgeBuilder},
-    },
+    shared::{StyleClass, StyleClassError, StyleProperty, generic_edge::GenericEdgeBuilder},
     traits::EdgeBuilder,
 };
 
@@ -107,69 +99,21 @@ impl Default for FlowchartEdgeBuilder {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Enumeration of attributes that can be set on a `FlowchartEdgeAttribute`.
-pub enum FlowchartEdgeAttribute {
-    /// Edge identifier.
-    Id,
-    /// Underlying generic edge attributes.
-    Generic(GenericEdgeAttribute),
-    /// Style classes associated with the edge.
-    StyleClasses,
-    /// Style properties for the edge.
-    StyleProperties,
-    /// Curve style of the edge.
-    CurveStyle,
-    /// Length of the edge.
-    Length,
-}
+impl TryFrom<FlowchartEdgeBuilder> for FlowchartEdge {
+    type Error = EdgeError;
 
-impl From<GenericEdgeAttribute> for FlowchartEdgeAttribute {
-    fn from(attr: GenericEdgeAttribute) -> Self {
-        FlowchartEdgeAttribute::Generic(attr)
-    }
-}
-
-impl Display for FlowchartEdgeAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            FlowchartEdgeAttribute::Id => write!(f, "id"),
-            FlowchartEdgeAttribute::Generic(attr) => write!(f, "{attr}"),
-            FlowchartEdgeAttribute::StyleClasses => write!(f, "style_classes"),
-            FlowchartEdgeAttribute::StyleProperties => write!(f, "style_properties"),
-            FlowchartEdgeAttribute::CurveStyle => write!(f, "curve_style"),
-            FlowchartEdgeAttribute::Length => write!(f, "length"),
-        }
-    }
-}
-
-impl IsCompleteBuilder for FlowchartEdgeBuilder {
-    fn is_complete(&self) -> bool {
-        self.edge_builder.is_complete() && self.length > 0 && self.id.is_some()
-    }
-}
-
-impl Attributed for FlowchartEdgeBuilder {
-    type Attribute = FlowchartEdgeAttribute;
-}
-
-impl Builder for FlowchartEdgeBuilder {
-    type Error = EdgeError<Self::Attribute>;
-    type Object = FlowchartEdge;
-
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        if self.length == 0 {
-            return Err(BuilderError::IncompleteBuild(FlowchartEdgeAttribute::Length).into());
+    fn try_from(builder: FlowchartEdgeBuilder) -> Result<Self, Self::Error> {
+        if builder.length == 0 {
+            return Err(EdgeError::InvalidLength);
         }
 
         Ok(FlowchartEdge {
-            id: self.id.ok_or(BuilderError::IncompleteBuild(FlowchartEdgeAttribute::Id))?,
-            edge: self.edge_builder.build()?,
-            style_classes: self.style_classes,
-            style_properties: self.style_properties,
-            curve_style: self.curve_style,
-            length: self.length,
+            id: builder.id.ok_or(EdgeError::MissingId)?,
+            edge: builder.edge_builder.try_into()?,
+            style_classes: builder.style_classes,
+            style_properties: builder.style_properties,
+            curve_style: builder.curve_style,
+            length: builder.length,
         })
     }
 }
@@ -177,6 +121,11 @@ impl Builder for FlowchartEdgeBuilder {
 impl EdgeBuilder for FlowchartEdgeBuilder {
     type Edge = FlowchartEdge;
     type Node = FlowchartNode;
+    type Error = EdgeError;
+
+    fn build(self) -> Result<Self::Edge, Self::Error> {
+        self.try_into()
+    }
 
     fn source(mut self, node: std::rc::Rc<Self::Node>) -> Result<Self, Self::Error> {
         self.edge_builder = self.edge_builder.source(node)?;

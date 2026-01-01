@@ -1,12 +1,7 @@
 //! Submodule providing a generic node struct which may be reused across
 //! different diagrams.
 
-use std::{fmt::Display, rc::Rc};
-
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::{Builder, BuilderError},
-};
+use std::rc::Rc;
 
 use crate::{
     errors::NodeError,
@@ -66,55 +61,24 @@ pub(crate) struct GenericNodeBuilder {
     style: Vec<StyleProperty>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Enumeration of attributes that can be set on a `GenericNode`.
-pub enum GenericNodeAttribute {
-    /// Unique identifier for the node.
-    Id,
-    /// Label of the node.
-    Label,
-    /// Classes associated with the node.
-    Classes,
-    /// Style properties for the node.
-    Style,
-}
+impl TryFrom<GenericNodeBuilder> for GenericNode {
+    type Error = NodeError;
 
-impl Display for GenericNodeAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            GenericNodeAttribute::Id => write!(f, "id"),
-            GenericNodeAttribute::Label => write!(f, "label"),
-            GenericNodeAttribute::Classes => write!(f, "classes"),
-            GenericNodeAttribute::Style => write!(f, "style"),
-        }
-    }
-}
+    fn try_from(builder: GenericNodeBuilder) -> Result<Self, Self::Error> {
+        let id = builder.id.ok_or(NodeError::MissingId)?;
+        let label = builder.label.ok_or(NodeError::MissingLabel)?;
 
-impl IsCompleteBuilder for GenericNodeBuilder {
-    fn is_complete(&self) -> bool {
-        self.id.is_some() && self.label.is_some()
-    }
-}
-
-impl Attributed for GenericNodeBuilder {
-    type Attribute = GenericNodeAttribute;
-}
-
-impl Builder for GenericNodeBuilder {
-    type Error = NodeError<Self::Attribute>;
-    type Object = GenericNode;
-
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        let id = self.id.ok_or(BuilderError::IncompleteBuild(GenericNodeAttribute::Id))?;
-        let label = self.label.ok_or(BuilderError::IncompleteBuild(GenericNodeAttribute::Label))?;
-
-        Ok(GenericNode { id, label, classes: self.classes, style: self.style })
+        Ok(GenericNode { id, label, classes: builder.classes, style: builder.style })
     }
 }
 
 impl NodeBuilder for GenericNodeBuilder {
     type Node = GenericNode;
+    type Error = NodeError;
+
+    fn build(self) -> Result<Self::Node, Self::Error> {
+        self.try_into()
+    }
 
     fn id(mut self, id: u64) -> Self {
         self.id = Some(id);

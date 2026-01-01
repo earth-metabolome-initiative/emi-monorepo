@@ -12,7 +12,7 @@ use crate::{
 };
 
 pub mod builder;
-pub use builder::{FlowchartEdgeAttribute, FlowchartEdgeBuilder};
+pub use builder::FlowchartEdgeBuilder;
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]

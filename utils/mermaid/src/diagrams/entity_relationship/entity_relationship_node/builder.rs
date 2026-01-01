@@ -1,22 +1,14 @@
 //! Submodule defining a builder struct for the entity-relationship node in
 //! entity-relationship diagrams.
 
-use std::{fmt::Display, rc::Rc};
-
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::Builder,
-};
+use std::rc::Rc;
 
 use crate::{
     diagrams::entity_relationship::entity_relationship_node::{
         ERNode, attribute::EntityRelationshipAttribute,
     },
     errors::NodeError,
-    shared::{
-        StyleClass, StyleClassError,
-        generic_node::{GenericNodeAttribute, GenericNodeBuilder},
-    },
+    shared::{StyleClass, StyleClassError, generic_node::GenericNodeBuilder},
     traits::NodeBuilder,
 };
 
@@ -30,52 +22,21 @@ pub struct ERNodeBuilder {
     class_attributes: Vec<EntityRelationshipAttribute>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Enumeration of possible attributes for flowchart nodes.
-pub enum ERNodeAttribute {
-    /// Attribute from the underlying generic node.
-    Generic(GenericNodeAttribute),
-    /// Class attribute for the entity-relationship node.
-    Attributes,
-}
+impl TryFrom<ERNodeBuilder> for ERNode {
+    type Error = NodeError;
 
-impl From<GenericNodeAttribute> for ERNodeAttribute {
-    fn from(attr: GenericNodeAttribute) -> Self {
-        ERNodeAttribute::Generic(attr)
-    }
-}
-
-impl Display for ERNodeAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ERNodeAttribute::Generic(attr) => write!(f, "{attr}"),
-            ERNodeAttribute::Attributes => write!(f, "attributes"),
-        }
-    }
-}
-
-impl IsCompleteBuilder for ERNodeBuilder {
-    fn is_complete(&self) -> bool {
-        self.builder.is_complete()
-    }
-}
-
-impl Attributed for ERNodeBuilder {
-    type Attribute = ERNodeAttribute;
-}
-
-impl Builder for ERNodeBuilder {
-    type Object = ERNode;
-    type Error = NodeError<Self::Attribute>;
-
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        Ok(ERNode { node: self.builder.build()?, attributes: self.class_attributes })
+    fn try_from(builder: ERNodeBuilder) -> Result<Self, Self::Error> {
+        Ok(ERNode { node: builder.builder.try_into()?, attributes: builder.class_attributes })
     }
 }
 
 impl NodeBuilder for ERNodeBuilder {
     type Node = ERNode;
+    type Error = NodeError;
+
+    fn build(self) -> Result<Self::Node, Self::Error> {
+        self.try_into()
+    }
 
     fn id(mut self, id: u64) -> Self {
         self.builder = self.builder.id(id);

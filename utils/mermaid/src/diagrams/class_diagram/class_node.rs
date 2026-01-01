@@ -6,12 +6,11 @@ mod class_attribute;
 mod class_method;
 use std::fmt::Display;
 
-pub use builder::ClassNodeAttribute;
+pub use builder::ClassNodeBuilder;
 pub use class_attribute::ClassAttribute;
 pub use class_method::ClassMethod;
 
 use crate::{
-    diagrams::class_diagram::class_node::builder::ClassNodeBuilder,
     shared::{ClickEvent, GenericNode, NODE_LETTER, StyleClass, StyleProperty},
     traits::Node,
 };

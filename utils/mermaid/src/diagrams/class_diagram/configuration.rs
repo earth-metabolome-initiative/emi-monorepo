@@ -4,7 +4,7 @@
 mod builder;
 use std::fmt::Display;
 
-pub use builder::{ClassDiagramConfigurationAttribute, ClassDiagramConfigurationBuilder};
+pub use builder::ClassDiagramConfigurationBuilder;
 
 use crate::{
     shared::{

@@ -1,103 +1,39 @@
 //! Submodule providing an enumeration of possible errors that can occur in the
 //! edges of diagrams in Mermaid syntax.
 
-use std::fmt::{Debug, Display};
+use thiserror::Error;
 
-use common_traits::prelude::BuilderError;
+use crate::shared::ArrowShape;
 
-use crate::{
-    diagrams::{class_diagram::ClassEdgeAttribute, flowchart::FlowchartEdgeAttribute},
-    shared::{ArrowShape, generic_edge::GenericEdgeAttribute},
-};
-
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Error)]
 #[cfg_attr(feature = "serde", derive(serde::Deserialize, serde::Serialize))]
 /// Enum representing errors related to edges in Mermaid diagrams.
-pub enum EdgeError<EdgeAttr> {
+pub enum EdgeError {
     /// The provided edge label is empty.
+    #[error("Edge label cannot be empty.")]
     EmptyLabel,
     /// The provided left arrow shape is not compatible with the diagram.
+    #[error("Incompatible left arrow shape: `{}`", .0.left())]
     IncompatibleLeftArrowShape(ArrowShape),
     /// The provided right arrow shape is not compatible with the diagram.
+    #[error("Incompatible right arrow shape: `{}`", .0.right())]
     IncompatibleRightArrowShape(ArrowShape),
     /// The provided source node does not exist in the diagram.
+    #[error("Source node not found: `{0}`")]
     SourceNodeNotFound(String),
     /// The provided destination node does not exist in the diagram.
+    #[error("Destination node not found: `{0}`")]
     DestinationNodeNotFound(String),
-    /// An error occurred while building the edge.
-    Builder(BuilderError<EdgeAttr>),
-}
-
-impl<EdgeAttr> From<BuilderError<EdgeAttr>> for EdgeError<EdgeAttr> {
-    fn from(error: BuilderError<EdgeAttr>) -> Self {
-        EdgeError::Builder(error)
-    }
-}
-
-impl From<EdgeError<GenericEdgeAttribute>> for EdgeError<FlowchartEdgeAttribute> {
-    fn from(error: EdgeError<GenericEdgeAttribute>) -> Self {
-        match error {
-            EdgeError::EmptyLabel => EdgeError::EmptyLabel,
-            EdgeError::IncompatibleLeftArrowShape(shape) => {
-                EdgeError::IncompatibleLeftArrowShape(shape)
-            }
-            EdgeError::IncompatibleRightArrowShape(shape) => {
-                EdgeError::IncompatibleRightArrowShape(shape)
-            }
-            EdgeError::SourceNodeNotFound(node) => EdgeError::SourceNodeNotFound(node),
-            EdgeError::DestinationNodeNotFound(node) => EdgeError::DestinationNodeNotFound(node),
-            EdgeError::Builder(builder_error) => {
-                EdgeError::Builder(builder_error.replace_field_name(From::from))
-            }
-        }
-    }
-}
-
-impl From<EdgeError<GenericEdgeAttribute>> for EdgeError<ClassEdgeAttribute> {
-    fn from(error: EdgeError<GenericEdgeAttribute>) -> Self {
-        match error {
-            EdgeError::EmptyLabel => EdgeError::EmptyLabel,
-            EdgeError::IncompatibleLeftArrowShape(shape) => {
-                EdgeError::IncompatibleLeftArrowShape(shape)
-            }
-            EdgeError::IncompatibleRightArrowShape(shape) => {
-                EdgeError::IncompatibleRightArrowShape(shape)
-            }
-            EdgeError::SourceNodeNotFound(node) => EdgeError::SourceNodeNotFound(node),
-            EdgeError::DestinationNodeNotFound(node) => EdgeError::DestinationNodeNotFound(node),
-            EdgeError::Builder(builder_error) => {
-                EdgeError::Builder(builder_error.replace_field_name(From::from))
-            }
-        }
-    }
-}
-
-impl<EdgeAttr: Display> std::fmt::Display for EdgeError<EdgeAttr> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            EdgeError::EmptyLabel => write!(f, "Edge label cannot be empty."),
-            EdgeError::IncompatibleLeftArrowShape(shape) => {
-                write!(f, "Incompatible left arrow shape: `{}`", shape.left())
-            }
-            EdgeError::IncompatibleRightArrowShape(shape) => {
-                write!(f, "Incompatible right arrow shape: `{}`", shape.right())
-            }
-            EdgeError::SourceNodeNotFound(node) => {
-                write!(f, "Source node not found: `{node}`",)
-            }
-            EdgeError::DestinationNodeNotFound(node) => {
-                write!(f, "Destination node not found: `{node}`",)
-            }
-            EdgeError::Builder(error) => write!(f, "Builder error: `{error}`"),
-        }
-    }
-}
-
-impl<EdgeAttr: Debug + Display + 'static> core::error::Error for EdgeError<EdgeAttr> {
-    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
-        match self {
-            EdgeError::Builder(error) => Some(error),
-            _ => None,
-        }
-    }
+    /// The source node is missing.
+    #[error("Source node is missing.")]
+    MissingSource,
+    /// The destination node is missing.
+    #[error("Destination node is missing.")]
+    MissingDestination,
+    /// The edge ID is missing.
+    #[error("Edge ID is missing.")]
+    MissingId,
+    /// The edge length is invalid (must be > 0).
+    #[error("Edge length must be greater than 0.")]
+    InvalidLength,
 }

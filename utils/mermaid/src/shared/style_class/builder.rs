@@ -1,12 +1,5 @@
 //! Submodule providing a builder struct for style classes in Mermaid diagrams.
 
-use std::fmt::Display;
-
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::{Builder, BuilderError},
-};
-
 use crate::shared::{
     StyleClass,
     style_class::{StyleClassError, StyleProperty},
@@ -22,44 +15,17 @@ pub struct StyleClassBuilder {
     properties: Vec<StyleProperty>,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub enum StyleClassAttribute {
-    Name,
-    Properties,
-}
-
-impl Display for StyleClassAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            StyleClassAttribute::Name => write!(f, "name"),
-            StyleClassAttribute::Properties => write!(f, "properties"),
-        }
-    }
-}
-
-impl IsCompleteBuilder for StyleClassBuilder {
-    fn is_complete(&self) -> bool {
-        self.name.is_some() && !self.properties.is_empty()
-    }
-}
-
-impl Attributed for StyleClassBuilder {
-    type Attribute = StyleClassAttribute;
-}
-
-impl Builder for StyleClassBuilder {
+impl TryFrom<StyleClassBuilder> for StyleClass {
     type Error = StyleClassError;
-    type Object = StyleClass;
 
-    fn build(self) -> Result<Self::Object, Self::Error> {
-        if self.properties.is_empty() {
-            return Err(BuilderError::IncompleteBuild(StyleClassAttribute::Properties).into());
+    fn try_from(builder: StyleClassBuilder) -> Result<Self, Self::Error> {
+        if builder.properties.is_empty() {
+            return Err(StyleClassError::MissingProperties);
         }
 
         Ok(StyleClass {
-            name: self.name.ok_or(BuilderError::IncompleteBuild(StyleClassAttribute::Name))?,
-            properties: self.properties,
+            name: builder.name.ok_or(StyleClassError::MissingName)?,
+            properties: builder.properties,
         })
     }
 }
@@ -103,5 +69,10 @@ impl StyleClassBuilder {
 
         self.properties.push(property);
         Ok(self)
+    }
+
+    /// Builds the style class.
+    pub fn build(self) -> Result<StyleClass, StyleClassError> {
+        self.try_into()
     }
 }

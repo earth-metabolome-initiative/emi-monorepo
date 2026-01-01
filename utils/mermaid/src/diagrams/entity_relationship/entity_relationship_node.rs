@@ -6,7 +6,7 @@ use std::fmt::Display;
 mod attribute;
 mod builder;
 use attribute::EntityRelationshipAttribute;
-pub use builder::{ERNodeAttribute, ERNodeBuilder};
+pub use builder::ERNodeBuilder;
 
 use crate::{
     shared::{GenericNode, NODE_LETTER, StyleClass, StyleProperty},

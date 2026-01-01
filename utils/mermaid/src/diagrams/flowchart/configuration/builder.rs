@@ -1,17 +1,10 @@
 //! Submodule providing a builder struct for the configuration of flowchart
 //! diagrams in Mermaid syntax.
 
-use std::fmt::Display;
-
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::Builder,
-};
-
 use crate::{
     diagrams::flowchart::{configuration::FlowchartConfiguration, curve_styles::CurveStyle},
     errors::ConfigError,
-    shared::generic_configuration::{GenericConfigurationAttribute, GenericConfigurationBuilder},
+    shared::generic_configuration::GenericConfigurationBuilder,
     traits::ConfigurationBuilder,
 };
 
@@ -52,63 +45,26 @@ impl FlowchartConfigurationBuilder {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Represents the configuration attributes specific to flowchart diagrams.
-pub enum FlowchartConfigurationAttribute {
-    /// Generic configuration attribute.
-    Generic(GenericConfigurationAttribute),
-    /// HTML labels attribute.
-    HtmlLabels,
-    /// Markdown auto-wrap attribute.
-    MarkdownAutoWrap,
-    /// Curve style attribute.
-    CurveStyle,
-}
+impl TryFrom<FlowchartConfigurationBuilder> for FlowchartConfiguration {
+    type Error = ConfigError;
 
-impl From<GenericConfigurationAttribute> for FlowchartConfigurationAttribute {
-    fn from(attr: GenericConfigurationAttribute) -> Self {
-        FlowchartConfigurationAttribute::Generic(attr)
-    }
-}
-
-impl Display for FlowchartConfigurationAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            FlowchartConfigurationAttribute::Generic(attr) => write!(f, "{attr}"),
-            FlowchartConfigurationAttribute::HtmlLabels => write!(f, "html_labels"),
-            FlowchartConfigurationAttribute::MarkdownAutoWrap => write!(f, "markdown_auto_wrap"),
-            FlowchartConfigurationAttribute::CurveStyle => write!(f, "curve_style"),
-        }
-    }
-}
-
-impl IsCompleteBuilder for FlowchartConfigurationBuilder {
-    fn is_complete(&self) -> bool {
-        self.generic.is_complete()
-    }
-}
-
-impl Attributed for FlowchartConfigurationBuilder {
-    type Attribute = FlowchartConfigurationAttribute;
-}
-
-impl Builder for FlowchartConfigurationBuilder {
-    type Object = FlowchartConfiguration;
-    type Error = ConfigError<Self::Attribute>;
-
-    fn build(self) -> Result<Self::Object, Self::Error> {
+    fn try_from(builder: FlowchartConfigurationBuilder) -> Result<Self, Self::Error> {
         Ok(FlowchartConfiguration {
-            generic: self.generic.build()?,
-            markdown_auto_wrap: self.markdown_auto_wrap,
-            html_labels: self.html_labels,
-            curve_style: self.curve_style,
+            generic: builder.generic.try_into()?,
+            markdown_auto_wrap: builder.markdown_auto_wrap,
+            html_labels: builder.html_labels,
+            curve_style: builder.curve_style,
         })
     }
 }
 
 impl ConfigurationBuilder for FlowchartConfigurationBuilder {
     type Configuration = FlowchartConfiguration;
+    type Error = ConfigError;
+
+    fn build(self) -> Result<Self::Configuration, Self::Error> {
+        self.try_into()
+    }
 
     fn title<S: ToString>(mut self, title: S) -> Result<Self, Self::Error> {
         self.generic = self.generic.title(title)?;

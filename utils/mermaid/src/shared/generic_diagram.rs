@@ -3,11 +3,12 @@
 
 use std::{fmt::Display, rc::Rc};
 
-use common_traits::{builder::Attributed, prelude::Builder};
-
 use crate::{
     shared::{StyleClass, StyleClassError},
-    traits::{Configuration, Diagram, DiagramBuilder, Edge, Node},
+    traits::{
+        Configuration, ConfigurationBuilder, Diagram, DiagramBuilder, Edge, EdgeBuilder, Node,
+        NodeBuilder,
+    },
 };
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -27,13 +28,9 @@ pub struct GenericDiagram<Node, Edge, Config> {
 impl<N: Node + Display, E: Edge<Node = N> + Display, C: Configuration> Diagram
     for GenericDiagram<N, E, C>
 where
-    crate::errors::Error<
-        <N::Builder as Attributed>::Attribute,
-        <E::Builder as Attributed>::Attribute,
-        <C::Builder as Attributed>::Attribute,
-    >: From<<N::Builder as Builder>::Error>
-        + From<<E::Builder as Builder>::Error>
-        + From<<C::Builder as Builder>::Error>,
+    crate::errors::Error: From<<N::Builder as NodeBuilder>::Error>
+        + From<<E::Builder as EdgeBuilder>::Error>
+        + From<<C::Builder as ConfigurationBuilder>::Error>,
 {
     type Builder = GenericDiagramBuilder<N, E, C>;
     type Node = N;
@@ -97,13 +94,9 @@ impl<N: Node + Display, E: Edge<Node = N> + Display, C: Configuration>
 impl<N: Node + Display, E: Edge<Node = N> + Display, C: Configuration> DiagramBuilder
     for GenericDiagramBuilder<N, E, C>
 where
-    crate::errors::Error<
-        <N::Builder as Attributed>::Attribute,
-        <E::Builder as Attributed>::Attribute,
-        <C::Builder as Attributed>::Attribute,
-    >: From<<N::Builder as Builder>::Error>
-        + From<<E::Builder as Builder>::Error>
-        + From<<C::Builder as Builder>::Error>,
+    crate::errors::Error: From<<N::Builder as NodeBuilder>::Error>
+        + From<<E::Builder as EdgeBuilder>::Error>
+        + From<<C::Builder as ConfigurationBuilder>::Error>,
     GenericDiagram<N, E, C>: Diagram<Node = N, Edge = E, Configuration = C, Builder = Self>,
 {
     type Diagram = GenericDiagram<N, E, C>;
@@ -113,22 +106,19 @@ where
     type EdgeBuilder = E::Builder;
     type Configuration = C;
     type ConfigurationBuilder = C::Builder;
-    type Error = crate::errors::Error<
-        <Self::NodeBuilder as Attributed>::Attribute,
-        <Self::EdgeBuilder as Attributed>::Attribute,
-        <Self::ConfigurationBuilder as Attributed>::Attribute,
-    >;
+    type Error = crate::errors::Error;
 
     fn configuration(
         mut self,
         configuration: Self::ConfigurationBuilder,
     ) -> Result<Self, Self::Error> {
-        self.generic_diagram.configuration = configuration.build()?;
+        self.generic_diagram.configuration =
+            configuration.build().map_err(crate::errors::Error::from)?;
         Ok(self)
     }
 
     fn edge(&mut self, edge: Self::EdgeBuilder) -> Result<Rc<Self::Edge>, Self::Error> {
-        let edge = edge.build()?;
+        let edge = edge.build().map_err(crate::errors::Error::from)?;
 
         if !self.generic_diagram.nodes.contains(edge.source()) {
             return Err(crate::errors::EdgeError::SourceNodeNotFound(
@@ -157,7 +147,7 @@ where
                 node = node.id(number_of_nodes as u64);
             }
         }
-        let node = node.build()?;
+        let node = node.build().map_err(crate::errors::Error::from)?;
 
         for class in node.classes() {
             if !self.generic_diagram.style_classes.iter().any(|sc| sc.name() == class.name()) {
@@ -194,7 +184,7 @@ where
         &mut self,
         style_class: super::StyleClassBuilder,
     ) -> Result<Rc<StyleClass>, Self::Error> {
-        let style_class = style_class.build()?;
+        let style_class = style_class.build().map_err(crate::errors::Error::from)?;
 
         if self.generic_diagram.style_classes.iter().any(|sc| sc.name() == style_class.name()) {
             return Err(StyleClassError::DuplicateClass(style_class.name().to_owned()).into());

@@ -1,22 +1,15 @@
 //! Submodule defining a builder struct for the class node in class diagrams.
 
-use std::{fmt::Display, rc::Rc};
-
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::Builder,
-};
+use std::rc::Rc;
 
 use crate::{
     diagrams::class_diagram::class_node::{ClassAttribute, ClassMethod, ClassNode},
     errors::NodeError,
-    shared::{
-        ClickEvent, StyleClass, StyleClassError,
-        generic_node::{GenericNodeAttribute, GenericNodeBuilder},
-    },
+    shared::{ClickEvent, StyleClass, StyleClassError, generic_node::GenericNodeBuilder},
     traits::NodeBuilder,
 };
 
+/// Builder for `ClassNode`.
 #[derive(Default, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct ClassNodeBuilder {
@@ -33,93 +26,53 @@ pub struct ClassNodeBuilder {
     methods: Vec<ClassMethod>,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Enumeration of possible attributes for flowchart nodes.
-pub enum ClassNodeAttribute {
-    /// Attribute from the underlying generic node.
-    Generic(GenericNodeAttribute),
-    /// Click event associated with the class node.
-    ClickEvent,
-    /// Annotation for the class node, such as `trait`, `interface`, etc.
-    Annotation,
-    /// Class attributes for the entity-relationship node.
-    Attributes,
-    /// Class methods for the entity-relationship node.
-    Methods,
-}
-
-impl From<GenericNodeAttribute> for ClassNodeAttribute {
-    fn from(attr: GenericNodeAttribute) -> Self {
-        ClassNodeAttribute::Generic(attr)
-    }
-}
-
-impl Display for ClassNodeAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ClassNodeAttribute::Generic(attr) => write!(f, "{attr}"),
-            ClassNodeAttribute::ClickEvent => write!(f, "click_event"),
-            ClassNodeAttribute::Attributes => write!(f, "attributes"),
-            ClassNodeAttribute::Methods => write!(f, "methods"),
-            ClassNodeAttribute::Annotation => write!(f, "annotation"),
-        }
-    }
-}
-
 impl ClassNodeBuilder {
     /// Sets the click event for the class node.
-    pub fn click_event(&mut self, click_event: ClickEvent) -> &mut Self {
+    pub fn click_event(mut self, click_event: ClickEvent) -> Self {
         self.click_event = Some(click_event);
         self
     }
 
     /// Sets the annotation for the class node.
-    pub fn annotation<S: ToString>(&mut self, annotation: &S) -> &mut Self {
+    pub fn annotation<S: ToString>(mut self, annotation: S) -> Self {
         self.annotation = Some(annotation.to_string());
         self
     }
 
     /// Adds an attribute to the class node.
-    pub fn attribute(&mut self, attribute: ClassAttribute) -> &mut Self {
+    pub fn attribute(mut self, attribute: ClassAttribute) -> Self {
         self.attributes.push(attribute);
         self
     }
 
     /// Adds a method to the class node.
-    pub fn method(&mut self, method: ClassMethod) -> &mut Self {
+    pub fn method(mut self, method: ClassMethod) -> Self {
         self.methods.push(method);
         self
     }
 }
 
-impl IsCompleteBuilder for ClassNodeBuilder {
-    fn is_complete(&self) -> bool {
-        self.builder.is_complete()
-    }
-}
+impl TryFrom<ClassNodeBuilder> for ClassNode {
+    type Error = NodeError;
 
-impl Attributed for ClassNodeBuilder {
-    type Attribute = ClassNodeAttribute;
-}
-
-impl Builder for ClassNodeBuilder {
-    type Object = ClassNode;
-    type Error = NodeError<Self::Attribute>;
-
-    fn build(self) -> Result<Self::Object, Self::Error> {
+    fn try_from(builder: ClassNodeBuilder) -> Result<Self, Self::Error> {
         Ok(ClassNode {
-            node: self.builder.build()?,
-            click_event: self.click_event,
-            annotation: self.annotation,
-            attributes: self.attributes,
-            methods: self.methods,
+            node: builder.builder.try_into()?,
+            click_event: builder.click_event,
+            annotation: builder.annotation,
+            attributes: builder.attributes,
+            methods: builder.methods,
         })
     }
 }
 
 impl NodeBuilder for ClassNodeBuilder {
     type Node = ClassNode;
+    type Error = NodeError;
+
+    fn build(self) -> Result<Self::Node, Self::Error> {
+        self.try_into()
+    }
 
     fn id(mut self, id: u64) -> Self {
         self.builder = self.builder.id(id);

@@ -2,17 +2,18 @@
 
 use std::rc::Rc;
 
-use common_traits::prelude::Builder;
-
-use crate::{
-    shared::{StyleClass, StyleClassError, StyleProperty},
-    traits::Node,
-};
+use crate::shared::{StyleClass, StyleClassError, StyleProperty};
 
 /// Trait for building nodes in Mermaid diagrams.
-pub trait NodeBuilder: Builder<Object = Self::Node> {
+pub trait NodeBuilder: Sized {
     /// Type of the node that this builder constructs.
-    type Node: Node<Builder = Self>;
+    type Node;
+
+    /// The error type returned when building the node fails.
+    type Error;
+
+    /// Builds the node.
+    fn build(self) -> Result<Self::Node, Self::Error>;
 
     /// Adds the provided style class to the node being built.
     ///

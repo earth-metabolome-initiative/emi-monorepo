@@ -7,10 +7,8 @@ pub mod visibility;
 use std::fmt::Display;
 
 use class_edge::ClassEdge;
-pub use class_edge::ClassEdgeAttribute;
 use class_node::ClassNode;
-pub use class_node::ClassNodeAttribute;
-pub use configuration::{ClassDiagramConfiguration, ClassDiagramConfigurationAttribute};
+pub use configuration::ClassDiagramConfiguration;
 
 use crate::{
     shared::generic_diagram::{GenericDiagram, GenericDiagramBuilder},

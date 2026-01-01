@@ -1,27 +1,21 @@
 //! Submodule defining a builder struct to construct flowchart nodes in the
 //! flowchart Mermaid diagrams.
 
-use std::{fmt::Display, rc::Rc};
-
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::{Builder, BuilderError},
-};
+use std::rc::Rc;
 
 use crate::{
     diagrams::flowchart::flowchart_node::{ClickEvent, FlowchartNode, shape::FlowchartNodeShape},
     errors::NodeError,
     shared::{
-        StyleClass, StyleClassError,
-        generic_configuration::Direction,
-        generic_node::{GenericNodeAttribute, GenericNodeBuilder},
+        StyleClass, StyleClassError, generic_configuration::Direction,
+        generic_node::GenericNodeBuilder,
     },
     traits::{Node, NodeBuilder},
 };
 
 #[derive(Default, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Builder for creating flowchart nodes with various properties.
+/// Builder for creating a `FlowchartNode`.
 pub struct FlowchartNodeBuilder {
     /// Shared attributes builder for the node.
     builder: GenericNodeBuilder,
@@ -60,10 +54,7 @@ impl FlowchartNodeBuilder {
     /// # Errors
     ///
     /// * If the subnode is already present in the list, an error is returned.
-    pub fn subnode(
-        mut self,
-        subnode: Rc<FlowchartNode>,
-    ) -> Result<Self, NodeError<FlowchartNodeAttribute>> {
+    pub fn subnode(mut self, subnode: Rc<FlowchartNode>) -> Result<Self, NodeError> {
         if self.subnodes.contains(&subnode) {
             return Err(NodeError::DuplicateNode(subnode.label().to_owned()));
         }
@@ -103,76 +94,33 @@ impl FlowchartNodeBuilder {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Enumeration of possible attributes for flowchart nodes.
-pub enum FlowchartNodeAttribute {
-    /// Attribute from the underlying generic node.
-    Generic(GenericNodeAttribute),
-    /// Click event attribute.
-    ClickEvent,
-    /// Shape attribute for the flowchart node.
-    Shape,
-    /// Subnodes attribute, representing child nodes.
-    Subnodes,
-    /// Whether the node is part of a subgraph.
-    PartOfSubgraph,
-    /// Direction attribute, representing the flow direction of the subgraph.
-    Direction,
-}
+impl TryFrom<FlowchartNodeBuilder> for FlowchartNode {
+    type Error = NodeError;
 
-impl From<GenericNodeAttribute> for FlowchartNodeAttribute {
-    fn from(attr: GenericNodeAttribute) -> Self {
-        FlowchartNodeAttribute::Generic(attr)
-    }
-}
-
-impl Display for FlowchartNodeAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            FlowchartNodeAttribute::Generic(attr) => write!(f, "{attr}"),
-            FlowchartNodeAttribute::ClickEvent => write!(f, "clickEvent"),
-            FlowchartNodeAttribute::Shape => write!(f, "shape"),
-            FlowchartNodeAttribute::Subnodes => write!(f, "subnodes"),
-            FlowchartNodeAttribute::PartOfSubgraph => write!(f, "partOfSubgraph"),
-            FlowchartNodeAttribute::Direction => write!(f, "direction"),
-        }
-    }
-}
-
-impl IsCompleteBuilder for FlowchartNodeBuilder {
-    fn is_complete(&self) -> bool {
-        self.builder.is_complete()
-    }
-}
-
-impl Attributed for FlowchartNodeBuilder {
-    type Attribute = FlowchartNodeAttribute;
-}
-
-impl Builder for FlowchartNodeBuilder {
-    type Object = FlowchartNode;
-    type Error = NodeError<Self::Attribute>;
-
-    fn build(mut self) -> Result<Self::Object, Self::Error> {
-        if self.direction.is_some() && self.subnodes.is_empty() {
-            return Err(BuilderError::IncompleteBuild(FlowchartNodeAttribute::Subnodes).into());
+    fn try_from(mut builder: FlowchartNodeBuilder) -> Result<Self, Self::Error> {
+        if builder.direction.is_some() && builder.subnodes.is_empty() {
+            return Err(NodeError::MissingSubnodes);
         }
 
-        self.subnodes.sort_unstable();
+        builder.subnodes.sort_unstable();
 
         Ok(FlowchartNode {
-            node: self.builder.build()?,
-            click_event: self.click_event,
-            shape: self.shape,
-            subnodes: self.subnodes,
-            direction: self.direction,
+            node: builder.builder.try_into()?,
+            click_event: builder.click_event,
+            shape: builder.shape,
+            subnodes: builder.subnodes,
+            direction: builder.direction,
         })
     }
 }
 
 impl NodeBuilder for FlowchartNodeBuilder {
     type Node = FlowchartNode;
+    type Error = NodeError;
+
+    fn build(self) -> Result<Self::Node, Self::Error> {
+        self.try_into()
+    }
 
     fn id(mut self, id: u64) -> Self {
         self.builder = self.builder.id(id);

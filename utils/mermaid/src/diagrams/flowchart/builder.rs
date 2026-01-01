@@ -1,7 +1,5 @@
 //! Submodule providing a builder for flowchart diagrams in Mermaid syntax.
 
-use common_traits::builder::Attributed;
-
 use crate::{
     prelude::{
         Flowchart, FlowchartConfiguration, FlowchartConfigurationBuilder, FlowchartEdge,
@@ -34,11 +32,7 @@ impl DiagramBuilder for FlowchartBuilder {
     type EdgeBuilder = FlowchartEdgeBuilder;
     type Node = FlowchartNode;
     type NodeBuilder = FlowchartNodeBuilder;
-    type Error = crate::errors::Error<
-        <Self::NodeBuilder as Attributed>::Attribute,
-        <Self::EdgeBuilder as Attributed>::Attribute,
-        <Self::ConfigurationBuilder as Attributed>::Attribute,
-    >;
+    type Error = crate::errors::Error;
 
     fn configuration(
         mut self,

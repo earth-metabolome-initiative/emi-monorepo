@@ -5,7 +5,7 @@ mod builder;
 
 use std::fmt::Display;
 
-pub use builder::{FlowchartConfigurationAttribute, FlowchartConfigurationBuilder};
+pub use builder::FlowchartConfigurationBuilder;
 
 use crate::{
     diagrams::flowchart::curve_styles::CurveStyle,

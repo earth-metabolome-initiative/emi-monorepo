@@ -5,7 +5,7 @@ mod builder;
 mod shape;
 use std::{fmt::Display, rc::Rc};
 
-pub use builder::{FlowchartNodeAttribute, FlowchartNodeBuilder};
+pub use builder::FlowchartNodeBuilder;
 pub use shape::FlowchartNodeShape;
 
 use crate::{

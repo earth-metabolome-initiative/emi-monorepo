@@ -3,11 +3,7 @@ pub mod diagrams;
 mod errors;
 mod shared;
 pub mod traits;
-pub use errors::{
-    ClassDiagramConfigError, ClassDiagramEdgeError, ClassDiagramError, ClassDiagramNodeError,
-    ERDiagramConfigError, ERDiagramEdgeError, ERDiagramError, ERDiagramNodeError,
-    FlowchartConfigError, FlowchartEdgeError, FlowchartError, FlowchartNodeError,
-};
+pub use errors::{ConfigError, EdgeError, NodeError, StyleClassError};
 
 /// Submodule providing common traits and types for Mermaid diagrams.
 pub mod prelude {

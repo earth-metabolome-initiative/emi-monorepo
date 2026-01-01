@@ -1,12 +1,7 @@
 //! Submodule providing a generic node struct which may be reused across
 //! different diagrams.
 
-use std::{fmt::Display, iter::empty, rc::Rc};
-
-use common_traits::{
-    builder::{Attributed, IsCompleteBuilder},
-    prelude::{Builder, BuilderError},
-};
+use std::{iter::empty, rc::Rc};
 
 use crate::{
     errors::EdgeError,
@@ -96,63 +91,17 @@ impl<Node> Default for GenericEdgeBuilder<Node> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Enumeration of attributes that can be set on a `GenericEdge`.
-pub enum GenericEdgeAttribute {
-    /// Label of the edge.
-    Label,
-    /// Source node of the edge.
-    Source,
-    /// Destination node of the edge.
-    Destination,
-    /// Line style of the edge.
-    LineStyle,
-    /// Left arrow shape of the edge, if any.
-    LeftArrowShape,
-    /// Right arrow shape of the edge, if any.
-    RightArrowShape,
-}
+impl<N> TryFrom<GenericEdgeBuilder<N>> for GenericEdge<N> {
+    type Error = EdgeError;
 
-impl Display for GenericEdgeAttribute {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            GenericEdgeAttribute::Label => write!(f, "label"),
-            GenericEdgeAttribute::Source => write!(f, "source"),
-            GenericEdgeAttribute::Destination => write!(f, "destination"),
-            GenericEdgeAttribute::LineStyle => write!(f, "line_style"),
-            GenericEdgeAttribute::LeftArrowShape => write!(f, "left_arrow_shape"),
-            GenericEdgeAttribute::RightArrowShape => write!(f, "right_arrow_shape"),
-        }
-    }
-}
-
-impl<N> IsCompleteBuilder for GenericEdgeBuilder<N> {
-    fn is_complete(&self) -> bool {
-        self.source.is_some() && self.destination.is_some()
-    }
-}
-
-impl<N> Attributed for GenericEdgeBuilder<N> {
-    type Attribute = GenericEdgeAttribute;
-}
-
-impl<N> Builder for GenericEdgeBuilder<N> {
-    type Error = EdgeError<Self::Attribute>;
-    type Object = GenericEdge<N>;
-
-    fn build(self) -> Result<Self::Object, Self::Error> {
+    fn try_from(builder: GenericEdgeBuilder<N>) -> Result<Self, Self::Error> {
         Ok(GenericEdge {
-            label: self.label,
-            source: self
-                .source
-                .ok_or(BuilderError::IncompleteBuild(GenericEdgeAttribute::Source))?,
-            destination: self
-                .destination
-                .ok_or(BuilderError::IncompleteBuild(GenericEdgeAttribute::Destination))?,
-            line_style: self.line_style,
-            left_arrow_shape: self.left_arrow_shape,
-            right_arrow_shape: self.right_arrow_shape,
+            label: builder.label,
+            source: builder.source.ok_or(EdgeError::MissingSource)?,
+            destination: builder.destination.ok_or(EdgeError::MissingDestination)?,
+            line_style: builder.line_style,
+            left_arrow_shape: builder.left_arrow_shape,
+            right_arrow_shape: builder.right_arrow_shape,
         })
     }
 }
@@ -160,6 +109,11 @@ impl<N> Builder for GenericEdgeBuilder<N> {
 impl<N: Node> EdgeBuilder for GenericEdgeBuilder<N> {
     type Node = N;
     type Edge = GenericEdge<N>;
+    type Error = EdgeError;
+
+    fn build(self) -> Result<Self::Edge, Self::Error> {
+        self.try_into()
+    }
 
     fn label<S: ToString>(mut self, label: S) -> Result<Self, Self::Error> {
         let label = label.to_string();
