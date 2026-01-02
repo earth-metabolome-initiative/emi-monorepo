@@ -1,6 +1,6 @@
 //! Submodule providing a builder for the `SynQL` struct.
 
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use super::SynQL;
 use crate::{structs::ExternalCrate, traits::SynQLDatabaseLike};

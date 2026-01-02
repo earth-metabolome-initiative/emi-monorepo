@@ -24,7 +24,6 @@ members = [
   "utils/inflector",
   "utils/iter_utils",
   "utils/macro_utils",
-  "utils/mermaid",
   "utils/numeric_common_traits",
   "utils/rosetta_timestamp",
   "utils/time_requirements",
@@ -189,7 +188,7 @@ media_types = { path = "web/web_common/media_types" }
 molecular_formulas = { path = "web/web_common/molecular_formulas" }
 cas_codes = { path = "web/web_common/cas_codes" }
 multi_ranged = { path = "data_structures/multi_ranged" }
-mermaid = { path = "utils/mermaid" }
+mermaid-builder = "0.1.1"
 colorsys = "0.7.0"
 prettyplease = "0.2"
 enumflags2 = "0.7.12"
