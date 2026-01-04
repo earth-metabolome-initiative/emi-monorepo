@@ -2,8 +2,6 @@
 name = "diesel_pgrx"
 version = "0.1.0"
 edition.workspace = true
-<<<<<<< HEAD
-=======
 authors.workspace = true
 license.workspace = true
 repository.workspace = true
@@ -11,7 +9,6 @@ description = "Diesel ORM integration for PGRX PostgreSQL extensions using binar
 readme = "README.md"
 keywords = ["diesel", "pgrx", "postgresql", "orm", "database"]
 categories = ["database"]
->>>>>>> main
 
 [dependencies]
 diesel_pgrx_derive.workspace = true
