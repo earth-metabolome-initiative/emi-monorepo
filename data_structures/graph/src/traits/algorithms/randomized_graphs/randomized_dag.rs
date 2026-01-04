@@ -4,18 +4,8 @@
 use std::collections::HashSet;
 
 use algebra::prelude::SparseMatrixMut;
-use common_traits::prelude::Builder;
 
-use crate::{
-    prelude::{
-        GenericMonoplexMonopartiteGraphBuilder,
-        generic_monoplex_monopartite_graph_builder::MonoplexMonopartiteGraphBuilderError,
-    },
-    traits::{
-        GrowableEdges, MonopartiteGraphBuilder, MonoplexGraph, MonoplexGraphBuilder,
-        MonoplexMonopartiteGraph,
-    },
-};
+use crate::traits::{GrowableEdges, MonoplexGraph, MonoplexMonopartiteGraph};
 
 /// Trait providing randomized dag method
 pub trait RandomizedDAG: MonoplexGraph {
@@ -29,11 +19,7 @@ pub trait RandomizedDAG: MonoplexGraph {
 
 impl<G> RandomizedDAG for G
 where
-    G: MonoplexMonopartiteGraph<Nodes = u64>
-        + TryFrom<
-            (G::Nodes, G::MonoplexMonopartiteEdges),
-            Error = MonoplexMonopartiteGraphBuilderError,
-        >,
+    G: MonoplexMonopartiteGraph<Nodes = u64> + From<(G::Nodes, G::MonoplexMonopartiteEdges)>,
     G::MonoplexMonopartiteEdges: GrowableEdges<EdgeId = u64, Edge = (u64, u64)>,
     <G::MonoplexMonopartiteEdges as GrowableEdges>::GrowableMatrix:
         SparseMatrixMut<MinimalShape = u64>,
@@ -61,7 +47,7 @@ where
         for (src, dst) in sorted_edge_tuples {
             edges.add((src, dst)).unwrap();
         }
-        GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build().unwrap()
+        G::from((nodes, edges))
     }
 }
 

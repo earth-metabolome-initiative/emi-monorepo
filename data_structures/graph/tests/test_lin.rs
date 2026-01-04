@@ -3,14 +3,8 @@
 use algebra::impls::{CSR2D, SquareCSR2D};
 use functional_properties::similarity::ScalarSimilarity;
 use graph::{
-    prelude::{
-        Builder, DiEdgesBuilder, DiGraph, GenericMonoplexMonopartiteGraphBuilder,
-        GenericVocabularyBuilder, Lin,
-    },
-    traits::{
-        EdgesBuilder, MonopartiteGraph, MonopartiteGraphBuilder, MonoplexGraphBuilder,
-        VocabularyBuilder,
-    },
+    prelude::{DiEdgesBuilder, DiGraph, GenericVocabularyBuilder, Lin},
+    traits::{EdgesBuilder, MonopartiteGraph, VocabularyBuilder},
 };
 use sorted_vec::prelude::SortedVec;
 
@@ -27,8 +21,7 @@ fn test_lin_on_tree() -> Result<(), Box<dyn std::error::Error>> {
         .expected_shape(nodes.len())
         .edges(edges.into_iter())
         .build()?;
-    let graph: DiGraph<usize> =
-        GenericMonoplexMonopartiteGraphBuilder::default().nodes(nodes).edges(edges).build()?;
+    let graph: DiGraph<usize> = DiGraph::try_from((nodes, edges))?;
     let lin = graph.lin(&[1, 1, 1])?;
     for nodeid in graph.node_ids() {
         let self_similarity = lin.similarity(&nodeid, &nodeid);
