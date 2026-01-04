@@ -10,3 +10,17 @@ pub mod sink_nodes;
 pub use sink_nodes::SinkNodes;
 pub mod simple_path;
 pub use simple_path::SimplePath;
+pub mod resnik;
+pub use resnik::{Resnik, ResnikResult};
+pub mod information_content;
+pub use information_content::{
+    InformationContent, InformationContentError, InformationContentResult,
+};
+pub mod lin;
+pub use lin::{Lin, LinResult};
+pub mod singleton_nodes;
+pub use singleton_nodes::SingletonNodes;
+pub mod wu_palmer;
+pub use wu_palmer::{WuPalmer, WuPalmerResult};
+pub mod randomized_graphs;
+pub use randomized_graphs::RandomizedDAG;

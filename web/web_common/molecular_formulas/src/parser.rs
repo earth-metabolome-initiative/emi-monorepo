@@ -5,20 +5,34 @@ use std::iter::Peekable;
 use crate::{Ion, MolecularFormula, molecular_formula::Side, token::Token};
 
 mod token_iter;
+pub use token_iter::TokenIter;
 
 /// Parser for the `MolecularFormula` struct
-pub struct Parser<'a> {
-    tokens_iter: Peekable<token_iter::TokenIter<'a>>,
+pub struct Parser<I: Iterator<Item = char>> {
+    tokens_iter: Peekable<token_iter::TokenIter<I>>,
 }
 
-impl<'a> From<&'a str> for Parser<'a> {
+impl<'a> From<&'a str> for Parser<std::str::Chars<'a>> {
     fn from(s: &'a str) -> Self {
         let tokens_iter = token_iter::TokenIter::from(s).peekable();
         Parser { tokens_iter }
     }
 }
 
-impl Parser<'_> {
+impl<I: Iterator<Item = char>> From<I> for Parser<I> {
+    fn from(iter: I) -> Self {
+        let tokens_iter = token_iter::TokenIter::from(iter).peekable();
+        Parser { tokens_iter }
+    }
+}
+
+impl<I: Iterator<Item = char>> From<TokenIter<I>> for Parser<I> {
+    fn from(tokens_iter: TokenIter<I>) -> Self {
+        Parser { tokens_iter: tokens_iter.peekable() }
+    }
+}
+
+impl<I: Iterator<Item = char>> Parser<I> {
     #[allow(clippy::too_many_lines)]
     fn update_formula(
         &mut self,

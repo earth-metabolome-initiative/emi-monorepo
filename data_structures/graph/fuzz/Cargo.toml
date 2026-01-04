@@ -12,6 +12,7 @@ honggfuzz = "0.5"
 graph = { path = "../", features = ["arbitrary"] }
 algebra = { path = "../../algebra", features = ["arbitrary"] }
 arbitrary = { version = "1", features = ["derive"] }
+functional_properties = { path = "../../../utils/functional_properties" }
 
 # Prevent this from interfering with workspaces
 [workspace]
@@ -35,5 +36,18 @@ doc = false
 [[bin]]
 name = "simple_path"
 path = "fuzz_targets/simple_path.rs"
+test = false
+doc = false
+
+
+[[bin]]
+name = "lin"
+path = "fuzz_targets/lin.rs"
+test = false
+doc = false
+
+[[bin]]
+name = "wu_palmer"
+path = "fuzz_targets/wu_palmer.rs"
 test = false
 doc = false

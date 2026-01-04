@@ -1,6 +1,6 @@
 #![doc = include_str!("../README.md")]
 
-/// Trait marked defining a type that can be used with both `diesel` and `pgrx`
+/// Trait marker defining a type that can be used with both `diesel` and `pgrx`
 pub trait DieselPGRX {}
 
 pub use diesel;

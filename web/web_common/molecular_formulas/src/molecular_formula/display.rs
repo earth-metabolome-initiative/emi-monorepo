@@ -2,7 +2,7 @@
 
 use std::fmt::Display;
 
-use elements::{ElementVariant, MassNumber};
+use elements_rs::{ElementVariant, MassNumber};
 use fmtastic::{Subscript, Superscript};
 
 use super::{MolecularFormula, Side};
@@ -10,11 +10,30 @@ use super::{MolecularFormula, Side};
 impl Display for MolecularFormula {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Element(element) => write!(f, "{element}"),
+            Self::Element(element) => {
+                if element.is_lowercase() {
+                    write!(f, "{}", element.as_ref().to_string().to_lowercase())?;
+                } else {
+                    write!(f, "{}", element.as_ref())?;
+                }
+                if let Some(chirality) = element.chirality() {
+                    write!(f, "{chirality}")
+                } else {
+                    Ok(())
+                }
+            }
             Self::Isotope(isotope) => {
-                let atomic_mass = Superscript(isotope.mass_number());
-                let element = isotope.element();
-                write!(f, "{atomic_mass}{element}")
+                let atomic_mass = Superscript(isotope.as_ref().mass_number());
+                let element = if isotope.is_lowercase() {
+                    isotope.as_ref().element().to_string().to_lowercase()
+                } else {
+                    isotope.as_ref().element().to_string()
+                };
+                if let Some(chirality) = isotope.chirality() {
+                    write!(f, "{atomic_mass}{element}{chirality}")
+                } else {
+                    write!(f, "{atomic_mass}{element}")
+                }
             }
             Self::Ion(ion) => write!(f, "{ion}"),
             Self::Mixture(mixture) => {

@@ -1,11 +1,11 @@
-//! Submodule providing the `SimpleRange` struct.
+//! Contiguous range implementation.
 
 use std::ops::{Mul, MulAssign};
 
 use crate::{MultiRanged, Step, errors::Error};
 
+/// A contiguous range from start to end (exclusive).
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-/// A `Range`-like struct with softer and stable constraints.
 pub struct SimpleRange<N> {
     /// The start of the range.
     start: N,

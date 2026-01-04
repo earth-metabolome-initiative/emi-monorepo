@@ -1,6 +1,5 @@
 [workspace]
 resolver = "2"
-
 members = [
   "bindings/sirius_bindings",
   "data_migrations/directus_migration",
@@ -35,8 +34,8 @@ members = [
   "web/web_common/backend_request_errors",
   "web/web_common/cas_codes",
   "web/web_common/csqlv",
-  "web/web_common/elements",
-  "web/web_common/elements/elements_builder",
+  "web/web_common/elements_rs",
+  "web/web_common/elements_rs/elements_builder",
   "web/web_common/generic_backend_request_errors",
   "web/web_common/iso_codes",
   "web/web_common/media_types",
@@ -57,6 +56,9 @@ members = [
 ]
 
 [workspace.package]
+authors = ["Earth Metabolome Initiative"]
+license = "GPL-3.0"
+repository = "https://github.com/earth-metabolome-initiative/emi-monorepo"
 edition = "2024"
 
 [workspace.dependencies]
@@ -98,8 +100,8 @@ diesel = { git = "https://github.com/LucaCappelletti94/diesel", branch = "future
   "extras",
 ] }
 # diesel_full_text_search = "2.2"
-diesel_pgrx = { path = "utils/diesel_pgrx" }
-diesel_pgrx_derive = { path = "utils/diesel_pgrx_derive" }
+diesel_pgrx = { path = "utils/diesel_pgrx", version = "0.1.0" }
+diesel_pgrx_derive = { path = "utils/diesel_pgrx_derive", version = "0.1.0" }
 example_extension = { path = "utils/diesel_pgrx/example_extension" }
 redis = { version = "0.32.1", features = ["tokio-comp"] }
 postgis_diesel = { git = "https://github.com/LucaCappelletti94/postgis-diesel", branch = "master", default-features = false }
@@ -116,9 +118,9 @@ yew-agent = { git = "https://github.com/yewstack/yew.git", branch = "master" }
 strum_macros = "0.27"
 zip = "5.1.1"
 reference_docker = { path = "web/web_common/reference_docker" }
-pgrx = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
-pgrx-tests = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
-pgrx-sql-entity-graph = { version = "0.14.3", git = "https://github.com/LucaCappelletti94/pgrx.git", branch = "binary-protocol" }
+pgrx = { version = "0.16.1" }
+pgrx-tests = { version = "0.16.1" }
+pgrx-sql-entity-graph = { version = "0.16.1" }
 image = "0.25.8"
 rand = { version = "0.9.2" }
 gloo = "0.11.0"
@@ -132,7 +134,7 @@ csqlv = { path = "web/web_common/csqlv", default-features = false, features = [
   "iso_codes",
 ] }
 iso_codes = { path = "web/web_common/iso_codes" }
-elements = { path = "web/web_common/elements" }
+elements_rs = { path = "web/web_common/elements_rs" }
 testcontainers = { version = "0.25.0" }
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
 common_traits = { path = "utils/common_traits" }
@@ -186,8 +188,8 @@ image_validation = { path = "utils/image_validation" }
 media_types = { path = "web/web_common/media_types" }
 molecular_formulas = { path = "web/web_common/molecular_formulas" }
 cas_codes = { path = "web/web_common/cas_codes" }
-multi_ranged = { path = "data_structures/multi_ranged" }
 mermaid-builder = "0.1.1"
+multi_ranged = { path = "data_structures/multi_ranged", version="0.1.0" }
 colorsys = "0.7.0"
 prettyplease = "0.2"
 enumflags2 = "0.7.12"
@@ -212,6 +214,16 @@ unreachable_patterns = "forbid"
 unused_import_braces = "forbid"
 unused_must_use = "forbid"
 deprecated = "deny"
+
+[workspace.lints.rustdoc]
+broken_intra_doc_links = "forbid"
+bare_urls = "forbid"
+invalid_codeblock_attributes = "forbid"
+invalid_html_tags = "forbid"
+missing_crate_level_docs = "forbid"
+unescaped_backticks = "forbid"
+redundant_explicit_links = "forbid"
+invalid_rust_codeblocks = "forbid"
 
 [workspace.lints.clippy]
 unreadable_literal = "allow"

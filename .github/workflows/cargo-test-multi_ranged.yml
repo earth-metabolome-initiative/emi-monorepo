@@ -3,13 +3,13 @@ name: Test
 on:
   push:
     paths:
-      - 'web/web_common/elements/**'
+      - 'data_structures/multi_ranged/**'
   pull_request:
     paths:
-      - 'web/web_common/elements/**'
+      - 'data_structures/multi_ranged/**'
 
 jobs:
   test:
     uses: ./.github/workflows/cargo-test-template.yml
     with:
-      path: 'web/web_common/elements'
+      path: 'data_structures/multi_ranged'

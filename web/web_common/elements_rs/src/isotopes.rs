@@ -1,4 +1,4 @@
-//! Submodule providing the enumeration of `Isotopes` for each element.
+//! Isotopes for all chemical elements with mass numbers and atomic masses.
 
 mod display;
 mod element_isotopes;
@@ -248,39 +248,39 @@ pub use yttrium::YttriumIsotope;
 pub use zinc::ZincIsotope;
 pub use zirconium::ZirconiumIsotope;
 
-/// Trait defining the relative atomic mass of an isotope.
+/// Relative atomic mass (in atomic mass units).
 pub trait RelativeAtomicMass {
-    /// Returns the relative atomic mass of the isotope.
+    /// Returns the relative atomic mass in daltons (Da).
     fn relative_atomic_mass(&self) -> f64;
 }
 
-/// Trait defining the mass number of an isotope.
+/// Mass number (number of protons + neutrons).
 pub trait MassNumber {
-    /// Returns the mass number of the isotope.
+    /// Returns the mass number (A).
     fn mass_number(&self) -> u16;
 }
 
-/// Trait defining the Element of an isotope.
+/// Element that an isotope belongs to.
 pub trait ElementVariant {
-    /// Returns the element of the isotope.
+    /// Returns the parent element.
     fn element(&self) -> crate::Element;
 }
 
-/// Trait defining the isotopic composition of an isotope.
+/// Natural abundance (isotopic composition) as a fraction.
 pub trait IsotopicComposition {
-    /// Returns the isotopic composition of the isotope.
+    /// Returns `None` for isotopes without stable natural occurrence.
     fn isotopic_composition(&self) -> Option<f64>;
 }
 
-/// Trait defining the most common isotope of an element.
+/// Most abundant naturally occurring isotope.
 pub trait MostAbundantIsotope {
-    /// Returns the most common isotope of the element.
+    /// Returns the most abundant isotope.
     fn most_abundant_isotope() -> Self;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Enumeration of all isotopes of the elements in the periodic table.
+/// All known isotopes for all elements.
 pub enum Isotope {
     /// Isotopes of `HydrogenIsotope`
     H(HydrogenIsotope),

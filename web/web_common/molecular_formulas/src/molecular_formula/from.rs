@@ -1,38 +1,41 @@
 //! Submodule implementing several `From` traits for the `MolecularFormula`
 //! struct
 
-use elements::{Element, Isotope};
+use elements_rs::{Element, Isotope};
 
 use super::MolecularFormula;
-use crate::{Ion, token::greek_letters::GreekLetter};
+use crate::{
+    Ion,
+    token::{Atom, greek_letters::GreekLetter},
+};
 
 impl From<Element> for MolecularFormula {
     fn from(element: Element) -> Self {
-        MolecularFormula::Element(element)
+        MolecularFormula::Element(Atom::new(element, false, None))
+    }
+}
+
+impl From<Element> for Box<MolecularFormula> {
+    fn from(element: Element) -> Self {
+        MolecularFormula::Element(Atom::new(element, false, None)).into()
     }
 }
 
 impl From<Isotope> for MolecularFormula {
     fn from(isotope: Isotope) -> Self {
-        MolecularFormula::Isotope(isotope)
+        MolecularFormula::Isotope(Atom::new(isotope, false, None))
     }
 }
 
 impl From<Isotope> for Box<MolecularFormula> {
     fn from(isotope: Isotope) -> Self {
-        MolecularFormula::Isotope(isotope).into()
+        MolecularFormula::Isotope(Atom::new(isotope, false, None)).into()
     }
 }
 
 impl From<GreekLetter> for MolecularFormula {
     fn from(greek_letter: GreekLetter) -> Self {
         MolecularFormula::Greek(greek_letter)
-    }
-}
-
-impl From<Element> for Box<MolecularFormula> {
-    fn from(element: Element) -> Self {
-        MolecularFormula::Element(element).into()
     }
 }
 
@@ -48,14 +51,14 @@ impl From<Ion<MolecularFormula>> for MolecularFormula {
     }
 }
 
-impl From<Ion<Element>> for MolecularFormula {
-    fn from(ion: Ion<Element>) -> Self {
+impl From<Ion<Atom<Element>>> for MolecularFormula {
+    fn from(ion: Ion<Atom<Element>>) -> Self {
         MolecularFormula::Ion(ion.into())
     }
 }
 
-impl From<Ion<Element>> for Box<MolecularFormula> {
-    fn from(ion: Ion<Element>) -> Self {
+impl From<Ion<Atom<Element>>> for Box<MolecularFormula> {
+    fn from(ion: Ion<Atom<Element>>) -> Self {
         Box::new(ion.into())
     }
 }

@@ -1,12 +1,12 @@
-//! Submodule providing the `MultiRange` struct.
+//! Multiple disjoint ranges implementation.
 
 use std::ops::{Mul, MulAssign};
 
 use super::SimpleRange;
 use crate::{MultiRanged, Step, errors::Error};
 
+/// A collection of disjoint ranges that can be built incrementally.
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-/// A struct representing a range which may be split into two parts.
 pub struct MultiRange<N> {
     /// A vector of `SimpleRange` instances.
     ranges: Vec<SimpleRange<N>>,

@@ -1,7 +1,7 @@
 //! Submodule providing methods to work with molecular formulas containing noble
 //! gasses.
 
-use elements::BondsNumber;
+use elements_rs::BondsNumber;
 
 impl crate::MolecularFormula {
     /// Returns whether the formula solely contains noble gasses.
@@ -12,8 +12,8 @@ impl crate::MolecularFormula {
     pub fn is_noble_gas_compound(&self) -> Result<bool, crate::errors::Error> {
         Ok(match self {
             Self::Residual => return Err(crate::errors::Error::InvalidOperationForResidual),
-            Self::Element(element) => element.is_noble_gas(),
-            Self::Isotope(isotope) => isotope.is_noble_gas(),
+            Self::Element(element) => element.as_ref().is_noble_gas(),
+            Self::Isotope(isotope) => isotope.as_ref().is_noble_gas(),
             Self::Ion(ion) => ion.entry.is_noble_gas_compound()?,
             Self::Count(formula, _) => formula.is_noble_gas_compound()?,
             Self::Complex(formula) | Self::RepeatingUnit(formula) | Self::Radical(formula, _) => {

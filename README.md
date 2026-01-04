@@ -15,7 +15,8 @@ Here follows a table with the crates, and the badges illustrating their status.
 
 | Crate | Description | Status | Crates.io |
 |-------|-------------|--------|-----------|
-| [`diesel_pgrx`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/utils/diesel_pgrx) | [Diesel](https://docs.rs/diesel/latest/diesel/) integration for [PGRX](https://github.com/pgcentralfoundation/pgrx) | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml) | [Tracking issue](https://github.com/earth-metabolome-initiative/emi-monorepo/issues/78) |
+| [`diesel_pgrx`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/utils/diesel_pgrx) | Diesel ORM integration for PGRX PostgreSQL extensions | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml) | [![Crates.io](https://img.shields.io/crates/v/diesel_pgrx.svg)](https://crates.io/crates/diesel_pgrx) |
+| [`diesel_pgrx_derive`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/utils/diesel_pgrx_derive) | Derive macros for diesel_pgrx | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-diesel-pgrx.yml) | [![Crates.io](https://img.shields.io/crates/v/diesel_pgrx_derive.svg)](https://crates.io/crates/diesel_pgrx_derive) |
 
 ### Web-related crates
 
@@ -27,10 +28,15 @@ Here follows a table with the crates, and the badges illustrating their status.
 
 | Crate | Description | Status | Crates.io |
 |-------|-------------|--------|-----------|
+| [`elements_rs`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/elements_rs) | [Chemical elements](https://en.wikipedia.org/wiki/Chemical_element) and their [isotopes](https://en.wikipedia.org/wiki/Isotope) | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-elements_rs.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-elements_rs.yml) | [![Crates.io](https://img.shields.io/crates/v/elements_rs.svg)](https://crates.io/crates/elements_rs) |
 | [`molecular_formulas`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/molecular_formulas) | [Molecular formula](https://en.wikipedia.org/wiki/Molecular_formula) parser | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-molecular_formulas.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-molecular_formulas.yml) | [Tracking issue](https://github.com/earth-metabolome-initiative/emi-monorepo/issues/81) |
-| [`cas_codes`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/cas_codes) | [CAS codes](https://en.wikipedia.org/wiki/CAS_Registry_Number) for chemical compounds | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-cas_codes.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-cas_codes.yml) | [Tracking issue](https://github.com/earth-metabolome-initiative/emi-monorepo/issues/80) |
+| [`cas_codes`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/web/web_common/cas_codes) | [CAS codes](https://en.wikipedia.org/wiki/CAS_Registry_Number) for chemical compounds | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-cas_codes.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-cas_codes.yml) | [![Crates.io](https://img.shields.io/crates/v/cas_codes.svg)](https://crates.io/crates/cas_codes) |
 
 ### Data structures
+
+| Crate | Description | Status | Crates.io |
+|-------|-------------|--------|-----------|
+| [`multi_ranged`](https://github.com/earth-metabolome-initiative/emi-monorepo/tree/main/data_structures/multi_ranged) | Efficient data structures for representing ranges of discrete values | [![Test](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-multi_ranged.yml/badge.svg)](https://github.com/earth-metabolome-initiative/emi-monorepo/actions/workflows/cargo-test-multi_ranged.yml) | [![Crates.io](https://img.shields.io/crates/v/multi_ranged.svg)](https://crates.io/crates/multi_ranged) |
 
 ## How to contribute
 

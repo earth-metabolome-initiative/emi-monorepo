@@ -3,21 +3,31 @@
 
 use std::collections::VecDeque;
 
-use elements::{Element, Isotope};
+use elements_rs::{Element, Isotope};
 use num_traits::{CheckedAdd, CheckedMul, ConstOne, ConstZero};
 
-use crate::token::{Token, greek_letters::GreekLetter};
+use crate::token::{Atom, Chirality, Token, greek_letters::GreekLetter};
 
-pub struct TokenIter<'a> {
+/// Iterator over the `Token`s found in a provided string.
+pub struct TokenIter<I: Iterator<Item = char>> {
     /// The peekable chars iterator
-    chars: std::iter::Peekable<std::str::Chars<'a>>,
+    chars: std::iter::Peekable<I>,
     /// Tokens already built by failed lookahead attempts.
     tokens: VecDeque<Token>,
 }
 
-impl<'a> From<&'a str> for TokenIter<'a> {
+impl<'a> From<&'a str> for TokenIter<std::str::Chars<'a>> {
     fn from(s: &'a str) -> Self {
         TokenIter { chars: s.chars().peekable(), tokens: VecDeque::new() }
+    }
+}
+
+impl<I> From<I> for TokenIter<I>
+where
+    I: Iterator<Item = char>,
+{
+    fn from(iter: I) -> Self {
+        TokenIter { chars: iter.peekable(), tokens: VecDeque::new() }
     }
 }
 
@@ -139,7 +149,10 @@ fn is_dot(c: char) -> bool {
     c == '.' || c == '•' || c == '⋅' || c == '·'
 }
 
-impl TokenIter<'_> {
+impl<I> TokenIter<I>
+where
+    I: Iterator<Item = char>,
+{
     fn consume_digit<T: From<u8> + ConstOne + CheckedMul + CheckedAdd>(
         &mut self,
         starting_digit: char,
@@ -196,6 +209,21 @@ impl TokenIter<'_> {
         is_charge(*self.chars.peek()?).then(|| self.chars.next()).flatten()
     }
 
+    /// Peaks the next characters and determines whether they form
+    /// a chirality indicator.
+    fn consume_chirality(&mut self) -> Option<Chirality> {
+        if Some('@') == self.chars.peek().copied() {
+            self.chars.next();
+            if Some('@') == self.chars.peek().copied() {
+                self.chars.next();
+                return Some(Chirality::Counterclockwise);
+            } else {
+                return Some(Chirality::Clockwise);
+            }
+        }
+        None
+    }
+
     /// Peaks the next alphabetical character in the iterator and consumes it
     /// if it is a solely alphabetical character.
     fn consume_alphabetic(&mut self, char: char) -> Result<Token, crate::errors::Error> {
@@ -206,16 +234,19 @@ impl TokenIter<'_> {
             && next.is_ascii_alphabetic()
         {
             self.chars.next();
-            return Element::try_from([char, next]).map(Into::into).map_err(Into::into);
+            let element = Element::try_from([char, next])?;
+
+            return Ok(Atom::new(element, char.is_lowercase(), self.consume_chirality()).into());
         }
         // To handle cases like 'P', 'D' and 'T', which respectively
         // represent Protium, Deuterium and Tritium.
         if let Ok(isotope) = Isotope::try_from(char) {
-            Ok(crate::token::Token::Isotope(isotope))
+            Ok(Atom::new(isotope, false, self.consume_chirality()).into())
         } else if char == 'R' {
             Ok(crate::token::Token::Residual)
         } else {
-            Element::try_from(char).map(Into::into).map_err(Into::into)
+            let element = Element::try_from(char)?;
+            Ok(Atom::new(element, char.is_lowercase(), self.consume_chirality()).into())
         }
     }
 
@@ -224,7 +255,7 @@ impl TokenIter<'_> {
     /// check whether the next character is a a lowercase letter, which may
     /// indicate a two-letter element. This operation may fail, and in that case
     /// we may need to push the newly built token back to the `tokens` queue.
-    fn consume_element(&mut self) -> Option<Element> {
+    fn consume_element(&mut self) -> Option<Atom<Element>> {
         if let Some(&next) = self.chars.peek()
             && next.is_ascii_alphabetic()
             && next.is_uppercase()
@@ -255,6 +286,17 @@ impl TokenIter<'_> {
         None
     }
 
+    /// Pushes a token back to the tokens queue.
+    pub fn push_back(&mut self, token: Token) {
+        self.tokens.push_back(token);
+    }
+
+    /// Returns a mutable reference to the internal chars iterator.
+    pub fn chars(&mut self) -> &mut std::iter::Peekable<I> {
+        &mut self.chars
+    }
+
+    #[allow(clippy::too_many_lines)]
     fn parse_token(&mut self, current_char: char) -> Result<Token, crate::errors::Error> {
         Ok(match current_char {
             '(' => crate::token::Token::OpenRoundBracket,
@@ -292,21 +334,32 @@ impl TokenIter<'_> {
                 // to fold it into a charge.
                 let mut charge = if is_any_plus(maybe_charge) { 1 } else { -1 };
 
-                if let Some(digit) = self.maybe_consume_digit(
-                    if is_superscript_charge(maybe_charge) {
-                        superscript_to_digit
-                    } else {
-                        ascii_to_digit
-                    },
-                    if is_superscript_charge(maybe_charge) {
-                        is_superscript_digit
-                    } else {
-                        is_ascii_digit
-                    },
-                )? {
-                    charge =
-                        charge.checked_mul(&digit).ok_or(crate::errors::Error::InvalidNumber)?;
+                let mut digit = 1;
+                while let Some(&next_char) = self.chars.peek()
+                    && next_char == maybe_charge
+                {
+                    self.chars.next();
+                    digit += 1;
                 }
+
+                if digit == 1
+                    && let Some(found_digit) = self.maybe_consume_digit(
+                        if is_superscript_charge(maybe_charge) {
+                            superscript_to_digit
+                        } else {
+                            ascii_to_digit
+                        },
+                        if is_superscript_charge(maybe_charge) {
+                            is_superscript_digit
+                        } else {
+                            is_ascii_digit
+                        },
+                    )?
+                {
+                    digit = found_digit;
+                }
+
+                charge = charge.checked_mul(&digit).ok_or(crate::errors::Error::InvalidNumber)?;
 
                 if charge == 0 {
                     return Err(crate::errors::Error::ZeroCharge);
@@ -353,9 +406,11 @@ impl TokenIter<'_> {
                 // element, this scalar may be meant as
                 // the mass number of an isotope.
                 else if let Some(element) = self.consume_element()
-                    && let Ok(isotope) = Isotope::try_from((element, digit))
+                    && let Ok(isotope) = Isotope::try_from((element.into(), digit))
                 {
-                    return Ok(Token::Isotope(isotope));
+                    return Ok(Token::Isotope(
+                        Atom::new(isotope, element.is_lowercase(), element.chirality()).into(),
+                    ));
                 }
 
                 return Err(crate::errors::Error::InvalidSuperscriptPosition);
@@ -382,7 +437,10 @@ impl TokenIter<'_> {
     }
 }
 
-impl Iterator for TokenIter<'_> {
+impl<I> Iterator for TokenIter<I>
+where
+    I: Iterator<Item = char>,
+{
     type Item = Result<crate::token::Token, crate::errors::Error>;
 
     fn next(&mut self) -> Option<Self::Item> {

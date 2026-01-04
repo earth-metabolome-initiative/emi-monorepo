@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 
-use elements::{Element, ElementVariant};
+use elements_rs::{Element, ElementVariant};
 use molecular_formulas::MolecularFormula;
 use strum::IntoEnumIterator;
 

@@ -10,7 +10,7 @@ use crate::token::{Token, greek_letters::GreekLetter};
 /// Enumeration of errors which may occur while parsing a molecular formula.
 pub enum Error {
     /// Error indicating that an unknown element was encountered.
-    Element(elements::errors::Error),
+    Element(elements_rs::errors::Error),
     /// Error indicating that a character in the formula is invalid.
     InvalidCharacter(char),
     /// Invalid repeated token in the formula.
@@ -57,8 +57,8 @@ pub enum Error {
     InvalidGreekLetter(String),
 }
 
-impl From<elements::errors::Error> for Error {
-    fn from(err: elements::errors::Error) -> Self {
+impl From<elements_rs::errors::Error> for Error {
+    fn from(err: elements_rs::errors::Error) -> Self {
         Error::Element(err)
     }
 }

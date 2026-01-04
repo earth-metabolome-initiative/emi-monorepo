@@ -2,7 +2,7 @@
 
 use std::str::FromStr;
 
-use elements::{Element, Isotope};
+use elements_rs::{Element, Isotope};
 use molecular_formulas::{Ion, MolecularFormula};
 
 fn test_parse<M: Into<MolecularFormula>>(formula: &str, expected: M, simmetric: Option<&str>) {
