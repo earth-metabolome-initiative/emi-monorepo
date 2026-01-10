@@ -6,8 +6,7 @@ edition.workspace = true
 [dependencies]
 sqlparser.workspace = true
 diesel.workspace = true
-graph.workspace = true
-algebra.workspace = true
+geometric-traits.workspace = true
 
 [lints]
 workspace = true

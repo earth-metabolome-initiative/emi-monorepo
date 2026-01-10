@@ -15,7 +15,6 @@ const_format.workspace = true
 rosetta_timestamp = { workspace = true, features = ["serde", "postgres"] }
 anyhow.workspace = true
 init_migration.workspace = true
-guided_procedures.workspace = true
 
 [dev-dependencies]
 init_db.workspace = true

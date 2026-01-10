@@ -14,7 +14,7 @@ path = "./src/bin/pgrx_embed.rs"
 pgrx = { workspace = true, optional = true }
 pgrx-tests = { workspace = true, optional = true }
 pgrx_validation_derive.workspace = true
-validation_errors.workspace = true
+validation-errors.workspace = true
 validator.workspace = true
 phf.workspace = true
 

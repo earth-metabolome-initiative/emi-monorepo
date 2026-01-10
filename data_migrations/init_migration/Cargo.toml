@@ -15,8 +15,7 @@ tokio.workspace = true
 init_db.workspace = true
 reference_docker.workspace = true
 dotenvy.workspace = true
-core_structures_vis.workspace = true
-time_requirements.workspace = true
+time_requirements = "0.1.0"
 
 [lints]
 workspace = true

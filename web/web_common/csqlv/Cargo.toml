@@ -9,7 +9,6 @@ diesel = { workspace = true, optional = true }
 flate2 = "1.0.35"
 indicatif.workspace = true
 rosetta_uuid.workspace = true
-inflector.workspace = true
 sqlparser.workspace = true
 serde_json.workspace = true
 serde.workspace = true

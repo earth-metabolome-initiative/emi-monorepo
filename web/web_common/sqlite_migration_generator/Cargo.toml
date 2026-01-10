@@ -7,7 +7,7 @@ edition.workspace = true
 proc-macro = true
 
 [dependencies]
-pg2sqlite.workspace = true
+pg2sqlite = { git = "https://github.com/LucaCappelletti94/pg2sqlite", branch = "main" }
 quote.workspace = true
 syn.workspace = true
 sql_minifier.workspace = true
