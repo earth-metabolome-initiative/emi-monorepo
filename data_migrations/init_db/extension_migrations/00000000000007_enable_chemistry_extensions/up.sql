@@ -1,2 +1,1 @@
 CREATE EXTENSION  IF NOT EXISTS "cas_codes";
-CREATE EXTENSION  IF NOT EXISTS "molecular_formulas";

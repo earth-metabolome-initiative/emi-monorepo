@@ -24,13 +24,10 @@ members = [
   "web/web_common/backend_request_errors",
   "web/web_common/cas_codes",
   "web/web_common/csqlv",
-  "web/web_common/elements_rs",
-  "web/web_common/elements_rs/elements_builder",
   "web/web_common/generic_backend_request_errors",
   "web/web_common/iso_codes",
   "web/web_common/media_types",
   "web/web_common/media_types/media_types_builder",
-  "web/web_common/molecular_formulas",
   "web/web_common/pgrx_validation",
   "web/web_common/pgrx_validation_derive",
   "web/web_common/reference_docker",
@@ -118,7 +115,6 @@ csqlv = { path = "web/web_common/csqlv", default-features = false, features = [
   "iso_codes",
 ] }
 iso_codes = { path = "web/web_common/iso_codes" }
-elements_rs = { path = "web/web_common/elements_rs" }
 testcontainers = { version = "0.25.0" }
 diesel_migrations_utils = { path = "utils/diesel_migrations_utils" }
 common_traits = { path = "utils/common_traits" }
@@ -164,7 +160,6 @@ byteorder = "1.5.0"
 anyhow = { version = "1.0", features = ["backtrace"] }
 image_validation = { path = "utils/image_validation" }
 media_types = { path = "web/web_common/media_types" }
-molecular_formulas = { path = "web/web_common/molecular_formulas" }
 cas_codes = { path = "web/web_common/cas_codes" }
 mermaid-builder = "0.1.1"
 multi_ranged = { version="0.1.1" }
