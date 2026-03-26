@@ -312,8 +312,8 @@ impl<V: Version> SiriusConfig<V> {
             .chain(self.formula_parameters.iter().map(|p| p.to_string()))
             .chain(self.zodiac_parameters.iter().map(|p| p.to_string()))
             .chain(self.fingerprint_parameters.iter().map(|p| p.to_string()))
-            .chain(self.structure_parameters.iter().map(|p| p.to_string()))
             .chain(self.canopus_parameters.iter().map(|p| p.to_string()))
+            .chain(self.structure_parameters.iter().map(|p| p.to_string()))
             .chain(
                 self.write_summaries_parameters
                     .iter()
