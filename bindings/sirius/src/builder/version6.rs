@@ -3,7 +3,7 @@ use crate::{builder::SiriusBuilder, prelude::*};
 
 /// The functions in this block are used to set the parameters of the SiriusBuilder.
 /// Most of the functions come from the `sirius config` command. The comments in the functions are usually a copy-paste from the `sirius config --help` command.
-impl SiriusBuilder<Version5> {
+impl SiriusBuilder<Version6> {
     /// Set the maximal value of m/z ratio on which Sirius calculation will be carried.
     ///
     /// # Arguments
@@ -63,7 +63,7 @@ impl SiriusBuilder<Version5> {
         isotope_settings_filter: bool,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::IsotopeSettingsFilter(isotope_settings_filter))?;
+            .add_config_parameter(ConfigV6::IsotopeSettingsFilter(isotope_settings_filter))?;
         Ok(self)
     }
 
@@ -84,7 +84,7 @@ impl SiriusBuilder<Version5> {
         formula_search_db: crate::sirius_types::SearchDB,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::FormulaSearchDB(formula_search_db))?;
+            .add_config_parameter(ConfigV6::FormulaSearchDB(formula_search_db))?;
         Ok(self)
     }
 
@@ -100,7 +100,7 @@ impl SiriusBuilder<Version5> {
     /// ```
     pub fn structure_search_db(mut self, structure_search_db: SearchDB) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::StructureSearchDB(structure_search_db))?;
+            .add_config_parameter(ConfigV6::StructureSearchDB(structure_search_db))?;
         Ok(self)
     }
 
@@ -119,7 +119,7 @@ impl SiriusBuilder<Version5> {
         timeout_seconds_per_tree: u32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::TimeoutSecondsPerTree(timeout_seconds_per_tree))?;
+            .add_config_parameter(ConfigV6::TimeoutSecondsPerTree(timeout_seconds_per_tree))?;
         Ok(self)
     }
 
@@ -128,7 +128,7 @@ impl SiriusBuilder<Version5> {
     /// * `number_of_candidates` - The number of candidates.
     pub fn number_of_candidates(mut self, number_of_candidates: u32) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::NumberOfCandidates(number_of_candidates))?;
+            .add_config_parameter(ConfigV6::NumberOfCandidates(number_of_candidates))?;
         Ok(self)
     }
 
@@ -140,7 +140,7 @@ impl SiriusBuilder<Version5> {
         number_of_candidates_per_ion: u32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::NumberOfCandidatesPerIon(
+            .add_config_parameter(ConfigV6::NumberOfCandidatesPerIonization(
                 number_of_candidates_per_ion,
             ))?;
         Ok(self)
@@ -154,7 +154,7 @@ impl SiriusBuilder<Version5> {
         number_of_structure_candidates: u32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::NumberOfStructureCandidates(
+            .add_config_parameter(ConfigV6::NumberOfStructureCandidates(
                 number_of_structure_candidates,
             ))?;
         Ok(self)
@@ -165,7 +165,7 @@ impl SiriusBuilder<Version5> {
     /// * `recompute_results` - Whether to recompute the results.
     pub fn recompute_results(mut self, recompute_results: bool) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::RecomputeResults(recompute_results))?;
+            .add_config_parameter(ConfigV6::RecomputeResults(recompute_results))?;
         Ok(self)
     }
 
@@ -174,7 +174,7 @@ impl SiriusBuilder<Version5> {
     /// * `print_citations` - Whether to print citations.
     pub fn print_citations(mut self, print_citations: bool) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::PrintCitations(print_citations))?;
+            .add_config_parameter(ConfigV6::PrintCitations(print_citations))?;
         Ok(self)
     }
 
@@ -190,7 +190,7 @@ impl SiriusBuilder<Version5> {
         timeout_seconds_per_instance: u32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::TimeoutSecondsPerInstance(
+            .add_config_parameter(ConfigV6::TimeoutSecondsPerInstance(
                 timeout_seconds_per_instance,
             ))?;
         Ok(self)
@@ -205,7 +205,7 @@ impl SiriusBuilder<Version5> {
         formula_result_threshold: bool,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::FormulaResultThreshold(formula_result_threshold))?;
+            .add_config_parameter(ConfigV6::FormulaResultThreshold(formula_result_threshold))?;
         Ok(self)
     }
 
@@ -215,12 +215,12 @@ impl SiriusBuilder<Version5> {
     /// but the matching candidates will not be tagged as lipid class.
     /// # Arguments
     /// * `inject_el_gordo_compounds` - Whether to inject El Gordo compounds.
-    pub fn inject_el_gordo_compounds(
+    pub fn tag_el_gordo_compounds(
         mut self,
         inject_el_gordo_compounds: bool,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::InjectElGordoCompounds(inject_el_gordo_compounds))?;
+            .add_config_parameter(ConfigV6::TagStructuresByElGordo(inject_el_gordo_compounds))?;
         Ok(self)
     }
 
@@ -238,7 +238,7 @@ impl SiriusBuilder<Version5> {
             ));
         }
         self.config
-            .add_config_parameter(ConfigV5::MedianNoiseIntensity(median_noise_intensity))?;
+            .add_config_parameter(ConfigV6::MedianNoiseIntensity(median_noise_intensity))?;
         Ok(self)
     }
 
@@ -263,7 +263,7 @@ impl SiriusBuilder<Version5> {
             ));
         }
         self.config
-            .add_config_parameter(ConfigV5::MS1AbsoluteIntensityError(
+            .add_config_parameter(ConfigV6::MS1AbsoluteIntensityError(
                 ms1_absolute_intensity_error,
             ))?;
         Ok(self)
@@ -289,7 +289,7 @@ impl SiriusBuilder<Version5> {
             ));
         }
         self.config
-            .add_config_parameter(ConfigV5::MS1MinimalIntensityToConsider(
+            .add_config_parameter(ConfigV6::MS1MinimalIntensityToConsider(
                 ms1_minimal_intensity_to_consider,
             ))?;
         Ok(self)
@@ -316,7 +316,7 @@ impl SiriusBuilder<Version5> {
             ));
         }
         self.config
-            .add_config_parameter(ConfigV5::MS1RelativeIntensityError(
+            .add_config_parameter(ConfigV6::MS1RelativeIntensityError(
                 ms1_relative_intensity_error,
             ))?;
         Ok(self)
@@ -339,7 +339,7 @@ impl SiriusBuilder<Version5> {
             ));
         }
         self.config
-            .add_config_parameter(ConfigV5::NoiseThresholdSettingsIntensityThreshold(
+            .add_config_parameter(ConfigV6::NoiseThresholdSettingsIntensityThreshold(
                 noise_threshold_settings_intensity_threshold,
             ))?;
         Ok(self)
@@ -353,7 +353,7 @@ impl SiriusBuilder<Version5> {
         noise_threshold_settings_maximal_number_of_peaks: u32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::NoiseThresholdSettingsMaximalNumberOfPeaks(
+            .add_config_parameter(ConfigV6::NoiseThresholdSettingsMaximalNumberOfPeaks(
                 noise_threshold_settings_maximal_number_of_peaks,
             ))?;
         Ok(self)
@@ -367,7 +367,7 @@ impl SiriusBuilder<Version5> {
         zodiac_cluster_compounds: bool,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::ZodiacClusterCompounds(zodiac_cluster_compounds))?;
+            .add_config_parameter(ConfigV6::ZodiacClusterCompounds(zodiac_cluster_compounds))?;
         Ok(self)
     }
 
@@ -380,7 +380,7 @@ impl SiriusBuilder<Version5> {
         zodiac_edge_filter_thresholds_min_local_candidates: u32,
     ) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacEdgeFilterThresholdsMinLocalCandidates(
+            ConfigV6::ZodiacEdgeFilterThresholdsMinLocalCandidates(
                 zodiac_edge_filter_thresholds_min_local_candidates,
             ),
         )?;
@@ -396,7 +396,7 @@ impl SiriusBuilder<Version5> {
         zodiac_edge_filter_thresholds_min_local_connections: u32,
     ) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacEdgeFilterThresholdsMinLocalConnections(
+            ConfigV6::ZodiacEdgeFilterThresholdsMinLocalConnections(
                 zodiac_edge_filter_thresholds_min_local_connections,
             ),
         )?;
@@ -420,7 +420,7 @@ impl SiriusBuilder<Version5> {
             ));
         }
         self.config
-            .add_config_parameter(ConfigV5::ZodiacEdgeFilterThresholdsThresholdFilter(
+            .add_config_parameter(ConfigV6::ZodiacEdgeFilterThresholdsThresholdFilter(
                 zodiac_edge_filter_thresholds_threshold_filter,
             ))?;
         Ok(self)
@@ -435,7 +435,7 @@ impl SiriusBuilder<Version5> {
         zodiac_epochs_burn_in_period: u32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::ZodiacEpochsBurnInPeriod(
+            .add_config_parameter(ConfigV6::ZodiacEpochsBurnInPeriod(
                 zodiac_epochs_burn_in_period,
             ))?;
         Ok(self)
@@ -449,7 +449,7 @@ impl SiriusBuilder<Version5> {
         zodiac_epochs_number_of_epochs: u32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::ZodiacEpochsIterations(
+            .add_config_parameter(ConfigV6::ZodiacEpochsIterations(
                 zodiac_epochs_number_of_epochs,
             ))?;
         Ok(self)
@@ -463,7 +463,7 @@ impl SiriusBuilder<Version5> {
         zodiac_epochs_number_of_markov_chains: u32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::ZodiacEpochsNumberOfMarkovChains(
+            .add_config_parameter(ConfigV6::ZodiacEpochsNumberOfMarkovChains(
                 zodiac_epochs_number_of_markov_chains,
             ))?;
         Ok(self)
@@ -477,7 +477,7 @@ impl SiriusBuilder<Version5> {
         zodiac_library_scoring_lambda: u32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::ZodiacLibraryScoringLambda(
+            .add_config_parameter(ConfigV6::ZodiacLibraryScoringLambda(
                 zodiac_library_scoring_lambda,
             ))?;
         Ok(self)
@@ -517,7 +517,7 @@ impl SiriusBuilder<Version5> {
             ));
         }
         self.config
-            .add_config_parameter(ConfigV5::ZodiacLibraryScoringMinCosine(
+            .add_config_parameter(ConfigV6::ZodiacLibraryScoringMinCosine(
                 zodiac_library_scoring_min_cosine,
             ))?;
         Ok(self)
@@ -533,7 +533,7 @@ impl SiriusBuilder<Version5> {
         zodiac_number_of_considered_candidates_at_300_mz: i32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::ZodiacNumberOfConsideredCandidatesAt300Mz(
+            .add_config_parameter(ConfigV6::ZodiacNumberOfConsideredCandidatesAt300Mz(
                 zodiac_number_of_considered_candidates_at_300_mz,
             ))?;
         Ok(self)
@@ -549,7 +549,7 @@ impl SiriusBuilder<Version5> {
         zodiac_number_of_considered_candidates_at_800_mz: i32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::ZodiacNumberOfConsideredCandidatesAt800Mz(
+            .add_config_parameter(ConfigV6::ZodiacNumberOfConsideredCandidatesAt800Mz(
                 zodiac_number_of_considered_candidates_at_800_mz,
             ))?;
         Ok(self)
@@ -575,7 +575,7 @@ impl SiriusBuilder<Version5> {
             ));
         }
         self.config.add_config_parameter(
-            ConfigV5::ZodiacRatioOfConsideredCandidatesPerIonization(
+            ConfigV6::ZodiacRatioOfConsideredCandidatesPerIonization(
                 zodiac_ratio_of_considered_candidates_per_ionization,
             ),
         )?;
@@ -590,7 +590,7 @@ impl SiriusBuilder<Version5> {
         zodiac_run_in_two_steps: bool,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::ZodiacRunInTwoSteps(zodiac_run_in_two_steps))?;
+            .add_config_parameter(ConfigV6::ZodiacRunInTwoSteps(zodiac_run_in_two_steps))?;
         Ok(self)
     }
 
@@ -605,7 +605,7 @@ impl SiriusBuilder<Version5> {
         ms1_mass_deviation_allowed_mass_deviation: MassDeviation,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::MS1MassDeviationAllowedMassDeviation(
+            .add_config_parameter(ConfigV6::MS1MassDeviationAllowedMassDeviation(
                 ms1_mass_deviation_allowed_mass_deviation.must_be_positive()?,
             ))?;
         Ok(self)
@@ -619,7 +619,7 @@ impl SiriusBuilder<Version5> {
         ms1_mass_deviation_mass_difference_deviation: MassDeviation,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::MS1MassDeviationMassDifferenceDeviation(
+            .add_config_parameter(ConfigV6::MS1MassDeviationMassDifferenceDeviation(
                 ms1_mass_deviation_mass_difference_deviation.must_be_positive()?,
             ))?;
         Ok(self)
@@ -633,7 +633,7 @@ impl SiriusBuilder<Version5> {
         ms1_mass_deviation_standard_mass_deviation: MassDeviation,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::MS1MassDeviationStandardMassDeviation(
+            .add_config_parameter(ConfigV6::MS1MassDeviationStandardMassDeviation(
                 ms1_mass_deviation_standard_mass_deviation.must_be_positive()?,
             ))?;
         Ok(self)
@@ -647,7 +647,7 @@ impl SiriusBuilder<Version5> {
         ms2_mass_deviation_standard_mass_deviation: MassDeviation,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::MS2MassDeviationStandardMassDeviation(
+            .add_config_parameter(ConfigV6::MS2MassDeviationStandardMassDeviation(
                 ms2_mass_deviation_standard_mass_deviation.must_be_positive()?,
             ))?;
         Ok(self)
@@ -664,7 +664,7 @@ impl SiriusBuilder<Version5> {
         ms2_mass_deviation_allowed_mass_deviation: MassDeviation,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::MS2MassDeviationAllowedMassDeviation(
+            .add_config_parameter(ConfigV6::MS2MassDeviationAllowedMassDeviation(
                 ms2_mass_deviation_allowed_mass_deviation.must_be_positive()?,
             ))?;
         Ok(self)
@@ -678,7 +678,7 @@ impl SiriusBuilder<Version5> {
         formula_settings_detectable: AtomVector,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::FormulaSettingsDetectable(
+            .add_config_parameter(ConfigV6::FormulaSettingsDetectable(
                 formula_settings_detectable,
             ))?;
         Ok(self)
@@ -696,7 +696,7 @@ impl SiriusBuilder<Version5> {
         formula_settings_enforced: AtomVector,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::FormulaSettingsEnforced(formula_settings_enforced))?;
+            .add_config_parameter(ConfigV6::FormulaSettingsEnforced(formula_settings_enforced))?;
         Ok(self)
     }
 
@@ -708,7 +708,7 @@ impl SiriusBuilder<Version5> {
         formula_settings_fallback: AtomVector,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::FormulaSettingsFallback(formula_settings_fallback))?;
+            .add_config_parameter(ConfigV6::FormulaSettingsFallback(formula_settings_fallback))?;
         Ok(self)
     }
 
@@ -721,7 +721,7 @@ impl SiriusBuilder<Version5> {
         forbid_recalibration: ForbidRecalibration,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::ForbidRecalibration(forbid_recalibration))?;
+            .add_config_parameter(ConfigV6::ForbidRecalibration(forbid_recalibration))?;
         Ok(self)
     }
 
@@ -729,27 +729,22 @@ impl SiriusBuilder<Version5> {
     /// The Top (NumberOfCandidates) candidates will then be computed exactly by solving the ILP.
     /// # Arguments
     /// * `use_heuristic_mz_to_use_heuristic` - The minimum m/z to enable heuristic preprocessing.
-    pub fn use_heuristic_mz_to_use_heuristic(
-        mut self,
-        use_heuristic_mz_to_use_heuristic: u32,
-    ) -> Result<Self, String> {
+    pub fn use_heuristic_above_mz(mut self, use_heuristic_above_mz: u32) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::UseHeuristicMZToUseHeuristic(
-                use_heuristic_mz_to_use_heuristic,
-            ))?;
+            .add_config_parameter(ConfigV6::UseHeuristicAboveMz(use_heuristic_above_mz))?;
         Ok(self)
     }
 
     /// Set minimum m/z to only use heuristic tree computation. No exact tree computation (ILP) will be performed for this compounds.
     /// # Arguments
     /// * `use_heuristic_mz_to_use_heuristic_only` - The minimum m/z to only use heuristic tree computation.
-    pub fn use_heuristic_mz_to_use_heuristic_only(
+    pub fn use_only_heuristic_above_mz(
         mut self,
-        use_heuristic_mz_to_use_heuristic: u32,
+        use_only_heuristic_above_mz: u32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::UseHeuristicMZToUseHeuristicOnly(
-                use_heuristic_mz_to_use_heuristic,
+            .add_config_parameter(ConfigV6::UseOnlyHeuristicAboveMz(
+                use_only_heuristic_above_mz,
             ))?;
         Ok(self)
     }
@@ -760,7 +755,7 @@ impl SiriusBuilder<Version5> {
         adduct_settings_detectable: AdductsVector,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::AdductSettingsDetectable(
+            .add_config_parameter(ConfigV6::AdductSettingsDetectable(
                 adduct_settings_detectable,
             ))?;
         Ok(self)
@@ -774,7 +769,7 @@ impl SiriusBuilder<Version5> {
         adduct_settings_fallback: AdductsVector,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::AdductSettingsFallback(adduct_settings_fallback))?;
+            .add_config_parameter(ConfigV6::AdductSettingsFallback(adduct_settings_fallback))?;
         Ok(self)
     }
 
@@ -783,7 +778,7 @@ impl SiriusBuilder<Version5> {
     /// * `algorithm_profile` - The algorithm profile.
     pub fn algorithm_profile(mut self, algorithm_profile: Instruments) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::AlgorithmProfile(algorithm_profile))?;
+            .add_config_parameter(ConfigV6::AlgorithmProfile(algorithm_profile))?;
         Ok(self)
     }
 
@@ -793,7 +788,7 @@ impl SiriusBuilder<Version5> {
     /// * `compound_quality` - The compound quality.
     pub fn compound_quality(mut self, compound_quality: CompoundQuality) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::CompoundQuality(compound_quality))?;
+            .add_config_parameter(ConfigV6::CompoundQuality(compound_quality))?;
         Ok(self)
     }
 
@@ -805,7 +800,7 @@ impl SiriusBuilder<Version5> {
         adduct_settings_enforced: AdductSettingsEnforced,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::AdductSettingsEnforced(adduct_settings_enforced))?;
+            .add_config_parameter(ConfigV6::AdductSettingsEnforced(adduct_settings_enforced))?;
         Ok(self)
     }
 
@@ -819,7 +814,7 @@ impl SiriusBuilder<Version5> {
         candidate_formulas: CandidateFormulas,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::CandidateFormulas(candidate_formulas))?;
+            .add_config_parameter(ConfigV6::CandidateFormulas(candidate_formulas))?;
         Ok(self)
     }
 
@@ -832,7 +827,7 @@ impl SiriusBuilder<Version5> {
         formula_result_ranking_score: FormulaResultRankingScore,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::FormulaResultRankingScore(
+            .add_config_parameter(ConfigV6::FormulaResultRankingScore(
                 formula_result_ranking_score,
             ))?;
         Ok(self)
@@ -844,7 +839,7 @@ impl SiriusBuilder<Version5> {
         isotope_ms2_settings: IsotopeMS2Settings,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::IsotopeMS2Settings(isotope_ms2_settings))?;
+            .add_config_parameter(ConfigV6::IsotopeMS2Settings(isotope_ms2_settings))?;
         Ok(self)
     }
 
@@ -857,7 +852,7 @@ impl SiriusBuilder<Version5> {
         isotope_settings_multiplier: u32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::IsotopeSettingsMultiplier(
+            .add_config_parameter(ConfigV6::IsotopeSettingsMultiplier(
                 isotope_settings_multiplier,
             ))?;
         Ok(self)
@@ -871,7 +866,7 @@ impl SiriusBuilder<Version5> {
         noise_threshold_settings_absolute_threshold: u32,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::NoiseThresholdSettingsAbsoluteThreshold(
+            .add_config_parameter(ConfigV6::NoiseThresholdSettingsAbsoluteThreshold(
                 noise_threshold_settings_absolute_threshold,
             ))?;
         Ok(self)
@@ -885,7 +880,7 @@ impl SiriusBuilder<Version5> {
         noise_threshold_settings_base_peak: BasePeak,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::NoiseThresholdSettingsBasePeak(
+            .add_config_parameter(ConfigV6::NoiseThresholdSettingsBasePeak(
                 noise_threshold_settings_base_peak,
             ))?;
         Ok(self)
@@ -899,7 +894,7 @@ impl SiriusBuilder<Version5> {
         structure_predictors: StructurePredictors,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::StructurePredictors(structure_predictors))?;
+            .add_config_parameter(ConfigV6::StructurePredictors(structure_predictors))?;
         Ok(self)
     }
 
@@ -915,7 +910,7 @@ impl SiriusBuilder<Version5> {
         possible_adduct_switches: PossibleAdductSwitches,
     ) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::PossibleAdductSwitches(possible_adduct_switches))?;
+            .add_config_parameter(ConfigV6::PossibleAdductSwitches(possible_adduct_switches))?;
         Ok(self)
     }
 
@@ -1039,7 +1034,7 @@ impl SiriusBuilder<Version5> {
     }
 }
 
-impl SiriusBuilder<Version5> {
+impl SiriusBuilder<Version6> {
     /// Set to default maximal value of m/z ratio on which Sirius calculation will be carried.
     ///
     /// # Example
@@ -1066,7 +1061,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default isotope settings filter.
     pub fn isotope_settings_filter_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::IsotopeSettingsFilter(bool::default()).into_default(),
+            ConfigV6::IsotopeSettingsFilter(bool::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1074,7 +1069,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default isotope settings intensity threshold.
     pub fn formula_search_db_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::FormulaSearchDB(crate::sirius_types::SearchDB::default()).into_default(),
+            ConfigV6::FormulaSearchDB(crate::sirius_types::SearchDB::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1082,7 +1077,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default structure search db.
     pub fn structure_search_db_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::StructureSearchDB(crate::sirius_types::SearchDB::default()).into_default(),
+            ConfigV6::StructureSearchDB(crate::sirius_types::SearchDB::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1090,21 +1085,21 @@ impl SiriusBuilder<Version5> {
     /// Set to default timeout seconds per tree.
     pub fn timeout_seconds_per_tree_default(mut self) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::TimeoutSecondsPerTree(u32::default()).into_default())?;
+            .add_config_parameter(ConfigV6::TimeoutSecondsPerTree(u32::default()).into_default())?;
         Ok(self)
     }
 
     /// Set to default number of candidates.
     pub fn number_of_candidates_default(mut self) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::NumberOfCandidates(u32::default()).into_default())?;
+            .add_config_parameter(ConfigV6::NumberOfCandidates(u32::default()).into_default())?;
         Ok(self)
     }
 
     /// Set to default number of candidates per ion.
-    pub fn number_of_candidates_per_ion_default(mut self) -> Result<Self, String> {
+    pub fn number_of_candidates_per_ionization_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::NumberOfCandidatesPerIon(u32::default()).into_default(),
+            ConfigV6::NumberOfCandidatesPerIonization(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1112,7 +1107,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default number of structure candidates.
     pub fn number_of_structure_candidates_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::NumberOfStructureCandidates(u32::default()).into_default(),
+            ConfigV6::NumberOfStructureCandidates(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1120,21 +1115,21 @@ impl SiriusBuilder<Version5> {
     /// Set to default wheter to recompute results.
     pub fn recompute_results_default(mut self) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::RecomputeResults(bool::default()).into_default())?;
+            .add_config_parameter(ConfigV6::RecomputeResults(bool::default()).into_default())?;
         Ok(self)
     }
 
     /// Set to default wheter to print citations.
     pub fn print_citations_default(mut self) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::PrintCitations(bool::default()).into_default())?;
+            .add_config_parameter(ConfigV6::PrintCitations(bool::default()).into_default())?;
         Ok(self)
     }
 
     /// Set to default timeout seconds per instance.
     pub fn timeout_seconds_per_instance_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::TimeoutSecondsPerInstance(u32::default()).into_default(),
+            ConfigV6::TimeoutSecondsPerInstance(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1142,15 +1137,15 @@ impl SiriusBuilder<Version5> {
     /// Set to default wheter to use the formula result threshold.
     pub fn formula_result_threshold_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::FormulaResultThreshold(bool::default()).into_default(),
+            ConfigV6::FormulaResultThreshold(bool::default()).into_default(),
         )?;
         Ok(self)
     }
 
     /// Whether to use the default El Gordo compounds setting.
-    pub fn inject_el_gordo_compounds_default(mut self) -> Result<Self, String> {
+    pub fn tag_el_gordo_compounds_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::InjectElGordoCompounds(bool::default()).into_default(),
+            ConfigV6::TagStructuresByElGordo(bool::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1158,14 +1153,14 @@ impl SiriusBuilder<Version5> {
     /// Set to default the median noise intensity.
     pub fn median_noise_intensity_default(mut self) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::MedianNoiseIntensity(f32::default()).into_default())?;
+            .add_config_parameter(ConfigV6::MedianNoiseIntensity(f32::default()).into_default())?;
         Ok(self)
     }
 
     /// Set to default the MS1 absolute intensity error.
     pub fn ms1_absolute_intensity_error_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::MS1AbsoluteIntensityError(f32::default()).into_default(),
+            ConfigV6::MS1AbsoluteIntensityError(f32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1173,7 +1168,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the MS1 minimal intensity to consider.
     pub fn ms1_minimal_intensity_to_consider_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::MS1MinimalIntensityToConsider(f32::default()).into_default(),
+            ConfigV6::MS1MinimalIntensityToConsider(f32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1181,7 +1176,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the MS1 relative intensity error.
     pub fn ms1_relative_intensity_error_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::MS1RelativeIntensityError(f32::default()).into_default(),
+            ConfigV6::MS1RelativeIntensityError(f32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1189,7 +1184,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the noise threshold settings intensity threshold.
     pub fn noise_threshold_settings_intensity_threshold_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::NoiseThresholdSettingsIntensityThreshold(f32::default()).into_default(),
+            ConfigV6::NoiseThresholdSettingsIntensityThreshold(f32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1199,7 +1194,7 @@ impl SiriusBuilder<Version5> {
         mut self,
     ) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::NoiseThresholdSettingsMaximalNumberOfPeaks(u32::default()).into_default(),
+            ConfigV6::NoiseThresholdSettingsMaximalNumberOfPeaks(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1207,7 +1202,7 @@ impl SiriusBuilder<Version5> {
     /// Wheter to set to default the clustering of compounds before running zodiac.
     pub fn zodiac_cluster_compounds_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacClusterCompounds(bool::default()).into_default(),
+            ConfigV6::ZodiacClusterCompounds(bool::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1217,7 +1212,7 @@ impl SiriusBuilder<Version5> {
         mut self,
     ) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacEdgeFilterThresholdsMinLocalCandidates(u32::default()).into_default(),
+            ConfigV6::ZodiacEdgeFilterThresholdsMinLocalCandidates(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1227,7 +1222,7 @@ impl SiriusBuilder<Version5> {
         mut self,
     ) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacEdgeFilterThresholdsMinLocalConnections(u32::default()).into_default(),
+            ConfigV6::ZodiacEdgeFilterThresholdsMinLocalConnections(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1237,7 +1232,7 @@ impl SiriusBuilder<Version5> {
         mut self,
     ) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacEdgeFilterThresholdsThresholdFilter(f32::default()).into_default(),
+            ConfigV6::ZodiacEdgeFilterThresholdsThresholdFilter(f32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1245,7 +1240,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the zodiac epochs burn in period.
     pub fn zodiac_epochs_burn_in_period_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacEpochsBurnInPeriod(u32::default()).into_default(),
+            ConfigV6::ZodiacEpochsBurnInPeriod(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1253,7 +1248,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the zodiac epochs iterations.
     pub fn zodiac_epochs_iterations_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacEpochsIterations(u32::default()).into_default(),
+            ConfigV6::ZodiacEpochsIterations(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1261,7 +1256,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the zodiac epochs number of markov chains.
     pub fn zodiac_epochs_number_of_markov_chains_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacEpochsNumberOfMarkovChains(u32::default()).into_default(),
+            ConfigV6::ZodiacEpochsNumberOfMarkovChains(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1269,7 +1264,7 @@ impl SiriusBuilder<Version5> {
     /// Sdet to default the zodiac library scoring lambda.
     pub fn zodiac_library_scoring_lambda_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacLibraryScoringLambda(u32::default()).into_default(),
+            ConfigV6::ZodiacLibraryScoringLambda(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1277,7 +1272,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the zodiac library scoring min cosine.
     pub fn zodiac_library_scoring_min_cosine_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacLibraryScoringMinCosine(f32::default()).into_default(),
+            ConfigV6::ZodiacLibraryScoringMinCosine(f32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1287,7 +1282,7 @@ impl SiriusBuilder<Version5> {
         mut self,
     ) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacNumberOfConsideredCandidatesAt300Mz(i32::default()).into_default(),
+            ConfigV6::ZodiacNumberOfConsideredCandidatesAt300Mz(i32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1297,7 +1292,7 @@ impl SiriusBuilder<Version5> {
         mut self,
     ) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacNumberOfConsideredCandidatesAt800Mz(i32::default()).into_default(),
+            ConfigV6::ZodiacNumberOfConsideredCandidatesAt800Mz(i32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1307,7 +1302,7 @@ impl SiriusBuilder<Version5> {
         mut self,
     ) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ZodiacRatioOfConsideredCandidatesPerIonization(f32::default()).into_default(),
+            ConfigV6::ZodiacRatioOfConsideredCandidatesPerIonization(f32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1315,14 +1310,14 @@ impl SiriusBuilder<Version5> {
     /// Whether to set to default the run in two steps.
     pub fn zodiac_run_in_two_steps_default(mut self) -> Result<Self, String> {
         self.config
-            .add_config_parameter(ConfigV5::ZodiacRunInTwoSteps(bool::default()).into_default())?;
+            .add_config_parameter(ConfigV6::ZodiacRunInTwoSteps(bool::default()).into_default())?;
         Ok(self)
     }
 
     /// Set to default the allowed mass deviation for MS1 spectra.
     pub fn ms1_mass_deviation_allowed_mass_deviation_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::MS1MassDeviationAllowedMassDeviation(
+            ConfigV6::MS1MassDeviationAllowedMassDeviation(
                 MassDeviation::Ppm(f32::default()).must_be_positive()?,
             )
             .into_default(),
@@ -1333,7 +1328,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the mass difference deviation for MS1 spectra.
     pub fn ms1_mass_deviation_mass_difference_deviation_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::MS1MassDeviationMassDifferenceDeviation(
+            ConfigV6::MS1MassDeviationMassDifferenceDeviation(
                 MassDeviation::Ppm(f32::default()).must_be_positive()?,
             )
             .into_default(),
@@ -1344,7 +1339,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the standard mass deviation for MS1 spectra.
     pub fn ms1_mass_deviation_standard_mass_deviation_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::MS1MassDeviationStandardMassDeviation(
+            ConfigV6::MS1MassDeviationStandardMassDeviation(
                 MassDeviation::Ppm(f32::default()).must_be_positive()?,
             )
             .into_default(),
@@ -1355,7 +1350,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the standard mass deviation for MS2 spectra.
     pub fn ms2_mass_deviation_standard_mass_deviation_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::MS2MassDeviationStandardMassDeviation(
+            ConfigV6::MS2MassDeviationStandardMassDeviation(
                 MassDeviation::Ppm(f32::default()).must_be_positive()?,
             )
             .into_default(),
@@ -1366,7 +1361,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the mass accuracy setting for MS2 spectra.
     pub fn ms2_mass_deviation_allowed_mass_deviation_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::MS2MassDeviationAllowedMassDeviation(
+            ConfigV6::MS2MassDeviationAllowedMassDeviation(
                 MassDeviation::Ppm(f32::default()).must_be_positive()?,
             )
             .into_default(),
@@ -1377,7 +1372,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the detectable elements.
     pub fn formula_settings_detectable_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::FormulaSettingsDetectable(AtomVector::default()).into_default(),
+            ConfigV6::FormulaSettingsDetectable(AtomVector::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1385,7 +1380,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the enforced elements.
     pub fn formula_settings_enforced_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::FormulaSettingsEnforced(AtomVector::default()).into_default(),
+            ConfigV6::FormulaSettingsEnforced(AtomVector::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1393,7 +1388,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the fallback elements.
     pub fn formula_settings_fallback_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::FormulaSettingsFallback(AtomVector::default()).into_default(),
+            ConfigV6::FormulaSettingsFallback(AtomVector::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1401,7 +1396,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the forbid recalibration.
     pub fn forbid_recalibration_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::ForbidRecalibration(ForbidRecalibration::default()).into_default(),
+            ConfigV6::ForbidRecalibration(ForbidRecalibration::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1409,7 +1404,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the minimum m/z to enable heuristic preprocessing.
     pub fn use_heuristic_mz_to_use_heuristic_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::UseHeuristicMZToUseHeuristic(u32::default()).into_default(),
+            ConfigV6::UseHeuristicMZToUseHeuristic(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1417,7 +1412,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the minimum m/z to only use heuristic tree computation.
     pub fn use_heuristic_mz_to_use_heuristic_only_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::UseHeuristicMZToUseHeuristicOnly(u32::default()).into_default(),
+            ConfigV6::UseHeuristicMZToUseHeuristicOnly(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1425,7 +1420,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the detectable adducts.
     pub fn adduct_settings_detectable_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::AdductSettingsDetectable(AdductsVector::default()).into_default(),
+            ConfigV6::AdductSettingsDetectable(AdductsVector::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1433,7 +1428,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the fallback adducts.
     pub fn adduct_settings_fallback_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::AdductSettingsFallback(AdductsVector::default()).into_default(),
+            ConfigV6::AdductSettingsFallback(AdductsVector::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1441,7 +1436,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the algorithm profile.
     pub fn algorithm_profile_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::AlgorithmProfile(Instruments::default()).into_default(),
+            ConfigV6::AlgorithmProfile(Instruments::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1449,7 +1444,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the compound quality.
     pub fn compound_quality_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::CompoundQuality(CompoundQuality::default()).into_default(),
+            ConfigV6::CompoundQuality(CompoundQuality::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1457,7 +1452,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the enforced adducts.
     pub fn adduct_settings_enforced_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::AdductSettingsEnforced(AdductSettingsEnforced::default()).into_default(),
+            ConfigV6::AdductSettingsEnforced(AdductSettingsEnforced::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1465,7 +1460,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the candidate formulas.
     pub fn candidate_formulas_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::CandidateFormulas(CandidateFormulas::default()).into_default(),
+            ConfigV6::CandidateFormulas(CandidateFormulas::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1473,7 +1468,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the formula result ranking score.
     pub fn formula_result_ranking_score_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::FormulaResultRankingScore(FormulaResultRankingScore::default())
+            ConfigV6::FormulaResultRankingScore(FormulaResultRankingScore::default())
                 .into_default(),
         )?;
         Ok(self)
@@ -1482,7 +1477,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the isotope ms2 settings.
     pub fn isotope_ms2_settings_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::IsotopeMS2Settings(IsotopeMS2Settings::default()).into_default(),
+            ConfigV6::IsotopeMS2Settings(IsotopeMS2Settings::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1490,7 +1485,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the isotope settings multiplier.
     pub fn isotope_settings_multiplier_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::IsotopeSettingsMultiplier(u32::default()).into_default(),
+            ConfigV6::IsotopeSettingsMultiplier(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1498,7 +1493,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the noise threshold settings absolute threshold.
     pub fn noise_threshold_settings_absolute_threshold_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::NoiseThresholdSettingsAbsoluteThreshold(u32::default()).into_default(),
+            ConfigV6::NoiseThresholdSettingsAbsoluteThreshold(u32::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1506,7 +1501,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the noise threshold settings base peak.
     pub fn noise_threshold_settings_base_peak_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::NoiseThresholdSettingsBasePeak(BasePeak::default()).into_default(),
+            ConfigV6::NoiseThresholdSettingsBasePeak(BasePeak::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1514,7 +1509,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the structure predictors algorithm.
     pub fn structure_predictors_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::StructurePredictors(StructurePredictors::default()).into_default(),
+            ConfigV6::StructurePredictors(StructurePredictors::default()).into_default(),
         )?;
         Ok(self)
     }
@@ -1522,7 +1517,7 @@ impl SiriusBuilder<Version5> {
     /// Set to default the possible adduct switches.
     pub fn possible_adduct_switches_default(mut self) -> Result<Self, String> {
         self.config.add_config_parameter(
-            ConfigV5::PossibleAdductSwitches(PossibleAdductSwitches::default()).into_default(),
+            ConfigV6::PossibleAdductSwitches(PossibleAdductSwitches::default()).into_default(),
         )?;
         Ok(self)
     }
