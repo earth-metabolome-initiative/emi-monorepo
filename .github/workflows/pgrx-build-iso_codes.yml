@@ -8,6 +8,9 @@ on:
     paths:
       - 'web/web_common/iso_codes/**'
 
+permissions:
+  contents: read
+
 jobs:
   call-build:
     uses: ./.github/workflows/pgrx-build-template.yml

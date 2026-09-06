@@ -8,6 +8,9 @@ on:
     paths:
       - 'data_structures/multi_ranged/**'
 
+permissions:
+  contents: read
+
 jobs:
   test:
     uses: ./.github/workflows/cargo-test-template.yml

@@ -8,6 +8,9 @@ on:
     paths:
       - 'utils/diesel_pgrx/**'
 
+permissions:
+  contents: read
+
 jobs:
   test:
     uses: ./.github/workflows/cargo-test-template.yml

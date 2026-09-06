@@ -12,12 +12,15 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
+permissions:
+  contents: read
+
 jobs:
   sirius:
     runs-on: ubuntu-latest
     environment: Sirius
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Retrieve Sirius install script
         run: |
           wget https://raw.githubusercontent.com/enpkg/enpkg_full/emikg-adapt/src/install_sirius.sh
@@ -27,7 +30,7 @@ jobs:
           bash ./install_sirius.sh
           chmod +x ./sirius/bin
       - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@16499b5e05bf2e26879000db0c1d13f7e13fa3af # v1
         with:
           toolchain: stable
           override: true

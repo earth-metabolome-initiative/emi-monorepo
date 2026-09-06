@@ -8,6 +8,9 @@ on:
     paths:
       - 'web/web_common/molecular_formulas/**'
 
+permissions:
+  contents: read
+
 jobs:
   clippy:
     uses: ./.github/workflows/cargo-clippy-template.yml

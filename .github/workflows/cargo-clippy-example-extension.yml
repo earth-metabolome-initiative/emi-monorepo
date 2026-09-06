@@ -8,6 +8,9 @@ on:
     paths:
       - 'utils/diesel_pgrx/example_extension/**'
 
+permissions:
+  contents: read
+
 jobs:
   clippy:
     uses: ./.github/workflows/cargo-clippy-template.yml

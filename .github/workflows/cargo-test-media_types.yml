@@ -8,6 +8,9 @@ on:
     paths:
       - 'web/web_common/media_types/**'
 
+permissions:
+  contents: read
+
 jobs:
   test:
     uses: ./.github/workflows/cargo-test-template.yml

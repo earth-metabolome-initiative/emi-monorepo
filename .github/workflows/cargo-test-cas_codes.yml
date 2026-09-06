@@ -8,6 +8,9 @@ on:
     paths:
       - 'web/web_common/cas_codes/**'
 
+permissions:
+  contents: read
+
 jobs:
   test:
     uses: ./.github/workflows/cargo-test-template.yml
