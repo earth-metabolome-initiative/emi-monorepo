@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Run actionlint
-        uses: reviewdog/action-actionlint@d290e336d5a743810aef4404f757dc862276d2ae # v1
+        uses: reviewdog/action-actionlint@ab7138020abfe6cd20b742c82e5b7a9749fb5884 # v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-check # shows inline annotations on PR
